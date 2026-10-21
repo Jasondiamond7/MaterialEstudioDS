@@ -1,0 +1,6304 @@
+1
+00:00:00,000 --> 00:00:16,000
+¿Cuántos hay? ¿105? Normalmente son 130. ¿Queda todavía gente por entrar? ¿Hay gente en la sala de espera?
+
+2
+00:00:16,000 --> 00:00:24,000
+Creo que no. No, no hay nadie por espera. Pues nada, pues empezamos entonces.
+
+3
+00:00:24,000 --> 00:00:44,000
+Vale, entonces como os decía, el sábado recordad que tenemos sesión de dudas, no alcancé a subiros lo que tenía que subiros, os dije que os iba a subir de ejercicios y tal, pero como la de hoy va a resumir también, va a pasar otra vez por lo que vimos el otro día, pues hacemos una conjunta, ¿de acuerdo?
+
+4
+00:00:44,000 --> 00:01:00,000
+Lo que no me acuerdo es cuál es la sesión que tenéis después de esta. Imagino que entraréis ya con todo lo que es Machine Learning, como más a los casos de supervisados, reinforcement learning, en fin.
+
+5
+00:01:00,000 --> 00:01:07,000
+El asunto es que nosotros hoy nos vamos a enfocar en la reducción de dimensionalidad y representación de variables, ¿de acuerdo?
+
+6
+00:01:07,000 --> 00:01:17,000
+En este caso, recordad que en las sesiones anteriores, pues bueno, estábamos enfocándonos en justamente preparar el terreno para esto de hoy, ¿de acuerdo?
+
+7
+00:01:17,000 --> 00:01:26,000
+Entonces, primero hicimos la preparación para Machine Learning, donde hacíamos ese ciclo de preguntar, responder, refinar.
+
+8
+00:01:26,000 --> 00:01:34,000
+Veíamos las cuatro dimensiones de calidad de los datos, que fueran exactos, completos, coherentes, frescos, actualizados.
+
+9
+00:01:34,000 --> 00:01:41,000
+Veíamos en tal caso si faltaban datos, si se podía hacer una imputación con la media, la mediana, la moda, con regresión.
+
+10
+00:01:41,000 --> 00:01:49,000
+Luego queríamos hacer una división del dataset en tres grupos, entrenamiento, validación y prueba o test.
+
+11
+00:01:49,000 --> 00:01:58,000
+Y después habíamos dicho que teníamos que, claro, si queríamos mejorar el modelo, queríamos ponerle restricciones porque aprendía demasiado del ruido,
+
+12
+00:01:58,000 --> 00:02:04,000
+entonces podíamos hacer métodos de regularización y ahí teníamos los modelos de Lasso y Ridge.
+
+13
+00:02:04,000 --> 00:02:18,000
+Y recordábamos que las métricas que teníamos que usar eran además Recall, Precision, F1, no solo el Accuracy, porque ya vimos que con el Accuracy solo pues podíamos meter las patas, ¿de acuerdo?
+
+14
+00:02:18,000 --> 00:02:31,000
+En la siguiente sesión ya pasamos este salto al Machine Learning y estuvimos hablando de cómo el Deep Learning era un conjunto, o sea, un caso particular dentro del Machine Learning, dentro de lo que se considera como IA.
+
+15
+00:02:31,000 --> 00:02:43,000
+Hablamos de este ciclo, si os acordáis, de estas ruedas que decíamos que teníamos los datos, que con estos datos generábamos los modelos, evaluábamos los modelos y teníamos que mejorarlos
+
+16
+00:02:43,000 --> 00:02:51,000
+y que este ciclo había que repetirlo hasta conseguir un modelo que realmente fuera válido para lo que buscábamos.
+
+17
+00:02:51,000 --> 00:03:05,000
+Luego habíamos hablado de los tres tipos de familias, de modelos dentro del Machine Learning, como eran el Aprendizaje Supervisado, el Aprendizaje No Supervisado y el Aprendizaje por refuerzo.
+
+18
+00:03:05,000 --> 00:03:22,000
+Además estuvimos viendo los casos de clasificación versus regresión con el caso Supervisado y en el No Supervisado estuvimos hablando del Clustering y del PCA, que era como resumir las variables, como reducir la dimensionalidad.
+
+19
+00:03:22,000 --> 00:03:36,000
+Y hoy ya nos vamos a centrar en este PCA, que va a ser un modelo que va a ser lineal, pero además vamos a ver otro modelo no lineal, donde vamos a trabajar también este análisis No Supervisado.
+
+20
+00:03:36,000 --> 00:03:47,000
+Entonces lo vamos a separar en cuatro bloques. ¿Qué es lo que vamos a hacer hoy? Vamos a seguir estos pasos.
+
+21
+00:03:47,000 --> 00:03:56,000
+Vamos a hacer un diagnóstico, es decir, ¿por qué tenemos que reducir variables? ¿Por qué realmente demasiadas variables van a perjudicar al modelo?
+
+22
+00:03:56,000 --> 00:04:03,000
+Vamos a ver las razones como la multicolinealidad, el ruido, el sobreajuste que ya habíamos hablado.
+
+23
+00:04:03,000 --> 00:04:12,000
+La multicolinealidad yo imagino que ya lo visteis en los temas de regresión, no sé si visteis regresión múltiple, ¿lo visteis o no? ¿O solo en una variable?
+
+24
+00:04:12,000 --> 00:04:17,000
+¿Visteis en varias variables o no? ¿Sí o no?
+
+25
+00:04:17,000 --> 00:04:20,000
+Sí, lo vimos.
+
+26
+00:04:20,000 --> 00:04:25,000
+Entonces, lo dicho que no es nada nuevo.
+
+27
+00:04:25,000 --> 00:04:34,000
+Luego, una vez que hacemos el diagnóstico, queremos ver cómo vamos a representar justamente las dimensiones que vamos a usar.
+
+28
+00:04:34,000 --> 00:04:44,000
+Como las escalamos, codificamos, si construimos variables, por ejemplo, si vamos a hacer combinación de las variables que nos de la base de datos, es lo que se llama Feature Engineering.
+
+29
+00:04:44,000 --> 00:04:54,000
+Después vamos a hacer esta extracción de dimensiones y vamos a resumir variables que estén correlacionadas en componentes principales.
+
+30
+00:04:54,000 --> 00:04:59,000
+Pero esto lo vamos a ver de una manera lo más sencillo posible.
+
+31
+00:04:59,000 --> 00:05:09,000
+Yo me voy a saltar un poco todo lo que tiene que ver con fórmulas, porque si bien efectivamente en los libros vais a poder ver las fórmulas que tienen que ver con las matrices, etc.
+
+32
+00:05:09,000 --> 00:05:20,000
+Pero no sé hasta qué punto, según los perfiles que tenéis, realmente nos interesan tanto las fórmulas matemáticas a quien quiera.
+
+33
+00:05:20,000 --> 00:05:28,000
+Por supuesto que en los materiales complementarios, que sí que os voy a subir los capítulos, pues que tengo que seleccionar la parte que realmente interesa.
+
+34
+00:05:28,000 --> 00:05:33,000
+Ahí vais a poder ver quién quiera profundizar un poquito más con el tema de las fórmulas y tal.
+
+35
+00:05:33,000 --> 00:05:42,000
+Pero mi objetivo es que salgamos de aquí, por lo menos entendiendo el concepto de lo que se está haciendo y que quien quiera profundizar puede profundizar,
+
+36
+00:05:42,000 --> 00:05:50,000
+pero no perdernos en temas de fórmulas y análisis de las mismas, porque a lo mejor nos distrae del foco principal.
+
+37
+00:05:50,000 --> 00:05:58,000
+Aunque bueno, por ahí en el código en algún punto lo menciono, pero bueno, que no me voy a meter en el tema fórmular.
+
+38
+00:05:59,000 --> 00:06:09,000
+Después vamos a ver entonces cómo se puede visualizar esta extracción con el método del t-SNE,
+
+39
+00:06:09,000 --> 00:06:16,000
+que vamos a visualizar la estructura no lineal en 2D preservando las relaciones de vecindad.
+
+40
+00:06:16,000 --> 00:06:22,000
+O sea, en realidad este es otro método que nos va a permitir justamente visualizar estas variables.
+
+41
+00:06:23,000 --> 00:06:34,000
+Y luego vamos a comparar y vamos a ver cuando tenemos que usar selección versus extracción y cuando tenemos que usar un método PCA versus t-SNE.
+
+42
+00:06:34,000 --> 00:06:44,000
+Y ahí vamos a hacer el caso aplicado. El otro día estuvimos hablando de la cancelación de planes, del abandono de clientes.
+
+43
+00:06:44,000 --> 00:06:48,000
+La fuga de clientes, bueno, vamos a hacer un caso de churn.
+
+44
+00:06:48,000 --> 00:06:56,000
+Vale, y en eso se va a basar. Entonces, dicho lo cual, vamos a partir con el primer bloque.
+
+45
+00:06:56,000 --> 00:07:01,000
+Van a ser cuatro bloques, de acuerdo? Entonces el primer bloque va a ser el problema de la dimensionalidad.
+
+46
+00:07:01,000 --> 00:07:10,000
+Entonces, ¿por qué demasiadas variables perjudican y no ayudan al modelo? Esa es la primera pregunta, de acuerdo?
+
+47
+00:07:10,000 --> 00:07:15,000
+Entonces, ¿qué pasa cuando hay demasiadas variables? Bueno, esto imagino que ya lo habíais visto.
+
+48
+00:07:15,000 --> 00:07:20,000
+¿Lo habíais visto ya o no en la parte de regresión, estos conceptos?
+
+49
+00:07:25,000 --> 00:07:35,000
+A ver qué dicen por aquí. Sí, sí, algo sí, profe. Vale, entonces, ¿qué es lo que pasa cuando tenemos demasiadas variables?
+
+50
+00:07:35,000 --> 00:07:41,000
+Fundamentalmente pasan estas cuatro cosas. El costo computacional que hemos hablado tantísimas veces.
+
+51
+00:07:41,000 --> 00:07:47,000
+Cuando tenemos más columnas, recordad que en una planilla de datos, o sea, cuando está esta planilla,
+
+52
+00:07:47,000 --> 00:07:53,000
+tenemos en el caso de personas, tenemos individuos por filas y por columnas las variables que medimos.
+
+53
+00:07:53,000 --> 00:07:58,000
+Entonces, ¿qué pasa? Cuantas más variables tengamos, cuantas más columnas tengamos,
+
+54
+00:07:58,000 --> 00:08:05,000
+hay mayor procesamiento de los datos y por lo tanto mayor coste en el entrenamiento, etcétera.
+
+55
+00:08:05,000 --> 00:08:12,000
+Con lo cual el coste computacional es mayor, todo va más lento, se necesita más memoria, etcétera.
+
+56
+00:08:12,000 --> 00:08:19,000
+Así que, mal ahí. Así que, una de las razones por las que queremos reducir las variables, las dimensiones,
+
+57
+00:08:19,000 --> 00:08:25,000
+recordad que al final cada variable va a representar un vector. Entonces, aquí me meto en el álgebra lineal.
+
+58
+00:08:25,000 --> 00:08:31,000
+En realidad, lo que estamos haciendo es que cada variable representa una dimensión, un vector,
+
+59
+00:08:31,000 --> 00:08:35,000
+que es linealmente independiente con otros, o bueno, idealmente así.
+
+60
+00:08:35,000 --> 00:08:40,000
+Es lo que va a pasar, que en la vida real vamos a tener muchos datos donde si nosotros pensamos,
+
+61
+00:08:40,000 --> 00:08:45,000
+no sé si os acordáis de la época que veíais vectores y veías, por ejemplo, un espacio en R3,
+
+62
+00:08:45,000 --> 00:08:52,000
+decís, bueno, pues tengo yo qué sé, si veis la esquina de una habitación, veis que tenéis las dos líneas del techo
+
+63
+00:08:52,000 --> 00:08:57,000
+y luego la línea que baja, ¿cierto? Entonces, esos son tres vectores que nos dan las tres dimensiones,
+
+64
+00:08:57,000 --> 00:09:02,000
+¿no? El alto, el largo y el ancho, ¿cierto? ¿Qué pasa? Si tenéis un vector entre medias,
+
+65
+00:09:02,000 --> 00:09:07,000
+pues bueno, ese vector se combina con las dos dimensiones. O sea, si vosotros trazáis una línea en el techo,
+
+66
+00:09:07,000 --> 00:09:14,000
+esa línea en el techo en realidad se puede combinar con las líneas que tenéis en la horizontal del techo, ¿cierto?
+
+67
+00:09:14,000 --> 00:09:19,000
+Entonces, no necesitaríais una tercera línea, esa estaría siendo redundante, con lo cual,
+
+68
+00:09:19,000 --> 00:09:24,000
+esto me estaría generando una tercera variable que sería, en este caso, dependiente de las otras,
+
+69
+00:09:24,000 --> 00:09:29,000
+estaría correlacionada con ellas, con lo cual estaría generando una información que es redundante
+
+70
+00:09:29,000 --> 00:09:34,000
+porque la puedo generar con la combinación de otras dos, ¿vale? Entonces, en realidad lo que queremos
+
+71
+00:09:34,000 --> 00:09:40,000
+es que de todas las variables que tengamos, vamos a tratar de reducirlas de tal manera que con las que tengamos
+
+72
+00:09:40,000 --> 00:09:45,000
+podamos representar las otras que eventualmente nos pueden venir también en esa base de datos,
+
+73
+00:09:45,000 --> 00:09:51,000
+pero sin necesidad de tenerlas en la planilla, las otras que estoy generando, ¿se entiende?
+
+74
+00:09:51,000 --> 00:09:56,000
+Luego, lo otro es la multicolinealidad, ¿de acuerdo? Que bueno, está relacionado con esto,
+
+75
+00:09:56,000 --> 00:10:01,000
+o sea, el costo computacional tiene que ver con esta colinealidad, ¿de acuerdo?
+
+76
+00:10:01,000 --> 00:10:05,000
+También, porque tenemos variables, como os he dicho, que están correlacionadas, entonces,
+
+77
+00:10:05,000 --> 00:10:10,000
+¿qué pasa? Que al final esto nos genera inestabilidad, ¿de acuerdo? En los modelos que hagamos,
+
+78
+00:10:10,000 --> 00:10:15,000
+¿por qué? Por lo que os estoy diciendo, hay una información ahí que está redundante, ¿ya?
+
+79
+00:10:16,000 --> 00:10:21,000
+No hay número ideal, el número ideal, porque es que va a depender de cuántas variables tienes,
+
+80
+00:10:21,000 --> 00:10:26,000
+el número ideal pues dos, pero es que dos depende del modelo, ¿me entiendes?
+
+81
+00:10:26,000 --> 00:10:31,000
+O sea, si lo dejas a... No hay un número ideal, el número ideal lo que vas a hacer es que dentro de tu modelo
+
+82
+00:10:31,000 --> 00:10:36,000
+vamos a ver cuándo decides que ya no necesitas más, ¿vale?
+
+83
+00:10:36,000 --> 00:10:42,000
+Ahí vamos a ver, de hecho, unos parámetros que nos van a permitir decidir en qué momento yo puedo
+
+84
+00:10:42,000 --> 00:10:47,000
+cortar y decir, mira, para este caso en concreto, con ocho variables estamos más que bien,
+
+85
+00:10:47,000 --> 00:10:52,000
+pero a lo mejor para otro problema, con ocho variables, pues siguen siendo muchas, ¿me entiendes?
+
+86
+00:10:52,000 --> 00:10:57,000
+O para otro problema, ocho variables son pocas, va a depender del problema, va a depender de,
+
+87
+00:10:57,000 --> 00:11:02,000
+pues eso, del contexto, ¿de acuerdo? Entonces, no hay un número ideal.
+
+88
+00:11:02,000 --> 00:11:07,000
+Siempre tenéis que tener en cuenta que en todas estas cosas que estamos viendo, no solo en las clases
+
+89
+00:11:07,000 --> 00:11:12,000
+que estáis viendo conmigo, sino en todas las que tienen que ver con matemáticas en general, ¿vale?
+
+90
+00:11:12,000 --> 00:11:17,000
+Pero en el diplomado, cuando os estén hablando de conceptos
+
+91
+00:11:17,000 --> 00:11:22,000
+donde se dan parámetros como, bueno, pues esto es un valor
+
+92
+00:11:22,000 --> 00:11:27,000
+que se asigna como valor de corte, tal, no sé qué, esos valores siempre son, digamos,
+
+93
+00:11:27,000 --> 00:11:32,000
+que una referencia, pero siempre hay que ver en los contextos que es lo que es lo que es lo que es el valor,
+
+94
+00:11:32,000 --> 00:11:37,000
+nosotros, por ejemplo, cuando hablamos del R cuadrado, claro, siempre hablamos que el R cuadrado
+
+95
+00:11:37,000 --> 00:11:42,000
+se mueve entre cero y uno, que si lo pasamos a porcentaje entre cero y cien, y uno dice,
+
+96
+00:11:42,000 --> 00:11:47,000
+bueno, pues cuanto más cerca de uno esté, más mejor es el modelo, pero en la vida real
+
+97
+00:11:47,000 --> 00:11:52,000
+hay muchísimos modelos que es que con que tengan un 0.6 de R cuadrado es buenísimo
+
+98
+00:11:52,000 --> 00:11:57,000
+y uno diría, pero a ver, 0.6 de R cuadrado, es muy bueno, pero en la vida real
+
+99
+00:11:57,000 --> 00:12:02,000
+0.6 de R cuadrado es buenísimo y uno diría, pero a ver, 0.6 es casi 0.5, no es un R tan bueno
+
+100
+00:12:02,000 --> 00:12:07,000
+por, sería mejor un 0.7, un 0.8, sí, pero es que en ese contexto
+
+101
+00:12:07,000 --> 00:12:12,000
+un 0.6 es lo más que vas a encontrar, ¿me entendéis?
+
+102
+00:12:12,000 --> 00:12:17,000
+Entonces hay que ver dentro de todo lo que nosotros expliquemos
+
+103
+00:12:17,000 --> 00:12:22,000
+como parámetros o puntos de referencia, siempre hay que bajarlo al contexto
+
+104
+00:12:22,000 --> 00:12:27,000
+y entender sabiendo cómo se interpretan esos valores
+
+105
+00:12:27,000 --> 00:12:32,000
+dentro de ese contexto qué es lo que realmente es lo mejor
+
+106
+00:12:32,000 --> 00:12:37,000
+que puedo conseguir, ¿de acuerdo? Entonces, a ver,
+
+107
+00:12:37,000 --> 00:12:42,000
+por ejemplo,
+
+108
+00:12:42,000 --> 00:12:47,000
+multicolinealidad, hay variables ruido, ya, en este caso
+
+109
+00:12:47,000 --> 00:12:52,000
+es lo que vimos el otro día, que no todas las columnas aportan información real al modelo,
+
+110
+00:12:52,000 --> 00:12:57,000
+¿de acuerdo? ¿Os acordáis que hay veces que
+
+111
+00:12:57,000 --> 00:13:02,000
+metemos variables el otro día, por ejemplo, en la base de datos, yo metí variables para que hicieran ruido
+
+112
+00:13:02,000 --> 00:13:07,000
+y justamente el Lasso lo que hacía era eliminarlas, ¿de acuerdo?
+
+113
+00:13:07,000 --> 00:13:12,000
+Entonces, bueno, al final está como relacionado el costo computacional, la multicolinealidad,
+
+114
+00:13:12,000 --> 00:13:17,000
+la variable ruido, o sea, que están correlacionadas no significa que están metiendo ruido,
+
+115
+00:13:17,000 --> 00:13:22,000
+sino que las variables ruido a veces no son variables que están correlacionadas,
+
+116
+00:13:22,000 --> 00:13:27,000
+sino que son variables que están ahí, pero que me da igual que no se representen por
+
+117
+00:13:27,000 --> 00:13:32,000
+otras variables porque la verdad es que no aportan nada, no sé si estáis viendo, por ejemplo,
+
+118
+00:13:32,000 --> 00:13:37,000
+el índice de masa corporal y decís, bueno, pues yo qué sé,
+
+119
+00:13:37,000 --> 00:13:42,000
+la altura, el índice de, o sea, la altura, el peso,
+
+120
+00:13:42,000 --> 00:13:47,000
+la ingesta de calorías, yo qué sé, estáis viendo todas esas variables y de repente decís,
+
+121
+00:13:47,000 --> 00:13:52,000
+pues voy a poner también como variable,
+
+122
+00:13:52,000 --> 00:13:57,000
+no sé, el tamaño del pie, por ejemplo, dices, bueno,
+
+123
+00:13:57,000 --> 00:14:02,000
+pues será una variable ruido, o sea, realmente la puedo poner
+
+124
+00:14:02,000 --> 00:14:07,000
+y a lo mejor me dice que aporta algo de información, pero vamos, si luego la analizo, seguramente
+
+125
+00:14:07,000 --> 00:14:12,000
+es insignificante, entonces esa es una variable que me está generando ruido,
+
+126
+00:14:12,000 --> 00:14:17,000
+no me interesa porque no está relacionada con ninguna, pero es que no me está aportando información real al modelo,
+
+127
+00:14:17,000 --> 00:14:22,000
+de acuerdo, vale, entonces, sesgo, estamos con el costo
+
+128
+00:14:22,000 --> 00:14:27,000
+computacional, la multicolinealidad, las variables ruido,
+
+129
+00:14:27,000 --> 00:14:32,000
+y luego sesgo versus varianza,
+
+130
+00:14:32,000 --> 00:14:37,000
+fijaros, con pocas observaciones, más variables
+
+131
+00:14:37,000 --> 00:14:42,000
+aumentan la varianza de las predicciones sin compensar el sesgo, qué quiere decir esto,
+
+132
+00:14:42,000 --> 00:14:47,000
+en resumen, si reducís el sesgo aumenta la varianza, si reducís la varianza
+
+133
+00:14:47,000 --> 00:14:52,000
+aumenta el sesgo, básicamente el tema es que
+
+134
+00:14:52,000 --> 00:14:57,000
+si tenemos pocas observaciones, más variables
+
+135
+00:14:57,000 --> 00:15:02,000
+van, la varianza siempre es la,
+
+136
+00:15:02,000 --> 00:15:07,000
+el promedio de distancias a la media, promedio de distancias al promedio,
+
+137
+00:15:07,000 --> 00:15:12,000
+entonces, qué pasa, si tenemos una mayor varianza,
+
+138
+00:15:12,000 --> 00:15:17,000
+obviamente va a haber, en ese caso, menos posibilidad,
+
+139
+00:15:17,000 --> 00:15:22,000
+de que haya más varianza, voy a tener menos sesgo, pero si nosotros reducimos la varianza,
+
+140
+00:15:22,000 --> 00:15:27,000
+hay mayor probabilidad de que haya sesgo, de que haya valores que estén generando
+
+141
+00:15:27,000 --> 00:15:32,000
+una diferencia de la masa central, sí, entonces, bueno, al final,
+
+142
+00:15:32,000 --> 00:15:37,000
+en este caso, cuando tenemos pocas observaciones, qué va a pasar,
+
+143
+00:15:37,000 --> 00:15:42,000
+qué va a aumentar la varianza, de acuerdo, porque obviamente si tengo pocas, pues voy a tratar
+
+144
+00:15:42,000 --> 00:15:47,000
+de que la masa central haga el promedio, la distancia de los valores al promedio, pues obviamente si tengo poquitos,
+
+145
+00:15:47,000 --> 00:15:52,000
+digamos que esos van a determinar como toda la masa que voy a tener, entonces bueno,
+
+146
+00:15:52,000 --> 00:15:57,000
+al final, o controlamos el sesgo, o controlamos la varianza, si aumenta una, disminuye la otra,
+
+147
+00:15:57,000 --> 00:16:02,000
+básicamente, pero bueno, qué es lo que pasa, que cuando tenemos muchas variables
+
+148
+00:16:02,000 --> 00:16:07,000
+puede darse cualquiera de estas circunstancias, y eso va a ser un problema, de acuerdo,
+
+149
+00:16:08,000 --> 00:16:11,000
+entonces,
+
+150
+00:16:12,000 --> 00:16:16,000
+no he visto la pregunta, bueno, pero ahí te he contestado Romina, si no, luego al final,
+
+151
+00:16:16,000 --> 00:16:19,000
+igual miro más preguntas, vale,
+
+152
+00:16:20,000 --> 00:16:23,000
+vale, siguiente,
+
+153
+00:16:23,000 --> 00:16:28,000
+entonces, ya que sabemos que es importante, o sea que tenemos un problema con
+
+154
+00:16:28,000 --> 00:16:32,000
+el tema de la, de hecho, aquí,
+
+155
+00:16:32,000 --> 00:16:36,000
+vale, entonces, cuando hay demasiadas variables, ya hemos visto que tenemos estos cuatro posibles problemas,
+
+156
+00:16:36,000 --> 00:16:41,000
+entonces, ¿por qué vale la pena reducir las dimensiones? ¿por qué vale la pena que
+
+157
+00:16:41,000 --> 00:16:45,000
+reduzcamos el número de variables? Bueno, primero, porque va a ser más fácil de poner en producción,
+
+158
+00:16:45,000 --> 00:16:50,000
+obviamente con menos variables, más fácil de ponernos manos a la obra,
+
+159
+00:16:50,000 --> 00:16:56,000
+lo segundo, va a aumentar la performance, o la, en el fondo, el rendimiento del modelo,
+
+160
+00:16:56,000 --> 00:17:01,000
+de acuerdo, lo siguiente es que va a remover variables que, pues, eso que me están generando ruido,
+
+161
+00:17:01,000 --> 00:17:06,000
+que son, que están ya representadas por otras, en fin, eso va a hacer que el entrenamiento
+
+162
+00:17:06,000 --> 00:17:11,000
+sea mucho más eficiente, a la vez, eso va a ser, si yo tengo menos variables, pues va a ser
+
+163
+00:17:11,000 --> 00:17:17,000
+mucho más fácil que yo limpie la base de datos, y a la vez, va a ser más fácil de interpretar si tengo
+
+164
+00:17:17,000 --> 00:17:22,000
+menos variables que si tengo más, porque luego, si no, los resultados, cuando tengo muchas variables,
+
+165
+00:17:22,000 --> 00:17:27,000
+que es lo que pasa, si os acordáis de las regresiones múltiples, al final, claro,
+
+166
+00:17:27,000 --> 00:17:32,000
+cuando estáis interpretando, tenéis que verlo en el conjunto, entonces, cuando decís,
+
+167
+00:17:32,000 --> 00:17:37,000
+ah, pues pongo cero todas las demás, y pongo uno en esta, entonces, lo que hacéis es interpretar cada variable
+
+168
+00:17:37,000 --> 00:17:42,000
+en ausencia de las otras, y luego, si hay, por ejemplo, combinación de variables,
+
+169
+00:17:42,000 --> 00:17:47,000
+imaginaos que tenéis muchísimas variables, pues eso hace que el modelo sea más difícil de interpretar
+
+170
+00:17:48,000 --> 00:17:53,000
+y de comprender, ¿de acuerdo? Insisto, no vamos a tener modelos con dos variables,
+
+171
+00:17:53,000 --> 00:17:58,000
+en estos casos estamos hablando de bases de datos gigantescas, entonces, igual, vamos a tener bastantes
+
+172
+00:17:58,000 --> 00:18:03,000
+variables, pero cuanto más las reduzcamos, pues más fácil de comprender va a ser el número,
+
+173
+00:18:03,000 --> 00:18:08,000
+o sea, en el fondo, ¿vale la pena reducir dimensiones? Por supuesto, porque al final, lo que estamos
+
+174
+00:18:08,000 --> 00:18:13,000
+haciendo es el mismo problema, simplificarlo sin perder la información esencial del modelo
+
+175
+00:18:13,000 --> 00:18:18,000
+y el rigor de la información que trae él mismo, ¿de acuerdo?
+
+176
+00:18:18,000 --> 00:18:23,000
+Entonces, yo lo que quiero es capturar la mayor información posible de los datos
+
+177
+00:18:23,000 --> 00:18:28,000
+y hacerlo lo más rigurosa posible, pero facilitando la vida lo más que pueda,
+
+178
+00:18:28,000 --> 00:18:33,000
+¿de acuerdo? Es que al final, todo esto también son matemáticas, y las matemáticas son flojas,
+
+179
+00:18:33,000 --> 00:18:38,000
+o sea, las matemáticas no quieren complicar la existencia, aunque creéis que sí,
+
+180
+00:18:38,000 --> 00:18:43,000
+las matemáticas siempre buscan el camino más eficiente, y reducir dimensiones es algo eficiente,
+
+181
+00:18:43,000 --> 00:18:48,000
+¿vale? Pero no es reducir por reducir, igual que en las regresiones no es dejar y quitar
+
+182
+00:18:48,000 --> 00:18:53,000
+outliers por quitar outliers, porque siempre podéis quitar el dato que está un poquito más alejado,
+
+183
+00:18:53,000 --> 00:18:58,000
+pero tiene sentido o no tiene sentido, mejora considerablemente o no,
+
+184
+00:18:58,000 --> 00:19:03,000
+pues esto es lo mismo con la reducción de dimensiones, ¿de acuerdo?
+
+185
+00:19:03,000 --> 00:19:08,000
+Bueno, entonces, manifold y por qué reducimos,
+
+186
+00:19:08,000 --> 00:19:13,000
+¿qué es un manifold? Y esto va a ser interesante luego cuando veamos el t-SNE.
+
+187
+00:19:13,000 --> 00:19:18,000
+Fijaros, un manifold, nosotros tenemos el globo terráqueo, ¿de acuerdo?
+
+188
+00:19:18,000 --> 00:19:23,000
+que en realidad el globo terráqueo es en tres dimensiones, ¿no?
+
+189
+00:19:23,000 --> 00:19:28,000
+Pues eso, tenemos la esfera de la Tierra y son 3D, pero resulta que nosotros lo que hacemos
+
+190
+00:19:28,000 --> 00:19:33,000
+es representarlo en un plano en dos dimensiones, y no por ello perdemos las relaciones
+
+191
+00:19:33,000 --> 00:19:38,000
+esenciales entre países y continentes, bueno, aquí hay todo un tema de que en realidad las dimensiones
+
+192
+00:19:38,000 --> 00:19:43,000
+que vemos en los mapas no tienen nada que ver con las dimensiones reales, ¿no? Como que en realidad
+
+193
+00:19:43,000 --> 00:19:48,000
+hay países que se representan mucho más grandes y son más chiquititos, ¿no? Un tema de problema
+
+194
+00:19:48,000 --> 00:19:53,000
+de representatividad, pero bueno, pero más o menos nosotros podemos entender que este globo terráqueo
+
+195
+00:19:53,000 --> 00:19:58,000
+en 3D lo vemos proyectado en un plano 2D, ¿de acuerdo? Bueno, pues el manifold viene siendo
+
+196
+00:19:58,000 --> 00:20:03,000
+esta estructura de menor dimensión, ¿de acuerdo? Que está doblada dentro de un espacio mayor
+
+197
+00:20:03,000 --> 00:20:10,000
+y que sigue manteniendo en el fondo la forma real de los datos, o sea, lo que hacemos es que cuando
+
+198
+00:20:10,000 --> 00:20:15,000
+reducimos la dimensionalidad, lo que estamos haciendo es desdoblar ese manifold, ¿ok?
+
+199
+00:20:15,000 --> 00:20:20,000
+Entonces cuando hablemos de manifold, recordad que estamos hablando de un manifold
+
+200
+00:20:20,000 --> 00:20:25,000
+que lo que hacemos es desdoblarlo o desplegarlo, ¿de acuerdo? Entonces bueno, ¿qué caminos hay?
+
+201
+00:20:25,000 --> 00:20:30,000
+Pues tenemos dos caminos. Uno, que es la selección de variables, es decir, vamos a eliminar las columnas,
+
+202
+00:20:30,000 --> 00:20:37,000
+vamos a quitar las variables redundantes o poco informativas y vamos a conservar las originales,
+
+203
+00:20:37,000 --> 00:20:43,000
+¿de acuerdo? Que sean más interpretables. Y el camino 2 va a ser la creación o extracción
+
+204
+00:20:43,000 --> 00:20:49,000
+de las variables que se presentan en el modelo 2D, ¿de acuerdo? Y el camino 3 va a ser la creación
+
+205
+00:20:49,000 --> 00:20:55,000
+o extracción de variables, es decir, vamos a combinar columnas en nuevas variables,
+
+206
+00:20:55,000 --> 00:21:01,000
+por ejemplo, que es cuando vamos a hacer el Feature Engineering, ¿de acuerdo? Y bueno,
+
+207
+00:21:01,000 --> 00:21:06,000
+también vamos a poder extraer variables con métodos que nos permitan decidir cómo podemos extraer
+
+208
+00:21:06,000 --> 00:21:16,000
+esas variables, ¿de acuerdo? Vale. Entonces, dicha esta parte de por qué es importante
+
+209
+00:21:16,000 --> 00:21:22,000
+reducir la dimensionalidad que nos mejora el modelo, ¿de acuerdo? Ahora vamos a pasar a ver
+
+210
+00:21:22,000 --> 00:21:27,000
+cómo representamos las variables, es decir, cómo las escalamos, cómo las codificamos,
+
+211
+00:21:27,000 --> 00:21:33,000
+cómo las construimos y cómo vamos a entregar la información al modelo para que se ejecute,
+
+212
+00:21:33,000 --> 00:21:43,000
+¿de acuerdo? Una cosa, yo aquí no tengo el Romina, no tengo el... A ver si me sale. No tengo el reloj,
+
+213
+00:21:43,000 --> 00:21:51,000
+¿de acuerdo? Entonces, si... Yo le aviso como un cuarto para las ocho, le aviso unos diez minutitos antes.
+
+214
+00:21:51,000 --> 00:21:55,000
+Vale, es que no tengo el móvil aquí y como tengo en grande la pantalla, no veo el reloj,
+
+215
+00:21:55,000 --> 00:22:01,000
+entonces avísame, ¿vale? Normalmente está calculado y seguro que voy a llegar a la mitad,
+
+216
+00:22:01,000 --> 00:22:08,000
+en la mitad, pero por si acaso, ¿ya? Vale, ¿alguna pregunta hasta aquí de la primera parte?
+
+217
+00:22:13,000 --> 00:22:25,000
+No. No, pues ya está, vale. Entonces, representación de variables. Fijaros, ¿os acordáis que en la primera
+
+218
+00:22:25,000 --> 00:22:30,000
+sesión, conmigo, o sea, la sesión 30, primero vimos que los datos tenían que ser exactos, completos,
+
+219
+00:22:30,000 --> 00:22:36,000
+coherentes y frescos, ¿de acuerdo? Es decir, queremos ver si los datos son confiables. Bueno, pues ahora
+
+220
+00:22:36,000 --> 00:22:41,000
+eso, en la primera, en la primera sesión decíamos, los datos son confiables, ahora imaginemos que ya son
+
+221
+00:22:41,000 --> 00:22:45,000
+confiables, vale, pero entonces, ¿de qué manera se los vamos a entregar al modelo? ¿De acuerdo?
+
+222
+00:22:45,000 --> 00:22:50,000
+Porque una cosa es que sean confiables y otra es que el modelo los pueda leer, o sea, yo primero me tengo
+
+223
+00:22:50,000 --> 00:22:55,000
+que asegurar que esa base es buena y una vez que ya sé que la base está ok, ahora tengo que traducirla
+
+224
+00:22:55,000 --> 00:23:02,000
+de tal manera que el modelo pueda ejecutar la base de datos que pueda ejecutar el modelo, tomar esta base
+
+225
+00:23:02,000 --> 00:23:09,000
+de datos y entregar información decente, ¿de acuerdo? Entonces, ¿qué es lo que pasa? ¿Cómo tenemos que
+
+226
+00:23:09,000 --> 00:23:16,000
+ver esto? Primero, si tienen escalas distintas, ¿de acuerdo? Lo que tenemos que hacer es pasarlo a una
+
+227
+00:23:16,000 --> 00:23:23,000
+escala semejante, ¿de acuerdo? De segundos llega a miles y reclamos es 0,1, entonces, ¿qué pasa? Que si
+
+228
+00:23:23,000 --> 00:23:28,000
+tenemos representación de escalas distintas, pues al final el modelo se va a volver loco, ¿de acuerdo?
+
+229
+00:23:28,000 --> 00:23:34,000
+Por lo tanto, tenemos que rescalar las variables. Luego, si nosotros tenemos textos y categorías,
+
+230
+00:23:34,000 --> 00:23:39,000
+tenemos que entender que los modelos computacionales no van a entender prepago o plan, sino que
+
+231
+00:23:39,000 --> 00:23:46,000
+necesitan una representación numérica de las categorías 0 y 1, en fin, lo típico, ¿de acuerdo?
+
+232
+00:23:46,000 --> 00:23:52,000
+Donde el 0 no representa que no exista o el 1 que exista, sino que en realidad estamos hablando de la
+
+233
+00:23:52,000 --> 00:23:57,000
+categoría 0, de la categoría 1, de la categoría 1, de la categoría 2, si tiene 3, pues 3, ¿vale?
+
+234
+00:23:57,000 --> 00:24:02,000
+Pero el tema es que recordad que necesitan que se lo codifiquemos a números, de hecho, bueno, también
+
+235
+00:24:02,000 --> 00:24:08,000
+vamos a hablar muy por encima del one-hot encoding, que lo que hace es transformar todo a cadenas de
+
+236
+00:24:08,000 --> 00:24:14,000
+ceros y unos, ¿de acuerdo? Bueno, el código binario. Y luego información implícitas, ¿qué pasa?
+
+237
+00:24:14,000 --> 00:24:19,000
+Que a veces un dato, un dato útil resulta que no es una columna en sí misma, sino que es una
+
+238
+00:24:19,000 --> 00:24:24,000
+combinación de varias columnas. ¿Cuántas veces habéis hecho sin meternos en cosas muy complejas?
+
+239
+00:24:29,000 --> 00:24:34,000
+¿Estáis en Excel? ¿Tenéis una columna, otra columna?
+
+240
+00:24:34,000 --> 00:24:40,000
+Y luego generáis otra columna, que es combinación de estas dos. Y resulta que llega un colega o
+
+241
+00:24:40,000 --> 00:24:47,000
+una colega, entra al trabajo otro día, toca el dato que no debe y entonces se desconfigura todo lo
+
+242
+00:24:47,000 --> 00:24:53,000
+siguiente. ¿Por qué? Porque ahí esa columna, lo que estaba pasando es que era un dato que estaba creado
+
+243
+00:24:53,000 --> 00:24:59,000
+en función a otros. ¿De acuerdo? Entonces, ¿qué es lo que pasa? Pues que esa información tenemos que tener
+
+244
+00:24:59,000 --> 00:25:06,000
+cuidado, cómo se la pasamos al modelo para que si se tocan las piezas de las que depende, pues que en el
+
+245
+00:25:06,000 --> 00:25:14,000
+fondo no se nos vaya el traste, el modelo al traste. ¿De acuerdo? Entonces, bueno, si las variables no
+
+246
+00:25:14,000 --> 00:25:20,000
+estuvieran bien representadas, o sea, si no tenemos en cuenta estos detalles a la hora de tradúcselo al
+
+247
+00:25:20,000 --> 00:25:27,000
+modelo, pues lo que va a pasar es que el modelo nos va a traducir ruido y no nos va a traducir la
+
+248
+00:25:27,000 --> 00:25:32,000
+información que necesitamos. ¿De acuerdo? Entonces, primero tenemos que tener la base de datos bien,
+
+249
+00:25:32,000 --> 00:25:40,000
+pero después tenemos que traducirla correctamente para el modelo. ¿De acuerdo? Vale. Entonces,
+
+250
+00:25:40,000 --> 00:25:47,000
+antes de aplicar ningún tipo de reducción de dimensionalidad, ¿de acuerdo? Tenemos que tener todas
+
+251
+00:25:47,000 --> 00:25:53,000
+las variables en una escala comparable, es decir, estandarizarlas. ¿De acuerdo? Entonces, aquí tenemos
+
+252
+00:25:53,000 --> 00:25:59,000
+el escalamiento y la estandarización. ¿De acuerdo? En lenguaje coloquial, en realidad, que es lo que
+
+253
+00:25:59,000 --> 00:26:05,000
+estamos diciendo, la estandarización lo que dice es cuántas desviaciones típicas se aleja del promedio.
+
+254
+00:26:05,000 --> 00:26:11,000
+¿De acuerdo? Entonces, todas las variables terminan centradas en el cero. ¿Ya? O sea, cuando os
+
+255
+00:26:11,000 --> 00:26:18,000
+acordáis, cuando hacíais el valor menos la media dividido en la desviación estándar. ¿Qué es lo que
+
+256
+00:26:18,000 --> 00:26:25,000
+estábais haciendo? Simplemente estábais reescalando, porque si os dais cuenta cuando... Bueno, ahora no,
+
+257
+00:26:25,000 --> 00:26:32,000
+no. ¿Podré dibujar yo aquí? A ver si puedo dibujar. ¿Se puede dibujar aquí o no? Yo creo que sí,
+
+258
+00:26:32,000 --> 00:26:39,000
+¿no? Anotar. Creo que sí, le aparece un lapicito. Ah, sí, me aparece un lapicito. Vale. Es que a mí me
+
+259
+00:26:39,000 --> 00:26:46,000
+gusta mucho hacer siempre este ejemplo así. De hecho, a ver si lo hago aquí en chiquitito.
+
+260
+00:26:46,000 --> 00:26:54,000
+Es que aquí está la mina. ¿Tengo aquí pizarra o no? A lo mejor también hay pizarra, ¿no? Sí, también
+
+261
+00:26:54,000 --> 00:27:03,000
+hay en más. Si es que usted coloca pizarras. Nunca las ha usado, pero aparece la opción.
+
+262
+00:27:04,000 --> 00:27:11,000
+En suave de grupos, deshabilitar rotación para otros. Es que no sé si hubiera una pizarra sería más
+
+263
+00:27:11,000 --> 00:27:16,000
+guay, pero bueno, da igual. Lo pongo aquí en chiquitito. ¿Qué es lo que pasa? Nosotros, de hecho,
+
+264
+00:27:16,000 --> 00:27:21,000
+sabéis que tengo otra idea, porque yo tengo un OneNote. Dame un segundito, si tardo medio segundo
+
+265
+00:27:21,000 --> 00:27:29,000
+en hacer esto. Dame un segundo, dejar de compartir. Voy a abrir el OneNote. Es que quiero que entedáis
+
+266
+00:27:29,000 --> 00:27:38,000
+por qué, cuando estandarizamos, por qué es un cambio de escala. Me acuerdo. Dame un segundito.
+
+267
+00:27:38,000 --> 00:27:54,000
+Lo abro aquí en el OneNote. Abro una página nueva. A ver. Vale. Y agregar página. Voy a hacer aquí
+
+268
+00:27:54,000 --> 00:28:02,000
+el dibujo más o menos rabio, chapucilla, pero se va a entender muy bien. A ver. Aquí el OneNote está aquí.
+
+269
+00:28:03,000 --> 00:28:12,000
+Vale. Veis mi OneNote. No sé. Perfecto. Muy bien. ¿Qué es lo que pasa? Fijaos. Cuando nosotros estamos
+
+270
+00:28:12,000 --> 00:28:20,000
+haciendo una estandarización, lo que estamos haciendo es lo siguiente. Nosotros tenemos la
+
+271
+00:28:20,000 --> 00:28:32,000
+normal 0,1. A ver si me sale bien la curvita más o menos. Esto es una estandar 0,1. Aquí tenemos el 0,
+
+272
+00:28:32,000 --> 00:28:40,000
+el 1, el 2, el 3. Esta es la media, ¿cierto? Y estas son las desviaciones estándar. Esto es la media más
+
+273
+00:28:40,000 --> 00:28:46,000
+una desviación estándar. Esto es la media más dos desviaciones estándar. Y esto es la media más tres
+
+274
+00:28:46,000 --> 00:28:51,000
+desviaciones estándar. Bueno, si estamos hablando de muestras serían X barra y el S. De acuerdo,
+
+275
+00:28:51,000 --> 00:28:57,000
+que sería lo más correcto de poner aquí, pero bueno, ya está. Entonces, ¿qué tenemos? Tenemos esto
+
+276
+00:28:57,000 --> 00:29:07,000
+y ahora fijaos. Esta es una normal que tiene de media 0 y de desviación estándar 1. De acuerdo. Esta es mi media
+
+277
+00:29:07,000 --> 00:29:13,000
+y esta es mi desviación estándar. Vale. ¿Qué es lo que pasa? Cuando nosotros tenemos una variable en la
+
+278
+00:29:13,000 --> 00:29:18,000
+vida real, ya va a tener otra media otra desviación estándar, que es muy raro que la media está en 0 y la
+
+279
+00:29:18,000 --> 00:29:24,000
+desviación estándar esté en 1. Si hablamos yo que sé de pesos, de edades, decimos vale un grupo etario,
+
+280
+00:29:24,000 --> 00:29:31,000
+pues la media está en los 15 años y tenemos en este grupo una desviación de más menos dos años. Entonces,
+
+281
+00:29:31,000 --> 00:29:38,000
+¿qué pasa? Que tenéis un 15 y un 2. Vale. O no sé, pongamos ahora una ficticia donde aquí vamos a poner
+
+282
+00:29:38,000 --> 00:29:44,000
+esta es nuestra recta real, o sea aquí seguimos teniendo el 0, 1, 2, 3 a la misma altura. Vale.
+
+283
+00:29:44,000 --> 00:29:54,000
+4, 5, 6, déjame que ponga aquí 7, 8, 9, 10. Vale. Entonces, ¿qué pasa? Imaginaos que ahora lo que tenéis es
+
+284
+00:29:54,000 --> 00:30:04,000
+una variable que está con media, es una normal que tiene la media, por ejemplo, en el 3 y la desviación
+
+285
+00:30:04,000 --> 00:30:11,000
+estándar de 2. ¿Eso qué significa? Que el centro está en 3 y la desviación estándar está en 2, o sea que una
+
+286
+00:30:11,000 --> 00:30:19,000
+desviación estándar equivaldría al 5. Dos desviaciones estándar equivaldría al 7 y así tres desviaciones
+
+287
+00:30:19,000 --> 00:30:25,000
+estándar equivaldrían al 9. ¿De acuerdo? Con lo cual, ¿qué es lo que pasa? Si os acordáis, aquí sería
+
+288
+00:30:25,000 --> 00:30:33,000
+una desviación estándar menos. Déjame que lo mueva aquí. Una desviación estándar menos y aquí una desviación
+
+289
+00:30:33,000 --> 00:30:43,000
+estándar menos. O sea, aquí ya van 2 y aquí serían 3. ¿Cierto? Menos 3. ¿Qué es lo que está pasando?
+
+290
+00:30:43,000 --> 00:30:49,000
+Que aquí nosotros vamos a dibujar nuestra distribución normal, que a ver si me sale o un poco mejor
+
+291
+00:30:49,000 --> 00:30:56,000
+dibujada, pero va a ser un poquito más chatita. ¿De acuerdo? Más o menos. Va a ser un poco más chata.
+
+292
+00:30:56,000 --> 00:31:02,000
+¿Por qué? Porque mi desviación estándar es más larga. Recuerda que entre una desviación estándar
+
+293
+00:31:02,000 --> 00:31:10,000
+entre la media y una desviación estándar, la cantidad, el porcentaje de datos que voy a tener ahí es la misma
+
+294
+00:31:10,000 --> 00:31:19,000
+que aquí, porque sigue siendo una distribución normal, sigue teniendo en el fondo la misma, el mismo reparto
+
+295
+00:31:19,000 --> 00:31:24,000
+de datos. ¿De acuerdo? Lo que pasa es que claro, en la primera están más cerca y en la segunda están más
+
+296
+00:31:24,000 --> 00:31:30,000
+dispersos porque tenéis una desviación estándar de longitud 2. Cuando nosotros hacemos el proceso de
+
+297
+00:31:30,000 --> 00:31:36,000
+estandarización, ¿qué es lo que estamos haciendo? Lo primero que queremos es, como queremos igualar
+
+298
+00:31:36,000 --> 00:31:41,000
+probabilidades, es decir, si yo lo que quiero es por ejemplo calcular la probabilidad de que X sea
+
+299
+00:31:41,000 --> 00:31:47,000
+igual a 5, ¿qué es lo que va a pasar? Dices, bueno, es lo mismo, tendría que ser lo mismo que la
+
+300
+00:31:47,000 --> 00:31:53,000
+probabilidad de que Z sea igual a 1, porque al final es una desviación estándar. ¿No? Entonces,
+
+301
+00:31:53,000 --> 00:31:58,000
+¿cómo hago para calcular eso si yo no tengo la tabla de la normal, pero si tengo la tabla de la
+
+302
+00:31:58,000 --> 00:32:04,000
+normal, 0,1? Pues bueno, decimos A. Pues es que entonces yo aquí lo que tengo es justamente que
+
+303
+00:32:04,000 --> 00:32:10,000
+esta desviación que tengo aquí, ¿cierto? Lo que voy a hacer, lo primero que voy a hacer es tratar de
+
+304
+00:32:10,000 --> 00:32:15,000
+escalar esto para que sea igual. Entonces, ¿qué es lo primero que voy a hacer? Lo primero que voy a hacer
+
+305
+00:32:15,000 --> 00:32:23,000
+es trasladarlo. Entonces, el centro que está en el 3 lo voy a pasar al 0, ¿me acuerdo? Y qué pasa,
+
+306
+00:32:23,000 --> 00:32:31,000
+una vez que yo lo tengo en el 0, ahora esta raya que corresponde a una desviación estándar no me está
+
+307
+00:32:31,000 --> 00:32:38,000
+cayendo en el 0, sino que me está cayendo en el 2. Y yo lo que quiero es que me caiga en el 1,
+
+308
+00:32:38,000 --> 00:32:44,000
+porque en el fondo tengo que hacer que hagan match las dos curvas. Entonces, ¿cómo hago para que ese 2
+
+309
+00:32:44,000 --> 00:32:50,000
+se transforme en un 1? Bueno, pues lo único que tengo que hacer es dividir 2 entre 2. O sea, lo que
+
+310
+00:32:50,000 --> 00:32:57,000
+voy a hacer es dividir entre la misma desviación estándar. ¿Lo veis? Lo hago un poquito así, obviamente
+
+311
+00:32:57,000 --> 00:33:03,000
+como mi dibujo era un poco piñufla, no coinciden del todo, pero al final, si hubiera hecho bien la
+
+312
+00:33:03,000 --> 00:33:08,000
+curva, esto no se habría coincidido y habría sido exactamente la misma curva normal. ¿Se entiende?
+
+313
+00:33:08,000 --> 00:33:14,000
+Entonces, ¿qué es lo que he hecho? Lo que he hecho ha sido que al valor original le he restado la media,
+
+314
+00:33:14,000 --> 00:33:21,000
+en este caso la media de X, y lo he dividido por la desviación estándar de X, convirtiéndolo así en la
+
+315
+00:33:21,000 --> 00:33:27,000
+misma escala que el Z. ¿Se entiende? Entonces, ¿qué pasa? Que al final, por eso, hacíais que esto es una Z,
+
+316
+00:33:27,000 --> 00:33:34,000
+que lo que hace es 5 menos 3 y lo divide entre 2. ¿Y esto qué es? Pues no es nada más que el 1. ¿Os dais
+
+317
+00:33:34,000 --> 00:33:40,000
+cuenta? Entonces, ¿qué es lo que hacemos cuando estamos haciendo esta estandarización? Estamos
+
+318
+00:33:40,000 --> 00:33:50,000
+reescalando la distribución. ¿De acuerdo? Vale, eso simplemente para... Sí, estoy dibujando la
+
+319
+00:33:50,000 --> 00:33:58,000
+recta real, efectivamente. No necesariamente, ta ta ta. Vale, sí, ya os han contestado perfectamente. Vale,
+
+320
+00:33:58,000 --> 00:34:04,000
+entonces, no estoy diciendo que tengan que ser normales, no. Lo que estoy diciendo es que cuando estamos
+
+321
+00:34:04,000 --> 00:34:09,000
+estandarizando, este es el ejemplo típico que hacemos de estandarización dentro de la normal, pero lo que
+
+322
+00:34:09,000 --> 00:34:15,000
+estamos haciendo es cambiar la escala. Es decir, estoy cambiando el centro y cambiando la dispersión.
+
+323
+00:34:15,000 --> 00:34:21,000
+Vale, si eso no es normal, igual vais a tener un centro y vais a tener una dispersión, una varianza de los
+
+324
+00:34:21,000 --> 00:34:28,000
+datos. Entonces, ¿qué es lo que vais a hacer? Vais a tratar de pasarlo a una escala comparable. ¿Me acuerdo?
+
+325
+00:34:28,000 --> 00:34:34,000
+Es decir, que hablen el mismo idioma todas las variables. Entonces, lo que hacíamos el otro día, ¿os
+
+326
+00:34:34,000 --> 00:34:40,000
+acordáis que teníamos que eran? Creo que era el precio de la vivienda y no me acuerdo que otro valor,
+
+327
+00:34:40,000 --> 00:34:45,000
+que estaba el número de meses, ¿no? Entonces, el precio de la vivienda oscilla van miles, el número de
+
+328
+00:34:45,000 --> 00:34:50,000
+meses de antigüedad, el número de años de antigüedad o meses de antigüedad, los meses de antigüedad
+
+329
+00:34:50,000 --> 00:34:55,000
+eran por decenas. Entonces, si los metíamos en el mismo modelo de regreso linal iba a ser un poco
+
+330
+00:34:55,000 --> 00:35:00,000
+lío, porque al final estás comparando miles con decenas. Entonces, teníamos que estandarizar esos
+
+331
+00:35:00,000 --> 00:35:06,000
+datos, tenemos que escalarlos, ¿de acuerdo? Para que el modelo lo entendiera como dentro de las mismas
+
+332
+00:35:06,000 --> 00:35:13,000
+dimensiones, ¿me acuerdo? Y se pudiera interpretar. Vale, entonces, esto es un ejemplo de lo que
+
+333
+00:35:13,000 --> 00:35:22,000
+significa, ¿de acuerdo? No sé si os he liado más o va a quedar más claro. ¿Alguna duda de esto?
+
+334
+00:35:22,000 --> 00:35:31,000
+¿No? Vale, pues vamos, yo cuando no hay dudas, no sé si es que lo he liado más o es que ha quedado clarísimo,
+
+335
+00:35:31,000 --> 00:35:38,000
+no sé qué decir. Espero que, ah, vale, más claro, menos mal, menos mal. Si no me lo decís y lo
+
+336
+00:35:38,000 --> 00:35:44,000
+replicamos de otra manera, pero bueno, yo creo que con esto más o menos se enciende la idea. Ya, entonces,
+
+337
+00:35:44,000 --> 00:35:50,000
+volviendo a esto, entonces, cuando hablamos de la estandarización, ¿de acuerdo? Esto de cuántas desviaciones
+
+338
+00:35:50,000 --> 00:35:57,000
+se aleja del promedio, a eso se refiere, ¿de acuerdo? Lo que queremos es pasar a un mismo centro y un
+
+339
+00:35:57,000 --> 00:36:04,000
+mismo ancho, por así decirlo, ¿vale? Y la normalización lo que hace es que comprime todos los valores,
+
+340
+00:36:04,000 --> 00:36:11,000
+¿de acuerdo? Pero además está poniendo justamente un mínimo y un máximo, ¿de acuerdo? Entonces, bueno,
+
+341
+00:36:11,000 --> 00:36:16,000
+están como relacionados, pero al final lo que estamos haciendo es justamente pasar a una misma
+
+342
+00:36:16,000 --> 00:36:22,000
+escala. Da igual el método, pero al final lo que estáis haciendo es reescalar las variables, ¿ya?
+
+343
+00:36:22,000 --> 00:36:31,000
+Vale, ¿he pasado bien? Sí. Entonces, ¿cómo podemos codificar variables categóricas? Es decir,
+
+344
+00:36:31,000 --> 00:36:42,000
+aquellas que tienen categorías, no las, no las, las, se me dio el nombre ahora, categóricas, bueno,
+
+345
+00:36:42,000 --> 00:36:49,000
+las ordinales, no las numéricas, ¿cierto? No, o sea, estamos hablando de las categoricas, ¿de acuerdo? Bueno,
+
+346
+00:36:49,000 --> 00:36:54,000
+pues en este caso, por ejemplo, podemos hacer el ordinal encoding, el one-hot encoding, que es el que
+
+347
+00:36:54,000 --> 00:37:00,000
+os mencionaba antes, y el target/frequency encoding, ¿ya? El ordinal encoding es para las nominales,
+
+348
+00:37:00,000 --> 00:37:08,000
+¿de acuerdo? Entonces, simplemente lo que hacemos es, por ejemplo, el monto, estamos diciendo, o sea,
+
+349
+00:37:08,000 --> 00:37:12,000
+nominal entero cuando existe un orden real, perdón. Entonces, aquí, ¿qué es lo que hacéis?
+
+350
+00:37:12,000 --> 00:37:17,000
+Decéis, por ejemplo, monto cero es bajo y nueve es alto, ¿cierto? Bueno, esto en realidad no se refiere,
+
+351
+00:37:17,000 --> 00:37:23,000
+esto sería ordinal, aquí hay un error. Entonces, ¿qué pasa? Que en este caso, pues, tenéis una escala,
+
+352
+00:37:23,000 --> 00:37:30,000
+¿de acuerdo? Entonces, lo pasamos a un ordinal encoding, ¿ya? Entonces, lo que hacéis es que no es lo mismo
+
+353
+00:37:30,000 --> 00:37:36,000
+cuando os hacen encuestas, ¿no? Que os dicen, bueno, del uno al siete, donde uno es que está muy en
+
+354
+00:37:36,000 --> 00:37:41,000
+desacuerdo y siete que está muy de acuerdo, ¿qué nota le daría? Pues esto es, ¿de acuerdo?
+
+355
+00:37:41,000 --> 00:37:47,000
+El one-hot encoding, en este caso, lo que estamos haciendo es pasar a código binario, ¿de acuerdo?
+
+356
+00:37:47,000 --> 00:37:53,000
+Por lo tanto, ¿qué es lo que tenemos que hacer? Pues uno va a ser verdadero y el contrario va a ser falso,
+
+357
+00:37:53,000 --> 00:38:00,000
+¿de acuerdo? Y entonces vamos a ponerlo en función a ceros y unos, eso no voy a entrar al detalle,
+
+358
+00:38:00,000 --> 00:38:06,000
+pero está también en el libro. De hecho, por ejemplo, cuando se hacen sistemas de recomendación,
+
+359
+00:38:06,000 --> 00:38:12,000
+se suele usar mucho el one-hot encoding, ¿de acuerdo? Porque en el fondo, cuando se da like, no like,
+
+360
+00:38:12,000 --> 00:38:18,000
+¿vale? Estamos haciéndoles, ¿ya? Y entonces, pues, se van poniendo ceros y unos a lo largo de, digamos,
+
+361
+00:38:18,000 --> 00:38:25,000
+imaginaros que tenéis un cajón, es un array, ¿vale? Es como un cajón, ¿vale? Con distintos espacios
+
+362
+00:38:25,000 --> 00:38:30,000
+y cada uno de esos espacios corresponde a una variable. Entonces, se pone ceros si es que está uno,
+
+363
+00:38:30,000 --> 00:38:35,000
+o sea, uno si es que está, ceros si es que no está. Si estamos en sistemas de recomendación es como un uno
+
+364
+00:38:35,000 --> 00:38:40,000
+si le gusta, un ceros si no le gusta, por ejemplo. Entonces, lo que vamos haciendo es que vamos poniendo
+
+365
+00:38:40,000 --> 00:38:46,000
+en el fondo a cada variable si le gusta, si no le gusta, y eso permite hacer luego un modelo
+
+366
+00:38:46,000 --> 00:38:53,000
+donde le estamos dando un peso al total de la suma, por así decirlo, de las variables que ha elegido
+
+367
+00:38:53,000 --> 00:39:00,000
+dentro de lo que contiene la información que contiene el dar like a un tipo de contenido, ¿de acuerdo?
+
+368
+00:39:00,000 --> 00:39:06,000
+Vale, es que eso es un tema muy entretenido, pero que no nos da tiempo a ver, así que para otra vez.
+
+369
+00:39:06,000 --> 00:39:12,000
+Ya, pero bueno, en el libro os lo paso para que lo leáis y veáis el ejemplo este de Netflix, ¿vale?
+
+370
+00:39:12,000 --> 00:39:19,000
+Y luego, target/frequency encoding, que lo que hace es que reemplaza la categoría por un estadístico, ¿vale?
+
+371
+00:39:19,000 --> 00:39:26,000
+Tasa de fuga, frecuencia y esto, pues bueno, esto va a ser muy útil en muchas categorías, ¿de acuerdo?
+
+372
+00:39:26,000 --> 00:39:33,000
+Entonces, por ejemplo, en vez de representar un Ñuñoa, pues lo que va a hacer es poner la tasa de fuga en Ñuñoa.
+
+373
+00:39:33,000 --> 00:39:44,000
+Entonces lo reemplaza por una estadística, un valor estadístico numérico asignado a esa comuna, ¿de acuerdo?
+
+374
+00:39:45,000 --> 00:39:50,000
+Entonces, bueno, luego vamos a ver en nuestro dataset cómo lo vamos a codificar, ¿no?
+
+375
+00:39:50,000 --> 00:39:56,000
+Vale, ahora, ¿qué es esto de la creación de variables o Feature Engineering?
+
+376
+00:39:56,000 --> 00:40:02,000
+Bueno, a veces, ¿qué es lo que pasa? Que la variable más informativa es la combinación de variables que están,
+
+377
+00:40:02,000 --> 00:40:05,000
+pero esa variable en sí no está todavía, no existe, ¿de acuerdo?
+
+378
+00:40:05,000 --> 00:40:09,000
+Entonces la tenemos que construir combinando columnas, ¿de acuerdo?
+
+379
+00:40:09,000 --> 00:40:15,000
+Por ejemplo, imaginaos que queremos ver la duración promedio, que esto lo vamos a ver luego en el ejemplo, ¿de acuerdo?
+
+380
+00:40:15,000 --> 00:40:20,000
+Imaginaos que vamos a necesitar la duración promedio de la llamada, el SMS por antigüedad,
+
+381
+00:40:20,000 --> 00:40:26,000
+uy, antigüedad, faltan los dos puntitos, la intensidad del contacto.
+
+382
+00:40:26,000 --> 00:40:32,000
+Entonces, ¿qué es lo que vamos a hacer? Vamos a generar esas variables como operaciones con otras variables.
+
+383
+00:40:32,000 --> 00:40:37,000
+Por ejemplo, la duración promedio por llamada, pues un cliente con muchas llamadas cortas
+
+384
+00:40:37,000 --> 00:40:44,000
+se va a comportar distinto que un cliente con pocas llamadas, pero largas, obviamente, porque apuntan a perfiles distintos.
+
+385
+00:40:44,000 --> 00:40:48,000
+Entonces, ¿qué es lo que vamos a hacer para generar la duración promedio por llamada?
+
+386
+00:40:48,000 --> 00:40:52,000
+Pues la duración en segundos entre la frecuencia de llamadas, ¿de acuerdo?
+
+387
+00:40:52,000 --> 00:40:57,000
+Si queremos generar, por ejemplo, el SMS por antigüedad, ¿de acuerdo?
+
+388
+00:40:57,000 --> 00:41:05,000
+¿Qué es lo que vamos a hacer? Pues vamos a normalizar el uso de SMS por el tiempo que lleva el cliente en la compañía,
+
+389
+00:41:05,000 --> 00:41:12,000
+es decir, vamos a dividir la frecuencia de SMS entre la antigüedad y eso nos va a dar SMS por antigüedad, ¿vale?
+
+390
+00:41:12,000 --> 00:41:18,000
+Una división normal y corriente, pero nosotros no vamos a tener el SMS por antigüedad, vamos a tener la base de datos,
+
+391
+00:41:18,000 --> 00:41:22,000
+la frecuencia de SMS y vamos a tener la antigüedad en la compañía.
+
+392
+00:41:22,000 --> 00:41:25,000
+Y luego, por ejemplo, la intensidad contactos.
+
+393
+00:41:25,000 --> 00:41:29,000
+Entonces, ¿qué va a ser? Va a ser el número de contactos entre la frecuencia de llamadas,
+
+394
+00:41:29,000 --> 00:41:36,000
+es decir, ¿qué tan concentrada está la actividad del cliente en pocos contactos?
+
+395
+00:41:36,000 --> 00:41:43,000
+¿Llama mucho a esos pocos contactos que tiene o llama poco a esos contactos que tiene?
+
+396
+00:41:43,000 --> 00:41:49,000
+¿Tiene muchos contactos pero realmente no los llama o tiene muchos contactos y los llama todos?
+
+397
+00:41:49,000 --> 00:41:51,000
+En fin, y cuánto los llama.
+
+398
+00:41:51,000 --> 00:41:54,000
+Entonces, la intensidad de los contactos.
+
+399
+00:41:54,000 --> 00:41:59,000
+Entonces, ¿qué es lo que pasa? Que cuando nosotros estamos creando, estamos haciendo este Feature Engineering,
+
+400
+00:41:59,000 --> 00:42:07,000
+nosotros lo que hacemos es añadir estas variables al conjunto antes de reducir la dimensionalidad.
+
+401
+00:42:07,000 --> 00:42:13,000
+¿Por qué? Porque si reduces la dimensionalidad, eventualmente estas variables no las vas a poder crear.
+
+402
+00:42:13,000 --> 00:42:19,000
+Entonces, ¿qué hacemos? Creamos estas variables que vemos que nos pueden aportar información
+
+403
+00:42:19,000 --> 00:42:22,000
+y luego vemos cómo reducimos la dimensionalidad.
+
+404
+00:42:22,000 --> 00:42:27,000
+Ahí vamos a ver porque obviamente estas variables van a depender de estas otras dos.
+
+405
+00:42:27,000 --> 00:42:33,000
+Uno diría, bueno, pues entonces me estás generando una variable que se genera con combinación de las otras,
+
+406
+00:42:33,000 --> 00:42:38,000
+pero es que aquí no es una combinación lineal, porque estamos dividiendo.
+
+407
+00:42:38,000 --> 00:42:44,000
+Entonces, las combinaciones lineales en realidad lo que estamos haciendo es cuando las estamos sumando,
+
+408
+00:42:44,000 --> 00:42:48,000
+estamos en el fondo pues eso, haciendo operaciones que son lineales.
+
+409
+00:42:48,000 --> 00:42:54,000
+Entonces, aquí este tipo de relaciones generan variables que no existen y por lo tanto hay que crearlas
+
+410
+00:42:54,000 --> 00:42:57,000
+antes de hacer la reducción de dimensionalidad.
+
+411
+00:42:57,000 --> 00:43:02,000
+¿No? ¿Apordo? Vale. Entonces, después de esto, es que hacemos el PCA.
+
+412
+00:43:02,000 --> 00:43:06,000
+Bueno, hay muchas preguntas. ¿Se están respondiendo?
+
+413
+00:43:06,000 --> 00:43:14,000
+Si quiero redimensionar la edad, por ejemplo, necesito definir... Vale, ahí habéis contestado.
+
+414
+00:43:14,000 --> 00:43:17,000
+Vale, veo que están contestando.
+
+415
+00:43:17,000 --> 00:43:22,000
+Vale, si veo luego en el descanso que hay tal, hago algún matices que estoy viendo que se están contestando.
+
+416
+00:43:22,000 --> 00:43:27,000
+Así que nada. Vale, entonces dicho lo igual. Feature Engineering before the... Va.
+
+417
+00:43:27,000 --> 00:43:33,000
+Perdón. Antes de... Es que me metí en el inglés. Feature Engineering, o sea,
+
+418
+00:43:33,000 --> 00:43:39,000
+la creación de variables lo vamos a hacer antes de reducir la dimensionalidad.
+
+419
+00:43:39,000 --> 00:43:41,000
+¿Me acuerdo? Vale.
+
+420
+00:43:41,000 --> 00:43:46,000
+Entonces, ya estamos. Hemos hecho los dos primeros pasos.
+
+421
+00:43:46,000 --> 00:43:50,000
+Ya hemos traducido las variables para que el modelo las entienda.
+
+422
+00:43:50,000 --> 00:43:53,000
+Ya sabemos la importancia de reducir variables.
+
+423
+00:43:53,000 --> 00:43:56,000
+Ya sabemos cómo tenemos que traducirlas al modelo.
+
+424
+00:43:56,000 --> 00:44:01,000
+Y ahora, ¿qué vamos a hacer? Vamos a extraer las variables. ¿De acuerdo?
+
+425
+00:44:01,000 --> 00:44:05,000
+Entonces, vamos a hacer primero la reducción de dimensionalidad.
+
+426
+00:44:06,000 --> 00:44:10,000
+Es decir, muchas variables correlacionadas o componentes...
+
+427
+00:44:10,000 --> 00:44:15,000
+Las vamos a reducir a componentes que van a resumir lo esencial.
+
+428
+00:44:15,000 --> 00:44:21,000
+Ya recordad. Después de haber hecho ya las variables que se generan con otras variables.
+
+429
+00:44:21,000 --> 00:44:23,000
+Vale.
+
+430
+00:44:30,000 --> 00:44:32,000
+En una frase, ¿qué sería?
+
+431
+00:44:32,000 --> 00:44:37,000
+La PCA lo que hace es tomar un montón de variables y las resumen unas pocas,
+
+432
+00:44:37,000 --> 00:44:39,000
+que van a ser las componentes,
+
+433
+00:44:39,000 --> 00:44:42,000
+tratando de perder siempre la menor cantidad de información posible.
+
+434
+00:44:42,000 --> 00:44:45,000
+O sea, esto es lo que no puede ser, es que yo reduzca porque digo,
+
+435
+00:44:45,000 --> 00:44:49,000
+¡uy! es que tengo cien variables y tengo que reducirlas porque tengo muchas.
+
+436
+00:44:49,000 --> 00:44:53,000
+Pues, chiquis, si las cien variables os dan toda la información
+
+437
+00:44:53,000 --> 00:44:56,000
+y no hay manera de resumirlas, son cien variables.
+
+438
+00:44:56,000 --> 00:44:58,000
+¿Qué le vamos a hacer? No es así como...
+
+439
+00:44:58,000 --> 00:45:00,000
+Son cien. Yo quiero eliminar, quiero eliminar.
+
+440
+00:45:00,000 --> 00:45:03,000
+No. Primero vamos a ver si se pueden eliminar.
+
+441
+00:45:03,000 --> 00:45:06,000
+¿De acuerdo? Porque si perdemos información,
+
+442
+00:45:06,000 --> 00:45:10,000
+pues es que a lo mejor... A ver, hay veces que se pierde información que no es relevante.
+
+443
+00:45:10,000 --> 00:45:13,000
+Pues vale. Pero hay que ver eso.
+
+444
+00:45:13,000 --> 00:45:17,000
+Vamos a ver cómo analizar que no estoy perdiendo información.
+
+445
+00:45:17,000 --> 00:45:18,000
+¿De acuerdo?
+
+446
+00:45:18,000 --> 00:45:22,000
+Entonces, ¿qué pasa? Que cada componente es como una mezcla o receta
+
+447
+00:45:22,000 --> 00:45:25,000
+hecha con un poco de cada variable original.
+
+448
+00:45:25,000 --> 00:45:26,000
+Vamos.
+
+449
+00:45:26,000 --> 00:45:29,000
+Que esto es como si tú al pastel que vas a hacer,
+
+450
+00:45:29,000 --> 00:45:33,000
+resulta que es un pastel que lleva harina, huevo, no sé qué,
+
+451
+00:45:33,000 --> 00:45:34,000
+y le quitas la harina.
+
+452
+00:45:34,000 --> 00:45:38,000
+Pues o le pones otro ingrediente que haga el efecto de la harina
+
+453
+00:45:38,000 --> 00:45:40,000
+o esto, el pastel no sube.
+
+454
+00:45:40,000 --> 00:45:42,000
+Ya, el bizcocho, lo que sea.
+
+455
+00:45:42,000 --> 00:45:44,000
+Pues esto es lo mismo. ¿De acuerdo?
+
+456
+00:45:44,000 --> 00:45:48,000
+Entonces lo que hacemos es tomar un poquito de cada variable original.
+
+457
+00:45:48,000 --> 00:45:49,000
+¿De acuerdo?
+
+458
+00:45:49,000 --> 00:45:50,000
+Entonces, ¿qué pasa?
+
+459
+00:45:50,000 --> 00:45:54,000
+La primera componente o el primer componente es la mezcla
+
+460
+00:45:54,000 --> 00:45:57,000
+que mejor captura el patrón principal de los datos.
+
+461
+00:45:57,000 --> 00:45:59,000
+El segundo, ¿qué va a hacer?
+
+462
+00:45:59,000 --> 00:46:01,000
+Ya no va a repetirse con el primero.
+
+463
+00:46:01,000 --> 00:46:04,000
+O sea, el primero va a seleccionar lo más que puede.
+
+464
+00:46:04,000 --> 00:46:07,000
+Pero es que luego el segundo lo que va a hacer es seleccionar
+
+465
+00:46:07,000 --> 00:46:11,000
+de lo que queda aquello que realmente aporta información extra.
+
+466
+00:46:11,000 --> 00:46:14,000
+Pero que no va a tener nada en común con el primer.
+
+467
+00:46:14,000 --> 00:46:20,000
+Porque la idea es que sea este concepto de vectores que son ortogonales.
+
+468
+00:46:20,000 --> 00:46:21,000
+¿De acuerdo?
+
+469
+00:46:22,000 --> 00:46:24,000
+Son vectores que aportan dimensiones distintas.
+
+470
+00:46:24,000 --> 00:46:25,000
+¿Acordamos de la pared?
+
+471
+00:46:25,000 --> 00:46:26,000
+¿De acuerdo?
+
+472
+00:46:26,000 --> 00:46:29,000
+Y de estos vectores que nos van generando la estructura en tres dimensiones.
+
+473
+00:46:29,000 --> 00:46:31,000
+Es eso. ¿De acuerdo?
+
+474
+00:46:31,000 --> 00:46:32,000
+Entonces, ¿qué tenemos que hacer?
+
+475
+00:46:32,000 --> 00:46:35,000
+Extraer la mayor parte de la variabilidad de los datos
+
+476
+00:46:35,000 --> 00:46:39,000
+usando muchas menos variables que el conjunto original.
+
+477
+00:46:39,000 --> 00:46:42,000
+Si os dais cuenta, constantemente lo que queremos hacer
+
+478
+00:46:42,000 --> 00:46:45,000
+desde las regresiones que veíais en la parte de estadística
+
+479
+00:46:45,000 --> 00:46:47,000
+hasta ahora con los modelos de Machine Learning
+
+480
+00:46:47,000 --> 00:46:50,000
+es capturar la mayor variabilidad posible
+
+481
+00:46:50,000 --> 00:46:54,000
+con la menor cantidad de dimensiones posibles.
+
+482
+00:46:54,000 --> 00:46:57,000
+La menor cantidad de datos posibles.
+
+483
+00:46:57,000 --> 00:46:58,000
+¿De acuerdo?
+
+484
+00:46:58,000 --> 00:47:02,000
+La menor cantidad de peso, por así decirlo.
+
+485
+00:47:02,000 --> 00:47:03,000
+¿Ya?
+
+486
+00:47:03,000 --> 00:47:08,000
+Entonces, ¿qué es lo que va a pasar?
+
+487
+00:47:08,000 --> 00:47:11,000
+Fijaros, en el aprendizaje no supervisado
+
+488
+00:47:11,000 --> 00:47:15,000
+no usa la variable objetivo para construir los componentes.
+
+489
+00:47:15,000 --> 00:47:19,000
+Además requiere escala, se calcula sobre variables estandarizadas.
+
+490
+00:47:19,000 --> 00:47:21,000
+Ahí lo vamos a ver después.
+
+491
+00:47:21,000 --> 00:47:23,000
+Y luego es una receta.
+
+492
+00:47:23,000 --> 00:47:27,000
+Cada componente combina un poco de cada variable original.
+
+493
+00:47:27,000 --> 00:47:29,000
+Esto es simplemente un resumen.
+
+494
+00:47:29,000 --> 00:47:30,000
+¿De acuerdo?
+
+495
+00:47:30,000 --> 00:47:32,000
+Ya.
+
+496
+00:47:34,000 --> 00:47:39,000
+Entonces, ¿qué es lo que pasa detrás del análisis de componentes principales?
+
+497
+00:47:39,000 --> 00:47:40,000
+Ya.
+
+498
+00:47:40,000 --> 00:47:43,000
+No necesitamos hablar de álgebra.
+
+499
+00:47:43,000 --> 00:47:46,000
+Como os digo, aquí me olvidé de las fórmulas.
+
+500
+00:47:46,000 --> 00:47:48,000
+No me olvide que no las puse.
+
+501
+00:47:48,000 --> 00:47:51,000
+Porque en realidad yo lo que quiero que entendáis aquí es que
+
+502
+00:47:51,000 --> 00:47:54,000
+si vosotros tenéis esta nube de puntos
+
+503
+00:47:54,000 --> 00:47:56,000
+nosotros lo que queremos ver es
+
+504
+00:47:56,000 --> 00:47:59,000
+de qué manera generamos vectores
+
+505
+00:47:59,000 --> 00:48:04,000
+que capturen la variabilidad de todos estos datos
+
+506
+00:48:04,000 --> 00:48:07,000
+en el espacio multidimensional en el que están.
+
+507
+00:48:07,000 --> 00:48:08,000
+¿De acuerdo?
+
+508
+00:48:08,000 --> 00:48:10,000
+Entonces, ¿qué es lo que vamos a hacer?
+
+509
+00:48:10,000 --> 00:48:13,000
+Vamos a empezar a ver cómo podemos generar
+
+510
+00:48:13,000 --> 00:48:15,000
+de reducir al máximo posible
+
+511
+00:48:15,000 --> 00:48:19,000
+los vectores que nos van a permitir generar todos los puntos que están ahí.
+
+512
+00:48:19,000 --> 00:48:20,000
+¿De acuerdo?
+
+513
+00:48:20,000 --> 00:48:21,000
+Entonces, ¿qué hace PCA?
+
+514
+00:48:21,000 --> 00:48:24,000
+Lo que hace es principal component analysis.
+
+515
+00:48:24,000 --> 00:48:25,000
+¿OK?
+
+516
+00:48:25,000 --> 00:48:27,000
+El análisis de componentes principales.
+
+517
+00:48:27,000 --> 00:48:28,000
+Vale.
+
+518
+00:48:28,000 --> 00:48:32,000
+Lo que hace es que busca la dirección donde todos los datos varían más.
+
+519
+00:48:32,000 --> 00:48:33,000
+¿De acuerdo?
+
+520
+00:48:33,000 --> 00:48:35,000
+Y ahí es donde hay más información para resumir.
+
+521
+00:48:35,000 --> 00:48:36,000
+Entonces, fijaos.
+
+522
+00:48:36,000 --> 00:48:39,000
+Dice, esa dirección se convierte en la primera componente,
+
+523
+00:48:39,000 --> 00:48:40,000
+¿sabéis?
+
+524
+00:48:40,000 --> 00:48:41,000
+Esto es como una nube de puntos.
+
+525
+00:48:41,000 --> 00:48:43,000
+Si estuviéramos viendo una regresión lineal, ¿cierto?
+
+526
+00:48:43,000 --> 00:48:44,000
+¿Qué es lo que haríais?
+
+527
+00:48:44,000 --> 00:48:48,000
+La primera línea que trazaría y sería atravesando los puntos
+
+528
+00:48:48,000 --> 00:48:51,000
+en función a esta línea que se ve por la tendencia de la nube.
+
+529
+00:48:51,000 --> 00:48:52,000
+¿Cierto?
+
+530
+00:48:52,000 --> 00:48:53,000
+Entonces, pensemos en esa línea.
+
+531
+00:48:53,000 --> 00:48:55,000
+Esa va a ser mi primera componente.
+
+532
+00:48:55,000 --> 00:48:56,000
+¿Vale?
+
+533
+00:48:56,000 --> 00:48:58,000
+Sería como buscar esta recta de regresión, por así decirlo.
+
+534
+00:48:58,000 --> 00:48:59,000
+¿De acuerdo?
+
+535
+00:48:59,000 --> 00:49:01,000
+Entonces, la siguiente dirección más informativa
+
+536
+00:49:01,000 --> 00:49:04,000
+que no repite lo que ya explicó la PCA 1,
+
+537
+00:49:04,000 --> 00:49:06,000
+en este caso, la inclinación de la nube,
+
+538
+00:49:06,000 --> 00:49:08,000
+que sería el ancho de la nube.
+
+539
+00:49:08,000 --> 00:49:09,000
+¿Os dais cuenta?
+
+540
+00:49:09,000 --> 00:49:10,000
+Entonces, ¿qué hacéis?
+
+541
+00:49:10,000 --> 00:49:14,000
+La segunda componente va a ser esta línea azul PC2.
+
+542
+00:49:14,000 --> 00:49:15,000
+¿De acuerdo?
+
+543
+00:49:15,000 --> 00:49:17,000
+Y claro, si tenemos muchas variables,
+
+544
+00:49:17,000 --> 00:49:20,000
+luego tendríamos que buscar otra dimensión, por ejemplo,
+
+545
+00:49:20,000 --> 00:49:22,000
+en altura.
+
+546
+00:49:22,000 --> 00:49:25,000
+Y bueno, ya visualizarlo en más dimensiones
+
+547
+00:49:25,000 --> 00:49:28,000
+es un poco difícil porque la especie humana
+
+548
+00:49:28,000 --> 00:49:30,000
+lo podemos ver en tres dimensiones.
+
+549
+00:49:30,000 --> 00:49:32,000
+Pero para que se entienda lo que está haciendo.
+
+550
+00:49:32,000 --> 00:49:34,000
+Aquí en dos dimensiones se ve muy claro.
+
+551
+00:49:34,000 --> 00:49:35,000
+Tenéis esa nube de puntos.
+
+552
+00:49:35,000 --> 00:49:37,000
+Si vosotros rodeáis esa nube de puntos,
+
+553
+00:49:37,000 --> 00:49:40,000
+¿cuál es primero la dirección donde se vería más?
+
+554
+00:49:40,000 --> 00:49:42,000
+Pues lo primero que nos salta a la vista
+
+555
+00:49:42,000 --> 00:49:45,000
+no es el ancho de la nube, sino que la nube va inclinada así.
+
+556
+00:49:45,000 --> 00:49:47,000
+O sea, dices, ah, tiene esta inclinación.
+
+557
+00:49:47,000 --> 00:49:49,000
+Pues ahora, esta es la componente principal 1.
+
+558
+00:49:49,000 --> 00:49:51,000
+Y después, la componente principal 2,
+
+559
+00:49:51,000 --> 00:49:53,000
+que es la que me habla de esa segunda dimensión,
+
+560
+00:49:53,000 --> 00:49:56,000
+que sería el ancho de la nube.
+
+561
+00:49:56,000 --> 00:49:57,000
+¿De acuerdo?
+
+562
+00:49:58,000 --> 00:49:59,000
+El tercer acto.
+
+563
+00:49:59,000 --> 00:50:03,000
+Ya, entonces, pues sí, pues ahí va.
+
+564
+00:50:03,000 --> 00:50:06,000
+Entonces, ¿queda claro?
+
+565
+00:50:06,000 --> 00:50:09,000
+Esto sería como seguir la PC1, la primera componente,
+
+566
+00:50:09,000 --> 00:50:11,000
+siempre sigue la máxima varianza.
+
+567
+00:50:11,000 --> 00:50:12,000
+¿De acuerdo?
+
+568
+00:50:12,000 --> 00:50:15,000
+O sea, la que va a capturar la mayor variabilidad inicial.
+
+569
+00:50:19,000 --> 00:50:23,000
+Entonces, no sé si pasar ya...
+
+570
+00:50:26,000 --> 00:50:31,000
+Yo creo que vamos a pasar ya al colab,
+
+571
+00:50:31,000 --> 00:50:34,000
+porque ya esto tiene que ver con el colab.
+
+572
+00:50:34,000 --> 00:50:36,000
+Y entonces ahí lo vamos a interpretar
+
+573
+00:50:36,000 --> 00:50:38,000
+y luego pasamos al t-SNE.
+
+574
+00:50:38,000 --> 00:50:40,000
+Vale, ¿qué es lo que vamos a hacer ahora?
+
+575
+00:50:42,000 --> 00:50:45,000
+Quedan 10 minutos para el descanso.
+
+576
+00:50:45,000 --> 00:50:48,000
+Perfecto. Entonces, voy a pasar al colab.
+
+577
+00:50:48,000 --> 00:50:51,000
+Vamos a ver esto y voy a empezar con el colab
+
+578
+00:50:51,000 --> 00:50:53,000
+para que entendamos este PCA.
+
+579
+00:50:53,000 --> 00:50:55,000
+Y así luego a la vuelta retomamos con esto.
+
+580
+00:50:55,000 --> 00:50:57,000
+Perfecto. Entonces, ¿qué vamos a ver?
+
+581
+00:50:57,000 --> 00:50:59,000
+Ahora vamos a ir a nuestro dataset.
+
+582
+00:50:59,000 --> 00:51:02,000
+Vamos a hacer todo lo que hay que hacer al principio.
+
+583
+00:51:02,000 --> 00:51:06,000
+Y queremos ver si el cliente va a cancelar la suscripción.
+
+584
+00:51:06,000 --> 00:51:08,000
+Vamos a hacer un caso de churn.
+
+585
+00:51:08,000 --> 00:51:10,000
+En el fondo, suscripción.
+
+586
+00:51:10,000 --> 00:51:12,000
+Queremos ver si el cliente se va o no se va.
+
+587
+00:51:12,000 --> 00:51:17,000
+En este caso, en temas de telecomunicaciones.
+
+588
+00:51:17,000 --> 00:51:22,000
+Vamos a ver esto de... ¿cómo se llama? Telefónica.
+
+589
+00:51:22,000 --> 00:51:25,000
+Entonces, vamos a generar una base de datos.
+
+590
+00:51:25,000 --> 00:51:28,000
+En este caso, sintética, pero que podría ser perfectamente real.
+
+591
+00:51:28,000 --> 00:51:30,000
+Lo que pasa es que para no estar liándonos que sí,
+
+592
+00:51:30,000 --> 00:51:33,000
+subo la base que sí sale, que sí la cargo y no la carga,
+
+593
+00:51:33,000 --> 00:51:35,000
+que no la carga, que no la carga,
+
+594
+00:51:35,000 --> 00:51:38,000
+pero se puede luego en el ejercicio que os voy a pasar,
+
+595
+00:51:38,000 --> 00:51:41,000
+os voy a pasar la base de datos para que uséis una base de datos real
+
+596
+00:51:41,000 --> 00:51:43,000
+y podáis manejarlo desde una base de datos real.
+
+597
+00:51:43,000 --> 00:51:45,000
+Vale, entonces, ¿qué tenemos aquí?
+
+598
+00:51:45,000 --> 00:51:47,000
+Vamos a tener estas variables.
+
+599
+00:51:47,000 --> 00:51:49,000
+Vamos a tener las variables que vienen, de acuerdo,
+
+600
+00:51:49,000 --> 00:51:51,000
+en las que no hemos creado.
+
+601
+00:51:51,000 --> 00:51:54,000
+Tenemos número de fallas, que van a ser el número de...
+
+602
+00:51:54,000 --> 00:51:57,000
+reclamos, que va a ser 0 si no hay reclamo,
+
+603
+00:51:57,000 --> 00:52:00,000
+1 con reclamo, antigüedad, que van a ser los meses en la suscripción,
+
+604
+00:52:00,000 --> 00:52:02,000
+el monto, que va a ser el nivel del plan,
+
+605
+00:52:02,000 --> 00:52:05,000
+si el nivel del plan es alto o bajo, de acuerdo,
+
+606
+00:52:05,000 --> 00:52:08,000
+según el monto de... o sea, lo que hacemos es clasificar
+
+607
+00:52:08,000 --> 00:52:10,000
+esto en función a rangos.
+
+608
+00:52:10,000 --> 00:52:13,000
+Segundos, si son los segundos totales de llamadas,
+
+609
+00:52:13,000 --> 00:52:15,000
+frecuencia de llamadas, que es el total de llamadas,
+
+610
+00:52:15,000 --> 00:52:18,000
+frecuencia de SMS, el total de mensaje de texto,
+
+611
+00:52:18,000 --> 00:52:21,000
+número de contactos, número de distintos números,
+
+612
+00:52:21,000 --> 00:52:25,000
+o sea, número de cantidad de números distintos contactados,
+
+613
+00:52:25,000 --> 00:52:29,000
+tipo de plan, si es de prepago, 1, y si es plan, es 2,
+
+614
+00:52:29,000 --> 00:52:32,000
+el estado, si está activo, es 1, si no está activo, es 2,
+
+615
+00:52:32,000 --> 00:52:36,000
+luego la edad del cliente, que bueno, vamos a suponer que...
+
+616
+00:52:36,000 --> 00:52:39,000
+que no hay niños que están mayores de edad, cierto,
+
+617
+00:52:39,000 --> 00:52:43,000
+y CLV, que es el valor del cliente, de acuerdo,
+
+618
+00:52:43,000 --> 00:52:46,000
+o Customer Lifetime Value, ¿ya?
+
+619
+00:52:46,000 --> 00:52:49,000
+Entonces, esas son las variables que vamos a tener.
+
+620
+00:52:49,000 --> 00:52:53,000
+¿Cuál es nuestro objetivo? Pues nuestro objetivo va a ser la fuga, ¿vale?
+
+621
+00:52:53,000 --> 00:52:56,000
+Va a ser si abandona, va a ser un 1,
+
+622
+00:52:56,000 --> 00:52:59,000
+y si está activo, va a ser un 0, ¿de acuerdo?
+
+623
+00:52:59,000 --> 00:53:02,000
+Entonces...
+
+624
+00:53:02,000 --> 00:53:05,000
+Bueno, aquí corregimos un par de cosas típicas ya.
+
+625
+00:53:05,000 --> 00:53:08,000
+Esto vamos ahora al Colab, yo os lo explico, ¿de acuerdo?
+
+626
+00:53:08,000 --> 00:53:11,000
+Y vamos a esto. Entonces, dejar de compartir,
+
+627
+00:53:11,000 --> 00:53:14,000
+me voy a ir al Google Colab.
+
+628
+00:53:17,000 --> 00:53:21,000
+Entonces, al Colab ya sabéis que os va a salir...
+
+629
+00:53:23,000 --> 00:53:26,000
+Pestañas de navegados.
+
+630
+00:53:26,000 --> 00:53:29,000
+Compartir... El Google Colab, recordad que tenéis que decir
+
+631
+00:53:29,000 --> 00:53:32,000
+que lo habrá con el Google Colab porque no sé qué ha pasado.
+
+632
+00:53:32,000 --> 00:53:35,000
+Reducción de dimensionalidad, aquí está,
+
+633
+00:53:35,000 --> 00:53:38,000
+compartir...
+
+634
+00:53:38,000 --> 00:53:41,000
+A ver, porque a mí aquí no me ha sacado del Excel,
+
+635
+00:53:41,000 --> 00:53:44,000
+del...
+
+636
+00:53:44,000 --> 00:53:47,000
+A ver, que no me ha sacado...
+
+637
+00:53:47,000 --> 00:53:50,000
+Que no me está sacando la presentación esta.
+
+638
+00:53:50,000 --> 00:53:53,000
+Que si no, yo no puedo ver el Colab.
+
+639
+00:53:53,000 --> 00:53:56,000
+Y esto lo cierro.
+
+640
+00:53:56,000 --> 00:53:59,000
+Volver a conectar.
+
+641
+00:53:59,000 --> 00:54:02,000
+Hecho, aquí está.
+
+642
+00:54:02,000 --> 00:54:05,000
+Vale, ok. Sí se ve, ¿no?
+
+643
+00:54:05,000 --> 00:54:08,000
+Mi...
+
+644
+00:54:08,000 --> 00:54:11,000
+Sí, sí se ve.
+
+645
+00:54:11,000 --> 00:54:14,000
+Vale, entonces...
+
+646
+00:54:14,000 --> 00:54:17,000
+Lo de siempre, aquí simplemente os explico un poquito,
+
+647
+00:54:17,000 --> 00:54:20,000
+vamos a ver el problema... Vamos a verlo entre cuatro bloques.
+
+648
+00:54:20,000 --> 00:54:23,000
+El problema de la alta dimensionalidad, la representación de variables.
+
+649
+00:54:23,000 --> 00:54:26,000
+O sea, lo que hemos visto en los bloques que hemos visto
+
+650
+00:54:26,000 --> 00:54:29,000
+en el PowerPoint. Ok?
+
+651
+00:54:29,000 --> 00:54:32,000
+Entonces, vamos a hacer los puntos 1, 2, 3. Luego ya, después del descanso,
+
+652
+00:54:32,000 --> 00:54:35,000
+vamos a hacer el punto 4. ¿De acuerdo? Voy a trabajar
+
+653
+00:54:35,000 --> 00:54:38,000
+con un dataset sintético, pero después con una semilla fija,
+
+654
+00:54:38,000 --> 00:54:41,000
+así que todos vamos a tener los mismos resultados.
+
+655
+00:54:41,000 --> 00:54:44,000
+Pero, para la práctica,
+
+656
+00:54:44,000 --> 00:54:47,000
+para que repaseis, os pondré una base de datos real.
+
+657
+00:54:47,000 --> 00:54:50,000
+¿De acuerdo? Aquí hacemos lo de siempre.
+
+658
+00:54:50,000 --> 00:54:53,000
+Vamos a hacer que corran todas las...
+
+659
+00:54:53,000 --> 00:54:56,000
+Ahí se me olvidó poner la frasecita de que está activada.
+
+660
+00:54:56,000 --> 00:54:59,000
+Entonces le ponemos esto. Entonces, acordaros,
+
+661
+00:54:59,000 --> 00:55:02,000
+¿cuál es el problema de la alta dimensionalidad? El costo computacional,
+
+662
+00:55:02,000 --> 00:55:05,000
+la multicolinealidad, las variables ruido
+
+663
+00:55:05,000 --> 00:55:08,000
+y el sesgo versus varianza.
+
+664
+00:55:08,000 --> 00:55:11,000
+¿De acuerdo? Obviamente, como es una
+
+665
+00:55:11,000 --> 00:55:14,000
+base de datos sintética,
+
+666
+00:55:14,000 --> 00:55:17,000
+pues no vamos a tener muchos problemas, pero
+
+667
+00:55:17,000 --> 00:55:20,000
+en la base real sí que va a haber datos que vamos a tener
+
+668
+00:55:20,000 --> 00:55:23,000
+que reemplazar, etcétera. Pero bueno, para hacer esto un poco más rápido
+
+669
+00:55:23,000 --> 00:55:26,000
+pues lo hice así. ¿De acuerdo? Entonces, bueno,
+
+670
+00:55:26,000 --> 00:55:29,000
+aquí generamos la base de datos sintética.
+
+671
+00:55:29,000 --> 00:55:32,000
+Que luego, cuando os pondré las indicaciones,
+
+672
+00:55:32,000 --> 00:55:35,000
+en vez de use real data, en vez de false,
+
+673
+00:55:35,000 --> 00:55:38,000
+le vamos a poner true y tenéis que poner la ruta
+
+674
+00:55:38,000 --> 00:55:41,000
+de acceso a la base de datos, cuando os pase
+
+675
+00:55:41,000 --> 00:55:44,000
+para hacer la atilla de repaso.
+
+676
+00:55:44,000 --> 00:55:47,000
+Bueno, pero ahí os lo voy a indicar, así que no os preocupéis.
+
+677
+00:55:47,000 --> 00:55:50,000
+Entonces, esto, hemos corrido esto, nos hace el dataset
+
+678
+00:55:50,000 --> 00:55:53,000
+sintético y aquí tenemos número de fallas,
+
+679
+00:55:53,000 --> 00:55:56,000
+reclamos, antigüedad, montos, segundos, frecuencia de llamadas,
+
+680
+00:55:56,000 --> 00:55:59,000
+etcétera. ¿De acuerdo? Y aquí fuga. Esto es un
+
+681
+00:55:59,000 --> 00:56:02,000
+head de la dataset, así que simplemente nos saca
+
+682
+00:56:02,000 --> 00:56:05,000
+las cinco primeras filas. ¿De acuerdo?
+
+683
+00:56:05,000 --> 00:56:08,000
+Vale, entonces, ¿qué hacemos? Hacemos una limpieza rápida
+
+684
+00:56:08,000 --> 00:56:11,000
+con exactitud, completitud, todo lo que vimos.
+
+685
+00:56:11,000 --> 00:56:14,000
+Y en este caso, pues como os digo, no hay que corregir
+
+686
+00:56:14,000 --> 00:56:17,000
+mucho porque es una dataset sintética. Así que nada,
+
+687
+00:56:17,000 --> 00:56:20,000
+si no, pues bueno, aquí lo que haría sería ver
+
+688
+00:56:20,000 --> 00:56:23,000
+cuáles son las que no son válidas, lo que vimos
+
+689
+00:56:23,000 --> 00:56:26,000
+en la otra sesión. ¿De acuerdo? Entonces, aquí
+
+690
+00:56:26,000 --> 00:56:29,000
+diría cuáles son los que son nulos,
+
+691
+00:56:29,000 --> 00:56:32,000
+si es que faltan datos para que pudiéramos
+
+692
+00:56:32,000 --> 00:56:35,000
+reemplazarlos. ¿De acuerdo? En este caso no hay,
+
+693
+00:56:35,000 --> 00:56:38,000
+así que, chimpún. Vale, ahora, ¿cuántas variables
+
+694
+00:56:38,000 --> 00:56:41,000
+tenemos y qué tan relacionadas están?
+
+695
+00:56:41,000 --> 00:56:44,000
+Vamos a hacer, o sea, ya tenemos la base de datos
+
+696
+00:56:44,000 --> 00:56:47,000
+preparada, ya hemos hecho la limpieza, si hay que hacer
+
+697
+00:56:47,000 --> 00:56:50,000
+imputación, tal y tal, tal, lo de siempre. Y ahora
+
+698
+00:56:50,000 --> 00:56:53,000
+vamos a ver cuántas variables tenemos
+
+699
+00:56:53,000 --> 00:56:56,000
+y qué tan correlacionadas están. ¿De acuerdo?
+
+700
+00:56:56,000 --> 00:56:59,000
+Entonces, bueno, le decimos que es un
+
+701
+00:56:59,000 --> 00:57:02,000
+de las observaciones que tiene, o sea, cuántos datos
+
+702
+00:57:02,000 --> 00:57:05,000
+hay, las variables sin contar, la tasa de fuga,
+
+703
+00:57:05,000 --> 00:57:08,000
+tal, tal. Vamos a ver. Entonces,
+
+704
+00:57:08,000 --> 00:57:11,000
+observaciones, pues tenemos 1500 datos, que son los que
+
+705
+00:57:11,000 --> 00:57:14,000
+hemos generado, variables sin contar fuga,
+
+706
+00:57:14,000 --> 00:57:17,000
+pues son 12. Vale, entonces aquí tenemos
+
+707
+00:57:17,000 --> 00:57:20,000
+12 variables. ¿Qué es lo que nos está diciendo
+
+708
+00:57:20,000 --> 00:57:24,000
+aquí? La tasa de fuga. Entonces, recordad que 0
+
+709
+00:57:27,000 --> 00:57:30,000
+es que no se habían
+
+710
+00:57:30,000 --> 00:57:33,000
+fugado y 1 era que se habían
+
+711
+00:57:33,000 --> 00:57:36,000
+fugado. Entonces, tenemos un 84, 85% que
+
+712
+00:57:36,000 --> 00:57:39,000
+no se han fugado
+
+713
+00:57:39,000 --> 00:57:42,000
+y un 15% que se ha fugado. ¿Me acuerdo?
+
+714
+00:57:42,000 --> 00:57:45,000
+De los usuarios que tenemos.
+
+715
+00:57:45,000 --> 00:57:48,000
+¿Qué pasará aquí con el Accuracy, no?
+
+716
+00:57:48,000 --> 00:57:51,000
+¿Qué tenemos que tener aquí de cuidado?
+
+717
+00:57:51,000 --> 00:57:54,000
+O sea, esta voy a replantear de otra manera.
+
+718
+00:57:54,000 --> 00:57:57,000
+Sabiendo que tenemos 12 variables y que tenemos 1500
+
+719
+00:57:57,000 --> 00:58:00,000
+datos, pero que el 85% ya sabemos que no se han
+
+720
+00:58:00,000 --> 00:58:03,000
+fugado. ¿Qué problema vamos a tener con este
+
+721
+00:58:03,000 --> 00:58:06,000
+dataset? ¿Está balanceado o no está balanceado?
+
+722
+00:58:09,000 --> 00:58:12,000
+A ver qué decís.
+
+723
+00:58:12,000 --> 00:58:15,000
+Está desbalanceado. Vale, entonces, cuando esté
+
+724
+00:58:15,000 --> 00:58:18,000
+desbalanceado, ¿qué es lo que teníamos que tener en cuenta a la hora
+
+725
+00:58:18,000 --> 00:58:21,000
+de hacer luego un modelo de Machine Learning cuando
+
+726
+00:58:21,000 --> 00:58:24,000
+tomamos el dataset?
+
+727
+00:58:26,000 --> 00:58:29,000
+Cuando hagamos esto de los datasets separados en
+
+728
+00:58:29,000 --> 00:58:32,000
+entrenamiento, validación, test.
+
+729
+00:58:35,000 --> 00:58:38,000
+¿Cuál es el objetivo? Estratificar.
+
+730
+00:58:38,000 --> 00:58:41,000
+O sea, tenemos que ver en este caso que cuando
+
+731
+00:58:41,000 --> 00:58:44,000
+tomemos efectivamente esas bases de datos,
+
+732
+00:58:44,000 --> 00:58:47,000
+estemos seguros que estamos tomando los estratos.
+
+733
+00:58:47,000 --> 00:58:50,000
+O sea, si no corremos el riesgo, tenemos un 85%
+
+734
+00:58:50,000 --> 00:58:53,000
+de personas que no se fugan. Si hacemos un muestreo
+
+735
+00:58:53,000 --> 00:58:56,000
+mal hecho, podríamos estar tomando todos
+
+736
+00:58:56,000 --> 00:58:59,000
+los elementos de este conjunto.
+
+737
+00:58:59,000 --> 00:59:02,000
+Entonces hay que tener mucho cuidado y asegurarnos
+
+738
+00:59:02,000 --> 00:59:05,000
+que en esa selección
+
+739
+00:59:05,000 --> 00:59:08,000
+de muestreo vamos a tomar
+
+740
+00:59:08,000 --> 00:59:11,000
+justamente los estratos.
+
+741
+00:59:11,000 --> 00:59:14,000
+Entonces, dicho esto,
+
+742
+00:59:14,000 --> 00:59:17,000
+vamos a ver también, entonces esto,
+
+743
+00:59:17,000 --> 00:59:20,000
+ojito con esto. Siempre lo primero es ver
+
+744
+00:59:20,000 --> 00:59:23,000
+cuántas variables tenemos y obviamente
+
+745
+00:59:23,000 --> 00:59:26,000
+cómo están repartidas. De acuerdo,
+
+746
+00:59:26,000 --> 00:59:29,000
+a ver si tenemos, si está desbalanceada o no.
+
+747
+00:59:29,000 --> 00:59:32,000
+Antes de ponernos a hacer separación
+
+748
+00:59:32,000 --> 00:59:35,000
+para entrenar el modelo.
+
+749
+00:59:35,000 --> 00:59:38,000
+A ver aquí, entonces aquí vamos a ver
+
+750
+00:59:38,000 --> 00:59:41,000
+la correlación y este es el cuadro que os tenía
+
+751
+00:59:41,000 --> 00:59:44,000
+que se ve mejor en el PDF.
+
+752
+00:59:44,000 --> 00:59:47,000
+Porque aquí puedo reducir la vista,
+
+753
+00:59:47,000 --> 00:59:50,000
+sí, pero bueno, luego lo vemos.
+
+754
+00:59:50,000 --> 00:59:53,000
+Entonces, ¿qué es lo que pasa aquí? Fijaros.
+
+755
+00:59:53,000 --> 00:59:56,000
+Aquí lo que tenemos es la correlación
+
+756
+00:59:56,000 --> 00:59:59,000
+entre las variables. Entonces, obviamente se repiten.
+
+757
+00:59:59,000 --> 01:00:02,000
+Ya habéis visto este tipo de matrices de correlaciones,
+
+758
+01:00:02,000 --> 01:00:05,000
+¿cierto? De varianza a correlación, ¿sí o no?
+
+759
+01:00:05,000 --> 01:00:08,000
+Sí, imagino que sí. Las habéis tenido que ver ya en
+
+760
+01:00:08,000 --> 01:00:11,000
+modelos de regresión. Sí, ¿no? Sí.
+
+761
+01:00:11,000 --> 01:00:14,000
+Entonces, aquí.
+
+762
+01:00:14,000 --> 01:00:17,000
+¿Cuáles diríais que son las variables?
+
+763
+01:00:17,000 --> 01:00:20,000
+Voy a pasar al PDF
+
+764
+01:00:20,000 --> 01:00:23,000
+porque se ve mejor.
+
+765
+01:00:23,000 --> 01:00:26,000
+Aquí está.
+
+766
+01:00:26,000 --> 01:00:29,000
+¿Cuáles diríais que son las variables?
+
+767
+01:00:29,000 --> 01:00:32,000
+Bueno, lo tenéis también en vuestro, se me olvidó que podéis correr vosotros también
+
+768
+01:00:32,000 --> 01:00:35,000
+el colab.
+
+769
+01:00:35,000 --> 01:00:38,000
+¿Cuáles diríais que son,
+
+770
+01:00:38,000 --> 01:00:41,000
+en este caso, las variables
+
+771
+01:00:41,000 --> 01:00:44,000
+que están correlacionadas?
+
+772
+01:00:44,000 --> 01:00:47,000
+Ay, bueno, es que ésta era con otra base de datos.
+
+773
+01:00:47,000 --> 01:00:50,000
+Ésta la puse con la base de datos real.
+
+774
+01:00:50,000 --> 01:00:53,000
+Ah, bueno, luego os la paso. Pero vale, entonces aquí no.
+
+775
+01:00:53,000 --> 01:00:56,000
+Dejadme pasar de aquí a la base de datos que ésta no era.
+
+776
+01:00:56,000 --> 01:00:59,000
+Ésta era la de base de datos real que es con la que hice el PDF.
+
+777
+01:00:59,000 --> 01:01:02,000
+Vamos al colab entonces.
+
+778
+01:01:02,000 --> 01:01:05,000
+Perdónas, me acabo de dar cuenta.
+
+779
+01:01:05,000 --> 01:01:08,000
+Bueno, ahí lo veis en el colab vuestro,
+
+780
+01:01:08,000 --> 01:01:11,000
+si es que no se ve bien en el mío.
+
+781
+01:01:11,000 --> 01:01:14,000
+Pero vamos a ver aquí.
+
+782
+01:01:17,000 --> 01:01:20,000
+Vale, ¿cuáles son las variables que están correlacionadas?
+
+783
+01:01:20,000 --> 01:01:23,000
+Entonces, las más correlacionadas en este caso.
+
+784
+01:01:26,000 --> 01:01:29,000
+Las que tienen que ver con intensidad de uso.
+
+785
+01:01:29,000 --> 01:01:32,000
+Vamos a ver.
+
+786
+01:01:32,000 --> 01:01:35,000
+Quedan cinco minutos. Vale.
+
+787
+01:01:35,000 --> 01:01:38,000
+Ahora lo vemos a la vuelta. Pero claro, ¿qué pasa?
+
+788
+01:01:38,000 --> 01:01:41,000
+Vosotros tenéis aquí 0,99 que son segundos, por ejemplo,
+
+789
+01:01:41,000 --> 01:01:44,000
+con frecuencia de llamadas.
+
+790
+01:01:44,000 --> 01:01:47,000
+Luego, por ejemplo, otra que está
+
+791
+01:01:47,000 --> 01:01:50,000
+muy correlacionada es el número de contactos
+
+792
+01:01:50,000 --> 01:01:53,000
+con segundos, frecuencias de llamadas.
+
+793
+01:01:53,000 --> 01:01:56,000
+Esas son bastante altas.
+
+794
+01:01:56,000 --> 01:01:59,000
+Y luego también, por ejemplo, el CLV
+
+795
+01:01:59,000 --> 01:02:02,000
+con segundos, frecuencias de llamadas.
+
+796
+01:02:02,000 --> 01:02:05,000
+Entonces, claro, ahí hay correlación entre ellas.
+
+797
+01:02:05,000 --> 01:02:08,000
+¿Cierto? Con lo cual, ¿qué es lo que pasa?
+
+798
+01:02:08,000 --> 01:02:11,000
+Tenemos segundos, las variables, varias variables de uso,
+
+799
+01:02:11,000 --> 01:02:14,000
+por ejemplo, segundos, frecuencias de llamadas,
+
+800
+01:02:14,000 --> 01:02:17,000
+número de contactos, frecuencias de SMS,
+
+801
+01:02:17,000 --> 01:02:20,000
+pues están fuertemente correlacionadas. ¿De acuerdo?
+
+802
+01:02:20,000 --> 01:02:23,000
+Por lo tanto, ¿qué me están diciendo? Que si están correlacionadas,
+
+803
+01:02:23,000 --> 01:02:26,000
+acordaros, si hay multicolinealidad,
+
+804
+01:02:26,000 --> 01:02:29,000
+hay todas las variables, o sea, todo lo que vimos antes.
+
+805
+01:02:29,000 --> 01:02:32,000
+En este caso se ha cubrido multicolinealidad, etc.
+
+806
+01:02:32,000 --> 01:02:35,000
+¿Qué pasa?
+
+807
+01:02:35,000 --> 01:02:38,000
+Esos son señales de que hay redundancia y que,
+
+808
+01:02:38,000 --> 01:02:41,000
+por lo tanto, tenemos que aplicar el principal
+
+809
+01:02:41,000 --> 01:02:44,000
+componente análisis. ¿De acuerdo? Y tratar de reducir
+
+810
+01:02:44,000 --> 01:02:47,000
+dimensiones porque estamos teniendo ahí
+
+811
+01:02:47,000 --> 01:02:50,000
+exceso de información redundante. ¿De acuerdo?
+
+812
+01:02:50,000 --> 01:02:53,000
+Efectivamente. Entonces, ¿podemos reducir
+
+813
+01:02:53,000 --> 01:02:56,000
+esas? Vamos a ver cómo se van a reducir. ¿De acuerdo?
+
+814
+01:02:56,000 --> 01:02:59,000
+Lo que sabemos es que no necesitamos las seis variables
+
+815
+01:02:59,000 --> 01:03:02,000
+para decir cuánto usa el cliente del servicio.
+
+816
+01:03:02,000 --> 01:03:05,000
+O sea, el uso del cliente del servicio
+
+817
+01:03:05,000 --> 01:03:08,000
+se va a poder simplificar, pero vamos a ver cómo. O sea,
+
+818
+01:03:08,000 --> 01:03:11,000
+no es así como, venga, pues voy a quitar esta. No. Vamos a ver
+
+819
+01:03:11,000 --> 01:03:14,000
+cómo vamos a separar esas variables.
+
+820
+01:03:14,000 --> 01:03:17,000
+Pero eso lo veremos después de la pausa. ¿Os parece?
+
+821
+01:03:17,000 --> 01:03:20,000
+Porque ya me dijeron ahí que quedaban cinco minutos,
+
+822
+01:03:20,000 --> 01:03:23,000
+así que creo que es el momento de la pausa.
+
+823
+01:03:23,000 --> 01:03:26,000
+¿Os parece?
+
+824
+01:03:26,000 --> 01:03:29,000
+¡Chimpún! ¡Gracias! Ahí sí.
+
+825
+01:03:29,000 --> 01:03:29,001
+[Pausa: recreo hacia 1:03:29 del video aprox. El video no contiene el tramo del descanso (no hay silencio ni audio intermedio); la clase continúa directamente con el regreso del recreo.]
+
+826
+01:03:29,000 --> 01:03:32,000
+Perfecto. Entonces,
+
+827
+01:03:32,000 --> 01:03:35,000
+volvemos al Google Colab.
+
+828
+01:03:38,000 --> 01:03:41,000
+Entonces, estábamos diciendo...
+
+829
+01:03:41,000 --> 01:03:44,000
+Perdonad.
+
+830
+01:03:44,000 --> 01:03:47,000
+Aquí vamos.
+
+831
+01:03:48,000 --> 01:03:51,000
+No, ese no es...
+
+832
+01:03:52,000 --> 01:03:55,000
+Es en...
+
+833
+01:03:58,000 --> 01:04:01,000
+¿Dónde está? Es en este.
+
+834
+01:04:10,000 --> 01:04:13,000
+Veis muy buen el Colab, ¿no?
+
+835
+01:04:13,000 --> 01:04:16,000
+Está cargando.
+
+836
+01:04:16,000 --> 01:04:19,000
+Ahí cargó. ¿Sí? Ya, perfecto.
+
+837
+01:04:19,000 --> 01:04:22,000
+Vale, entonces, os estaba diciendo
+
+838
+01:04:22,000 --> 01:04:25,000
+que en este de acá...
+
+839
+01:04:28,000 --> 01:04:31,000
+Aquí. Entonces, estábamos viendo
+
+840
+01:04:31,000 --> 01:04:34,000
+que teníamos correlación, ¿cierto? entre varias variables.
+
+841
+01:04:34,000 --> 01:04:37,000
+Aquí. Por lo tanto,
+
+842
+01:04:38,000 --> 01:04:41,000
+¿qué es lo que tenemos aquí?
+
+843
+01:04:41,000 --> 01:04:44,000
+¿Qué es lo que tenemos?
+
+844
+01:04:44,000 --> 01:04:47,000
+Por lo tanto, habíamos dicho,
+
+845
+01:04:47,000 --> 01:04:50,000
+vamos a ver cuáles son las que están correlacionadas antes de ponernos a hacer nada.
+
+846
+01:04:50,000 --> 01:04:53,000
+Entonces, antes de reducir dimensionalidad,
+
+847
+01:04:53,000 --> 01:04:56,000
+vamos a ver cuáles son las que están correlacionadas,
+
+848
+01:04:56,000 --> 01:04:59,000
+si es que realmente tiene sentido reducir las dimensiones.
+
+849
+01:04:59,000 --> 01:05:02,000
+Y ahora, lo que queremos decir es
+
+850
+01:05:02,000 --> 01:05:05,000
+vamos a ver, antes de reducir, recordad, vamos a hacer un feature engineering
+
+851
+01:05:05,000 --> 01:05:08,000
+y vamos a ver si podemos crear variables nuevas
+
+852
+01:05:08,000 --> 01:05:11,000
+antes de escalar. Y habíamos dicho que íbamos a crear tres variables
+
+853
+01:05:11,000 --> 01:05:14,000
+que nos iban a importar en cuanto a lo que era
+
+854
+01:05:14,000 --> 01:05:17,000
+el análisis de la fuga de clientes, ¿no?
+
+855
+01:05:17,000 --> 01:05:20,000
+Que era, por ejemplo, sus patrones de consumo, ¿no?
+
+856
+01:05:20,000 --> 01:05:23,000
+Entonces, habíamos dicho la duración promedio llamada,
+
+857
+01:05:23,000 --> 01:05:26,000
+el SMS por antigüedad y la intensidad del contacto, ¿de acuerdo?
+
+858
+01:05:26,000 --> 01:05:29,000
+Y habíamos dicho que íbamos a hacer con esta combinación de segundos
+
+859
+01:05:29,000 --> 01:05:32,000
+sobre frecuencia de llamadas, frecuencia de mensajes
+
+860
+01:05:32,000 --> 01:05:35,000
+sobre antigüedad y luego número de contactos
+
+861
+01:05:35,000 --> 01:05:38,000
+sobre frecuencias de llamadas, ¿de acuerdo?
+
+862
+01:05:38,000 --> 01:05:41,000
+Entonces, bueno, pues ahí está, creamos ahí las variables
+
+863
+01:05:41,000 --> 01:05:44,000
+y por lo tanto las incluimos en nuestra base de datos, ¿ya?
+
+864
+01:05:44,000 --> 01:05:47,000
+Entonces, ¿qué es lo que pasa? Que ahora,
+
+865
+01:05:47,000 --> 01:05:50,000
+pues aquí nos hace simplemente una estadística
+
+866
+01:05:50,000 --> 01:05:53,000
+de nuestras variables
+
+867
+01:05:53,000 --> 01:05:56,000
+para asegurarnos que las ha creado bien, ¿sí?
+
+868
+01:05:56,000 --> 01:05:59,000
+Entonces, tenemos 1500 datos, o sea, las ha creado
+
+869
+01:05:59,000 --> 01:06:02,000
+en todos los datos, ahí está la media de la duración de llamadas,
+
+870
+01:06:02,000 --> 01:06:05,000
+vamos a las estadísticas descriptivas básicas, el box plot, ¿ya?
+
+871
+01:06:05,000 --> 01:06:08,000
+Vale, entonces nos ha creado esas nuevas variables
+
+872
+01:06:08,000 --> 01:06:11,000
+y ahora lo que vamos a hacer es ver
+
+873
+01:06:11,000 --> 01:06:14,000
+cómo traducir obviamente esas variables al modelo.
+
+874
+01:06:14,000 --> 01:06:17,000
+Entonces, lo que vamos a hacer es codificar
+
+875
+01:06:17,000 --> 01:06:20,000
+las variables categóricas. ¿Os acordáis que era otro de los pasos
+
+876
+01:06:20,000 --> 01:06:23,000
+que teníamos que hacer antes de entrar a aplicar
+
+877
+01:06:23,000 --> 01:06:26,000
+ningún modelo de Machine Learning, ¿ya?
+
+878
+01:06:26,000 --> 01:06:29,000
+Entonces, hemos visto que los datos ya están completos,
+
+879
+01:06:29,000 --> 01:06:32,000
+hemos visto que efectivamente hay variables que están correlacionadas,
+
+880
+01:06:32,000 --> 01:06:35,000
+con lo cual hay que reducirlas,
+
+881
+01:06:35,000 --> 01:06:38,000
+hemos visto que podíamos crear otras variables nuevas
+
+882
+01:06:38,000 --> 01:06:41,000
+antes de hacer la reducción de dimensiones
+
+883
+01:06:41,000 --> 01:06:44,000
+y ahora tenemos que codificar las variables que no están
+
+884
+01:06:44,000 --> 01:06:47,000
+en el lenguaje que pueda entender el modelo, ¿de acuerdo?
+
+885
+01:06:47,000 --> 01:06:50,000
+Como por ejemplo el tipo de plan y el estado, ¿sí?
+
+886
+01:06:50,000 --> 01:06:53,000
+Que ya habíamos dicho que el tipo de plan pues era
+
+887
+01:06:53,000 --> 01:06:56,000
+si era alto, bajo, etcétera, y luego el estado,
+
+888
+01:06:56,000 --> 01:06:59,000
+si estaba activo o no estaba activo, ¿de acuerdo?
+
+889
+01:06:59,000 --> 01:07:02,000
+Entonces, ¿qué pasa? Que los tenemos que pasar a enteros, ¿ya?
+
+890
+01:07:02,000 --> 01:07:05,000
+Vale, los vamos a convertir a un one-hot, ¿ya?
+
+891
+01:07:05,000 --> 01:07:08,000
+Ceros y unos.
+
+892
+01:07:08,000 --> 01:07:11,000
+Entonces, aquí el one-hot encoder, ¿ya?
+
+893
+01:07:11,000 --> 01:07:14,000
+Le decimos que sea binario,
+
+894
+01:07:14,000 --> 01:07:17,000
+luego pues nada, simplemente le ponemos aquí las instrucciones
+
+895
+01:07:17,000 --> 01:07:20,000
+para que me pase las categóricas a binarias, etcétera
+
+896
+01:07:20,000 --> 01:07:23,000
+y luego el estado, ¿sí?
+
+897
+01:07:23,000 --> 01:07:26,000
+Y luego, ¿qué es lo que hacemos? Decimos, vale,
+
+898
+01:07:26,000 --> 01:07:29,000
+es que, bueno, ya da igual, es que como estuve en el descanso
+
+899
+01:07:29,000 --> 01:07:32,000
+para poner los textos bien, ya he corrido todo,
+
+900
+01:07:32,000 --> 01:07:35,000
+pero bueno, ya está.
+
+901
+01:07:35,000 --> 01:07:38,000
+El asunto es que antes que teníamos, tenemos 15 columnas,
+
+902
+01:07:38,000 --> 01:07:41,000
+ahora ¿qué pasa? Pues con el one-hot vamos a tener
+
+903
+01:07:41,000 --> 01:07:44,000
+15 columnas también, ¿vale? Es decir, no estamos
+
+904
+01:07:44,000 --> 01:07:47,000
+creando una variable nueva, sino que lo que hemos hecho
+
+905
+01:07:47,000 --> 01:07:50,000
+ha sido simplemente recodificar las variables
+
+906
+01:07:50,000 --> 01:07:53,000
+que teníamos, ¿de acuerdo? O sea, ojo con eso,
+
+907
+01:07:53,000 --> 01:07:56,000
+para que no estemos creando una variable nueva, ¿ya?
+
+908
+01:07:56,000 --> 01:07:59,000
+Vale, pues aquí está, entonces tenemos reclamos,
+
+909
+01:07:59,000 --> 01:08:02,000
+antigüedad, monto, etcétera, ¿ya? Así que estamos bien con eso.
+
+910
+01:08:02,000 --> 01:08:05,000
+Muy bien, ahora ¿qué va a pasar? Nosotros vamos a separarlo
+
+911
+01:08:05,000 --> 01:08:08,000
+en los grupos para hacer la validación, el test,
+
+912
+01:08:08,000 --> 01:08:11,000
+el entrenamiento, ¿de acuerdo?
+
+913
+01:08:17,000 --> 01:08:20,000
+En este caso, el escalador fit
+
+914
+01:08:20,000 --> 01:08:23,000
+se ajusta solo con el entrenamiento, igual que cualquier
+
+915
+01:08:23,000 --> 01:08:26,000
+importación o transformación y después aplicamos transform
+
+916
+01:08:26,000 --> 01:08:29,000
+a la validación o prueba, ¿de acuerdo?
+
+917
+01:08:29,000 --> 01:08:32,000
+Entonces, bueno, aquí separamos simplemente, yo os explico
+
+918
+01:08:32,000 --> 01:08:35,000
+las instrucciones que estamos usando y aquí nada,
+
+919
+01:08:35,000 --> 01:08:38,000
+separamos el grupo, lo vamos a separar en el 75% y 25%
+
+920
+01:08:38,000 --> 01:08:41,000
+y vamos a tener entrenamiento y test, ¿de acuerdo?
+
+921
+01:08:41,000 --> 01:08:44,000
+En este caso, sí que he puesto entrenamiento y test,
+
+922
+01:08:44,000 --> 01:08:50,640
+no he puesto el de la validación, porque en realidad como simplemente
+
+923
+01:08:50,640 --> 01:08:56,920
+vamos a seleccionar las variables y luego reducirlas, o sea no es no voy a hacer un modelo
+
+924
+01:08:56,920 --> 01:09:02,720
+como tal de ver la precisión del entrenamiento, luego la validación y el test paso directamente
+
+925
+01:09:02,720 --> 01:09:08,400
+del entrenamiento al test, por eso lo he separado en dos, pero lo lógico es que lo hubiéramos
+
+926
+01:09:08,400 --> 01:09:13,680
+separado en train, validation y test, lo que pasa es que para este PCA en realidad podemos separarlo
+
+927
+01:09:13,680 --> 01:09:19,840
+simplemente en un train test, porque es que nos van a salir las mismas, la misma descomposición que
+
+928
+01:09:19,840 --> 01:09:25,680
+si lo separamos en tres, entonces aquí lo que nos sale es simplemente cuántos son los
+
+929
+01:09:25,680 --> 01:09:31,520
+elementos que tenemos en el grupo de entrenamiento y cuáles son los que tenemos en el grupo de test,
+
+930
+01:09:31,520 --> 01:09:40,200
+entonces están en 75% y 25% y contienen 15 variables cada uno de ellos, obviamente hay
+
+931
+01:09:40,200 --> 01:09:46,640
+que poner el scaler etcétera y que esté estratificado, acordaros que tiene que estar
+
+932
+01:09:46,640 --> 01:09:54,200
+estratificado porque la base estaba desbalanceada, eso es lo mismo que hemos hecho en las sesiones
+
+933
+01:09:54,200 --> 01:10:01,280
+anteriores, y ahora ya vamos, ya hemos visto cuáles eran las correlaciones, hemos
+
+934
+01:10:01,280 --> 01:10:06,680
+estandarizado las variables, hemos creado, hemos hecho el Feature Engineering, hemos hecho
+
+935
+01:10:06,680 --> 01:10:13,720
+la separación en los grupos de entrenamiento y test, o sea ya hemos preparado todo, ahora sí
+
+936
+01:10:13,720 --> 01:10:20,720
+podemos ir al PCA, entonces vamos a extraer las variables, entonces bueno aquí simplemente vamos
+
+937
+01:10:20,720 --> 01:10:26,520
+a trabajar con NumPy, porque vamos a trabajar con vectores y valores propios, no sé si sabéis y
+
+938
+01:10:26,520 --> 01:10:33,960
+esa es la fórmula que me he bailado, pero básicamente aquí lo que estamos haciendo es que vamos a hacer
+
+939
+01:10:33,960 --> 01:10:41,240
+matrices, vamos a calcular cuántas personas aquí han visto álgebra lineal, que levanten un poco la
+
+940
+01:10:41,240 --> 01:10:53,920
+mano para saber cuántas personas han visto álgebra lineal, a ver cuántas, dos, a ver más o menos,
+
+941
+01:10:53,920 --> 01:11:01,080
+más o menos, bueno por ahí hay gente que ha visto álgebra lineal, no tantos, pero bueno,
+
+942
+01:11:01,760 --> 01:11:09,600
+algunos poquitos sí que han visto álgebra lineal, no muchos, bueno pues entonces voy a tener que
+
+943
+01:11:09,600 --> 01:11:13,960
+explicarlo en lenguaje sencillo, por eso no quería poner la fórmula, porque sabía que esto podía
+
+944
+01:11:13,960 --> 01:11:21,080
+aburrir, vale entonces vamos a ver, personas, poquitas personas, vale
+
+945
+01:11:21,080 --> 01:11:37,120
+hace mucho tiempo, hace mucho tiempo, vale, hace mucho tiempo, vamos a traducirlo, cuando nosotros
+
+946
+01:11:37,120 --> 01:11:43,120
+hablamos en álgebra lineal, a ver cómo lo traduzco a lenguaje colombiano, cuando hablamos en álgebra
+
+947
+01:11:43,120 --> 01:11:50,920
+lineal, hablamos de bases de vectores, nosotros lo que tenemos son, en álgebra lineal tenemos
+
+948
+01:11:50,920 --> 01:11:57,160
+estructuras, vale, que aquí estas estructuras de vectores y espacios lo que representan son
+
+949
+01:11:57,160 --> 01:12:04,440
+nuestras variables y las dimensiones distintas que vamos a tener para responder a una pregunta de
+
+950
+01:12:04,440 --> 01:12:09,920
+una variable concreta, de acuerdo, entonces digamos que cada variable va a representar una
+
+951
+01:12:09,920 --> 01:12:16,520
+dimensión, cuando en álgebra lineal eso lo traducimos, lo traducimos a estructuras abstractas
+
+952
+01:12:16,520 --> 01:12:22,600
+algebraicas que son vectores y estos vectores tienen unas características que me permiten ir
+
+953
+01:12:22,600 --> 01:12:27,680
+construyendo espacios, entonces la forma más sencilla de ver es en un plano, nosotros tenemos
+
+954
+01:12:27,680 --> 01:12:33,320
+la hoja, la hoja es bidimensional, porque tenemos un ancho y un alto, vale, o un ancho y un largo,
+
+955
+01:12:33,320 --> 01:12:39,160
+como queréis decirlo, cuando pasamos a la tercera dimensión necesitamos un alto, si queremos pasar
+
+956
+01:12:39,160 --> 01:12:45,040
+a una cuarta dimensión, entonces qué pasa, que necesitamos una cuarta dimensión, de acuerdo,
+
+957
+01:12:45,120 --> 01:12:50,760
+y así vamos sumando dimensiones cuando queremos empezar a añadir, por así decirlo,
+
+958
+01:12:53,600 --> 01:13:02,040
+características que no están en el espacio anterior, ya, vale, dentro de todas las cosas que se pueden
+
+959
+01:13:02,040 --> 01:13:10,040
+hacer dentro de estos espacios, nosotros llamamos base al conjunto de esos vectores mínimos,
+
+960
+01:13:10,960 --> 01:13:17,760
+el conjunto más pequeño de vectores que me generan el espacio que yo busco, si ese conjunto
+
+961
+01:13:17,760 --> 01:13:23,640
+de vectores además resulta que no se pueden crear como combinación de los otros, es decir,
+
+962
+01:13:23,640 --> 01:13:28,160
+lo que se decía, tenéis el techo y cualquier línea que dibujéis en el techo ya se puede
+
+963
+01:13:28,160 --> 01:13:32,920
+combinar por, se puede generar combinando las dos líneas que tenemos en los bordes,
+
+964
+01:13:32,920 --> 01:13:36,760
+porque podemos decir, ah, por recorro esta línea hasta aquí, esta línea hasta aquí y llego al punto
+
+965
+01:13:36,760 --> 01:13:42,960
+que he dibujado ahí, uno al centro y llego a ese punto, bueno, pues las bases son justamente esos
+
+966
+01:13:42,960 --> 01:13:52,840
+vectores que aportan información distinta, y el mínimo número de vectores que aportan información
+
+967
+01:13:52,840 --> 01:13:58,640
+distinta se dice que son linealmente independientes, entonces cuando tenemos esa base ya podemos
+
+968
+01:13:58,640 --> 01:14:04,320
+generar cualquier cosa que esté dentro de ese espacio, en este caso se traduce en que si yo
+
+969
+01:14:04,320 --> 01:14:11,600
+tengo las variables mínimas que condensan toda la variabilidad de la información que tengo,
+
+970
+01:14:11,600 --> 01:14:18,200
+yo voy a poder crear todo lo que yo quiera simplemente con esa información y va a estar
+
+971
+01:14:18,200 --> 01:14:24,000
+dentro del conjunto, o sea, cualquier dato que yo tenga en el conjunto lo puedo encontrar combinando
+
+972
+01:14:24,000 --> 01:14:31,160
+simplemente esas variables que yo selecciona, de acuerdo, vale, cuando empezamos a trabajar dentro
+
+973
+01:14:31,160 --> 01:14:36,400
+de estos espacios vectoriales en álgebra lineal hacemos una serie de transformaciones,
+
+974
+01:14:36,400 --> 01:14:43,120
+y estas transformaciones pues pueden ser de lo más variopintas, pero una de las transformaciones
+
+975
+01:14:43,120 --> 01:14:51,880
+más básicas es generar vectores proporcionales a otros vectores, es decir, que si yo tengo un
+
+976
+01:14:51,880 --> 01:14:56,200
+vector de este largo, pues puedo generar un vector exactamente, o sea, este es mi vector,
+
+977
+01:14:56,920 --> 01:15:02,120
+y entonces esta es la dimensión que está generando, yo puedo generar un vector proporcional a este que
+
+978
+01:15:02,120 --> 01:15:06,920
+va a ser otro que tenga la misma inclinación pero que sea más chiquito o que sea más largo o que
+
+979
+01:15:06,920 --> 01:15:12,000
+esté igual pero dado la vuelta, es decir, que apunte a otro lado, entonces ¿qué pasa? esas
+
+980
+01:15:12,000 --> 01:15:16,840
+transformaciones, lo que están haciendo es generarme las transformaciones del vector,
+
+981
+01:15:16,840 --> 01:15:22,160
+lo que pueden hacer es, pues este vector me lo puede dejar así, lo puede dejar exactamente igual,
+
+982
+01:15:22,160 --> 01:15:26,160
+lo puede reducir pero manteniendo el mismo, pero también lo que podría hacer es que este vector
+
+983
+01:15:26,160 --> 01:15:32,000
+lo esté doblando y me esté generando una curva o que haga una cosa más estrambótica,
+
+984
+01:15:32,000 --> 01:15:38,520
+bueno, nosotros nos vamos a quedar con ese tipo de transformaciones que lo que hacen es que
+
+985
+01:15:38,520 --> 01:15:46,440
+simplemente me mantienen el mismo vector pero proporcional, entonces esto es lo que cuando
+
+986
+01:15:46,440 --> 01:15:54,200
+en álgebra lineal hablamos de los eigenvalues y eigenvectors, es decir, los vectores propios y
+
+987
+01:15:54,200 --> 01:16:01,440
+los valores propios, el valor propio es qué tanto varío ese vector, es decir, si lo hago más grande
+
+988
+01:16:01,440 --> 01:16:08,000
+tres veces, más grande, más pequeño a la tercera parte, si le doy vuelta, entonces lo multiplico por
+
+989
+01:16:08,000 --> 01:16:17,000
+un menos uno, entonces ese valor propio, ese valor lo que me dice es qué tanto estoy cambiando
+
+990
+01:16:17,000 --> 01:16:23,040
+ese vector, pero nos vamos a fijar en las transformaciones en las que ese vector
+
+991
+01:16:23,040 --> 01:16:29,200
+simplemente es el mismo pero con otro traje, me acuerdo, pero es el mismo vector, es decir,
+
+992
+01:16:29,200 --> 01:16:35,200
+lo va chica, lo va larga o le da vuelta, porque digo todo esto, nosotros cuando estamos viendo
+
+993
+01:16:35,200 --> 01:16:44,080
+justamente este proceso que está aquí la extracción de variables, lo que estamos buscando es de todos
+
+994
+01:16:44,080 --> 01:16:49,120
+los vectores que tenemos, es decir, de todas las variables que tenemos en nuestra base de datos,
+
+995
+01:16:49,440 --> 01:16:59,240
+queremos elegir aquellos vectores que a través de esta transformación, en este caso el modelo
+
+996
+01:16:59,240 --> 01:17:07,440
+que voy a aplicar, me deja al vector tal cual está, es decir, aquellos que realmente aportan
+
+997
+01:17:07,440 --> 01:17:14,320
+información esencial se van a mantener a través del modelo y los que no aportan información esencial
+
+998
+01:17:14,320 --> 01:17:19,840
+entonces se van a transformar en algo que no son ellos, se entiende, entonces qué es lo que va a
+
+999
+01:17:19,840 --> 01:17:25,640
+hacer este modelo, va a seleccionar esos vectores, en este caso esas componentes, esas variables,
+
+1000
+01:17:25,640 --> 01:17:33,880
+que cuando yo les aplico esta transformación se quedan en una réplica más grande, más pequeña
+
+1001
+01:17:33,880 --> 01:17:42,840
+o dada la vuelta de ella misma, y eso es lo que aparece aquí como este Av = λv, y que es lo que
+
+1002
+01:17:42,840 --> 01:17:49,240
+se llama el vector propio, es decir, A es la matriz de la transformación, V es el vector que
+
+1003
+01:17:49,240 --> 01:17:55,520
+va a representar la variable y λ sería ese valor propio, es decir, que tanto estoy agrandando o
+
+1004
+01:17:55,520 --> 01:18:02,360
+empequeñeciendo ese vector, entonces ¿en qué consiste este proceso? consiste justamente en
+
+1005
+01:18:02,360 --> 01:18:10,320
+seleccionar esos vectores que por sí solos representan a la mayor variabilidad posible en
+
+1006
+01:18:10,320 --> 01:18:18,000
+cada dimensión, ¿se entiende? ha quedado más o menos claro para la gente que sabía algebra y
+
+1007
+01:18:18,000 --> 01:18:23,760
+ideal como para la gente que no, es el momento de preguntar antes de que corra el código
+
+1008
+01:18:29,840 --> 01:18:30,800
+¿hay alguien ahí?
+
+1009
+01:18:33,480 --> 01:18:36,760
+yo no entendí pero quizá con el ejemplo me queda más claro, vale
+
+1010
+01:18:37,360 --> 01:18:47,040
+hay gente, hay alguien, vale, vale, vale, es que no sé, yo creo que aquí han muerto varios,
+
+1011
+01:18:47,040 --> 01:18:54,840
+hemos tenido varias, la última oración, ¿cuál es la última oración?
+
+1012
+01:18:56,360 --> 01:19:01,880
+quizás si lo dibuja, estamos aquí muy atentos, vale, ¿qué última oración? es que he hecho
+
+1013
+01:19:01,880 --> 01:19:08,840
+tantas cosas que no sé cuál es la última oración, pero vale, vamos a ver si hacemos la,
+
+1014
+01:19:08,840 --> 01:19:16,320
+quizás con un dibujo se haga más fácil, puede ser, voy a tratar de hacer un dibujo para que
+
+1015
+01:19:16,320 --> 01:19:20,080
+entendamos lo que estamos haciendo, vale, es que necesito que entendamos esto para entender el
+
+1016
+01:19:20,080 --> 01:19:25,320
+proceso, aunque no lo vayáis a hacer a mano, pero sí que necesito que esto se entienda un poquito,
+
+1017
+01:19:25,800 --> 01:19:36,200
+a ver, esto ahora dónde estaba aquí para que yo dibuje, pausar salas, ocultar controles,
+
+1018
+01:19:36,200 --> 01:19:44,480
+porque ahora no me deja dibujar, a ver, aquí está, he dejado de compartir, ¿no?
+
+1019
+01:19:46,120 --> 01:19:52,960
+no, se sigue viendo, vale, vale, vale, entonces lo que he hecho ha sido quitar simplemente esto de acá,
+
+1020
+01:19:53,800 --> 01:20:02,560
+a ver, vale, ¿veis mi pantalla? sí, ahí, ¿por qué no me he dejado? es que quiero dibujar y ahora no me
+
+1021
+01:20:02,560 --> 01:20:09,880
+he dejado, automatizar, permite que todos lo usen, no, comenzar a tomar notas, a ver, me deja ahí,
+
+1022
+01:20:09,880 --> 01:20:17,360
+my notes, no, no me deja, no me deja dibujar, no sé por qué no me deja dibujar esto ahora,
+
+1023
+01:20:17,560 --> 01:20:27,080
+bueno, os lo voy a hacer en el OneNote entonces, porque si no, no, no puedo dibujarlo aquí,
+
+1024
+01:20:27,080 --> 01:20:28,640
+dame un segundín,
+
+1025
+01:20:34,640 --> 01:20:42,480
+si me deja en el OneNote, compartir, ahora voy a dejar de compartir un segundo para compartir en el otro,
+
+1026
+01:20:47,480 --> 01:20:50,120
+vale, no os preocupéis, voy a compartir el OneNote,
+
+1027
+01:20:55,600 --> 01:20:57,680
+hay que que me sale en algún lado el OneNote,
+
+1028
+01:21:00,680 --> 01:21:06,720
+aquí el OneNote, vale, vale, entonces, ahora sí veis el OneNote, ¿cierto? lo de, vale,
+
+1029
+01:21:08,400 --> 01:21:13,920
+a ver, nosotros tenemos vectores, ya estos vectores pues nos están haciendo dimensiones,
+
+1030
+01:21:13,960 --> 01:21:20,320
+vale, entonces aquí tenemos un espacio tridimensional, por ejemplo, ya, simplemente tenemos un espacio
+
+1031
+01:21:20,320 --> 01:21:28,120
+tridimensional, madre mía que dibujo mal hecho esta vez, voy a hacerlo así, vale, esto se entiende
+
+1032
+01:21:28,120 --> 01:21:34,440
+que es un espacio tridimensional, ¿cierto? entonces estos tres vectores forman una base, ¿vale? ¿por qué?
+
+1033
+01:21:34,440 --> 01:21:39,360
+porque simplemente me está generando cada uno de ellos una dimensión, o sea yo aquí solo puedo ir
+
+1034
+01:21:39,360 --> 01:21:44,720
+hacia arriba hacia abajo, si yo añado eso y yo quiero este punto, ¿este punto que hago? me voy
+
+1035
+01:21:44,720 --> 01:21:49,160
+tantos pasos hacia la derecha y tantos pasos hacia arriba, o sea yo voy siguiendo los vectores,
+
+1036
+01:21:49,160 --> 01:21:54,560
+¿lo veis? o sea yo este punto, por ejemplo, lo puedo escribir haciendo esto y esto, o puedo subir
+
+1037
+01:21:54,560 --> 01:21:58,360
+hacia arriba y luego ir hacia la derecha, ¿me entendéis? entonces yo aquí cualquier punto que
+
+1038
+01:21:58,360 --> 01:22:04,240
+yo dibuje en el plano, pues bueno, me voy, este me voy para abajo, por ejemplo, y luego me voy,
+
+1039
+01:22:04,800 --> 01:22:10,600
+o sea hago el opuesto, aquí estaría multiplicando por un negativo que sería como la mitad pero en
+
+1040
+01:22:10,600 --> 01:22:15,520
+opuesto del sentido del que está en vertical y luego el opuesto del que está en horizontal pero
+
+1041
+01:22:15,520 --> 01:22:19,920
+de la misma longitud aproximadamente, y llegaría ese sentido, entonces yo con esos dos vectores
+
+1042
+01:22:19,920 --> 01:22:25,280
+podría generar cualquier punto en el plano, pero si yo quiero sacar un punto en la tercera dimensión,
+
+1043
+01:22:25,280 --> 01:22:30,280
+o sea este espacio, esto ya se viene hacia afuera, ¿vale? y entonces yo quiero un punto, por ejemplo,
+
+1044
+01:22:30,280 --> 01:22:36,440
+que esté aquí, que este punto, pues qué pasa, que está en el fondo, tengo que subir,
+
+1045
+01:22:36,440 --> 01:22:44,840
+luego tengo que ir hacia aquí y luego tengo que ir hacia la derecha, o sea voy hacia la derecha,
+
+1046
+01:22:44,840 --> 01:22:49,960
+hacia arriba y hacia acá y ahí encuentro el punto, ¿lo veis? entonces necesito las tres
+
+1047
+01:22:49,960 --> 01:22:54,680
+dimensiones y así podemos ir haciendo más dimensiones, entonces yo lo que quiero es que
+
+1048
+01:22:54,680 --> 01:22:59,440
+si yo quiero, por ejemplo, imaginaros que estáis en un cubo y yo quiero poder describir cualquier
+
+1049
+01:22:59,440 --> 01:23:06,720
+punto de este, ¿ya? este cubo tiene tres dimensiones, por lo tanto esto sería como que yo tuviera un
+
+1050
+01:23:06,720 --> 01:23:14,880
+problema donde mi base de datos tiene tres variables y yo cualquier respuesta la puedo obtener, cualquier
+
+1051
+01:23:14,880 --> 01:23:22,560
+punto de esa base de datos la voy a obtener combinando estas tres dimensiones, ¿vale? que son en el fondo
+
+1052
+01:23:22,560 --> 01:23:28,520
+estos tres vectores, este, este y este, que son los que forman mi base, ¿ya? cuando nosotros hacemos
+
+1053
+01:23:28,520 --> 01:23:33,440
+el análisis de componentes principales lo que estamos diciendo es que imaginaros que en este
+
+1054
+01:23:33,440 --> 01:23:42,200
+cubo resulta que todos los puntos, por ejemplo, estuvieran, imaginaros que resulta que todos
+
+1055
+01:23:42,200 --> 01:23:49,920
+los puntos estuvieran, pues aquí, ¿vale? estuvieran en esa pared, entonces yo, por ejemplo,
+
+1056
+01:23:49,920 --> 01:23:55,840
+esta dimensión no la necesitaría, ¿os dais cuenta? yo podría reducirlo simplemente a esta
+
+1057
+01:23:55,840 --> 01:24:02,840
+dimensión y esta dimensión, ¿ya? entonces ¿qué es lo que va a hacer el modelo? lo que va a hacer es
+
+1058
+01:24:02,840 --> 01:24:08,440
+decir, mira, yo me voy a quedar con estos tres vectores que tengo, yo me voy a quedar con aquellos
+
+1059
+01:24:08,440 --> 01:24:16,320
+que cuando yo le aplique esta transformación los puntos del espacio que yo tengo se van a poder
+
+1060
+01:24:16,320 --> 01:24:23,120
+generar con transformaciones proporcionales de estos vectores, ¿vale? entonces va a ser, por ejemplo,
+
+1061
+01:24:23,120 --> 01:24:29,440
+este vector más chiquitito y este vector más chiquitito, ¿vale? eso en que se traduce a va a
+
+1062
+01:24:29,440 --> 01:24:34,960
+ser la matriz de la transformación, ¿ya? esta va a ser la transformación, en este caso el modelo,
+
+1063
+01:24:34,960 --> 01:24:39,840
+lo que va a hacer el modelo, ¿vale? porque hay modelos que lo que hacen es que elevan al cuadrado
+
+1064
+01:24:39,840 --> 01:24:44,880
+el valor, otros modelos que toman la raíz, este lo que va a hacer es que esta transformación,
+
+1065
+01:24:44,880 --> 01:24:52,280
+cuando yo se la aplique al vector, lo que va a hacer es que va a generar ese mismo vector pero
+
+1066
+01:24:52,280 --> 01:24:58,600
+con un tamaño proporcional al suyo, ¿vale? puede ser que lo deje igual, puede ser que le de la vuelta,
+
+1067
+01:24:58,600 --> 01:25:03,360
+si le da la vuelta lo multiplica por un menos, ¿vale? entonces lo que va a hacer es va a observar
+
+1068
+01:25:03,360 --> 01:25:10,480
+todos los puntos que hay y va a tomar aquellos vectores que cuando yo les aplique este modelo,
+
+1069
+01:25:10,480 --> 01:25:18,360
+que es esta transformación, me deje el mismo vector pero achicado, dado la vuelta, agrandado,
+
+1070
+01:25:18,360 --> 01:25:24,880
+o sea el mismo vector, entonces va a mirar todos los puntos y se va a quedar con aquellos vectores
+
+1071
+01:25:24,880 --> 01:25:30,880
+que combinados en sus proporciones me van a poder representar todos los puntos que yo tenga,
+
+1072
+01:25:30,880 --> 01:25:37,800
+¿se entiende así mejor? más o menos, ahora lo vamos a ver pero ese es como lo que va a hacer,
+
+1073
+01:25:37,800 --> 01:25:47,040
+¿vale? sí, vale, entonces vamos ahora al Colab, de acuerdo, entonces cuando veamos esa matriz que
+
+1074
+01:25:47,040 --> 01:25:56,040
+pone Av = λv, que era con ese g mogollón, sí, es con g mogollón, mojollón es una vez
+
+1075
+01:25:56,040 --> 01:26:04,320
+tan muy rara porque mojón podéis buscar lo que es, pero está como raro, vale, entonces,
+
+1076
+01:26:04,320 --> 01:26:14,240
+entonces aquí qué es lo que pasa cuando vosotros veáis el Av = λv, esa era la fórmula que yo
+
+1077
+01:26:14,240 --> 01:26:21,120
+quería evitar en el fondo para no perdernos pero que necesitamos usar para poder aplicar este
+
+1078
+01:26:21,120 --> 01:26:25,880
+modelo, ¿de acuerdo? pero simplemente quedaros con eso, lo que vamos a hacer es aplicar un modelo
+
+1079
+01:26:25,880 --> 01:26:33,080
+que me va a tomar aquellos vectores que combinados con proporcionales a ellos me van a permitir
+
+1080
+01:26:33,080 --> 01:26:38,000
+ir combinando todos ellos generar todos los puntos que yo tenga o explicar en el fondo
+
+1081
+01:26:38,000 --> 01:26:42,400
+todos los datos que yo tenga en la base de datos, ¿de acuerdo? ahora sí, vamos al Colab,
+
+1082
+01:26:43,600 --> 01:26:52,920
+dejadme que deje de compartir, ¿se pueden resumir en mapas que preservan la estructura? sí, viene
+
+1083
+01:26:52,920 --> 01:27:01,400
+siendo lo mismo, vale, al final siguen siendo dimensiones que te están reduciendo el espacio,
+
+1084
+01:27:01,400 --> 01:27:11,560
+vale, en el fondo espacios que siguen explicando todos los datos, vale, déjame ver aquí, compartir
+
+1085
+01:27:15,320 --> 01:27:18,240
+y el Colab, ahora sí veis el Colab
+
+1086
+01:27:20,640 --> 01:27:28,480
+y sí, perfecto, entonces, ¿qué es lo que hemos hecho? entendido eso, vale, tenemos que hacer esta
+
+1087
+01:27:28,480 --> 01:27:31,920
+extracción de variables tenemos que hacer la base matemática de esto, entonces hacemos un array,
+
+1088
+01:27:31,920 --> 01:27:37,080
+en el fondo estamos generando estos vectores, vamos a hacer los valores propios y vectores propios,
+
+1089
+01:27:37,080 --> 01:27:42,720
+el valor propio es ese numerito que me va a dar la proporción del vector y el vector propio,
+
+1090
+01:27:42,720 --> 01:27:47,040
+o sea que me va a decir cuántas veces tengo ese vector y el vector propio es el vector que a través
+
+1091
+01:27:47,040 --> 01:27:51,600
+de esta transformación se mantiene como su proporcional, vale, que no se transforma en
+
+1092
+01:27:51,600 --> 01:27:59,640
+otra cosa más que el mismo proporcional, entonces, ¿qué vamos a hacer? vamos a imprimir los valores
+
+1093
+01:27:59,640 --> 01:28:04,960
+propios y los vectores propios, entonces, ¿qué va a pasar? vamos a hacer un conjunto de vectores
+
+1094
+01:28:04,960 --> 01:28:11,400
+propios y de valores propios y aquí nos van a salir si coinciden o no coinciden, ¿de acuerdo?
+
+1095
+01:28:11,400 --> 01:28:18,560
+entonces, ¿qué es lo que tenemos aquí? los valores propios, vale, los vectores propios son estos,
+
+1096
+01:28:18,560 --> 01:28:25,040
+estos son los valores propios y ¿qué pasa? me calcula la transformación por el vector v que me
+
+1097
+01:28:25,040 --> 01:28:33,040
+da justamente estos valores y luego me da el proporcional de esos vectores y resulta que
+
+1098
+01:28:33,040 --> 01:28:38,680
+efectivamente me está dando el mismo valor, por lo tanto se mantiene esa igualdad que os decía,
+
+1099
+01:28:38,680 --> 01:28:43,760
+es decir, la transformación por el vector se ha convertido en el vector por un escalar, por un
+
+1100
+01:28:43,760 --> 01:28:49,800
+número, por lo tanto, ¿coinciden? sí, entonces, ¿cómo están coincidiendo? yo ya puedo aplicar
+
+1101
+01:28:49,800 --> 01:28:57,000
+en la reducción de dimensiones, ¿de acuerdo? ya, entonces, ¿cómo las va a reducir? bueno, pues le decimos
+
+1102
+01:28:57,000 --> 01:29:04,640
+que aplique el PCA, que lo aplique al grupo de entrenamiento, cierto, y esto es lo que nos sale,
+
+1103
+01:29:04,640 --> 01:29:10,080
+bueno, aquí simplemente es para que nos haga el gráfico, etcétera, ¿de acuerdo? que haga el gráfico
+
+1104
+01:29:10,080 --> 01:29:15,880
+de barras, que haga en el fondo la línea, etcétera, que me combine, ¿de acuerdo? entonces, fijaros,
+
+1105
+01:29:15,880 --> 01:29:22,560
+¿qué es lo que va a hacer esto? aquí nos va a hacer una varianza explicada por componente, las barras
+
+1106
+01:29:22,560 --> 01:29:29,120
+nos van a hablar de la varianza individual de cada componente, es decir, cuánto de la varianza es
+
+1107
+01:29:29,120 --> 01:29:36,960
+explicado por la componente y luego la línea naranja nos va a hablar de la varianza acumulada,
+
+1108
+01:29:36,960 --> 01:29:46,520
+es decir, la primera componente explica solo por sí misma un 35% de la varianza, ¿de acuerdo? la
+
+1109
+01:29:46,520 --> 01:29:53,360
+segunda componente explica por sí misma la diferencia, es decir, de 35% a 44% un 9%,
+
+1110
+01:29:53,360 --> 01:30:00,780
+lo veis, aquí es que claro, con esta escala no se ve, pero esto equivale a un 9%, de 44% esto va a
+
+1111
+01:30:00,780 --> 01:30:06,780
+ser un 8%, esto va a ser un 7%, ¿lo veis? entonces, esto es el porcentaje que cada una de las
+
+1112
+01:30:06,780 --> 01:30:12,260
+componentes explica por sí misma, obviamente la primera componente, os acordáis que es la que
+
+1113
+01:30:12,260 --> 01:30:17,740
+tomaba la mayor varianza posible, luego la siguiente era la que tomaba la siguiente dimensión que se
+
+1114
+01:30:17,740 --> 01:30:24,100
+veía, que estaba marcando la varianza, si hay más dimensiones, pues claro, si con la primera ya tienes
+
+1115
+01:30:24,100 --> 01:30:30,740
+el 35%, con la segunda hemos pillado otro, hemos dicho otro 9%, o sea, hemos acumulado ya un 40%,
+
+1116
+01:30:30,740 --> 01:30:36,100
+pues ahora cada componente obviamente va a ir explicando cada vez un poquito menos, o sea,
+
+1117
+01:30:36,100 --> 01:30:42,820
+estas columnas, estas barras van a ir bajando, porque la primera componente es la que más
+
+1118
+01:30:42,820 --> 01:30:48,500
+tienen que explicar, es la que captura la mayor parte de información posible, la que no captura
+
+1119
+01:30:48,500 --> 01:30:52,300
+ahí, entonces ya trata de pillar la segunda componente, lo que no capturan entre la primera
+
+1120
+01:30:52,300 --> 01:30:56,740
+y la segunda, lo trata de pillar la tercera, y así consecutivamente, entonces si hacéis la diferencia
+
+1121
+01:30:56,740 --> 01:31:01,300
+entre la acumulada, o sea la acumulada en la componente siguiente menos la acumulada anterior,
+
+1122
+01:31:01,300 --> 01:31:07,420
+sabéis cuánto ha sido lo que ha tenido cada una, la segunda tiene un 9%, la tercera tiene un 8%,
+
+1123
+01:31:07,420 --> 01:31:22,660
+la cuarta un 7%, la quinta tiene un 7%, la sexta va a tener un 6%, la séptima va a tener un 7%,
+
+1124
+01:31:22,700 --> 01:31:29,940
+esta tiene un poquito más 7, un 6, bueno aquí tiene, aquí hay un pequeño descuadre, pero vamos,
+
+1125
+01:31:29,940 --> 01:31:36,420
+es porque debe ser en decimales, lo está redondeando, entonces posiblemente es un 6,9 y el otro es un 6,8,
+
+1126
+01:31:36,420 --> 01:31:42,420
+entonces ¿qué es lo que pasa? Aquí va haciendo cuál es la acumulada, de acuerdo,
+
+1127
+01:31:43,260 --> 01:31:51,140
+vale, fijaros, si nosotros vamos, entonces ¿dónde cortamos? ¿cuál va a ser la componente en la que
+
+1128
+01:31:51,140 --> 01:31:56,100
+vamos a decir que hemos explicado la mayor parte de la variabilidad? Pues fijaros, aquí ya empieza
+
+1129
+01:31:56,100 --> 01:32:06,340
+la curva, crece mucho, sale 85%, podríamos decir 90%, aquí ya baja 5%, 4%, 3%, 2%, o sea ya las
+
+1130
+01:32:06,340 --> 01:32:11,660
+siguientes componentes es que están explicando un porcentaje muy chiquitito, o sea podríamos quedarnos,
+
+1131
+01:32:11,660 --> 01:32:18,580
+por ejemplo, en este caso con las ocho primeras, con las ocho primeras ya estamos explicando un
+
+1132
+01:32:18,580 --> 01:32:27,180
+85% de la varianza, podríamos ir al 90%, si, esto es un poco de criterio, es lo de siempre,
+
+1133
+01:32:27,180 --> 01:32:33,620
+es un poco un arte, me quedo en el 85, el 90, pues hombre, la verdad es que si veis la pendiente de
+
+1134
+01:32:33,620 --> 01:32:40,220
+la curva es como que sí, yo me podría quedar quizá con el 85, el 90 me quedaría, o sea me
+
+1135
+01:32:40,220 --> 01:32:43,700
+quedaría con 8,9 componentes, la verdad es que no es tanta la diferencia entre la octava y la
+
+1136
+01:32:43,700 --> 01:32:51,380
+novena, ya un 85% de la varianza explicada es bastante alta y recordad que además teníamos
+
+1137
+01:32:51,380 --> 01:32:57,900
+un 85% de fuga, o sea ya con 8 componentes ya empezamos a, ya hemos cubierto por así decirlo
+
+1138
+01:32:57,900 --> 01:33:04,700
+todos los que se fugan, con lo cual quizá, quizá conviene irse al 90% por pillar los que no están
+
+1139
+01:33:04,700 --> 01:33:11,300
+fugándose, pero bueno, o sea perdón, los que no se fugan, pero esos los que se fugan, entonces por
+
+1140
+01:33:11,300 --> 01:33:16,700
+pillar un poquito más del 85% que habíamos visto que estaba desbalanceado, pero ya bueno el 85%
+
+1141
+01:33:16,700 --> 01:33:20,980
+estamos explicando casi todo, entonces aquí lo que estáis viendo es como la curva luego aquí
+
+1142
+01:33:20,980 --> 01:33:27,180
+prácticamente no sube, lo veis, entonces podríais quedaros con la componente 8 o con la componente
+
+1143
+01:33:27,180 --> 01:33:33,660
+9, me acuerdo, entonces eso os diría cuántas componentes tendréis que tomar, ya más o menos,
+
+1144
+01:33:33,660 --> 01:33:40,140
+me acuerdo, ahora, ¿qué variables arma cada componente?, porque aquí solo sabemos cuántas son y
+
+1145
+01:33:40,140 --> 01:33:48,100
+cuánto explican, me acuerdo, recordad la línea es la acumulada y las barras son las que explica
+
+1146
+01:33:48,100 --> 01:33:53,460
+cada una de ellas, me acuerdo, aquí tenéis el gráfico para ver cuáles son, aquí está el de barras
+
+1147
+01:33:53,460 --> 01:33:57,900
+y aquí está el de línea, me acuerdo, y entonces luego tenéis que combinarlos, y bueno ahí tenéis
+
+1148
+01:33:57,900 --> 01:34:04,460
+los títulos para los labels de las de los ejes, etcétera, me acuerdo, la leyenda, etcétera,
+
+1149
+01:34:05,100 --> 01:34:13,220
+simplemente es el script para la gráfica, entonces con 8 componentes cubrimos al menos el 85%
+
+1150
+01:34:13,220 --> 01:34:17,340
+la varianza total, o sea que ya está bastante bien, la verdad es que con 8 nos podríamos quedar
+
+1151
+01:34:17,340 --> 01:34:23,580
+perfectamente, pero por eso como tenemos la base que el 85% está desbalanceado, pues a lo mejor
+
+1152
+01:34:23,580 --> 01:34:31,900
+la novena, pero 85% ya está bastante bien, entonces de nuevo hay que fijarse en el contexto, hay que
+
+1153
+01:34:31,900 --> 01:34:37,000
+fijarse cómo va, luego con la base de datos que os voy a pasar para hacer la actividad de repaso
+
+1154
+01:34:37,000 --> 01:34:43,300
+van a salir otros números y ahí vais a poder ver un poco más la curva pronunciada de otra manera y
+
+1155
+01:34:43,300 --> 01:34:49,780
+vais a poder elegir de otra manera, pero la idea es la misma, entonces qué variables, aquí sabemos
+
+1156
+01:34:49,780 --> 01:34:54,700
+cuánto explica cada una, pero no sabemos qué contiene cada una, no sabemos cuáles son,
+
+1157
+01:34:54,700 --> 01:35:00,100
+justamente sabemos que estas son las componentes, pero no sabemos qué variables están en estas
+
+1158
+01:35:00,100 --> 01:35:04,740
+componentes, o sea porque esto no es una variable sola, sino que es una combinación de ellas,
+
+1159
+01:35:04,740 --> 01:35:10,380
+cierto, recordad, o sea estamos mirando con qué combinaciones estamos pillando la mayor cantidad
+
+1160
+01:35:10,380 --> 01:35:15,100
+de información posible y esa es una componente, es como que en ese cubo que os había puesto
+
+1161
+01:35:15,100 --> 01:35:19,700
+tuviéramos puntitos en una cara y luego en otra cara, pero no estuvieramos por aquí en medio,
+
+1162
+01:35:19,700 --> 01:35:23,740
+en el cubo, en el centro del cubo, entonces claro pues estaríamos diciendo pues me voy a quedar con
+
+1163
+01:35:23,740 --> 01:35:28,180
+la componente de esta cara y la componente que me genera esta cara, ahí estaríamos tomando los
+
+1164
+01:35:28,180 --> 01:35:33,020
+tres vectores, pero una componente sería por ejemplo los dos vectores que generan esta cara y
+
+1165
+01:35:33,020 --> 01:35:38,380
+la segunda componente tomaría solo este vector, si me explico, o si hay más puntos en esta cara
+
+1166
+01:35:38,380 --> 01:35:45,060
+de acá, tomaría como primera componente los dos vectores, o es decir la cara completa y luego tomaría
+
+1167
+01:35:45,060 --> 01:35:51,580
+como segunda componente el segundo vector, el tercer vector, si me explico, entonces en este caso
+
+1168
+01:35:51,580 --> 01:35:57,300
+tenemos que ver quiénes son los que están en cada una de estas componentes principales, en cada uno
+
+1169
+01:35:57,300 --> 01:36:03,220
+de estos mapas, de estos planos, entonces ahí qué vamos a hacer, vamos a hacer un círculo de
+
+1170
+01:36:03,220 --> 01:36:09,340
+correlaciones, y eso qué va a hacer, pues para las dos primeras componentes va a decir cuánto pesa
+
+1171
+01:36:09,340 --> 01:36:15,100
+cada variable original, entonces las flechas largas y cercanas al borde del círculo va a decir que
+
+1172
+01:36:15,100 --> 01:36:20,100
+esa variable está muy bien representada por la componente 1 y la componente 2, entonces vamos a
+
+1173
+01:36:20,100 --> 01:36:25,860
+ver, vamos a hacer el círculo de correlaciones, entonces vamos a poner acá la componente x, la
+
+1174
+01:36:25,860 --> 01:36:31,100
+componente y, eso te habla en el eje, te va a decir en el fondo cómo está representado, esto
+
+1175
+01:36:31,100 --> 01:36:36,260
+simplemente para poder hacer el círculo de correlaciones, entonces bueno ahí están los
+
+1176
+01:36:36,260 --> 01:36:42,300
+parámetros para poder hacer el círculo de correlaciones, como os dije ya no, ya la había
+
+1177
+01:36:42,300 --> 01:36:50,620
+corrido así que está aquí, entonces fijaros, no sé si puedo agrandar esto,
+
+1178
+01:36:50,620 --> 01:37:04,940
+no me deja, hay un espectro de gatos, a ver si me deja, no, pero no me deja, bueno da igual, la cuestión es en este caso qué va a pasar si os
+
+1179
+01:37:04,940 --> 01:37:11,140
+dais cuenta, aquí tenéis la primera componente, que es esta horizontal, entonces tenéis el monto,
+
+1180
+01:37:11,140 --> 01:37:18,860
+la frecuencia de mensajes, creo que está la frecuencia de llamadas, el clv, de acuerdo, la segunda,
+
+1181
+01:37:18,860 --> 01:37:24,540
+porque si os dais cuenta son las más largas y que están llegando casi, y que están todas juntas,
+
+1182
+01:37:24,540 --> 01:37:29,220
+entonces esta es la primera componente, la segunda componente vendría por el tipo de plan y la
+
+1183
+01:37:29,220 --> 01:37:35,860
+antigüedad, y luego ya pues se van poniendo las otras componentes, que están un poco aquí más
+
+1184
+01:37:35,860 --> 01:37:45,380
+mezcladas, la pc1 explicaba ya el 34,9% y la pc2 ha explicado el 8,9%, bueno era lo que veíamos por acá,
+
+1185
+01:37:45,380 --> 01:37:56,180
+sí, ya entonces, qué pasa, que vamos a tener por lo tanto las componentes explicadas en la componente 1 y
+
+1186
+01:37:56,180 --> 01:38:03,460
+la componente 2, pues ya hemos explicado el 44% y está representado por estas variables que aparecen en
+
+1187
+01:38:03,460 --> 01:38:15,100
+el círculo, ahora bien, vamos a ver cómo se ve esto en colores, de acuerdo, entonces cómo se ven los clientes
+
+1188
+01:38:15,100 --> 01:38:21,820
+proyectados en las dos primeras componentes, y bueno aquí si os dais cuenta los naranjas son la fuga y
+
+1189
+01:38:21,820 --> 01:38:29,100
+los ceros son los activos, y aquí qué tenemos, tenemos la pc1, se ven dos componentes, lo que pasa
+
+1190
+01:38:29,100 --> 01:38:36,620
+que aquí están muy mezcladas, porque en realidad claro, fijaros que aquí explica el 34,9% y aquí
+
+1191
+01:38:36,620 --> 01:38:44,060
+explica el 8,9%, entonces aquí se ve como un clúster aquí y otro clúster acá, esto es simplemente
+
+1192
+01:38:44,220 --> 01:38:50,300
+ver cómo están los clientes, aquí ya estamos viendo los puntitos, no estamos viendo las variables,
+
+1193
+01:38:50,300 --> 01:38:55,220
+sino que estamos viendo los puntos por separado en función a las dimensiones que están generando,
+
+1194
+01:38:55,220 --> 01:39:00,460
+la verdad que en este por ejemplo no se ve del todo claro, pero bueno se pueden distinguir los
+
+1195
+01:39:00,460 --> 01:39:09,300
+dos grupos, entonces, cómo se puede, ahora si queremos comparar una regresión logística simple,
+
+1196
+01:39:10,020 --> 01:39:17,940
+con los componentes principales, entonces vamos a ver qué costo tiene esto, entonces fijaros aquí
+
+1197
+01:39:17,940 --> 01:39:25,780
+tenemos el PCA, tenemos el train test y lo que vamos a hacer es ver las variables,
+
+1198
+01:39:28,540 --> 01:39:35,180
+entonces qué es lo que vamos a hacer, vamos a comparar respecto a tener el modelo con las 15
+
+1199
+01:39:35,180 --> 01:39:44,780
+variables versus haber aplicado el PCA, entonces que también va a ajustar el modelo, en este caso
+
+1200
+01:39:44,780 --> 01:39:51,780
+el modelo logístico, la regresión logística, que también va a ajustar en función a si usamos las
+
+1201
+01:39:51,780 --> 01:39:59,420
+15 variables originales o si usamos las 8 componentes principales que nos ha seleccionado el modelo,
+
+1202
+01:39:59,420 --> 01:40:10,580
+de acuerdo, esos gráficos se ven bonitos en 3D, es verdad, pero aquí estábamos en 2D porque ahora
+
+1203
+01:40:10,580 --> 01:40:17,700
+vamos a ver qué pasa con el t-SNE, entonces el t-SNE se va a ver además más bonito también lo de las
+
+1204
+01:40:17,700 --> 01:40:24,620
+componentes, o sea cómo quedan los clústeres, entonces fijaros lo que os decía, las variables
+
+1205
+01:40:24,620 --> 01:40:30,660
+originales y PCA, con 15 variables el F1, bueno aquí la verdad es que como es una base sintética
+
+1206
+01:40:30,660 --> 01:40:35,820
+pues no está tan seleccionada así como en la realidad, el modelo que os voy a pasar después
+
+1207
+01:40:35,820 --> 01:40:41,540
+para que practiquéis vosotros sí que está basado en datos reales y vais a ver que el F1 es un poco
+
+1208
+01:40:41,540 --> 01:40:47,780
+más grande, va a ser como un 50 y algo por ciento, el MCC también, de acuerdo, que el MCC es el
+
+1209
+01:40:47,780 --> 01:40:54,620
+Matthews correlation coefficient, que bueno es otro coeficiente que nos ayuda a medir también
+
+1210
+01:40:54,620 --> 01:41:02,020
+la combinación, lo que pasa que el F1 lo que está haciendo es contar las fugas y el MCC es el que
+
+1211
+01:41:02,020 --> 01:41:07,460
+está, es un coeficiente que nos cuenta tanto las fugas como las no fugas, es un poco más complejo,
+
+1212
+01:41:07,460 --> 01:41:14,580
+entonces nos permite medir un poquito mejor pues en el fondo la validez del modelo, o sea que tan
+
+1213
+01:41:14,580 --> 01:41:20,380
+bueno es el modelo, pero si os dais cuenta no varían mucho, en este caso los dos modelos
+
+1214
+01:41:20,380 --> 01:41:26,180
+nos aportan una información similar, entonces aquí estamos con las variables originales,
+
+1215
+01:41:26,180 --> 01:41:30,620
+o sea este MCC no os he hablado del, pero bueno que sepáis que es otro coeficiente que nos ayuda
+
+1216
+01:41:30,620 --> 01:41:38,260
+a ver qué tan bueno es el modelo, de acuerdo, solo que con la aparición de muchos componentes,
+
+1217
+01:41:38,260 --> 01:41:44,980
+ahora te contesto a esto, que digo, aquí el F1 score, recordad que estaba hacia la combinación
+
+1218
+01:41:44,980 --> 01:41:56,540
+del recall con el precision, entonces en ese caso estábamos viendo las combinaciones de las
+
+1219
+01:41:56,540 --> 01:42:07,100
+fugas y el MCC lo que hace es un coeficiente que nos permite ver en el fondo la veracidad del
+
+1220
+01:42:07,100 --> 01:42:13,780
+modelo o la precisión del modelo, pero en este caso cuando está considerando tanto la fuga como
+
+1221
+01:42:13,780 --> 01:42:19,980
+los que no se fugan, de acuerdo, y entonces insisto en el modelo logístico con las 15 variables,
+
+1222
+01:42:19,980 --> 01:42:27,940
+pues si os dais cuenta sale un 0.270, un 0.265, o sea que 0.270, 0.265, ambos coeficientes informan
+
+1223
+01:42:27,940 --> 01:42:33,580
+más o menos lo mismo, te dicen que ese es el coeficiente, pero cuando pasa al PCA de 8 componentes
+
+1224
+01:42:33,580 --> 01:42:42,860
+no empeora, realmente no empeora casi, es prácticamente igual, es 0.267 y 0.252,
+
+1225
+01:42:42,860 --> 01:42:48,500
+o sea que es que hemos reducido ocho componentes y estamos teniendo la misma calidad de modelo,
+
+1226
+01:42:48,500 --> 01:42:53,500
+entonces ¿para qué vamos a usar 15 componentes? Si ya vimos que había correlación entre ellas,
+
+1227
+01:42:53,500 --> 01:42:59,500
+si ya vimos que además la base estaba desbalanceada, ya vimos que todas las cosas estaban perfectas
+
+1228
+01:42:59,500 --> 01:43:08,500
+para molestar, entonces pues vamos a quitar cosas de medio y resulta que cuando hacemos todo
+
+1229
+01:43:08,500 --> 01:43:14,140
+lo que tenemos que hacer, resulta que corremos el modelo, quitamos variables y es que el modelo
+
+1230
+01:43:14,140 --> 01:43:18,460
+sigue explicando igual de bien, pues para qué voy a hacer todos el astre, para qué voy a andar cargando
+
+1231
+01:43:18,460 --> 01:43:24,940
+yo con todas estas variables, cierto, aquí recordad a simplificarse la vida, de paso están las
+
+1232
+01:43:24,940 --> 01:43:29,820
+matemáticas, aunque creéis lo contrario, ya entonces aquí nos ha simplificado la vida,
+
+1233
+01:43:29,820 --> 01:43:35,820
+tenemos ocho componentes y esto funciona perfectamente, ¿estamos hasta ahí? Sí,
+
+1234
+01:43:35,820 --> 01:43:41,300
+entonces ¿qué pasa? que con menos columnas, con menos variables, se mantienen prácticamente iguales,
+
+1235
+01:43:41,300 --> 01:43:49,380
+por lo tanto chapejado, aquí lo que sobra para la casa, ¿de acuerdo? Vale, sí a mí la verdad que
+
+1236
+01:43:49,380 --> 01:43:57,060
+este tema me gusta mucho porque es eso, es muy interesante porque te permite explicar con la misma
+
+1237
+01:43:57,060 --> 01:44:03,700
+veracidad, pero reduciendo cosas que son redundantes y que a simple vista nos puede ver, cuando estamos
+
+1238
+01:44:03,700 --> 01:44:10,580
+hablando de bases de datos, con muchísimos datos, millones de datos y variables, pero muchísimas
+
+1239
+01:44:10,580 --> 01:44:16,620
+variables, imaginaos porque claro, uno hay ciertos modelos que bueno más o menos pues la experiencia
+
+1240
+01:44:16,620 --> 01:44:21,820
+y tal y puede ver las cosas que funcionan y las que no dentro de un modelo con un número limitado
+
+1241
+01:44:21,820 --> 01:44:26,100
+de variables, cierto, pero cuando ya estamos manejando Big Data, pues es que esto es una
+
+1242
+01:44:26,100 --> 01:44:31,180
+maravilla, me acuerdo y luego es lo que decís, si lo veis hay muchísimos más gráficos que se pueden
+
+1243
+01:44:31,180 --> 01:44:35,580
+ver, pues en tres dimensiones, hoy en día con la inteligencia artificial se pueden hacer maravillas
+
+1244
+01:44:35,580 --> 01:44:40,500
+a nivel visual, vale, aquí vamos un poco a lo básico, que ya con lo básico, volvemos a lo mismo,
+
+1245
+01:44:40,500 --> 01:44:45,660
+ya con lo básico se puede tener información, para qué nos vamos a complicar la existencia,
+
+1246
+01:44:45,660 --> 01:44:53,780
+vale, y la pregunta de Ignacia, ¿tiene algo que ver una muestra desbalanceada con la aparición de
+
+1247
+01:44:53,780 --> 01:45:00,700
+muchos componentes para explicar mayor varianza?, ¿una muestra desbalanceada con que haya muchos
+
+1248
+01:45:00,700 --> 01:45:10,460
+componentes para explicar mayor varianza?, pues no creo que haya una correlación directa en eso,
+
+1249
+01:45:10,460 --> 01:45:18,860
+porque en el fondo, bueno claro tú dices que como está desbalanceada, entonces hay mayor variabilidad,
+
+1250
+01:45:18,860 --> 01:45:25,580
+ojo, es que, a ver aquí hay dos conceptos, que esté desbalanceada significa que tienes muchos
+
+1251
+01:45:25,580 --> 01:45:31,380
+datos de uno y pocos de otro, entonces estaríamos hablando de algo que tiene como un sesgo, pero
+
+1252
+01:45:31,380 --> 01:45:37,900
+que tenga un sesgo no significa necesariamente que haya una mayor dispersión, porque ese sesgo
+
+1253
+01:45:37,900 --> 01:45:43,740
+puedes no estar muy lejos de, no sé si me explico, sí, o sea tú puedes tener una concentración aquí
+
+1254
+01:45:43,740 --> 01:45:48,660
+y un sesgo, pero que está no tan separado, o sea no te hace una cola tan larga, entonces no
+
+1255
+01:45:48,660 --> 01:45:55,300
+necesariamente vas a necesitar muchas componentes, porque no necesariamente hay mucha dispersión,
+
+1256
+01:45:55,300 --> 01:46:02,180
+si me explico, o sea una cosa es sesgo y otra es varianza, volvemos a lo mismo, vale, recordad
+
+1257
+01:46:02,180 --> 01:46:07,020
+varianza y sesgo no es lo mismo, tú estás pensando, según me lo estás diciendo, muestra desbalanceada,
+
+1258
+01:46:07,020 --> 01:46:12,900
+estamos hablando de que, pues efectivamente hay un sesgo, pero no necesariamente va a haber más
+
+1259
+01:46:12,900 --> 01:46:18,660
+varianza, por eso, vale, y de hecho, recuerda, si controlamos la varianza no vamos a poder controlar
+
+1260
+01:46:18,660 --> 01:46:24,980
+el sesgo y viceversa, o sea, si hacemos, reducimos la varianza seguramente aumenta el sesgo, si
+
+1261
+01:46:24,980 --> 01:46:31,220
+reducimos el sesgo posiblemente aumenta la varianza, sí, entonces una muestra desbalanceada habla más
+
+1262
+01:46:31,220 --> 01:46:39,860
+del sesgo que de la varianza, entonces desbalanceada depende de cómo esté, si me explico, entonces no
+
+1263
+01:46:39,860 --> 01:46:46,940
+diría yo, yo te diría que los muchos componentes sí que tienen que ver con la variabilidad de los
+
+1264
+01:46:46,940 --> 01:46:52,700
+datos, obviamente, sí, cuando Lasso y cuando PCA veo que aquí se pierde la interpretación de los
+
+1265
+01:46:52,700 --> 01:46:59,220
+coeficientes, claro, ¿qué es lo que pasa? es que son cosas distintas, Lasso lo que te está haciendo
+
+1266
+01:46:59,220 --> 01:47:05,900
+es te está quitando variables que no aportan información, de acuerdo, en el sentido de que
+
+1267
+01:47:05,900 --> 01:47:12,260
+es un modelo de regresión, al final, el Lasso, el Ridge son modelos de regresión que lo que hacen es
+
+1268
+01:47:13,460 --> 01:47:23,100
+pues eso, o te reducen los coeficientes o te elimina variables, pero PCA es un clustering,
+
+1269
+01:47:23,100 --> 01:47:29,940
+al final es distinto, son cosas distintas, Lasso y Ridge lo que hacen es poner restricciones al
+
+1270
+01:47:29,940 --> 01:47:35,700
+modelo, PCA automáticamente te está quitando cosas de en medio, te está diciendo esto no me
+
+1271
+01:47:35,700 --> 01:47:40,740
+sirve, entonces ¿qué pasa? cuando te está diciendo que esto no te sirve, corres el riesgo porque claro
+
+1272
+01:47:40,740 --> 01:47:46,460
+tú estás diciendo me quedo con ocho componentes o me quedo con nueve, entonces claro hay una elección
+
+1273
+01:47:46,460 --> 01:47:53,020
+ahí, posiblemente si está explicando sólo un 5% más pues no es tanta la diferencia, para eso haces
+
+1274
+01:47:53,020 --> 01:47:59,140
+luego estos coeficientes y mires el f1, mires el mcc para ver si realmente la diferencia entre
+
+1275
+01:47:59,140 --> 01:48:03,380
+ocho componentes, nueve componentes, hay una diferencia significativa en eso, porque si no
+
+1276
+01:48:03,380 --> 01:48:09,300
+efectivamente lo que pasa es que como estás eliminando componentes puedes estar justamente
+
+1277
+01:48:09,300 --> 01:48:17,700
+perdiendo información y por lo tanto vas a perder información para interpretar luego los coeficientes
+
+1278
+01:48:17,700 --> 01:48:23,380
+que te salen del modelo, entonces si tú me dices cuando Lasso y cuando PCA es que son
+
+1279
+01:48:23,380 --> 01:48:31,820
+funcionalidades distintas, porque Lasso se usa para hacer, o sea cuando tú tienes un sobreajuste,
+
+1280
+01:48:31,820 --> 01:48:40,500
+lo que quieres es hacer que ese modelo no aprenda del ruido y por lo tanto lo que quieres es quitar
+
+1281
+01:48:40,500 --> 01:48:48,300
+variables, entonces ahí no estás reduciendo dimensiones porque hay una, ahí no estás reduciendo
+
+1282
+01:48:48,300 --> 01:49:00,500
+dimensiones porque el boon me perdí. Se me escapó, se me escapó y la tenía, yo la tenía escrita y
+
+1283
+01:49:00,500 --> 01:49:09,100
+y a brenten te dice escapó. Me dije bueno qué pena que sea Lasso, bueno me salto y dije que he dicho
+
+1284
+01:49:09,100 --> 01:49:16,380
+la he puesto triste, no pues eso que Lasso, volviendo al tema que son cosas distintas,
+
+1285
+01:49:16,380 --> 01:49:20,940
+de acuerdo, cuando estamos diciendo una es reducir dimensiones porque hay pues lo que
+
+1286
+01:49:20,940 --> 01:49:25,820
+habíamos dicho una multicolinalidad, porque hay ruido, porque pero no estamos hablando PCA,
+
+1287
+01:49:25,820 --> 01:49:31,820
+yo no la voy a usar porque hay un sobreajuste, si hay un sobreajuste yo lo primero que voy a hacer
+
+1288
+01:49:31,820 --> 01:49:38,740
+es ver si puedo meter alguna restricción al modelo para que en el fondo no me aprenda del ruido,
+
+1289
+01:49:38,740 --> 01:49:45,660
+entonces voy a ver qué pasa con eso. Si ya después de eso yo además veo y analizo que las variables
+
+1290
+01:49:45,660 --> 01:49:51,380
+efectivamente pues tienen estas características que dijimos, que están por así decirlo
+
+1291
+01:49:51,380 --> 01:49:59,180
+sobre representadas, están pues eso tienen correlaciones entre ellas y que realmente pues
+
+1292
+01:49:59,180 --> 01:50:04,420
+estoy haciendo redundancia de información, entonces ahí sí voy a meter el PCA, pero son
+
+1293
+01:50:04,420 --> 01:50:11,620
+funciones distintas, de acuerdo, entonces PCA lo que hace es quitar dimensiones, de acuerdo,
+
+1294
+01:50:11,620 --> 01:50:18,140
+es un clustering al fin y al cabo, Lasso no es un clustering, Lasso lo que hace es ajustar los
+
+1295
+01:50:18,140 --> 01:50:24,580
+coeficientes de un modelo, ya son cosas distintas, PCA no te va a ajustar los coeficientes, PCA lo
+
+1296
+01:50:24,580 --> 01:50:32,460
+que te va a decir es quédate con esto, entonces claro en PCA pues cuando tú quitas componentes y
+
+1297
+01:50:32,460 --> 01:50:36,780
+luego haces el modelo obviamente te cambian los coeficientes, por supuesto, pero el objetivo de
+
+1298
+01:50:36,780 --> 01:50:43,140
+PCA no es cambiar los coeficientes, no sé si me explico, vale, recordad que cuando estábamos con
+
+1299
+01:50:43,140 --> 01:50:47,620
+el sobreajuste, recordad que teníamos las nubes de puntos y decíamos pasa una línea y la línea me
+
+1300
+01:50:47,620 --> 01:50:52,380
+deja muchos puntos, qué tal, ah, es un subajuste, luego hacíamos una curva y dijimos ah pues sí mira,
+
+1301
+01:50:52,380 --> 01:50:57,020
+toma más o menos la forma de los puntos, hay algunos que no los toma, pero bien, y cuando
+
+1302
+01:50:57,020 --> 01:51:01,660
+hacía un sobreajuste lo que pasaba es que iba tomando cada puntito, entonces iba haciendo así,
+
+1303
+01:51:01,660 --> 01:51:06,700
+entonces decía sí se ve como una curva así, pero es que además como que la detalla demasiado,
+
+1304
+01:51:06,700 --> 01:51:13,300
+entonces es como demasiado, porque qué es lo que pasa cuando sobre ajusta, lo que va a pasar es que
+
+1305
+01:51:13,300 --> 01:51:17,500
+cuando metas un dato nuevo se va a volverlo con el modelo, o sea no te sirve que sobreajuste un
+
+1306
+01:51:17,500 --> 01:51:22,620
+modelo, y entonces ahí es donde metes la regularización, porque entonces lo que estás haciendo es que quieres
+
+1307
+01:51:22,620 --> 01:51:31,420
+que te de un modelo más simple, quieres que lo que haga coloque cada ruido que no lo considere,
+
+1308
+01:51:31,420 --> 01:51:37,940
+pero no te está eliminando los datos, simplemente te está ajustando ese polinomio para que pase
+
+1309
+01:51:37,940 --> 01:51:44,260
+tomando la información necesaria, pese a lo que te dices vamos a ver aquí quiénes son los que
+
+1310
+01:51:44,260 --> 01:51:48,660
+informan, quiénes son los que informan, tú estás informando de más porque esto ya lo tenía con este
+
+1311
+01:51:48,660 --> 01:52:00,660
+y con este, para casa, me explico, se entiende ahí Gastón? Vale perfecto, entonces pasemos al siguiente,
+
+1312
+01:52:00,660 --> 01:52:03,780
+entonces ahora dicho lo cual pasamos al
+
+1313
+01:52:06,180 --> 01:52:11,060
+a las reducción de dimensionalidad, vamos al PowerPoint,
+
+1314
+01:52:14,060 --> 01:52:19,380
+vale entonces bueno pues aquí estaba, si estáis viendo mis diapos,
+
+1315
+01:52:19,380 --> 01:52:29,380
+no, si, no, madre mía me huele el tiempo, ni me doy cuenta la hora que es, me pongo a hablar,
+
+1316
+01:52:29,380 --> 01:52:36,980
+y ahora todo en el tema, me apasiona y entonces pues se me pasa el tiempo, vale entonces estaba
+
+1317
+01:52:36,980 --> 01:52:41,420
+diciendo que no me había dado cuenta que ya son las nueve, vale pero ya nos queda poquito porque
+
+1318
+01:52:41,420 --> 01:52:45,540
+esto lo voy a pasar ya más rápido porque en realidad el objetivo de esta clase era más bien PCA,
+
+1319
+01:52:45,540 --> 01:52:53,660
+vale pero bueno aquí simplemente os estaba explicando lo que os he explicado antes y tal,
+
+1320
+01:52:53,660 --> 01:52:59,740
+el proyecto de los clientes en las dos dimensiones y entonces, que pasa, reducir dimensiones cuesta
+
+1321
+01:52:59,740 --> 01:53:04,540
+desempeño, pues lo que estábamos hablando aquí, que en el fondo el desempeño baja apenas un poco,
+
+1322
+01:53:04,540 --> 01:53:09,540
+por lo tanto en realidad que hacemos que sí, que nos quedamos con los ocho componentes,
+
+1323
+01:53:09,540 --> 01:53:17,540
+ahora bien, que es el t-SNE, vale, esto va a ser un mapa no lineal, vale, porque el PCA al fin de
+
+1324
+01:53:17,540 --> 01:53:23,300
+al cabo lo que hace es linealizar, porque recordad que lo que estamos tomando son proporcionales de
+
+1325
+01:53:23,300 --> 01:53:27,900
+esos vectores, o sea estamos haciendo combinaciones lineales de los vectores, o sea suma este vector
+
+1326
+01:53:27,900 --> 01:53:32,660
+con este vector, como sabemos al general, me creéis, que en el fondo estamos haciendo sumas y restas de
+
+1327
+01:53:32,660 --> 01:53:38,700
+vectores, vale, entonces esto es lineal, aunque estemos en cosas multidimensionales, pero es lineal,
+
+1328
+01:53:38,700 --> 01:53:45,940
+entonces t-SNE, t-SNE, lo que hace es que es un mapa no lineal, de acuerdo, para explorar la estructura
+
+1329
+01:53:45,940 --> 01:53:53,060
+de los datos, vale, fijaros, esta alternativa que se llama t distributed stochastic neighbor,
+
+1330
+01:53:53,060 --> 01:53:59,740
+neighbor embedding, de acuerdo, la s de stochastic, neighbor, vecinos, embedding, de acuerdo,
+
+1331
+01:53:59,740 --> 01:54:07,300
+embedding es como, la traducción en español de embedding, era, es que tiene un nombre así como,
+
+1332
+01:54:07,420 --> 01:54:18,660
+bueno, embedding es como un solapamiento, como un embebido, sí, embebido, pero no sé, hay otra
+
+1333
+01:54:18,660 --> 01:54:24,020
+palabra, de hecho en el libro lo pone, luego os lo digo porque me acuerdo que cuando lo pasamos a
+
+1334
+01:54:24,020 --> 01:54:30,460
+los editores pusieron la traducción, tuvimos ahí una discusión de autores de embebido, de no sé qué,
+
+1335
+01:54:30,460 --> 01:54:34,740
+y ahora no me acuerdo la palabra, perdonadme por las horas, pero bueno, me acuerdo que fue una
+
+1336
+01:54:34,740 --> 01:54:40,100
+discusión que tuvimos todos los autores con la traducción al español de embedding, vale,
+
+1337
+01:54:40,100 --> 01:54:46,900
+entonces, pero bueno, en el fondo embebido, vale, entonces, el t distributed stochastic neighbor
+
+1338
+01:54:46,900 --> 01:54:53,180
+embedding, t-SNE, de acuerdo, que lo pusieron estas personicas aquí, bueno, qué es lo que hace,
+
+1339
+01:54:53,180 --> 01:54:57,860
+va a buscar un mapa de dos o tres dimensiones que mantiene juntos los puntos que eran parecidos
+
+1340
+01:54:57,860 --> 01:55:04,460
+originalmente y separados a los que no, de acuerdo, es decir, si bien a PCA le importaba
+
+1341
+01:55:04,460 --> 01:55:12,500
+la varianza total, aquí no le importa cuánta sea la varianza que haya, aquí dice, tú eres vecino
+
+1342
+01:55:12,500 --> 01:55:17,740
+de fulanito, listo, entras al grupo, tú no, para otro lado, vete al otro barrio, vale, entonces,
+
+1343
+01:55:17,740 --> 01:55:23,500
+le da igual en el fondo cuánta varianza hay, lo que hace es buscar los vecinos, de acuerdo, vale,
+
+1344
+01:55:23,500 --> 01:55:28,140
+entonces, cuál es la idea fundamental, si dos clientes se parecen mucho en las variables originales,
+
+1345
+01:55:28,140 --> 01:55:34,420
+el t-SNE los va a dibujar cerca en el mapa 2d y si son distintos los alejo, de acuerdo,
+
+1346
+01:55:34,420 --> 01:55:40,300
+entonces ve dos clientes que se parecen juntos, que son distintos, chau, los separa, el embedding,
+
+1347
+01:55:40,300 --> 01:55:45,620
+esto simplemente es el mapa simplificado, vale, y es una representación más chica que lo que
+
+1348
+01:55:45,620 --> 01:55:50,740
+hace es conservar las relaciones fundamentales entre los datos, fijaros que aquí antes en las
+
+1349
+01:55:50,740 --> 01:55:55,980
+pcas estamos hablando de las componentes, es decir, de las variables, aquí nos estamos fijando en
+
+1350
+01:55:55,980 --> 01:56:01,940
+los datos, van a cosas distintas, obviamente, al final, si afectas a las componentes, estás realizando
+
+1351
+01:56:01,940 --> 01:56:06,820
+los datos igual, pero lo estás analizando desde las componentes principales, aquí lo que estamos
+
+1352
+01:56:06,820 --> 01:56:12,500
+haciendo es ver las relaciones entre los datos, no estamos hablando de las variables, sino de los
+
+1353
+01:56:12,500 --> 01:56:18,340
+datos, de acuerdo, y bueno, aquí qué es lo que hace, pues ya no está asumiendo que hay una relación
+
+1354
+01:56:18,340 --> 01:56:24,060
+lineal entre las variables, sino que captura patrones más retorcidos, porque no se está fijando,
+
+1355
+01:56:24,060 --> 01:56:30,020
+insisto, no se está fijando como PCA en las variables y en base a esas variables ver cómo
+
+1356
+01:56:30,020 --> 01:56:35,020
+representas los datos, sino que aquí lo que está diciendo es que si fulanito se parece a menganito,
+
+1357
+01:56:36,020 --> 01:56:43,980
+se parece pues porque hay una combinación estrambótica de cosas, entonces puede que en el PCA no aparezcan
+
+1358
+01:56:43,980 --> 01:56:50,100
+esas relaciones, porque PCA simplemente busca estas relaciones lineales, busca que ese punto yo
+
+1359
+01:56:50,100 --> 01:56:55,980
+lo pueda representar con las combinaciones más básicas posibles de esas variables, de esos vectores,
+
+1360
+01:56:55,980 --> 01:57:02,020
+aquí no, aquí me mira los puntos y dice es que este punto se parece a este y por qué se parece,
+
+1361
+01:57:02,020 --> 01:57:08,500
+ah, pues mira, es que tienen los ojos parecidos, el pelo, estoy diciendo una cosa muy básica,
+
+1362
+01:57:08,500 --> 01:57:13,660
+pero para que me entendáis, o sea que en el fondo está viendo la relación entre los datos,
+
+1363
+01:57:16,020 --> 01:57:18,980
+entonces cómo funciona, lo que hace es que mide vecindades originales,
+
+1364
+01:57:18,980 --> 01:57:25,780
+entonces qué es lo que mira, qué tan probable es que cada cliente sea vecino,
+
+1365
+01:57:25,780 --> 01:57:33,900
+o sea que cada cliente sea vecino de otro, y luego qué hace, dibuja un mapa en 2d que respete estas
+
+1366
+01:57:34,500 --> 01:57:40,660
+vecindades, ubica cada cliente como un punto en el plano y lo que hace es que va moviendo esos puntos
+
+1367
+01:57:40,660 --> 01:57:46,580
+de a poco hasta que las vecindades del mapa se parecen lo más posible a las vecindades originales,
+
+1368
+01:57:46,580 --> 01:57:52,780
+entonces es como que ya toma los datos, los va juntando y mira esto se parece al original,
+
+1369
+01:57:52,780 --> 01:57:59,100
+perfecto, ahí está el modelo hecho, entonces lo que hace es que va acomodando los puntitos en el
+
+1370
+01:57:59,100 --> 01:58:06,860
+mapa, ahora vamos a ver en el Colab que vamos a decir cuántas vueltas vamos a hacer,
+
+1371
+01:58:06,860 --> 01:58:13,860
+en fin, vamos a darle unos parámetros para saber cuando parar esto, en este caso no va a ser una
+
+1372
+01:58:13,860 --> 01:58:21,580
+fórmula que se aplica, sino que es algo que va iterando, por eso además el t-SNE es pesado,
+
+1373
+01:58:21,580 --> 01:58:28,540
+me acuerdo con lo cual no lo vamos a usar tanto, porque es pesado computacionalmente,
+
+1374
+01:58:28,540 --> 01:58:39,100
+pues obviamente puede tardar, entonces vamos al Colab porque nos va a salir esto, vamos al Colab
+
+1375
+01:58:42,220 --> 01:58:49,020
+incrustación, gracias, incrustación, este fue el término que usamos al final, ahora estoy viendo,
+
+1376
+01:58:49,020 --> 01:58:54,900
+incrustado, efectivamente, embebido, incrustado, esa fue la palabra que hicimos, incrustación,
+
+1377
+01:58:54,900 --> 01:59:00,700
+en el libro de hecho al final usamos incrustación, con los editores, fue un rollo traducir que si no,
+
+1378
+01:59:00,700 --> 01:59:04,900
+que si lo dejamos, cómo no, que no sé quién, lo dejamos en inglés, no lo ponemos, incrustado,
+
+1379
+01:59:04,900 --> 01:59:10,660
+incrustación, eso es, muchas gracias, quien ha sido, Rodrigo, ha sido el primero, muchas gracias Rodrigo,
+
+1380
+01:59:11,420 --> 01:59:14,980
+vale, vamos entonces al Colab,
+
+1381
+01:59:22,900 --> 01:59:24,820
+es que a veces no me salen las palabras,
+
+1382
+01:59:28,100 --> 01:59:33,500
+a veces no me sale ni mi nombre, vale, vamos aquí, entonces,
+
+1383
+01:59:34,980 --> 01:59:39,940
+estáis viendo, sí, el este, pero yo no lo estoy viendo porque no he salido de estátua,
+
+1384
+01:59:41,300 --> 01:59:47,940
+ahí está, ahí veis mi Colab, cierto, entonces, t-SNE,
+
+1385
+01:59:51,700 --> 01:59:56,740
+los vamos a buscar las relaciones de vecindad, quiénes son parecidos entre sí, esto está
+
+1386
+01:59:56,740 --> 02:00:01,860
+pensado justamente para visualizar, de acuerdo, no para producir variables reutilizables, ya,
+
+1387
+02:00:01,860 --> 02:00:08,820
+en una, en un pipeline, en una de producción, entonces, que vamos a probar aquí, perplexity,
+
+1388
+02:00:09,460 --> 02:00:15,620
+perplexity en el fondo viene siendo como la complejidad que le vais a dar al, al,
+
+1389
+02:00:17,220 --> 02:00:24,100
+al modelo, de acuerdo, entonces vamos a usar perplexities de 5, de 30 y de 80, ya, y bueno,
+
+1390
+02:00:24,100 --> 02:00:29,060
+esto simplemente nos está hablando de la complejidad, aquí es cómo se modifica el t-SNE,
+
+1391
+02:00:29,060 --> 02:00:34,220
+de acuerdo, estos son los parámetros que se usan, para ver si está activo, el 0 va a ser activo,
+
+1392
+02:00:34,220 --> 02:00:42,540
+el 1 va a ser fuga, usamos los valores del set de train, vale, ahí simplemente los parámetros
+
+1393
+02:00:42,540 --> 02:00:48,380
+para el modelo, y entonces fijaros, si hacemos un perplexity de 5, un perplexity de 30 y un
+
+1394
+02:00:48,380 --> 02:00:55,860
+perplexity de 80, cuanto más bajo, más clustercillos hace, lo veis, porque al final no está haciendo
+
+1395
+02:00:55,860 --> 02:01:00,820
+como, claro, diría eso, bueno, se ve aquí un grupo, se ve aquí otro, pero es que no, en realidad,
+
+1396
+02:01:00,820 --> 02:01:08,980
+si veis, hay uno por acá, hay uno por acá, hay otro por acá, como que no se ve tan, tan claro,
+
+1397
+02:01:08,980 --> 02:01:18,020
+cierto, si hacemos un perplexity de 30, ya se ven grupos más diferenciados, los veis, y además se
+
+1398
+02:01:18,020 --> 02:01:23,820
+ve como más reducido, aunque fijaros que la shape, la forma viene siendo más o menos igual, o sea,
+
+1399
+02:01:23,820 --> 02:01:28,340
+fijaros en esto, veis mi mouse, cierto, a lo mejor estoy aquí pensando que veis mi mouse y no veis
+
+1400
+02:01:28,340 --> 02:01:35,580
+mi mouse, y estáis como diciendo esta que está señalando, si veis mi mouse o no, sí, hola, hola,
+
+1401
+02:01:35,580 --> 02:01:40,700
+ah, vale, vale, es que digo, a ver si estoy aquí hablando como cuando uno está señalando y nadie ve
+
+1402
+02:01:40,700 --> 02:01:45,460
+dónde está señalando, entonces, esta figura, por ejemplo, lo veis, al final los clusters están más
+
+1403
+02:01:45,460 --> 02:01:50,660
+o menos igual, pero claro, es que aquí no se diferencian tanto, si vais a un perplexity de 80,
+
+1404
+02:01:50,660 --> 02:01:57,340
+está clarísimamente el grupo hecho, pero claro, se modifican, porque en el fondo lo que estás
+
+1405
+02:01:57,340 --> 02:02:01,700
+haciendo es que estás buscando relaciones más complejas, con lo cual, relaciones más complejas,
+
+1406
+02:02:01,700 --> 02:02:08,180
+pues te lleva a ver, pues esas relaciones que no se te ocurren, me acuerdo, esto me recuerda a un,
+
+1407
+02:02:10,180 --> 02:02:16,300
+sí, vendría siendo como la complejidad de las iteraciones, en el fondo como la complejidad que
+
+1408
+02:02:16,300 --> 02:02:23,220
+vais a tener, me acuerdo, a la hora de buscar las relaciones, esto me recuerda, dije es una
+
+1409
+02:02:23,860 --> 02:02:32,380
+comparación, es como una, no estoy yo con una metáfora, no sé, estoy yo hoy con las palabras mal,
+
+1410
+02:02:32,380 --> 02:02:38,780
+bueno, es que me recuerda que había un vídeo que vi el otro día de estas cosas que te salen en
+
+1411
+02:02:38,780 --> 02:02:46,300
+Instagram, y había un tío que empezaba y decía, no sé quién se ha muerto en tal día, los números
+
+1412
+02:02:46,300 --> 02:02:52,860
+suman no sé cuánto, esos números estaban en el Wikipedia de no sé dónde, que justo era lo que
+
+1413
+02:02:52,860 --> 02:02:59,020
+necesitaba, no sé quién, una teoría de la conspiración basada en la fecha en la que una persona se
+
+1414
+02:02:59,020 --> 02:03:05,020
+murió de un accidente, que me lo expliquen, pues eso es esto, entonces empiezan a ver relaciones
+
+1415
+02:03:05,020 --> 02:03:10,340
+donde no las hay, porque empieza a tirar del hilo, entonces el perplexity, que es lo que va a
+
+1416
+02:03:10,340 --> 02:03:20,220
+hacer, va a buscar la complejidad de esas relaciones, relaciones espurias, la numerología, exactamente,
+
+1417
+02:03:20,220 --> 02:03:26,100
+es que hay cada cosa, es que luego cuando empezáis a aprender de estas cosas, veis las locuras que hay
+
+1418
+02:03:26,100 --> 02:03:31,980
+por el mundo, entonces pues uno ya saca las palomitas, las cabritas y momentos de ocio,
+
+1419
+02:03:31,980 --> 02:03:38,740
+que se llaman, vale, entonces volviendo a esto, para experimentar en clase, qué pasa, pues que si
+
+1420
+02:03:38,740 --> 02:03:45,180
+bajamos el perplexity a 5, luego podéis jugar vosotros con el perplexity, ponéis otros
+
+1421
+02:03:45,180 --> 02:03:50,500
+perplexities y ver qué es lo que sale, para ver en el fondo qué es lo que sale, entonces qué pasa,
+
+1422
+02:03:50,500 --> 02:03:55,260
+si bajáis la perplexity a 5 se forman muchos grupos pequeños y locales, porque en el fondo
+
+1423
+02:03:55,260 --> 02:04:00,900
+está habiendo las vecindades, pues muy, o sea, en el fondo ver relaciones aquí, pero no las ve aquí,
+
+1424
+02:04:00,900 --> 02:04:06,700
+sabes, porque está tomando menos, está tomando una baja complejidad, por así decirlo, ahora si lo
+
+1425
+02:04:06,700 --> 02:04:12,980
+subes a 80 le estás metiendo ya una caña, diciendo oye, mira, en realidad quiero que busques, pues eso,
+
+1426
+02:04:13,460 --> 02:04:19,020
+de la numerología, buscame todos los líos que puedas ver y enredalos, entonces claro, qué pasa,
+
+1427
+02:04:19,020 --> 02:04:25,260
+que al final están todos relacionados casi, claro, si lo subís vais a ir viendo que cada vez se ve más
+
+1428
+02:04:25,260 --> 02:04:31,460
+continuo y más global, o sea, al final se ve más como una masa, es más difícil, y luego si cambiáis el
+
+1429
+02:04:31,460 --> 02:04:40,980
+random state ya y comparáis, entonces bueno, vais a ir viendo qué es lo que va pasando, vale, entonces
+
+1430
+02:04:40,980 --> 02:04:47,860
+recordad que esto no es determinístico, por lo tanto, pues bueno, ir jugando con los datos y vais
+
+1431
+02:04:47,860 --> 02:04:56,020
+a ir viendo qué es lo que va haciendo, vale, entonces, ¿cuál sería la síntesis del PCA versus el t-SNE?
+
+1432
+02:04:57,700 --> 02:05:03,780
+Fijaros, vamos a fijarnos en la naturaleza, qué conserva, si es determinístico, el costo que tiene,
+
+1433
+02:05:03,780 --> 02:05:12,300
+si sirve para nuevos datos, si el uso típico, etcétera, entonces PCA, la naturaleza es lineal,
+
+1434
+02:05:12,300 --> 02:05:19,060
+ya lo dijimos, mientras que el t-SNE no es lineal, ¿qué conserva? el PCA conserva la varianza global,
+
+1435
+02:05:19,060 --> 02:05:25,340
+porque sí se fija en la varianza, de acuerdo, recuerda que busca las variables que me permiten
+
+1436
+02:05:25,340 --> 02:05:32,740
+representar a los datos y el t-SNE conserva las relaciones de vecindades locales, le importa
+
+1437
+02:05:32,740 --> 02:05:41,460
+tres carajos la varianza global, de acuerdo, el PCA es determinístico, el t-SNE no, el costo en el PCA
+
+1438
+02:05:41,460 --> 02:05:50,460
+es bajo, es decir, computacionalmente no es tanto, pero si le dais un N alto, pues el t-SNE va a ser
+
+1439
+02:05:50,460 --> 02:05:57,220
+muy costoso a nivel computacional, vale, ¿sirve para nuevos datos? pues sí, el PCA, recordad que
+
+1440
+02:05:57,220 --> 02:06:03,660
+metíamos en el fondo nuevas, queríamos meter nuevas variables, teníamos que hacerlas antes de
+
+1441
+02:06:03,660 --> 02:06:13,820
+aplicar el PCA, de acuerdo, el t-SNE no, no porque en el fondo no está pensado para producción,
+
+1442
+02:06:13,820 --> 02:06:18,940
+simplemente está viendo las relaciones entre datos, entonces ahí que metéis nuevas variables le da
+
+1443
+02:06:18,940 --> 02:06:25,220
+un poco igual, de acuerdo, y ahora ¿cuál es el uso típico que le damos a uno u a otro? bueno, pues el
+
+1444
+02:06:25,220 --> 02:06:31,260
+PCA lo que queremos es reducir antes de modelar y el t-SNE nos sirve para visualizar la estructura de
+
+1445
+02:06:31,260 --> 02:06:37,100
+los datos, explorar un poco los clústeres que se pueden hacer, etcétera, de acuerdo, entonces bueno,
+
+1446
+02:06:37,100 --> 02:06:42,340
+para que sigáis practicando después os dejo aquí algunas cosillas que podéis cambiar en el código y
+
+1447
+02:06:42,340 --> 02:06:46,380
+ver qué es lo que va saliendo, que estas cosas pues bueno, las podemos ver luego el sábado, vale, el
+
+1448
+02:06:46,380 --> 02:06:52,220
+sábado yo lo que quiero es que de lo que os suba de luego con otra base de datos para que practiquéis
+
+1449
+02:06:52,220 --> 02:07:00,620
+esto y lo que habíamos visto ayer, el martes, más lo que os dejé de la otra tarea, pues que veamos
+
+1450
+02:07:00,620 --> 02:07:05,980
+un poco las dudas que hay, hacemos un resumen y un poco relajado en el sentido de no os voy a pasar
+
+1451
+02:07:05,980 --> 02:07:10,700
+nueva batería simplemente es como no es obligatorio además, es más que nada para que resolvamos dudas
+
+1452
+02:07:10,700 --> 02:07:20,420
+y veamos un poco ejercicios, cosas curiosas que hayáis observado, un poco de pues eso, de discutir
+
+1453
+02:07:20,420 --> 02:07:27,100
+resultados, jugar un poco con las cosas y cerrar un poco las ideas que hemos visto en estas tres
+
+1454
+02:07:27,100 --> 02:07:31,580
+clases, sí, entonces bueno aquí probad a agregar y quitar variables, por ejemplo en el Future
+
+1455
+02:07:31,580 --> 02:07:37,140
+Engineering, mirad si queréis crear nuevas variables, vale, y ver por ejemplo cómo cambia
+
+1456
+02:07:37,140 --> 02:07:42,300
+el gráfico, luego por ejemplo comparar el desempeño de un random forest que es otro
+
+1457
+02:07:42,300 --> 02:07:49,100
+tipo de modelo, vale, de clasificación, que bueno, como están diseñados ahí, eso lo vais a ver después
+
+1458
+02:07:49,100 --> 02:07:57,780
+pero no habéis visto todavía random forest, no, porque eso lo habéis visto en esta estética, no creo, no lo habéis visto en esta, la que anita en la RAE
+
+1459
+02:08:01,420 --> 02:08:09,340
+Rodrigo, lo de cuál sería el uso del t-SNE, lo he puesto aquí, te lo he contestado ahora, o sea, se ha contestado solo
+
+1460
+02:08:09,340 --> 02:08:18,620
+o se puede ver qué características comparte, ah esto es del random forest, vale, sí, vale, pues esto
+
+1461
+02:08:18,620 --> 02:08:25,020
+aquí el random forest igual lo podéis poner dentro del modelo, bueno luego si no el sábado
+
+1462
+02:08:25,020 --> 02:08:31,140
+jugamos un poquito con esto, os hago un poco de spoiler, vale, y bueno, luego la idea es que con el
+
+1463
+02:08:31,140 --> 02:08:39,780
+dataset, el que os voy a pasar o en este mismo, por ejemplo si seleccionaríais variables o las
+
+1464
+02:08:39,780 --> 02:08:47,420
+extraeríais, en el fondo un poco jugar con los conceptos que tenemos, pero bueno como os voy a
+
+1465
+02:08:47,420 --> 02:08:53,380
+pasar una nueva dataset ahí lo vais a jugar con eso, que digo, a ver quién fue que lo preguntó, Rodrigo,
+
+1466
+02:08:53,380 --> 02:08:59,420
+Rodrigo, esto de cuál sería el uso del t-SNE y cómo podríamos hacer un análisis, eso se ha respondido
+
+1467
+02:08:59,420 --> 02:09:05,500
+entonces aquí o no, porque en el fondo el uso del t-SNE es simplemente cuando lo que quieres es explorar
+
+1468
+02:09:05,500 --> 02:09:12,900
+o visualizar la estructura de los datos, no necesariamente son usos distintos, simplemente
+
+1469
+02:09:12,900 --> 02:09:19,980
+estamos haciendo modelos de machine learning que no son supervisados y que lo que hacemos es traer
+
+1470
+02:09:19,980 --> 02:09:27,380
+información sobre los datos, de acuerdo, en el PCA lo que hacemos es reducir variables antes de
+
+1471
+02:09:27,380 --> 02:09:32,140
+meternos luego en otros modelos más complejos y el t-SNE nos ayuda a visualizar la estructura de
+
+1472
+02:09:32,140 --> 02:09:40,500
+los datos antes de meternos en otros modelos, de acuerdo, vale, perfecto, y no sé si me queda
+
+1473
+02:09:40,500 --> 02:09:47,060
+algo más, dejadme que vaya al, que creo que ya en las diapos era un poco el resumen de esto,
+
+1474
+02:09:47,060 --> 02:09:53,380
+pero dejadme ver si me falta algo más, estáis viendo las diapos,
+
+1475
+02:09:55,660 --> 02:10:02,140
+vale, entonces eso la perplexity es cuántos vecinos le presto atención, de acuerdo, en el
+
+1476
+02:10:02,140 --> 02:10:08,260
+fondo la complejidad que le estáis dando al modelo, entonces si es baja vais a tener grupos
+
+1477
+02:10:08,260 --> 02:10:13,140
+chicos y muy locales y si es alta pues vais a tener una vista más panorámica con grupos más
+
+1478
+02:10:13,140 --> 02:10:20,140
+grandes, en práctica se prueba entre 5 y 50, pero bueno aquí probamos 80 pues ya está, vale, entonces
+
+1479
+02:10:20,140 --> 02:10:24,980
+no se se ha quedado claro lo que es la perplexity, en el fondo es esa complejidad, de acuerdo, entonces
+
+1480
+02:10:24,980 --> 02:10:30,580
+cuanto más complejo sea pues a menos vecinos le presto atención por así decir, o mejor dicho,
+
+1481
+02:10:30,580 --> 02:10:38,020
+más grupos voy a hacer, porque en el fondo es como no voy a tratar de hacer la quenita la
+
+1482
+02:10:38,020 --> 02:10:46,860
+rein con la numerología que dice, vale, este mayor perplexity es el tío ese que está tratando de ver
+
+1483
+02:10:46,860 --> 02:10:53,180
+la relación de la muerte de una persona con la reproducción de las tortugas de ecuador, yo que
+
+1484
+02:10:53,180 --> 02:11:00,260
+sé, sabéis, es como algo insólito, pues eso, eso es la perplexity 80, de acuerdo, entonces pues bueno,
+
+1485
+02:11:00,260 --> 02:11:09,940
+eso es lo que os decía aquí, entonces consideraciones prácticas, perplexity acotada, pues debe ser menor
+
+1486
+02:11:09,940 --> 02:11:13,980
+al número de observaciones, eso sí, no hagáis un perplexity igual al número de observaciones,
+
+1487
+02:11:13,980 --> 02:11:19,940
+porque entonces lo que vais a hacer es pues eso, un grupo por cada por cada dato, no tiene sentido,
+
+1488
+02:11:20,300 --> 02:11:25,900
+entonces la práctica se prueba entre 5 y 50, no determinístico, es decir, cada corrida puede
+
+1489
+02:11:25,900 --> 02:11:32,620
+variar levemente el resultado, de acuerdo, entonces si por ejemplo fijáis el random state, pues eso
+
+1490
+02:11:32,620 --> 02:11:39,540
+ayuda a hacer, a reproducir de acuerdo en cada estado que hacéis, en el fondo que iteráis,
+
+1491
+02:11:39,540 --> 02:11:47,140
+de acuerdo, por lo tanto no es determinístico, el PCA sí que es determinístico, luego no es un
+
+1492
+02:11:47,140 --> 02:11:53,180
+modelo de cluster, en este caso sí que estáis haciendo en cierto modo cluster, pero se refiere
+
+1493
+02:11:53,180 --> 02:11:58,180
+a que no es un modelo de cluster porque expande grupos de estos densos y compacta los dispersos,
+
+1494
+02:11:58,180 --> 02:12:04,460
+entonces no está hablando de una distancia, o sea no es un K-means, por si acaso ha quedado eso a
+
+1495
+02:12:04,460 --> 02:12:11,140
+entender, no es un K-means, cuando estábamos haciendo el K-means lo que buscábamos era ese centroid y
+
+1496
+02:12:11,140 --> 02:12:17,620
+veíamos los datos que eran en el fondo cercanos a ese centroid, mirábamos distancias entre los
+
+1497
+02:12:17,620 --> 02:12:21,940
+puntos, aquí yo no estoy mirando la distancia entre este vecino y este, sino que estoy diciendo,
+
+1498
+02:12:21,940 --> 02:12:28,460
+o sea, yo puedo tener este y este y este, los dos están igual de cerca, pero lo relaciono con este y
+
+1499
+02:12:28,460 --> 02:12:33,580
+no con este, en el K-means yo lo que hago es ver las distancias, tomo un centroid y lo que hago es
+
+1500
+02:12:33,580 --> 02:12:42,860
+tomar los datos que están cerca de ese centroid, mientras es una cosa de distancias, aquí es un
+
+1501
+02:12:42,860 --> 02:12:48,100
+cluster, pero no se entiende como cluster en el sentido de distancias, por eso se dice que no es
+
+1502
+02:12:48,100 --> 02:12:52,500
+un modelo de cluster, aunque al final estáis haciendo cluster, pero lo estáis haciendo a través
+
+1503
+02:12:52,500 --> 02:12:56,820
+de la semejante entre vecinos, es decir, si tenéis un vecino que está a la misma distancia que otro,
+
+1504
+02:12:56,820 --> 02:13:02,620
+no necesariamente va a aparecer en el mismo grupo, porque no se van a aparecer, o sea,
+
+1505
+02:13:02,620 --> 02:13:08,220
+pueden estar cerca, pero no ser parecidos, entonces no estamos hablando de un K-means,
+
+1506
+02:13:08,220 --> 02:13:15,820
+no confundamos el t-SNE con un K-means por si acaso, y el costo computacional, que ya hemos dicho que
+
+1507
+02:13:15,820 --> 02:13:23,660
+es un costo computacional alto, porque lo que va a hacer es que va a comparar parejas de observaciones,
+
+1508
+02:13:23,660 --> 02:13:28,940
+entonces si tenéis más datos lo que va a hacer es comparar más parejas, por lo tanto es lo que va
+
+1509
+02:13:28,940 --> 02:13:32,980
+a hacer, entonces dice, venga compárese con este, se parece, venga, pero es que este también se
+
+1510
+02:13:32,980 --> 02:13:38,820
+parece a este, pero es que este se parece a este, y este se parece a, pues ya me entendéis, o sea, va
+
+1511
+02:13:38,820 --> 02:13:46,060
+haciendo comparaciones de pares, entonces al final, obviamente, cuanto mayor sea la complejidad,
+
+1512
+02:13:46,060 --> 02:13:51,500
+pues obviamente más parejas va a ir comparando unas con otras, y eso pues va a ser una locura,
+
+1513
+02:13:51,500 --> 02:13:58,860
+entonces el costo computacional del t-SNE es alto, por lo tanto, que otras alternativas
+
+1514
+02:13:58,860 --> 02:14:04,460
+tenemos, recordad, si tenemos, el primero es lineal y el segundo no es lineal, de acuerdo, el PCA,
+
+1515
+02:14:04,460 --> 02:14:09,100
+¿qué características tiene? Combina variables de forma simple, es lineal, conserva la variabilidad
+
+1516
+02:14:09,100 --> 02:14:15,860
+global, da el mismo resultado cada vez, es rápido y sirve para producción, porque en el fondo,
+
+1517
+02:14:15,860 --> 02:14:21,300
+pues sí, me sirve, porque como en el fondo sí que es determinístico, pues como siempre me va a dar
+
+1518
+02:14:21,300 --> 02:14:28,300
+el mismo resultado, al final, pues eso me sirve como para tomar decisiones para producción,
+
+1519
+02:14:28,500 --> 02:14:33,140
+el t-SNE, sin embargo, combina variables de forma más compleja, por lo tanto, no va a ser lineal,
+
+1520
+02:14:33,140 --> 02:14:40,580
+va a conservar vecindades locales, el resultado varía cada vez un poquito, es más lento,
+
+1521
+02:14:40,580 --> 02:14:46,580
+más costoso que el PCA y está pensado para visualizar, pero no en un sentido de producir,
+
+1522
+02:14:46,580 --> 02:14:52,740
+¿de acuerdo? ¿Qué otros algoritmos son similares o están en la familia del PCA? Pues está el
+
+1523
+02:14:52,740 --> 02:14:57,220
+análisis factorial, que eso lo habréis visto, lo habréis visto en estadística, está el análisis
+
+1524
+02:14:57,220 --> 02:15:04,740
+discriminante y el single value decomposition, la descomposición en valores singulares, que esto
+
+1525
+02:15:04,740 --> 02:15:09,820
+también es otro de los procesos que se ven en Machine Learning y también tiene que ver mucho
+
+1526
+02:15:09,820 --> 02:15:16,100
+con la álgebra lineal, ¿de acuerdo? Que no sé si lo vais a ver después, creo que sí, no estoy
+
+1527
+02:15:16,100 --> 02:15:20,900
+segura, pero bueno, ahí están, el análisis factorial se ve en estadística y el análisis
+
+1528
+02:15:20,900 --> 02:15:25,940
+discriminante yo creo que también, usted le sube, yo creo que lo vais a ver después, no estoy segura,
+
+1529
+02:15:25,940 --> 02:15:32,020
+estoy segura si se ve ya después. Bueno y luego otros modelos más complejos que no son lineales,
+
+1530
+02:15:32,020 --> 02:15:38,180
+que son en el fondo de la familia del t-SNE, pues los autoencoders, que eso también es interesante,
+
+1531
+02:15:38,180 --> 02:15:45,340
+se usa bastante en Machine Learning y Isomap, Local Linear Embedding y UMAP, ¿de acuerdo? Bueno,
+
+1532
+02:15:45,340 --> 02:15:52,700
+esto yo no creo que los veáis, quizás vais a ver autoencoders, no sé si local linear embedding,
+
+1533
+02:15:53,340 --> 02:16:00,700
+no sé, pero bueno, yo creo que más vais a usar es el autoencoders, ya, entonces bueno,
+
+1534
+02:16:00,700 --> 02:16:04,940
+esto simplemente son modelos que son no lineales y modelos lineales como para que los tengáis ahí
+
+1535
+02:16:04,940 --> 02:16:11,420
+en el mapa de posibilidades para quien quiera investigar un poquito más, ¿de acuerdo? Y bueno,
+
+1536
+02:16:11,420 --> 02:16:17,460
+y con esto ya estamos listos porque en estas tres sesiones hemos hecho esto, hemos visto la calidad
+
+1537
+02:16:17,460 --> 02:16:22,020
+de los datos, es decir, diagnosticamos si nuestra base de datos es buena, recordad,
+
+1538
+02:16:22,020 --> 02:16:27,460
+vuestros modelos de inteligencia artificial serán tanto cuanto más inteligentes en tanto en cuanto
+
+1539
+02:16:27,460 --> 02:16:33,500
+mejor sea la calidad de vuestros datos, si entrenáis basura vais a obtener un modelo basura,
+
+1540
+02:16:33,500 --> 02:16:39,700
+si entrenáis con datos con muchos sesgos vais a tener conclusiones con muchos sesgos, al final
+
+1541
+02:16:39,700 --> 02:16:46,100
+la máquina es simplemente un reflejo de la mano que lo entrena, así que la calidad de los datos
+
+1542
+02:16:46,100 --> 02:16:51,660
+es fundamental, por lo tanto hay que diagnosticar, imputar y dividir honestamente el dataset,
+
+1543
+02:16:51,660 --> 02:16:58,940
+hacer bien la división en entrenamiento, validación y test, recordad que como es el proceso de
+
+1544
+02:16:58,940 --> 02:17:04,580
+aprendizaje, recordad la importancia del error, recordad que las máquinas aprenden pero no son
+
+1545
+02:17:04,580 --> 02:17:09,340
+inteligentes, por lo tanto según la calidad de los datos y según en tanto en cuanto tengamos
+
+1546
+02:17:09,340 --> 02:17:17,100
+controlado el error, no sólo la accuracy, entonces vamos a poder tener modelos mejores y recordad
+
+1547
+02:17:17,100 --> 02:17:22,300
+que para no siempre vamos a necesitar machine learning, muchas veces con estadísticas está resuelto
+
+1548
+02:17:22,300 --> 02:17:29,420
+pero dentro de machine learning recordad que tenemos familias de algoritmos de aprendizaje
+
+1549
+02:17:29,420 --> 02:17:34,460
+supervisado y no supervisado y con refuerzo y después una vez que ya tenemos la calidad de los
+
+1550
+02:17:34,460 --> 02:17:39,540
+datos y que sabemos cómo funcionan estas maquinitas que aprenden, entonces tenemos que pasar a
+
+1551
+02:17:39,540 --> 02:17:45,620
+representar y reducir las variables que vamos a meter en la máquina, ya sabemos que nuestros
+
+1552
+02:17:45,620 --> 02:17:50,980
+datos son buenos, sabemos cómo aprende la máquina, entonces ahora traduzcamos todo para que podamos
+
+1553
+02:17:50,980 --> 02:17:58,220
+hacer el trabajo fácil para la máquina, escalando, codificando y resumiendo variables y después de
+
+1554
+02:17:58,220 --> 02:18:04,580
+esto ya vais a poder pasar a utilizar otros algoritmos de inteligencia artificial con modelos
+
+1555
+02:18:04,580 --> 02:18:11,300
+que funcionen de manera óptima, entonces de datos confiables a un modelo que aprende a variables
+
+1556
+02:18:11,300 --> 02:18:17,180
+bien representadas y resumidas, en el fondo todas las sesiones lo que han hecho es en estas tres
+
+1557
+02:18:17,180 --> 02:18:24,020
+sesiones os he armado como el esquema para que podáis aplicar correctamente modelos de inteligencia
+
+1558
+02:18:24,020 --> 02:18:31,380
+artificial en la vida real y bueno para que penséis si tuvierais un proyecto en el trabajo
+
+1559
+02:18:32,700 --> 02:18:41,420
+en el problema que pensáis en un problema en vuestro trabajo y que tengáis ahí y que penséis que
+
+1560
+02:18:41,420 --> 02:18:45,820
+os haya dicho el jefe o la jefa es que quiero usar inteligencia artificial, bueno pues empezad a haceros
+
+1561
+02:18:45,820 --> 02:18:50,660
+estas preguntas, que por ejemplo de las variables que vais a trabajar cuáles creéis que están
+
+1562
+02:18:50,660 --> 02:18:56,100
+altamente correlacionadas entre sí, qué variables nuevas podríais construir combinando las que ya
+
+1563
+02:18:56,100 --> 02:19:00,300
+tenéis, qué feature engineering podríais hacer que a lo mejor no habéis hecho, si tuvierais que
+
+1564
+02:19:00,300 --> 02:19:06,140
+quedar con la mitad de las variables que haríais, las eliminaríais o es decir las seleccionaríais y
+
+1565
+02:19:06,140 --> 02:19:14,420
+dirías chao o las resumiríais, es decir extrairíais y cuando preferiríais el t-SNE para explorar los
+
+1566
+02:19:14,420 --> 02:19:20,060
+datos y cuando el PCA para reducir antes de modelar en vuestro escenario real, o sea son preguntas que
+
+1567
+02:19:20,060 --> 02:19:25,580
+bueno siempre es interesante hacerlas antes de meter las manos en un modelo de inteligencia
+
+1568
+02:19:25,580 --> 02:19:32,620
+artificial, de acuerdo, entonces bueno lo dicho tenéis subido esto tenéis subido el Colab, me
+
+1569
+02:19:32,620 --> 02:19:39,180
+faltaría subiros la actividad y lo que os había prometido también de los capítulos del enlace,
+
+1570
+02:19:39,180 --> 02:19:46,300
+bueno todo lo que os he prometido lo tengo anotado, juro que lo subo, y el sábado estaríamos viéndonos
+
+1571
+02:19:46,380 --> 02:19:48,140
+Romina a las 10 ¿cierto?
+
+1572
+02:19:50,700 --> 02:20:00,180
+Sí, hasta las 12 y media. De 10 a 12 y media con una pausita, de acuerdo, así que no sé si tenéis
+
+1573
+02:20:00,180 --> 02:20:15,100
+alguna otra duda y si no pues con esto y un bizcocho, gracias, gracias a todas y todos, calabaza.
+
+1574
+02:20:16,780 --> 02:20:24,460
+Me parece que dice con esto y un bizcocho hasta mañana a las 8 así que perfecto, muy bien hoy sí tengo
+
+1575
+02:20:24,460 --> 02:20:34,740
+hujeras, pues entonces estaríamos por ahí, vale juntad dudas y hasta la vista malabarista, nos veríamos
+
+1576
+02:20:34,740 --> 02:20:43,740
+el sábado de acuerdo, vale que descanse y una buena semana para todos, chau a ti también buenas noches,
+

@@ -1,0 +1,1533 @@
+Antes de partir, el tema de hoy que son los modelos de Boosting, no sé si hay alguna pregunta de la semana pasada, algo que no haya quedado claro, algo con respecto a los ejercicios que quedaron como pendientes.
+Bueno, todo claro.
+Entonces seguimos con los modelos de Boosting.
+Vamos aquí a pasear en el fondo.
+No sé si la intuición es realmente la palabra, está ahí, pero qué es lo que está de fondo.
+Bueno, puede ser la intuición detrás de los modelos de Boosting.
+¿Cuál es la diferencia fundamental en el fondo por los modelos que ya vimos? Porque sigue siendo modelos ensamblados.
+No estamos desviando de eso.
+Así que sigue siendo mezclas de modelos.
+Pero tienen otra idea por detrás, bien distinta.
+Eso es un poco lo que vamos a partir.
+Después de eso vamos a ir viendo en el fondo los modelos más simples, por decirlo así, o los que le dan como el piso a este tipo de modelos, que sería AdaBoost.
+Para después ya pasar a los modelos más desarrollados, que en general tienen mejores desempeños.
+A partir de primero ahí parece Caldus, pero no lo voy a hablar porque no hay al tiempo.
+Solo puedo mencionar, si vamos a ver el XGBoost y el LightGBM, que son modelos típicos de este tipo de cosas.
+Ahí vamos a ir comparando y viendo cómo es lo que son.
+Entonces la idea de estos tipos de modelos es un poco ir equilibrando las capacidades de los modelos y tratando de sacarlos mejor.
+En el fondo la evolución del bugging al Roundoff Forest era justamente que la variabilidad dentro de lo que teníamos, de proceso o de las predicciones, estaba metido la correlación entre los errores de los árboles.
+Entonces si estaba mostrando bajo distintas muestras, porque es lo que hacen, evidentemente vamos a tener menos correlación entre esos errores, pero evidentemente podría estar ocurriendo.
+Y por eso el Roundoff Forest viene en el fondo hacer un muestreo de las variables para dejarlos aún más independientes.
+Pero decía en el fondo que cuando el error es cuando tenemos correlación alta, en el fondo no solo los modelos no bajan el error, sino que es síntoma de que al final del día tenemos los datos
+y los modelos cometen el mismo error una y otra vez.
+Y nosotros nos gustaría que eso no ocurra por supuesto, que si un modelo, como se dice en buen chilen, uno quiere tropezar dos veces con la misma piedra.
+Entonces si un modelo tuvo mal desempeño en un conjunto de los datos, me gustaría que existiese alguna forma de que estos modelos pudiesen ir aprendiendo de esos errores.
+¿Para lo de abajo?
+Bien.
+Y eso justamente lo que hacen todos los modelos de boosting.
+Entonces vamos a ir avanzando en ello.
+Entonces como les decía, los modelos de boosting en general simple.
+Primero hay un cambio fundamental.
+El caso de los modelos que hicimos antes, ya, el Roundoff Forest y de Bindin, teníamos que eran modelos que se podían paralizar, o sea que en el fondo eran todos independientes.
+Tenías X muestras y tenías en el fondo un árbol en cada muestra y cada uno se entrenaba sobre su muestra y no le importaba el de al lado realmente.
+En cambio, los modelos de boosting se entrenan de manera secuencial, es decir, se entrena un árbol y una vez que se entrene se entrena el siguiente.
+¿Y por qué se hace eso?
+Bueno, es por cómo sale este diagrama en esencia.
+Nos tiramos los datos.
+¿Cuáles son los datos?
+Yo ajusto mi árbol.
+Ahí sale como árbol 1.
+Y ese árbol 1 comete ciertos errores.
+Bien.
+Y esa información de dónde está cometiendo errores se le pasa al siguiente árbol.
+Por eso es que ahora no los puedo hacer en paralelo, porque la información del árbol 1 va a servir como feedback para el árbol 2.
+De manera de que este puede aprender dónde el árbol 1 se equivocó y tratar de corregir esos errores.
+Cosa que no hacía en los anteriores.
+Ya.
+¿Cuál pregunta si el árbol 2 opera con los mismos datos?
+Exactamente con los mismos datos.
+Ya.
+Aquí la forma básica en el fondo de esto es que los modelos operan sobre todo el dataset.
+A diferencia del anterior que operan sobre muestra.
+Entonces acá el punto es ese.
+Y después tiene un modelo 2.
+Y a ese modelo 2 se le entrega información del modelo 1 para que no repita los errores.
+Se entrena y vuelve y comete errores.
+Aquí errores 2.
+Y esos errores 2 van para el árbol 3 y así sucesivamente.
+Bien. Entonces cada árbol entrega información a los siguientes como feedback.
+Para que este en el fondo vaya mejorando y se vaya fijando exactamente dónde están los errores.
+Y no que siga entrenándose de cualquiera. Así como sin digamos ningún ella.
+Esa es la es la esencia digamos detrás de estos modelos.
+Finalmente los modelos se terminan siendo un modelo aditivo.
+Es decir tenemos todos estos árboles entre ellos y finalmente las respuestas se suman de una manera ponderada.
+Donde cada uno está portando algo.
+Profes.
+Sí.
+Sí.
+Juan Vilches pregunta si el árbol 2 opera con los mismos datos que el 1.
+Sí, sí, sí.
+Entonces lo respondí.
+Ah, no.
+Sí, lo había dicho que sí.
+Que opera con los mismos datos.
+La la.
+Entiendo que hay versiones tradicionales que esto también lo mezclan con con un poco de mostreo, pero.
+La versión tradicional no ya porque de hecho por ejemplo en nada busque uno de los primeros que van a ver.
+La forma en que estos errores se pasan árbol 2 es ponderando los mismos datos.
+Entonces si tuviésemos muestra y saco en esa muestra donde me equivoqué en el árbol 1.
+No se los voy a poder entregar como feedback al árbol 2.
+Entonces como que no tiene mucho sentido acá optar por muestras distintas para cada uno de los árboles.
+Sino que sobre todos los datos de entrenamiento por supuesto.
+Yo voy pudiendo hacer cosas así que es todos los datos.
+Bien.
+Y entonces como decía el árbol final se construye como una suma de todos estos.
+Y además tenemos un parámetro que se fijan.
+Este que es un parámetro es un ETA.
+Y este ETA controla.
+Cuánto aporta cada nuevo modelo.
+Y eso es un parámetro.
+Un parámetro que uno puede entregarlo al modelo.
+Para al fondo generar más o menos aprendizaje.
+Y mejores modelos.
+Si esto dice si se espera que los errores del árbol 2 sea igual o menor que los errores del árbol 1.
+O podría aumentar.
+También podría aumentar.
+Lo que se espera.
+No es que no cometa menos errores que el árbol 1.
+Se espera que no cometa los mismos errores.
+Ya.
+Por eso en el fondo el de la muestra es el que se está haciendo.
+Por eso en el fondo el árbol 1 va a poner a los datos donde él error.
+Entonces el modelo 2 va a ponerle más atención a eso.
+Y por decirlo así va a descuidar un poco los otros.
+Pero el fondo del otro ya lo estoy aprendiendo bien.
+Entonces voy a enfocarme más en eso.
+Bien.
+Eso es un poco la forma de cómo lo hace.
+Bien.
+Entonces como les decía hay como diferencia.
+Los modelos de binding y modelo boosting.
+Una de las principales diferencias automáticamente es uno es modelo paralelo y el otro es modelo secuencia.
+Cada modelo va a una muestra distinta.
+En el modelo boosting cada etapa usa un error que va haciendo acumulado sobre el mismo data set.
+Las predicciones promedio ya no votan en el binding.
+En boosting son contribuciones que se suman.
+En ese sentido se puede entender también como un promedio ponderado.
+En algunos casos.
+¿Por qué?
+Porque algunos modelos.
+Ya.
+Algunos modelos van a ser mejores que otros.
+Algunos van a errar más.
+Algunos van a errar menos.
+Y cuando los modelos erran menos esto le va a dar más peso en la predicción final.
+Mientras que cuando erran más se les va a quitar un poco el peso.
+Y así va a ir controlando cómo.
+Como estos van a ir aportando.
+Vamos a ver en el fondo las fórmulas que están detrás de cada una de esas cosas que estamos diciendo.
+Y por último el binding tiene el objetivo de reducir la varianza.
+Como la habíamos visto mientras que el objetivo de boosting.
+Reducir sesgo pero más que nada es el error.
+Típicamente están pensados en reducir errores.
+Por lo tanto hacer modelos más precisos.
+Obviamente en términos de predicción.
+El ciclo general del boosting como dice acá.
+Es bueno se inicia.
+Se mide.
+Ya se mide en el fondo.
+Típicamente estos modelos utilizan una.
+Una.
+Una función de pérdida que se llama.
+Una función que ayuda a determinar el error.
+Pues es pérdida cuadrática.
+Pérdida logarítmica.
+Pérdida absoluta etc.
+Hay distintas métricas.
+De función de pérdida que son como típicas de uso.
+Muy ligadas.
+Trísticamente a las distancias de Manhattan por ejemplo.
+O a la estación de Ocligana.
+En algunos casos.
+Y en esos se mide eso.
+Y con eso se ajusta.
+Y se le llaman aprendices.
+En el fondo a estos modelos y los datos.
+Entonces.
+En todos los casos tomamos una predicción.
+Va a ser.
+Hacemos predicciones.
+Vemos la función de pérdida.
+Vemos dónde se equivoca y dónde no.
+Y donde se equivoca.
+Vamos a generar un impacto a nivel.
+Digamos de los datos.
+Que nos permita ajustar un nuevo modelo.
+Con esos errores en mente.
+Y eso va a ir sumando a la contribución total de los modelos.
+Y finalmente esto se detiene.
+Una vez que se cumplen las etapas que uno necesita.
+Al igual que los anteriores.
+Puedo definir.
+Cuántos modelos.
+Voy a considerar.
+En este caso también funcionan a base de árboles.
+Cuántos árboles voy a considerar.
+En cada caso.
+Entonces.
+Eso es un poco el.
+Es como funciona y por ejemplo si yo dije mil árboles.
+Entonces esto se va a ajustar hasta que tengamos mil árboles.
+Y ahí va a terminar y va a aportar el estimador.
+Bien.
+Entonces.
+El primer modelo es el AdaBoost.
+Que como dices se enfoca en casos difíciles.
+Comenta el peso de la observación en más clasificada.
+Y combina.
+Sus modelos según dicen pe.
+Entonces ustedes tienen inicio con peso iguales.
+Dice el árbol falla.
+Arbol 1 falla en tres casos.
+Bien.
+Se responderán.
+Esos casos para que pesen más.
+Entonces el árbol 2 se concentra en ellos.
+Bien.
+Y el voto final.
+Tiene un peso según calidad.
+Ok.
+Entonces cómo se mide esto.
+Bueno.
+Una de las primeras cosas es el error del modelo.
+Ya.
+El error del modelo.
+Es.
+Se mide como estos W que son los pesos.
+Que en principio son todos iguales.
+Bien.
+Ahí está.
+Por la.
+Esto en el fondo está viendo si es que se cumple o no.
+El objetivo.
+Bien.
+Entonces para cada observación.
+H.
+Y.
+Este dice ser H.
+M.
+Dijen me lo voy a corregir.
+Activo.
+Porque no tengo.
+Perdón.
+Ahora.
+Bien.
+Entonces.
+Esta parte de acá.
+Entonces.
+Esta parte de acá.
+Esta parte.
+Es una función que se llama indicatriz o indicadora.
+Y lo único que hace es decir oye.
+Si tu modelo.
+En tus variables.
+Es igual.
+Y.
+Y.
+Y.
+Y.
+Y.
+Y.
+Y.
+Y.
+Y.
+Y.
+acknowledging o con vernieras.
+Muy bajito nivel.
+de a poco.
+Entonces, como les decía, este de acá es una función indicadora.
+Esta función es 1, va a ser 1 si es que la predicción del modelo es igual al valor
+y 0 en caso contrario.
+Entonces, esta función lo que está diciendo es 0, y se cumple lo que dice ahí, o sea,
+y1, si y sub i, bien, perdón, esto es al revés, es igual a hmx.
+Entonces, este es 1 y este es 0.
+Entonces, ¿qué es lo que está haciendo esto?
+Si se fijan, el error del modelo lo único que está haciendo es contando las veces en
+que la predicción no es igual.
+Eso es lo que está haciendo, porque es 1 cuando la predicción, que es h, estamos refiriendo
+h como el modelo, es distinto del i.
+Eso es que la predicción está mala.
+Cuando está buena le ponen 0.
+Entonces, fíjense que si el modelo fuese perfecto, es decir, para todos los i, o sea,
+para todos mis registros y todos mis variables, hago la predicción y es exactamente igual
+al valor objetivo, entonces serían puros 0, eso haría el número error 0 y haría el
+error igual a 0.
+Entonces, es el caso extremo cuando el modelo es perfecto.
+Aquí el error está medido como un número entre 0 y 1.
+En el caso de que se equivocara absolutamente en todos los valores, bueno, este va a ser
+1, siempre, así que usted va a reemplazar esto por 1 y arriba le queda la suma de los
+pesos dividido la suma de los pesos, por lo tanto eso es 1.
+Entonces, el error del modelo se mira así, contando dónde el modelo está agarrando y
+eso me va a generar un indicador entre 0 y 1 el error.
+Mientras más cercan a 0, menos error quiere el modelo, mientras más cercan a 1, más
+error quiere el modelo.
+En base a eso se calcula el peso del modelo, como les decía, estos modelos tienen pesos
+según el nivel de error que tengan.
+Entonces acá tienen el peso como un medio del logaritmo natural de esto de acá.
+Entonces como ven en el fondo, esto de acá es una función que va a ir, tienen que ir
+viendo en el fondo qué es lo que vale.
+Por ejemplo, en un medio, el error es un medio, esto es 1.
+Bien, logaritmo 1 es 0, ya, entonces ahí va a poner peso 0.
+Entonces, si este error es mayor que un medio, entonces típicamente este número de acá
+va a ser menor que 1 y por lo tanto el logaritmo va a ser menor que 0.
+Entonces va a castigar errores altos y va a premiar errores bajos.
+Eso es lo que hace el peso del modelo.
+Y el peso del modelo sirve para dos cosas.
+Uno, para actualizar los pesos.
+De aquí, el peso del modelo es el peso de la persona.
+Y el peso del modelo sirve para dos cosas.
+Uno, para actualizar los pesos.
+De aquí a acá se actualizan los pesos.
+¿Cómo se actualizan los pesos?
+Bueno, en aquellos casos donde el modelo falla, se actualiza de esta forma.
+Ese es el nuevo peso.
+Si falló en el caso 1, entonces el W1 ahora se va a transformar en W1 por la exponencial
+del peso del modelo por el valor de la variable por el valor que está entregando el modelo.
+Ese es el peso que está entregando esto.
+Entonces influyen el valor donde estamos mirando, el peso donde estamos del modelo y el modelo.
+Acá hay una cosa que es importante y es que los I sub I, no sé si es tan importante,
+pero en general esto se mide mucho, se ve mucho para valores, para datos categóricos,
+que típicamente es donde más se muestran.
+Y esto de acá, los típicos datos categóricos binarios son 0 y 1.
+En realidad esto asume como que esto está entre menos y 1 y 1 para todos estos cálculos.
+Si no está entre 1 y 1, hace las transformaciones adecuadas para que eso ocurra.
+Solo para tener en mente que esto por ejemplo no se va a hacer 0.
+Por ejemplo si la variable I fuese 0.
+Por eso es 1 y menos 1, entonces este siempre va a ir cambiando el signo nomás.
+El modelo también y este de acá, va a ir aportando el peso.
+Y finalmente el A sub M también sirve para ponderar cada peso.
+Aquí se fijan que con la suma ponderada de cada uno de los modelos,
+acorde a lo que van incluyendo.
+Ya.
+Entonces acá, se fijan y aquí es donde es importante esto,
+porque aquí yo estoy preguntando por el signo de esta expresión.
+¿Por qué? Porque como vais ponderando entre medio,
+me puede de repente dar un número 5 o de repente dar un menos 8.
+Lo único que le interesa a esto es que si es positivo,
+significa que habría más elementos asociados a valores positivos
+de los modelos H.
+Si hay valores negativos significa que van más asociados al menos 1.
+Entonces cuando yo le pido el signo, estoy diciendo que transforme esto de acá,
+lo que está acá adentro, a un 1 y un menos 1,
+que es lo que hacen los modelos entre cada dos categorías.
+Este es el caso binario de un cierto.
+Pero esto es un poco cómo funciona.
+Todo esto está por detrás.
+No hay para qué tenerlo en cuenta, digamos.
+No hay para qué aprender cosas de memoria ni nada.
+Pero es lo que está por detrás de estos modelos.
+Entonces para que tengan claro que son modelos que calculan los errores,
+modelo a modelo, se los van pasando a otros en términos de peso de variables
+y también van influyendo en cómo se hace el modelo final.
+Antes era un promedio simple, ahora ya no es un promedio simple,
+ahora es, digamos, ni siquiera es un promedio, es una suma ponderada.
+De cada una las cosas.
+Entonces mayor error del árbol, menor influencia.
+Un caso más clasificado, menor influencia porque va a ser, digamos,
+con este lo vamos a llevar para abajo.
+Y un caso más clasificado va a pasar acá a la actualización de peso
+y por lo tanto va a tener mayor peso en el siguiente.
+Entonces acá hay un ejemplo súper simple.
+Imagínense que esto está haciendo clasificación binaria
+y ustedes tienen esto de acá.
+Entonces la línea como medias verde, morada,
+son como rondas en el fondo, el primer árbol, el segundo árbol,
+porque como esto va avanzando de manera secuencial,
+por eso muchas veces van a encontrar con esa forma de llamarle como rondas.
+Entonces se fijan acá error en algunos puntos, particular.
+Error en S, en S, en S no lo marcamos, pero en S, en S y en S.
+Porque acá están mayormente azules, acá mayormente rojos,
+entonces el lado izquierdo dicen ser apuro azules
+y el lado derecho dice ser mayormente rojo.
+Entonces aprendió y los marca.
+Y si se fijan acá, esa pelotita, en esta me faltó, hay que grandarla,
+pero en esas dos pelotitas que son las que venían marcadas amarillas,
+que son las que erró en el caso anterior, ahora son más grandes.
+Entonces la está, como se llama esto,
+le está entregando un peso mayor gráficamente.
+Entonces ¿qué es lo que va a hacer?
+La ronda dos, no se va a fijar tanto en estos ni en estos,
+se va a fijar más en aquellos donde erró,
+que son estos dos en estos casos que solo querían los pesos mayores.
+Entonces ahí lo que hace es tirar ahora esta línea horizontal,
+porque esa se vara estos dos puntos gigantes.
+Pero al hacer eso, por supuesto, no ahorrar en S y en S.
+Entonces este proceso que es lo que va a ir haciendo,
+después ya no va a ir tomando cada uno de estos pedacitos de ciertas formas
+y finalmente se genera una línea como la que muestra el último,
+que es la combinación final, que empieza a tener ya fronteras escalonadas
+y va logrando separar de buena forma.
+Por supuesto no es que llegue a la perfección como se muestra,
+esto es simplemente una idea, una idea gráfica con estos puntos gigantes
+de ir mostrando que efectivamente es donde el modelo va a poner el énfasis
+y se va a olvidar un poco de los otros.
+Eso es un poco la idea que está por detrás de todas estas cosas.
+Bien, ventajas de estos modelos es que, bueno, creo que la intuición es muy clara.
+No es que cada uno entregue información a siguiente para que mejore
+y tratará de mejorar entre todos, más que ser independientes.
+Tiene pocos parámetros, eso depende en el fondo del modelo que ocupemos,
+pero como modelo en sí efectivamente tiene poquitos.
+Tiene en general buen desempeño, a pesar de que es simple la forma de que estamos trabajando
+y en el fondo con aprendices muy simples, el aprendice en el fondo son los modelos
+que les llaman estas cosas.
+Y en ese sentido, por ejemplo, cuando uno lo pone con árboles,
+que son modelos muy simples, esto aún así tiene muy buen desempeño.
+No necesita escalar variables para los árboles, por ejemplo,
+así que eso también es bueno.
+Y para clasificación y para regración tenemos la implementación en ambos casos.
+Y bueno, estos ahora sí sufren exactamente los mismos problemas que cualquiera
+de los modelos que son ensamblados de árboles,
+que no logran salir del intervalo al que están entrenados.
+Si ustedes tienen datos que están entrenados entre 10 y 100,
+sus previsiones son entre 10 y 100 y no es capaz de predecir 200 ni 5,
+aún cuando sean ensamblados.
+Gustavo.
+Sí, pero ¿puedo explicar de nuevo la diferencia en la lámina anterior?
+No me quedó tan claro lo de las pelotas azules y rojas,
+como que el color representaba algo...
+Son dos clases, la clase azul y la clase roja.
+O sea, es como una clasificación que tiene que hacer,
+una etiqueta azul y una etiqueta roja.
+Exacto, tiene dos clases, azul y rojo y el color tiene que hacerse para...
+¿Cómo es que lo identifica el error de la ronda?
+Porque está separando como por una línea en el fondo.
+Y sí, todo esto no es exactamente como funciona, pero...
+En el fondo lo que está haciendo esto es que tiene los puntos y dice
+que yo con esta línea voy a separar, voy a dejar a un lado los azules
+y a un lado los rojos.
+Claramente a este lado hay más azules y a este lado hay más rojos.
+Por lo tanto cualquier cosa que no se vea rojo al lado derecho de la línea
+va a ser un error.
+O sea, este de acá.
+Cualquier cosa que se vea al lado izquierdo, esto insisto, es solo de manera pedagógica.
+Sí, como visual.
+Ok, marca ese rojo porque es el que está más lejos de la línea.
+Claro, en realidad aquí me equivoqué, este tenía el marcado al lado...
+Ah, ok, ok.
+Son todos los que quiero.
+Y el punto es que estos de acá, en esta siguiente...
+Imagínate, también la vamos a hacer más grande aquí a la bala.
+Bien, ahí.
+Entonces claro, después el modelo dice ya, ya sé que me equivoqué
+en esos tres, en estos dos que están aquí con puntos grandes.
+Sí.
+Y en este de acá.
+Entonces en eso se va a fijar.
+Y en eso el modelo, lo que hace es tirar esta línea horizontal.
+Y en este caso ahora especifico bien estos.
+Ya.
+Y este también.
+Por lo demás, ahora tiene cuatro azules y cuatro rojos a cada lado.
+Antes tenía cuatro y tres.
+Entonces además tiene un menor error.
+Pero ahora el error en estos otros dos.
+Bien.
+Entonces la siguiente ronda a esto los va a poner con un círculo gigante
+porque esos son los que va a poner énfasis.
+Y entonces este ya va a empezar, después va a tirar las líneas más abajo.
+Y esta es la línea más arriba que son finalmente las que están representadas aquí y acá.
+Bien.
+Y empieza a hacer este movimiento como no lineal.
+Todos estos modelos son capaces de detectar patrónes no lineales en los datos.
+Mientras claramente estos están separados.
+Igual podría separarlos con una línea así como diagonal.
+En este caso con una línea así como escalonada los separa perfecto.
+Bien.
+Y eso lo va encontrando justamente porque va poniendo énfasis en separar algunos puntos.
+De aquí de la ronda 1 a la ronda 2 se fijó en estos tres que están con una flecha.
+De la ronda 2 a la ronda 3 se fija en estos dos que están acá.
+Y después ahí fijando en otros subesíamente hasta que llega a un modelo final.
+Bien.
+Bien.
+Carolina pregunta cómo se relaciona este modelo con el KDNN.
+No tiene ninguna relación finalmente.
+El KDNN lo único que hace es que de un punto mira a los que están más cerca.
+Esto no mira nada en relación a eso sino que mira errores del modelo.
+De hecho no involucra distancia.
+Por eso una de las cosas importantes es que no se necesita escalar variables.
+Porque no basa en distancias.
+KDNN es exclusivamente basado en distancias.
+Bien.
+Entonces como le decía es claro lo que quiere lograr.
+Tiene buen desempeño incluso utilizando modelos simples como base.
+En este caso los árboles.
+Lo tenemos que escalar lo cual es algo bueno en el sentido de que es más simple
+todo el procesamiento que tiene a causa de los datos.
+Y podemos utilizar para reaccionar y clasificación.
+Dentro de las limitantes es sensible al ruido y etiquetas incorrectas.
+¿Por qué?
+Porque como el modelo pone énfasis en los errores.
+Si un dato está mal etiquetado por ejemplo y sus variables son super claras.
+Supongamos que como los datos que teníamos la clase pasada.
+De estos datos como de problemas al corazón.
+Era como super claro que si tú eras de una edad bien avanzada,
+tenías colesterol alto, tus pulsaciones por minuto eran bajas,
+tenías la presión alta.
+Era casi seguro que te iba a hacer una predicción como que eras digamos.
+Que ibas a tener problemas al corazón.
+¿Ya?
+Si tú tienes un sujeto que efectivamente tenía problemas al corazón
+pero estaba mal etiquetado y tenía todas estas cosas.
+El modelo siempre lo va a errar porque en el fondo va en contra de la lógica
+que tienen todos tus datos.
+¿Bien?
+Pero eso dice el ruido porque en el fondo ruido sería un dato que no está mal
+etiquetado sino que es raro en relación a la relación usual.
+O que esté mal etiquetado en ese caso.
+¿Bien?
+¿Y por qué?
+Entonces casi siempre te va a decir hoy esta persona debe tener problemas
+al corazón y tú va a ver la etiqueta original y decir no,
+no tiene problemas al corazón.
+¿Cómo no?
+Si mira, a ver veámoslo no.
+Sí, va a tener problemas al corazón.
+¿Ya?
+Entonces en ese sentido es importante digamos que eso es importante
+tener en cuenta que ojalá que los datos estemos súper seguros de que vienen
+con etiquetas bien correctas.
+¿Ya?
+Si es ese el caso el ruido puede hacerse digamos mediante un propio sensamiento
+de los datos.
+Mediante no sé también temas de outliers cosas por el estilo nosotros
+podemos lograr separar ese ruido excesivo y mediante por supuesto como calidad
+de datos podemos ver que estén no etiquetados correctamente porque lo que pasa es que en
+esos datos siempre se va a equivocar y como los modelos ponen énfasis va a empezar ese
+énfasis en esos datos que no va a poder nunca predecirlos bien va a quedarse como pegado
+y dándole toda la importancia a eso y va a descuidar todos los demás.
+Chuchu, si me dan un segundo que me están llevando de mercado libre por una palabra
+clave, ¿pa' qué manera me entrega?
+Me dan un segundo.
+Ya, perdón, gracias.
+No, no era AdaBoost lamentablemente, era Saiten, no más, pero muy bien.
+Entonces ese es el problema cierto que tienen con las etiquetas, ¿ya?
+Pues con la sensibilidad de ruido, es que el modo saque ha pegado en el error, lo vamos
+a poder sacar de ahí.
+El entrenamiento secuencial es una limitación en el sentido de que va lo va a ser más pesado,
+¿bien?
+El hecho de que sea más pesado en realidad más costoso el tiempo al no poder paralelizar
+antes yo tenía mil árboles y tenía 10 procesadores y paralelizaba en el fondo y
+iba a ser mil árboles pero en un tiempo de 100, ¿ok?
+Pero acá si tengo mil árboles voy a demorarme el tiempo de mil, entonces 10 veces más
+solo por el hecho de que no puedo paralelizar.
+Entonces es una limitante y más que una limitante es algo digamos que le pega de mala
+forma al modelo en el sentido del costo computacional, ¿ya?
+Bueno y tienen menos flexibilidad que variantes modernas porque en el fondo el AdaBoost fue
+uno de los primeros modelos de boost bien AdaBoost a todo esto significa additive boosting
+bien porque en el fondo los modelos se van sumando, ¿ok?
+Entonces se van agregando entre ellos.
+Y las versiones modernas se refiere al otro que vamos a ver como el XGBoost, el Light
+DBM, etc.
+Así que bien, como dice entonces abajo es una buena línea base pensando en que cuando
+los datos realmente vienen limpios y nosotros ya le hicimos tratamiento sabemos que no tenemos
+ruido sabemos que no tenemos etiqueta incorrecta entonces debiese no hablar nada de mal, ¿bien?
+Bien y después vienen los modelos de gradient boosting, ¿bien?
+Y aquí la palabra en el fondo clave es el gradient ¿ya?
+¿Qué es lo que uno hace?
+Ya aquí no quiero meter digamos en temas muy técnicos pero ¿qué es lo que pasa?
+Ustedes tienen en todos estos modelos tienen una función de pérdida ¿ya?
+Básicamente lo que mide es cuánto está en diferencia el la variable con mi prediction
+¿bien?
+Entonces yo simplemente y esto puede ser insisto una pérdida cuadrática o sea que
+la diferencia, ustedes van a ver la diferencia al cuadrado puede ser una diferencia logarítmica
+y subesivamente existen distintos tipos ¿ok?
+Y esta función lo que uno busca en todos estos modelos es optimizar esa pérdida, la
+pérdida nunca va a ser buena imagínense que ustedes están en un negocio digamos y ustedes
+quieren digamos siempre por supuesto minimizar las pérdidas ojalá que haya ganas ¿bien?
+Pero siempre ahora quieren minimizar las pérdidas casi en todo esto en todo este tipo de entonces
+Entonces ustedes van a ver una función sea o garcea y ustedes lo que buscan es esta es
+llegar acá al mínimo ¿bien?
+Ok pero estas funciones en general es difícil llegar al mínimo ¿bien?
+Porque no los mínimos utilizan solamente estas funciones de pérdida tienen mínimos
+que están hechas para eso yo no puedo ocupar cualquier función de pérdida pero con todo
+pero encontrarlo es complicado ¿no?
+Entonces lo que se hace se ocupan los gradientes y que son los gradientes son las direcciones
+en donde se van a ir a encontrar estos valores ¿ya?
+El gradiente básicamente son las derivadas ¿bien?
+Son las derivadas pero en el fondo como esto tiene más variables podría digamos ser con
+derivadas parciales como parecen ahora lo mismo lo que significa eso
+en el fondo lo que hace es que ustedes se paran un punto y encuentran el gradiente
+y el gradiente me determina con dirección y magnitud hacia donde está el mínimo ¿bien?
+Y entonces de manera como iterativa esto va a ir encontrando puntos que se van a ir
+encontrando en dirección hacia el mínimo y van a ir convergiendo sea el por supuesto
+me voy a ir acercando mucho casi nunca voy a llegar a él ¿bien?
+Pero en el fondo ese proceso me va a ir acercando
+Y en general yo tengo aquí una cantidad de iteraciones o muchas veces para cada modelo
+de boosting yo voy a llegar mediante un proceso de optimización numérico
+así que va a existir un parámetro de tolerancia ¿bien?
+Cuando de un paso a otro en la búsqueda este mínimo avance muy poquito entonces ya estoy muy cerca
+eso es lo que dice la teoría entonces en ese caso tú paras el modelo y paras en el fondo la búsqueda
+entonces en el fondo la búsqueda y dice ya llegué ¿bien?
+numéricamente ya llegué me falta demasiado poco esa tolerancia típicamente es como 0.001
+entonces cuando estoy a menos de 0.001 del mínimo en el fondo ya estamos ahí
+Entonces eso es un poco lo que hace el boosting a diferencia del anterior ¿ya?
+Entonces también utiliza los anteriores también utiliza un ¿cómo se llama esto?
+este parámetro ¿bien? que este parámetro es el de aprendizaje ya vamos a ver si llama learning rate
+el parámetro entonces va a ir entregando nuevos árboles y va a ir generando digamos información nueva
+y así en el fondo vamos entregando información igual del error ¿ok?
+¿en qué es lo que trabaja esto? trabaja en funciones del estilo y menos los modelos ¿ok?
+entonces siempre trabaja sobre el error siempre el y menos los modelos son el error
+la diferencia es que antes se fijaba en los valores específicos donde raba
+ahora se fija en la función del error y esa es la que va a ir ajustando
+entonces ustedes van a tener predicciones y van a tener predicciones buenas y van a tener algunas predicciones malas
+y entonces ¿qué es lo que va a hacer? el nuevo modelo esto es muy simple y sobresimplificado de lo que significa
+pero va a agarrar esto y va a decir ok sabí que de ti ya aprendí y voy a ajustar un modelo acá
+entonces solo los errores pone como un árbol para solo aprender de estos valores ¿ya?
+no es exactamente así, no es exactamente así, estoy sobresimplificando pero solo para que se entienda que básicamente
+el otro ponía énfasis en los puntos, esto pone énfasis en los errores y aquí es donde ajusta el modelo
+y asume en el fondo que este árbol va a seguir haciendo bien lo que ya se estaba haciendo bien
+esto no quita que por supuesto acá abajo igual se puede equivocar
+bien pero esas son las dos diferencias, esa es la diferencia entre los modelos de boosting y los modelos de add-a-boost como inicialmente
+uno pone los pesos en los puntos para enseñar a los siguientes árboles
+el otro va a través de los errores pasándole la información, el error como función digamos ya
+como nuevo valor de apredecir, esa es la forma
+pero ambos van al mismo objetivo, a entregar información de donde me equivoco, de un árbol al siguiente para que este pueda mejorar
+bien, entonces los modelos se van actualizando y a medida que van a esto
+entonces esto en el fondo es lo que uno busca, ustedes tienen las observaciones, tienen los valores y en el fondo tienen una apredicción como basada por así decirlo
+esto está hecho muy simple para que quede claro
+entonces uno que es lo que ve lo recibo o la diferencia, entonces ve y-f
+entonces este es más 2, este es menos 3, ese es 1, ese es 0
+y que es lo que hace entonces uno pone un árbol acá
+bien por supuesto los ceros en el fondo es como que a dos categorías esta cosa
+entonces sabe que los ceros van a ser alguien que está bien predicho y los números son alguien mal predicho
+bien, más o menos, pero mal predicho
+entonces nosotros ajustamos el árbol sobre estos valores
+tenemos una parte base, 10 y después vamos a tener una predicción para ese error
+entonces aquí vamos a poner el árbol 1
+entonces el árbol 1 por ejemplo va a predecir para este 1, para este un menos 4, para este un 1 y para este un 0
+bien, entonces si hace eso, este va a quedar bien, este va a quedar mal y este también va a quedar mal
+pero en el fondo después con esa predicción, este va a quedar en 6
+la predicción que es la suma de estos dos valores, este va a quedar en 11 y este va a quedar en 10
+bien, entonces después tendrían un R2, este finalmente sería el y-r1 al final
+y este R2 sería en este caso, este va a estar junto a un 1, este sería un 11
+bien, en el fondo, esto de acá, esto generaría un F1
+este sería el F1
+y el F1 sería esto más la predicción, o sea 10 más 1, aquí sería 11, acá sería este más la predicción que era menos 4, así que sería 6
+este sería 11 y este sería 10, bien
+y ahora sí vendría el R2 que es la diferencia de F1 del y menos el F1
+sorry, perdón, escribir con el mouse es una real pesadilla
+entonces este sería el F1, y este sería y menos F1
+entonces acá tendríamos y menos F1, este sería 11, este sería 11, 0, 0
+y entonces ahora el modelo se va acercando, cometido menos errores, eso es un poco lo que va haciendo, como se fijó
+más en estos tres valores que en este, la punto, y eso genera el R2
+y así sucesivamente, entonces después el modelo va a tener un F2, va a ser F1 más un cierto modelo
+bien, aquí vamos a generar otro modelo, vamos a generar un modelo, este era H1, este es H2
+aquí H1 se generó sobre R1 y H2 se genera sobre R2, entonces ahora vamos a tratar de predecir estos valores
+y como él sabe estos de acá son los que erraron y estos de acá son los que no erraron, y así sucesivamente
+bien, uno tras otro va a ir sumando las cosas que corresponden
+por supuesto además esto tiene un parámetro que es el parámetro de aprendizaje
+ya lo vamos a ver en el fondo qué es lo que hace
+entonces
+eso es un poco cómo funciona, en un ejemplo insisto, muy simple
+como para entender como el mecanismo
+bien, entonces aquí hay algunos parámetros que son importantes
+tener como súper en cuenta, uno es la pérdida, que es lo que define qué significa equivocarse
+como les decía, las más típicas son la pérdida cuadrática, la pérdida logística, la pérdida absoluta
+la tasa, la tasa NU
+control al tamaño de cada paso, bien, y ese es el que se llama en los modelos un parámetro que se denomina learning rate
+que es la tasa de aprendizaje, bien, a menor valor que el que se llama el parámetro de aprendizaje
+a menor valor de la tasa de aprendizaje típicamente uno tiene un mejor desempeño del modelo
+pero por supuesto, esto es como, imagínense que ustedes están estudiando por una prueba
+una prueba que tienen unos más, si estudian un poquito todos los días lo más probable es que les vaya bien
+si estudian todo la noche anterior lo más probable es que puedan salvar, si es que, ya, entonces
+que para qué digo eso, típicamente cuando uno estudia de a pocos va interiorizando mejor
+y por lo tanto va a generar un mejor aprendizaje y va a poder tener un mejor desempeño
+si yo le doy el aprendizaje de golpe, lo más probable es que no va a poder
+capturar todo y no va a tener un gran desempeño, ya
+entonces, y finalmente, la complejidad que es lo que está dentro del modelo
+y lo que limita lo que los árboles aprenden cada uno de ellos, bien, y ahí están los mismos parámetros
+que nosotros ya habíamos visto, profundidad, hojas, muestra, etc.
+entonces como les digo, típicamente una tasa de aprendizaje pequeña, genera mejores aprendizajes
+pero si yo necesito, yo voy a aprender de a pocos, tengo una prueba fin de mes
+no me puedo poner tres días antes a aprender porque no voy a tener tiempo suficiente para aprender todo
+bien, acá, el análogo a los días de aprendizaje en el caso de la prueba
+sería los árboles, cada árbol es su aprendizaje y eso es lo que le estamos dando que aprendan de a poquito
+entonces, a menor tasa de aprendizaje, mayor cantidad de árboles yo necesito para poder aprender
+entonces, si ustedes tienen mayor cantidad de árboles, por supuesto, significa un mayor costo computacional
+pero en general esa combinación, más árboles y menos tasas, tiene un mayor costo computacional
+pero en general esa combinación, más árboles y menos tasas, tiende también a tener modelos muchísimo más estables
+en relación a ahora
+bien, entonces vimos AdaBoost y los de Boosting o Gradient Boosting que son los modelos básicos
+pero después, en el mundo de los modelos ensamblados de árboles
+existe, digamos, hay hartos desarrollos asociados a estos tratando de, ok, muchos árboles
+digamos, tenemos esta tasa de aprendizaje que tiene que ser baja, entonces, pucha, es como
+difícil tener un buen modelo pero a la vez ser eficiente computacionalmente, etcétera, etcétera
+entonces, en ese sentido, se desarrollaron varios modelos para ir mejorando esto
+de hecho, están los modelos de Boosting, los de Gradient Boosting y después viene este que es el XGBoost
+que viene de Extreme Gradient Boosting, ok
+y es que es nada más que lo mismo que antes, solo que viene regularizado y viene, digamos, eficientado computacionalmente
+entonces, ¿qué es lo que hace? es un sistema optimizado, como dice, de datos para adaptabulares y para ponerlo en producción
+el hecho de que sea regularizado significa que genera, digamos, todas las regularizaciones
+siempre tienden a reducirse estos niveles de errores, las regularizaciones ocurren a nivel de pérdida
+no vamos a entrar en detalle lo que significa eso, pero las regularizaciones vienen en todos los sistemas de optimización
+y lo que hacen es que reducen el espacio donde esos óptimos se pueden encontrar y en general eso genera algunos beneficios
+por otro lado, también usa su muestro de filas y columnas, similar a como el Random Forest, entonces él lo está mezclando
+tiene tratamiento eficiente de la dispersión, o sea, cuando hay alta variabilidad él se puede adaptar
+además también tiene un tratamiento de datos nulos que viene incorporado, que no todos los modelos lo tienen
+no es la gran cosa porque en general los datos nulos uno debiese, digamos, tenerlos, uno debiese tratarlos, pero aquí es importante
+bien, y los ingredientes, primero de todo, tampoco los puedo explicar, pero son cosas, digamos, de fondo para
+simplemente los puse para que vean que tiene hasta más cosas que la anterior, o sea, todo lo anterior más regularización, más submetreo, más distintos tipos de gradientes, etc.
+entonces finalmente tiene en el fondo una optimización en la función de pérdida en el entrenamiento, lo cual genera típicamente mejores resultados
+y tiene una penalización, que viene en la regularización por complejidad, es decir, impide que los árboles que están dentro sean excesivamente complejos, premio a la simplicidad
+entonces, todas estas cosas se meten en la juguera y sale un mejor modelo
+el XGBoost típicamente es uno de los mejores modelos que hay, de tipo ensamblado, por supuesto más costoso computacionalmente
+y por otro lado, tan costoso computacionalmente, está optimizado todo, pero es tan poderoso y son tantas cosas las que hace por adentro
+que ni siquiera está programado en Python, ni siquiera está en Cycle, sino que el XGBoost es un modelo como en sí y que se llama
+desde Python como un wrapper, está programado en C++, donde se pueden hacer todos estos cálculos de manera eficiente
+si ustedes llevaron el mismo modelo a Python o a R, probablemente sería muy lento
+entonces ustedes lo tienen programado en C++ y lo llamas desde Python para poder ocuparlo
+pero una de las cosas que tiene en particular es que no está en Cycle Learn
+y eso siempre en todo este mundo, cuando uno ocupa lenguajes que son open source
+entonces tienes la dependencia de que alguien lo haya programado bien, de que alguien lo mantenga, que se preocupe de mantenerlo actualizado
+que funcione ese que se cae, que lo levanten, etc.
+cuando tú estás en el mundo Cycle Learn es algo que está súper bien trabajado esa parte
+cuando te vas a módulos fuera puedes correr ese riesgo, entonces ahí también, no digo que haya un riesgo porque ahora está bien mantenido
+pero puede ocurrir, no es bueno que esté para el Cycle Learn, pero no lo podías meter nunca porque como les digo es de afuera
+y después además tenemos otro modelo, se llama Light-GBM, que es Light Gradient Boosting Machine
+eso significa el GBM, y lo que hace es que, esto lo que está acá, básicamente lo más importante es esto que dice acá
+el árbol Leafwise, no es un modelo que busca dividir los árboles para todos lados
+no que toma uno, toma el nuevo principal, lo divide en dos, siempre tiene que dividir en dos
+después dentro de las dos hojas que quedaron, se mira las preguntas correspondientes y ve cuál es la que tiene un mejor criterio de información
+recuerden que los árboles dividen por criterios de información, ya sea entropía o formación de Gini
+entonces, imagínense que tienen el criterio de información de Gini, y ustedes tienen estas dos hojas y dicen bueno esto me da X, esto me da Y
+Y es más información que X, entonces sólo voy a dividir acá, y divide esa hoja, no la da ya
+y después quedan tres nodos, porque hemos dividido dos
+vamos a dibujarlo, es más fácil que estén mirando mis manos
+entonces teníamos nuevo principal, esto siempre vivía en dos, no uno, no dos
+después entonces este se pregunta, cuál es la información que yo gano acá, X, ¿cuál es la información que yo gano acá? Y
+¿cuál es mayor? Y, listo, entonces divido acá, divido en dos
+y ahora quedaron tres nodos, este, este y este
+bueno, ¿cuánto información gano acá? X, acá Y, acá Z, ¿cuál es la mayor? Y de nuevo
+entonces acá, bien, entonces no es un árbol simétrico, es un árbol que va creciendo con la información
+al no tener que dividir absolutamente todo, se hace mucho, mucho más eficiente
+en términos computacionales
+y después vuelve a preguntar, y acá tengo X, acá tengo Y, acá tengo Z, acá tengo doble, ¿cuál es el más grande? X
+y ahora sí divido acá, puede volver acá, no es que se fue siempre a su lado
+y así va creciendo, bien, entonces finalmente eso es lo que se denomina X
+expande la hoja con mayor ganancia
+entonces, no es un árbol simétrico que va, digamos, dividiéndose de dos por ambos lados
+sino que es un árbol que va tomando la división donde más gana
+y eso hace que en particular este sea un modelo que uno preferiría
+cuando tiene una cantidad de datos muy muy grande, bien, porque tiene una cantidad de datos gigante
+más probable es que el XGBoost y todos los modos anteriores tengan, digamos, un desempeño no muy bueno
+o sea, van a ser muy costosos computacionalmente
+mientras que este puede permitir tener información muy buena, perdón, muy grande y tener resultados muy buenos
+siendo aún eficiente computacionalmente gracias a esto que divide no de forma pareja
+sino que va dividiendo por donde más gana, como mapuquilla, ¿no?
+y eso es lo que se sentía
+bien, entonces lo que les decía, típicamente XGBoost crece por nivel, o sea, dividimos una vez
+de ese nivel dividimos de nuevo, a tal vez es como le digamos, porque tiene los mismos parámetros que tenía
+random forest, que tenía el bagging, que son los parámetros asociados a los árboles
+mientras que likeDVM es por hojas, que es lo que les decía, DVM2, después agarra una, esa la divide
+y después busca otra, y esa la divide, según ganancia
+bien, este crecimiento es eficiente, puede generar un peor desempeño que este, pero insisto, en datos grandes
+pueden tener desempeños competitivos con una eficiencia computacional que es muy superior a este de acá
+bien, entonces, los hiperparámetros en el fondo que realmente tienen impacto acá, que los podemos ver
+son algunos que están acá, particular, creo que en estos modelos, si me preguntan, que yo, que yo he
+trabajado más, creo que este es muy importante, porque es la cantidad de árboles que yo voy a ocupar
+la cantidad de árboles en general siempre va a ser un buen parámetro, porque a medida que yo tengo más espacio
+para ir trabajando mis errores en este caso, más voy a poder ir logrando
+un buen parámetro, porque a medida que yo tengo más espacio para ir trabajando mis errores en este caso, más voy a poder ir
+más voy a poder ir logrando mejora, digamos, y un mejor modelo
+el learning rate, que es el que yo les decía, es el aporte que produce cada etapa
+típicamente valores pequeños, bien, de esto es preferible
+y valores, menor que uno, no es un valor, digamos, bajo, así como 0 como 9, no es bajo, digamos, estamos hablando de que
+0,03, es como la tasa de aprendizaje típica, bien, no es, uno tiene que tener como un porcentaje, simplemente la tasa
+y en el fondo eso es lo que va a ir multiplicando, ya el peso, pero eso es como se traduce al final del día
+en, cómo se va a traducir en el aporte en total, no es realmente un porcentaje, bien, sino es como
+la porción que aporta en cada etapa, ¿no es?
+el max depth siempre es bueno, ya, el max depth es siempre un buen parámetro porque es uno que nos permite
+primero que el árbol no se vaya infinito y cuando el árbol no se va muy grande
+automáticamente ustedes tienen una ganancia en términos de
+tienen una ganancia en términos de no, que no haya sobreajuste, ¿ok?
+después en regularización, escucha, en general la regularización que es típica es L2, ya, L2 sirve mucho en el fondo
+para regularizar y bajar, bajar en general los errores de clasificación y también la complejidad del problema, ya
+y la aleatoriedad que nosotros ya la hemos visto, ok, sub-sample, call-sample, son los asociados más o menos como era random forest, ok
+así que eso es un poco, en general me preguntan, este es importante, este es importante, este es importante
+yo no lo metería con la regularización porque hay que entender bien qué significa y qué es lo que produce cada regularización
+ahora, si ustedes la quieren meter dentro de un optimizador, bueno, allá ustedes, digamos, ahí el optimizador va a ser la pega
+pero creo que es importante entender qué significa cada regularización y eso no es tan simple porque van a tener que meter
+a ver, ok, si estoy regularizando con L2, ¿qué significa en términos de mi proceso de optimización?
+eso no es tan simple, hay que saber alta matemática, no digo que no la sepan, simplemente que no todo el mundo se va a querer meter ahí
+porque de repente puede enredar más de lo que pueda ayudar, entonces si es que lo quieren meter de repente en un proceso de optimización, bien
+pero si no, así como cambiarlos porque a mí me tinkó, yo usaría L2 que es lo típico, ya
+y la aleatoriedad, bueno, creo que esto sí es algo que se prueba, porque me parece que en el random forest funciona bien
+acá puede ser contraproducente en el sentido de, sobre todo en esta, las dos en realidad, el hecho de que
+que un error con una muestra y algunas columnas no necesariamente puede ser error en otro lado, ya
+o sea con otra muestra y otras columnas, eso me refiero, eso puede ser algo, digamos, digamos que uno podría tener ahí
+su cierto, digamos, como conservador y ocupar todas las muestras, pero si uno se quiere arriesgar también es una buena opción
+por lo menos en el random forest sabemos que funciona bien
+bien, pues acá tenemos una especie como de resumen de lo que
+de lo que tenemos como los modelos, tenemos el August, bien, que en el fondo tenemos
+que el ponder en el fondo, casi difícil es predecir, ponder a los datos, mientras que los modelos de gradiente
+desde ahí para abajo todos ocupan el gradiente de la función de perdida para tratar de minimizar dicha perdida
+en el caso del XzBus y el LightGBM, en el fondo el XzBus tiene regularización para
+controlar la complejidad del modelo y tiene sistemas escalables que significa que lo hacen súper buenos en el sentido de
+cuando yo lo quiero por ejemplo poner en producción para ocuparlo, ya, y el LightGBM tiene este tema de que los árboles se abren
+con ese concepto de Livewise, o sea que son muy fáciles digamos de estimar y por ende lo hacen un candidato ideal cuando los datos son grandes
+todos pueden ocupar variables categoricas, pero en los tres primeros hay que codificarlas, ahora dice que el XzBus depende de la implementación
+pero usualmente hay que codificarla, hay veces que la implementación es la que llama, este XzBus típicamente tiene un propio
+procesamiento, hay veces que hay que codificarlas o no, el LightGBM las puede admitir casi como nativas
+ahí están las velocidades de computación, tenemos la media, esta velocidad media en el caso del XzBus y a media que van con el gradient boosting
+van creciendo, tienen media baja en el gradient boosting, después alta y muy alta en el caso del LightGBM
+ok, riesgos principales, bueno ya lo vimos, ruidos y outliers en el caso del LightGBM, porque se quedan pegados los mismos errores siempre
+ajuste sensible en el caso del gradient boosting, porque como esto trabaja directo sobre los errores, entonces es muy sensible
+el XzBus es más complejo en el tuning, tuning significa la elección de parámetros, porque tiene muchos, como tiene regularización
+tiene todas estas cosas, lo hacen más complejo como modelo, entonces si uno se está manejando muy bien en ese lado, de repente puede en el fondo
+puede ir en redax, en el caso del LightGBM puede tender a hacer un overfitting cuando tiene datos pequeños, el LightGBM está pensado en una porción de datos grandes
+muy grande, no está pensado en datos pequeños, entonces ahí uno tiene que tener mucha cuidado, entonces fijan cada uno se ajusta a un problema particular
+cada uno puede ayudar en una situación en particular, ahí son los típicos ejemplos que tienen, como aplicaciones que uno podría tener
+y en el fondo, como uno puede ir eligiendo, es preguntándose en qué domina el problema que tenemos
+entonces si es un problema de base simple, entonces el AdaBoost basta, piensa que esto es más creciendo en complejidad de modelos
+como tal, miren, si uno quiere este control didáctico, dice en el fondo, si podemos en el fondo, querer tener cierto control sobre los errores de manera bien específica
+porque los otros se desaparecen, en el fondo, la enboosting era bien fácil de explicar, no sé si fácil, quizás es mala la palabra que estoy ubando
+se podía explicar cómo el modelo con este cierto que vimos con el F0, después con ese R1 que calculábamos, después sacábamos el F1
+es simple en ese sentido ir siguiendo como el árbol está creciendo, pero cuando ustedes ya llegan a XGBoost o LightGBM, todos estos modelos ya esas cosas desaparecen
+porque son tan enredados por dentro que es muy difícil poder hacer el seguimiento, entonces yo elegiría el XGBoost cuando es el mejor que tiene el rendimiento en general
+o sea debiese ser si es que el AdaBoost no está funcionando bien, LightGBM no sirve para tanto, el XGBoost debiese ser el candidato por defecto
+porque es el que tiene el mejor rendimiento a nivel general
+y si ustedes tienen muchos datos, entonces para una gran escala de datos el LightGBM es el candidato porque el XGBoost va a ser muy costoso a completación alante
+y finalmente uno que no vimos pero que también existe dentro de esta familia es el CatBoost, el CatBoost es para cuando si bien lo vimos antes
+entonces todos estos modelos aceptan variables categóricas, bueno cuando tienen muchas variables categóricas, entonces el CatBoost puede ser una mejor opción
+pero todos por ejemplo imagínense que tienen un dataset con puras variables categóricas, bueno el XGBoost va a funcionar, si va a funcionar, LightGBM va a funcionar, si va a funcionar
+pero realmente ahí el CatBoost es el que yo debiese utilizar para tener un mejor rendimiento
+bien
+y así como para cerrar lo que serían nuestros modelos, tenemos que nuestros modelos a diferencia de lo que estaban moviendo la semana pasada
+y así como para boosting aprende de forma secuencial
+lo vimos eso, en comillas es una limitante
+y genera un costo mayor no computacionalmente porque todos son costosos en algún sentido computacionalmente
+ya
+pero si va a ser muy costoso en tiempo, vamos a perder la ganancia que tiene en tiempo el hacer el digamos el entrenamiento en paralelo
+dicho sea a paso, el XGBoost está tan bien hecho que todos los procesos al interior del que puede si bien es secuencial en los árboles
+dentro de cada uno de esos árboles y cada una de las cosas que hace hay procesos que si me veo pegado, me escuchan o no?
+si se escucha pero no se ve la imagen
+si escuchas
+perfecto, entonces como le decía, el XGBoost si bien los árboles son secuenciales, los procesos dentro de cada uno de esos elementos en la secuencia
+tienen mini procesos por decirlo así que si son
+si son paralelizables y en ese caso XGBoost si lo hace, eso es parte del fondo de la optimización interior que tiene
+así que si bien son secuenciales y perdimos eso, el XGBoost por eso también dentro de las velocidades como modelo que aparecían, tenía velocidad alta porque está muy bien programado
+muy bien aprovechado todo
+ahora tiene una pregunta pero te voy a terminar con esta lámina y te responde
+la perdida, la función de perdida es en los casos de boosting es lo que define cómo se corrige en cada etapa
+si ustedes ponen la perdida cuadrática es un resultado, si ponen la perdida logarítmica es otro resultado porque es cómo el modelo le va a decir al siguiente que es lo que tiene que corregir
+y esto de acá, como dice KBiloteca prioriza un problema distinto, aquí es Biloteca, refiero a modelo, cada función que es lo que vamos a ver en Python prioriza problemas distintos y eso uno tiene que tenerlo en claro antes
+así como vamos a hacer nosotros que vamos a comparar los modelos bajo el mismo pipeline y vamos a ver cómo funciona
+entonces aquí están algunas preguntas que dejo pero que cambia entre adus y line boosting, ya lo habéis de saber hasta ahora, por qué el enrate va de la mano con número de árboles y cuando uno que lo usaría like gibi
+entonces voy con la pregunta de Alan que dice en su trabajo actual cuál de estos modelos le ha tocado usar más y por qué lo ha seleccionado
+de estos modelos hemos ocupado, mi equipo, yo ya no veo modelo hace mucho rato
+pero los que hemos ocupado acá ha sido particularmente el XGBoost y el random forest
+así como los que tengo más en la cabeza que me acuerdo en este momento
+en qué casos lo ocupamos, por ejemplo el XGBoost hace no mucho lo ocupamos en, teníamos que hacer ciertas predicciones de demanda para nuestros clientes
+y estamos explorando modelos de serie de tiempo, son como los clásicos y otros no tan clásicos, típicos estos modelos como Arima, Sarima que son los modelos más estadísticos de punto de vista de serie de tiempo
+son modelos complejos, son modelos con muchas restricciones de supuestos, entonces no nos están entregando buenos resultados
+después dijimos bueno vamos con un cañón y nos fuimos a los modelos tipo GRU o LSTM que son basados en redes neuronales
+los problemas de las redes neuronales es que cuando tú no tienes una cantidad suficiente de datos y en este caso era como era a nivel de cliente la predicción y era mensual
+no tienes tanta data porque si en el fondo si miras una serie que tome 6 años, es 6 por 12, 72 registros de la serie de datos, no hay mucha información
+entonces a pesar de ser tremendos modelos el GRU y el LSTM, las redes neuronales no funcionan bien cuando tienen poco datos, funcionan cuando tienen una cantidad gigante de información
+por eso por ejemplo el LSTM ha tenido muy buenos resultados cuando ustedes hacen predicciones de valores de acciones intradariarias
+porque ahí tienen un cambio durante todo el día a nivel de segundo, entonces ahí sí tienen una cantidad brutal de información y ahí es donde he visto sus mejores desempeños
+y entonces que es lo que hicimos, bueno si no funcionaban los modelos más top de hoy en día de serie de tiempo, que son repasados en renal y no funcionaban los típicos
+fuimos a algo más intermedio y toca la casualidad de que XGBoost también puede funcionar en base a modelos a series de tiempo
+los datos se tienen que especificar de una manera muy muy muy particular, pero cuando uno lo logra el modelo es capaz de hacer predicciones a 1, 2, 3, 4 pasos que uno quiera hacia adelante tal como lo hacen las series de tiempo
+de ese punto de vista además es un modelo ultra versátil, incluso puede hacer trabajos de series de tiempo
+¿por qué se logra eso? bueno porque estos modelos son super como, estos se llaman modelos, son libres de supuestos, son libres de probabilidades, son libres de todo
+Model FreeCroc que es el nombre técnico, entonces no tienen ningún tipo de supuestos, son super flexibles y se adaptan según las circunstancias que nosotros necesitemos
+entonces ese es un punto grande a favor de ese tipo de modos
+y la otra vez que ocupamos Random Forest, fue cuando teníamos un modelo
+nosotros teníamos un modelo que permite a los liquidadores, y yo trajo en el monar, entonces cuando los camiones salen a repartir, en particular los supermercados
+salen a repartir, ellos entregan la mercadería con una factura y el supermercado no dice, ah bueno si lo dice la factura eso es, no, ellos dicen ok quedate con tu factura, yo voy a revisar lo que me traes
+y ellos revisan lo que tu le traes, y en base a lo que tu le traes ellos te emiten una nota de recepción que es lo que el supermercado certifica que recibió
+y después tú tienes que en el proceso de liquidación, tú juntar estos dos documentos diversos que efectivamente están iguales o faltó algo
+porque hay muchas veces que los productos se facturan, pero después por ejemplo no estaban en la bodega o se acabó el stock o los fueron a subir y se encuentran ansiosos, pero ocurrió un montón de cosas
+y no se llevan, entonces pueden faltar, hay veces que el supermercado también dice que no lo recibió pero si lo recibió y ahí toca pelear
+pero en el fondo como es responsabilidad del camión nosotros hacemos la liquidación y si falta algo la empresa de distribución es la que se tiene que acercar
+entonces ese proceso lo hacemos nosotros antes así a mano, la gente recibía los papeles y tenía que ir ticket por ticket así como, ah si están todos y después subirlo a dos plataformas para hacer las notas de créditos que correspondían para poder hacer la cobrancia
+entonces eso después lo empezamos a hacer nosotros ya de manera con modelos y lo primero que teníamos que hacer, bueno el problema principal era obtener los documentos, extraer la información y poder hacer toda esta conciliación de manera automática
+y eso lo hicimos con modelos de reino oral que los típicos OCR que extraen información, pero era distinto extraer información de una factura de una nota de recepción
+entonces tuvimos que generar un modelo que ayudara a determinar qué era, para que después entraran los modelos que extraían la información
+y ese modelo que tenía que tomar el documento y clasificarlo como factura o como nota de recepción lo hicimos con un random offers, funcionó perfecto
+de hecho en la página yo le subí un archivo que dice ejemplo de random offers en imágenes, algo así y es un modelo de random offers que sirve para clasificar imágenes
+ahí para que lo prueben y en el fondo ver también la versatilidad de todos estos modelos
+y ocupamos random offers porque la primera instrucción fue bueno, ocupemos una red oral convulsional que son los modelos por defecto típicos para poder hacer este tipo de cosas
+coincidentemente cuando nosotros partimos esto no teníamos tanta información, la información en este caso serían los documentos, no teníamos tantos por ende nos costó entrenar la red neuronal y finalmente no entregaba tan buenos resultados
+la diferencia del random offers que pudo captar automáticamente las diferencias y generamos un modelo y no es que esto vaya a ocurrir siempre pero dado la problemática en sí
+era un modelo que tenía cero error, siempre clasificó bien y sigue clasificando perfecto hasta el día de hoy
+no es lo usual pero en este caso es muy particular porque serán dos documentos y las facturas son súper fáciles de identificar porque tienen arriba un objeción que dice factura, número de factura, tienen el estampado del servicio impuesto interno
+entonces tienen muchas cosas que le hacían fácil de decir y por eso funcionó súper bien y aún así las redes no le hicieron
+así que
+el sobreajuste solo se considera, yo estoy clasificando en dos
+el sobreajuste solo se considera si es que el modelo hubiese sido bueno haciendo las predicciones en mi data set de entrenamiento pero cuando le pasaron al set de test entonces no era capaz de predecir nada
+ahí es sobreajuste, si tu modelo anda bien, anda bien y no hay que estar triste por ello
+siempre que revisen el fondo del rendimiento siempre se ve en el set de test y cuando el set de test anda bien está todo bien
+en el set de test está mal porque el sobreajuste y el bajo ajuste son malos modelos
+la diferencia entre ambos es que en el bajo ajuste ambos, tanto en el set de test como en el set de entrenamiento anda mal
+el sobreajuste anda bien en el set de entrenamiento pero no en el de test
+y si uno podría decirlo que se logró un modelo determinista, hasta el día de hoy no se ha equivocado, voy a tocar madera a que no falle porque está funcionando bastante bien
+pero tienen dos ejemplos donde hoy día, nosotros lo hemos ocupado, han funcionado muy muy bien, así que nada que recriminal de estos modelos
+ok, si no hay otra pregunta, propongo ir al descanso, igual que la pasaba hasta las 8.30 y volvemos con la parte más de práctica
+entonces volvemos a las 8.30
+bien, de vuelta
+perfecto
+voy a rendar la grabación
+vamos a la parte práctica
+vamos a hacer el civi de ayer, o sea del martes
+vamos a usar los mismos dataset, ok, KERX para clasificación y Nameless Housing para regresión que ayer no lo alcanzó
+bueno, esta es como la entrada, casi igual, solo que ahora tiene distintos modelos, y lo que les mencionaba en un comienzo
+en el modelo de ensamblados trae el NadaBoost en clasificador y en regresor, y el GradientBoosting en clasificador y en regresor
+pero el XGBoost y el LightDVM vienen desde modulos apartes
+y los modos de acá tienen que instalarlos, vienen por defecto en python
+si usan colab es probable que ahí sí vengan, pero si no cuando corran esto les va a arrojar al tiro el error
+esto creo que cuando se lo subí tenía el fastmode como true, eso es para que se vea más rápido
+así que lo subí así con false, que es como lo voy a correr yo
+ok, entonces, vemos esto
+y ahí está, bien, entonces en este caso lo que cambia en el fondo con el fastmode, una de las cosas que cambia
+y que es bien pesada es esta, son las iteraciones del random research que las posamos allá
+esta parte simplemente trae la data, bien, de las rutas asociadas a cada uno
+bien, y acá lo único que está simplemente es lo mismo que antes, como un resumen de evaluación de clasificadores
+y un resumen de evaluación de modelos de regresión
+y esta primera simplemente es porque vamos a emular el mismo preprocesamiento que hicimos la vez pasada utilizando el pipeline
+ok, entonces fijan, esto recibe un dataset, la función, y lo único que hace es que selecciona las que son numéricas
+en el caso de la, para variar en numérica y para las categoricas, hace una selección excluyendo las numéricas
+bien, entonces con eso llevamos las variables en cada caso y después tenemos este pipeline numérico
+donde lo único que haremos es una imputación simple por la mediana, es exactamente lo mismo que alguien está rayando en la pizarra
+por favor no raye a la pizarra, o sea a la pantalla
+bien, y tenemos un imputador simple que es por la mediana y en el caso de las categoricas vamos a utilizar la moda
+y además vamos a utilizar el one-hot encoder
+bien, y finalmente lo que regresa a esta función es un transformador de columnas donde va a agarrar ambos pipelines
+bien, uno que se vaya por num, que va a agarrar el pipeline numérico y lo va a aplicar sobre las variables numéricas
+y cat, que es el pipeline categórico, va a tomar solo las variables categoricas
+bien, así que esas son las tres funciones que están definidas acá, que son simplemente, es por ahorrar código más adelante
+bien, entonces aquí tomamos los datos, lo mismo más o menos que antes, tenemos 303 y 14 variables
+aquí están los tipos, ya, también lo habíamos visto, hay algunas que tenían datos faltantes, hay algunas que tenían datos numéricos
+y estas cinco son las que nosotros consideramos numéricas, las demás se consideran categóricas en general
+hay algunas distribuciones, esto ya lo habíamos visto, ok, esto es lo mismo que vimos el martes, aquí lo estamos viendo con histograma
+el martes lo vimos con densidades, el histograma y la densidad es lo mismo, solo que esto es una aproximación de la densidad
+bien, entonces acá tenemos la separación entre el set de entrenamiento y testeo, tenemos separamos la variable objetivo
+hay alguien desmultiado
+hay alguien desmultiado
+y separamos la variable objetivo de las variables, las variables como dan, estos nuestros predictores
+y la variable objetivo además hacemos el mismo mapeo que hicimos antes, los no, los llevamos a un cero y los y a uno
+después tenemos entrenamiento de esteo, entrenamiento de esteo para los x y los y, hacemos 30 de split
+pasamos los datos, hicimos un set de test de un 25%, esto queda stratificado por la variable objetivo
+eso siempre es útil hacerlo independiente de que en este caso no hay un desbalance de clases, eso es lo que está acá
+las clases están casi equilibradas, pero aún así es mejor siempre irse a la segura y tener las muestras stratificadas para que no te encorramos ningún riesgo
+encorramos esto y ahí tienen las porciones positivas en el train y test, positivas se entiende como el uno
+así que tenemos casi un 46% en ambos casos, lo cual es correcto
+y aquí vamos a definir todos los modelos, lo primero que vamos a hacer es el preprocesador del pipeline
+entonces simplemente tomamos el preprocesador y le metemos los datos del train
+y eso me genera el preprocesador
+y después nosotros hacemos los estimadores de clasificación y aquí tenemos varios
+ustedes lo pueden poner como una lista y pasárselos todos al pipeline
+entonces tenemos el AdaBoost que va a ser con el AdaBoost classifier porque en eso estamos
+vamos a tomar la cantidad de estimadores que nosotros tenemos bien que 100
+es 100 o 250 dependiendo de este parámetro fast mode
+vamos a tomar un learning rate de 0.05 en todos
+y el random take es 42
+entonces se van acá encima para ver que este tiene hartos parámetros
+y tiene un parámetro en particular que lo comparte con varios de estos modelos que es el estimador
+el estimador es el modelo que va a ocupar y que va a repetir varias veces, es como la unidad base
+recuerda que el random forest era el árbol pero bagging nos permitía poner un estimador en particular
+que nosotros usamos el árbol porque es la típica
+bien, acá el AdaBoost permite exactamente lo mismo
+el AdaBoost, o sea aquí el clasificador base lo podríamos cambiar
+en este caso, por defecto es que es el árbol de clasificación
+cuando ese parámetro es null que es el valor por defecto
+en cambio, cuando ustedes tienen por ejemplo Gradient Boosting es automáticamente basado en árboles
+lo mismo con el XGBoost y el LightGBM
+entonces, por eso, en particular cuando ustedes se meten al AdaBoost
+por ejemplo cuando se meten a esta aparecen muchos parámetros
+como por ejemplo este el min_samples_split, min_samples_leaf, max depth, etc.
+son parámetros que nosotros sabemos, el ccp_alpha, son parámetros que sabemos corresponden a los árboles
+en cambio, cuando ustedes se meten al AdaBoost no aparece ninguno de ellos, ¿por qué?
+porque el estimador no necesariamente es un árbol
+en el caso de que lo sea, ustedes lo pueden agregar
+como dentro de este asterisco o directamente poniendo en el fondo estimador, árbol de decisión
+y adentro de él poniendo los parámetros que uno quiera
+entonces todos los árboles con lo mismo, salvo algunos
+que es que por ejemplo acá vamos a poner la profundidad máxima 2, acá 3, acá max depth menos 1
+significa no limit, o sea no tenemos un limit
+en el caso del XGBoost y el LightGBM se fijan tienen subsamples y column samples de 0.8
+o sea van a tomar el 80% de la muestra y el 80% de las columnas
+el muestreo acá se hace sin repetición
+tiene un parámetro asociado al boosted
+típicamente lo tiene cuando uno quiere elegir si es con repetición
+entonces esos son los modelos y este en el fondo diccionario gigante los define
+y después lo agregamos en el pipeline
+el pipeline completo ya es en el fondo primero el preprocesamiento y luego los estimadores
+nosotros vamos a generarlo para cada uno de ellos
+lo anterior solo define las cosas
+entonces aquí si se fijan esto es un for, solo que el for está abajo
+entonces ustedes sacan el nombre y el estimador
+el nombre y el estimador
+y eso los va a ir colocando donde corresponde
+entonces el nombre va a ir acá para que cree un diccionario
+y el estimador va a ir acá para que cree en el fondo esto dentro de un pipeline
+y ahora lo que tenemos que hacer es ajustar estas cosas
+el ajuste se hace, bueno aquí si se fijan tengo un diccionario vacío
+con los clasificadores y en esta lista vacía lo voy a tener con los resultados de la clasificación
+y después de nuevo tomo el pipeline de clasificación
+y voy tomando los valores que necesito
+entonces voy a tomar esto, le voy a entregar el nombre, el pipeline que le corresponde
+los datos de entrenamiento y los datos de test
+si ustedes van a esta función en la que está arriba
+es esta y esto recibe justamente el nombre del modelo, cuál pipeline le corresponde
+el entrenamiento de test para entrenar el modelo
+y después de test para yo poder hacer las predicciones y todas las variaciones
+entonces esto de acá va a ajustar el modelo y va a entregar los resultados
+los modelos ajustados los voy a guardar en el diccionario que dice fitted clasifiers
+y en los resultados los voy agregando a esta lista de classification results
+eso es lo que hace todo este for
+y finalmente acá lo estoy arreglando un poquito, lo estoy pasando en DataFrame
+y estamos haciendo un ordenamiento de valores utilizando el RockAUC de manera descendente
+y vamos a hacer un reset de los index porque en el fondo esta cosa puede dejar la tabla media distorsionada
+y después finalmente imprimimos
+lo estremos un poquito y ahí está
+entonces tenemos acá nuestros modelos
+y acá tenemos en el fondo los valores
+entonces si se fijan
+esto habría que verlo más en detalle pero estos tienen buenos resultados en el set de test
+pero fíjense el LightDVM tiene un accuracy de 1
+o sea en el set de test de entrenamiento no se equivoca en nada
+estos dos uno podría ver si es que existe algo de sobreajuste
+aunque existiera sobreajuste en este caso igual tienen buen indicador
+pero en este caso el que está agrandando es este
+tiene mejor RockAUC, tiene mejor F1, está empatado en Recall, tiene mejor precisión y tiene mejor accuracy en general
+entonces este es el que está agrandando no solo por esto
+y todo lo indicador en general sino que además estos de acá
+no podría tender a pensar de que es raro que un modelo tenga un mejor desempeño en el set de entrenamiento
+y un mal desempeño en el set de test
+entonces estos de acá pueden estar un poco sobreajustando sin dejar de ser un mal modelo
+y eso es en general porque estos modelos pueden estar siendo más complejos
+en particular nosotros pusimos en el gradient boosting por ejemplo profundidad máxima 2
+mientras que en este pusimos 3 y en este sin límite
+la profundidad del árbol es un parámetro en sí de complejidad
+por ende si es que este tiene un 3 y este un 2 este es más complejo
+si este tiene sin límite es más complejo
+así que tiene sentido lo que está ocurriendo dado estos nubes
+si nosotros acá cambiamos el parámetro 2
+no lo voy a cambiar aquí bien, si lo voy a cambiar en este
+a ver si es que algo se modifica
+y ahora el XGBoost se fijan bajó bastante en el de curación
+este lo sigue manteniendo pero ya ahora está un poquito más balanceado
+y ahora si se fijan el AUC del XGBoost es el mejor
+entonces le bajamos lo que estábamos viendo en el resultado anterior
+es que estaba un poquito pasado a sobreajuste
+no existe tal cosa porque en el gráfico típico es sobreajuste
+es este
+este
+aquí dice early stopping pero muchas veces esto de acá se llama también como
+así como este el mejor ajuste o sweet spot depende de la
+pero en el fondo este es el mejor ajuste
+el mejor ajuste igual es difícil encontrarlo porque en el fondo ustedes tienen una complejidad del modelo
+que en este caso la estamos controlando con en parte
+en parte no todo con el parámetro profundidad
+entonces que es lo que ocurra
+uno puede estar aquí en el mejor modelo pero si yo me voy un poquito para allá o un poquito para acá
+no voy a ver muchas diferencias
+donde si en este caso debo estar un poquito hacia la derecha en el XGBoost
+pero no estamos acá
+en el fondo con un error altísimo
+en el CTT si un error bajo en el centro de entrenamiento
+entonces si yo estoy un poquito acá está un poquito sobreajustado
+pero no necesariamente es así como se va bien el acabo del mundo
+sino que bueno puedo tratar de controlar un poco eso pero tampoco es que voy a poder llegar siempre a ese mejor ajuste
+voy a tratar de que mi resultado y eso es lo que debe predominar en general
+es que mi resultado sea tenga un buen desempeño y un desempeño que a mi me sirva en el CTT
+porque eso está demolando como funcionan los datos reales
+y sobre ajuste bajo ajuste siempre indican un muy mal desempeño en el CTT
+así que en este caso bueno este es el que tiene mejor indicador en el AUC
+pero en los otros indicadores es competitivo en relación a la embuste
+nadie tiene que tomar una decisión en cuanto a qué modelo va a elegir y qué indicador se va a fijar
+ahora en este caso son todos re buenos
+podrías cualquier factera y básicamente estaría generando el mismo impacto
+hay algunos desempeños como forma gráfica
+la mayoría tiene un mayor desempeño en CTT lo cual es normal
+lo importante es que estos gráficos no se vean con una diferencia gigante
+las diferencias aquí son bastante reguladas así que está perfecto
+acá están las matrices de confusión que a pesar de los indicadores siempre igual es bueno verlas
+y por ejemplo en predicciones el likegvm y el XGBoost están bastante parecidos
+este que está mejor en boosting tiene uno menos en este error
+y el AdaBoost es el peor
+tiene sentido en el fondo estas cosas iban en orden de complejidad
+el AdaBoost sea el peor está bien
+ahora sigue siendo competitivo con los otros
+está súper bien
+acá hay un ejercicio en el fondo pueden ir comparando en el fondo que es lo que acabo un poco de hacer
+y ahora vamos a hacer una optimización pero no los vamos a optimizar todos
+sino se va a demorar mucho
+entonces vamos a optimizar el AdaBoost y el XGBoost
+el peor y el mejor en algún sentido
+igual que antes tenemos acá la validación cruzada stratificada que aquí lo estamos creando
+que es la misma que han ocupado ambos
+y después tenemos el grid search
+el grid search está aquí definido
+esto está definido en los parámetros iniciales
+entonces la cantidad de estimadores 50 o 150
+en el fast mode vamos a tener 50, 150 y 300
+y en el caso del learning rate vamos a tener 0.05 y 0.2
+en el caso del fast mode tienen 0.03, 0.1 y 0.30
+el scoring va a ser el rock AUC
+y vamos a ocupar todos los procesadores
+y vamos a entrenar el score de entrenamiento también
+entonces escorran esto, no se debes asegurar mucho
+ahí está
+entonces los mejores parámetros son learning rate 0.3
+y 50 estimadores
+el rock AUC promedio en validación es 0.88
+es bastante más bajo de lo que habíamos recibido arriba
+donde está aquí
+aquí habíamos recibido 0.90 y algo
+y una de las cosas interesantes es que acá nosotros ocupamos 0.05
+del learning rate entonces
+si uno quiere que siempre esto
+vamos a agregarlo
+si uno hace pruebas como con los modelos
+si uno hace pruebas con un parámetro y después quiere mejorar
+es bueno incluir los parámetros como bases que teníamos antes
+porque si tú no los incluyes en el fondo
+y ese era mejor que el que tienes
+entonces automáticamente va a seleccionar el mejor dentro de lo que está
+pero puede no ser el mejor dentro de lo que está
+entonces vamos a tener que tenerlo en cuenta
+y vamos a tener que tenerlo en cuenta
+y ahora veremos si es que tenemos un mejor
+vamos a llamar tu igual
+bien, no cambia nada
+al cambiar el fasmo igual tu
+cambia el orden de los modelos
+y ahora vamos a cambiar el parámetro
+y ahora vamos a cambiar el parámetro
+y ahora vamos a cambiar el parámetro
+vamos a cambiar el parámetro
+donde
+aquí
+al fuego
+no debiese, acá no influye el fasmo
+el fasmo solo sirve para esquivar
+aquí no hay nada asociado a eso
+cambiar es el orden en que corren las cosas con la semilla
+pero no debiese
+debiese obtener lo mismo, lo que si yo cambié acá es un parámetro
+este por defecto estaba en 3 y yo lo cambié a 2 y ahí se movieron
+no sé si es eso, pero no es el fasmo entra acá
+en la optimización, estos valores dependen de él
+pero no otros
+bien, y acá
+fija, estoy con el Xtbus
+bien, y lo voy a hacer con el Render My Search
+ahí tienen el pipeline que corresponde
+y aquí están todos los parámetros con los valores y esto va generando combinaciones de manera
+arbitraria
+y esto logró un RockAuse de 0.90
+la clasificación final
+tenemos que el AdaBoost optimizado tiene un RockAuse de 0.93.4 y este 0.93.2
+creo que andan por ahí con los que teníamos antes, 0.93 algo
+el Xtbus de hecho bajó
+que vean en el fondo, cuáles son los parámetros que cogió y por qué bajó
+este cambio
+no sé si la cantidad de estimuares parece que también
+pero
+tenemos un modelo que no anda mal y en este caso gana al menos por AUC
+no gana en todo
+el AdaBoost
+uno podría preguntarse por qué gana el AdaBoost
+si el AdaBoost es más simple que el Xtbus
+esa misma aseveración es la respuesta
+a problemas complejos ustedes usan modelos complejos
+a problemas más simples uno tiene que pensar en modelos más simples
+no porque el Xtbus típicamente sea el modelo más avanzado va a ser con los mejores resultados
+probablemente si aquí nosotros seguimos tonteando con los parámetros y haciendo más optimización
+puede ser que eventualmente logre que el Xtbus gane
+pero lo que estamos viendo
+es que aunque gane los modelos son competitivos
+el AdaBoost está ganando pero no gana, no es un no caud
+es muy al límite, están desempeñándose muy parecidos
+ustedes ya lo vieron arriba, lo único que hacía es que erraba en un muchacho más el Xtbus
+eso también está influido por el tamaño muestro
+si ese 1 es en una muestra mucho más grande también estas cosas son más cercanas
+así que el mensaje es que todos los modelos son útiles
+no es que 1 es el mejor de todos y siempre ocupo ese
+es lo que les decía el martes también
+es importante fijarse más en el problema, cómo solucionamos problemas
+más que en un modelo en particular porque me gusta lo voy a ocupar
+ahí como ejercicio ustedes hagan
+lo mismo pero para el gradient boosting y para el LightGBM
+a ver si es que mejoran los resultados que tuvimos con el AdaBoost y con el Xtbus
+y día si vamos a alcanzar a ver la parte de regresión
+vamos un poco más rápido porque ya vimos todo esto el martes también
+bien, a este luego vamos a tener que ver un poco más en detalle porque son
+son datos que no vimos la semana pasada
+entonces estos son datos de casas en una ciudad Ames
+bien donde mi variable objetivo a predecir es esta que se llama cell price
+que es el precio de venta de la casa
+tenemos casi 3000 casas 81 variables
+entonces acá
+tenemos variables que tienen
+muchos valores faltantes
+tenemos variables categóricas
+y variables numéricas
+son muchas variables así que tenemos aquí 35 numéricas y 46 categóricas
+entonces en general variables numéricas
+numéricas son todas las que dicen int y las que dicen string
+van a ser las categóricas que mientras no tengan una cantidad brutal de categorías las podemos ocupar
+aquí en el gráfico en el fondo más o menos como es la distribución de nuestra variable objetivo
+típicamente tenemos un pic de valores aquí
+esto está en 150 mil 170 mil
+creo que el proveo la mediana anda en 175 mil dólares
+el supuesto precio
+así que eso es un poco como la media
+también tenemos variables como la
+la superficie habitable
+bien que este es el ground leave area
+con el precio de venta y se ve que tiene una relación relativamente lineal
+es igual es es empático
+está bien y está de acá
+bien en el fondo es tienen una
+una variable bien que es como una clasificación de qué tan bueno está el lugar
+y se fijan tienen sobre promedio en el promedio buena muy buena excelente
+muy excelente muy mala mala ahí como como férrez como regular de bajos promedio
+bien y claramente en el fondo cuando estamos bajo promedio irregular o muy malo
+los precios son más bajos y van subiendo a medida que tienen una clasificación mejor
+claramente el
+excellent es el que tiene mejor
+la mejor distribución o más alta distribución en precios
+y eso son variables
+bien la variable
+aquí hay preguntas cierto la distribución de los precios
+parece no ser simétrica
+tiene aquí un alto y después de cae y se fijan que aquí aparezcan 700.000 porque hay valores ahí
+base es que por temas de escala no se ven pero en el fondo si aparece 700.000 porque hay si hubiesen solo llegado hasta aquí
+el gráfico me lo hubiese cortado ya
+efectivamente este monito ya
+vamos a hacer un dibujito
+es un monito que sube así
+y después de cae y llega hasta por allá
+bien entonces claramente tengo una cola larga hacia la derecha por tanto hay un nivel de asimetría ya cuando hay asimetría
+típicamente uno puede aplicarse transformaciones ya
+ya sea funciones exponenciales o logarítmica dependiendo del tipo de asimetría que yo quiera
+o regiro ya cuando quiero traer datos grandes más hacia la masa es decir cuando la cola está hacia la derecha
+típicamente aplico logaritmo cuando es al revés aplica exponencial o alguna otra función está la
+ah eso me olvidaron
+la de box cox es una
+también se puede aplicar la raíz cuadrada
+y la de yao jenkins también funciona hay distintas funciones que son
+las que sirven para hacer este tipo de
+de correcciones cuando uno quiere que la variable
+la variable precio o sea pero la variable objetivo esté un poco más simétrica y eso muchas veces te traduce en que
+cosas que uno no las ve relacionadas cuando uno las transforma así se ve una relación entonces no puede ayudar
+ya
+después dice observan ahí se ven observaciones atípicas entre relación superficie y precio yo diría que sí hay valores que en el fondo estos de acá se ve bastante atípico en el fondo terrenos muy grandes
+con precios muy bajos entonces no podría aplicarse porque sea aquí la tendencia es que a a mientras más grande el terreno más
+es el precio entonces igual es raro
+bien
+entonces aquí la última pregunta es por qué incluye
+conviene incluir variables categorías en lugar de solo trabajar con las colores numéricas bueno esto de aquí claramente me está diciendo que la categoría tiene un impacto en cómo se parece
+ya
+aquí
+vamos a hacer un drop y aquí lo que me faltó es algo lo que voy a hacer es un drop también de las variables latitud y longitud ya solo para hacer el problema un poco más simple
+y porque la latitud y longitud en general hay que trabajarlas así como por defecto no entregan información ya así que eso se me fue
+bueno
+bien
+entonces ahí
+para las X eliminé el precio-venta por supuesto y también la latitud y la longitud y nos quedamos con la variable objetivo el precio-venta
+bien hacemos la división entre entrenamiento y test aquí 20% para el test y ojo que aquí no aparece la stratificación cuando la variable es continua
+estamos en un problema de regresión la stratificación carece de sentido ya si ustedes la ponen el computador obediente pero en realidad no va a afectar mucho no va a hacer nada y solo va a estar dando más trabajo
+así que tienen que preocuparse en el fondo de eliminar la stratificación cuando eso ocurra
+y en este caso tenemos 2340 para entrenar tenemos 78 variables y 586 para testear precios medianos de train es 160 y precios medianos en test es 165
+ya si ustedes quieren
+podemos
+podemos
+podemos poner el promedio
+lo que yo le había dicho que andaba como en 170 algo
+así que tenemos los precios promedios los precios medianos la diferencia entre la mediana y el promedio
+el promedio hace evidente justamente la simetría que tiene hacia la derecha la distribución de los precios
+siempre que la mediana esté antes que el promedio evidencia una cola larga hacia la derecha la mediana no se ve tan afectada por valores grandes valores aularios valores extremos mientras que el promedio sí
+y si al revés el promedio está antes que la mediana entonces la cola va hacia la izquierda en distribuciones simétricas la mediana y el promedio deben ser muy cerca
+bien entonces acá de nuevo hacemos el pre-procesamiento tenemos los estimadores normalmente es AdaBoost ahora a la diferencia que se llama AdaBoost regreso
+ok
+también lo va a cambiar por un
+vamos con un 3.1
+ok
+aquí corremos todos los modelos hacemos el pipeline es igual que el anterior y este también ya ahora la diferencia en el fondo es que los modelos estos son un poquito más pesados porque tenemos la misma cantidad de modelos pero mayor cantidad de data
+así que si se va a mejorar un poquito más y las métricas que vamos a ocupar en este caso son el rmdc el maer cuadrado bien son los típicos
+bien entonces acá nosotros vamos a estar clasificando vamos a estar ordenando por el rmdc ya el rmdc es una forma de estimar como la varianza de la diferencia de la o la advertencia standard pero de la diferencia de las predicciones con los valores reales
+ok se me está diciendo más o menos que están alejados de las predicciones de los valores reales y en este caso por ejemplo el gradient boosting que es el que tiene el mejor resultado tiene un rmdc de 25 mil
+ya eso quiere decir que estoy en esencia errando super en bruto y no es tan así de nuevo estoy sobre simplificando pero estoy errando en 25 mil dólares en el precio ya entonces si una casa mi modelo me dice
+insisto estoy sobre simplificando no se tomen esto es como para interpretar de manera más simple
+si mi modelo me dice que el precio el precio de predicción de una casa es 200 mil dólares entonces yo debiese pensar que anda entre 175 mil y 225 mil entonces como que estas métricas de desempeño de los modelos me dan un poco una métrica cerca de la incertidumbre que hay respecto a las
+a las predicciones y por otro lado también ayudan bastante ya a discriminar entre modelos nuevamente like gbm fíjense se equivoca muy poquito en el set de entrenamiento se equivoca bastante en el set de test entonces el like gbm en este momento está sobre ajustando
+y el AdaBoost en este caso anda muchísimo más mal que los demás en el caso anterior de no y este anda muchísimo más y el rmdc de adarado que también es un valor que es bien interesante porque mide la calidad de ajuste entonces a medida que más se acerca uno también hay más evidencia de que es un mejor modelo
+y el rmdc de adarado que también es un valor que es bien interesante porque mide la calidad de ajuste entonces a medida que más se acerca uno también hay más evidencia de que es un mejor modelo
+y así que en este caso estos dos que sería el graienboosting y el XGBoost son los que andan mejor y están entrenando los mejores resultados
+bien
+bien
+bien
+acá están en el fondo lo que yo les decía cuando tienen esta diferencia tan grande es que hay un posible sobre ajuste
+de hecho el XGBoost también tiene un poco menos en el fondo pero también tiene un gap más o menos interesante acá
+bien
+bien entonces aquí tienen un poco el valor precio promedio versus precio predicho el AdaBoost claramente es el que está desempleando peor
+primero hay muchísima más dispersión en las predicciones versus los valores reales tenemos un problema en la cola inferior o sea los precios bajos y también tenemos un problema evidentemente los precios altos
+en los precios altos en general todos tienen problemas ya pero el graienboosting que es el que ganó si se fijan junto con el XGBoost son los que tienen un menor grado de dispersión alrededor de esta recta
+bien
+bien
+que es en el fondo que debiese si es que el modelo fuese perfecto el precio real con el precio predicho debiese ser igual por tanto estarían todos sobre encima de esa recta
+mientras menos se despegan de esa recta es más evidencia de que es un mejor modelo por eso les digo en el fondo aquí uno ve que este y este like demand también un poco pero tienen mucha más dispersión acá en medio
+bien estos son los que tienen menor grave dispersión y como les dije en la lado derecho o sea precios altos son los que están más
+digamos como aquí es donde todos están fallando ya entonces antes de seguir
+Ignacia pregunta por qué ahora no se ve el recall en la cura si para comparar modelos y vemos esta métrica porque los modelos de regresión no pueden no ocupan aquí ahora si ni recall y nada de eso
+el record el accuracy la precisión f1 rock auxet todas esas cosas son para modelos de clasificación este es un modelo de regresión dado que la variable objetivo es una variable numérica continua
+por eso es que tuvimos que cambiar las
+las métricas y Walter dice profesor no me quedó claro cómo interpretar el regreso de este dinero es la deviación estándar o sea
+si no es exactamente eso porque son otras métricas no estamos viendo la
+de la estandar típicamente se mide derechamente como eso ya es cuánto uno se desvía en promedio
+de la media ya esto no es eso es en promedio cuánto están desviado mis predicciones de los valores reales eso es lo que mide
+no es la media
+por eso decía de fondo cuando tú tienes una predicción puedes decir bueno mis predicciones están en promedio alejada 25 mil dólares del valor real
+de vis a estar más o menos entre x y x monto ya eso es lo que es lo que yo tengo que decir
+y finalmente aquí tenemos una optimización ya acá no se hace se fijaron antes en la
+en la en la en la validación cruzada nosotros teníamos uno que se llamaba como stratified
+ahora ya no se usa eso porque es de regresión es importante esos detalles para que no cometamos errores
+bien y acá son varias cosas similares a antes no lo voy a explicar
+lo que sí es importante que el scoring cambia ya en el caso anterior todo esto se hizo tratando de optimizar el rock AUC
+en este caso lo que nosotros vamos a optimizar acá es el root minus square error que es el RMSE que es el mismo que estábamos viendo acá
+acá ok
+el RMSE por si no lo saben bien
+el RMSE se define como
+el RMSE se define como la raíz cuadrada
+de
+del promedio
+bien de la suma
+igual a uno hasta el uno lo que sea uno digamos de
+de las predicciones
+menos los valores reales
+y
+y
+este es el RMSE me faltó algo perdón
+y esto va al cuadrado ahí sí bien entonces son las diferencias entre los valores predichos y los valores reales al cuadrado se suman todos y después se promedian
+si ustedes cambian en vez del valor predicho cambian el promedio de los y entonces rescatan la aplicación standard belly por eso es que es muy similar
+exacto por eso son mediciones de error bien root minus square error es el error cuadrático medio en raíz
+bien entonces acá eso es lo que tienen que hacer si ustedes se meten a la página de scikit learn pueden ver todos a eso creo que lo vimos en mate
+entonces se meten a la página de scikit learn ustedes pueden ver absolutamente todos los tipos de scoring que existen para tanto modelos de regresión como modelos de clasificación
+entonces si ustedes desean cambiarlo o experimentar con otro basta con que se metan a la página de scikit learn y los busquen
+entonces vamos a correr esto no tiene nada del otro mundo la única diferencia es que ya no usamos variación cruzada stratificada y cambiamos el scoring por un scoring que corresponda a un modelo de regresión
+es un modelo de regresión
+si desean cambiar mucho
+es un poquito parado así que
+bueno
+cuando lo probé
+en la tarde lo probé con el otro modo
+fast mode
+true
+ahí no sabemos lo nuevo pero esto es lo que tenemos que hacer
+a ver
+a ver
+funcionando esto
+el computador está a tope
+bueno digo que debes de bajar pronto
+mientras corren no sé si hay alguna pregunta algo que no haya quedado claro
+o si hay alguna pregunta que no hay que hacer
+o si hay alguna pregunta que no hay que hacer
+o si hay alguna pregunta que no hay que hacer
+mientras corren no sé si hay alguna pregunta algo que no haya quedado claro
+¿no tengo bien?
+un 2 para arriba 12 para arriba
+pero bueno tienes 2 para arriba
+bien
+lo que sigue
+voy a contarles lo que sigue para que no tengamos que estar esperando aquí
+que ya mientras termina
+después tiene lo mismo
+el like y bien pero tiene con el random way search
+la única diferencia y después al igual que el otro
+generamos un
+una digamos como comparación entre estos dos
+y aquí lo que ustedes pueden ver es
+en el fondo
+ver que es lo que ocurre con el XGBoost
+y compararlo con el like y bien
+nosotros acá estamos haciéndolo con el
+random boosting y el like y bien
+entonces ustedes pueden comparar el XGBoost que típicamente es el mejor
+uno de los que entrega
+general sobre todo cuando ya tienen más datos como este
+debiese uno esperar que entregara un mejor resultado
+el caso anterior de desclasificación es particular porque
+ustedes tienen
+ustedes tienen digamos
+poquitos datos eran como 300
+entonces en esos contextos estos modelos más poderosos no funcionan bien
+ahora que ya tenemos algo como 3000
+debiese a lo mejor andar un poquito mejor bien
+acá están los mejores parámetros tenemos
+el learning rate de 0.12
+max depth 3
+y tenemos 350 árboles
+tenemos con un RMS promedio
+de 25000
+ok
+solo para
+para que sea más rápido digamos ya estamos más o menos en la obra
+voy a cambiar el
+perdón
+perdón
+ya está en false lo vamos a dejar en true solo para que
+este corra más rápido y podamos tener la comparación final que va a ser
+no tan buena porque en el fondo este tuvo menos opciones digamos ya
+por aquí está la
+la optimización y ahí tenemos igual bajó
+bien el RMS en promedio
+bien y tenemos al final del día
+que ahí está el gradient boosting
+en un RMS
+menor en test
+bien que el otro el más en test andan competitivos y en el R cuadrado andan
+bastante parecidos bien
+entonces me fijan general aquí el gradient boosting tuvo mejor desempeño
+el ejercicio que queda planteado es buscar
+optimizar el XGBoost y comparar en el fondo con el like y bien o con el gradient boosting
+y bueno
+ya y
+acá están las variables en general
+que más utiliza o que tienen mayor importancia para el modelo
+ya en cada caso
+en la arriba son las variables
+con mayor importancia para el XGBoost y tiene
+las categóricas está la esta que se llama a tal el dolor en el pecho
+dentro de las numéricas está este que se llama ca
+y así su decisivamente bien y el tal de nuevo que aparece porque está en el fondo recuerdo que el one-hod encoder lo que
+hace es que agarra una variable categórica y le separan múltiples variables dummy para cada una de las categorías por eso dice tal normal y tal
+reversal
+mientras que para la equivalencia se fijan
+tiene muchas variables numéricas y la gran mayoría son
+asociadas a
+el tamaño de la casa del lugar bien aquí tienen el
+area tiene el
+tiene el total en pies cuadrados s f significa pies cuadrados
+del sótano del primer piso el área del garage en los pies cuadrados del porch trato que es como el frontis
+del segundo piso etc etc etc entonces aquí claramente uno entiende que las dimensiones tanto del terreno como de la casa
+son las variables que están impactando de mayor forma en nuestras predicciones
+y lo demás son cosas digamos que pueden hacer
+cuestionarse y
+bien alguna consulta duda
+todo claro
+a ver Walter dice que estoy trabajando en un modelo
+considerando que los datos de computador
+me preceden muchas variables categóricas
+con variables continuos
+cuando hay implementaciones suelo hacer un mejor balance de velocidad y precisión
+para problemas de chocin y fitting
+CatBoost es cuando tú tienes una cantidad excesiva de variables categoricas entonces creo que es el único que
+creo que es el único modelo que yo descartaría ya y entre el XGBoost y el like gbm creo que la la el el punto que te hace
+elegir entre uno y otro es la cantidad de datos
+ya si tienes un modelo de CatBoost
+ya si tú tienes muchísimos datos entonces el like gbm va a generar una mejor equilibrio entre precisión y velocidad
+si no tienes tantos entonces eso lo debes hacer el XGBoost
+en particular
+en particular por si no esto va a depender exclusivamente de modelos es como lo que acabamos de hacer acá en el papel
+uno hubiese pensado a lo mejor que el XGBoost era el mejor modelo pero cuando tú miras los resultados no fue el mejor
+entonces en general la siempre
+la
+el consejo en este tipo de modelos es
+en este tipo de modelos es prueben ya aquí tienes distintas opciones prueba y con eso anda mirando y mira el set de entrenamiento
+también mira el set de test las métricas para que tú puedas ir identificando si es que estás cayendo en overfilling o no
+y un punto importante típicamente los modelos
+como de churn
+las clases son bien desbalanceadas entonces ahí ojalá ocupar un modelo también que te ayude a trabajar las clases que están en desbalance
+en general varios de estos modelos lo pueden hacer los tienen un parámetro que permite hacerlo
+si no también lo puedes hacer tú dentro del mismo muestreo en el set de entrenamiento
+Rodrigo dice, ¿puedo hacer una pequeña reseña de los árboles de decisión?
+el análisis de decisión
+el análisis de decisión estaba
+de M cansado
+que significa eso
+ah, demasiado cansado, perdón
+escucha que los árboles
+los árboles de decisión son simplemente modelos que
+tienen una forma de elegir
+entonces tú tienes estos datos y perfectamente tú podrías decir
+si fuese la que te tenga más información el ground area entonces puedes decir
+voy a separar las casas en aquellas que tienen un área de más de 2000 y una menor de 2000
+y después cada uno ellos dice, bueno acá voy a separar por la cantidad de autos que entran en el garage
+si entran 3 o más las separo para acá
+menos de 3 para el otro lado y empieza a hacer preguntas
+que por supuesto tiene un modelo por detrás, tiene una fórmula matemática
+y eso genera en el fondo que tú después para cualquier dato nuevo tú le hagas las mismas preguntas
+y vas a ver en qué nodo puede terminar y con eso tú puedes hacer predicciones
+esos son los árboles, esos son unos de los modelos más simples que uno puede hacer
+es un modelo basado en preguntas y respuestas
+lo único que hace es si desarrollar, todos estos son algoritmos
+y lo que tiene por dentro el árbol es que él te dice
+cuáles son las preguntas que tú tienes que hacer para llegar acá a predicción
+y eso está dentro del algoritmo del árbol mínimo
+pero pucha en los 0 minutos que quedan no podría explicar mucho más que eso Rodrigo
+pero busca en internet y va a ver bien poco eso
+¿uno debería acompañar árboles con regresión por ejemplo?
+¿es una lección común?
+no entiendo la pregunta Ignacio
+¿A parte de lo que usted nos pasó que está en Moodle
+¿qué se podría leer como para acompañar la materia también?
+para reforzar el contenido
+¿qué nos recomienda?
+hay un libro, no me acuerdo el autor pero
+es de Haste y Tip Chirani y todo este tipo
+que se llama An Introduction to Statistical Learning
+este libro es el clásico para todos estos cursos
+estos se pueden descargar de manera gratuita
+y tú lo puedes descargar con aplicaciones en R
+y tú puedes descargar con aplicaciones en R
+y tú lo puedes descargar con aplicaciones en R o en Python
+los libros son exactamente iguales
+son los mismos autores, James, Whitney, Haste y Tip Chirani
+y acá está Jonathan Taylor pero ese de haber cambiado a Python
+en esencia los libros son exactamente iguales
+los ejemplos son exactamente iguales
+lo único que cambia es que no esté programado con R y R con Python
+ustedes los descargan y tienen el libro
+a ver si se me descarga rápido
+es medio pesado pero
+este libro tiene absolutamente todo
+lo que uno necesita saber
+ustedes sabrán contenidos, se fijan que es el libro estadístico
+tiene harto tema en el fondo de qué es lo que significa una estimación
+qué es lo que significa el concepto de aprendizaje supervisado versus no supervisado
+problemas de clasificación versus problemas de regresión
+que es una de las cosas que estaban con dudas quien me preguntó
+en Ignacia por ejemplo
+acá hay harto tema en el fondo de cómo uno mide bien un ajuste
+después tiene todos los modelos, tienes modelos de regresión lineal
+aquí hay modelos de clasificación donde tienes regresión logística
+análisis de componentes, análisis de discriminantes
+tienes después modelos con métodos resampleados
+y acá tenemos distintas cosas y por aquí aparecen los modelos basados en árboles
+entonces tú tienes aquí los árboles de decisión
+tienes Vagin, Random Forest, Boosting, etc.
+aquí está todo, después tienes Super Vector Machine, todo eso lo van a ver
+modelos de Deep Learning, modelos de SuperNC sobrevivencia, etc.
+es un muy buen libro, un libro que está pensado en la aplicación más que en la teoría
+entonces cuando ustedes vayan a cualquier lado
+por ejemplo Vagin, Random Forest van a poder leer
+les va a dar los aspectos técnicos y matemáticos de los modelos
+pero no va a entrar en un detalle que sea muy denso
+sino que se va a ir más a la aplicación misma
+entonces en esos sentidos bien común
+¿Qué es lo primero?
+Bien, entonces estaríamos por hoy
+casi me salgo del tiro
+para compartir
+nos vemos el sábado, la última sesión que tienen conmigo
+y tenemos repaso, así que vamos a hacer más que nada
+ejemplo y ejercicio asociado a lo que hemos visto en estas dos sesiones
+bien, así que eso, que tengan
+buenas noches, descansen, nos vemos sábado
+chau chicos, buenas noches
+que les vaya bien, buenas noches

@@ -1,0 +1,189 @@
+Buenas tardes a todos. Como está estipulado en el mismo calendario y yo les comentaba
+la semana pasada, hoy tenemos la publicación y el desarrollo del taller número 3. Si ustedes
+van al módulo del curso, al final verán que en la sesión correspondiente a hoy
+está disponible ya un archivo comprimido con bases de datos, dos bases de datos
+separadas y archivos que son Jupyter Notebooks y QMD para que puedan trabajar.
+Hoy vamos a dar inicio, entonces vamos a leer el enunciado, si hay alguna pregunta,
+duda y luego de ello, tal como le hicieron en los talleres pasados, van a
+organizarse en grupos de tres a cinco personas, también se puede ser un
+poco menos si así lo estimas conveniente, pero yo recomiendo al menos tres personas.
+Y el grupo ayudantes va a generar grupos o pequeñas salas dentro de este zoom para que
+ustedes pueden ir coordinándose e ir ingresando a cada una de las salas para trabajar y aprovechar
+este tiempo en desarrollar este taller.
+Entonces,
+primero vamos a dar inicio a la lectura.
+este taller número 3
+consta en esencia de los tópicos vistos en este curso de o este módulo curso de
+aprendizaje automático ya que corresponde desde la sesión 30 en
+adelante ya incluyendo los repasos además. Por ello entonces, fíjense, la
+problemática que nos planteamos es la respuesta a una campaña bancaria.
+el caso que vamos a trabajar y ustedes van a desarrollar es de un banco portugués que
+realiza campañas telefónicas para ofrecer depósitos a plazo y como pequeño contexto
+le planteo que dice contactar a toda la cartera tiene un costo y muchos clientes no contratan
+el producto. Así entonces el equipo comercial quiere anticipar qué registros tienen mayor
+probabilidad de contratación y
+una predicción favorable que no se concreta implica un contacto poco productivo y una
+predicción desfavorable puede dejar fuera una oportunidad. Entonces, como equipo de Data
+Science, en este caso como contexto, deberán preparar los datos, comparar modelos y recomendar
+a qué clientes contactar. Entonces, la predicción se realiza antes de la llamada registrada
+y el análisis de grupos y de registros inusuales complementará su recomendación. En el archivo
+y en el archivo comprimido ya tienen dos bases de datos .csv
+que en principio van a estar separados, digamos en entrenamiento y
+validación, ya sea de prueba más bien, pero es una base de datos de
+4521 registros y cada fila contiene información de un cliente y sus
+contactos, junto con el resultado de la contratación o no del depósito a plazo.
+en términos administrativos, ustedes tendrán que organizarse en pequeños grupos y escoger un
+lenguaje en el cual quieren desarrollarlo, ya sea R o Python, ambos son válidos pero deben desarrollar
+ese mismo taller en ese mismo lenguaje. Sólo una persona del grupo tiene que entregar o subir el
+archivo al buzón de entrega y debe subir, digamos, en esencia
+el nombre del archivo comprimido en este formato, Grupo_XX_Taller3.zip
+el nombre de xx hace descripción, digamos, los apellidos o algún identificador que pueda tener el grupo.
+Para el desarrollo yo les pongo a disposición digamos esquemas, digamos
+template para que ustedes puedan trabajarlo en términos de Quarto o
+Jupyter Notebooks, ambos configurados para trabajarlos en R o Python
+según su propia elección. Si ustedes mandan el compilado, digamos que lo
+compilan a un PDF o a un HTML, el
+Jupyter Notebook o el Quarto, además tienen que incorporar y agregar los archivos fuente, ya, que en esencia es el QMD.
+Entonces, si ustedes revisan
+el
+el archivo que está a disposición, que es el archivo
+Taller03_2026.zip, les va a dar
+seis, no, siete archivos. Los primeros dos, ya, son
+los clientes de entrenamiento y prueba, ya para ser reproducible esto, yo hago la separación
+en términos de entrenamiento y prueba.
+Y les comento, entonces, que hay que trabajar con clientes_entrenamiento para entrenar los modelos y el de prueba se reserva para hacer la prueba.
+Para la pregunta 3b. Hay que conservar las filas y fijar la semilla como 2026 en los casos que sea necesario.
+Y vamos a considerar la variable contrata igual a 1 como la clase positiva.
+Pequeñas otras especificaciones: usar 5 pliegues para la validación cruzada, aprender las transformaciones
+y la selección de variables solo con las filas de ajuste en cada pliegue para que no
+tengamos fugas de datos y reúnan las predicciones fuera de pliegue que son las probabilidades
+para los modelos probabilísticos y los puntajes de decisión para SVM, Support Vector Machine.
+El modelo de referencia predice la proporción positiva de las filas de ajuste y para la
+evaluación final calculen esa proporción con todo el conjunto de entrenamiento
+si se fijan acá está una pequeña descripción del conjunto de datos el
+conjunto de entrenamiento tiene 3617 registros y el conjunto de prueba tiene
+904 registros en esta tabla le escribo
+no se ve lo que está proyectando o sea se ve como el PDF pero no la descripción
+de los datos que está leyendo
+es la misma tabla del pdf en todo caso
+no es que la pantalla se ve la primera hoja del pdf
+la pantalla se ve la primera hoja del pdf ya déjame
+la pantalla nos ha movido
+toda la razón que por algún motivo lo tengo abierto dos veces y estaba en otro pdf
+ahí sí se ve.
+Gracias por la charla.
+Entonces, la descripción de los datos está en esta tabla, 3.617 registros de
+entrenamiento, 904 de prueba y en esta tabla describo cada una de las co-variables.
+La idea es que ustedes van a tener que utilizar estos por temas de reproducibilidad,
+hago la separación yo, en vez de dejarlo, digamos, libre y para tener un
+recurso común entre lenguajes también. Hay un par de especificaciones para las
+preguntas 4 y 5 y acá está la fuente donde sacamos los datos con los cuales
+vamos a trabajar. Entonces yo les pregunto en este taller,
+primero, identificar la tarea de aprendizaje, la unidad de observación y la respuesta,
+y tienen que responder un par de preguntas ¿por qué la duración como variable no puede
+usarse para predecir antes de la llamada? Exclúyanla de los predictores, junto con id_cliente, pliegue
+y contrata. (b) Revisen tipos de variables faltantes, categorías unknown, duplicados y
+balance de clases. Interpreten los valores negativos de saldo y el código menos uno de la variable
+dias_previos. Y la pregunta es: ¿sería suficiente la exactitud de
+predecir siempre la clase mayoritaria y tienen que fundamentarlo y
+justificar. El ítem (c): se construyen dos variables, contactado_antes igual a
+1 si dias_previos es distinto de -1, y log_contactos_previos,
+el logaritmo de 1 más contactos_previos y expliquen el sentido de estas.
+Reemplacen -1 por 0 en dias_previos
+En la sección de selección de variables y modelos supervisados tendremos
+los modelos: regresión logística con ciertas configuraciones, árbol de
+Random Forest, Boosting, SVM radial y Naive Bayes.
+Par de preguntas respecto a estas metodologías. Comparar la regresión logística con todas las
+columnas preparadas y con las 10 de mayor estadístico F ANOVA respecto de la variable
+contrata. Informen las columnas seleccionadas de cada pliegue y comparen sus métricas fuera de
+pliegue, en qué se diferencia esta selección de PCA,
+qué limitación tiene el filtro univariado.
+Compare las configuraciones de la tabla incluidas las dos regresiones de 2A
+mediante sus predicciones fuera de pliegue y presenten como métricas la
+pérdida logarítmica, Brier y AUC. Y para
+SVM solo utilicen el AUC. Incluyan el modelo de referencia y para ambos árboles la log loss medio de entrenamiento de los cinco
+ajustes.
+El punto (c): interpreten los resultados considerando profundidad y sobreajuste de los árboles,
+diferencias entre bagging, Random Forest y boosting,
+independencia condicional de Naive Bayes,
+y limitaciones de la variante gaussiana para columnas binarias.
+El efecto del C, gamma y escalamiento de la máquina de soporte vectorial.
+Y les pregunto, ¿un mejor ordenamiento de las observaciones implica mejores probabilidades?
+Tienen que fundamentarlo.
+La siguiente sección, que es la evaluación y la decisión, dos pequeñas preguntas.
+(a) Con las probabilidades fuera de pliegue del modelo elegido.
+Evalúen los umbrales 0.05, 0.1, así hasta 0.95.
+y predigan contratación si p es mayor o igual al umbral.
+Elijan el que minimiza el costo hipotético con esta función de costos
+en donde FP es una alerta de contratación que no ocurre y FN
+una contratación no detectada. Ahí haciendo referencia a la matriz de confusión.
+Presente una tabla o curva e interpreten ambos errores.
+(b) Reajusten el modelo elegido con todo el entrenamiento y evalúen en clientes_prueba.csv.
+Tienen que informar las métricas que acabamos de utilizar, incluida adicionalmente
+en la curva ROC, y comparen el umbral elegido con 0.5 mediante una matriz de confusión,
+sensibilidad, especificidad y C sobre n. Incluyan el modelo de referencia, que recomendarían
+al banco, que permiten concluir los resultados y que falta verificar para una campaña futura.
+Aquí traten de explayarse lo suficiente en términos de las repercusiones de los análisis que están haciendo.
+Para componentes principales y agrupamiento, tienen que realizar componentes principales,
+informen las varianzas explicadas por las componentes principales, primer y segunda,
+su suma y las cargas; grafiquen las observaciones en ese plano,
+y les pregunto qué información resume la proyección y cuál omite.
+En términos de K-means, los van a tener que ajustar sobre las cuatro variables estandarizadas con k igual a 2, 3 y 4 y al menos 30 inicializaciones.
+Compare en WSS y silueta media y elijan el k de mayor silueta. Informen tamaño, describan perfiles y representen los grupos en el plano TSA.
+Calculen la proporción de contratación dentro de cada grupo y expliquen por qué los grupos no
+equivalen a clases predichas. Finalmente, en términos de la detección de anomalías,
+tienen que calcular la distancia de Mahalanobis al cuadrado y usar el corte,
+como corte, el cuantil 0.99 de una chi cuadrado con 4 grados de libertad. Informar el corte,
+la cantidad y el porcentaje de registros marcados, identifiquen los dos de mayor
+distancia y presenten sus valores originales y como último un par de
+preguntas ¿por qué son inusuales los dos registros identificados?
+¿esto demuestra que contienen errores?
+el corte utilizado garantiza marcar al 1% de la muestra, fundamenten e
+indiquen qué revisarían antes de eliminar un registro. Si se equivocan en
+algo lo vamos a considerar como un error, digamos, pero no va a ser un error de
+arrastre sustancial a lo largo de todo el taller. Pueden haber diferencias
+numéricas respectivas por temas de cálculo de los distintos lenguajes.
+No sé si tienen alguna pregunta, hace mucha referencia a cada una de las
+sesiones que han tenido hasta ahora, por lo que debiese ser bastante natural
+realizarlas. Solo para confirmar y para repaso, ¿desde qué sesión empieza como para...
+Aprendizaje automático, que si tú lo ves en...
+recuerdo que es 30, si mal no recuerdo, hay una pestaña a la izquierda que tú
+puedes hacer clic.
+Está cargando.
+Te dije acá, tengo que hacer esto.
+Entiendo.
+Aprendizaje automático.
+Muchas gracias.
+De ahí en adelante.
+La fecha de entrega es el miércoles 21,
+por lo cual tienen prácticamente dos semanas,
+lo cual es tiempo suficiente para realizar este taller.
+La idea es que comiencen a trabajarlo hoy,
+para que puedan avanzar y ver si tienen posibles dudas
+que podamos resolver
+durante esta sesión.
+Adicionalmente también se va a hacer,
+vamos a seguir en la metodología del taller dos,
+con la generación y creación de un foro dentro del módulo para ir respondiendo preguntas de manera
+sincrónica. Ahora les voy a pedir al equipo de ayudantes que puedan ayudarme a generar los
+grupos, las salas, las salas.
+Pero podemos responder preguntas por
+ahora. Víctor.
+Profesor, si lo que le quería plantear y
+pasó con un taller que tuvimos hace un
+tiempo, el, digamos, por qué la fecha de
+entrega a mitad de semana pensando que
+todos trabajamos y que tenemos un montón
+de actividades la semana incluyendo las
+clases y entregar la mitad de semana y
+entregarlo un domingo a las 23 con 59 por ejemplo
+donde se junta. Mira yo lo puse, hice el contrario de lo que hiciste tú, porque yo le iba a poner el
+domingo el domingo 18 como fecha de entrega y dije para que tengan un
+tiempo adicional lo voy a poner el 21 así lo pensé yo
+pero en principio la fecha que yo iba a poner era el 18 lo vi como tiempo adicional
+le voy a poner un domingo de hecho la noche pero dije el domingo puede estar más desocupado pero
+un fin de semana pero puede ser el otro domingo profesor el siguiente
+ya es un tiempo un poco más excesivo eso y nos pasamos mucho de los extendemos demasiado creo
+que el 21 es una fecha más o menos razonable digamos ya ahora para las próximas talleres
+vamos a tratar de ponerlo en una fecha digamos poco más cómoda si lo queréis.
+Otras preguntas que hay en el chat, sí que pueden ser los mismos grupos del trabajo principal y nadie

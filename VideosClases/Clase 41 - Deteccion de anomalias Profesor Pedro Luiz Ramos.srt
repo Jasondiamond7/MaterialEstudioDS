@@ -1,0 +1,5603 @@
+1
+00:00:00,000 --> 00:00:05,000
+Bueno, ya somos como clase 80.
+
+2
+00:00:05,000 --> 00:00:18,000
+Empezamos la clase. Buenas tardes a todos. Vamos a empezar ahora una clase, un curso de, en este caso, vamos a hablar sobre detección de anomalías.
+
+3
+00:00:18,000 --> 00:00:29,000
+Bueno, es una área muy interesante. Voy a poder presentar un par de métodos de cómo podemos hacer la detección de outliers, detección de anomalías.
+
+4
+00:00:29,000 --> 00:00:37,000
+Es una área que está siempre surgiendo nuevos métodos. Los métodos son nuevos, no son tan antiguos.
+
+5
+00:00:37,000 --> 00:00:46,000
+Y bueno, para mí es una área muy entretenida, principalmente porque no puedo ver cómo va a utilizar algunos métodos que ya conoce.
+
+6
+00:00:47,000 --> 00:00:53,000
+Bueno, hasta el momento vimos varios, al menos conmigo, algunos métodos como...
+
+7
+00:00:53,000 --> 00:00:54,000
+¿Profesor?
+
+8
+00:00:54,000 --> 00:00:55,000
+Sí.
+
+9
+00:00:55,000 --> 00:00:59,000
+Un segundo para empezar la grabación que no se haya comenzado.
+
+10
+00:00:59,000 --> 00:01:01,000
+Ah sí, por empezar entonces.
+
+11
+00:01:01,000 --> 00:01:02,000
+Ya.
+
+12
+00:01:02,000 --> 00:01:03,000
+Muchas gracias.
+
+13
+00:01:03,000 --> 00:01:04,000
+Mucho gracias.
+
+14
+00:01:04,000 --> 00:01:05,000
+Verdad.
+
+15
+00:01:05,000 --> 00:01:09,000
+Sí. Bueno, hay más gente para ser aceptado ahí.
+
+16
+00:01:09,000 --> 00:01:15,000
+Bueno, buenos días a todos. De nuevo, vamos a empezar nuestra clase de detección de anomalías, ¿vía?
+
+17
+00:01:15,000 --> 00:01:18,000
+O detección de outliers, como quieran llamar.
+
+18
+00:01:18,000 --> 00:01:24,000
+Bueno, me gusta bastante esa mirada de intentar buscar outliers.
+
+19
+00:01:24,000 --> 00:01:32,000
+Yo creo que es una área entretenida, muy importante, principalmente porque como van a ver, outliers funcionan con nuestros resultados.
+
+20
+00:01:32,000 --> 00:01:42,000
+Pero lo más interesante para mí es poder tener una mirada de cómo se aplican otros métodos que vimos, que conocemos, para detectar outliers.
+
+21
+00:01:42,000 --> 00:01:51,000
+Entonces, la primera vez que me presentaron ese método, yo pensé, oh, no, no, yo creo que yo no habría propuesto una cosa como esa.
+
+22
+00:01:51,000 --> 00:01:53,000
+Fue muy, con una mirada muy distinta.
+
+23
+00:01:53,000 --> 00:02:00,000
+Y así me gustó bastante la propuesta que hace, principalmente, Isolation Forest.
+
+24
+00:02:00,000 --> 00:02:05,000
+Cuando empecé a dar con árboles, después cuando vi Isolation Forest, empecé a usar una R&D.
+
+25
+00:02:05,000 --> 00:02:18,000
+Bueno, ya vimos hasta ahora, al menos conmigo, varios métodos de análisis criminante, como lineal, cuadrático, Navy Base, regresión horística,
+
+26
+00:02:18,000 --> 00:02:30,000
+métodos para poder hacer la clasificación, diferentes métricas, que más vimos también la parte de clusterización, como no poder trabajar con camins, camut, con prototype.
+
+27
+00:02:30,000 --> 00:02:41,000
+Pero yo sé que tuvieron clases con otros profesores y vieron, por ejemplo, métodos como árboles y R&D, bushing, ojalá tengan visto bushing también,
+
+28
+00:02:42,000 --> 00:02:52,000
+PCA conocen análisis de componentes principales, y bueno, va a haber un método acá que no conocen, pero también se utiliza para detección de outliers.
+
+29
+00:02:52,000 --> 00:03:01,000
+Entonces, una cosa que va a ser interesante es que algunos de estos métodos que voy a presentar ahora, inicialmente fueron pensados para hacer regresión o clasificación,
+
+30
+00:03:01,000 --> 00:03:06,000
+y después uno lo adaptó para trabajar con detección de anomalías.
+
+31
+00:03:06,000 --> 00:03:11,000
+Bueno, vamos a hablar un poco sobre distancias, densidad, PCA, Isolation Forest.
+
+32
+00:03:11,000 --> 00:03:22,000
+El material ya pide para que Vanessa lo suba, pues ustedes deberían tener la vía positiva, los códigos en R, en Python, y los activos necesarios.
+
+33
+00:03:23,000 --> 00:03:31,000
+Novamente, voy a intentar hablar despacio, sé que el portunión no es la mejor forma de aprender la clase,
+
+34
+00:03:31,000 --> 00:03:40,000
+entonces he intentado el máximo posible, me expresaré de la mejor manera para ustedes, pero si no entienden alguna cosa, si no comprenden, me comentan,
+
+35
+00:03:40,000 --> 00:03:44,000
+voy hablando más despacio e intento presentar de una forma distinta.
+
+36
+00:03:45,000 --> 00:03:56,000
+Lo importante es que al final puedan aplicar el método con facilidad, siempre con utilización.
+
+37
+00:03:58,000 --> 00:04:05,000
+Entonces, ¿cómo va a ser la cosa? Bueno, generalmente, cuando vamos a hablar con nuestra base de datos,
+
+38
+00:04:05,000 --> 00:04:16,000
+tenemos datos, generalmente tenemos datos con una simetría muy grande, muchas veces tenemos dificultad para evaluar los supuestos que estamos poniendo en nuestro modelo,
+
+39
+00:04:16,000 --> 00:04:26,000
+principalmente muchos ponen supuestos de normalidad, los datos tienen una simetría, idealmente hay que evaluar varias situaciones,
+
+40
+00:04:26,000 --> 00:04:34,000
+por ejemplo, cuando me llega una base de datos, tenemos que evaluar si lo que está ahí es un outlier,
+
+41
+00:04:34,000 --> 00:04:45,000
+fue un error, de hecho fue un error si acabamos poniendo un valor que está malo, por ejemplo, una estatura fue registrada con 1800 cm,
+
+42
+00:04:45,000 --> 00:04:48,000
+por supuesto, no hay una persona que tiene este tamaño.
+
+43
+00:04:48,000 --> 00:05:00,000
+A mí siempre me toca, muchas veces, la primera cosa cuando bajo un artículo en Excel, voy a empezar a hacer una análisis estadística, es trabajar con la idad,
+
+44
+00:05:00,000 --> 00:05:08,000
+al tiro ya encuentro idades con valores negativos, entonces personas con 120, 150 años,
+
+45
+00:05:08,000 --> 00:05:18,000
+yo sé que aunque es posible que alguna persona haya 120, pero es altamente improbable, y a 150 casi es imposible,
+
+46
+00:05:18,000 --> 00:05:30,000
+tal vez ustedes pueden encontrar un outlier, no sé cuántos millones de personas que tuvieron, pero tener una persona con una idad tan alta,
+
+47
+00:05:30,000 --> 00:05:39,000
+es muy probable, entonces hay que hacer una evaluación, hay que hacer una validación, volver a la base de datos,
+
+48
+00:05:39,000 --> 00:05:50,000
+es muy importante volver a la base de datos, no simplemente sacar esos elementos, ya sea posible, porque ellos realmente tienen una fuente de información,
+
+49
+00:05:50,000 --> 00:05:58,000
+si ustedes eliminan esos elementos sin ninguna justificativa, pueden tener ciesgos en sus estimativas.
+
+50
+00:06:00,000 --> 00:06:08,000
+Bueno, de todas las formas, vamos a suponer que ustedes van a trabajar con algunos modelos, es importante hacer evaluación de outliers,
+
+51
+00:06:08,000 --> 00:06:20,000
+varias áreas son extremamente importantes, los alumnos que trabajaron con series temporales, y es terrible, series outliers, principalmente en temas de vendas,
+
+52
+00:06:20,000 --> 00:06:29,000
+entonces hay que evaluar si se puede dividir las vendas, se puede de alguna manera trabajar de una forma distinta, porque ellos influencian las estimativas y los parámetros.
+
+53
+00:06:29,000 --> 00:06:42,000
+Bueno, hablando un poco sobre las anomalías globales, contextuales y conjuntas, podemos tener un monto muy alejado de todos los demás,
+
+54
+00:06:42,000 --> 00:06:51,000
+tenemos que evaluar eso lo que pasa, por ejemplo, un contextual, un consumo habitual de día, pero inusual por ejemplo de madrugada,
+
+55
+00:06:51,000 --> 00:06:56,000
+y multivariada, que son valores individuales comunes pero una combinación poco frecuente.
+
+56
+00:06:56,000 --> 00:07:08,000
+Realmente los problemas que tenemos más son esos elementos, esas anomalías globales, por ejemplo vendas, siempre tienen un período, no sé, cyber, acá, en Estados Unidos Black Friday,
+
+57
+00:07:08,000 --> 00:07:19,000
+el momento que siempre nos pone muy complicado con el modelo, porque nos complica cuando vamos a hacer los ajustes, hay un aumento de vendas muy grande.
+
+58
+00:07:19,000 --> 00:07:29,000
+Entonces tenemos que intentar evaluar eso, lo sacamos y trabajamos con ese punto de una forma separada, pero siempre me va a informar,
+
+59
+00:07:29,000 --> 00:07:32,000
+ya profesor, sacamos esa observación, va a tener pérdida de información.
+
+60
+00:07:33,000 --> 00:07:44,000
+Bueno, si ustedes saben lo que va a pasar por ejemplo en Black Friday, pueden trabajar exactamente con ese punto y planificar por ejemplo cómo hacer vendas, stock,
+
+61
+00:07:44,000 --> 00:07:59,000
+advertisement, propaganda, publicidad, lo que sea, exactamente para esa fecha, pero mantener un outlier en su base solamente porque no hace sentido removérselo,
+
+62
+00:07:59,000 --> 00:08:06,000
+puede hacer con que todos los otros resultados sean altamente influenciados por el outlier.
+
+63
+00:08:06,000 --> 00:08:18,000
+Para eso les dejo un ejemplo muy sencillo, todos conocen cómo ajustar una regresión lineal, entonces ya saben ahí, una regresión lineal, tenemos nuestro Y, nuestra variable de respuesta Y,
+
+64
+00:08:18,000 --> 00:08:37,000
+acá, Xbeta, y vamos a ajustar ese beta de alguna manera acá, beta cero, beta uno, tenemos beta cero acá, medio inicial, beta uno que nos va a dar exactamente la inclinación de la red.
+
+65
+00:08:37,000 --> 00:08:47,000
+Lo estimamos con mínimos cuadrados sin ningún problema, si la base viene limpia, sin outliers, y tiene una relación lineal, logramos hacer acá el ajuste,
+
+66
+00:08:47,000 --> 00:09:07,000
+sin ninguna dificultad, pero vamos a suponer que nuestros datos tienen esta información acá, y por algún momento, por alguna situación muy específica, pero que de hecho es una situación real, que debe de tener una explicación,
+
+67
+00:09:07,000 --> 00:09:27,000
+me viene un punto exactamente acá, esto acá es solamente un punto en la regresión lineal, uno observación, cuando intentamos correr nuevamente la regresión lineal, la reta que debería ser así, ahora cambió completamente para esta dirección.
+
+68
+00:09:27,000 --> 00:09:50,000
+Bueno, si uno va a intentar hacer alguna interpretación con ese beta, o utilizar ese beta para hacer predicciones, va a tener muy malas predicciones, ya van a tener resultados muy malos, no va a funcionar, es decir, solamente un punto está influenciando de forma demasiado en la estimación de beta cero, y beta uno, ya?
+
+69
+00:09:51,000 --> 00:09:56,000
+De una forma que ellos están muy lejos, son muy distintos del verdadero.
+
+70
+00:09:56,000 --> 00:10:20,000
+Bueno, una de las formas de pensar evaluar esto es un posible outlier, entendemos lo que pasó acá, evaluamos su significancia, su importancia en nuestro análisis estadístico, y lo sacamos, corremos nuevamente nuestros parámetros, y ahí sí vamos a tener exactamente el ajuste que nos gusta acá.
+
+71
+00:10:20,000 --> 00:10:21,000
+Ya?
+
+72
+00:10:21,000 --> 00:10:29,000
+Realmente no me gusta poner información en la basura porque son importantes, pero nos complica para hacer la estimación de los otros parámetros.
+
+73
+00:10:29,000 --> 00:10:30,000
+Ya?
+
+74
+00:10:30,000 --> 00:10:47,000
+Bueno, hay formas de hacer eso, una de las formas de sacar el punto, en regresión lineal uno puede hacer un análisis conocido como inferencia robusta, inferencia robusta va a dar muy pesos muy pequeños para valores como ese, y al final van a tener un ajuste más o menos como ese acá.
+
+75
+00:10:47,000 --> 00:10:48,000
+Ya?
+
+76
+00:10:48,000 --> 00:10:56,000
+De alguna manera va a ser un descarto, va a dar poco peso en valores que son muy lejos o son outliers, por ejemplo.
+
+77
+00:10:56,000 --> 00:11:03,000
+Conciernos que hay gente hoy proponiendo métodos de inferencia robusta para poder hacer inferencia, son algunos métodos que están siendo desarrollados.
+
+78
+00:11:03,000 --> 00:11:07,000
+Una otra área va exactamente por esta detección de anomalías, ya?
+
+79
+00:11:07,000 --> 00:11:09,000
+Vamos a continuar acá.
+
+80
+00:11:09,000 --> 00:11:34,000
+Bueno, cosas que son importantes a hacer antes de eliminar, verificar las unidades, verificar si están duplicadas, faltantes, problemas en el registro, consultar el contexto de los casos marcados y a distinguir un error corregible de un evento real poco frecuente, comparar sus resultados con y sin y verificar si afecta su análisis.
+
+81
+00:11:34,000 --> 00:11:35,000
+Ya?
+
+82
+00:11:36,000 --> 00:11:41,000
+En fraudes o fallas, los casos poco frecuentes pueden ser el objeto del estudio.
+
+83
+00:11:41,000 --> 00:11:46,000
+En otros análisis, interesa reducir su influencia sin perder la información.
+
+84
+00:11:46,000 --> 00:12:01,000
+Y bueno, eso pasa a ser muy importante porque algunas áreas, varias áreas que son muy importantes, que buscan evaluar fraudes o fallas, buscan exactamente intentar evaluar esos outliers.
+
+85
+00:12:01,000 --> 00:12:02,000
+Ya?
+
+86
+00:12:02,000 --> 00:12:15,000
+Por ejemplo, yo tengo alumnos que trabajan en la Receita Federal de Brasil que hacen exactamente la evaluación de fraudes en términos de emisiones de boletas, de honorarios.
+
+87
+00:12:15,000 --> 00:12:16,000
+Ya?
+
+88
+00:12:16,000 --> 00:12:27,000
+Entonces, bueno, ellos intentan sacar el texto, evaluar valores, demás, algún montón de información e intentan evaluar eso desde el punto de vista de busca por outliers.
+
+89
+00:12:27,000 --> 00:12:28,000
+Ya?
+
+90
+00:12:28,000 --> 00:12:35,000
+Es una persona que hace eso de una forma un poco distinta de lo que realmente los otros hacen o su comportamiento.
+
+91
+00:12:35,000 --> 00:12:49,000
+Se cambia acto, es un posible outlier, una posible fraude y ahí van a tener los alertas que ellos hacen para poder intentar buscar más información y de alguna manera hacer la punición necesaria de esa persona.
+
+92
+00:12:49,000 --> 00:12:50,000
+Sí?
+
+93
+00:12:50,000 --> 00:12:53,000
+Entonces, hay mucha gente que trabaja con eso.
+
+94
+00:12:53,000 --> 00:12:58,000
+Pero como le comenté, el contexto acá pasa a ser fundamental.
+
+95
+00:12:58,000 --> 00:12:59,000
+¿Verdad?
+
+96
+00:12:59,000 --> 00:13:10,000
+Ahora el contexto pasa a ser fundamental porque necesitamos evaluar si podemos eliminar esa base y cómo vamos a tratar exactamente los puntos que fueron eliminados.
+
+97
+00:13:10,000 --> 00:13:11,000
+Ya?
+
+98
+00:13:11,000 --> 00:13:13,000
+Porque eso es.
+
+99
+00:13:13,000 --> 00:13:22,000
+Alunos que tengo que trabajar con vendas intentan hacer proyecciones de vendas, siempre tienen problemas exactamente con Black Friday.
+
+100
+00:13:22,000 --> 00:13:23,000
+Ya?
+
+101
+00:13:23,000 --> 00:13:39,000
+Si uno mete Black Friday ahí y hace el ajuste de una serie temporal, va a ver que solamente este punto que es muy discrepante, como es un outlier muy significativo, influencia acto en todas las otras estimativas.
+
+102
+00:13:39,000 --> 00:13:42,000
+Aumentando demasiado el error, creando muchos problemas.
+
+103
+00:13:42,000 --> 00:13:43,000
+Ya?
+
+104
+00:13:43,000 --> 00:13:50,000
+Entonces, una de las sugerencias es, ya sabemos que en ese período tenemos una venda histórica más o menos con esos valores.
+
+105
+00:13:50,000 --> 00:14:08,000
+Entonces, no saco esa información, voy a analizar la serie temporal de la forma normal, pero yo sé que en algunos periodos específicos como Black Friday o una fecha muy específica de Navidad, vamos a tener un aumento de vendas muy discrepante, un outlier muy grande ahí.
+
+106
+00:14:08,000 --> 00:14:18,000
+Y ahí podemos intentar trabajar solamente con esas informaciones para nos planificar o para poder hacer la planificación de caja que vamos a tener.
+
+107
+00:14:18,000 --> 00:14:19,000
+Si?
+
+108
+00:14:19,000 --> 00:14:21,000
+Entonces, es muy importante distinguir eso.
+
+109
+00:14:21,000 --> 00:14:24,000
+También es importante distinguir lo que son errores.
+
+110
+00:14:24,000 --> 00:14:25,000
+Ya?
+
+111
+00:14:25,000 --> 00:14:30,000
+Conozco a un montón de gente, principalmente cuando llega a la base, cuando empezaron a mirar, encuentran la edad.
+
+112
+00:14:30,000 --> 00:14:37,000
+Como 99 años, eliminan a esa persona y corren el análisis.
+
+113
+00:14:37,000 --> 00:14:38,000
+Ya?
+
+114
+00:14:38,000 --> 00:14:48,000
+Super mal hacer eso porque uno puede hacer la corrección, se puede llamar la persona que no hizo o la persona que estaba trabajando con la base de datos.
+
+115
+00:14:48,000 --> 00:14:52,000
+Muchas veces eso puede ser, ellos pueden corregir los errores.
+
+116
+00:14:52,000 --> 00:14:53,000
+Ya?
+
+117
+00:14:54,000 --> 00:14:58,000
+Eso le va a ayudar a tener más información y por supuesto menor sesgo.
+
+118
+00:14:58,000 --> 00:14:59,000
+Ya?
+
+119
+00:14:59,000 --> 00:15:01,000
+Entonces van a tener mejores predicciones con eso.
+
+120
+00:15:01,000 --> 00:15:04,000
+Entonces también es muy importante intentar hacer las correcciones cuando posible.
+
+121
+00:15:04,000 --> 00:15:05,000
+Ya?
+
+122
+00:15:05,000 --> 00:15:06,000
+Como eso puede influenciar?
+
+123
+00:15:06,000 --> 00:15:09,000
+Por ejemplo, emocionar un gráfico, acá van a dar los muy sencillos.
+
+124
+00:15:09,000 --> 00:15:14,000
+Vamos a suponer que tenemos 1, 2, 3, 3 observaciones.
+
+125
+00:15:14,000 --> 00:15:16,000
+La media acaba a ser de 2.
+
+126
+00:15:16,000 --> 00:15:17,000
+Ya?
+
+127
+00:15:17,000 --> 00:15:22,000
+Vamos a suponer que ahora incorporo solamente un outlier con el valor 30.
+
+128
+00:15:22,000 --> 00:15:25,000
+Se ve que la media se cambia de 2 a 9.
+
+129
+00:15:25,000 --> 00:15:26,000
+Ya?
+
+130
+00:15:26,000 --> 00:15:35,000
+Y bueno, cuando vamos a hacer una regresión o ajustar por ejemplo un K-meets, si vamos a minimizar estos valores en términos de un clúster específico,
+
+131
+00:15:35,000 --> 00:15:40,000
+va a ver que el residuo ahí va a ser extremamente significativo, en torno de 400.
+
+132
+00:15:40,000 --> 00:15:41,000
+Ya?
+
+133
+00:15:41,000 --> 00:15:46,000
+Entonces un caso solo por influenciar mucho, aunque sea solo una observación.
+
+134
+00:15:46,000 --> 00:15:48,000
+Generalmente no vamos a hacer solamente una observación.
+
+135
+00:15:48,000 --> 00:15:56,000
+Vamos a intentar eliminar 5%, 4, 3% de las observaciones y correr nuevamente nuestra base.
+
+136
+00:15:56,000 --> 00:15:58,000
+Ya?
+
+137
+00:15:58,000 --> 00:16:00,000
+Bueno.
+
+138
+00:16:00,000 --> 00:16:02,000
+Para eso vamos a discutir algunos métodos.
+
+139
+00:16:02,000 --> 00:16:03,000
+Voy a presentar varios.
+
+140
+00:16:03,000 --> 00:16:05,000
+Vamos a ver que estamos usando la mina 7.
+
+141
+00:16:05,000 --> 00:16:08,000
+Solamente una idea de lo que vamos a hablar inicialmente acá.
+
+142
+00:16:08,000 --> 00:16:11,000
+Vamos a hablar sobre la regla del rango intercuartílico.
+
+143
+00:16:11,000 --> 00:16:12,000
+Ya?
+
+144
+00:16:12,000 --> 00:16:13,000
+Enrique.
+
+145
+00:16:13,000 --> 00:16:20,000
+Después, voy a hablar un poco sobre distancias.
+
+146
+00:16:20,000 --> 00:16:26,000
+Vamos a hablar un poco sobre la parte de milares o de distancia de Mahalanobis.
+
+147
+00:16:26,000 --> 00:16:28,000
+Ya?
+
+148
+00:16:28,000 --> 00:16:29,000
+Sus aplicaciones.
+
+149
+00:16:29,000 --> 00:16:32,000
+Vamos a utilizar los cables y los más cercanos.
+
+150
+00:16:32,000 --> 00:16:36,000
+No sé si tuvieron una clase con el KNN.
+
+151
+00:16:36,000 --> 00:16:39,000
+Es un excelente método de regresión y clasificación.
+
+152
+00:16:39,000 --> 00:16:40,000
+Ya?
+
+153
+00:16:40,000 --> 00:16:41,000
+Los cables y los más cercanos.
+
+154
+00:16:41,000 --> 00:16:44,000
+Vamos a utilizarlo para hacer la detección de outliers.
+
+155
+00:16:44,000 --> 00:16:46,000
+Local Outlier Factor.
+
+156
+00:16:46,000 --> 00:16:47,000
+Ya?
+
+157
+00:16:47,000 --> 00:16:51,000
+Entonces, ese es un método que no conocía, pero un método muy bueno.
+
+158
+00:16:51,000 --> 00:16:54,000
+Una forma de utilizar, a pensar, es no supervisar.
+
+159
+00:16:54,000 --> 00:16:56,000
+Sí, Claudia?
+
+160
+00:16:56,000 --> 00:16:58,000
+Buenas tardes, profesor.
+
+161
+00:16:58,000 --> 00:16:59,000
+Una duda.
+
+162
+00:16:59,000 --> 00:17:07,000
+¿Hasta qué punto una outlier puede desplazar el centroide y terminar afectando no solo el error dentro del cluster,
+
+163
+00:17:07,000 --> 00:17:12,000
+sino también la asignación de las demás observaciones, por ejemplo?
+
+164
+00:17:12,000 --> 00:17:20,000
+Una outlier va a influenciar demasiado el centroide del cluster.
+
+165
+00:17:20,000 --> 00:17:26,000
+De hecho, dependiendo de muchas veces, cuando uno quiere intentar definir centroides o outliers,
+
+166
+00:17:26,000 --> 00:17:29,000
+uno puede intentar definir, aumentar el número de clusters,
+
+167
+00:17:29,000 --> 00:17:35,000
+y si tenemos una outlier, es posible que él va a ser exactamente un centroide específico.
+
+168
+00:17:35,000 --> 00:17:39,000
+Eso es super malo porque si tenemos…
+
+169
+00:17:47,000 --> 00:17:53,000
+Por ejemplo, el mismo valor que usted tenía de 400 fuera 1000, por ejemplo.
+
+170
+00:17:53,000 --> 00:17:59,000
+¿Eso va a estar permitido por la clusterización o…?
+
+171
+00:17:59,000 --> 00:18:08,200
+Usted como analista va tendo que evaluar, en este caso no tener una regla de oro como informaría
+
+172
+00:18:08,200 --> 00:18:11,640
+segundo a Cami informo que yo tengo que ser exactamente eso.
+
+173
+00:18:11,640 --> 00:18:17,720
+No es exactamente como aplicar por ejemplo un KNL, sabemos como aplicar un KNL, o no
+
+174
+00:18:17,720 --> 00:18:23,320
+va a evaluar, sabemos como se va a hacer el enteramento del KNL, como se va a estimar.
+
+175
+00:18:23,320 --> 00:18:28,680
+Víctor parece que se puede dibujar.
+
+176
+00:18:28,680 --> 00:18:33,960
+Sí profesor parece que sí.
+
+177
+00:18:33,960 --> 00:18:39,640
+Parece que sí, parece que ustedes también pueden dibujar si no les gusta.
+
+178
+00:18:39,640 --> 00:18:46,600
+Pero vamos a poner acá, este es el centroide, vamos a poner el otro por acá, estoy correndo
+
+179
+00:18:46,600 --> 00:18:55,640
+el método, tengo un punto acá y tengo otro punto acá, claramente estos son outliers.
+
+180
+00:18:55,640 --> 00:19:05,560
+El cláusula debería ser alguna cosa como esta con el centroide exactamente, este debería
+
+181
+00:19:05,560 --> 00:19:11,320
+ser un centroide y el centro del centroide debería estar acá, debería ser un centroide
+
+182
+00:19:11,320 --> 00:19:14,880
+acá y acá.
+
+183
+00:19:14,880 --> 00:19:19,460
+Cuando tenemos más observaciones se espera que esas más observaciones van a influenciar
+
+184
+00:19:19,460 --> 00:19:27,920
+menos en nuestro centroide, pero aún si no tenemos tantas observaciones y el outlier
+
+185
+00:19:27,920 --> 00:19:33,800
+está muy lejos, es posible que cuando fuemos a ajustar el centroide, él estaba acá, él
+
+186
+00:19:33,800 --> 00:19:40,440
+se va a deslocar más o menos para acá y ese va a ser el cláusula que se va a ajustar.
+
+187
+00:19:40,440 --> 00:19:46,760
+Lo mismo va a tocar acá, acá fue lo que teníamos, acá fue el ajustado y tenemos
+
+188
+00:19:46,760 --> 00:19:48,320
+este posible cláusula.
+
+189
+00:19:48,320 --> 00:19:54,240
+Es malo, porque cuando ustedes van a evaluar y calcular el VWSS van a ver que ese valor
+
+190
+00:19:54,240 --> 00:20:00,200
+va a estar muy alto, entonces ese valor está muy alto y van a poder tener una indicación
+
+191
+00:20:00,200 --> 00:20:02,720
+de que tiene alguna cosa mala ahí.
+
+192
+00:20:02,720 --> 00:20:08,760
+Vamos a suponer que de alguna manera ustedes van a poner ahí para correr cuatro cláusulas.
+
+193
+00:20:08,960 --> 00:20:12,880
+Casi es seguro, depende del punto inicial que van a poner, que me va a salir un cluster
+
+194
+00:20:12,880 --> 00:20:16,680
+acá, un cluster acá, otro acá y otro acá.
+
+195
+00:20:16,680 --> 00:20:23,120
+Entonces, a veces el camino puede ser una forma de hacer detección de outliers.
+
+196
+00:20:23,120 --> 00:20:27,480
+Por eso es importante que cuando estén haciendo el dibujo de su cluster, cuando estén ajustando
+
+197
+00:20:27,480 --> 00:20:32,800
+un cluster, cuando estén ajustando sus modelos, evaluar los outliers porque los outliers
+
+198
+00:20:32,800 --> 00:20:38,080
+van a influenciar alto todo, pero van a influenciar alto de manera significativa.
+
+199
+00:20:38,160 --> 00:20:45,000
+Por ejemplo, este alumno que estaba comentando en series temporales fue un alumno de un MBA
+
+200
+00:20:45,000 --> 00:20:47,000
+en Data Science en Brasil.
+
+201
+00:20:47,000 --> 00:20:52,560
+El alumno se quedó cinco meses evaluando los outliers, haciendo divisiones e intentando
+
+202
+00:20:52,560 --> 00:21:01,960
+sacar algunos para evaluar, pero era muy sencillo de evaluar que cuando uno ponía el outlier
+
+203
+00:21:01,960 --> 00:21:08,440
+allá el modelo que él estaba ajustando, el modelo ARMA, ARIMAS, ARIMA, los modelos
+
+204
+00:21:08,440 --> 00:21:15,520
+Prophet, LSTM, se quedaban super malos, pero super malos, no tenían ningún buen
+
+205
+00:21:15,520 --> 00:21:17,520
+ajuste.
+
+206
+00:21:17,520 --> 00:21:22,560
+Se influenciaban no solamente los outliers, pero influenciaban todos porque se cambian
+
+207
+00:21:22,560 --> 00:21:28,000
+altos parámetros para que en algún momento este punto logre llegar en ese serie.
+
+208
+00:21:28,040 --> 00:21:43,960
+Tiene una serie más o menos así de vendas, más o menos así que pasa en situaciones
+
+209
+00:21:43,960 --> 00:21:45,960
+como esta, como Black Friday.
+
+210
+00:21:45,960 --> 00:21:53,400
+Entonces el modelo, sí, intentaba hacer más o menos algo así, cuando sacaba el outlier.
+
+211
+00:21:54,360 --> 00:21:59,800
+Cuando intentaba poner el outlier, el modelo, hacía más o menos así.
+
+212
+00:21:59,800 --> 00:22:05,560
+Entonces se vio que este otro modelo ajustado con el outlier no alcanzaba nada, estaba super malo.
+
+213
+00:22:05,560 --> 00:22:09,720
+Entonces la clase de obra será importante exactamente por eso, para que ustedes tengan
+
+214
+00:22:09,720 --> 00:22:14,520
+en consideración que se pueda hacer una análisis para ello y evaluar lo que están influenciando
+
+215
+00:22:14,520 --> 00:22:15,520
+en sus modelos.
+
+216
+00:22:15,520 --> 00:22:20,800
+Ya, esta es una área muy importante, pero muy importante mismo.
+
+217
+00:22:21,200 --> 00:22:25,360
+Detección de outliers es una área de estadística que tiene un respecto muy grande y mucha gente
+
+218
+00:22:25,360 --> 00:22:26,960
+trabaja con eso.
+
+219
+00:22:26,960 --> 00:22:32,520
+Tenemos buenos profesores de la católica, Vanessa Conocer, Manuel Galea, Alejandra,
+
+220
+00:22:32,520 --> 00:22:38,640
+que trabajan solamente con diagnóstico de influencia, lo que estos puntos están influenciando
+
+221
+00:22:38,640 --> 00:22:43,480
+en nuestra análisis, incluso outliers.
+
+222
+00:22:43,480 --> 00:22:48,880
+Entonces es muy importante evaluar los outliers cuando fomos a hacer una análisis.
+
+223
+00:22:48,960 --> 00:22:57,960
+Bueno, como ya estábamos hablando sobre camins, acá no voy a presentar exactamente camins,
+
+224
+00:22:57,960 --> 00:23:01,800
+voy a presentar un método que le comenté en algún momento, que es un método también
+
+225
+00:23:01,800 --> 00:23:04,160
+de clasarización que se llama DBSCAN.
+
+226
+00:23:04,160 --> 00:23:09,760
+Entonces él intenta de alguna manera de una forma mejor evaluar clústeres que tienen
+
+227
+00:23:09,760 --> 00:23:11,920
+una alta densidad de puntos.
+
+228
+00:23:11,920 --> 00:23:17,840
+Y básicamente con esta idea vamos a informar a Yacy, tenemos altas densidades de puntos
+
+229
+00:23:18,800 --> 00:23:22,840
+El punto que está muy lejos de esta densidad debería ser un posible outlier.
+
+230
+00:23:22,840 --> 00:23:28,720
+Entonces vamos a ajustar eso, evaluar cómo miramos estos posibles outliers a lo largo
+
+231
+00:23:28,720 --> 00:23:29,720
+de nuestra clase.
+
+232
+00:23:29,720 --> 00:23:34,880
+Voy a mostrar un poco cómo se utiliza PCA para poder hacer detección de outliers, vamos
+
+233
+00:23:34,880 --> 00:23:36,800
+a aplicar eso en una base de dados.
+
+234
+00:23:36,800 --> 00:23:44,080
+Y al final vamos a hablar un poco sobre Isolation Forest, que también es una aplicación de
+
+235
+00:23:44,080 --> 00:23:48,480
+random forest, exactamente para hacer la evaluación de outliers.
+
+236
+00:23:48,480 --> 00:23:53,360
+Entonces eso es lo que esperamos hoy para nuestra clase.
+
+237
+00:23:53,360 --> 00:24:00,440
+Bueno, el primero método es un método conocido como Reguling Rango Interquantílico.
+
+238
+00:24:00,440 --> 00:24:07,280
+El Rango Interquantílico se va a calcular como LRCI, y va a mirar exactamente el cuantil
+
+239
+00:24:07,280 --> 00:24:13,840
+3, que va a ser 0.75, y el cuantil 1.
+
+240
+00:24:13,840 --> 00:24:23,840
+Así que cuando ustedes van a hacer la división de su base, van a tener acá 0.25%,
+
+241
+00:24:23,840 --> 00:24:39,600
+0.50, y 0.75.
+
+242
+00:24:39,600 --> 00:24:46,120
+Lo que vamos a intentar mirar es exactamente los puntos que deberían estar dentro de esta
+
+243
+00:24:46,120 --> 00:24:47,120
+región acá.
+
+244
+00:24:48,120 --> 00:24:55,760
+O sea, los puntos que vamos a estar considerando ahí en torno de 50% de los valores, no vamos
+
+245
+00:24:55,760 --> 00:25:01,320
+exactamente a mirar en esos puntos, vamos a hacer una pequeña modificación para poder
+
+246
+00:25:01,320 --> 00:25:05,040
+abarcar un poco más esos puntos.
+
+247
+00:25:05,040 --> 00:25:08,640
+Pero básicamente vamos a intentar hacer un dibujo y mirar los puntos que están muy lejos
+
+248
+00:25:08,640 --> 00:25:12,480
+cuando miramos ellos desde el punto de vista de cuantiles.
+
+249
+00:25:12,480 --> 00:25:15,520
+Y ahí nos miramos con posibles outliers.
+
+250
+00:25:15,920 --> 00:25:21,320
+Para eso, cuando miramos acá utilizamos el 150% de los datos, no la media y la división
+
+251
+00:25:21,320 --> 00:25:22,320
+estándar.
+
+252
+00:25:22,320 --> 00:25:27,160
+Voy a comentar por qué no, vamos a ver una aplicación de cuando ponemos la media y la
+
+253
+00:25:27,160 --> 00:25:31,360
+división estándar, puede nos dificultar para hacer la decisión de outliers.
+
+254
+00:25:31,360 --> 00:25:36,080
+Un resultado interesante es que este tipo de detector de outliers no va a requerir una
+
+255
+00:25:36,080 --> 00:25:39,120
+distribución normal, entonces no tendrá una suposición de normalidad.
+
+256
+00:25:39,720 --> 00:25:45,920
+En variadas muy asimétricas pueden marcar valores variados y la cola.
+
+257
+00:25:45,920 --> 00:25:51,720
+Bueno, es una regla de exploración o una prueba automática de Ruhl.
+
+258
+00:25:51,720 --> 00:25:56,120
+La mayoría de los métodos que vamos a discutir acá son reglas de exploración.
+
+259
+00:25:56,120 --> 00:26:00,840
+Entonces, uno va a utilizar PCA, va a tener algunas indicaciones de outliers, vamos a utilizar
+
+260
+00:26:00,840 --> 00:26:04,960
+Isosation Forest, vamos a hacer otras indicaciones de outliers.
+
+261
+00:26:05,800 --> 00:26:10,360
+El profesor de etio es un outlier, va a depender del modelo que uno ajusta, si usted va a
+
+262
+00:26:10,360 --> 00:26:13,360
+ajustar una distribución normal, por eso va a ser solo un outlier.
+
+263
+00:26:13,360 --> 00:26:19,160
+Sería trabajar con una distribución que tiene colas pesadas y no se puede eliminar
+
+264
+00:26:19,160 --> 00:26:23,360
+esos puntos, no se va a considerar como outliers.
+
+265
+00:26:23,360 --> 00:26:29,360
+Entonces son posibles outliers, generalmente con modelos más flexibles, podrían ser considerados.
+
+266
+00:26:29,760 --> 00:26:36,760
+Pero bueno, ahí tenemos que evaluar exactamente lo que está influyendo en nuestro análisis.
+
+267
+00:26:36,760 --> 00:26:41,360
+Vamos a hacer esto también al final de la clase, no se preocupen porque acá parece
+
+268
+00:26:41,360 --> 00:26:47,760
+que estoy muy como, podemos hacer esto, podemos hacer de esta forma, tampoco pueden hacer lo que quieren.
+
+269
+00:26:47,760 --> 00:26:56,760
+Hay algunas formas de evaluar y vamos a llegar en algunas reglas para poder eliminar al final.
+
+270
+00:26:57,160 --> 00:27:01,160
+Pero no va a tener un p-valor que me va a llamar ya, voy a eliminar ese valor acá con
+
+271
+00:27:01,160 --> 00:27:08,160
+p-valor de 0.5, si está abajo de 0.05 elimino ese valor con base a un p-valor específico.
+
+272
+00:27:11,160 --> 00:27:17,160
+Bueno, estaba comentando sobre el HIC, o regla del rango intercontílico.
+
+273
+00:27:18,160 --> 00:27:23,160
+Vamos a suponer que tenemos algunas observaciones acá solamente como otro ejemplo, después
+
+274
+00:27:23,560 --> 00:27:30,560
+explicamos un poquito más adelante una base real. Vamos a ver que tenemos valores acá,
+
+275
+00:27:30,560 --> 00:27:38,560
+10, 11, 12, 13, 14, 15. No necesitamos de un método E30, no necesitamos de un método formal para
+
+276
+00:27:38,560 --> 00:27:43,560
+evaluar que 30 es un outlier, pero lo importante es que ustedes tengan en cuenta si el método
+
+277
+00:27:43,560 --> 00:27:46,560
+nos ayuda a de hecho eliminar esos posibles puntos.
+
+278
+00:27:46,960 --> 00:27:51,960
+Lo que vamos a intentar hacer es dibujar nuestros intercuartiles,
+
+279
+00:27:51,960 --> 00:27:56,960
+nuestros cuartiles interpolados con los códigos, entonces los cuartiles que
+
+280
+00:27:56,960 --> 00:28:02,960
+vamos a ser dibujados acá 25, 50, más aquel límite que vamos a hacer la modificación.
+
+281
+00:28:02,960 --> 00:28:07,960
+Tenemos que hacer los límites que vamos a dibujar acá, vamos a utilizar nuestro HIC,
+
+282
+00:28:07,960 --> 00:28:11,960
+nuestro rango intercontílico, y junto con este rango intercontílico vamos a dibujar
+
+283
+00:28:12,360 --> 00:28:17,360
+límites, ya? O límite inferior va a ser dibujado por ese punto, o el límite superior
+
+284
+00:28:17,360 --> 00:28:22,360
+va a ser dibujado por ese punto. Y eso acá es exactamente el cuartil 3, los 75% de
+
+285
+00:28:22,360 --> 00:28:27,360
+observaciones, no, ese es el cuartil 1, no, pueden ver que estoy multiplicando por 1.5
+
+286
+00:28:27,360 --> 00:28:33,360
+acá para dar una dimensión mayor. Entonces cuando vamos a calcular ese L que va a ser
+
+287
+00:28:33,360 --> 00:28:38,360
+el límite inferior y U que va a ser el límite superior, él va a tomar en cuenta nuestro
+
+288
+00:28:38,760 --> 00:28:43,760
+rango intercontílico como uno va a calcular, va a calcular el cuartil 1, ya? 11.75, el
+
+289
+00:28:43,760 --> 00:28:50,760
+cuartil 3, 14.25 y el HIC acá. Pero donde está sacando 11.75, siendo que tenemos acá
+
+290
+00:28:55,760 --> 00:29:01,760
+11, 12, si? Cuando ustedes fueran a entrar allá con una función no para calcular exactamente
+
+291
+00:29:02,160 --> 00:29:09,160
+esos puntos para evaluar toda la región, si ustedes fueran a sacar un cuartil, él va
+
+292
+00:29:09,160 --> 00:29:16,160
+a dar una estimativa que debe estar acá entre 11.75, 14.25, ya? Bueno, esto es muy importante,
+
+293
+00:29:19,160 --> 00:29:24,160
+estoy utilizando exactamente este rango acá para desarrollar un artículo que estoy haciendo
+
+294
+00:29:24,160 --> 00:29:31,160
+de detección de enfermedades en algunos animales acá en Chile. Básicamente utilizamos la regla
+
+295
+00:29:31,560 --> 00:29:37,080
+intercontílico para poder hacer el ajuste, por eso pensé que era bueno poner acá las
+
+296
+00:29:37,080 --> 00:29:44,080
+láminas para ustedes, era una regla muy útil. Y bueno, ajustando nuestro cuartil 1 que se
+
+297
+00:29:44,080 --> 00:29:48,440
+mantiene acá, también nuestro cuartil 3 que se va a mantener acá, vamos a calcular el
+
+298
+00:29:48,440 --> 00:29:55,440
+rango intercontílico que va a ser la diferencia entre este punto y ese punto, ya? Esta diferencia
+
+299
+00:29:55,600 --> 00:30:02,600
+va a ser de 2.5, se suma 2.5 acá, va a llegar a este punto acá, ya? Multiplicamos por 1.5,
+
+300
+00:30:03,600 --> 00:30:09,000
+vamos a tener el límite inferior de 8 y el límite superior de 18. Dibujamos o hacemos
+
+301
+00:30:09,000 --> 00:30:15,720
+una condición en el E y en el Python, si el valor es superior a 8 y es menor que 18,
+
+302
+00:30:15,720 --> 00:30:20,040
+mantenemos nuestras observaciones, si está fuera, desesamos, lo asumimos como posibles
+
+303
+00:30:20,040 --> 00:30:27,040
+outliers, ya? Posibles outliers, hay que revisar. Entonces, cuando hacemos el dibujo de los
+
+304
+00:30:27,040 --> 00:30:38,040
+intercuartiles, vamos a tener 8, el límite 8 acá, 18, los puntos 10, 11, 12, 13, 14 y 15, ya?
+
+305
+00:30:41,040 --> 00:30:47,040
+Por supuesto, tenemos algunos empates acá, por eso incluso vamos a hacer esta aproximación
+
+306
+00:30:47,040 --> 00:30:56,040
+11.65, dado los empates que tenemos y el punto 30 fue exactamente definido acá como
+
+307
+00:30:56,040 --> 00:31:01,040
+un posible outlier, ya? Entonces, esta regla nos ayuda a tener una posible regla formal de evaluar
+
+308
+00:31:01,040 --> 00:31:08,040
+nuestros outliers, ya? Es la forma más sencilla de tener una metodología sofisticada como PCA.
+
+309
+00:31:08,040 --> 00:31:13,040
+PCA tiene una mirada muy interesante, me gusta bastante la idea de PCA, por ejemplo,
+
+310
+00:31:13,040 --> 00:31:18,040
+ustedes van a tener que estimar parámetros, hacer una construcción y después volver a la
+
+311
+00:31:18,040 --> 00:31:23,040
+construcción original y calcular la diferencia. Esta diferencia de reconstrucción debería ser
+
+312
+00:31:23,040 --> 00:31:30,040
+nuestra outlier, ya? Algunos métodos van a utilizar reglas estadísticas sencillas, otros van a utilizar
+
+313
+00:31:30,040 --> 00:31:40,040
+métodos más sofisticados, si? Por ejemplo, acá estoy tratando con quantiles, pero uno puede
+
+314
+00:31:40,040 --> 00:31:42,040
+evaluar esto desde el punto de vista de...
+
+315
+00:31:46,040 --> 00:31:54,040
+por evaluar esto desde el punto de vista de medias, ya? Entonces, podemos hacer una estandarización
+
+316
+00:31:54,040 --> 00:32:00,040
+en nuestra base de dados y evaluar cuáles son los puntos que están se alejando demasiado de la
+
+317
+00:32:00,040 --> 00:32:06,040
+media, ya? No me gusta mucho esto, ustedes van a ver que no es la mejor. Bueno, va a tener
+
+318
+00:32:06,040 --> 00:32:11,040
+comentar preguntas acá, no hay nada que vaya ayudando. Si tienen alguna duda adicionales,
+
+319
+00:32:11,040 --> 00:32:13,040
+después pueden comentar.
+
+320
+00:32:17,040 --> 00:32:25,040
+Y bueno, hay otra forma sencilla de mirar esto, desde el punto de vista de hacer una estandarización
+
+321
+00:32:25,040 --> 00:32:30,040
+en nuestra base. Entonces, simplemente tengo las observaciones que tenemos anteriormente acá.
+
+322
+00:32:31,040 --> 00:32:37,040
+Voy a calcular el promedio de estas observaciones, la dirección estándar y va a ser la estandarización,
+
+323
+00:32:37,040 --> 00:32:45,040
+¿cierto? Bueno, en esta base de dados vamos a tener un problema muy específico. Como tenemos
+
+324
+00:32:45,040 --> 00:32:52,040
+una observación que es claramente una outlier ahí, ella va a influenciar demasiado en la media, ya?
+
+325
+00:32:52,040 --> 00:32:58,040
+Entonces, la media que debería ser alguna cosa en torno a no sé, 12, debe estar más o menos como
+
+326
+00:32:58,040 --> 00:33:06,040
+12,5, cuando calculamos la media va para 14,62. Lo malo es que esto también va a influenciar
+
+327
+00:33:06,040 --> 00:33:12,040
+mucho en la deviación estándar, está un punto muy lejos. Entonces, cuando vamos a hacer la estandarización
+
+328
+00:33:12,040 --> 00:33:20,040
+entre el 30 que fue la outlier menos la media que fue estimada a partir de la deviación estándar,
+
+329
+00:33:20,040 --> 00:33:27,040
+tuvimos aproximadamente un valor de 2,39, ya? Se ve que es un valor extremo, pero generalmente
+
+330
+00:33:27,040 --> 00:33:36,040
+este método utiliza como sugerencia asumir que va a ser detectar como outlier los valores que
+
+331
+00:33:36,040 --> 00:33:42,040
+tuvieron, el módulo mayor que 3, porque el módulo vamos a suponer que acá fue 30, pero de todas
+
+332
+00:33:42,040 --> 00:33:50,040
+las formas también tenemos un valor que debería ser 1 acá, si tenemos por ejemplo 1, 10, 11, 12, por ahí adelante.
+
+333
+00:33:50,040 --> 00:33:58,040
+Cuando vamos a calcular este valor acá va a ser menos 1,9, o menos 2, alguna cosa así, ya?
+
+334
+00:33:58,040 --> 00:34:03,040
+Entonces va a ser un valor negativo si este valor está muy abajo de la media,
+
+335
+00:34:03,040 --> 00:34:11,040
+entonces, bueno, de todas las formas vamos a ver nuestro valor calculado,
+
+336
+00:34:11,040 --> 00:34:19,040
+estos valores deberían estar distribuidos en torno de un valor como 0, ya?
+
+337
+00:34:19,040 --> 00:34:24,040
+Y no tener una variancia muy grande. Cuando intentamos mirar como posibles outliers,
+
+338
+00:34:24,040 --> 00:34:31,040
+una regla muy utilizada de corte es asumir que son outliers los valores que están arriba de 3, ya?
+
+339
+00:34:31,040 --> 00:34:37,040
+En este caso, esto es malo porque claramente este punto 30 es un outlier,
+
+340
+00:34:37,040 --> 00:34:44,040
+acá nadie tiene ninguna duda que este punto 30 es un outlier, pero este método de estandarización
+
+341
+00:34:44,040 --> 00:34:52,040
+nos va a dar esta indicación, entonces el RIC que apreciamos anteriormente, intercuartílico,
+
+342
+00:34:52,040 --> 00:35:05,040
+marca 30 como outlier, pero el corte de módulo DZ cuando hacemos la evaluación por medio de los valores extremos
+
+343
+00:35:05,040 --> 00:35:11,040
+utilizando esta estandarización no nos va a marcar como posible el outlier, ya?
+
+344
+00:35:11,040 --> 00:35:23,040
+El propio extremo elevó la media y la dirección estándar, entonces barro normal aproximadamente 4.55 queda fuera de más 2 sigma
+
+345
+00:35:23,040 --> 00:35:29,040
+y 0.2, 20% se va a quedar fuera de 3.0 sigma, ya?
+
+346
+00:35:30,040 --> 00:35:40,040
+Esto es muy interesante porque básicamente lo que estamos intentando hablar acá es que el 4.45 por ciento de los valores no se queda fuera
+
+347
+00:35:40,040 --> 00:35:47,040
+si utilizamos esta regla, no es exactamente esta regla de decisión, si miramos solamente 2
+
+348
+00:35:47,040 --> 00:35:54,040
+y en este caso estamos asumiendo un 3.0 sigma, acá cuando hacemos la estandarización este sigma debería ser 1, ya?
+
+349
+00:35:54,040 --> 00:36:01,040
+Entonces estamos mirando exactamente en este 2.27 por ciento acá, ya?
+
+350
+00:36:01,040 --> 00:36:09,040
+Esto es lo que los japoneses intentaron mirar a un buen tiempo cuando intentaban desarrollar el control a riesgo de calidad, ya?
+
+351
+00:36:09,040 --> 00:36:17,040
+Utilizaban una política de 3 signas, entonces no querían los valores que podrían fallar, serían valores muy extremos, si?
+
+352
+00:36:17,040 --> 00:36:28,040
+Después fueron aumentando estos signas, 4, 5, una política de 6 signas, o sea, 1 a cada 1 milión de valores, a cada 1 milión de productos solamente va a fallar
+
+353
+00:36:28,040 --> 00:36:31,040
+entonces de 1 milión de computadores 1 solamente falla, si?
+
+354
+00:36:31,040 --> 00:36:37,040
+Conforme aumentamos este sigma vamos dejando un límite más extremo, ya?
+
+355
+00:36:37,040 --> 00:36:41,040
+Realmente asumimos este 3 sigma, pero por supuesto no podemos definir otras reglas
+
+356
+00:36:42,040 --> 00:36:55,040
+Vemos acá que este 3 sigma, cuando ponemos este 3 sigma como regla decisión no vamos a tener un rechazo o una indicación de que 30 es posiblemente un outlier, ya?
+
+357
+00:36:55,040 --> 00:37:04,040
+Entonces debemos utilizar varios de los métodos conjuntamente y después una sugerencia es utiliza todos los métodos que pueden
+
+358
+00:37:04,040 --> 00:37:09,040
+después intenta seleccionar los puntos en que los métodos tienen una concordancia, si?
+
+359
+00:37:09,040 --> 00:37:14,040
+Bueno, el nombrado va a depender del objetivo, ninguna de estas reglas es universal, si?
+
+360
+00:37:14,040 --> 00:37:25,040
+Como lo hacemos en R&Python de una manera muy sencilla, vamos definiendo estos valores, acá, 10 hasta 30, vamos calcular los cuantiles, ya?
+
+361
+00:37:25,040 --> 00:37:37,040
+En el punto 0.25 y 0.65 me va a salir aquellos valores, calculamos el RIC que va a ser la diferencia, el límite inferior, exactamente como aparece en la expresión,
+
+362
+00:37:37,040 --> 00:37:44,040
+el límite superior y simplemente una alerta mirando si los valores fueron abajo o arriba del límite superior.
+
+363
+00:37:44,040 --> 00:37:55,040
+En Python la misma diferencia, simplemente lo único que se puede cambiar ahora es utilizando la función, bueno, definimos NP acá, calculamos el cuantil,
+
+364
+00:37:55,040 --> 00:38:10,040
+la función NP.Cuantil y calculamos todo bien, entonces NP.Array y básicamente calculamos de la misma forma que fue definida en R&Python.
+
+365
+00:38:10,040 --> 00:38:23,040
+Bueno, siguiendo acá, ya vamos a empezar a hablar sobre algunas otras escalas de distancia, pero hasta el momento todo tranquilo,
+
+366
+00:38:23,040 --> 00:38:30,040
+alguna duda, después vamos a correr juntos, ustedes también tienen los codios, pero vamos a correr acá los primeros ejemplos, ya?
+
+367
+00:38:30,040 --> 00:38:43,040
+Por ejemplo, acá cuando miramos la regla intercuartílica, cuando miramos el RIC, la forma que le mostré, el print, ya?
+
+368
+00:38:43,040 --> 00:38:53,040
+Y la indicación de que posiblemente sería un outlier, una alerta de un posible outlier nos va a salir exactamente como esta función.
+
+369
+00:38:53,040 --> 00:39:00,040
+Entonces vamos a hacer exactamente como salió todo, límite inferior, límite superior, alerta que va a tener las condiciones y fiel,
+
+370
+00:39:00,040 --> 00:39:07,040
+después hago un print acá de las posibles indicaciones, sí?
+
+371
+00:39:07,040 --> 00:39:20,040
+Bueno, en este caso también ya había hecho el cálculo del Z como una posibilidad utilizando la estandardización y el alerta con la función alertaZ,
+
+372
+00:39:20,040 --> 00:39:29,040
+que fue exactamente utilizando esta regla de decisión acá, no nos informó que este valor acá era un posible outlier, ya?
+
+373
+00:39:29,040 --> 00:39:36,040
+Entonces hasta ahora hay un método informando que es un posible outlier, otro método informando que está dentro de lo que se espera.
+
+374
+00:39:36,040 --> 00:39:43,040
+Bueno, estos métodos son sencillos, ahora vamos a empezar a hablar de otros métodos basados en distancias, ya?
+
+375
+00:39:43,040 --> 00:39:52,040
+Bueno, para eso vamos a cambiar ahora un poco la base de dados, como vamos a empezar a calcular distancias, vamos a mirar una base un poco más compleja, ya?
+
+376
+00:39:52,040 --> 00:40:02,040
+Bueno, vamos a hablar un poco sobre la escala y los dados, básicamente la escala de los dados, vamos a considerar un conjunto simulado de 200 observaciones,
+
+377
+00:40:02,040 --> 00:40:17,040
+ahí ustedes tienen un artículo que se llama puntos.csv, ya? Y vamos a tener observaciones simuladas correlacionadas y vamos a tener seis casos adicionales ahí que son problemáticos, ya?
+
+378
+00:40:17,040 --> 00:40:32,040
+Bueno, vamos a hacer la estandarización, acá dejé algunas informaciones importantes, como por ejemplo una variable en pesos y otra en metros no son directamente comparables, por eso es importante hacer la estandarización.
+
+379
+00:40:32,040 --> 00:40:45,040
+Estandarizar fija una escala común, no elimina atípicos ni correlaciones, nuevamente eso es muy importante porque a veces cuando uno va a trabajar con un sueldo o una variable que es muy distante,
+
+380
+00:40:45,040 --> 00:40:54,040
+si miramos métricas basadas en distancia, se espera que esos valores muy grandes van a dominar toda la métrica de distancia final, si?
+
+381
+00:40:54,040 --> 00:41:13,040
+O sea, si quiero calcular la distancia entre un individuo basado en su edad y su sueldo solamente en esos dos puntos y dejamos sin hacer ninguna estandarización, la edad no, vamos a ver la altura, la altura y su sueldo, ya?
+
+382
+00:41:13,040 --> 00:41:26,040
+Si queremos evaluar los individuos por similitud con base en su altura y su sueldo, por supuesto la altura va a estar 1.54, 1.66, 1.7, 1.8, pero la diferencia es muy pequeña,
+
+383
+00:41:26,040 --> 00:41:36,040
+en cuanto al sueldo uno va a ser 1 milion, otro va a ser 2 miliones, otro 3, otro 4, 5 y va subiendo, entonces la diferencia pasa a ser en millones, entonces cuando uno va a mirar las distancias,
+
+384
+00:41:36,040 --> 00:41:48,040
+si no están estandarizadas, el sueldo va a dominar como 99% de la información, la edad no va a tener casi ninguna contribución, es importante hacer la estandarización acá, ya?
+
+385
+00:41:48,040 --> 00:42:11,040
+Una otra forma va a ser por base, conocida como la distancia de Mahalanobis, ella toma como base una distancia más formal, va a intentar hacer un dibujo, ahora tomando en cuenta toda la estructura de nuestros X de una forma conjunta, ya?
+
+386
+00:42:11,040 --> 00:42:27,040
+De esta forma va a ser posible evaluar o dibujar posibles estructuras de elipsis acá, básicamente vamos calcular la distancia de Mahalanobis, donde ésta va a ser la matriz de variances y covariantes, ya?
+
+387
+00:42:27,040 --> 00:42:51,040
+Vamos ajustar la distancia por medio de las variances y correlaciones, vamos tomar como referencia valores que vienen de una discusión normal con P variables, vamos ver que acá tenemos 20 covariables, o sea el sueldo, la edad y varios otros de dimensión de tamaño P, vamos tener ahí una normal con esas 20 covariables ya?
+
+388
+00:42:51,040 --> 00:42:59,040
+Y vamos definir un corte de referencia cuando miramos ya, esto es lo que se esperaba tener una discusión normal y esto fue lo que fue observado, ya?
+
+389
+00:42:59,040 --> 00:43:14,040
+Como sabemos como debería ser la curva de la discusión normal, podemos hacer un dibujo acá informando ya, con 95% los puntos deberían estar en esta región, con 95% debería estar en una región un poco mayor, ya?
+
+390
+00:43:15,040 --> 00:43:20,040
+Y empezamos a mirar cuáles son los puntos de referencia y posibles elementos, ya?
+
+391
+00:43:20,040 --> 00:43:32,040
+Estos eran los puntos que fueron dibujados en nuestra base original, de estos puntos que fueron dibujados, tenemos que estos eran outliers, ya?
+
+392
+00:43:32,040 --> 00:43:36,040
+Ese punto, ese punto, ese, ese, ese, sí?
+
+393
+00:43:36,040 --> 00:43:40,040
+Pero profesor, ¿por qué ese punto está muy a la mitad acá?
+
+394
+00:43:40,040 --> 00:43:50,040
+Bueno, estoy haciendo una proyección de una dimensión muy alta para una dimensión más chica, entonces se va a perder un poco de información cuando miramos solamente X1 y X2, ya?
+
+395
+00:43:50,040 --> 00:44:00,040
+Si tenemos más covariables ahí, por supuesto, vamos a suponer que ustedes van a hacer un cambio y ese punto está muy alto, ya?
+
+396
+00:44:00,040 --> 00:44:11,040
+Entonces vamos a suponer que acá tenemos varios puntos y tiene un punto que está muy alto acá.
+
+397
+00:44:11,040 --> 00:44:16,040
+Si uno hace una proyección de ese punto para abajo, ese punto va a acabar se mudando con todos, ya?
+
+398
+00:44:16,040 --> 00:44:21,040
+Entonces, si tuviésemos una cosa en tres dimensiones, en una dimensión el punto está muy lejos y muy alto,
+
+399
+00:44:21,040 --> 00:44:29,040
+cuando bajamos a dos dimensiones es posible que ese punto acá se junte a nosotros, entonces se va a perder información, ¿sí?
+
+400
+00:44:29,040 --> 00:44:46,040
+Bueno, lo que vamos a tomar en consideración entonces va a ser, bueno, esto va a ser una aproximación comparando los estimados, no una garantía de 1% de falsos alertas, ya?
+
+401
+00:44:46,040 --> 00:44:55,040
+Acá estamos haciendo una suposición un poco fuerte de que los dados que estamos comparando elementos con distribuciones normales, hay críticas en ese punto,
+
+402
+00:44:55,040 --> 00:45:09,040
+por ejemplo, esta forma de dibujar acá, claramente se ve que se parece con una curva de una secución normal, bueno, una proyección de una secución normal, con dos parámetros correlacionados ahí, ¿sí?
+
+403
+00:45:09,040 --> 00:45:21,040
+Pero se espera que depende de la estructura podríamos tener en algunas situaciones donde tenemos curvas que van a inglobar a otros puntos, ya?
+
+404
+00:45:22,040 --> 00:45:34,040
+Un poco más flexes en consideración de que podría tener modelos que agreguen colas, entonces hacer una suposición normalidad no es muy razonable.
+
+405
+00:45:34,040 --> 00:45:43,040
+Bueno, vamos a tener el cálculo de la materia de variance y covariance de nuestra base, ellos están estandarizados, van a ser variances 1,
+
+406
+00:45:43,040 --> 00:45:52,040
+pero la correlación sí se muestra que los dados están altamente correlacionados, la variencia es 1, como está estandarizado, vamos a ver la correlación 1 acá,
+
+407
+00:45:52,040 --> 00:45:58,040
+pero la covariancia entre las dos posibles variables es extremamente alta, 0.9, ¿cierto?
+
+408
+00:45:58,040 --> 00:46:09,040
+Tenemos que, como vamos a calcular esta matriz, esta distancia de Mahalanobis, tenemos que sacar nuestra matriz de covariancia, en este caso exactamente la matriz de correlación,
+
+409
+00:46:09,040 --> 00:46:12,040
+y invertemos esta matriz, ¿bien?
+
+410
+00:46:12,040 --> 00:46:21,040
+Y después empezamos a mirar los puntos 1,1, por ejemplo, cuando calculamos la distancia ocrigena de 1,1,1,
+
+411
+00:46:21,040 --> 00:46:32,040
+se va a ver que estos elementos no están tan lejos, bueno, acá hacemos las cuentas de la distancia al cuadrado de los puntos,
+
+412
+00:46:32,040 --> 00:46:48,040
+y acá cuando tenemos un posible outlier, en este caso está considerando el posible outlier 1.18, está dividido por 0.19 que viene de esta distancia de Mahalanobis,
+
+413
+00:46:48,040 --> 00:47:03,040
+básicamente se calculó estos S, estos Z aquí, y este S, y cuando fuimos a calcular este D al cuadrado tuvimos estos valores 1.05 y me salió 20,
+
+414
+00:47:03,040 --> 00:47:12,040
+bueno, tenemos que mirar estos valores y evaluar si son posibles o no posibles valores outliers,
+
+415
+00:47:12,040 --> 00:47:18,040
+bueno, Mahalanobis nos va a devolver, nos va a retornar exactamente esta distancia al cuadrado, no el D,
+
+416
+00:47:18,040 --> 00:47:30,040
+la matriz de covariancia debe ser invertible, y extremos fuertes pueden distorsionarla, bueno, hay formas más robustas de estimar cuando tienen esta situación,
+
+417
+00:47:30,040 --> 00:47:46,040
+pero con la licencia de Mahalanobis vamos a estimar estos valores y conociendo esta distancia vamos a poder evaluar valores que están fuera de lo que debería ser comparado con un D al cuadrado de referencia,
+
+418
+00:47:46,040 --> 00:47:57,040
+porque estimamos, calculamos el D y después comparamos con lo que debería venir de un valor elegido de una exhibición normal,
+
+419
+00:47:58,040 --> 00:48:11,040
+entonces te calculo acá estos valores 1.05 y 20, entonces cuando fueron a calcular la distancia de Mahalanobis en estos puntos, este D al cuadrado me salió 1.05 y 20,
+
+420
+00:48:11,040 --> 00:48:17,040
+lo que hago con esto, no estoy entendiendo nada, hasta el momento acá no me llegó ninguna conclusión,
+
+421
+00:48:18,040 --> 00:48:27,040
+si, miramos exactamente con el valor de referencia, para una referencia aproximadamente normal, con P variables, un corte orientativo debería ser,
+
+422
+00:48:27,040 --> 00:48:36,040
+si este valor va a ser mayor que un valor de referencia de 9.21, si tenemos por ejemplo dos covariables,
+
+423
+00:48:36,040 --> 00:48:45,040
+si tenemos tres, tenemos que recalcular este valor de la equidad cuadrada con tres, si tenemos cuatro covariables, se va calculando con cuatro,
+
+424
+00:48:45,040 --> 00:48:56,040
+estos valores van cambiando conforme tenemos más covariables, y calculamos nuestro valor, si este valor fuera mayor que se espera en una exhibición normal,
+
+425
+00:48:56,040 --> 00:49:07,040
+podría ser definido como un posible outlier, entonces este valor acá sería un posible outlier, desde el 41, si se acabe la distancia de Mahalanobis con 95%,
+
+426
+00:49:07,040 --> 00:49:20,040
+clasificamos 1, 2, 3, 4, 1, 2, 3, 4 elementos correctamente y un elemento de forma incorrecta,
+
+427
+00:49:20,040 --> 00:49:31,040
+4, 5, con 95, cuando aumentamos para 99 clasificamos 1, 2, 3, 4, y vamos si clasificamos 1 de forma mal,
+
+428
+00:49:31,040 --> 00:49:40,040
+por supuesto conforme ponemos más confianza o está aumentando la confianza, estamos aumentando nuestro límite,
+
+429
+00:49:40,040 --> 00:49:49,040
+estamos aumentando las colas de la exhibición normal, los puntos que son más extremos ahí, pasan a ser valores muy grandes,
+
+430
+00:49:49,040 --> 00:50:00,040
+y básicamente estamos eliminando ellos con posibles valores, entonces si no vamos a poner 99.9 de confianza, es posible que va a dejar de considerar este y este punto,
+
+431
+00:50:00,040 --> 00:50:07,040
+hasta que en algún momento, si la confianza es muy grande, no vamos a llegar a clasificar ninguno de los individuos como outliers,
+
+432
+00:50:07,040 --> 00:50:15,040
+aproximadamente no podemos eliminar 95 o 99, tenemos otro método que puede ayudarnos,
+
+433
+00:50:15,040 --> 00:50:23,040
+bueno, la mejor forma, podemos ir para métodos que son un poco más conocidos en la idea de machine learning,
+
+434
+00:50:23,040 --> 00:50:36,040
+por ejemplo el método basado en KNN, para que se conozcan, tuvieron clases de KNN acá, solamente para que yo esté al tanto,
+
+435
+00:50:36,040 --> 00:50:49,040
+conocen KNN, chat, me escucho, o estoy pegado, el profesor comenta que sí, perfecto,
+
+436
+00:50:49,040 --> 00:51:00,040
+entonces se ve que la idea de KNN es extremamente sencilla pero muy poderosa, si tenemos puntos acá de una regresión, puede ser una regresión original,
+
+437
+00:51:00,040 --> 00:51:13,040
+lo que el método va a intentar hacer es, me gustaría hacer una previsión, por ejemplo, en un término acá,
+
+438
+00:51:13,040 --> 00:51:22,040
+lo que vamos a intentar hacer es evaluar la cantidad de posibles vecinos más cercanos, hacemos eso con validación cruzada,
+
+439
+00:51:22,040 --> 00:51:29,040
+encontramos el mejor K que nos va a dar mejores predicciones, pero empezamos a mirar los individuos que están cerca,
+
+440
+00:51:29,040 --> 00:51:38,040
+por ejemplo si sacamos un K igual a 3 por validación cruzada, empezamos a mirar las variables respuestas que vamos a tener tanto en ese punto,
+
+441
+00:51:38,040 --> 00:51:51,040
+tanto en ese, tanto en ese, sacamos un promedio de estos individuos acá y debemos tener una buena representación de este punto que no fue observado.
+
+442
+00:51:51,040 --> 00:51:53,040
+¿De acuerdo?
+
+443
+00:51:54,040 --> 00:52:02,040
+¿Por qué es una idea muy buena?
+
+444
+00:52:02,040 --> 00:52:11,040
+Primero, si tenemos vecinos que son muy similares esperamos que la respuesta también va a estar en torno a lo que se espera.
+
+445
+00:52:12,040 --> 00:52:18,040
+Para los que vivimos desde el punto de vista teórico, van a ver que los KNM tienen excelentes propiedades teóricas,
+
+446
+00:52:18,040 --> 00:52:26,040
+convergen para la verdadera función de regresión, va a tener, o sea, el método funciona bien, no va a ser, no va a tener ciego,
+
+447
+00:52:26,040 --> 00:52:34,040
+bueno, si tóricamente no va a tener ciego, tiene un montón de tajas minimax, limitas que uno puede definir,
+
+448
+00:52:34,040 --> 00:52:43,040
+en fin, tiene un método muy bueno para hacer regresión, tiene sus ventas y sus desventas, tiene que, costo computacional,
+
+449
+00:52:43,040 --> 00:52:47,040
+a veces no es tan preciso, pero un método muy establecido.
+
+450
+00:52:47,040 --> 00:52:57,040
+Y la idea pasa a ser exactamente intentar utilizar esa idea de los vecinos más cercanos para hacer una búsqueda de la cantidad de autívars.
+
+451
+00:52:58,040 --> 00:53:08,040
+Entonces podemos utilizar KNM para detectar puntos aislados, se va a calcular la distancia a los k vecinos más cercanos excluyendo el propio punto.
+
+452
+00:53:08,040 --> 00:53:15,040
+Aquí usamos como puntaje la distancia al vecino, entonces, bueno, después de calcular,
+
+453
+00:53:15,040 --> 00:53:22,040
+después de tener nuestra distancia calculada vamos a excluir eso, ya vamos con el propio punto,
+
+454
+00:53:22,040 --> 00:53:26,040
+y vamos a evaluar cuáles son los individuos que están más menos.
+
+455
+00:53:26,040 --> 00:53:33,040
+La idea es de alguna manera elegir una cantidad de vecinos, por ejemplo, vamos a elegir acá,
+
+456
+00:53:33,040 --> 00:53:39,040
+igual a 10, después uno puede cambiar eso por sensibilidad.
+
+457
+00:53:43,040 --> 00:53:45,040
+Y empezamos a evaluar.
+
+458
+00:53:52,040 --> 00:53:54,040
+Vamos a calcular la distancia.
+
+459
+00:53:59,040 --> 00:54:03,040
+Que ese punto, por ejemplo, tiene en relación a sus 10 vecinos.
+
+460
+00:54:05,040 --> 00:54:12,040
+Y bueno, ese punto que tiene en relación a sus 10 vecinos.
+
+461
+00:54:12,040 --> 00:54:15,040
+Uno va a ver que si tenemos un vecino que está muy lejos,
+
+462
+00:54:15,040 --> 00:54:17,040
+cuando vamos a calcular la distancia en relación a,
+
+463
+00:54:17,040 --> 00:54:22,040
+mismo que sean los 10 puntos, vamos a tener puntajes muy elevadas ahí.
+
+464
+00:54:22,040 --> 00:54:27,040
+Bueno, después voy a comentar exactamente cómo elegimos eso, pero vamos a calcular estas distancias.
+
+465
+00:54:28,040 --> 00:54:34,040
+Por ejemplo, para acá igual a 3, vamos a suponer que tengo ahí el punto A y el punto B,
+
+466
+00:54:34,040 --> 00:54:36,040
+la distancia es igual a 10,
+
+467
+00:54:36,040 --> 00:54:41,040
+por ejemplo, para acá igual a 3, vamos a suponer que tengo ahí el punto A y el punto B,
+
+468
+00:54:41,040 --> 00:54:47,040
+la distancia a los tres vecinos más cercanos, 0.2, 0.3 y 0.5.
+
+469
+00:54:48,040 --> 00:54:54,040
+Definimos, podemos definir acá, vamos a ver si está formada, sacamos el máximo,
+
+470
+00:54:56,040 --> 00:55:00,040
+sacamos el máximo, la distancia máxima entre esos puntos,
+
+471
+00:55:00,040 --> 00:55:05,040
+y se ve que por ejemplo, en relación al vecino más cercano,
+
+472
+00:55:05,040 --> 00:55:08,040
+ese punto tiene una distancia de 0.5.
+
+473
+00:55:09,040 --> 00:55:12,040
+Bueno, vamos a intentar hacer eso para todos los posibles puntos.
+
+474
+00:55:13,040 --> 00:55:14,040
+Cuando miramos,
+
+475
+00:55:16,040 --> 00:55:20,040
+este dividido con este, con este, con este, con este, con este, con este, con este,
+
+476
+00:55:22,040 --> 00:55:27,040
+bueno, este acá está calculando el máximo, pero uno podría calcular después la distancia media.
+
+477
+00:55:27,040 --> 00:55:29,040
+Acá podría ser una puntaje máxima,
+
+478
+00:55:30,040 --> 00:55:35,040
+una hora, pero sí, yo creo que más sazonable es sacar la puntaje media.
+
+479
+00:55:37,040 --> 00:55:40,040
+Después de calcular la distancia entre esos tres vecinos,
+
+480
+00:55:40,040 --> 00:55:44,040
+vamos a ver la distancia de 0.2, 0.3 y 0.5.
+
+481
+00:55:44,040 --> 00:55:48,040
+Podemos definir o el máximo o una otra media, como por ejemplo la media,
+
+482
+00:55:49,040 --> 00:55:53,040
+y evaluamos si en media o en máximo,
+
+483
+00:55:53,040 --> 00:55:58,040
+ese divido está muy distante en términos de nuestros vecinos.
+
+484
+00:56:00,040 --> 00:56:05,040
+Si la distancia fue muy grande, hay una gran indicación de que ese punto está muy lejos de sus vecinos
+
+485
+00:56:06,040 --> 00:56:09,040
+y debería ser considerado como un outlier.
+
+486
+00:56:10,040 --> 00:56:13,040
+Bueno, acá es el número de vecinos, no es un número de clusters.
+
+487
+00:56:14,040 --> 00:56:18,040
+Tenemos que elegir ese K con una sabedoria, voy a comentar cómo lo hacemos.
+
+488
+00:56:18,040 --> 00:56:21,040
+Inicialmente podemos poner el odd como 10,
+
+489
+00:56:23,040 --> 00:56:25,040
+pero al final, cómo va a funcionar la cosa?
+
+490
+00:56:26,040 --> 00:56:34,040
+Vamos a calcular, aunque yo hable exactamente de calcular eso desde el punto de vista de sacar la media,
+
+491
+00:56:35,040 --> 00:56:39,040
+lo que al final él acaba haciendo es algo un poco distinto.
+
+492
+00:56:39,040 --> 00:56:43,040
+El gráfico de la distancia en relación a una cantidad de vecinos
+
+493
+00:56:44,040 --> 00:56:49,040
+será un ordenamiento de lo cuánto estos individuos están o más distantes de sus vecinos,
+
+494
+00:56:50,040 --> 00:56:56,040
+puede ser la distancia máxima acá, o después podemos hacer con la media, generalmente es suma y máxima.
+
+495
+00:56:58,040 --> 00:57:01,040
+Y cuando hacemos el ordenamiento de estas distancias,
+
+496
+00:57:02,040 --> 00:57:05,040
+por ejemplo, no es porque el vecino uno está más distante,
+
+497
+00:57:05,040 --> 00:57:10,040
+esto fue alguno de los individuos y cuando fuimos a calcular la distancia entre ellos y sus vecinos,
+
+498
+00:57:11,040 --> 00:57:13,040
+él tenía un valor de distancia muy pequeño,
+
+499
+00:57:14,040 --> 00:57:16,040
+fue derecho la distancia a cero.
+
+500
+00:57:17,040 --> 00:57:19,040
+Para algunos vecinos el punto va a empezar a aumentar.
+
+501
+00:57:20,040 --> 00:57:26,040
+Bueno, acá no podemos, la ecuación del escótero debería haber ponido acá,
+
+502
+00:57:26,040 --> 00:57:38,040
+pero se puede obtener un límite que va a ser una distancia en relación a la cantidad de vecinos que estamos lejos.
+
+503
+00:57:39,040 --> 00:57:44,040
+Cuando uno va a hacer esa cuenta sale en ese gráfico la distancia máxima,
+
+504
+00:57:45,040 --> 00:57:47,040
+y cuando uno va a hacer esa cuenta,
+
+505
+00:57:48,040 --> 00:57:53,040
+el punto de vista de la distancia en relación a la cantidad de vecinos que estamos lejos,
+
+506
+00:57:53,040 --> 00:57:57,040
+esa cuenta sale en ese gráfico la distancia uno.
+
+507
+00:57:58,040 --> 00:58:03,040
+Y ahí definimos los individuos que estuvieron arriba de esa distancia uno como posibles outliers.
+
+508
+00:58:04,040 --> 00:58:10,040
+Funciona de forma real, bueno, después voy a actualizar la lâmina o voy a enviar por el personal de esta manera separado,
+
+509
+00:58:11,040 --> 00:58:14,040
+cómo salen las cuentas. Interesante es que no se quiere solamente la información,
+
+510
+00:58:15,040 --> 00:58:19,040
+porque esa distancia ya sale al tiro acá por esta función KNN distance.
+
+511
+00:58:19,040 --> 00:58:23,040
+Entonces sería interesante saber cómo definimos este umbral acá.
+
+512
+00:58:24,040 --> 00:58:27,040
+Nos va a salir una puntaje, vamos definiendo umbral,
+
+513
+00:58:28,040 --> 00:58:32,040
+este umbral ya sale exactamente de la función quanti, de este puntaje que calculamos acá,
+
+514
+00:58:33,040 --> 00:58:41,040
+pero este umbral para este ejemplo acá fue cerca de 0.98, una cosa así.
+
+515
+00:58:41,040 --> 00:58:46,040
+Ya, entonces me recuerdo, va a tener la distancia entre los vecinos,
+
+516
+00:58:47,040 --> 00:58:51,040
+vamos a suponer que sacamos el promedio máximo entre esos vecinos,
+
+517
+00:58:52,040 --> 00:58:55,040
+y vamos a tener una distancia en promedio en torno de cuatro.
+
+518
+00:58:56,040 --> 00:58:58,040
+Entonces vamos a suponer acá.
+
+519
+00:58:59,040 --> 00:59:02,040
+Acá, me voy a volver, aquí no se quiere mucho confuso.
+
+520
+00:59:04,040 --> 00:59:10,040
+Bueno, tenemos tres vecinos, me sale la distancia, 0.2, 0.3 y 0.5.
+
+521
+00:59:11,040 --> 00:59:15,040
+Ya, inicialmente, esta regla que ellos definieron inicialmente es sacar el valor
+
+522
+00:59:16,040 --> 00:59:19,040
+con la distancia máxima entre sus vecinos, los vecinos que están más distantes.
+
+523
+00:59:20,040 --> 00:59:26,040
+Los vecinos que están más distantes fueron de 0.5, ya sé que ese vecino tiene un valor de 0.5.
+
+524
+00:59:27,040 --> 00:59:32,040
+Cuando fui a mirar a otro vecino, yo vi que ese vecino específico tenía una distancia de 2,
+
+525
+00:59:33,040 --> 00:59:35,040
+de 2.3, 2.8 de otro individuo.
+
+526
+00:59:36,040 --> 00:59:39,040
+Saco el valor que ocorre con la distancia máxima.
+
+527
+00:59:39,040 --> 00:59:45,040
+Esta es una medida racional porque cuando miramos, ahora cuando pienso bien en termos de lo gráfico,
+
+528
+00:59:46,040 --> 00:59:48,040
+si tenés este individuo y tenía otros puntos acá,
+
+529
+00:59:49,040 --> 00:59:56,040
+este individuo está muy lejos, cuando voy a calcular la distancia entre ellos, me salió 2, 2.3 y 2.8.
+
+530
+00:59:57,040 --> 01:00:00,040
+Y eso aquí informo exactamente, la distancia era igual a esa.
+
+531
+01:00:01,040 --> 01:00:08,040
+Si tengo un vecino que está muy cerca de los otros, acá, esta distancia tendría a ser muy pequeña, 0.5.
+
+532
+01:00:09,040 --> 01:00:13,040
+Es decir, no es posiblemente un outlier, entonces ese es el valor de 0.5.
+
+533
+01:00:14,040 --> 01:00:18,040
+Cuando fuimos a empezar a calcular estas distancias para un montón de gente, me va a salir valores.
+
+534
+01:00:19,040 --> 01:00:30,040
+Con la distancia 0, 0.1, 0.2, 0.3, 0.3, se recuerda que estoy ordenando, ya?
+
+535
+01:00:31,040 --> 01:00:35,040
+Esta distancia 0 fue el individuo con ID 40.
+
+536
+01:00:35,040 --> 01:00:41,040
+El individuo 40 estaba con una distancia básicamente 0 de sus vecinos.
+
+537
+01:00:42,040 --> 01:00:44,040
+El individuo 50 tenía una distancia de 0.01.
+
+538
+01:00:45,040 --> 01:00:48,040
+El individuo 62 tenía una distancia de 0.2.
+
+539
+01:00:50,040 --> 01:00:56,040
+Y después de hacer todo este ordenamiento, voy a sacar exactamente acá,
+
+540
+01:00:56,040 --> 01:01:06,040
+acá, 0.95.
+
+541
+01:01:07,040 --> 01:01:15,040
+Es decir, voy a sacar exactamente el punto que está más lejos acá, en torno de 0.95.
+
+542
+01:01:16,040 --> 01:01:18,040
+Este valor va a ser valor extremamente alto.
+
+543
+01:01:19,040 --> 01:01:24,040
+Después de 0 de 95 acá, vamos a empezar teniendo valores como 1,
+
+544
+01:01:26,040 --> 01:01:28,040
+1.0, 2.1, por ahí adelante.
+
+545
+01:01:29,040 --> 01:01:35,040
+Entonces ya sé que el umbral va a ser la cantidad que me va a informar 5% de los individuos.
+
+546
+01:01:37,040 --> 01:01:42,040
+Y ahí este umbral que salió para aquel ejemplo específico era Kc1.
+
+547
+01:01:43,040 --> 01:01:46,040
+El valor K que salió de este umbral.
+
+548
+01:01:47,040 --> 01:01:51,040
+Se recuerda que este umbral viene de la función quantil, que salió de la puntaje que calculó las distancias.
+
+549
+01:01:52,040 --> 01:01:58,040
+Entonces este umbral salió como 0.91.
+
+550
+01:01:59,040 --> 01:02:05,040
+Entonces todos los individuos que están arriba de 0.98 son posibles individuos que están muy lejos.
+
+551
+01:02:06,040 --> 01:02:11,040
+O sea, tienen una distancia de esos 10 vecinos de al menos 4.
+
+552
+01:02:13,040 --> 01:02:17,040
+Un punto tiene al menos 4, un individuo va a ser 3, otro 2.
+
+553
+01:02:17,040 --> 01:02:21,040
+Estos individuos están muy lejos, son posiblemente outliers.
+
+554
+01:02:22,040 --> 01:02:28,040
+De hecho, sintiendo hacer un plot bidimensional de estos individuos acá, vamos a ver que tenemos estos puntos específicos.
+
+555
+01:02:29,040 --> 01:02:32,040
+Estos puntos fueron los que fueron elegidos por KNN.
+
+556
+01:02:33,040 --> 01:02:38,040
+Entonces se ve que la gran mayoría está lejos de su centro.
+
+557
+01:02:40,040 --> 01:02:44,040
+Si tu hubieses utilizado el KNN para hacer selección de outliers,
+
+558
+01:02:44,040 --> 01:02:47,040
+estos puntos con KNN seríamos dedicados.
+
+559
+01:02:48,040 --> 01:02:53,040
+¿Por qué? Porque la distancia entre él y sus vecinos es muy grande.
+
+560
+01:02:54,040 --> 01:03:00,040
+La distancia de éste entre sus vecinos no es tan grande, pero fue lo suficiente para ser arriba de 1.
+
+561
+01:03:01,040 --> 01:03:10,040
+O de los 95%, estos son los 5% de los individuos más lejos internos del grupo general.
+
+562
+01:03:10,040 --> 01:03:17,040
+Entonces se ve que los individuos que están más cerca, este cuando no va a calcular la distancia, va a ser una distancia pequeña.
+
+563
+01:03:18,040 --> 01:03:20,040
+Esta tiene ésta acá, una distancia pequeña.
+
+564
+01:03:21,040 --> 01:03:25,040
+Pero éste sí, todos los puntos son extremamente distantes.
+
+565
+01:03:40,040 --> 01:03:43,040
+Bueno, si los vecinos están demasiado separados,
+
+566
+01:03:44,040 --> 01:03:48,040
+una cosa que puede ocurrir es que todos los puntos están demasiado separados.
+
+567
+01:03:49,040 --> 01:03:56,040
+Por supuesto, cuando fuémos a calcular la distancia, ellos van a tener una distancia razonavelmente mayor,
+
+568
+01:03:57,040 --> 01:03:59,040
+pero un sino va a ser una distancia tan grande.
+
+569
+01:04:00,040 --> 01:04:03,040
+La única cosa que va a estar cambiando acá va a ser la escala de esta distancia.
+
+570
+01:04:03,040 --> 01:04:07,040
+Osea, si son casas que están más lejos, entonces está aumentando promedios,
+
+571
+01:04:08,040 --> 01:04:11,040
+sendo 150 metros de distancia entre ellos.
+
+572
+01:04:12,040 --> 01:04:17,040
+De forma general, ellos van a estar cerca pero en términos de 100 metros.
+
+573
+01:04:18,040 --> 01:04:21,040
+Pero si va a tener alguna persona que vive en el campo,
+
+574
+01:04:22,040 --> 01:04:24,040
+tiene una casa que está muy lejos, 1.5 km.
+
+575
+01:04:25,040 --> 01:04:27,040
+Y ahí el método va a ayudar a identificar a esa persona.
+
+576
+01:04:27,040 --> 01:04:29,040
+No es porque estos puntos están extremamente conjuntos,
+
+577
+01:04:30,040 --> 01:04:33,040
+que si abrimos un poco más, el método va a fallar.
+
+578
+01:04:34,040 --> 01:04:38,040
+No, él va a sacar exactamente los 5% de los individuos que están más distantes.
+
+579
+01:04:39,040 --> 01:04:41,040
+No se va a pujar lo que está más distante.
+
+580
+01:04:42,040 --> 01:04:47,040
+Entonces funciona de esta forma, va a mirar todos los vecinos y evaluar si los son más distantes.
+
+581
+01:04:48,040 --> 01:04:50,040
+Si estos puntos estuvieran más distantes,
+
+582
+01:04:51,040 --> 01:04:53,040
+entonces el método va a caer en el campo.
+
+583
+01:04:53,040 --> 01:04:55,040
+Si estos puntos estuvieran más lejos,
+
+584
+01:04:56,040 --> 01:04:58,040
+estos acá también estarían más lejos.
+
+585
+01:04:59,040 --> 01:05:02,040
+De todas maneras, la distancia entre estos puntos
+
+586
+01:05:03,040 --> 01:05:06,040
+seguiría siendo grande y continuaríamos identificando
+
+587
+01:05:07,040 --> 01:05:09,040
+a ellos como posibles vecinos cercanos.
+
+588
+01:05:10,040 --> 01:05:15,040
+Bueno, paramos, ya estamos a 1h10, paramos ahora para un café,
+
+589
+01:05:16,040 --> 01:05:18,040
+volvemos a las 8h00 y cerramos a las 9h00.
+
+590
+01:05:19,040 --> 01:05:21,040
+La clase acaba hasta las 9h00.
+
+591
+01:05:23,040 --> 01:05:25,040
+¿Se atoma esa?
+
+592
+01:05:26,040 --> 01:05:27,040
+¿Sí?
+
+593
+01:05:28,040 --> 01:05:29,040
+Perfecto.
+
+594
+01:05:34,040 --> 01:05:35,040
+Ya.
+
+595
+01:05:38,040 --> 01:05:40,040
+¿Paramos la grabación?
+
+596
+01:05:41,040 --> 01:05:43,040
+Literalmente ya la dos en la grabación.
+
+597
+01:05:44,040 --> 01:05:45,040
+Perfecto.
+
+598
+01:05:45,040 --> 01:05:49,040
+Volvemos a las 8h00, la clase va hasta las 9h00.
+
+599
+01:05:50,040 --> 01:05:51,040
+Ya, perfecto.
+
+600
+01:05:51,040 --> 01:05:53,040
+Ya, perfecto.
+
+601
+01:05:53,040 --> 01:26:21,040
+[Pausa: recreo entre 1:05:53 y 1:26:21 del video. No hay audio de la clase en este tramo.]
+
+602
+01:26:21,040 --> 01:26:28,040
+Hola a todos, estamos de vuelta.
+
+603
+01:26:28,040 --> 01:26:29,040
+¿Me escuchan?
+
+604
+01:26:29,040 --> 01:26:30,040
+Sí, sí se le escuchan.
+
+605
+01:26:30,040 --> 01:26:31,040
+Gracias, Maurice.
+
+606
+01:26:31,040 --> 01:26:32,040
+Bueno, seguimos entonces.
+
+607
+01:26:32,040 --> 01:26:41,040
+Un de los alumnos que fue Jesús Alexander, había hecho una excelente pregunta.
+
+608
+01:26:41,040 --> 01:26:46,040
+¿Qué se pasa si las casas están cerradas?
+
+609
+01:26:47,040 --> 01:26:54,040
+¿Qué se pasa si las casas están demasiado separadas o el barrio es gigante?
+
+610
+01:26:54,040 --> 01:26:56,040
+Bueno, llegamos a este punto.
+
+611
+01:26:56,040 --> 01:26:59,040
+No quería hablar sobre exactamente esta situación.
+
+612
+01:26:59,040 --> 01:27:01,040
+Una vez nos acercamos.
+
+613
+01:27:01,040 --> 01:27:08,040
+No debería ser tan influente, pero la idea es que este método funcione exactamente para
+
+614
+01:27:08,040 --> 01:27:09,040
+situaciones como esta.
+
+615
+01:27:09,040 --> 01:27:12,040
+Se llama Local Outlier Factor.
+
+616
+01:27:12,040 --> 01:27:14,040
+Densidad local.
+
+617
+01:27:14,040 --> 01:27:19,040
+El loft comparado a densidad alrededor de un punto con la de sus vecinos.
+
+618
+01:27:19,040 --> 01:27:26,040
+Entonces básicamente acá va a tener exactamente la respuesta que Alexander había nos hecho.
+
+619
+01:27:26,040 --> 01:27:30,040
+¿Qué pasa si tenemos algunos locales que tienen vecindades mayores?
+
+620
+01:27:30,040 --> 01:27:36,040
+Vamos a tener en cuenta exactamente cuál es el promedio de las distancias de las vecindades
+
+621
+01:27:36,040 --> 01:27:42,040
+pero mirando en densidad, de la densidad alrededor, con la densidad que yo tengo.
+
+622
+01:27:43,040 --> 01:27:49,040
+Bueno, si es más separado y ellos tienen una densidad similar a la mía, los locales pueden
+
+623
+01:27:49,040 --> 01:27:51,040
+ser más separados, pero no hay problema.
+
+624
+01:27:51,040 --> 01:27:54,040
+Vamos a ser equivalentes en esta comparación.
+
+625
+01:27:54,040 --> 01:27:58,040
+Entonces este método mira más, tiene exactamente esta mirada.
+
+626
+01:27:58,040 --> 01:28:03,040
+Entonces el loft compara la densidad alrededor de un punto con la de sus vecinos.
+
+627
+01:28:04,040 --> 01:28:10,040
+El va a calcular el reach que va a ser el máximo de la distancia entre los puntos y rota
+
+628
+01:28:10,040 --> 01:28:14,040
+y la k distancia entre rota.
+
+629
+01:28:14,040 --> 01:28:23,040
+Después, él va a calcular una otra medida que se llama LRDK que va a ser uno sobre el promedio de este reach.
+
+630
+01:28:23,040 --> 01:28:25,040
+Y llegamos al loft que va a ser el promedio.
+
+631
+01:28:25,040 --> 01:28:27,040
+Bueno, acá tiene varias métricas.
+
+632
+01:28:27,040 --> 01:28:29,040
+Una métrica importante es como ser loft.
+
+633
+01:28:29,040 --> 01:28:35,040
+Voy a mostrar después como sale la cuenta para quien tiene básicamente el promedio de LRDK de sus vecinos
+
+634
+01:28:35,040 --> 01:28:39,040
+dividido por exactamente la densidad de este individuo.
+
+635
+01:28:39,040 --> 01:28:49,040
+Entonces quiero saber cuál es LRDK o básicamente esta densidad promedia.
+
+636
+01:28:49,040 --> 01:28:51,040
+Acá en vez de estos vecinos.
+
+637
+01:28:51,040 --> 01:28:57,040
+Quiero saber cómo está el promedio de mis vecinos con lo que yo tengo de densidad.
+
+638
+01:28:57,040 --> 01:29:03,040
+Bueno, cuando comparo el promedio de LRDK de mis vecinos con lo mío,
+
+639
+01:29:03,040 --> 01:29:07,040
+somos muy similares y este valor debería ser cercano a uno.
+
+640
+01:29:07,040 --> 01:29:12,040
+Si los valores son mucho mayores, tenemos un problema muy grande
+
+641
+01:29:12,040 --> 01:29:18,040
+y posiblemente este individuo tiene una alta y ansia de ser un outlier.
+
+642
+01:29:20,040 --> 01:29:23,040
+Entonces miramos exactamente pensando en este punto uno.
+
+643
+01:29:24,040 --> 01:29:33,040
+Por ejemplo, para un punto A, las distancias de accesibilidad a tres vecinos son exactamente 0.4, 0.5 y 0.6.
+
+644
+01:29:33,040 --> 01:29:38,040
+El promedio de estos tres vecinos va a ser de 0.5.
+
+645
+01:29:38,040 --> 01:29:47,040
+Cuando voy a intentar calcular esta densidad que yo tengo en relación a los vecinos va a ser 1 dividido por este promedio acá.
+
+646
+01:29:47,040 --> 01:29:49,040
+Entonces fue 2.
+
+647
+01:29:49,040 --> 01:29:55,040
+Para cada uno de los vecinos que tiene sus propias distancias en relación a los otros,
+
+648
+01:29:55,040 --> 01:30:01,040
+voy a tener un vecino con un valor igual a 6, otro con un valor igual a 5,
+
+649
+01:30:01,040 --> 01:30:03,040
+y otro con un valor igual a 7.
+
+650
+01:30:03,040 --> 01:30:08,040
+Como son tres vecinos que están cerca, voy a calcular la densidad comparada con estos vecinos.
+
+651
+01:30:08,040 --> 01:30:14,040
+Cuando saco un promedio de estas densidades, tengo el valor 6.
+
+652
+01:30:15,040 --> 01:30:22,040
+Ahora tengo que calcular la densidad que tengo en relación a los vecinos con la densidad que salió para mí.
+
+653
+01:30:24,040 --> 01:30:28,040
+Entonces tengo que mirar exactamente este partido 2.
+
+654
+01:30:28,040 --> 01:30:32,040
+6 dividido por 2, me sale un valor igual a 3.
+
+655
+01:30:32,040 --> 01:30:34,040
+Es un valor alto.
+
+656
+01:30:34,040 --> 01:30:40,040
+Entonces, quiere decir, mis vecinos están cerca de 6, 5, 7.
+
+657
+01:30:40,040 --> 01:30:43,040
+¿Cierto? Yo más 2.
+
+658
+01:30:43,040 --> 01:30:47,040
+Ves que estoy muy lejos de mis vecinos.
+
+659
+01:30:47,040 --> 01:30:52,040
+Si encuentro mis vecinos en promedio 6, yo estoy con un valor de 2.
+
+660
+01:30:52,040 --> 01:30:56,040
+Entonces tengo ahí una diferencia de 3.
+
+661
+01:30:56,040 --> 01:31:00,040
+Esto no es una probabilidad, nada de tipo, es una métrica.
+
+662
+01:31:00,040 --> 01:31:02,040
+¿Cuál sería el valor de referencia?
+
+663
+01:31:02,040 --> 01:31:06,040
+Si yo fuese más cercano a mis vecinos, cuando fuese calcular este valor acá,
+
+664
+01:31:06,040 --> 01:31:13,040
+y fuese saliendo este valor, y saliera acá alguna cosa con 5 o 6, más o menos ahí, 5 y medio por ahí.
+
+665
+01:31:13,040 --> 01:31:16,040
+Y ahí sí, ese valor estaría cercano a uno.
+
+666
+01:31:16,040 --> 01:31:24,040
+Si tengo un valor 5, 5 y medio o 6, o va a ser exactamente 1, o va a ser algún valor ahí 1.2, 1.3, por ahí.
+
+667
+01:31:24,040 --> 01:31:28,040
+Entonces, A tiene menor densidad que su entorno.
+
+668
+01:31:28,040 --> 01:31:31,040
+El valor 3 no es una probabilidad.
+
+669
+01:31:32,040 --> 01:31:37,040
+Entonces la idea es cómo va a funcionar este valor.
+
+670
+01:31:37,040 --> 01:31:40,040
+Entonces podemos mirar y elegir algunos puntos.
+
+671
+01:31:40,040 --> 01:31:46,040
+Después de hablar de DBSCAMP, yo quería que él des una mirada en el ejemplo que estábamos presentando anteriormente.
+
+672
+01:31:46,040 --> 01:31:54,040
+Yo quiero que damos una mirada en cómo estaban los puntos, los individuos que eran posiblemente altilares, que están muy lejos acá.
+
+673
+01:31:54,040 --> 01:32:04,040
+Y cuando vamos a calcular este LOF que acabé de enseñar, Local Outlier Factor,
+
+674
+01:32:04,040 --> 01:32:12,040
+cuando voy a calcular el LOF, o Local Outlier Factor, voy a mirar el valor 1, son individuos que están muy cercanos a mí.
+
+675
+01:32:12,040 --> 01:32:21,040
+Voy a definir un punto de corte, acá ellos utilizan como suherencia 1.5, si el valor es mayor que 1.5,
+
+676
+01:32:21,040 --> 01:32:25,040
+defino a estos individuos como posiblemente altilares.
+
+677
+01:32:25,040 --> 01:32:29,040
+Entonces cuando voy a calcular la densidad que yo tengo como la de 10.000 vecinos,
+
+678
+01:32:29,040 --> 01:32:39,040
+este valor toma en cuenta exactamente estas distancias, ya que fue exactamente lo que nuestro alumno hizo una muy buena pregunta, Alexander,
+
+679
+01:32:39,040 --> 01:32:41,040
+exactamente para esta solución.
+
+680
+01:32:41,040 --> 01:32:48,040
+Entonces en este caso debemos ir con LOF que va a ser muy bien representativo.
+
+681
+01:32:48,040 --> 01:32:53,040
+Yo entiendo que el representante KNE, LOF, va teniendo un montón de métodos acá,
+
+682
+01:32:53,040 --> 01:33:00,040
+al final ustedes van a salir con varios métodos y por ello confundir cuál de ellos es mejor seguido.
+
+683
+01:33:00,040 --> 01:33:06,040
+Vamos a ver una tabla al final que varios de los métodos tienen un nivel de concordancia entre ellos.
+
+684
+01:33:08,040 --> 01:33:12,040
+Entonces es uno de los métodos que se puede utilizar.
+
+685
+01:33:12,040 --> 01:33:16,040
+Como implementamos, tiene una función que se llama LOF que va a calcular,
+
+686
+01:33:16,040 --> 01:33:20,040
+va a depender exactamente de la cantidad de vecinos que queremos elegir.
+
+687
+01:33:20,040 --> 01:33:27,040
+Definí un brand de 1.5 acá y después para hacer un alert exactamente si el valor o esa puntaje fue menor que 1.5.
+
+688
+01:33:27,040 --> 01:33:31,040
+En Python, la misma tiene sus versiones acá.
+
+689
+01:33:34,040 --> 01:33:37,040
+Ahora vamos para una otra mirada.
+
+690
+01:33:37,040 --> 01:33:44,040
+Este método de Bayescan no fue representado como método de clasificación.
+
+691
+01:33:44,040 --> 01:33:52,040
+Bueno, voy a dejar con su vencencia Ricardo que preparo una clase exactamente hablando sobre Bayescan.
+
+692
+01:33:52,040 --> 01:33:57,040
+Me gusta bastante, siempre enseño a los alumnos del curso de...
+
+693
+01:33:57,040 --> 01:34:00,040
+Yo creo que Mauricio no se entiende de clases de Bayescan.
+
+694
+01:34:00,040 --> 01:34:04,040
+Tuvimos plazas con este método, ¿o no?
+
+695
+01:34:05,040 --> 01:34:09,040
+Yo estoy muy seguro, no está dentro de los principales al menos.
+
+696
+01:34:09,040 --> 01:34:11,040
+Puede que lo hayamos comentado más por encima.
+
+697
+01:34:11,040 --> 01:34:18,040
+Yo sé que bueno, yo realmente lo presento al menos para el majista, entonces siempre lo tengo.
+
+698
+01:34:18,040 --> 01:34:24,040
+Tengo las láminas preparadas y me gusta el método porque él tiene una mirada muy buena.
+
+699
+01:34:24,040 --> 01:34:30,040
+Yo sé que acá en este curso no lo representamos, entonces eso es triste.
+
+700
+01:34:30,040 --> 01:34:34,040
+Es triste, ¿por qué? Porque el Bayescan es otra forma de hacer clasificación.
+
+701
+01:34:34,040 --> 01:34:39,040
+En cuanto camins, va a tener un centroide y va a buscar los individuos cerca de su centroide.
+
+702
+01:34:39,040 --> 01:34:45,040
+El Bayescan mira más en torno de la densidad que tenemos, ¿cierto?
+
+703
+01:34:45,040 --> 01:34:48,040
+Mira que acá yo tengo una alta densidad de puntos.
+
+704
+01:34:48,040 --> 01:34:53,040
+Entonces él intenta buscar una alta densidad y forma.
+
+705
+01:34:53,040 --> 01:34:56,040
+Y ah, este acá posiblemente es un cluster, ¿sí?
+
+706
+01:34:56,040 --> 01:35:02,040
+Y después va a identificar a estos individuos como lejos del cluster y posiblemente podría ser outliers.
+
+707
+01:35:03,040 --> 01:35:09,040
+Pero básicamente lo que el Bayescan es, él va, tenemos que definir.
+
+708
+01:35:10,040 --> 01:35:14,040
+Posiblemente, ¿cuáles van a ser nuestros, nuestros?
+
+709
+01:35:14,040 --> 01:35:17,040
+Acá no definimos el número de grupos, ¿sí?
+
+710
+01:35:17,040 --> 01:35:21,040
+El Bayescan va a tener una otra mirada en este caso.
+
+711
+01:35:21,040 --> 01:35:26,040
+El Bayescan va a tener dos parámetros que son muy importantes.
+
+712
+01:35:26,040 --> 01:35:34,040
+Uno que va a ser el radio que va a considerar y el mínimo de puntos que va a considerar dentro de una legión.
+
+713
+01:35:34,040 --> 01:35:40,040
+Entonces, lo que el Bayescan va a intentar hacer, va a ser muy bueno acá para ustedes.
+
+714
+01:35:40,040 --> 01:35:44,040
+Acá tenemos ya, entonces, muy fácil de clavar.
+
+715
+01:35:44,040 --> 01:35:49,040
+Vamos a suponer que acá él va a intentar definir un centroide, ¿cierto?
+
+716
+01:35:49,040 --> 01:35:52,040
+O un punto que debería ser posiblemente un centroide.
+
+717
+01:35:52,040 --> 01:35:57,040
+Y va a evaluar si dentro de ese punto tengo al menos seis observaciones.
+
+718
+01:35:57,040 --> 01:36:01,040
+Entonces, es posible que él sea el centro del centroide.
+
+719
+01:36:01,040 --> 01:36:09,040
+Una otra situación que podría ocurrir es que este valor acá no va a tener seis puntos cuando miramos conjuntamente.
+
+720
+01:36:09,040 --> 01:36:13,040
+Este va a tener no sé, uno, dos, ese debería tener seis.
+
+721
+01:36:13,040 --> 01:36:17,040
+Pero vamos a ver, por ejemplo, este acá si miramos,
+
+722
+01:36:20,040 --> 01:36:21,040
+puede ser este acá.
+
+723
+01:36:21,040 --> 01:36:27,040
+Este acá vamos a mirar y al final cuando vamos a entrar a hacer la región que él va a considerar,
+
+724
+01:36:28,040 --> 01:36:32,040
+él tiene un punto de centroide y intento mirar algunos individuos.
+
+725
+01:36:32,040 --> 01:36:42,040
+Llegó solamente en dos posibles puntos de similitud que está dentro de una posible legión que puede componer un clúster.
+
+726
+01:36:42,040 --> 01:36:47,040
+Pero mira que estos puntos acá están lejos y no parecen ser centroides.
+
+727
+01:36:47,040 --> 01:36:53,040
+Entonces, lo que él va a intentar hacer es, voy a definir algunos puntos como posibles centroides acá.
+
+728
+01:36:53,040 --> 01:37:03,040
+Estos van a ser nuestros puntos, nuestros centros que nos van a dar esa alta densidad, que tienen al menos seis individuos más cercanos.
+
+729
+01:37:03,040 --> 01:37:07,040
+Va a tener algunos puntos que no, cuando miramos de forma generaria,
+
+730
+01:37:08,040 --> 01:37:23,040
+él no va a tener los seis individuos, pero aunque no tenga los seis individuos, tiene ese posible centroide o ese posible punto de alta densidad como un punto en común que está dentro de la región.
+
+731
+01:37:24,040 --> 01:37:33,040
+Entonces lo que él va a intentar hacer es que va a tener puntos de alta densidad, aunque va a tener puntos en la borda, en una región aca limita,
+
+732
+01:37:33,040 --> 01:37:38,040
+porque realmente estos individuos no van a ser considerados fuera de este clúster.
+
+733
+01:37:38,040 --> 01:37:45,040
+Porque aunque este punto no es precisamente un centroide, un punto de alta densidad,
+
+734
+01:37:45,040 --> 01:37:51,040
+está siendo ligado con este punto que es un punto de alta densidad.
+
+735
+01:37:52,040 --> 01:37:55,040
+Bueno, ustedes van a ver que acá vamos a tener varios puntos.
+
+736
+01:37:55,040 --> 01:38:02,040
+Casi todos estos puntos que tenemos acá son puntos de alta densidad, porque ellos están siendo linkados con seis puntos o más.
+
+737
+01:38:02,040 --> 01:38:09,040
+Lo que sería un punto de alta densidad, un punto que tiene al menos seis vecinos cercanos.
+
+738
+01:38:10,040 --> 01:38:14,040
+Si definimos una región acá como una región, como un círculo,
+
+739
+01:38:15,040 --> 01:38:19,040
+ese es un punto de alta densidad, si conocemos el dibujo del círculo, él tiene seis individuos.
+
+740
+01:38:19,040 --> 01:38:22,040
+Vamos a ver que hacer un círculo para todos.
+
+741
+01:38:22,040 --> 01:38:37,040
+Este punto es un punto de alta densidad, no, pero mira, este punto está linkado con un punto de alta densidad.
+
+742
+01:38:38,040 --> 01:38:43,040
+Este es un punto de alta densidad, probablemente no, porque cuando vamos a hacer el dibujo acá,
+
+743
+01:38:43,040 --> 01:38:46,040
+él no acaba linkando todos.
+
+744
+01:38:46,040 --> 01:38:58,040
+No sé si ustedes pueden verlo, pero este individuo que tiene una relación con este individuo,
+
+745
+01:38:58,040 --> 01:39:05,040
+este sí, cuando vamos a hacer el dibujo, si sacamos el centro,
+
+746
+01:39:05,040 --> 01:39:12,040
+este tiene al menos seis individuos.
+
+747
+01:39:12,040 --> 01:39:19,040
+Entonces, decir así, esta persona o este individuo no tiene seis vecinos cercanos,
+
+748
+01:39:19,040 --> 01:39:22,040
+hacemos un dibujo de una región.
+
+749
+01:39:22,040 --> 01:39:26,040
+Este valor acaba de ser lo mismo para todos, este valor.
+
+750
+01:39:26,040 --> 01:39:30,040
+¿Dónde va a venir este valor? Va a venir exactamente
+
+751
+01:39:30,040 --> 01:39:35,040
+de esta cantidad acá.
+
+752
+01:39:35,040 --> 01:39:38,040
+¿Dónde está?
+
+753
+01:39:41,040 --> 01:39:48,040
+¿De B-scala? ¿Va a venir exactamente de este épsilon que tenemos que definir?
+
+754
+01:39:48,040 --> 01:39:55,040
+Y la cantidad mínima de puntos. Este épsilon va a definir exactamente la región que estamos asumiendo.
+
+755
+01:39:56,040 --> 01:40:01,040
+Determinados valores de épsilon, van a permitir regiones mucho más largas.
+
+756
+01:40:01,040 --> 01:40:05,040
+Otros valores de épsilon, van a definir valores más pequeños.
+
+757
+01:40:05,040 --> 01:40:14,040
+Y el punto mínimo, la cantidad mínima de puntos que hay que tener para ser un punto de alta densidad.
+
+758
+01:40:14,040 --> 01:40:18,040
+A ver si tengo otra denominación.
+
+759
+01:40:18,040 --> 01:40:24,040
+Bueno, acá son las denominaciones que tenemos en D-B-scala.
+
+760
+01:40:24,040 --> 01:40:32,040
+Épsilon va a ser esta región, este radio que vamos a tener para considerar los puntos que están cercanos.
+
+761
+01:40:32,040 --> 01:40:38,040
+El mínimo de puntos va a ser la cantidad mínima dentro de este radio que vamos a tener.
+
+762
+01:40:38,040 --> 01:40:42,040
+Y vamos a tener puntos con tres clasificaciones distintas.
+
+763
+01:40:42,040 --> 01:40:47,040
+Tiene al menos seis puntos en su radio, o sea, es conocido como núcleo.
+
+764
+01:40:47,040 --> 01:40:53,040
+En esta situación hay un núcleo, este individuo tiene al menos seis puntos dentro de
+
+765
+01:40:53,040 --> 01:40:56,040
+este círculo que él dibujó.
+
+766
+01:40:56,040 --> 01:41:01,040
+Va a tener algunos puntos que no van a tener exactamente seis vecinos cercanos,
+
+767
+01:41:01,040 --> 01:41:04,040
+que no van a tener seis puntos dentro de esta región.
+
+768
+01:41:04,040 --> 01:41:11,040
+Pero él está cerca, bueno, él contiene un individuo que es un núcleo.
+
+769
+01:41:11,040 --> 01:41:16,040
+Vamos a encontrar quiénes son los núcleos, va a tener una infinidad de núcleos acá.
+
+770
+01:41:16,040 --> 01:41:22,040
+Y si al menos este individuo está alincado con el núcleo, él pasa a ser un punto de borde.
+
+771
+01:41:22,040 --> 01:41:28,040
+Bueno, si no es un punto de borde, tampoco es un núcleo, él va a ser considerado como un ruido.
+
+772
+01:41:28,040 --> 01:41:31,040
+Y este ruido sería nuestro outlier.
+
+773
+01:41:31,040 --> 01:41:35,040
+Entonces, básicamente es esto que el DBSCAN intenta hacer acá.
+
+774
+01:41:35,040 --> 01:41:43,040
+En una clase, exactamente, de enseñando a hacer clasificación, hacer clasificación con DBSCAN,
+
+775
+01:41:43,040 --> 01:41:47,040
+nosotros ponemos después un dibujo acá de quién sería...
+
+776
+01:41:53,040 --> 01:41:56,040
+Ponemos un dibujo después de quién serían los núcleos.
+
+777
+01:41:56,040 --> 01:41:59,040
+Entonces cada uno de estos puntos son posibles núcleos.
+
+778
+01:41:59,040 --> 01:42:02,040
+Así usted va a ver que varios de estos puntos acá, varios de ellos,
+
+779
+01:42:02,040 --> 01:42:06,040
+cuando furen empezar a evaluar muchos de ellos, van a ser núcleos.
+
+780
+01:42:06,040 --> 01:42:11,040
+Algunos que van a estar en algunas regiones acá, más a la limita no van a ser núcleos,
+
+781
+01:42:11,040 --> 01:42:16,040
+pero van a ser bordes, van a estar en la borda.
+
+782
+01:42:16,040 --> 01:42:19,040
+Y al final va a tener individuos que no van a estar alincados.
+
+783
+01:42:19,040 --> 01:42:22,040
+Ningún lado no va a ser en borda, que van a estar alincados con núcleo.
+
+784
+01:42:22,040 --> 01:42:25,040
+No es un núcleo, tampoco es una borda.
+
+785
+01:42:25,040 --> 01:42:29,040
+Entonces, estos individuos que están muy lejos, pasan a ser exactamente...
+
+786
+01:42:29,040 --> 01:42:31,040
+DBSCAN, este es acá.
+
+787
+01:42:31,040 --> 01:42:35,040
+Estos individuos pasan a ser exactamente conocidos como ruidos.
+
+788
+01:42:35,040 --> 01:42:39,040
+Y bueno, estos ruidos pueden...
+
+789
+01:42:39,040 --> 01:42:44,040
+En clasificación después, ellos pueden estar en otro grupo.
+
+790
+01:42:44,040 --> 01:42:49,040
+Vamos a ver que después vamos a tener acá un otro grupo como posible ruido,
+
+791
+01:42:49,040 --> 01:42:53,040
+como posible cluster, y DBSCAN ayuda a construir.
+
+792
+01:42:53,040 --> 01:42:58,040
+Este podría ser un cluster y este podría ser un cluster.
+
+793
+01:43:00,040 --> 01:43:04,040
+Tenemos los clusters, y estos otros individuos acá que serían clusters individuos,
+
+794
+01:43:04,040 --> 01:43:06,040
+serían posiblemente outliers.
+
+795
+01:43:06,040 --> 01:43:11,040
+Pero mira que DBSCAN hace muy bien esta idea de evaluar.
+
+796
+01:43:11,040 --> 01:43:14,040
+Individuos que están altamente agrupados,
+
+797
+01:43:14,040 --> 01:43:18,040
+y nos ayuda exactamente con esto.
+
+798
+01:43:18,040 --> 01:43:22,040
+No sé si ustedes se recuerdan, pero en algún momento en una clase yo había hecho
+
+799
+01:43:22,040 --> 01:43:26,040
+un diburro que tenía unos puntos así.
+
+800
+01:43:26,040 --> 01:43:29,040
+Había un grupo que tenía varios puntos arriba,
+
+801
+01:43:29,040 --> 01:43:33,040
+y después tenían varios abajo, que eran azules.
+
+802
+01:43:33,040 --> 01:43:38,040
+Deja que me deje, déjame ver la clase.
+
+803
+01:43:38,040 --> 01:43:41,040
+A ver si les vamos a ver.
+
+804
+01:43:44,040 --> 01:43:47,040
+Aquí está.
+
+805
+01:43:47,040 --> 01:43:50,040
+Por favor.
+
+806
+01:43:50,040 --> 01:43:53,040
+Dejen que me dejen.
+
+807
+01:43:53,040 --> 01:43:56,040
+Dejemos que se vean.
+
+808
+01:43:56,040 --> 01:43:59,040
+Dejemos que se vean.
+
+809
+01:44:00,040 --> 01:44:03,040
+Dejemos que se vean.
+
+810
+01:44:09,040 --> 01:44:12,040
+Dejemos que se vean.
+
+811
+01:44:12,040 --> 01:44:15,040
+y
+
+812
+01:44:16,040 --> 01:44:19,040
+y
+
+813
+01:44:26,040 --> 01:44:29,040
+y
+
+814
+01:44:29,040 --> 01:44:34,040
+y cuando se ve una buena situación para utilizar debes que cuando intentamos correr
+
+815
+01:44:34,040 --> 01:44:41,040
+correr camins nos vemos cuenta de que el camins va a encontrar un centroide acá
+
+816
+01:44:41,040 --> 01:44:44,040
+un punto que va a ser acá, un centro
+
+817
+01:44:45,040 --> 01:44:50,040
+y después de eso va a clasificar todos los individuos que están dentro
+
+818
+01:44:52,040 --> 01:44:58,040
+dentro de esta región como individuos dentro de este cluster
+
+819
+01:45:00,040 --> 01:45:03,040
+otra región, seria un centroide acá
+
+820
+01:45:04,040 --> 01:45:08,040
+y iria dibujar estos individuos
+
+821
+01:45:08,040 --> 01:45:10,040
+dentro de otro cluster
+
+822
+01:45:11,040 --> 01:45:15,040
+debes no va a mirar exactamente de esta forma como le comenté lo que le hace es
+
+823
+01:45:15,040 --> 01:45:21,040
+evalúa densidades entonces este individuo está cerca de un núcleo si todos
+
+824
+01:45:21,040 --> 01:45:24,040
+estos individuos acá pero todos
+
+825
+01:45:24,040 --> 01:45:29,040
+van a estar o van a ser núcleos o van a ser bordas
+
+826
+01:45:30,040 --> 01:45:33,040
+entonces al final el debes va a informar
+
+827
+01:45:33,040 --> 01:45:36,040
+y este acá es un grupo
+
+828
+01:45:39,040 --> 01:45:42,040
+y este acá es otro grupo
+
+829
+01:45:45,040 --> 01:45:50,040
+no va a ser perder en una situación como esta como ocurrió con camins
+
+830
+01:45:51,040 --> 01:45:55,040
+pero profesor este está muy cerca de este no hay una distancia muy grande este está
+
+831
+01:45:55,040 --> 01:45:58,040
+mucho más cerca de este individuo que este
+
+832
+01:45:58,040 --> 01:46:01,040
+pero profesor este está muy cerca de este no hay una distancia muy grande este está
+
+833
+01:46:01,040 --> 01:46:05,040
+mucho más cerca de este individuo pero este próximo también está cerca entonces
+
+834
+01:46:05,040 --> 01:46:09,040
+ellos van a ser agrupando entonces todos estos puntos van a estar siempre agrupados
+
+835
+01:46:09,040 --> 01:46:12,040
+en relación a los individuos que tienen más densidad
+
+836
+01:46:12,040 --> 01:46:17,040
+entonces el método intenta evaluar exactamente esta agrupación de densidades
+
+837
+01:46:18,040 --> 01:46:22,040
+entonces ahí si debes iria hacer la clasificación de este método por eso que le comenté
+
+838
+01:46:22,040 --> 01:46:26,040
+a veces camins funciona bien? si pero acá hay una limitación en esta
+
+839
+01:46:26,040 --> 01:46:30,040
+situación específica de B-scan debería salir mejor
+
+840
+01:46:35,040 --> 01:46:39,040
+bueno en este ejemplo específico que estábamos haciendo y aplicando para los
+
+841
+01:46:39,040 --> 01:46:44,040
+otros métodos, la distancia de Mahalanobis entre otros aplicamos tanto LOF que le
+
+842
+01:46:44,040 --> 01:46:50,040
+comenté ahora hace poco y estos fueron indicados como posibles
+
+843
+01:46:50,040 --> 01:46:55,040
+a ultilaires tuvimos una indicación de que éstos son los posibles a ultilaires
+
+844
+01:46:55,040 --> 01:47:01,040
+los métodos tienen una concordancia no mira que LOF informó que éstos individuos
+
+845
+01:47:01,040 --> 01:47:06,040
+no son a ultilaires, DBSCAN informó que éstos puntos acá son a ultilaires
+
+846
+01:47:06,040 --> 01:47:11,040
+entonces algunos métodos van a clasificar un grupo otros van a clasificar otro
+
+847
+01:47:11,040 --> 01:47:16,040
+por ejemplo en KNN éstos tres puntos fueron clasificados como
+
+848
+01:47:16,040 --> 01:47:24,040
+como ultilaires en cuanto con LOF no fue clasificado
+
+849
+01:47:24,040 --> 01:47:29,040
+entonces KNN si lo clasificó como ultilaires LOF no lo clasificó
+
+850
+01:47:29,040 --> 01:47:34,040
+al final cada uno de los metros clasifica unos puntos específicos claramente
+
+851
+01:47:34,040 --> 01:47:38,040
+hay varios puntos que son a ultilaires con todos los metros pero los puntos que
+
+852
+01:47:38,040 --> 01:47:42,040
+están más cerca a veces son los más difíciles de clasificar
+
+853
+01:47:42,040 --> 01:47:47,040
+en este caso cuando hacemos una evaluación acá hay algunos puntos donde
+
+854
+01:47:47,040 --> 01:47:53,040
+claramente todos están de acuerdo de 2001 hasta
+
+855
+01:47:53,040 --> 01:48:02,040
+201, 202, 203 y 205 hay una concordancia con todos los puntos
+
+856
+01:48:02,040 --> 01:48:10,040
+solamente 204 que Mahalanobis indicó que no, el caso 206 es un punto que está en la
+
+857
+01:48:10,040 --> 01:48:14,040
+mitad y no fue clasificado con ninguno entonces ninguno de los metros clasificó
+
+858
+01:48:14,040 --> 01:48:19,040
+como un posible ultilaires pero se ve que hay una concordancia en varios de los
+
+859
+01:48:19,040 --> 01:48:24,040
+puntos o la gran mayoría de los puntos entre todos los metros
+
+860
+01:48:24,040 --> 01:48:29,040
+coincidencias y diferencias entre detectores solamente acá 204 Mahalanobis no
+
+861
+01:48:29,040 --> 01:48:38,040
+identificó bueno le apresente hasta ahora 4 métodos para ser detenidos de ultilaires
+
+862
+01:48:38,040 --> 01:48:43,040
+cerramos acá nos seguimos un poquito más creo que para una clase de dos horas
+
+863
+01:48:43,040 --> 01:48:48,040
+le puedo presentar como seis métodos uno de ellos es por medio de una técnica de
+
+864
+01:48:48,040 --> 01:48:52,040
+componentes principales la idea es muy sencilla
+
+865
+01:48:52,040 --> 01:48:58,040
+ustedes saben cómo crear nuestros componentes principales
+
+866
+01:48:58,040 --> 01:49:05,040
+voy a presentar una función un poco más
+
+867
+01:49:06,040 --> 01:49:11,040
+para los que utilizaron la notación un poco distinta tenemos acá nuestros
+
+868
+01:49:11,040 --> 01:49:20,040
+componentes nuestros ex originales y acá nuestros fis que son nuestros
+
+869
+01:49:20,040 --> 01:49:27,040
+nuestros auto vetores y lo que hacemos es que creamos componentes
+
+870
+01:49:27,040 --> 01:49:31,040
+principales que va a ser un valor y, recuerdo que ese y no es la variable
+
+871
+01:49:31,040 --> 01:49:35,040
+respuesta por ejemplo un vw capa para que no se pierda básicamente salimos de una
+
+872
+01:49:35,040 --> 01:49:40,040
+dimensión ex que tiene una dimensión de tamaño p y estamos creando una otra
+
+873
+01:49:40,040 --> 01:49:46,040
+también de dimensión tamaño p pero vamos solamente nos mantener en en vez de
+
+874
+01:49:46,040 --> 01:49:50,040
+trabajar con las p dimensiones en el componente principal voy a elegir menos
+
+875
+01:49:50,040 --> 01:49:55,040
+entonces así estoy con una un conjunto de covariables que tienen una dimensión de
+
+876
+01:49:55,040 --> 01:50:01,040
+tamaño 20 me llegó dados del banco tengo ahí 20 covariables ya yo pensó ya
+
+877
+01:50:01,040 --> 01:50:06,040
+creo que varias covariables están muy relacionadas bueno estoy teniendo
+
+878
+01:50:06,040 --> 01:50:09,040
+dificultad para hacer los ajustes voy a hacer una reducción de dimensión voy
+
+879
+01:50:09,040 --> 01:50:15,040
+a aplicar pca ya y ahí como se aplica pca van a crear componentes principales
+
+880
+01:50:15,040 --> 01:50:19,040
+pero se recuerda que ustedes siempre van a crear la misma cantidad de
+
+881
+01:50:20,040 --> 01:50:25,040
+dimensiones entonces se tengo 20 variables originales el pca va a tener 20
+
+882
+01:50:25,040 --> 01:50:31,040
+variables ya pero se acuerdan que el pca mueve o acaba moviendo toda la
+
+883
+01:50:31,040 --> 01:50:37,040
+variabilidad para los primeros puntos entonces no hay la necesidad de mantener
+
+884
+01:50:37,040 --> 01:50:43,040
+las 20 los 20 componentes principales siendo que no sé 4 o 5 y a mantener más de
+
+885
+01:50:44,040 --> 01:50:50,040
+80% de la variabilidad entonces yo puedo poner la basura 15 covariables y me
+
+886
+01:50:50,040 --> 01:50:59,040
+mantengo solamente con las cinco ya cuál es la idea la idea que se uv doble es
+
+887
+01:50:59,040 --> 01:51:04,040
+construido a partir de fi dado x
+
+888
+01:51:04,040 --> 01:51:10,040
+recuerda que eso acaba ser estimado vamos a poner que voy a intentar hacer
+
+889
+01:51:10,040 --> 01:51:15,040
+ahora en revés yo tengo los componentes principales
+
+890
+01:51:15,040 --> 01:51:22,040
+yo puedo aplicar acá alguna transformación inversa e reconstruir las
+
+891
+01:51:22,040 --> 01:51:27,040
+variables originales si debería ser posible se yo voy e creo componentes
+
+892
+01:51:27,040 --> 01:51:32,040
+principales yo sé cuál fueron las transformaciones que logré hacer yo puedo
+
+893
+01:51:32,040 --> 01:51:37,040
+envolver y crear las variables originales ya entonces antes yo tenía en el banco
+
+894
+01:51:37,040 --> 01:51:42,040
+yo tengo no sé 20 covariables no quiero trabajar con las 20 que trabajar con 5
+
+895
+01:51:42,040 --> 01:51:47,040
+entonces acabé haciendo una reducción de dimensión de 20 para 5 pero el truco
+
+896
+01:51:47,040 --> 01:51:56,040
+acá es que si estoy saliendo de x que tiene 20 y estoy llegando en este que
+
+897
+01:51:56,040 --> 01:52:01,040
+tiene 5 se va a tratar de hacerlo inverso ahora voy a salir de uv doble con 5 y
+
+898
+01:52:02,040 --> 01:52:06,040
+tiempo recriar x con 20
+
+899
+01:52:06,040 --> 01:52:13,040
+cuál va a ser la diferencia entre el x y el uv doble que fue creado
+
+900
+01:52:13,040 --> 01:52:17,040
+y eso acaba siendo el error de reconstrucción
+
+901
+01:52:17,040 --> 01:52:22,040
+si el método funciona bien el método está muy bien como tengo las buenas
+
+902
+01:52:22,040 --> 01:52:28,040
+oposiciones los valores no son tan raros no son tan no son outliers este error
+
+903
+01:52:28,040 --> 01:52:33,040
+debería ser lo menor posible bien entonces miramos exactamente con
+
+904
+01:52:33,040 --> 01:52:38,040
+eso y ahí viene una idea muy rara de componentes principales
+
+905
+01:52:40,040 --> 01:52:45,040
+lo que vamos a intentar hacer es tenemos nuestra matriz z de variables
+
+906
+01:52:45,040 --> 01:52:50,040
+centrales o sea nuestros x que ya fueron centrales estandarizados ya tenemos
+
+907
+01:52:50,040 --> 01:52:56,040
+nuestros auto vetores orto normalizados acá están como las cargas de las
+
+908
+01:52:56,040 --> 01:53:04,040
+primeras r componentes ya si tengo z y tengo pr yo tengo ahora entonces los
+
+909
+01:53:04,040 --> 01:53:09,040
+componentes principales el tr acá que está siendo llamado ya
+
+910
+01:53:09,040 --> 01:53:14,040
+entonces tr contiene las coordenadas en el subespaço retrimido la palabra que
+
+911
+01:53:14,040 --> 01:53:18,040
+está un poco complicada lo que tenemos acá en nuestros componentes principales
+
+912
+01:53:18,040 --> 01:53:23,040
+pero el juego ahora es hacer el cambio yo tenía las variables originales como
+
+913
+01:53:23,040 --> 01:53:27,040
+le comenté las con variables del banco logré hacer una reducción de
+
+914
+01:53:27,040 --> 01:53:32,040
+dimensión ahora que al intentar recriar las variables originales
+
+915
+01:53:32,040 --> 01:53:38,040
+simplemente teniendo los componentes ajustados y esa reducción de dimensión
+
+916
+01:53:38,040 --> 01:53:44,040
+que logramos hacer bueno yo tengo una estimativa de cómo
+
+917
+01:53:44,040 --> 01:53:49,040
+debes decir las variables originales tengo estimado los ex ahí que me vio del
+
+918
+01:53:49,040 --> 01:53:53,040
+banco pero yo conozco cual fue los reales entonces puedo calcular la diferencia
+
+919
+01:53:53,040 --> 01:53:59,040
+entre ellos y voy a tener exactamente ese error ya
+
+920
+01:53:59,040 --> 01:54:04,040
+entonces ahí va a ser nuestro error con reconstrucción entonces la diferencia
+
+921
+01:54:04,040 --> 01:54:09,040
+midi lo que no quedó bien representado ya entonces vamos a tener una diferencia
+
+922
+01:54:10,040 --> 01:54:15,040
+porque yo estaba en 20 barria 5 ahora estoy intentando volver a 20 o ver una
+
+923
+01:54:15,040 --> 01:54:20,040
+pérdida de información ahí ya y miramos exactamente en esa pérdida
+
+924
+01:54:20,040 --> 01:54:23,040
+de información
+
+925
+01:54:23,040 --> 01:54:28,040
+nuestro objetivo entonces va a ser durante esta reconstrucción los
+
+926
+01:54:28,040 --> 01:54:33,040
+individuos que están más malo reconstruidos son individuos que tienen un
+
+927
+01:54:33,040 --> 01:54:38,040
+comportamiento más lejos de lo que se espera y para que se vea el cambio
+
+928
+01:54:38,040 --> 01:54:43,040
+y pasan a ser considerados altilares ya pues es cuando voy a intentar hacer la
+
+929
+01:54:43,040 --> 01:54:47,040
+reconstrucción original van a ver que ellos tienen casi el mismo comportamiento
+
+930
+01:54:47,040 --> 01:54:52,040
+pero va a tener puntos ahí por ejemplo un punto acá y un punto acá que está muy
+
+931
+01:54:52,040 --> 01:54:58,040
+lejos de la reconstrucción original pero muy lejos ya b está muy lejos del
+
+932
+01:54:58,040 --> 01:55:05,040
+centro ya también está lejos del centro pero también pero b permanece la
+
+933
+01:55:05,040 --> 01:55:11,040
+reta ya a no está tampoco en la reta acá y tampoco permanece en el centro
+
+934
+01:55:11,040 --> 01:55:17,040
+el objetivo es tener los puntos lo más cerca de la reta y también del centro
+
+935
+01:55:17,040 --> 01:55:23,040
+si entonces se ve que se ve y se ha sido los puntos que me parecen más raros en
+
+936
+01:55:23,040 --> 01:55:28,040
+esta base no se podrían ser considerados posiblemente altilares pero
+
+937
+01:55:28,040 --> 01:55:32,040
+profesor hay otros otros podemos mirar en esos puntos ese podría ser un
+
+938
+01:55:32,040 --> 01:55:38,040
+y se podría ser también un posible y ahí pasa a tener esa estructura la
+
+939
+01:55:38,040 --> 01:55:43,040
+reconstrucción acá algo muestro para ustedes cómo hacemos las cuentas lo que
+
+940
+01:55:43,040 --> 01:55:48,040
+creo que para ustedes no va a ser una cosa muy interesante pero básicamente
+
+941
+01:55:48,040 --> 01:55:53,040
+lo que intentamos hacer es exactamente esta ida hacemos reducción de dimensiones
+
+942
+01:55:53,040 --> 01:55:55,040
+pues hacemos la vuelta ya
+
+943
+01:55:55,040 --> 01:56:04,040
+y ahí esa diferencia entre ellos pasa a ser esa reconstrucción bueno voy a hacer
+
+944
+01:56:04,040 --> 01:56:09,040
+una aplicación acá para que vean cómo funciona la cosa vamos a aplicar un
+
+945
+01:56:09,040 --> 01:56:13,040
+control de dados que son canciones tiene siete variables numéricas entonces la
+
+946
+01:56:13,040 --> 01:56:18,040
+idea es hay algunas canciones que tienen variables que hacen son tan distintas
+
+947
+01:56:18,040 --> 01:56:23,040
+que acabo nación no con que sean consideradas como altilares y entonces
+
+948
+01:56:23,040 --> 01:56:27,040
+vamos a evaluar si hay variantes canciones que son muy distinto de que
+
+949
+01:56:27,040 --> 01:56:32,040
+realmente está como un promedio bueno para eso voy a tener algunas variables
+
+950
+01:56:32,040 --> 01:56:39,040
+originales acá la acusness que un carácter acústico la danciabilidad que
+
+951
+01:56:39,040 --> 01:56:46,040
+se una bailabilidad energía energy liveness la presencia del público
+
+952
+01:56:46,040 --> 01:56:51,040
+gravación en vivo la unis nivel de solonidad es piscines la presencia de
+
+953
+01:56:51,040 --> 01:56:56,040
+voz hablada y instrumentales se tiene un carácter más instrumental por
+
+954
+01:56:56,040 --> 01:56:59,040
+supuesto la música tiene un carácter instrumental debe ser un poco más
+
+955
+01:56:59,040 --> 01:57:04,040
+distinto de uno que tiene una presencia muy grande de voz si los objetivos
+
+956
+01:57:04,040 --> 01:57:08,040
+intentar bueno esos valores cómo funciona esos valores fueron construidos
+
+957
+01:57:08,040 --> 01:57:13,040
+con base a una métrica específica y también con una base de una métrica
+
+958
+01:57:13,040 --> 01:57:18,040
+específica ya y esas métricas van a tener un escor específico cada una de
+
+959
+01:57:18,040 --> 01:57:24,040
+ellas ya entonces lo que vamos a hacer acá va a ser yo tengo uno dos tres cuatro
+
+960
+01:57:24,040 --> 01:57:29,040
+cinco seis siete entonces el ex que tengo acá
+
+961
+01:57:29,040 --> 01:57:36,040
+tiene una dimensión de tamaño 7 ya bueno no voy a trabajar con ex porque
+
+962
+01:57:36,040 --> 01:57:41,040
+necesito estandarizar los dados para hacer la transformación y el
+
+963
+01:57:41,040 --> 01:57:47,040
+transformación en z que también va a tener la dimensión de tamaño 7 ya lo que
+
+964
+01:57:47,040 --> 01:57:53,040
+voy a intentar hacer ahora va a ser crear un y acá un v doble que podría ser los
+
+965
+01:57:53,040 --> 01:58:01,040
+dos que va a ser esa representación de parámetros estimados acá
+
+966
+01:58:01,040 --> 01:58:09,040
+autovetores que hace la construcción y este es el centro
+
+967
+01:58:09,040 --> 01:58:12,040
+entonces voy a intentar estimar los componentes con eso voy a trabajar con un
+
+968
+01:58:12,040 --> 01:58:21,040
+v doble de dimensión de tamaño 7 no ya lo que voy a intentar hacer es voy a
+
+969
+01:58:21,040 --> 01:58:26,040
+trabajar con él de una dimensión de tamaño no sé cuatro
+
+970
+01:58:26,040 --> 01:58:31,040
+y ahí tengo ahora una cosa que está saliendo de siete y está indo a cuatro
+
+971
+01:58:31,040 --> 01:58:35,040
+o una reducción de dimensión la pregunta que no puede tener es
+
+972
+01:58:35,040 --> 01:58:41,040
+es posible reconstruir eso con conocen los parámetros originales que
+
+973
+01:58:41,040 --> 01:58:46,040
+fueron utilizados y el uv doble que se estimó
+
+974
+01:58:46,040 --> 01:58:49,040
+salió una buena representación no sé tengo que calcular la diferencia de lo que
+
+975
+01:58:49,040 --> 01:58:55,040
+tenemos y lo que fue estimado ya voy a tener un momento de acá este error no
+
+976
+01:58:55,040 --> 01:58:59,040
+será exactamente los puntos que nos van a identificar cuáles son nuestros
+
+977
+01:58:59,040 --> 01:59:04,040
+las músicas están todas el oceano y acá puedo poner los reales de dimensión de
+
+978
+01:59:04,040 --> 01:59:09,040
+tamaño 7 entonces va a ser una cosa que va a salir de los reales y también va
+
+979
+01:59:09,040 --> 01:59:13,040
+para los reales
+
+980
+01:59:13,040 --> 01:59:16,040
+bueno
+
+981
+01:59:16,040 --> 01:59:20,040
+entonces ya sabemos cuáles son los covariables tengo siete covariables acá
+
+982
+01:59:20,040 --> 01:59:25,040
+197 canciones y voy evaluando cuánto de la variencia sabemos que el componente
+
+983
+01:59:25,040 --> 01:59:29,040
+principal nos da esta información voy evaluando cuánto de esta variencia es
+
+984
+01:59:29,040 --> 01:59:33,040
+explicada por cada uno de los componentes ya entonces el primero
+
+985
+01:59:33,040 --> 01:59:38,040
+componente va a explicar 30% de la variabilidad segundo 40 el tercero casi
+
+986
+01:59:38,040 --> 01:59:46,040
+60 el cuarto casi 70 después de 80% 81% 5 componentes de la variabilidad
+
+987
+01:59:46,040 --> 01:59:51,040
+después de 80% 81% 5 componentes ser tenidas tengo más de 80% de la variabilidad
+
+988
+01:59:51,040 --> 01:59:55,040
+entonces estoy poniendo en la basura dos puntos
+
+989
+01:59:55,040 --> 02:00:02,040
+ya bueno después de hacer todo isso y acelerar de burro acá en ese punto voy
+
+990
+02:00:02,040 --> 02:00:06,040
+utilizar estos componentes principales que fueron creados
+
+991
+02:00:06,040 --> 02:00:10,040
+voy a intentar hacer ahora la reconstrucción y voy a calcular la
+
+992
+02:00:10,040 --> 02:00:15,040
+diferencia o voy a calcular este error que le comenté ya está
+
+993
+02:00:15,040 --> 02:00:21,040
+ya bueno este error va a ser el cu en una escala estandarizada
+
+994
+02:00:21,040 --> 02:00:25,040
+va a ser exactamente estos posibles puntos acá
+
+995
+02:00:25,040 --> 02:00:30,040
+entonces estos fueron los puntos que tuvimos mayor dificultad para hacer la
+
+996
+02:00:30,040 --> 02:00:34,040
+reconstrucción entonces es posible que estos puntos
+
+997
+02:00:34,040 --> 02:00:39,040
+tengan una alta probabilidad de que estos puntos sean los outliers
+
+998
+02:00:40,040 --> 02:00:45,040
+los especiales ayuda a ser eso de una forma más estadística más formal
+
+999
+02:00:45,040 --> 02:00:50,040
+comparando los estimados tener una regla decisión un poco más bien definida
+
+1000
+02:00:50,040 --> 02:00:55,040
+las primeras cinco componentes explican 87.75% de la varianza
+
+1001
+02:00:55,040 --> 02:01:02,040
+el corte de cu en el cuantio 95 marca 10 canciones para revisar ya bueno
+
+1002
+02:01:02,040 --> 02:01:07,040
+explicar mucha varianza no va a garantizar detectar todas las anomalías
+
+1003
+02:01:07,040 --> 02:01:12,040
+generalmente mantenemos más de 80% de la variabilidad como tenemos ese cambio
+
+1004
+02:01:12,040 --> 02:01:17,040
+hacemos este tipo de aplicación si bueno yo le comparto con
+
+1005
+02:01:17,040 --> 02:01:23,040
+con el r que va a tener las canciones que van a sacar
+
+1006
+02:01:23,040 --> 02:01:29,040
+las con variables acá de las canciones va a hacer la transformación
+
+1007
+02:01:29,040 --> 02:01:34,040
+o va a ser la estandarización y después ajustar los componentes principales
+
+1008
+02:01:34,040 --> 02:01:39,040
+después de ajustar los componentes principales vamos a ir vamos a tener la proyección
+
+1009
+02:01:39,040 --> 02:01:44,040
+entonces voy a intentar hacer la predicción
+
+1010
+02:01:47,040 --> 02:01:52,040
+voy a intentar estimar que el nube doble que había comentado ya con base en los
+
+1011
+02:01:52,040 --> 02:01:57,040
+componentes principales y nuestros ex acá después de hacer
+
+1012
+02:01:57,040 --> 02:02:01,040
+esto voy a intentar hacer la reconstrucción entonces voy a comparar ya voy a intentar
+
+1013
+02:02:01,040 --> 02:02:06,040
+construir lo que había comentado anteriormente voy a intentar construir
+
+1014
+02:02:06,040 --> 02:02:11,040
+acá voy a intentar construir ese valor después de construir
+
+1015
+02:02:11,040 --> 02:02:18,040
+eso ya en esta proyección voy a intentar hacer la reconstrucción ahora
+
+1016
+02:02:18,040 --> 02:02:23,040
+ya o bueno ese acá fue la proyección
+
+1017
+02:02:23,040 --> 02:02:28,040
+ahora voy a intentar hacer la reconstrucción la reconstrucción va a ser de ese acá
+
+1018
+02:02:28,040 --> 02:02:33,040
+el ese lado ya después de hacer la construcción la
+
+1019
+02:02:33,040 --> 02:02:38,040
+reconstrucción voy a calcular la diferencia entre las la reconstrucción y
+
+1020
+02:02:38,040 --> 02:02:44,040
+los valores originales ya y ahí voy a tener ahí este umbral de 0 de
+
+1021
+02:02:44,040 --> 02:02:49,040
+95% definimos como es el valor de por medio del contín
+
+1022
+02:02:49,040 --> 02:02:54,040
+y clasifico las posibilidades de utilizar los que están muy lejos o 5%
+
+1023
+02:02:54,040 --> 02:02:59,040
+más arriba en términos de los contínuos ya y bueno ese es una forma
+
+1024
+02:02:59,040 --> 02:03:04,040
+interesante de utilizar a componentes principales
+
+1025
+02:03:04,040 --> 02:03:10,040
+bueno también se puede hacer en paíton ya vamos a seguir un poco por
+
+1026
+02:03:10,040 --> 02:03:15,040
+tiempo de tiempo de los tres recibimos dos códigos en paíton vamos a hacer lo mismo
+
+1027
+02:03:15,040 --> 02:03:20,040
+tiene que ser nuevamente primeramente la construcción en pca pca.fi de con los
+
+1028
+02:03:20,040 --> 02:03:25,040
+estandarizados después va a ser la proyección ya después de hacer la
+
+1029
+02:03:25,040 --> 02:03:29,040
+proyección tiene que hacerla con reconstrucción o lo que sale de la proyección en los
+
+1030
+02:03:29,040 --> 02:03:34,040
+componentes principales después calcula la diferencia bueno por medio de las
+
+1031
+02:03:34,040 --> 02:03:40,040
+canciones el cu acá que tuvimos indica que las posibles canciones
+
+1032
+02:03:40,040 --> 02:03:46,040
+133 65 109 148 y 38 son posibles
+
+1033
+02:03:46,040 --> 02:03:50,040
+a utilizar el que está influenciando demasiado en nuestra la vez entonces
+
+1034
+02:03:50,040 --> 02:03:55,040
+ustedes tienen que hacer una análisis de la vez de su trabajo
+
+1035
+02:03:55,040 --> 02:03:59,040
+podrían aplicar ese método y evaluar cuáles son los posibles puntos que salieron
+
+1036
+02:03:59,040 --> 02:04:04,040
+como el tiempo después de salir estos puntos como el tiempo hay que evaluar porque
+
+1037
+02:04:04,040 --> 02:04:09,040
+ellos están teniendo este comportamiento si es posible por temas de un error o una
+
+1038
+02:04:09,040 --> 02:04:13,040
+cosa del tipo ser más alguna de roa y a ver cuenta que estos individuos se
+
+1039
+02:04:13,040 --> 02:04:17,040
+están influenciando demasiado estamos haciendo con que tenga malas predicciones
+
+1040
+02:04:17,040 --> 02:04:24,040
+y ahí nos eliminan bueno monitorear observaciones nuevas con pca
+
+1041
+02:04:24,040 --> 02:04:28,040
+vamos a ajustar las medias vamos a hacer las escalas de los componentes con los
+
+1042
+02:04:28,040 --> 02:04:32,040
+dados de referencia establecer el corte con esa referencia o con la
+
+1043
+02:04:32,040 --> 02:04:37,040
+sensación se puede ser cruzada estandarizar cada nuevo dato con la misma
+
+1044
+02:04:37,040 --> 02:04:42,040
+media escala o sea no tener vazamento acá siempre que tenemos nuevos dados
+
+1045
+02:04:42,040 --> 02:04:46,040
+tener que tener cuidado con ese es el pan de vazamento de dados
+
+1046
+02:04:46,040 --> 02:04:52,040
+proyectar reconstruir comparar con un correto de fixo y investigar las alertas
+
+1047
+02:04:52,040 --> 02:04:57,040
+y revisar cambios persistentes del proceso ya bueno eso pasa demasiado es
+
+1048
+02:04:57,040 --> 02:05:01,040
+muy importante hacer los cambios no eliminar los datos por ejemplo mi esposa
+
+1049
+02:05:01,040 --> 02:05:05,040
+está siendo doctorado y llegó exactamente cuando algunas personas comenza
+
+1050
+02:05:05,040 --> 02:05:10,040
+tenía varias observaciones que los dados tenían no debería tener cero y
+
+1051
+02:05:10,040 --> 02:05:19,040
+tenía cero o debería ser un valor 3 o 4 o 3 o 4 o 5 pero en la base parece 3 o 4
+
+1052
+02:05:19,040 --> 02:05:23,040
+entonces después de poner estas observaciones en la basura
+
+1053
+02:05:23,040 --> 02:05:29,040
+tiene que evaluar lo que estaba pasando ya para no tener que perder información
+
+1054
+02:05:29,040 --> 02:05:31,040
+bueno
+
+1055
+02:05:31,040 --> 02:05:34,040
+es una forma muy interesante de hacer la cosa por medio de componentes
+
+1056
+02:05:34,040 --> 02:05:39,040
+principales entonces ahora conocemos cinco metros de dirección de utilares
+
+1057
+02:05:39,040 --> 02:05:44,040
+mi objetivo es presentar el último que se llama Isolation Forest
+
+1058
+02:05:44,040 --> 02:05:48,040
+bueno Isolation Forest es un método muy interesante me gusta bastante la idea de
+
+1059
+02:05:48,040 --> 02:05:53,040
+como fue construido o como viene la idea de hacer la construcción de
+
+1060
+02:05:53,040 --> 02:05:55,040
+de
+
+1061
+02:05:55,040 --> 02:05:58,040
+de esta identificación de utilares ya
+
+1062
+02:05:58,040 --> 02:06:03,040
+utilizo de una forma muy inteligente básicamente lo que va a hacer es
+
+1063
+02:06:04,040 --> 02:06:08,040
+vamos a tener los puntos varios puntos acá
+
+1064
+02:06:08,040 --> 02:06:15,040
+la idea es la siguiente si ustedes estaban trabajando con
+
+1065
+02:06:15,040 --> 02:06:19,040
+hábitos que tenían una variable respuesta para dar una mirada
+
+1066
+02:06:19,040 --> 02:06:24,040
+intentaban minimizar o encontrar la división acá
+
+1067
+02:06:24,040 --> 02:06:29,040
+intentaban estimar cuál sería la mejor división por ejemplo si voy a ser la división
+
+1068
+02:06:30,040 --> 02:06:32,040
+así
+
+1069
+02:06:32,040 --> 02:06:36,040
+la cosa que una árbol lo que la va a hacer es un espacio de particiones
+
+1070
+02:06:36,040 --> 02:06:41,040
+básicamente voy a tener una situación como ésta y evalúo
+
+1071
+02:06:41,040 --> 02:06:46,040
+si se corta el mensaje bien ya por ser voy a tener acá
+
+1072
+02:06:46,040 --> 02:06:52,040
+un árbol donde x2 es menor que 1 ya
+
+1073
+02:06:52,040 --> 02:06:56,040
+y evalúo este punto interesante o no, entonces voy a intentar hacer cortes acá
+
+1074
+02:06:56,040 --> 02:07:02,040
+y el mejor corte que minimizo es el punto que va a ayudar a mejorar la
+
+1075
+02:07:02,040 --> 02:07:05,040
+predicción
+
+1076
+02:07:05,040 --> 02:07:10,040
+entonces lo que va a hacer es empezar a hacer varios puntos de corte
+
+1077
+02:07:10,040 --> 02:07:14,040
+acá intentamos hacer de una forma más inteligente
+
+1078
+02:07:14,040 --> 02:07:19,040
+tener un punto así y un punto así después empezar a hacer otras divisiones
+
+1079
+02:07:19,040 --> 02:07:22,040
+otro punto acá
+
+1080
+02:07:23,040 --> 02:07:27,040
+cuál es la idea del Isolation Forest lo que va a intentar hacer es
+
+1081
+02:07:27,040 --> 02:07:31,040
+vamos a crear divisiones aleatóricas
+
+1082
+02:07:31,040 --> 02:07:38,040
+no voy a determinizar nada acá, voy a generar una posible división aleatórica
+
+1083
+02:07:38,040 --> 02:07:42,040
+la posible división aleatórica sería esta
+
+1084
+02:07:42,040 --> 02:07:44,040
+ok
+
+1085
+02:07:44,040 --> 02:07:49,040
+vamos siguiendo con esta división, una posible y otra segunda división podría ser
+
+1086
+02:07:49,040 --> 02:07:51,040
+esta
+
+1087
+02:07:53,040 --> 02:07:56,040
+mira que interesante
+
+1088
+02:07:56,040 --> 02:08:01,040
+con solamente dos divisiones, una división así y otra así
+
+1089
+02:08:01,040 --> 02:08:07,040
+yo alcance a aislar un punto específico
+
+1090
+02:08:07,040 --> 02:08:12,040
+bueno ustedes están de acuerdo que este punto acá fue extremamente fácil de aislar
+
+1091
+02:08:12,040 --> 02:08:16,040
+pero recuerden que estas divisiones se hacen de forma aleatória
+
+1092
+02:08:16,040 --> 02:08:19,040
+entonces la próxima división puede venir acá
+
+1093
+02:08:19,040 --> 02:08:22,040
+una otra puede venir acá
+
+1094
+02:08:22,040 --> 02:08:24,040
+bueno, perdón
+
+1095
+02:08:24,040 --> 02:08:27,040
+una otra puede venir acá
+
+1096
+02:08:27,040 --> 02:08:32,040
+pero es muy poco probable que existan tan cercanas al menos al inicio
+
+1097
+02:08:32,040 --> 02:08:36,040
+entonces lo que va a pasar son divisiones así, aleatóricas
+
+1098
+02:08:38,040 --> 02:08:43,040
+una cosa que es muy importante es que estos puntos que no parecen ser outliers
+
+1099
+02:08:43,040 --> 02:08:48,040
+tal vez este, acá no, este también no tiene la indicación que debería ser
+
+1100
+02:08:48,040 --> 02:08:53,040
+pero puntos como este, estos que están más lejos podrían ser posibles outliers
+
+1101
+02:08:53,040 --> 02:08:56,040
+pero hay varios puntos que están cerca
+
+1102
+02:08:56,040 --> 02:09:01,040
+de hecho, si voy corriendo demasiado este tipo de división
+
+1103
+02:09:01,040 --> 02:09:08,040
+me va a tomar mucho tiempo para crear una regla donde voy a aislar este punto acá
+
+1104
+02:09:08,040 --> 02:09:09,040
+¿cierto?
+
+1105
+02:09:09,040 --> 02:09:14,040
+bueno yo alcance a aislar este, este, este, este y este
+
+1106
+02:09:15,040 --> 02:09:18,040
+y ahí viene la idea de Isolation Forest
+
+1107
+02:09:18,040 --> 02:09:21,040
+vamos a crear varias particiones aleatórias
+
+1108
+02:09:21,040 --> 02:09:24,040
+voy a crear varios caminos aleatórios acá
+
+1109
+02:09:24,040 --> 02:09:27,040
+varias particiones aleatórias y voy a evaluar
+
+1110
+02:09:27,040 --> 02:09:33,040
+cuántas veces me tomó, cuántos cortes o cuántas divisiones tuve que hacer
+
+1111
+02:09:33,040 --> 02:09:39,040
+para que este punto fuese separado o fuese de alguna manera aislado
+
+1112
+02:09:40,040 --> 02:09:45,040
+y mira que interesante, este punto fue aislado de una forma muy rápida
+
+1113
+02:09:45,040 --> 02:09:47,040
+en 12 interacciones solamente, 2, 3
+
+1114
+02:09:47,040 --> 02:09:51,040
+este acá se quedó aislado en 3 o 4, este también 3 o 4
+
+1115
+02:09:51,040 --> 02:09:58,040
+pero estos otros puntos acá van a tomar como no sé, 40, 50, 60, 70
+
+1116
+02:09:58,040 --> 02:10:03,040
+tal vez 1000 divisiones para aislar cada uno de estos puntos
+
+1117
+02:10:03,040 --> 02:10:07,040
+entonces el método que intenta hacer es, él intenta evaluar
+
+1118
+02:10:07,040 --> 02:10:12,040
+cómo fue la división
+
+1119
+02:10:12,040 --> 02:10:15,040
+vamos a hacer un conteo de cuántas divisiones
+
+1120
+02:10:15,040 --> 02:10:20,040
+cuántas divisiones nos tomó para aislar cada uno de estos puntos
+
+1121
+02:10:20,040 --> 02:10:26,040
+Outliers deberían ser aislados en pocos pasos
+
+1122
+02:10:26,040 --> 02:10:31,040
+estos puntos acá que están muy aglomerados le van a tomar muchos pasos para aislarlo
+
+1123
+02:10:32,040 --> 02:10:39,040
+mientras estos puntos se quedaran aislados con una rapidez muy grande
+
+1124
+02:10:40,040 --> 02:10:45,040
+y esa es la idea, vamos a crear árboles, vamos a intentar aislarlos
+
+1125
+02:10:45,040 --> 02:10:50,040
+voy a crear una otra, voy a intentar aislar, voy a crear otra, voy a intentar aislar
+
+1126
+02:10:50,040 --> 02:10:55,040
+voy a intentar hacer esto muchas veces y después evaluo cuáles fueron los puntos que lograron ser aislados
+
+1127
+02:10:55,040 --> 02:10:59,040
+de una forma más rápida, de forma general
+
+1128
+02:10:59,040 --> 02:11:04,040
+porque una cosa que no me puede pasar es, ok, de alguna manera
+
+1129
+02:11:04,040 --> 02:11:08,040
+alcancé a aislar este punto acá, en tres interacciones
+
+1130
+02:11:08,040 --> 02:11:11,040
+pero si voy a correr esto un montón de veces, ¿esto va a pasar?
+
+1131
+02:11:11,040 --> 02:11:15,040
+no, creo que puede ser poco probable, de hecho acá no fue lo que ocurrió
+
+1132
+02:11:15,040 --> 02:11:19,040
+si replico esto un montón de veces, este punto fue aislado en algún momento
+
+1133
+02:11:19,040 --> 02:11:24,040
+pero en general no va a ser aislado, entonces no es un posible Outlier
+
+1134
+02:11:29,040 --> 02:11:34,040
+la idea va a ser, vamos a intentar hacer, crear árboles de aislamiento
+
+1135
+02:11:34,040 --> 02:11:38,040
+vamos a intentar aislar, o dejar aislado
+
+1136
+02:11:38,040 --> 02:11:42,040
+con algo de aislar acá, se va a aislar
+
+1137
+02:11:42,040 --> 02:11:46,040
+dejamos ellos como separados solos
+
+1138
+02:11:46,040 --> 02:11:50,040
+pues cada árbol de aislamiento usa una subamoestra de los dados
+
+1139
+02:11:50,040 --> 02:11:54,040
+vamos a hacer esto un montón de veces con las muestras que fueron creadas
+
+1140
+02:11:54,040 --> 02:11:59,040
+vamos a elegir una variabilidad al azar, básicamente esto es el paso que funciona con Randall Forest
+
+1141
+02:11:59,040 --> 02:12:02,040
+vamos a elegir cuáles son las variabilidades que van a entrar
+
+1142
+02:12:02,040 --> 02:12:05,040
+y después elegimos las variabilidades, si empezamos a hacer divisiones
+
+1143
+02:12:05,040 --> 02:12:08,040
+cómo se quedan estos puntos, vamos a elegir un corte al azar
+
+1144
+02:12:08,040 --> 02:12:12,040
+dentro de su rango, vamos a separar los puntos a ambos lados y repetir
+
+1145
+02:12:12,040 --> 02:12:17,040
+se detiene al aislar puntos o alcanzar la limita de profundidad
+
+1146
+02:12:17,040 --> 02:12:22,040
+vamos a utilizar el corte al azar, vamos a separar los puntos a ambos lados y repetir
+
+1147
+02:12:22,040 --> 02:12:27,040
+cada ahorro con varios puntos requiere una corrección de longitud
+
+1148
+02:12:27,040 --> 02:12:30,040
+la idea es que ustedes van a hacer divisiones
+
+1149
+02:12:30,040 --> 02:12:33,040
+conforme van a hacer divisiones
+
+1150
+02:12:43,040 --> 02:12:46,040
+la idea es que se voy a hacer divisiones acá
+
+1151
+02:12:46,040 --> 02:12:50,040
+varios divisiones en el espacio, donde voy a tener varios puntos
+
+1152
+02:12:52,040 --> 02:12:55,040
+ya
+
+1153
+02:12:58,040 --> 02:13:01,040
+si vamos a hacer un montón de divisiones, al final lo que estamos haciendo es
+
+1154
+02:13:01,040 --> 02:13:04,040
+creando árboles
+
+1155
+02:13:04,040 --> 02:13:07,040
+y ustedes están haciendo una árbol extremamente profunda
+
+1156
+02:13:07,040 --> 02:13:10,040
+entonces la idea es que tampoco la árbol sea muy profunda
+
+1157
+02:13:10,040 --> 02:13:15,040
+entonces ellos no van a intentar penalizar eso para que las árboles no sean muy profundas
+
+1158
+02:13:23,040 --> 02:13:27,040
+y básicamente como esto va a funcionar, va a ser varias divisiones
+
+1159
+02:13:27,040 --> 02:13:31,040
+va a ser un conteo de las veces que logramos aislar estos puntos
+
+1160
+02:13:31,040 --> 02:13:36,040
+por ejemplo un punto central se va a requerir más cortes
+
+1161
+02:13:36,040 --> 02:13:40,040
+pero mira que en algún momento ya empezamos a aislar estos puntos
+
+1162
+02:13:40,040 --> 02:13:45,040
+después de correr este algoritmo varias veces como hacemos en Ramon Flores
+
+1163
+02:13:45,040 --> 02:13:50,040
+vamos a tener ahí los posibles puntos que aparecieron con una gran frecuencia
+
+1164
+02:13:50,040 --> 02:13:53,040
+bueno acá es una otra forma de calcular
+
+1165
+02:13:53,040 --> 02:13:57,040
+puntar el Isolation Forest, una forma clásica de calcular el puntar
+
+1166
+02:13:57,040 --> 02:14:00,040
+12 elevado a la esperanza
+
+1167
+02:14:00,040 --> 02:14:04,040
+de una función artx de partido phi psi
+
+1168
+02:14:04,040 --> 02:14:09,040
+donde esa esperanza es la longitud media corrida del camino
+
+1169
+02:14:09,040 --> 02:14:13,040
+y si, si normaliza por el tamaño de la subiamosa
+
+1170
+02:14:13,040 --> 02:14:16,040
+básicamente acá estamos mostrando una suma de las frecuencias
+
+1171
+02:14:16,040 --> 02:14:20,040
+básicamente acá estamos mostrando más o menos como funciona por vista
+
+1172
+02:14:20,040 --> 02:14:24,040
+un poquito más detallado
+
+1173
+02:14:24,040 --> 02:14:28,040
+básicamente vamos a tener algos, podemos ajustar acá 300 algos
+
+1174
+02:14:28,040 --> 02:14:33,040
+y lo que va a controlar, cuántos caminos se combinan para obtener el puntaje
+
+1175
+02:14:33,040 --> 02:14:36,040
+una subiamosa después de 256
+
+1176
+02:14:36,040 --> 02:14:41,040
+cuántos regíso en cada árbol no son 256 variables
+
+1177
+02:14:41,040 --> 02:14:45,040
+la contaminación en Skyland es determinada por el número de arbol
+
+1178
+02:14:45,040 --> 02:14:49,040
+en Skyland determina el corte o convertir puntarres clásicas
+
+1179
+02:14:49,040 --> 02:14:52,040
+para el final de continuo 95
+
+1180
+02:14:52,040 --> 02:14:57,040
+lo que vamos a hacer, vamos a aplicar el conjunto de dados cardio
+
+1181
+02:14:57,040 --> 02:15:00,040
+que había empezado a aplicar en ustedes anteriormente
+
+1182
+02:15:00,040 --> 02:15:06,040
+lo que vamos a hacer es, tenemos en una situación con dados cardio
+
+1183
+02:15:06,040 --> 02:15:11,040
+1655 personas normales
+
+1184
+02:15:11,040 --> 02:15:16,040
+y 166 personas que tienen alguna dificultad y alguna anomalía
+
+1185
+02:15:16,040 --> 02:15:20,040
+son cosas que no salieron bien durante la evaluación de la imagen
+
+1186
+02:15:20,040 --> 02:15:28,040
+pero el objetivo es, ok, en esta base yo conozco quiénes somos normales y quiénes no somos anómalos
+
+1187
+02:15:28,040 --> 02:15:34,040
+pero puedo utilizar estos métodos para intentar reconstruir los posibles anómalos
+
+1188
+02:15:34,040 --> 02:15:40,040
+es decir, el método aplicado desde el punto de vista de evaluar individuos anómalos
+
+1189
+02:15:40,040 --> 02:15:43,040
+individuos que tienen un comportamiento más raro
+
+1190
+02:15:43,040 --> 02:15:46,040
+de hecho, alcanzamos a hacer eso
+
+1191
+02:15:46,040 --> 02:15:50,040
+para hacer eso voy a hacer una división entre el conjunto de entrenamiento y validación
+
+1192
+02:15:50,040 --> 02:15:54,040
+voy a ajustar el modelo de Isolation Forest en el conjunto de entrenamiento
+
+1193
+02:15:54,040 --> 02:15:58,040
+y después lo comparo en un conjunto de prueba
+
+1194
+02:15:58,040 --> 02:16:02,040
+acá estoy dividiendo en 70-30%
+
+1195
+02:16:02,040 --> 02:16:06,040
+pero profesor, no tenemos el label, la idea es que ustedes no registren el label
+
+1196
+02:16:06,040 --> 02:16:10,040
+entonces en una aplicación real no se puede hacer ese tipo de validación
+
+1197
+02:16:10,040 --> 02:16:13,040
+pero acá como otro ejemplo sí lo podemos hacer
+
+1198
+02:16:13,040 --> 02:16:18,040
+entonces en el conjunto de entrenamiento tenemos 1159 observaciones
+
+1199
+02:16:18,040 --> 02:16:22,040
+y de donde esos 1000 son normales
+
+1200
+02:16:22,040 --> 02:16:26,040
+y 122 son anómalos, en total 1281
+
+1201
+02:16:26,040 --> 02:16:30,040
+en el conjunto de prueba dejamos casi 500 personas normales fuera
+
+1202
+02:16:30,040 --> 02:16:33,040
+y 54 demos anómalos
+
+1203
+02:16:33,040 --> 02:16:37,040
+voy a evaluar cómo funciona el método para acá y después intentar informar
+
+1204
+02:16:37,040 --> 02:16:43,040
+en esos puntos alcanzamos clasificar los 54 como posibles anómalos
+
+1205
+02:16:45,040 --> 02:16:49,040
+entonces inicialmente voy a hacer la reconstrucción con PCA
+
+1206
+02:16:49,040 --> 02:16:55,040
+entonces la misma cosa, ajusto el PCA con ese conjunto acá
+
+1207
+02:16:55,040 --> 02:16:58,040
+voy a hacer la reconstrucción con ese conjunto acá
+
+1208
+02:16:58,040 --> 02:17:02,040
+después de hacer la reconstrucción voy a aplicar el nuevo conjunto de prueba
+
+1209
+02:17:02,040 --> 02:17:06,040
+o sea ese conjunto no fue utilizado para estimar los parámetros acá
+
+1210
+02:17:06,040 --> 02:17:10,040
+después de evaluar el conjunto de prueba me pasaré posibles valores
+
+1211
+02:17:10,040 --> 02:17:15,040
+este total aquí, 450
+
+1212
+02:17:15,040 --> 02:17:20,040
+y ahí voy a comparar de los normales, cuántos anómalos clasifico correctamente como normal
+
+1213
+02:17:20,040 --> 02:17:23,040
+los anómalos, cuántos clasifico correctamente como anómalos
+
+1214
+02:17:23,040 --> 02:17:27,040
+recuerda que durante el entrenamiento no utilizamos exactamente esa minimización
+
+1215
+02:17:27,040 --> 02:17:32,040
+no minimizamos los resultados con base en el label
+
+1216
+02:17:32,040 --> 02:17:39,040
+entonces este label acá no fue utilizado para entrenar el modelo como conocemos y aprendizamos en supervisado
+
+1217
+02:17:42,040 --> 02:17:47,040
+bueno, aplico el PCA, acá ya vamos a ver cómo salen los resultados
+
+1218
+02:17:47,040 --> 02:17:50,040
+pero también aplico Isolation Forest, que es tanto IR como IPyte
+
+1219
+02:17:50,040 --> 02:17:55,040
+bueno, tenemos la batería de confusión que no salió
+
+1220
+02:17:55,040 --> 02:17:59,040
+ya con esta base nueva, eran 500 y pocas observaciones
+
+1221
+02:17:59,040 --> 02:18:05,040
+mira que el método clasifico correctamente las personas normales que no tenían ninguna modificación
+
+1222
+02:18:05,040 --> 02:18:08,040
+483% de las veces, ahí está super bien
+
+1223
+02:18:08,040 --> 02:18:13,040
+pero para detectar los puntos que eran anómalos, fue solamente 16%
+
+1224
+02:18:13,040 --> 02:18:16,040
+entonces el PCA dejó
+
+1225
+02:18:16,040 --> 02:18:22,040
+de clasificar 38 personas o 38 exames de cardio
+
+1226
+02:18:22,040 --> 02:18:27,040
+que de hecho eran anómalos pero la precisión salió normal
+
+1227
+02:18:27,040 --> 02:18:31,040
+muestra que el método no tiene una precisión muy perfecta
+
+1228
+02:18:31,040 --> 02:18:33,040
+pero tampoco es un método tan malo
+
+1229
+02:18:33,040 --> 02:18:36,040
+la acuracia de este método es 0.9
+
+1230
+02:18:36,040 --> 02:18:39,040
+pero ahí que es muy importante evaluar la sensibilidad
+
+1231
+02:18:39,040 --> 02:18:43,040
+mira, la sensibilidad solo tenía un número de personas
+
+1232
+02:18:43,040 --> 02:18:48,040
+entonces el método identifica posibles outliers, posibles informaciones anómalas
+
+1233
+02:18:48,040 --> 02:18:53,040
+pero no identifica de una forma con una precisión muy grande
+
+1234
+02:18:55,040 --> 02:18:58,040
+bueno, intentamos aplicar estas tres versiones
+
+1235
+02:18:58,040 --> 02:19:01,040
+tanto con el PCA, como con Isolation Forest
+
+1236
+02:19:01,040 --> 02:19:02,040
+ya?
+
+1237
+02:19:02,040 --> 02:19:04,040
+y todo eso
+
+1238
+02:19:04,040 --> 02:19:06,040
+ya está, ya está, ya está
+
+1239
+02:19:06,040 --> 02:19:08,040
+ya está, ya está, ya está
+
+1240
+02:19:08,040 --> 02:19:10,040
+ya está, ya está, ya está
+
+1241
+02:19:10,040 --> 02:19:12,040
+ya está, ya está
+
+1242
+02:19:13,040 --> 02:19:15,040
+ese tipo de precisión
+
+1243
+02:19:15,040 --> 02:19:17,040
+en el conjunto, intentamos
+
+1244
+02:19:17,040 --> 02:19:19,040
+ajustamos el modelo
+
+1245
+02:19:20,040 --> 02:19:23,040
+sin utilizar la vagabina expuesta en PCA
+
+1246
+02:19:23,040 --> 02:19:25,040
+y ajustamos también con Isolation Forest
+
+1247
+02:19:25,040 --> 02:19:30,040
+ajustado a esto, aplicamos este modelo en un conjunto de prueba
+
+1248
+02:19:30,040 --> 02:19:33,040
+el segundo de prueba no fue utilizado para el entrenamiento
+
+1249
+02:19:33,040 --> 02:19:35,040
+no sé la acuracia funcionó bien
+
+1250
+02:19:35,040 --> 02:19:38,040
+de hecho Isolation Forest en él no sale con 0.91
+
+1251
+02:19:38,040 --> 02:19:40,040
+pero la sensibilidad
+
+1252
+02:19:40,040 --> 02:19:44,040
+no sale supermalo, está siempre clasificando malo un montón de gente
+
+1253
+02:19:44,040 --> 02:19:46,040
+está clasificando siempre malo
+
+1254
+02:19:48,040 --> 02:19:50,040
+clasificó bien en el ejercicio
+
+1255
+02:19:50,040 --> 02:19:52,040
+entonces clasificó malo ahí
+
+1256
+02:19:52,040 --> 02:19:55,040
+predito que él fue malo, predito como malo
+
+1257
+02:19:55,040 --> 02:19:58,040
+entonces al final la clasificación salió como 51
+
+1258
+02:19:58,040 --> 02:20:02,040
+51 de 500 y poco
+
+1259
+02:20:03,040 --> 02:20:06,040
+bueno, 10% de caso está clasificando malo
+
+1260
+02:20:07,040 --> 02:20:08,040
+ya?
+
+1261
+02:20:09,040 --> 02:20:11,040
+bueno, la sensibilidad está mala
+
+1262
+02:20:11,040 --> 02:20:14,040
+hay que mejorar esto, este modelo no tiene una buena sensibilidad
+
+1263
+02:20:14,040 --> 02:20:16,040
+entonces no nos ayuda mucho
+
+1264
+02:20:16,040 --> 02:20:19,040
+y bueno, puedo calcular también por la área sobre la curva rock
+
+1265
+02:20:19,040 --> 02:20:21,040
+pero una cosa así
+
+1266
+02:20:21,040 --> 02:20:23,040
+el PCA va a coincidir
+
+1267
+02:20:23,040 --> 02:20:25,040
+tanto en las lenguajes
+
+1268
+02:20:25,040 --> 02:20:27,040
+ya no va a tener problemas con R-Python
+
+1269
+02:20:27,040 --> 02:20:31,040
+pero los bosses como hacemos construcciones de forma aleatoria
+
+1270
+02:20:31,040 --> 02:20:34,040
+entonces, segura que el PCA lo estimamos
+
+1271
+02:20:34,040 --> 02:20:37,040
+lo estimamos, siempre con el proceso de maximización
+
+1272
+02:20:37,040 --> 02:20:39,040
+es lo mismo
+
+1273
+02:20:39,040 --> 02:20:41,040
+Presolation Forest
+
+1274
+02:20:41,040 --> 02:20:43,040
+tiene un componente aleatorio
+
+1275
+02:20:43,040 --> 02:20:45,040
+la semilla no es la misma que utilizamos en R
+
+1276
+02:20:45,040 --> 02:20:47,040
+por eso eso cambia
+
+1277
+02:20:47,040 --> 02:20:49,040
+por supuesto luego cambian los resultados
+
+1278
+02:20:51,040 --> 02:20:53,040
+y ahí hacemos una comparación
+
+1279
+02:20:53,040 --> 02:20:57,040
+entonces podemos tratar de comparar el método como si tuviésemos el label
+
+1280
+02:20:57,040 --> 02:20:59,040
+como si tuviesemos una variable de respuesta
+
+1281
+02:20:59,040 --> 02:21:02,040
+solamente para confirmar que el método funciona
+
+1282
+02:21:03,040 --> 02:21:06,040
+pero en general no vamos a tener los labels
+
+1283
+02:21:08,040 --> 02:21:11,040
+bueno, dibujé también la área sobre la curva rock acá
+
+1284
+02:21:11,040 --> 02:21:13,040
+se ve que el ESF funciona mejor
+
+1285
+02:21:15,040 --> 02:21:18,040
+y bueno, uno puede cambiar el umbral para ver también si mejora
+
+1286
+02:21:18,040 --> 02:21:21,040
+la clasificación de la sensibilidad
+
+1287
+02:21:21,040 --> 02:21:28,040
+y en este caso cuando cambiamos el umbral para 0.4994
+
+1288
+02:21:28,040 --> 02:21:36,040
+tuvimos un cambio de sensibilidad mejorado un poco para 0.815
+
+1289
+02:21:36,040 --> 02:21:40,040
+con un corte mayor, menos alertas aquí y menor sensibilidad
+
+1290
+02:21:40,040 --> 02:21:42,040
+entonces el ranking no cambia
+
+1291
+02:21:42,040 --> 02:21:47,040
+la área sobre la curva rock siempre será mantenida en 0.9
+
+1292
+02:21:47,040 --> 02:21:49,040
+porque acá si vamos cambiando el umbral
+
+1293
+02:21:49,040 --> 02:21:53,040
+recuerda que la área sobre la curva rock no toma en cuenta el umbral
+
+1294
+02:21:54,040 --> 02:21:57,040
+calcula la área, exactamente cambiando estos valores del umbral
+
+1295
+02:21:57,040 --> 02:22:01,040
+pero por supuesto el umbral nos va a informar o va a cambiar
+
+1296
+02:22:01,040 --> 02:22:04,040
+en términos de la sensibilidad
+
+1297
+02:22:06,040 --> 02:22:09,040
+bueno, el ESF va a hacerse varios cortes
+
+1298
+02:22:09,040 --> 02:22:12,040
+y nos va a ayudar exactamente a clasificar a estos individuos
+
+1299
+02:22:13,040 --> 02:22:15,040
+de forma general le presenté varios métodos
+
+1300
+02:22:15,040 --> 02:22:20,040
+como el HIC, Mahalanobis, KNL, Loft, TBScan, PCA
+
+1301
+02:22:21,040 --> 02:22:23,040
+y Isolation Forest
+
+1302
+02:22:23,040 --> 02:22:28,040
+ahora se conoce varios métodos para poder hacer clasificación
+
+1303
+02:22:28,040 --> 02:22:31,040
+y ojalá pueda aplicar al menos alguno de ellos en su trabajo
+
+1304
+02:22:32,040 --> 02:22:34,040
+era esto que quería hablar por hoy
+
+1305
+02:22:34,040 --> 02:22:36,040
+cerramos exactamente a las 9
+
+1306
+02:22:38,040 --> 02:22:40,040
+dejamos solamente algunas decisiones acá
+
+1307
+02:22:40,040 --> 02:22:43,040
+para ver si hay etiquetas, lo que hacer si no hay etiquetas
+
+1308
+02:22:43,040 --> 02:22:45,040
+básicamente las formaciones que ya conocemos
+
+1309
+02:22:45,040 --> 02:22:48,040
+si tenemos etiquetas vamos a pensar en supervisar
+
+1310
+02:22:48,040 --> 02:22:50,040
+si no hay etiquetas nada que hacer
+
+1311
+02:22:54,040 --> 02:22:56,040
+era esto que quería comentar con Ceres
+
+1312
+02:22:56,040 --> 02:22:58,040
+los códigos están disponibles
+
+1313
+02:22:58,040 --> 02:22:59,040
+pueden correr
+
+1314
+02:22:59,040 --> 02:23:03,040
+en la próxima ayudantía me junto con Ceres para revisar el contenido
+
+1315
+02:23:03,040 --> 02:23:06,040
+y ahí corremos más ejemplos
+
+1316
+02:23:07,040 --> 02:23:09,040
+pero todos están acá, la distancia de Mahalanobis
+
+1317
+02:23:09,040 --> 02:23:12,040
+si no corre el código no va a tener problemas
+
+1318
+02:23:12,040 --> 02:23:16,040
+la distancia de Mahalanobis, el KNL como había comentado
+
+1319
+02:23:16,040 --> 02:23:18,040
+Lofty
+
+1320
+02:23:20,040 --> 02:23:21,040
+TBScan
+
+1321
+02:23:24,040 --> 02:23:25,040
+PCA
+
+1322
+02:23:25,040 --> 02:23:27,040
+y por fin
+
+1323
+02:23:37,040 --> 02:23:39,040
+ah sí, ese no
+
+1324
+02:23:39,040 --> 02:23:41,040
+está todo acá, la base PtD
+
+1325
+02:23:42,040 --> 02:23:45,040
+entonces como corre el código no va a tener problemas
+
+1326
+02:23:45,040 --> 02:23:48,040
+el TBS va a salir exactamente a la base PtD
+
+1327
+02:23:48,040 --> 02:23:50,040
+ahí no vamos a ver el chip program
+
+1328
+02:23:50,040 --> 02:23:53,040
+el nombrar y los componentes que me sacan
+
+1329
+02:23:53,040 --> 02:23:57,040
+los scores, el nombrar, todo lo que necesita
+
+1330
+02:23:57,040 --> 02:24:00,040
+como ser Isolation Forest, es cual fue lo mejor nombrar
+
+1331
+02:24:00,040 --> 02:24:02,040
+entre otros
+
+1332
+02:24:02,040 --> 02:24:05,040
+y como se ve aquí, el nombre de la base PtD
+
+1333
+02:24:05,040 --> 02:24:07,040
+el nombre de la base PtD
+
+1334
+02:24:07,040 --> 02:24:11,040
+y como se calcula la area sobre la cruzahog para estos casos
+
+1335
+02:24:14,040 --> 02:24:18,040
+como cambia también la sensibilidad cuando vamos a hablar con quantiles
+
+1336
+02:24:18,040 --> 02:24:20,040
+cuando vamos a hablar con quantiles
+
+1337
+02:24:20,040 --> 02:24:23,040
+bueno, en fin, sería eso que había planificado para ustedes
+
+1338
+02:24:23,040 --> 02:24:25,040
+tienen los códigos
+
+1339
+02:24:25,040 --> 02:24:30,040
+ya saben cómo aplicar varios métodos para detección de outliers
+
+1340
+02:24:30,040 --> 02:24:34,040
+bueno, cuando le preguntan, saben cómo evaluar detección de outliers
+
+1341
+02:24:34,040 --> 02:24:37,040
+a la hora saben varios métodos y los métodos muy poderosos
+
+1342
+02:24:38,040 --> 02:24:40,040
+los que damos acá no porque
+
+1343
+02:24:40,040 --> 02:24:43,040
+se tienen problemas con outliers
+
+1344
+02:24:43,040 --> 02:24:46,040
+pueden buscar siempre métodos nuevos
+
+1345
+02:24:46,040 --> 02:24:48,040
+yo vi gente trabajando con su support vector machine
+
+1346
+02:24:48,040 --> 02:24:53,040
+con redes neuronales, hay varias formas nuevas de intentar detectar outliers
+
+1347
+02:24:53,040 --> 02:24:56,040
+estas son las más conocidas
+
+1348
+02:24:56,040 --> 02:25:01,040
+que ya están bien implementadas, esencias para que ustedes puedan trabajar
+
+1349
+02:25:01,040 --> 02:25:06,040
+y tener un poder muy bueno para detectar los posibles valores outliers
+
+1350
+02:25:07,040 --> 02:25:09,040
+bueno, era eso que había planificado para hoy
+
+1351
+02:25:09,040 --> 02:25:11,040
+estoy disponible a preguntas
+
+1352
+02:25:13,040 --> 02:25:16,040
+profesor, una pregunta Claudia por acá
+
+1353
+02:25:16,040 --> 02:25:19,040
+en relación a la clase del jueves
+
+1354
+02:25:19,040 --> 02:25:24,040
+se nos va a presentar el taller que tenemos que resolver
+
+1355
+02:25:24,040 --> 02:25:29,040
+y así mismo la clase va a estar enfocada presentando el taller
+
+1356
+02:25:29,040 --> 02:25:31,040
+o va a ser una clase distinta?
+
+1357
+02:25:32,040 --> 02:25:34,040
+esa es una excelente pregunta Claudia
+
+1358
+02:25:34,040 --> 02:25:40,040
+yo vi la programación y el profesor que va a estar responsable por el taller es Eloy
+
+1359
+02:25:40,040 --> 02:25:43,040
+voy a dejar una pregunta para Eloy, exactamente para eso
+
+1360
+02:25:43,040 --> 02:25:45,040
+porque no sé si él no sabe cómo va a ser
+
+1361
+02:25:45,040 --> 02:25:46,040
+tiene que preguntar a Ricardo
+
+1362
+02:25:46,040 --> 02:25:50,040
+pero lo ideal sería que los ayudantes ya tienen esa información
+
+1363
+02:25:50,040 --> 02:25:55,040
+ahí esa duda debería contestar a Claudia lo más pronto posible
+
+1364
+02:25:56,040 --> 02:25:59,040
+todavía si no tengo idea cómo va a ser el taller
+
+1365
+02:25:59,040 --> 02:26:01,040
+Ricardo no me informó
+
+1366
+02:26:01,040 --> 02:26:05,040
+entonces, bueno, voy a tener la clase de ahora
+
+1367
+02:26:05,040 --> 02:26:07,040
+que fue ahora ese martes
+
+1368
+02:26:07,040 --> 02:26:09,040
+y tengo la próxima el próximo martes
+
+1369
+02:26:09,040 --> 02:26:13,040
+y ahí encerra mi participación en el diplomado
+
+1370
+02:26:13,040 --> 02:26:18,040
+entonces la de jueves ahora tenemos que preguntar
+
+1371
+02:26:18,040 --> 02:26:22,040
+exactamente para Eloy porque él es responsable por ese curso
+
+1372
+02:26:22,040 --> 02:26:28,040
+aproveché de preguntar como usted siempre dice que siempre están en contacto con el profesor
+
+1373
+02:26:28,040 --> 02:26:30,040
+por eso aproveché de la instancia
+
+1374
+02:26:30,040 --> 02:26:34,040
+Eloy, por ejemplo, lo que yo hago con el vacío
+
+1375
+02:26:34,040 --> 02:26:42,040
+en ese sábado no tenemos, no hay repaso, solamente el próximo
+
+1376
+02:26:42,040 --> 02:26:46,040
+entonces mañana yo iría preguntarle a Eloy, ¿cómo está la cosa?
+
+1377
+02:26:46,040 --> 02:26:48,040
+¿podemos compartir el material?
+
+1378
+02:26:48,040 --> 02:26:51,040
+porque ahí yo preparo un repaso conjunto
+
+1379
+02:26:51,040 --> 02:26:54,040
+pero como no tenemos repaso no voy a abrir con Eloy
+
+1380
+02:26:54,040 --> 02:26:57,040
+entonces no sé cómo Eloy va a hacer con el tema del taller
+
+1381
+02:26:57,040 --> 02:27:00,040
+pero si no, yo vi a Eloy hoy en la universidad
+
+1382
+02:27:00,040 --> 02:27:04,040
+entonces como tres veces hablamos pero no le pregunté sobre eso
+
+1383
+02:27:04,040 --> 02:27:06,040
+lo siento Claudia
+
+1384
+02:27:06,040 --> 02:27:10,040
+yo vi ese tema del taller también me quedé curioso
+
+1385
+02:27:10,040 --> 02:27:14,040
+¿cómo va a ser? porque no es una clase, Eloy no va a aplicar, ¿cómo va a ser?
+
+1386
+02:27:14,040 --> 02:27:17,040
+los ayudantes no tendrán que apoyar en eso
+
+1387
+02:27:17,040 --> 02:27:19,040
+realmente lo siento, no tengo la información
+
+1388
+02:27:19,040 --> 02:27:21,040
+o qué?
+
+1389
+02:27:22,040 --> 02:27:24,040
+gracias de todas formas
+
+1390
+02:27:24,040 --> 02:27:26,040
+gracias, bueno, lo siento
+
+1391
+02:27:26,040 --> 02:27:32,040
+pero Mauricio, Vanessa, tienen la duda ahí
+
+1392
+02:27:32,040 --> 02:27:35,040
+idealmente hablen con Ricardo mañana temprano
+
+1393
+02:27:35,040 --> 02:27:40,040
+y envíen un correo para Claudia y para los alumnos ya informados cómo va a ser
+
+1394
+02:27:40,040 --> 02:27:43,040
+ok, sí le vamos a hacer llegar la pregunta
+
+1395
+02:27:43,040 --> 02:27:45,040
+perfecto, muy bien
+
+1396
+02:27:45,040 --> 02:27:50,040
+si no hay nada más nos vemos el próximo martes
+
+1397
+02:27:50,040 --> 02:27:53,040
+me junto con ustedes el próximo martes
+
+1398
+02:27:53,040 --> 02:27:57,040
+que le va muy bien muchas gracias a todos que tengan una buena noche
+
+1399
+02:27:57,040 --> 02:27:59,040
+gracias profe, chau chau
+
+1400
+02:27:59,040 --> 02:28:01,040
+gracias, buena noche
+
+1401
+02:28:01,040 --> 02:28:04,040
+chau que tengan una buena noche

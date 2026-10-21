@@ -1,0 +1,168 @@
+# Clase 39: K-means y numero de grupos
+# Pedro Luiz Ramos - 29 de septiembre de 2026
+# install.packages("cluster")
+
+# 1. Leer los datos --------------------------------------------------------
+library(cluster)
+setwd("D:/codigos/clustering")
+
+vinos <- read.csv("vinos.csv")
+head(vinos)
+dim(vinos)
+
+# 2. Estandarizar ----------------------------------------------------------
+# Codigo identifica al vino; no es una variable para formar los grupos.
+x <- vinos[, names(vinos) != "codigo"]
+z <- scale(x)
+
+# Cada variable queda con media 0 y desviacion estandar 1.
+head(round(z, 2))
+
+# 3. Ajustar K-means para distintos numeros de grupos -----------------------
+# nstart = 50 prueba 50 inicios y conserva el de menor WSS para cada k.
+set.seed(2026)
+valores_k <- 1:8
+modelos <- vector("list", length(valores_k))
+wss <- numeric(length(valores_k))
+silueta <- rep(NA_real_, length(valores_k))
+distancias <- dist(z)
+
+for (k in valores_k) {
+  modelos[[k]] <- kmeans(z, centers = k, nstart = 50,
+                         iter.max = 100, algorithm = "Lloyd")
+  wss[k] <- modelos[[k]]$tot.withinss
+
+  # La silueta compara grupos, por eso no se calcula con k = 1.
+  if (k > 1) {
+    silueta[k] <- mean(silhouette(modelos[[k]]$cluster, distancias)[, 3])
+  }
+}
+
+comparacion <- data.frame(k = valores_k, WSS = wss, Silueta = silueta)
+print(comparacion, digits = 4, row.names = FALSE)
+
+# 4. Elegir k: codo y silueta -----------------------------------------------
+# En el codo buscamos donde la reduccion del WSS comienza a ser menor.
+# Para elegir automaticamente, usamos la mayor silueta entre k = 2 y k = 8.
+k_silueta <- comparacion$k[which.max(comparacion$Silueta)]
+cat("k recomendado por silueta:", k_silueta, "\n")
+
+par(mfrow = c(1, 2))
+plot(valores_k, wss, type = "b", pch = 19, col = "steelblue",
+     xlab = "Numero de grupos (k)", ylab = "WSS", main = "Codo")
+plot(valores_k[-1], silueta[-1], type = "b", pch = 19, col = "darkorange3",
+     xlab = "Numero de grupos (k)", ylab = "Silueta media", main = "Silueta")
+abline(v = k_silueta, lty = 2, col = "grey50")
+points(k_silueta, silueta[k_silueta], pch = 19, col = "darkgreen", cex = 1.5)
+par(mfrow = c(1, 1))
+
+# 5. Revisar la solucion elegida -------------------------------------------
+# Recuperamos el ajuste ya calculado, sin volver a cambiar los grupos.
+k_elegido <- k_silueta
+kmedias <- modelos[[k_elegido]]
+grupo <- kmedias$cluster
+
+cat("\nCantidad de vinos por grupo:\n")
+print(table(grupo))
+
+# Los centroides estan en escala estandarizada; 1 significa una desviacion
+# estandar sobre la media general de esa variable.
+cat("\nCentroides estandarizados:\n")
+print(round(kmedias$centers, 2))
+print(c(WSS = kmedias$tot.withinss, BSS = kmedias$betweenss,
+        TSS = kmedias$totss))
+
+# Las medias en unidades originales ayudan a describir cada grupo.
+perfiles <- aggregate(x, by = list(Grupo = grupo), FUN = mean)
+cat("\nMedias en unidades originales:\n")
+print(round(perfiles, 2))
+
+# 6. Graficar los grupos ---------------------------------------------------
+# Mostramos dos variables, pero K-means utilizo las 13 variables estandarizadas.
+# Los numeros de grupo son etiquetas y pueden cambiar entre R y Python.
+colores <- hcl.colors(k_elegido, "Dark 3")
+plot(vinos$alcohol, vinos$flavonoides, col = colores[grupo], pch = 19,
+     xlab = "Alcohol", ylab = "Flavonoides", main = "Grupos de K-means")
+legend("topleft", legend = paste("Grupo", 1:k_elegido),
+       col = colores, pch = 19, bty = "n")
+
+boxplot(alcohol ~ grupo, data = vinos, col = colores,
+        xlab = "Grupo", ylab = "Alcohol", main = "Alcohol por grupo")
+
+# 7. Comparar los grupos con las clases reales -----------------------------
+# Recuperamos las clases de UCI en el mismo orden de los vinos.
+# No se usaron para ajustar K-means ni para elegir k.
+etiquetas <- read.csv("vinos_clases_reales.csv")
+clase_real <- etiquetas$clase_real[match(vinos$codigo, etiquetas$codigo)]
+tabla <- table(Clase_real = clase_real, Grupo = grupo)
+print(tabla)
+
+# Los numeros de grupo son arbitrarios. Coloreamos cada grupo segun
+# su clase mayoritaria para poder comparar los dos graficos.
+clase_del_grupo <- apply(tabla, 2, which.max)
+clase_asignada <- clase_del_grupo[as.character(grupo)]
+discrepa <- clase_asignada != clase_real
+coincidencias <- sum(!discrepa)
+pureza <- mean(!discrepa)
+cat("Coincidencias con la clase mayoritaria:", coincidencias, "de", nrow(vinos), "\n")
+cat("Pureza de los grupos:", round(100 * pureza, 1), "%\n")
+# Es una comparacion descriptiva de estos vinos, no exactitud en datos nuevos.
+
+# PCA resume las 13 variables en dos ejes para dibujar los mismos vinos.
+# No volvemos a ajustar K-means sobre estos dos componentes.
+# Los signos de los ejes pueden invertirse entre R y Python sin cambiar los grupos.
+pca <- prcomp(z, center = FALSE, scale. = FALSE)
+coordenadas <- pca$x[, 1:2]
+varianza <- 100 * pca$sdev^2 / sum(pca$sdev^2)
+eje_x <- paste0("PC1 (", round(varianza[1], 1), "% de varianza)")
+eje_y <- paste0("PC2 (", round(varianza[2], 1), "% de varianza)")
+paleta <- c("#4067A0", "#C66A25", "#247D72")
+
+par(mfrow = c(1, 2), oma = c(3, 0, 2, 0))
+plot(coordenadas, col = paleta[clase_real], pch = 19,
+     xlab = eje_x, ylab = eje_y, main = "Clases reales de los vinos")
+legend("topright", legend = paste("Clase", 1:3), col = paleta,
+       pch = 19, bty = "n", cex = 0.8)
+
+plot(coordenadas, col = paleta[clase_asignada], pch = 19,
+     xlab = eje_x, ylab = eje_y, main = "Grupos encontrados por K-means")
+legend("topright", legend = paste0("Grupo ", 1:k_elegido,
+       " (clase ", clase_del_grupo, ")"), col = paleta[clase_del_grupo],
+       pch = 19, bty = "n", cex = 0.8)
+points(coordenadas[discrepa, , drop = FALSE], pch = 1, cex = 1.7, lwd = 1.5)
+mtext(paste0("Coincidencia con clase mayoritaria: ", coincidencias, "/",
+             nrow(vinos), " vinos (", round(100 * pureza, 1), "%)."),
+      side = 3, outer = TRUE, line = 0)
+mtext("Colores por clase mayoritaria; circulos negros: discrepancias.",
+      side = 1, outer = TRUE, line = 1, cex = 0.9)
+par(mfrow = c(1, 1), oma = c(0, 0, 0, 0))
+
+# 8. Complemento: elegir k con Gap -----------------------------------------
+# Comparamos con 30 bases simuladas sin grupos, uniformes en el rango
+# de cada columna de z. Este bloque puede demorar mas que los anteriores.
+set.seed(2026)
+gap <- clusGap(z, FUNcluster = kmeans, K.max = max(valores_k), B = 30,
+               nstart = 20, iter.max = 100, algorithm = "Lloyd",
+               d.power = 2, spaceH0 = "original", verbose = FALSE)
+
+resultado_gap <- data.frame(k = valores_k, Gap = gap$Tab[, "gap"],
+                            Error = gap$Tab[, "SE.sim"])
+print(round(resultado_gap, 3), row.names = FALSE)
+
+# Elegimos el primer k con Gap(k) >= Gap(k+1) - Error(k+1).
+k_gap <- maxSE(gap$Tab[, "gap"], gap$Tab[, "SE.sim"], method = "Tibs2001SEmax")
+cat("k recomendado por Gap:", k_gap, "\n")
+
+with(resultado_gap, {
+  plot(k, Gap, type = "b", pch = 19, col = "steelblue",
+       ylim = range(Gap - Error, Gap + Error),
+       xlab = "Numero de grupos (k)", ylab = "Gap", main = "Estadistico Gap")
+  arrows(k, Gap - Error, k, Gap + Error, angle = 90, code = 3,
+         length = 0.05, col = "steelblue")
+})
+abline(v = k_gap, lty = 2, col = "darkorange3")
+
+print(data.frame(Criterio = c("Silueta", "Gap"), k = c(k_silueta, k_gap)),
+      row.names = FALSE)
+# Los criterios pueden discrepar: no hay un k verdadero garantizado.
+# Para los perfiles y graficos anteriores usamos la solucion de silueta.

@@ -1,0 +1,811 @@
+"""Genera el notebook guiado de Introducción al Machine Learning (Clase 31).
+
+Uso normal:      python notebook_c31.py             -> Guias/notebooks/C31_IntroML.ipynb
+Modo de prueba:  C31_TEST=1 python notebook_c31.py  -> las soluciones se emiten como celdas de código
+                                                       (para ejecutar el notebook completo con nbclient).
+"""
+import json
+import os
+from pathlib import Path
+
+TEST = os.environ.get("C31_TEST") == "1"
+DIR = Path(__file__).resolve().parent.parent / "notebooks"
+OUT = DIR / ("_C31_IntroML_test.ipynb" if TEST else "C31_IntroML.ipynb")
+cells = []
+
+
+def md(text):
+    cells.append({"cell_type": "markdown", "metadata": {}, "source": text.strip("\n")})
+
+
+def code(text):
+    cells.append({"cell_type": "code", "metadata": {}, "execution_count": None,
+                  "outputs": [], "source": text.strip("\n")})
+
+
+def solution(code_text, note=""):
+    if TEST:
+        code(code_text)
+        return
+    body = f"{note}\n\n" if note else ""
+    md(f"<details><summary><b>Ver solución</b> (inténtalo al menos 5 minutos antes)</summary>\n\n"
+       f"{body}```python\n{code_text.strip()}\n```\n\n</details>")
+
+
+# ---------------------------------------------------------------- encabezado
+md("""
+# Clase 31 · Introducción al Machine Learning
+**Diplomado Data Science** · Profa. Laura Sánchez
+
+Material de apoyo:
+- `Guias/C31_Guia_IntroML.pdf` — guía visual de la clase.
+- `Guias/apuntes/C31_Apuntes_IntroML.pdf` — apuntes con ejemplos resueltos y pistas.
+- `Guias/apuntes/C31_Ejercicios_Cuaderno_IntroML.pdf` — ejercicios en papel (antes o después de este notebook).
+- Material de la profesora: `Sesion_31_Intro_a_ML_Practica.ipynb`, las diapositivas, el apunte, y (para el desafío «¿supervisado o no supervisado?») `Base de datos Churn-Actividad repaso.xlsx` y las respuestas del caso de repaso (Sesiones 31 y 32), que están en la carpeta de la Clase 32.
+- Transcripción: `VideosClases/Clase 31 - Introduccion a Machine learning.txt` (versión corregida).
+
+⚠️ **Antes de empezar**: necesitas `scikit-learn`, `pandas`, `numpy`, `matplotlib` y `openpyxl` (para leer el .xlsx). Si no los tienes:
+```
+pip install scikit-learn pandas numpy matplotlib openpyxl
+```
+**Datos**: (1) el caso **Club Activo**, 800 clientes **simulados** que se generan con código y semilla fija (`np.random.seed(42)`): obtienes los mismos números que la profesora; (2) la **base real** de 3.150 clientes de la actividad de repaso (archivo en la carpeta de la Clase 32; se usa en B5, C4, D3 y el ejercicio de cierre).
+
+### Objetivos
+1. Distinguir **supervisado** (clasificación y regresión), **no supervisado** (clustering y reducción de dimensionalidad) y **refuerzo**, y elegir el enfoque según el problema.
+2. Entrenar y evaluar una **regresión logística** (sigmoide, umbral, matriz de confusión) y una **regresión lineal** (RMSE, R²), con el preprocesamiento **dentro de un `Pipeline`**.
+3. Agrupar con **K-Means** (una iteración a mano, escalado, elegir k) y usar **PCA** solo para mirar los grupos.
+4. Reconocer **subajuste** y **sobreajuste**, y ver el efecto de **Ridge** y **Lasso**.
+5. Evitar la **trampa del accuracy** con una línea base, la matriz de confusión y las métricas por clase.
+6. Reconocer lo que el material original afirma de forma imprecisa.
+
+### Plan
+| Parte | Min | Bloque |
+|---|---|---|
+| — | 10 | Preparación y datos |
+| A | 10 | A1 · Del problema a la tarea |
+| A | 10 | A2 · Elegir el enfoque (y sus límites) |
+| B | 20 | B1 · Clasificación: Pipeline y regresión logística |
+| B | 15 | B2 · La sigmoide a mano |
+| B | 15 | B3 · Matriz de confusión y línea base |
+| B | 15 | B4 · Regresión |
+| B | 20 | B5 · La base real: ¿supervisado o no? |
+| C | 15 | C1 · K-Means a mano |
+| C | 20 | C2 · K-Means en Club Activo: escalar y elegir k |
+| C | 10 | C3 · PCA para mirar los grupos |
+| C | 15 | C4 · Segmentos en la base real |
+| D | 15 | D1 · Subajuste y sobreajuste |
+| D | 15 | D2 · Ridge frente a Lasso |
+| D | 15 | D3 · La trampa del accuracy |
+| — | 10 | Alertas del material |
+| — | 35 | Ejercicio de cierre **sin ayuda** (base real) |
+
+### Cómo usar este notebook
+- Ejecuta las celdas en orden (`Shift + Enter`).
+- Las celdas marcadas con ✍️ son **tuyas**: escribe el código antes de abrir la solución.
+- Cada ejercicio tiene una solución desplegable. Intenta **al menos 5 minutos** antes de abrirla.
+- Los números del texto fueron verificados contra la salida real de este notebook con `scikit-learn 1.9`. Con otras versiones pueden variar un poco.
+""")
+
+# ---------------------------------------------------------------- preparación
+md("## Preparación")
+code("""
+import warnings
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from IPython.display import display
+
+import sklearn
+from sklearn.cluster import KMeans
+from sklearn.compose import ColumnTransformer
+from sklearn.decomposition import PCA
+from sklearn.dummy import DummyClassifier
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import Lasso, LassoCV, LinearRegression, LogisticRegression, Ridge
+from sklearn.metrics import (accuracy_score, adjusted_rand_score, confusion_matrix, f1_score, mean_squared_error,
+                             precision_score, r2_score, recall_score, roc_auc_score, silhouette_score)
+from sklearn.model_selection import cross_val_predict, cross_val_score, train_test_split
+from sklearn.pipeline import Pipeline, make_pipeline
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
+
+warnings.filterwarnings("ignore")
+plt.rcParams.update({"figure.dpi": 100, "axes.grid": True, "grid.alpha": 0.3})
+RS = 42   # semilla de la clase
+print("scikit-learn:", sklearn.__version__)
+""")
+md("""
+### Mini-repaso de la API (Clase 30)
+Los tres verbos valen igual para escaladores, imputadores y modelos: **`fit`** aprende (solo con entrenamiento), **`transform`** aplica lo aprendido y **`predict`** predice con un modelo ya ajustado. Un **`Pipeline`** encadena pasos y hace el `fit` de cada uno solo con los datos que recibe; un **`ColumnTransformer`** aplica un tratamiento distinto a cada columna. Hoy los usamos para que **nada se aprenda con la prueba**.
+
+### Los datos de la clase: Club Activo (simulados)
+La profesora simula un servicio de suscripción con 800 clientes. El `gasto_mensual` depende de la antigüedad y el uso (más ruido) y la probabilidad de cancelar sube con las quejas y baja con el uso y la antigüedad. La función de abajo es **idéntica** a su código y además genera, **en el mismo orden**, los números aleatorios que ella usa después (la curva de ajuste y las variables de ruido), para que obtengas sus mismos resultados.
+""")
+code("""
+def club_activo(n=800):
+    np.random.seed(42)
+    edad = np.random.normal(38, 12, n).clip(18, 75)
+    antiguedad_meses = np.random.exponential(14, n).clip(1, 60)
+    uso_mensual = np.random.poisson(8, n).clip(0, 30)
+    quejas_soporte = np.random.poisson(0.6, n).clip(0, 8)
+    # el gasto depende (con ruido) de la antigüedad y el uso: la regla "oculta" que la regresión debe redescubrir
+    gasto_mensual = (25 + 0.9 * antiguedad_meses + 3.2 * uso_mensual + np.random.normal(0, 12, n)).clip(15, None)
+    # la probabilidad de cancelar sube con las quejas y baja con el uso y la antigüedad (logit + sigmoide)
+    logit = (-0.7 + 1.35 * quejas_soporte - 0.14 * uso_mensual - 0.05 * antiguedad_meses + np.random.normal(0, 0.5, n))
+    cancelo = (np.random.rand(n) < 1 / (1 + np.exp(-logit))).astype(int)
+    d = pd.DataFrame({"edad": edad.round(1), "antiguedad_meses": antiguedad_meses.round(1), "uso_mensual": uso_mensual,
+                      "quejas_soporte": quejas_soporte, "gasto_mensual": gasto_mensual.round(0), "cancelo": cancelo})
+    for col in ["edad", "antiguedad_meses"]:                     # 3 % de faltantes, como en la clase
+        idx = d.sample(frac=0.03, random_state=1).index
+        d.loc[idx, col] = np.nan
+    # sorteos que la profesora hace más adelante (Secciones 7 y 8), en el mismo orden
+    x_dato = np.linspace(0, 10, 60)
+    y_dato = 3 + 2.5 * x_dato - 0.18 * x_dato ** 2 + np.random.normal(0, 1.6, 60)
+    ruido1, ruido2 = np.random.normal(0, 1, n), np.random.normal(0, 1, n)
+    return d, x_dato, y_dato, ruido1, ruido2
+
+
+df, x_dato, y_dato, ruido1, ruido2 = club_activo()
+print("Clientes:", len(df), "| tasa de cancelación:", f"{df['cancelo'].mean():.1%}", "| faltantes:", df.isna().sum()[lambda s: s > 0].to_dict())
+df.head()
+""")
+md("""
+La tasa de cancelación es **20.9 %** (en clase salió 22.8 % con otra versión del notebook). Hay 24 faltantes en `edad` y 24 en `antiguedad_meses`: **no los imputamos todavía**. La profesora los rellena antes de dividir; nosotros lo haremos dentro de un `Pipeline`, para que la media y la mediana se calculen solo con el entrenamiento.
+""")
+
+# ================================================================== PARTE A
+md("""
+## Parte A · El mapa del Machine Learning
+
+### A1 · Del problema a la tarea (10 min)
+Una **regla fija** dice qué hacer ante ciertas condiciones («si la nota ≥ 4, aprueba»). Un **modelo** ajusta sus parámetros con ejemplos. El ciclo es siempre el mismo: **datos → modelo → evaluación (error contra la realidad) → mejora**. Según los datos, el problema cae en una familia:
+
+| Familia | ¿Hay variable objetivo? | Tarea | Ejemplo (Club Activo) | Algoritmo de la clase |
+|---|---|---|---|---|
+| Supervisado | sí, categoría | clasificación | ¿cancela? | regresión logística |
+| Supervisado | sí, número | regresión | ¿cuánto gastará? | regresión lineal |
+| No supervisado | no | clustering | segmentos de clientes | K-Means |
+| No supervisado | no | reducción de dimensionalidad | resumir variables | PCA |
+| Por refuerzo | entorno + recompensa | aprender acciones | ensayo y error | — |
+
+Deep Learning es un **subconjunto de ML** (redes con muchas capas); no es una familia aparte: puede ser supervisado, no supervisado o de refuerzo.
+
+La profesora cierra con una función que clasifica el problema con cuatro preguntas. La copiamos tal cual:
+""")
+code("""
+def recomendar_enfoque(tengo_etiquetas, quiero_descubrir_patrones, entorno_dinamico, problema_muy_complejo):
+    if problema_muy_complejo:
+        return "Aprendizaje Profundo (redes neuronales) — imágenes, audio, texto, gran volumen de datos."
+    if entorno_dinamico:
+        return "Aprendizaje por Refuerzo — agentes que aprenden por ensayo y error maximizando una recompensa."
+    if tengo_etiquetas:
+        return "Aprendizaje Supervisado — Regresión (predicción numérica) o Clasificación (predicción de categoría)."
+    if quiero_descubrir_patrones:
+        return "Aprendizaje No Supervisado — K-Means (segmentar) o PCA (simplificar/visualizar)."
+    return "Vuelve a evaluar tus datos: probablemente necesitas más contexto sobre qué problema quieres resolver."
+
+print(recomendar_enfoque(tengo_etiquetas=True, quiero_descubrir_patrones=False, entorno_dinamico=False, problema_muy_complejo=False))
+print(recomendar_enfoque(tengo_etiquetas=False, quiero_descubrir_patrones=True, entorno_dinamico=False, problema_muy_complejo=False))
+""")
+md("""
+### ✍️ Ejercicio A1
+Usa `recomendar_enfoque` para clasificar: (a) predecir si un correo es spam (hay historial marcado); (b) agrupar tiendas según su perfil de ventas, sin categorías previas; (c) un robot que aprende a caminar con premios; (d) reconocer objetos en 2 millones de fotos con etiquetas. ¿Alguna respuesta te parece incompleta?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+casos = {
+    "a) spam":              dict(tengo_etiquetas=True,  quiero_descubrir_patrones=False, entorno_dinamico=False, problema_muy_complejo=False),
+    "b) agrupar tiendas":   dict(tengo_etiquetas=False, quiero_descubrir_patrones=True,  entorno_dinamico=False, problema_muy_complejo=False),
+    "c) robot":             dict(tengo_etiquetas=False, quiero_descubrir_patrones=False, entorno_dinamico=True,  problema_muy_complejo=False),
+    "d) 2 millones fotos":  dict(tengo_etiquetas=True,  quiero_descubrir_patrones=False, entorno_dinamico=False, problema_muy_complejo=True),
+}
+for nombre, kw in casos.items():
+    print(nombre, "->", recomendar_enfoque(**kw).split(" — ")[0])
+""", "(a) supervisado (clasificación), (b) no supervisado (K-Means), (c) refuerzo, (d) aprendizaje profundo. La respuesta (d) es incompleta: ese problema **también** es supervisado (hay etiquetas); la función devuelve solo el primer caso que se cumple y trata las familias como excluyentes.")
+
+md("""
+### A2 · Elegir el enfoque y sus límites (10 min)
+La función es un buen punto de partida, pero **no decide por ti**. Tres límites que conviene recordar:
+
+1. Las familias **no son excluyentes**: una red neuronal puede ser supervisada; un agente de refuerzo puede usar redes; un sistema de recomendación mezcla etiquetas y estructura.
+2. **No siempre hace falta IA.** «Quieren un Ferrari para ir a comprar pan a la esquina»: si una regla, una tabla o una regresión ya resuelven el problema, un modelo más complejo solo cuesta más.
+3. Antes del algoritmo, la **métrica**: ¿con qué número demostraré que el modelo supera la regla actual?
+
+El **desafío 1 de la actividad de repaso** (Retención quiere anticipar quién cancela; Marketing quiere descubrir «tipos» de clientes sin etiquetas) es exactamente esta pregunta. Lo resolvemos con datos reales en B5 y C4.
+
+### ✍️ Ejercicio A2
+Tu jefatura propone usar Deep Learning para predecir la demanda semanal de 500 productos con 3 años de historia en una planilla. ¿Qué le responderías y con qué línea base compararías?
+""")
+code("""
+# tu respuesta aquí (puedes escribirla como comentario)
+""")
+solution("""
+respuesta = (
+    "Datos tabulares y pocas filas: partir con regresión o series de tiempo (y modelos de árboles). "
+    "Línea base: la demanda de la semana anterior o un promedio móvil; el modelo debe superarla en el error de prueba. "
+    "Deep Learning solo si la línea base y los modelos simples no alcanzan y hay datos suficientes."
+)
+print(respuesta)
+""", "No hay una única respuesta, pero conviene empezar por modelos simples y una línea base. Con 500 productos × 156 semanas (≈ 78.000 filas, pero pocas por producto) Deep Learning no está justificado de entrada.")
+
+# ================================================================== PARTE B
+md("""
+## Parte B · Aprendizaje supervisado
+
+### B1 · Clasificación: Pipeline y regresión logística (20 min)
+¿Este cliente va a cancelar? La variable objetivo `cancelo` es una **categoría** (0 o 1): es un problema de **clasificación**. Flujo de la Clase 30: dividir (estratificado), ajustar con el entrenamiento, evaluar con la prueba. La diferencia con el notebook de la profesora es que la **imputación** (media para `edad`, mediana para `antiguedad_meses`) y el **escalado** van dentro del `Pipeline`.
+""")
+code("""
+FEATS_CLF = ["edad", "antiguedad_meses", "uso_mensual", "quejas_soporte"]
+X_tr, X_te, y_tr, y_te = train_test_split(df[FEATS_CLF], df["cancelo"], test_size=0.30, random_state=RS, stratify=df["cancelo"])
+
+def modelo_clasificacion(class_weight="balanced"):
+    imputar = ColumnTransformer([("edad", SimpleImputer(strategy="mean"), ["edad"]),
+                                 ("antig", SimpleImputer(strategy="median"), ["antiguedad_meses"]),
+                                 ("resto", "passthrough", ["uso_mensual", "quejas_soporte"])])
+    return Pipeline([("imp", imputar), ("esc", StandardScaler()), ("lr", LogisticRegression(class_weight=class_weight))])
+
+clf = modelo_clasificacion().fit(X_tr, y_tr)          # imputa, escala y ajusta: TODO con el entrenamiento
+pred = clf.predict(X_te)
+print("Entrenamiento:", X_tr.shape, "| prueba:", X_te.shape, "| cancelación en prueba:", f"{y_te.mean():.1%}")
+print(f"Accuracy {accuracy_score(y_te, pred):.1%} | precisión {precision_score(y_te, pred):.1%} | recall {recall_score(y_te, pred):.1%} | F1 {f1_score(y_te, pred):.1%}")
+""")
+md("""
+Resultado: **accuracy 73.3 %, precisión 39.4 %, recall 52.0 %, F1 44.8 %**: exactamente los números de la profesora (que imputaba antes de dividir; aquí cambian solo las celdas imputadas, sin efecto visible). Dos cosas para leer con cuidado:
+
+- `class_weight="balanced"` pondera las clases de forma **inversa a su frecuencia** (aquí ≈ 0.63 para «se queda» y 2.39 para «cancela»): el modelo se vuelve **alarmista**, detecta más cancelaciones y genera más falsas alarmas. Es una **decisión de modelado**, no un arreglo gratuito.
+- 73.3 % **no es un buen accuracy**: la línea base «nadie cancela» logra 79.2 % en esta prueba (lo veremos en B3).
+
+### ✍️ Ejercicio B1
+Ajusta el mismo modelo **sin** `class_weight`. ¿Cómo cambian precisión y recall? ¿Y el AUC?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+clf_sin = modelo_clasificacion(class_weight=None).fit(X_tr, y_tr)
+ps = clf_sin.predict(X_te)
+print(f"sin class_weight: accuracy {accuracy_score(y_te, ps):.1%} | precisión {precision_score(y_te, ps):.1%} | recall {recall_score(y_te, ps):.1%} | F1 {f1_score(y_te, ps):.1%}")
+print("AUC balanceado:", round(roc_auc_score(y_te, clf.predict_proba(X_te)[:, 1]), 3), "| AUC sin pesos:", round(roc_auc_score(y_te, clf_sin.predict_proba(X_te)[:, 1]), 3))
+""", "Sin pesos: precisión 69.2 % y recall 18.0 % (F1 28.6 %): casi no «alarma». El AUC es el mismo (0.685): los pesos **no mejoran el modelo**, solo cambian el punto de operación (cuántos casos se marcan como «cancela»).")
+
+md("""
+### B2 · La sigmoide a mano (15 min)
+La regresión logística calcula un **puntaje** `z = b₀ + b₁x₁ + …` y lo convierte en probabilidad con `p = 1 / (1 + e^(−z))`. Verifiquemos con un cliente de prueba que `predict_proba` no hace magia.
+""")
+code("""
+lr = clf.named_steps["lr"]
+print("Coeficientes (variables estandarizadas):", {k: round(float(v), 3) for k, v in zip(FEATS_CLF, lr.coef_[0])}, "| intercepto:", round(float(lr.intercept_[0]), 3))
+
+cliente = X_te.iloc[[0]]
+z_estandarizado = clf[:-1].transform(cliente)                     # imputar + escalar (lo aprendido en entrenamiento)
+z = (z_estandarizado @ lr.coef_[0] + lr.intercept_[0]).item()      # puntaje de riesgo
+p_mano = 1 / (1 + np.exp(-z))
+print(cliente.to_dict("records")[0])
+print(f"puntaje z = {z:.3f} -> p a mano = {p_mano:.4f} | predict_proba = {clf.predict_proba(cliente)[0, 1]:.4f}")
+print("Odds por 1 sd más de quejas: e^b =", round(float(np.exp(lr.coef_[0][3])), 2))
+""")
+md("""
+Coinciden. Los coeficientes están en unidades **estandarizadas**: quejas (+1.08) sube el riesgo, antigüedad (−0.80) y uso (−0.22) lo bajan, y la edad (+0.08) casi no importa. Cada desviación estándar adicional de quejas multiplica las *odds* por e^1.08 ≈ 2.9.
+
+### ✍️ Ejercicio B2
+Con el modelo ajustado, calcula cuántos clientes de prueba tienen `p ≥ 0.5` y cómo cambian precisión y recall con el umbral **0.7**. ¿Por qué subir el umbral aumenta la precisión?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+proba = clf.predict_proba(X_te)[:, 1]
+for umbral in (0.5, 0.7):
+    p_u = (proba >= umbral).astype(int)
+    print(f"umbral {umbral}: marcados {p_u.sum()} | precisión {precision_score(y_te, p_u):.1%} | recall {recall_score(y_te, p_u):.1%}")
+""", "Con 0.5 se marcan 66 clientes (precisión 39.4 %, recall 52.0 %). Con 0.7 se marcan solo 20: la precisión sube a 50.0 % (los que quedan son los más probables) pero el recall cae a 20.0 %. El umbral es una **decisión de negocio**: depende del costo de una falsa alarma frente a una cancelación no detectada.")
+
+md("""
+### B3 · Matriz de confusión y línea base (15 min)
+La **matriz de confusión** cuenta los cuatro tipos de resultado. En scikit-learn las **filas** son lo real y las **columnas** lo predicho: la celda superior izquierda son los **verdaderos negativos**.
+""")
+code("""
+cm = confusion_matrix(y_te, pred)
+vn, fp, fn, vp = cm.ravel()
+print(pd.DataFrame(cm, index=["real: se queda", "real: cancela"], columns=["pred: se queda", "pred: cancela"]))
+print(f"VN {vn} | FP {fp} | FN {fn} | VP {vp}")
+print(f"accuracy = (VP+VN)/total = {(vp + vn) / cm.sum():.1%} | precisión = VP/(VP+FP) = {vp / (vp + fp):.1%} | recall = VP/(VP+FN) = {vp / (vp + fn):.1%}")
+
+base = DummyClassifier(strategy="most_frequent").fit(X_tr, y_tr)
+pb = base.predict(X_te)
+print(f"\\nLínea base «nadie cancela»: accuracy {accuracy_score(y_te, pb):.1%} | recall {recall_score(y_te, pb):.1%}")
+print("AUC del modelo:", round(roc_auc_score(y_te, clf.predict_proba(X_te)[:, 1]), 3), "(0.5 = azar)")
+""")
+md("""
+VN 150, FP 40, FN 24, VP 26. El modelo **pierde contra la línea base en accuracy** (73.3 % frente a 79.2 %) pero es el único que detecta cancelaciones (recall 52 % frente a 0 %). Dos aclaraciones sobre lo dicho en clase: la celda superior izquierda son verdaderos **negativos** (no «149 verdaderos positivos»), y una precisión de 39.4 % con un 20.8 % de cancelación **no es «lanzar una moneda»**: un modelo al azar tendría precisión ≈ 20.8 % y AUC 0.5; este tiene AUC 0.685 (modesto, pero real).
+
+### ✍️ Ejercicio B3
+La profesora pidió **quitar `quejas_soporte`** y volver a ejecutar. Hazlo (reutiliza `modelo_clasificacion` con las otras tres variables) y compara accuracy, precisión, recall, F1 y AUC. ¿Es verdad que «lo único que baja es la exactitud»? ¿«Desbalanceamos» el modelo?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+f3 = ["edad", "antiguedad_meses", "uso_mensual"]
+imputar3 = ColumnTransformer([("edad", SimpleImputer(strategy="mean"), ["edad"]),
+                              ("antig", SimpleImputer(strategy="median"), ["antiguedad_meses"]),
+                              ("resto", "passthrough", ["uso_mensual"])])
+clf3 = Pipeline([("imp", imputar3), ("esc", StandardScaler()), ("lr", LogisticRegression(class_weight="balanced"))]).fit(X_tr[f3], y_tr)
+p3 = clf3.predict(X_te[f3])
+tabla = pd.DataFrame({"con quejas": [accuracy_score(y_te, pred), precision_score(y_te, pred), recall_score(y_te, pred), f1_score(y_te, pred), roc_auc_score(y_te, clf.predict_proba(X_te)[:, 1])],
+                      "sin quejas": [accuracy_score(y_te, p3), precision_score(y_te, p3), recall_score(y_te, p3), f1_score(y_te, p3), roc_auc_score(y_te, clf3.predict_proba(X_te[f3])[:, 1])]},
+                     index=["accuracy", "precisión", "recall", "F1", "AUC"]).round(3)
+print(tabla)
+print("Cancelación en prueba (no cambia):", round(float(y_te.mean()), 3))
+""", "Sin quejas: accuracy 73.3 → 52.5 %, precisión 39.4 → 24.6 %, **recall 52 → 62 %**, F1 44.8 → 35.2 % y AUC 0.685 → 0.575. No es cierto que solo baje la exactitud (la precisión y el F1 también bajan; solo sube el recall, como notó una participante) y no se «desbalancea» nada: la proporción de cancelaciones no cambia. Se perdió **la variable más informativa**.")
+
+md("""
+### B4 · Regresión (15 min)
+¿Cuánto gastará este cliente? `gasto_mensual` es un **número continuo**: **regresión**. Se evalúa con el **error** (MSE, RMSE) y el **R²** en datos nuevos. Como los datos son simulados con la fórmula `25 + 0.9·antigüedad + 3.2·uso + ruido`, podemos comprobar si el modelo la redescubre.
+""")
+code("""
+FEATS_REG = ["antiguedad_meses", "uso_mensual"]
+Xr_tr, Xr_te, yr_tr, yr_te = train_test_split(df[FEATS_REG], df["gasto_mensual"], test_size=0.30, random_state=RS)
+reg = Pipeline([("imp", SimpleImputer(strategy="median")), ("lr", LinearRegression())]).fit(Xr_tr, yr_tr)
+pr = reg.predict(Xr_te)
+mse = mean_squared_error(yr_te, pr)
+print(f"MSE {mse:.1f} | RMSE {np.sqrt(mse):.1f} | R² prueba {r2_score(yr_te, pr):.3f} | R² entrenamiento {r2_score(yr_tr, reg.predict(Xr_tr)):.3f}")
+print("Gasto medio:", round(df["gasto_mensual"].mean(), 1), "| desviación:", round(df["gasto_mensual"].std(), 1))
+print("Coeficientes aprendidos:", {k: round(float(v), 3) for k, v in zip(FEATS_REG, reg.named_steps["lr"].coef_)}, "(reales: 0.9 y 3.2)")
+print("Intercepto aprendido:", round(float(reg.named_steps["lr"].intercept_), 2), "(real: 25)")
+""")
+md("""
+RMSE 12.0 (≈ 19 % del gasto medio de 63.2) y **R² 0.548** en prueba (0.572 en entrenamiento): el modelo explica algo más de la mitad de la variación. Que no sea más alto **no es un fallo**: el ruido que se simuló (desviación 12) pone el techo. Los coeficientes aprendidos (0.93 y 2.98, intercepto 26.8) están cerca de la regla oculta (0.9, 3.2 y 25): el modelo la **redescubrió solo mirando los datos**. En un caso real esa fórmula no existe; aquí se puede comparar porque los datos son simulados.
+
+### ✍️ Ejercicio B4
+Agrega `edad` y `quejas_soporte` como variables (que **no** están en la fórmula del gasto). ¿Mejora el R² de prueba? ¿Qué coeficientes salen?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+f4 = ["antiguedad_meses", "uso_mensual", "edad", "quejas_soporte"]
+A_tr, A_te, b_tr, b_te = train_test_split(df[f4], df["gasto_mensual"], test_size=0.30, random_state=RS)
+reg4 = Pipeline([("imp", SimpleImputer(strategy="median")), ("lr", LinearRegression())]).fit(A_tr, b_tr)
+print("R² prueba:", round(r2_score(b_te, reg4.predict(A_te)), 3))
+print({k: round(float(v), 3) for k, v in zip(f4, reg4.named_steps["lr"].coef_)})
+""", "El R² de prueba no mejora (0.544 frente a 0.548) y los coeficientes de `edad` (0.07) y `quejas_soporte` (−0.16) quedan cerca de 0: agregar variables sin señal no ayuda. Lo veremos con Ridge y Lasso en D2.")
+
+md("""
+### B5 · La base real: ¿supervisado o no? (20 min)
+La **actividad de repaso** (Sesiones 31 y 32) usa una base real de 3.150 clientes de una telco. **Desafío 1:** Retención quiere anticipar quién cancela; Marketing quiere descubrir «tipos» de clientes. Cargamos la base y limpiamos lo mínimo: los valores **imposibles** (segundos o llamadas negativas, edades fuera de 0–100) pasan a faltante y se imputan **dentro del Pipeline**.
+""")
+code("""
+raiz = next(p for p in [Path.cwd(), *Path.cwd().parents] if any(p.glob("Clase 32*")))
+carpeta = next(raiz.glob("Clase 32*"))
+real_cruda = pd.read_excel(carpeta / "Base de datos Churn-Actividad repaso.xlsx")
+
+def limpiar_real(d):
+    d = d.copy()
+    for c in ["segundos", "frec_llamadas", "frec_sms", "antiguedad"]:
+        d.loc[d[c] < 0, c] = np.nan
+    d.loc[(d["edad"] < 0) | (d["edad"] > 100), "edad"] = np.nan
+    return d
+
+real = limpiar_real(real_cruda)
+yR = real["fuga"]
+XR = real.drop(columns=["fuga"])
+XR_tr, XR_te, yR_tr, yR_te = train_test_split(XR, yR, test_size=0.25, random_state=31, stratify=yR)
+print("Base real:", real_cruda.shape, "| fuga:", f"{yR.mean():.1%}", "| entrenamiento:", len(XR_tr), "| prueba:", len(XR_te))
+print("Valores imposibles pasados a faltante:", int(real.isna().sum().sum() - real_cruda.isna().sum().sum()))
+
+def pipe_real(**kw):
+    return make_pipeline(SimpleImputer(strategy="median"), StandardScaler(), LogisticRegression(max_iter=2000, **kw))
+
+filas = {}
+for nombre, modelo in {"siempre «no fuga»": DummyClassifier(strategy="most_frequent"), "logística": pipe_real(), "logística balanceada": pipe_real(class_weight="balanced")}.items():
+    modelo.fit(XR_tr, yR_tr)
+    p = modelo.predict(XR_te)
+    filas[nombre] = {"accuracy": accuracy_score(yR_te, p), "precisión": precision_score(yR_te, p, zero_division=0), "recall": recall_score(yR_te, p), "F1": f1_score(yR_te, p, zero_division=0)}
+pd.DataFrame(filas).T.round(3)
+""")
+md("""
+**Retención** es **supervisado** (hay etiqueta: `fuga`) y de **clasificación** (categoría 0/1). La línea base «nadie se fuga» ya da **84.3 %** de accuracy: la logística (88.5 %) mejora, pero lo importante es el recall (44.4 % frente a 0 %). Con `class_weight="balanced"` el recall sube a 87.9 % a costa de precisión (46.4 %) y de accuracy (82.1 %, **por debajo de la línea base**): la elección depende del costo de cada error. **Marketing** es **no supervisado** (no hay etiqueta de «tipo»): lo hacemos en C4.
+
+El caso pregunta también qué cambia si se quisiera predecir «cuántos meses le quedan al cliente antes de cancelar». La respuesta oficial dice «regresión lineal»; es una simplificación: los clientes que **aún no cancelan** no tienen una fecha observada (datos **censurados**), y eso se trata con **análisis de supervivencia**.
+
+### ✍️ Ejercicio B5
+Para la logística balanceada, calcula la **matriz de confusión** en la prueba y el AUC. Si cada fuga no detectada le cuesta a la empresa 10 veces lo que cuesta llamar a un cliente que no se iba a ir, ¿qué modelo (logística simple o balanceada) tiene menor costo total?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+costos = {}
+for nombre, modelo in {"logística": pipe_real().fit(XR_tr, yR_tr), "logística balanceada": pipe_real(class_weight="balanced").fit(XR_tr, yR_tr)}.items():
+    p = modelo.predict(XR_te)
+    vn_, fp_, fn_, vp_ = confusion_matrix(yR_te, p).ravel()
+    costos[nombre] = 10 * fn_ + 1 * fp_
+    print(nombre, "| VN", vn_, "FP", fp_, "FN", fn_, "VP", vp_, "| AUC", round(roc_auc_score(yR_te, modelo.predict_proba(XR_te)[:, 1]), 3), "| costo", costos[nombre])
+""", "La logística simple: FN 69 y FP 22 → costo 712. La balanceada: FN 15 y FP 126 → costo 276. Con ese costo gana la balanceada, aunque tenga **menos accuracy**. Los AUC son casi iguales (0.908 y 0.910): cambia el punto de operación, no la capacidad de ordenar.")
+
+# ================================================================== PARTE C
+md("""
+## Parte C · Aprendizaje no supervisado
+
+### C1 · K-Means a mano (15 min)
+K-Means necesita **k**, un punto de partida (los centroides) y una distancia. Cada iteración: (1) **asignar** cada punto al centroide más cercano; (2) **recalcular** cada centroide como la **media** de sus puntos. Se detiene cuando las asignaciones no cambian. Mide qué tan compactos son los grupos con la **inercia** (suma de distancias² de cada punto a su centroide). *(La diapositiva dice que K-Means «minimiza la distancia entre los puntos de cada grupo»; es la distancia de cada punto a **su centroide**, al cuadrado.)*
+""")
+code("""
+puntos = np.array([[1, 2], [2, 1], [2, 4], [7, 7], [8, 9], [9, 6]], dtype=float)     # (antigüedad, uso)
+centros = np.array([[1, 2], [9, 6]], dtype=float)
+
+def iteracion(puntos, centros):
+    d2 = ((puntos[:, None, :] - centros[None, :, :]) ** 2).sum(axis=2)       # distancia² de cada punto a cada centroide
+    asign = d2.argmin(axis=1)
+    nuevos = np.array([puntos[asign == k].mean(axis=0) for k in range(len(centros))])
+    inercia = d2[np.arange(len(puntos)), asign].sum()
+    return asign, nuevos, inercia
+
+for it in range(1, 4):
+    asign, nuevos, inercia = iteracion(puntos, centros)
+    print(f"iteración {it}: asignación {asign} | inercia {inercia:.2f} | nuevos centroides {nuevos.round(2).tolist()}")
+    if np.allclose(nuevos, centros):
+        print("-> las asignaciones ya no cambian: terminó")
+        break
+    centros = nuevos
+""")
+md("""
+En la primera iteración los puntos A, B y C van al centroide 1 y D, E y F al 2; los nuevos centroides son (1.67, 2.33) y (8.00, 7.33). En la segunda nada cambia: **convergió**. `scikit-learn` repite esto con varios puntos de partida (`n_init`) y se queda con la menor inercia.
+
+### ✍️ Ejercicio C1
+Compara tu resultado con `KMeans(n_clusters=2, init=centros_iniciales, n_init=1)`. ¿Coinciden los centroides finales y la inercia?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+km = KMeans(n_clusters=2, init=np.array([[1, 2], [9, 6]], dtype=float), n_init=1).fit(puntos)
+print("centroides:", km.cluster_centers_.round(2).tolist(), "| inercia:", round(km.inertia_, 2), "| etiquetas:", km.labels_)
+""", "Coinciden: centroides (1.67, 2.33) y (8.00, 7.33), inercia 12.00 (con `init` explícito y `n_init=1`, el algoritmo hace exactamente lo que hiciste a mano; la inercia pasó de 22.00 con los centroides iniciales a 12.00).")
+
+md("""
+### C2 · K-Means en Club Activo: escalar y elegir k (20 min)
+Sin usar `cancelo`, la profesora agrupa con **antigüedad, uso y gasto**. Como K-Means usa distancias, hay que **estandarizar**: si no, manda la variable de mayor escala. Hay que decidir **k**: no existe un k «verdadero»; se miran el codo de la inercia, la silueta y la utilidad para el negocio.
+""")
+code("""
+FEATS_CLU = ["antiguedad_meses", "uso_mensual", "gasto_mensual"]
+pre = make_pipeline(SimpleImputer(strategy="median"), StandardScaler())
+Z = pre.fit_transform(df[FEATS_CLU])
+
+print("k | inercia | silueta")
+for k in range(2, 9):
+    km_k = KMeans(k, random_state=RS, n_init=10).fit(Z)
+    print(f"{k} | {km_k.inertia_:7.1f} | {silhouette_score(Z, km_k.labels_):.3f}")
+
+km = KMeans(3, random_state=RS, n_init=10).fit(Z)
+d = df.assign(segmento=km.labels_, antiguedad_meses=df["antiguedad_meses"].fillna(df["antiguedad_meses"].median()))
+perfil = d.groupby("segmento")[FEATS_CLU + ["cancelo"]].mean().round(2)
+perfil["n_clientes"] = d.groupby("segmento").size()
+display(perfil)
+print("Centros en desviaciones estándar:")
+display(pd.DataFrame(km.cluster_centers_, columns=FEATS_CLU).round(2))
+""")
+md("""
+La silueta es casi plana (0.348 con k = 2, 0.338 con k = 3, 0.327 con k = 4) y el codo no es nítido: **los datos no piden un k claro**; k = 3 es una elección razonable de la profesora, no un resultado. Los segmentos (252, 439 y 109 clientes) son:
+
+- **Segmento 0**: mucho uso (+0.99 sd) y gasto alto (+0.43); cancela 21 %.
+- **Segmento 1**: poco uso (−0.56) y poco gasto (−0.61); cancela 24 %.
+- **Segmento 2**: clientes **antiguos** (+1.99 sd) y de **alto gasto** (+1.48); cancela **7 %**.
+
+Dos correcciones a las notas del notebook: (1) la nota dice que **el gasto** es lo que más distingue al segmento 2 y «queda invisible» en el gráfico antigüedad–uso; lo que más lo distingue es la **antigüedad** (+1.99 frente a +1.48), que sí se ve en el eje x. (2) El texto espera un segmento con una cancelación **mucho más alta**; ocurre lo contrario: el segmento 2 cancela mucho **menos** (7 % frente a 21–24 %; χ² p = 0.0006) y los segmentos 0 y 1 apenas se diferencian.
+
+### ✍️ Ejercicio C2
+Comprueba la **sensibilidad**: (a) ¿qué tan parecidos son los segmentos si ejecutas K-Means con otra semilla y `n_init=1`? (b) ¿Y si **no** estandarizas? Usa el índice de Rand ajustado (`adjusted_rand_score`: 1 = iguales).
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+aris = [adjusted_rand_score(km.labels_, KMeans(3, random_state=s, n_init=1).fit_predict(Z)) for s in range(10)]
+sin_escalar = KMeans(3, random_state=RS, n_init=10).fit_predict(SimpleImputer(strategy="median").fit_transform(df[FEATS_CLU]))
+print("ARI mínimo con 10 semillas (n_init=1):", round(min(aris), 2))
+print("ARI contra el agrupamiento SIN estandarizar:", round(adjusted_rand_score(km.labels_, sin_escalar), 2))
+""", "Con otras semillas el ARI mínimo es 0.84 (los segmentos son bastante estables). Sin estandarizar el ARI baja a 0.39: **los segmentos cambian mucho**, porque la antigüedad y el gasto (decenas) pesan más que el uso.")
+
+md("""
+### C3 · PCA para mirar los grupos (10 min)
+Con tres variables, un gráfico de dos ejes siempre deja algo fuera. **PCA** crea dos ejes nuevos, combinaciones de las tres variables, que conservan la mayor varianza. Aquí lo usamos solo para **mirar**; cómo se calcula, cuántos componentes elegir y qué es t-SNE se ve en la **Clase 32**.
+""")
+code("""
+pca = PCA(n_components=2, random_state=RS).fit(Z)
+E = pca.transform(Z)
+print("Varianza explicada:", (pca.explained_variance_ratio_ * 100).round(1), "| suma:", round(float(pca.explained_variance_ratio_.sum()) * 100, 1), "%")
+print(pd.DataFrame(pca.components_.round(2), columns=FEATS_CLU, index=["PC1", "PC2"]))
+
+colores = ["#4F46E5", "#D97706", "#0D9488"]
+fig, ax = plt.subplots(figsize=(6.5, 4.5))
+for s in range(3):
+    m = km.labels_ == s
+    ax.scatter(E[m, 0], E[m, 1], s=10, alpha=0.5, color=colores[s], label=f"segmento {s}")
+ax.set_xlabel(f"PC1 ({pca.explained_variance_ratio_[0]:.1%})"); ax.set_ylabel(f"PC2 ({pca.explained_variance_ratio_[1]:.1%})")
+ax.set_title("Los mismos clientes, vistos con PCA"); ax.legend(); plt.show()
+""")
+md("""
+PC1 explica 58.2 % y PC2 33.6 %: entre ambos **91.8 % de la varianza** (no «de la información») de las 3 variables. Tres precisiones sobre lo dicho en clase: (1) los componentes **no son «dos de las tres variables»**: cada uno mezcla las tres (PC1: antigüedad 0.60, uso 0.37, gasto 0.71; PC2: antigüedad −0.53, uso 0.85, gasto 0.01); (2) **PCA no formó los grupos**: los colores vienen de K-Means; PCA solo cambió los ejes; (3) los grupos «se ven iguales» porque K-Means los calculó con las tres variables.
+
+### ✍️ Ejercicio C3
+Reajusta K-Means **sobre los dos componentes** (`E`) en vez de las tres variables. ¿Qué tan parecidos son los segmentos a los originales (`adjusted_rand_score`)?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+km_pca = KMeans(3, random_state=RS, n_init=10).fit(E)
+print("ARI entre K-Means en 3 variables y K-Means sobre PC1-PC2:", round(adjusted_rand_score(km.labels_, km_pca.labels_), 2))
+""", "El ARI es 0.99: con dos componentes se conserva casi toda la estructura, porque ya retienen el 91.8 % de la varianza. Reducir dimensiones **antes** de agrupar es una técnica habitual, pero aquí fue K-Means quien agrupó.")
+
+md("""
+### C4 · Segmentos en la base real (15 min)
+Retomamos el **desafío 1** para **Marketing**: descubrir «tipos» de clientes por su uso, **sin** la etiqueta `fuga`. Usamos las seis variables de uso (`segundos`, `frec_llamadas`, `n_contactos`, `frec_sms`, `monto`, `clv`), el escalador y K-Means **ajustados con el entrenamiento**; luego miramos la fuga por segmento **en la prueba**.
+""")
+code("""
+USO = ["segundos", "frec_llamadas", "n_contactos", "frec_sms", "monto", "clv"]
+prepR = make_pipeline(SimpleImputer(strategy="median"), StandardScaler()).fit(XR_tr[USO])
+Ztr, Zte = prepR.transform(XR_tr[USO]), prepR.transform(XR_te[USO])
+print("k | silueta (entrenamiento)")
+for k in range(2, 7):
+    print(k, "|", round(silhouette_score(Ztr, KMeans(k, random_state=31, n_init=10).fit(Ztr).labels_), 3))
+
+kmR = KMeans(3, random_state=31, n_init=10).fit(Ztr)
+orden = np.argsort(pd.Series(XR_tr["clv"].values).groupby(kmR.labels_).median().values)       # ordenar por CLV mediano
+remap = {int(o): i for i, o in enumerate(orden)}
+seg_tr = np.array([remap[v] for v in kmR.labels_])
+seg_te = np.array([remap[v] for v in kmR.predict(Zte)])
+perfil = XR_tr[USO].assign(segmento=seg_tr).groupby("segmento").median().round(1)
+perfil["n_train"] = np.bincount(seg_tr)
+perfil["fuga_prueba"] = [round(float(yR_te.values[seg_te == s].mean()), 3) for s in range(3)]
+perfil["n_prueba"] = np.bincount(seg_te)
+display(perfil)
+""")
+md("""
+La silueta es la mejor con **k = 3** (0.473; con k = 2, 0.439), así que k = 3 está respaldado por los datos. Tres tipos: **uso bajo** (mediana de 1.935 segundos, CLV 142), **llamadas intensivas** (10.625 segundos, 157 llamadas) y **SMS y valor altos** (275 SMS, CLV 1.307). Aunque `fuga` no se usó, en la prueba el grupo de uso bajo concentra **24.7 %** de fuga y los otros dos **0.0 %** y **2.3 %**: el clustering encontró un patrón de riesgo sin que nadie se lo enseñara. Esto es lo que la profesora quería mostrar; en esta base sí ocurre (a diferencia de Club Activo, C2).
+
+### ✍️ Ejercicio C4
+Marketing prefiere 4 grupos. Ajusta k = 4 y compara la silueta y la fuga por grupo en la prueba. ¿Qué cambia?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+km4 = KMeans(4, random_state=31, n_init=10).fit(Ztr)
+print("silueta k=4:", round(silhouette_score(Ztr, km4.labels_), 3))
+seg4_te = km4.predict(Zte)
+print(pd.DataFrame({"n_prueba": np.bincount(seg4_te), "fuga_prueba": [round(float(yR_te.values[seg4_te == s].mean()), 3) for s in range(4)]}))
+""", "Con k = 4 la silueta baja a 0.346: los grupos son menos nítidos. El segmento de uso bajo se parte en dos, con fuga de 12.9 % y 32.0 % en la prueba. Más grupos dan más detalle pero menos claridad: la decisión depende de lo que Marketing pueda accionar.")
+
+# ================================================================== PARTE D
+md("""
+## Parte D · Ajuste del modelo y evaluación
+
+### D1 · Subajuste y sobreajuste (15 min)
+Un modelo **demasiado simple** no captura el patrón (**subajuste**); uno **demasiado complejo** memoriza el ruido (**sobreajuste**). Se ve comparando el R² de **entrenamiento** y de **prueba**. La profesora lo muestra con polinomios de grado 1, 2 y 15 sobre la relación inversión–ventas (60 puntos con ruido).
+""")
+code("""
+x_tr, x_te, y_tr_p, y_te_p = train_test_split(x_dato.reshape(-1, 1), y_dato, test_size=0.3, random_state=7)
+
+def polinomio(grado, escalar=True):
+    pasos = [StandardScaler()] if escalar else []
+    return make_pipeline(*pasos, PolynomialFeatures(grado, include_bias=False), LinearRegression())
+
+print("grado | R² entren. | R² prueba   (con StandardScaler)")
+for g in (1, 2, 4, 8, 15):
+    m = polinomio(g).fit(x_tr, y_tr_p)
+    print(f"{g:5d} | {r2_score(y_tr_p, m.predict(x_tr)):10.3f} | {r2_score(y_te_p, m.predict(x_te)):9.3f}")
+""")
+md("""
+El grado 1 **subajusta** (0.52 en entrenamiento y 0.10 en prueba: mal en los dos), el grado 2 es el **ajuste adecuado** (0.80 / 0.51) y el grado 15 **sobreajusta** (0.90 en entrenamiento y **−4.79** en prueba). Con 18 puntos de prueba el R² es ruidoso; lo importante es la **tendencia**: el entrenamiento solo sube y la prueba se hunde.
+
+Una trampa del notebook original: la profesora usa `PolynomialFeatures(15)` **sin escalar**. Como x llega a 10, x¹⁵ ≈ 10¹⁵ y la regresión queda mal condicionada. Veámoslo:
+
+### ✍️ Ejercicio D1
+Ajusta el grado 15 **sin** `StandardScaler` y compara el R² de entrenamiento con el del grado 2. ¿Se cumple lo que dice el texto del notebook («R² de entrenamiento altísimo»)?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+for g in (2, 15):
+    m = polinomio(g, escalar=False).fit(x_tr, y_tr_p)
+    print(f"grado {g} SIN escalar: R² entren. {r2_score(y_tr_p, m.predict(x_tr)):.3f} | R² prueba {r2_score(y_te_p, m.predict(x_te)):.3f}")
+""", "Sin escalar, el grado 15 da R² de entrenamiento **0.30** (y 0.80 el grado 2) y de prueba −0.56: el ajuste numérico falla, así que el entrenamiento **no** es «altísimo». El diagnóstico (sobreajuste) es correcto, pero las cifras de esa celda no lo muestran. Con `StandardScaler` el grado 15 llega a 0.90. La «brecha de 37 puntos» que cita el texto es la de la Sesión 30, no la de esta celda.")
+
+md("""
+### D2 · Ridge frente a Lasso (15 min)
+La **regularización** agrega una penalización al error: **Ridge (L2)** suma `α·Σβ²` (encoge todos los coeficientes, rara vez los anula) y **Lasso (L1)** suma `α·Σ|β|` (puede llevar coeficientes exactamente a 0). Para verlo, el gasto se predice con 6 variables, **dos de ellas ruido puro**, y se comparan OLS, Ridge (α = 5) y Lasso (α = 0.5), con las variables estandarizadas **dentro del Pipeline**.
+""")
+code("""
+dd = df.assign(ruido_1=ruido1, ruido_2=ruido2)
+cols = ["antiguedad_meses", "uso_mensual", "edad", "quejas_soporte", "ruido_1", "ruido_2"]
+Xa_tr, Xa_te, ya_tr, ya_te = train_test_split(dd[cols], dd["gasto_mensual"], test_size=0.3, random_state=RS)
+
+def con_penalizacion(modelo):
+    return make_pipeline(SimpleImputer(strategy="median"), StandardScaler(), modelo)
+
+tabla, r2s = pd.DataFrame(index=cols), {}
+for nombre, mod in {"OLS": LinearRegression(), "Ridge (α=5)": Ridge(alpha=5.0), "Lasso (α=0.5)": Lasso(alpha=0.5)}.items():
+    p_ = con_penalizacion(mod).fit(Xa_tr, ya_tr)
+    tabla[nombre] = p_[-1].coef_.round(2)
+    r2s[nombre] = round(r2_score(ya_te, p_.predict(Xa_te)), 3)
+display(tabla)
+print("R² de prueba:", r2s)
+""")
+md("""
+**Lasso** lleva a **0.00** los coeficientes de `quejas_soporte`, `ruido_1` y `ruido_2` y deja `edad` en 0.22 (en la fórmula del gasto, edad y quejas no entran); **Ridge** apenas los toca (α = 5 es pequeño frente a 560 filas). El R² de prueba casi no cambia (0.544, 0.545 y 0.552): con 6 variables y 560 filas la regularización **no mejora** la predicción, solo **simplifica** el modelo. Con un α enorme ambos tienden a predecir la media (R² ≈ 0). *(La profesora estandariza todos los datos **antes** de dividir; aquí el escalador va en el Pipeline y los coeficientes de la tabla coinciden con los suyos salvo por decimales.)*
+
+### ✍️ Ejercicio D2
+En vez de fijar α, elígelo con **validación cruzada**: `LassoCV(cv=5)` dentro del Pipeline, ajustado solo con el entrenamiento. ¿Qué α elige y qué coeficientes anula?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+lcv = con_penalizacion(LassoCV(cv=5, random_state=RS, max_iter=20000)).fit(Xa_tr, ya_tr)
+print("alpha elegido:", round(float(lcv[-1].alpha_), 3))
+print(pd.Series(lcv[-1].coef_, index=cols).round(2).to_dict())
+print("R² prueba:", round(r2_score(ya_te, lcv.predict(Xa_te)), 3))
+""", "La validación cruzada elige alpha ≈ 0.33: anula `quejas_soporte` y `ruido_1`, deja `ruido_2` en 0.04 y `edad` en 0.40; antigüedad y uso quedan como las únicas variables importantes. El R² de prueba es 0.55 (como el de Lasso con alpha 0.5). La validación cruzada **elige alpha con los datos**, en lugar de fijarlo a mano.")
+
+md("""
+Un atajo útil para el papel: cuando las columnas son **ortonormales**, Ridge deja `β/(1+λ)` y Lasso aplica un **umbral suave** `signo(β)·máx(|β| − λ, 0)`. Comprobémoslo con los coeficientes (4.0, −2.0, 0.8, 0.3) del Bloque 5 del cuaderno:
+""")
+code("""
+Q, _ = np.linalg.qr(np.random.default_rng(0).normal(size=(300, 4)))     # columnas ortonormales (Q'Q = I)
+beta = np.array([4.0, -2.0, 0.8, 0.3]); yy = Q @ beta; lam = 0.5
+rid = Ridge(alpha=lam, fit_intercept=False).fit(Q, yy).coef_
+las = Lasso(alpha=lam / len(yy), fit_intercept=False, tol=1e-12, max_iter=100000).fit(Q, yy).coef_     # sklearn divide el error por n
+print("Ridge  :", rid.round(3), "| fórmula β/(1+λ):", (beta / (1 + lam)).round(3))
+print("Lasso  :", las.round(3), "| umbral suave   :", (np.sign(beta) * np.maximum(np.abs(beta) - lam, 0)).round(3))
+""")
+
+md("""
+### D3 · La trampa del accuracy (15 min)
+En un problema **desbalanceado** (fraude, enfermedades raras) un modelo que siempre responde «no pasa nada» logra un accuracy altísimo y es **inútil**. La profesora lo muestra con 1.000 casos y solo 5 % de riesgo.
+""")
+code("""
+riesgo = np.zeros(1000, dtype=int); riesgo[:50] = 1                 # 5 % de casos de riesgo real
+perezoso = np.zeros(1000, dtype=int)                                # «siempre sin riesgo»
+print(f"accuracy {accuracy_score(riesgo, perezoso):.1%} | recall {recall_score(riesgo, perezoso, zero_division=0):.1%} | F1 {f1_score(riesgo, perezoso, zero_division=0):.1%}")
+print("precisión (0/0, se define como 0):", precision_score(riesgo, perezoso, zero_division=0))
+""")
+md("""
+Accuracy **95 %**, recall **0 %**: el modelo no detecta ni uno de los 50 casos. En la base real el mismo fenómeno es más suave: «nadie se fuga» ya logra **84.3 %** (B5). Reglas prácticas: (1) **siempre** compara con la línea base «clase mayoritaria»; (2) mira la **matriz de confusión** completa y las métricas **por clase**; (3) elige la métrica según el **costo** de cada error (recall si dejar escapar un caso es caro; precisión si lo caro es la falsa alarma; F1 si ambos importan).
+
+### ✍️ Ejercicio D3
+Para el modelo de Club Activo (`clf`), calcula **el umbral** que maximiza el F1 usando **validación cruzada solo en el entrenamiento** (`cross_val_predict` con `method="predict_proba"`), y evalúalo en la prueba. ¿Mejora el F1 frente al umbral 0.5?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+p_cv = cross_val_predict(modelo_clasificacion(), X_tr, y_tr, cv=5, method="predict_proba")[:, 1]
+umbrales = np.linspace(0.2, 0.8, 61)
+f1s = [f1_score(y_tr, (p_cv >= u).astype(int)) for u in umbrales]
+u_mejor = float(umbrales[int(np.argmax(f1s))])
+p_prueba = clf.predict_proba(X_te)[:, 1]
+print("umbral elegido (CV en entrenamiento):", round(u_mejor, 2))
+print("F1 prueba con 0.5:", round(f1_score(y_te, (p_prueba >= 0.5).astype(int)), 3), "| con el umbral elegido:", round(f1_score(y_te, (p_prueba >= u_mejor).astype(int)), 3))
+""", "El umbral que maximiza el F1 en validación cruzada es 0.53 (el modelo ya está balanceado por `class_weight`) y el F1 en prueba no mejora (0.442 frente a 0.448): la diferencia es ruido con 50 cancelaciones. El punto importante es el **método**: el umbral se elige **sin mirar la prueba**.")
+
+# ================================================================== ALERTAS
+md("""
+## Alertas del material: qué conviene corregir
+
+| Dónde | Qué dice | Qué pasa realmente (verificado) |
+|---|---|---|
+| Notebook, nota de K-Means | «el gasto es lo que más distingue al segmento 2 y queda invisible» | Lo que más lo distingue es la **antigüedad** (+1.99 sd; gasto +1.48) y sí se ve en el eje x (C2). |
+| Notebook, lectura de K-Means | se espera un segmento con cancelación «mucho más alta» | Ocurre lo contrario: el segmento 2 cancela **7 %** frente a 21 % y 24 % (C2). |
+| Notebook, grado 15 | «R² de entrenamiento altísimo» | Sin escalar da **0.30** (peor que el grado 2) y −0.56 en prueba; con `StandardScaler`, 0.90 y −4.79 (D1). La «brecha de 37 puntos» es de la Sesión 30. |
+| Notebook, secciones 2, 5 y 8 | imputa y escala **antes** de dividir | Fuga leve; dentro de un `Pipeline` se aprende solo con entrenamiento (B1, C2, D2). |
+| Notebook, lectura de clasificación | el modelo es «alarmista» por `class_weight='balanced'` | Es verdad, pero es una decisión: sin pesos precisión 69.2 % y recall 18.0 %, con **el mismo AUC** (B1). Y el accuracy (73.3 %) queda **bajo** la línea base (79.2 %). |
+| Clase | «149 verdaderos positivos» | La celda superior izquierda son los **verdaderos negativos** (150 en el notebook final); los VP son 26 (B3). |
+| Clase | «precisión 51 % / recall 52 % es como lanzar una moneda» | La comparación es con la prevalencia (20.8 %) y el AUC (0.685 > 0.5): modesto, no azar (B3). |
+| Clase | «quitar quejas desbalanceó el modelo; solo baja la exactitud» | El balance no cambia. Accuracy 73.3 → 52.5 %, precisión 39.4 → 24.6 %, F1 44.8 → 35.2 %; solo sube el recall (52 → 62 %) (B3). |
+| Clase | «con 90/10 corres el riesgo de sobreajuste» | Un 10 % de prueba da una estimación ruidosa del error; el sobreajuste depende de la complejidad del modelo. |
+| Diapositiva 8 | K-Means «encuentra centros (K) que minimizan la distancia entre los puntos de cada grupo» | K es el **número de grupos**; se minimiza la suma de distancias² de cada punto a **su centroide** (C1). PCA no «elimina ruido visual»: descarta direcciones de poca varianza. |
+| Clase y notebook | «con dos de las tres variables» / «91.8 % de la información» / PCA «separa tres clústeres» | Los componentes mezclan las tres variables; es 91.8 % de la **varianza**; los grupos los formó **K-Means** (C3). |
+| Diapositiva 12 | «Modelos neuronales requieren conjuntos… divididos en entrenamiento, validación y prueba» | La división vale para **cualquier** modelo (B1). |
+| Diapositiva 13 | ML «cajas blancas» / DL «millones de registros» | Tendencias, no reglas: un boosting no es caja blanca y hay redes con pocos datos. |
+| Notebook, `recomendar_enfoque` | devuelve un solo enfoque | Las familias no son excluyentes (A1). |
+| Notebook, cierre | «Próxima sesión (32): redes neuronales» | La Clase 32 es reducción de dimensionalidad (PCA y t-SNE). |
+| Apunte, demo de clasificación | variables «antigüedad, uso, edad, quejas y gasto»; predice «un cliente nuevo» | Son 4 variables (sin gasto) y se predice el conjunto de prueba (B1). |
+| Caso de repaso, pregunta 1.2 | «meses que le quedan antes de cancelar» → regresión lineal | Es tiempo hasta el evento con datos **censurados**: análisis de supervivencia (B5). |
+| Versiones | clase: 22.8 % de cancelación y accuracy 77.9 % | El notebook entregado da 20.9 % y 73.3 % (preparación, B1). |
+
+**Transcripción con ruido**: «KIC» = KYC, «Service Solution» = Survey Solutions, «camins/Kamins/camis/Cummings» = K-Means, «cura/la cura» = accuracy, «recol/record» = recall, «PSA/IPCA/pcea» = PCA, «CAPCHAT» = CAPTCHA, «jornales» = neuronales, «Machilas/Machete» = Machine Learning, «hía» = IA. El volumen cayó a ≈ −65 dB desde ≈ 35:00 y a ≈ −78 dB desde ≈ 85:00 (se transcribió una copia amplificada); el recreo (≈ 0:59:00) no está en el video.
+""")
+
+# ================================================================== CIERRE
+md("""
+## Ejercicio de cierre (35 min, SIN mirar lo anterior)
+
+Eres analista de la telco y recibes la **base real** (`real`, 3.150 clientes; usa `limpiar_real`, `USO` y el mismo `train_test_split` de B5). Retención y Marketing te piden cosas distintas. Responde con código:
+
+1. **Retención**: arma un `Pipeline` (imputar mediana → escalar → regresión logística con `class_weight="balanced"`), ajústalo con el entrenamiento y reporta matriz de confusión, precisión, recall, F1 y AUC **en la prueba**. Compara con la línea base «nadie se fuga».
+2. Elige el **umbral** que maximiza el F1 con `cross_val_predict` (5-Fold) **solo en el entrenamiento** y evalúalo en la prueba (una sola vez).
+3. **Marketing**: con las 6 variables de uso (escalador y K-Means ajustados con el entrenamiento), elige k con la silueta (k entre 2 y 6) y describe cada segmento con la mediana de sus variables. Calcula la fuga por segmento en la prueba.
+4. Si cada fuga no detectada cuesta 10 veces una llamada de retención, ¿qué umbral del punto 2 y qué modelo (simple o balanceado) recomiendas?
+5. Responde sin código: ¿qué corregirías del caso de repaso (pregunta 1.2) y de las diapositivas antes de dárselo a otra persona?
+""")
+code("""
+# tu código aquí
+""")
+md("""
+✍️ **Mi recomendación y mis correcciones:**
+
+""")
+solution("""
+# 1. Retención
+modelo_r = pipe_real(class_weight="balanced").fit(XR_tr, yR_tr)
+p_r = modelo_r.predict(XR_te)
+print(pd.DataFrame(confusion_matrix(yR_te, p_r), index=["real no fuga", "real fuga"], columns=["pred no fuga", "pred fuga"]))
+print(f"precisión {precision_score(yR_te, p_r):.3f} | recall {recall_score(yR_te, p_r):.3f} | F1 {f1_score(yR_te, p_r):.3f} | AUC {roc_auc_score(yR_te, modelo_r.predict_proba(XR_te)[:, 1]):.3f}")
+print("línea base «nadie se fuga»: accuracy", round(1 - float(yR_te.mean()), 3), "| modelo:", round(accuracy_score(yR_te, p_r), 3))
+
+# 2. umbral con validación cruzada solo en el entrenamiento
+p_cv = cross_val_predict(pipe_real(class_weight="balanced"), XR_tr, yR_tr, cv=5, method="predict_proba")[:, 1]
+umbrales = np.linspace(0.1, 0.9, 81)
+u_f1 = float(umbrales[int(np.argmax([f1_score(yR_tr, (p_cv >= u).astype(int)) for u in umbrales]))])
+pp = modelo_r.predict_proba(XR_te)[:, 1]
+print("umbral F1 (CV):", round(u_f1, 2), "| F1 prueba:", round(f1_score(yR_te, (pp >= u_f1).astype(int)), 3), "| precisión", round(precision_score(yR_te, (pp >= u_f1).astype(int)), 3), "| recall", round(recall_score(yR_te, (pp >= u_f1).astype(int)), 3))
+
+# 3. Marketing
+sil = {k: round(silhouette_score(Ztr, KMeans(k, random_state=31, n_init=10).fit(Ztr).labels_), 3) for k in range(2, 7)}
+print("silueta:", sil, "-> k =", max(sil, key=sil.get))
+
+# 4. costo (10 por FN, 1 por FP) con umbral 0.5 y con el umbral del punto 2
+def costo(p_hat):
+    vn_, fp_, fn_, vp_ = confusion_matrix(yR_te, p_hat).ravel()
+    return 10 * fn_ + fp_
+print("costo | simple 0.5:", costo(pipe_real().fit(XR_tr, yR_tr).predict(XR_te)), "| balanceado 0.5:", costo((pp >= 0.5).astype(int)), "| balanceado umbral F1:", costo((pp >= u_f1).astype(int)))
+""", "Ver «Resultado de referencia» en la celda siguiente.")
+md("""
+**Resultado de referencia** (base real, `random_state=31`): la logística balanceada logra recall 87.9 %, precisión 46.4 %, F1 0.607 y AUC 0.910 en la prueba; su accuracy (82.1 %) queda **bajo** la línea base «nadie se fuga» (84.3 %), por eso el accuracy no sirve para compararlos. Segmentos de uso con k = 3 (silueta 0.473): fuga de 24.7 % (uso bajo), 0.0 % (llamadas intensivas) y 2.3 % (SMS y valor altos). El umbral que maximiza el F1 en validación cruzada es 0.64 (F1 en prueba 0.595, precisión 50.9 %, recall 71.8 %), pero con el costo 10:1 el mejor es el balanceado con umbral 0.5 (costo 276), frente al balanceado con 0.64 (436) y al simple (712): el umbral óptimo depende del costo, no solo del F1. **Correcciones**: (1) la pregunta 1.2 no se resuelve con regresión lineal si hay clientes que aún no cancelan (censura; análisis de supervivencia); (2) comparar siempre con la línea base y mirar la matriz de confusión; (3) escalar e imputar dentro de un Pipeline; (4) las notas de K-Means de la diapositiva y del notebook (K es el número de grupos; la distancia es al centroide); (5) PCA no forma grupos; (6) elegir el umbral con validación cruzada y no con la prueba.
+""")
+
+# ---------------------------------------------------------------- autoevaluación
+md("""
+## Autoevaluación (responde sin mirar)
+
+1. ¿Cómo distingues clasificación, regresión, clustering y reducción de dimensionalidad?
+2. ¿Qué hace la función sigmoide y qué significa un puntaje de 0?
+3. Describe una iteración de K-Means y explica por qué se estandariza antes.
+4. ¿Cómo reconoces subajuste y sobreajuste en una tabla de R² de entrenamiento y prueba?
+5. ¿En qué se diferencian Ridge y Lasso sobre los coeficientes?
+6. Un modelo tiene 98 % de accuracy con 2 % de casos positivos. ¿Qué miras antes de aplaudir?
+
+<details><summary><b>Respuestas</b></summary>
+
+1. Por la variable objetivo: categoría → clasificación; número → regresión; sin objetivo, formar grupos → clustering; sin objetivo, resumir variables → reducción de dimensionalidad.
+2. Convierte un puntaje cualquiera en una probabilidad entre 0 y 1: p = 1/(1 + e^(−z)). Puntaje 0 equivale a p = 0.5 (el umbral habitual).
+3. Se asigna cada punto al centroide más cercano y se recalcula cada centroide como la media de su grupo. Se estandariza porque usa distancias: la variable de mayor escala dominaría.
+4. Subajuste: R² bajo en entrenamiento y en prueba. Sobreajuste: R² alto en entrenamiento y mucho menor en prueba (brecha grande).
+5. Ridge encoge todos los coeficientes sin anularlos (penaliza Σβ²); Lasso puede dejar coeficientes en exactamente 0 (penaliza Σ|β|).
+6. La línea base «siempre negativo» (98 % también), la matriz de confusión, el recall y la precisión de la clase positiva, y el costo de cada error.
+</details>
+
+---
+✍️ **Mis notas de hoy** (qué entendí, qué me costó, qué preguntaría en clase):
+
+-
+
+---
+**Próxima sesión:** Clase 32 · Reducción de dimensionalidad y representación de variables (PCA y t-SNE). Revisa `Guias/apuntes/C31_Ejercicios_Cuaderno_IntroML.pdf` si quedó algo pendiente de practicar a mano.
+""")
+
+nb = {"cells": cells,
+      "metadata": {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
+                   "language_info": {"name": "python"}},
+      "nbformat": 4, "nbformat_minor": 5}
+OUT.parent.mkdir(exist_ok=True)
+OUT.write_text(json.dumps(nb, ensure_ascii=False, indent=1), encoding="utf-8")
+print("Notebook:", OUT, "| celdas:", len(cells))

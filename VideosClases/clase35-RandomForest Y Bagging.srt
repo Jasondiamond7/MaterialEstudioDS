@@ -1,0 +1,5284 @@
+1
+00:00:00,000 --> 00:00:07,000
+He diplomado desde unos 6 años probablemente.
+
+2
+00:00:07,000 --> 00:00:12,000
+Más o menos ese es el tiempo que llevo haciendo cursos.
+
+3
+00:00:12,000 --> 00:00:19,000
+Siempre he estado ligado a los módulos asociados a Machine Learning.
+
+4
+00:00:19,000 --> 00:00:24,000
+Hubo un tiempo que hacía todo el módulo completo.
+
+5
+00:00:24,000 --> 00:00:31,000
+Después evolucionó el modelo del programa a esto que tienen distintos profesores.
+
+6
+00:00:31,000 --> 00:00:36,000
+Se mantienen distintas formas de revisar los contenidos.
+
+7
+00:00:36,000 --> 00:00:41,000
+En esta ocasión a mi me tocó ver modelos ensamblados con arboles.
+
+8
+00:00:41,000 --> 00:00:45,000
+Hoy vamos a ver Random Forest y Bagging.
+
+9
+00:00:46,000 --> 00:00:52,000
+En jueves veremos todo lo que tiene que ver con los modelos de Boosting.
+
+10
+00:00:56,000 --> 00:01:01,000
+Yo trabajo en esto hace muchísimos años.
+
+11
+00:01:01,000 --> 00:01:05,000
+No sé si tantos años, pero al menos 9 años.
+
+12
+00:01:05,000 --> 00:01:13,000
+Hoy estoy a cargo de todo lo que tiene que ver con datos, analítica e inteligencia artificial en Coca-Cola en Bonor.
+
+13
+00:01:13,000 --> 00:01:18,000
+Es una de las embotelladoras de Coca-Cola en Chile.
+
+14
+00:01:18,000 --> 00:01:27,000
+La idea es mostrar un poco cómo funcionan estos modelos desde el punto de vista teórico.
+
+15
+00:01:27,000 --> 00:01:33,000
+Será una hora probablemente y después de eso nos vamos a ir a código.
+
+16
+00:01:33,000 --> 00:01:41,000
+Vamos a ir viendo los ejemplos, vamos a ocupar estos modelos tanto para problemas de clasificación como de regresión.
+
+17
+00:01:41,000 --> 00:01:47,000
+Las vamos a comparar, vamos a enseñar herramientas para ver optimización de los parámetros, etc.
+
+18
+00:01:47,000 --> 00:01:51,000
+Algunas probablemente ustedes ya las saben, algunas no.
+
+19
+00:01:51,000 --> 00:01:54,000
+Vamos a ir viendo ahí cómo va avanzando.
+
+20
+00:01:54,000 --> 00:02:01,000
+Y finalmente, si nos alcanza el tiempo, quiero terminar con un ejemplo de Random Forest pero aplicado a un tipo de datos más particular.
+
+21
+00:02:01,000 --> 00:02:07,000
+Porque siempre se ocupa con datos que son estilo tablas.
+
+22
+00:02:07,000 --> 00:02:12,000
+Pregunta si se está grabando.
+
+23
+00:02:12,000 --> 00:02:15,000
+Aún no.
+
+24
+00:02:15,000 --> 00:02:20,000
+Cuando usted nos diga que apartamos y desde ahorita lo grabamos.
+
+25
+00:02:20,000 --> 00:02:23,000
+Ahora sí está grabando.
+
+26
+00:02:23,000 --> 00:02:26,000
+Bien.
+
+27
+00:02:26,000 --> 00:02:34,000
+Entonces la idea es llevar Random Forest en esta última parte como a un mundo no tan clásico.
+
+28
+00:02:34,000 --> 00:02:46,000
+No es nada muy loco pero vamos a ocupar Random Forest para clasificación de imágenes.
+
+29
+00:02:46,000 --> 00:02:50,000
+Y eso.
+
+30
+00:02:50,000 --> 00:02:56,000
+Así que vamos con la parte más teórica.
+
+31
+00:02:56,000 --> 00:02:59,000
+Entonces el objetivo.
+
+32
+00:02:59,000 --> 00:03:08,000
+Bien, entonces el objetivo de la clase es entender qué son los modelos que estamos hablando acá.
+
+33
+00:03:08,000 --> 00:03:15,000
+Ustedes en el curso anterior a este miraron viendo árboles de desayuno.
+
+34
+00:03:15,000 --> 00:03:24,000
+Y el árbol de decisión es un modelo súper simple.
+
+35
+00:03:24,000 --> 00:03:29,000
+Me escuchan bien que me veo como una imagen mega pegada.
+
+36
+00:03:29,000 --> 00:03:32,000
+Perfecto.
+
+37
+00:03:32,000 --> 00:03:37,000
+Cualquier cosa que se diga es una imagen de un árbol de decisión.
+
+38
+00:03:37,000 --> 00:03:42,000
+Me escuchan bien que me veo como una imagen mega pegada.
+
+39
+00:03:42,000 --> 00:03:45,000
+Perfecto.
+
+40
+00:03:45,000 --> 00:03:47,000
+Cualquier cosa me avisan.
+
+41
+00:03:47,000 --> 00:03:49,000
+Los tengo aquí en otra pantalla.
+
+42
+00:03:49,000 --> 00:03:54,000
+Así que puedo ver si es que levanta la mano o si escribe en el chat también.
+
+43
+00:03:54,000 --> 00:04:00,000
+Bien, entonces les vieron árboles de decisión y los árboles de decisión son modelos simples.
+
+44
+00:04:00,000 --> 00:04:03,000
+Basados mucho en preguntas y respuestas.
+
+45
+00:04:03,000 --> 00:04:08,000
+Como vieron, tienen los datos, le hacen una pregunta, no sé, mides más de 1 a 75.
+
+46
+00:04:08,000 --> 00:04:10,000
+La respuesta sí, mueve por la base.
+
+47
+00:04:10,000 --> 00:04:11,000
+La respuesta no, mueve para otro.
+
+48
+00:04:11,000 --> 00:04:14,000
+Generan dos nuevos novos.
+
+49
+00:04:14,000 --> 00:04:18,000
+Y a eso se les hacen nuevas preguntas y así se va a reivindicar.
+
+50
+00:04:18,000 --> 00:04:20,000
+Como en historia, vamos a empezar sobre lo que...
+
+51
+00:04:20,000 --> 00:04:23,000
+Bien, por supuesto, esas preguntas se eligen de una cierta forma.
+
+52
+00:04:23,000 --> 00:04:27,000
+Y en base a eso uno va avanzando.
+
+53
+00:04:27,000 --> 00:04:33,000
+Ahora, el árbol es tan simple como...
+
+54
+00:04:33,000 --> 00:04:35,000
+Simple en su forma.
+
+55
+00:04:35,000 --> 00:04:41,000
+Y también muy simple en el sentido como de modelo.
+
+56
+00:04:41,000 --> 00:04:43,000
+De complejidad de modelo.
+
+57
+00:04:43,000 --> 00:04:45,000
+Y eso qué significa?
+
+58
+00:04:45,000 --> 00:04:51,000
+Bueno, que cuando ustedes tienen modelos simples, pueden atacar modelos simples.
+
+59
+00:04:51,000 --> 00:04:58,000
+Y hay muchos modelos donde los datos están también estructurados que uno logra capturar de manera muy fácil y rápida.
+
+60
+00:04:58,000 --> 00:05:02,000
+Los patrones asociados que permiten hacer predicciones.
+
+61
+00:05:02,000 --> 00:05:07,000
+Pero cuando ya los datos son más complejos y rellenen modelos un poco más.
+
+62
+00:05:07,000 --> 00:05:16,000
+El árbol empieza a ser, digamos, demasiado poco para poder atacarlo.
+
+63
+00:05:16,000 --> 00:05:23,000
+Y en ese sentido entra esta técnica que se llama ensamblado de modelos.
+
+64
+00:05:23,000 --> 00:05:29,000
+El ensamblado de modelos, en simple, es una combinación de modelos.
+
+65
+00:05:29,000 --> 00:05:32,000
+Entonces no vamos a ocupar uno.
+
+66
+00:05:32,000 --> 00:05:36,000
+Vamos a ocupar muchos de manera simultánea.
+
+67
+00:05:36,000 --> 00:05:38,000
+Eso es en esencia.
+
+68
+00:05:38,000 --> 00:05:41,000
+¿Por qué uno querría hacer eso?
+
+69
+00:05:41,000 --> 00:05:46,000
+Simplemente las técnicas que vamos a ocupar.
+
+70
+00:05:46,000 --> 00:05:57,000
+Permiten ir descubriendo de mejor forma los distintos patrones que uno va teniendo en los datos.
+
+71
+00:05:57,000 --> 00:06:03,000
+¿Qué es lo que permite hacer estos varios modelos?
+
+72
+00:06:03,000 --> 00:06:07,000
+Porque uno dice, ya voy a ocupar muchos modelos.
+
+73
+00:06:07,000 --> 00:06:11,000
+Pero si los modelos entrenan siempre sobre los mismos datos.
+
+74
+00:06:11,000 --> 00:06:17,000
+Entonces finalmente voy a tener hartos modelos, pero todos iguales.
+
+75
+00:06:17,000 --> 00:06:19,000
+¿De qué sirve tener hartos modelos todos iguales?
+
+76
+00:06:19,000 --> 00:06:22,000
+Finalmente no gané absolutamente nada.
+
+77
+00:06:22,000 --> 00:06:25,000
+Bien, y ahí es donde entra el punto 2.
+
+78
+00:06:25,000 --> 00:06:29,000
+El fondo que viene desde el punto de el busta.
+
+79
+00:06:29,000 --> 00:06:32,000
+El busta es hacer muestras con reemplazo.
+
+80
+00:06:32,000 --> 00:06:35,000
+¿Qué quiere decir? Ya lo vamos a ver en detalle.
+
+81
+00:06:35,000 --> 00:06:37,000
+Es que yo voy a tener mi data set.
+
+82
+00:06:37,000 --> 00:06:39,000
+Y voy a generar muestras de esa.
+
+83
+00:06:39,000 --> 00:06:41,000
+Donde voy a ir sacando uno.
+
+84
+00:06:41,000 --> 00:06:43,000
+Lo voy a anotar.
+
+85
+00:06:43,000 --> 00:06:44,000
+Lo voy a devolver.
+
+86
+00:06:44,000 --> 00:06:45,000
+Voy a sacar otro.
+
+87
+00:06:45,000 --> 00:06:46,000
+Lo voy a anotar y voy a devolver.
+
+88
+00:06:46,000 --> 00:06:50,000
+Y en ese proceso, en el fondo por eso estoy haciendo muestras con reemplazo.
+
+89
+00:06:50,000 --> 00:06:53,000
+Va a ocurrir que puedo repetir datos.
+
+90
+00:06:53,000 --> 00:06:57,000
+Eso en principio uno podría decir, bueno.
+
+91
+00:06:57,000 --> 00:07:00,000
+Esos malos.
+
+92
+00:07:00,000 --> 00:07:05,000
+Y la verdad es que en general no produce mayores problemas.
+
+93
+00:07:05,000 --> 00:07:06,000
+Bien.
+
+94
+00:07:06,000 --> 00:07:13,000
+Y además va en línea ya con tener muestras completamente independientes.
+
+95
+00:07:13,000 --> 00:07:14,000
+Ya.
+
+96
+00:07:14,000 --> 00:07:22,000
+Por ejemplo uno dice cómo van a ser independientes si es que estoy tomando los datos repetidos al final del día.
+
+97
+00:07:22,000 --> 00:07:24,000
+Están súper dependientes.
+
+98
+00:07:24,000 --> 00:07:27,000
+Sí, la muestra puede quedar algunos dependientes entre ellos.
+
+99
+00:07:27,000 --> 00:07:30,000
+Pero la gracia es que el muestreo completo es independiente.
+
+100
+00:07:30,000 --> 00:07:32,000
+En el sentido de que.
+
+101
+00:07:32,000 --> 00:07:34,000
+Cuando yo tengo.
+
+102
+00:07:34,000 --> 00:07:35,000
+Un.
+
+103
+00:07:35,000 --> 00:07:37,000
+Cuando yo saco un valor.
+
+104
+00:07:37,000 --> 00:07:39,000
+Y no lo repongo.
+
+105
+00:07:39,000 --> 00:07:42,000
+Cambia la probabilidad de escoger los siguientes.
+
+106
+00:07:42,000 --> 00:07:47,000
+Es lo típico que cuando uno le hacía la pregunta de sacar una carta de un NIP.
+
+107
+00:07:47,000 --> 00:07:48,000
+Ya.
+
+108
+00:07:48,000 --> 00:07:50,000
+Me dicen saca una carta de un NIP.
+
+109
+00:07:50,000 --> 00:07:51,000
+Cuál es la probabilidad que sea un AS.
+
+110
+00:07:51,000 --> 00:07:52,000
+Y te dicen bueno hay cuatro ASes.
+
+111
+00:07:52,000 --> 00:07:53,000
+Y cuatro cartas.
+
+112
+00:07:53,000 --> 00:07:54,000
+Uno sobre tres.
+
+113
+00:07:54,000 --> 00:07:56,000
+Perfecto.
+
+114
+00:07:57,000 --> 00:07:59,000
+No devuelvas esa carta.
+
+115
+00:07:59,000 --> 00:08:00,000
+Y saca otra.
+
+116
+00:08:00,000 --> 00:08:02,000
+Cuál es la probabilidad de sacar un AS.
+
+117
+00:08:02,000 --> 00:08:03,000
+Bueno depende.
+
+118
+00:08:03,000 --> 00:08:04,000
+Si fue un AS la primera.
+
+119
+00:08:04,000 --> 00:08:05,000
+Entonces.
+
+120
+00:08:05,000 --> 00:08:06,000
+Como no la devolví.
+
+121
+00:08:06,000 --> 00:08:08,000
+Ahora va a tener tres sobre.
+
+122
+00:08:08,000 --> 00:08:10,000
+Doce perdón.
+
+123
+00:08:10,000 --> 00:08:12,000
+Tres sobre cincuenta y uno.
+
+124
+00:08:12,000 --> 00:08:13,000
+Bien.
+
+125
+00:08:13,000 --> 00:08:15,000
+Y en el caso de que la primera no haya sido un AS.
+
+126
+00:08:15,000 --> 00:08:16,000
+Voy a tener cuatro sobre cincuenta y uno.
+
+127
+00:08:16,000 --> 00:08:17,000
+Pero en cualquier caso.
+
+128
+00:08:17,000 --> 00:08:20,000
+Cambia el denominador porque va a tener una carta menos.
+
+129
+00:08:20,000 --> 00:08:22,000
+Entonces el hecho.
+
+130
+00:08:22,000 --> 00:08:25,000
+De que yo haya sacado una carta inicialmente.
+
+131
+00:08:25,000 --> 00:08:26,000
+Condiciona.
+
+132
+00:08:26,000 --> 00:08:28,000
+La probabilidad que viene después.
+
+133
+00:08:28,000 --> 00:08:30,000
+Y las que vienen después también.
+
+134
+00:08:30,000 --> 00:08:32,000
+Por ende hay una cierta.
+
+135
+00:08:32,000 --> 00:08:34,000
+Relación en todo el proceso.
+
+136
+00:08:34,000 --> 00:08:36,000
+Ya.
+
+137
+00:08:36,000 --> 00:08:39,000
+En cambio cuando uno hace el reemplazo.
+
+138
+00:08:39,000 --> 00:08:40,000
+La probabilidad siempre es la misma.
+
+139
+00:08:40,000 --> 00:08:42,000
+O sea yo les digo saqué una carta.
+
+140
+00:08:42,000 --> 00:08:43,000
+Y vean la probabilidad que sea un AS.
+
+141
+00:08:43,000 --> 00:08:45,000
+Cuatro sobre cincuenta y dos.
+
+142
+00:08:45,000 --> 00:08:46,000
+Listo devuélvela.
+
+143
+00:08:46,000 --> 00:08:47,000
+Saca una carta al azar.
+
+144
+00:08:47,000 --> 00:08:49,000
+Cuál es la probabilidad que sea un AS.
+
+145
+00:08:49,000 --> 00:08:50,000
+Cuatro sobre cincuenta y dos.
+
+146
+00:08:50,000 --> 00:08:52,000
+Y así lo puedo hacer infinito.
+
+147
+00:08:52,000 --> 00:08:54,000
+Entonces la probabilidad es exactamente siempre la misma.
+
+148
+00:08:55,000 --> 00:08:56,000
+Ya.
+
+149
+00:08:56,000 --> 00:08:58,000
+Entonces en ese sentido se usa el boost trap.
+
+150
+00:08:58,000 --> 00:09:00,000
+Y se usa con el reemplazo.
+
+151
+00:09:00,000 --> 00:09:01,000
+Y como les dije.
+
+152
+00:09:01,000 --> 00:09:02,000
+La repetición de los datos.
+
+153
+00:09:02,000 --> 00:09:04,000
+En general no produce ningún problema.
+
+154
+00:09:04,000 --> 00:09:05,000
+Además.
+
+155
+00:09:05,000 --> 00:09:06,000
+Tomar una muestra.
+
+156
+00:09:06,000 --> 00:09:07,000
+Es decir tomar.
+
+157
+00:09:07,000 --> 00:09:10,000
+Una porción menor de los datos originales.
+
+158
+00:09:12,000 --> 00:09:15,000
+Hace que el modelo se enfoque en ciertas cosas particulares.
+
+159
+00:09:15,000 --> 00:09:18,000
+Que va a ayudar muchas veces a que el modelo.
+
+160
+00:09:18,000 --> 00:09:20,000
+Genere mejores previsiones.
+
+161
+00:09:20,000 --> 00:09:21,000
+Ya.
+
+162
+00:09:21,000 --> 00:09:23,000
+Y además.
+
+163
+00:09:23,000 --> 00:09:26,000
+Tiene otro tema que lo vamos a hablar más adelante.
+
+164
+00:09:26,000 --> 00:09:27,000
+Tiene varios beneficios en general.
+
+165
+00:09:27,000 --> 00:09:28,000
+Tomar esos sumos.
+
+166
+00:09:29,000 --> 00:09:31,000
+Y después vienen los dos modelos que vamos a ver.
+
+167
+00:09:31,000 --> 00:09:32,000
+Primero es Bagging.
+
+168
+00:09:32,000 --> 00:09:33,000
+Y después Random Forest.
+
+169
+00:09:33,000 --> 00:09:34,000
+Bagging es como la intro.
+
+170
+00:09:34,000 --> 00:09:35,000
+El curso.
+
+171
+00:09:35,000 --> 00:09:37,000
+Que ustedes ven el título.
+
+172
+00:09:37,000 --> 00:09:39,000
+Como en el cronograma decía.
+
+173
+00:09:39,000 --> 00:09:40,000
+Random Forest.
+
+174
+00:09:40,000 --> 00:09:41,000
+Pero.
+
+175
+00:09:41,000 --> 00:09:43,000
+El modelo parte como Bagging.
+
+176
+00:09:43,000 --> 00:09:45,000
+Y evoluciona a Random Forest.
+
+177
+00:09:45,000 --> 00:09:47,000
+Entonces me parece que.
+
+178
+00:09:47,000 --> 00:09:49,000
+Lo correcto es.
+
+179
+00:09:49,000 --> 00:09:51,000
+Dar una introducción al primero que parte.
+
+180
+00:09:51,000 --> 00:09:52,000
+Bien.
+
+181
+00:09:52,000 --> 00:09:53,000
+El Bagging es.
+
+182
+00:09:53,000 --> 00:09:55,000
+Nada más que hacer.
+
+183
+00:09:55,000 --> 00:09:56,000
+Listo.
+
+184
+00:09:56,000 --> 00:09:58,000
+Una vez estén seleccionados todos.
+
+185
+00:09:58,000 --> 00:09:59,000
+Muchos árboles.
+
+186
+00:09:59,000 --> 00:10:01,000
+En cada una de estas muestras.
+
+187
+00:10:01,000 --> 00:10:03,000
+Entonces yo tengo muchas muestras Bustrap.
+
+188
+00:10:03,000 --> 00:10:04,000
+En cada una de ellos.
+
+189
+00:10:04,000 --> 00:10:05,000
+Yo puedo ajustar un árbol.
+
+190
+00:10:05,000 --> 00:10:07,000
+Y después yo voy a combinar.
+
+191
+00:10:07,000 --> 00:10:09,000
+Mis predicciones.
+
+192
+00:10:09,000 --> 00:10:10,000
+Ya.
+
+193
+00:10:10,000 --> 00:10:11,000
+Como promedio votación.
+
+194
+00:10:11,000 --> 00:10:14,000
+Para poder generar una predicción como modelo.
+
+195
+00:10:14,000 --> 00:10:15,000
+Como modelo ensamblado.
+
+196
+00:10:15,000 --> 00:10:16,000
+Ya.
+
+197
+00:10:17,000 --> 00:10:19,000
+Y la evolución del Bagging.
+
+198
+00:10:19,000 --> 00:10:20,000
+Es Random Forest.
+
+199
+00:10:20,000 --> 00:10:21,000
+Que ya.
+
+200
+00:10:21,000 --> 00:10:23,000
+También va a considerar las mismas muestras.
+
+201
+00:10:23,000 --> 00:10:24,000
+Ya.
+
+202
+00:10:24,000 --> 00:10:25,000
+Pero.
+
+203
+00:10:25,000 --> 00:10:27,000
+No solo va a considerar.
+
+204
+00:10:27,000 --> 00:10:28,000
+Tengo mis datos.
+
+205
+00:10:28,000 --> 00:10:29,000
+Va a considerar una muestra de ellos.
+
+206
+00:10:29,000 --> 00:10:30,000
+Sino que además.
+
+207
+00:10:30,000 --> 00:10:31,000
+Tampoco va a considerar.
+
+208
+00:10:31,000 --> 00:10:32,000
+Todas las columnas.
+
+209
+00:10:32,000 --> 00:10:34,000
+O sea no va a considerar todas las variables.
+
+210
+00:10:34,000 --> 00:10:36,000
+Va a considerar algunas.
+
+211
+00:10:36,000 --> 00:10:37,000
+Ya.
+
+212
+00:10:37,000 --> 00:10:38,000
+Y eso.
+
+213
+00:10:38,000 --> 00:10:39,000
+Como vamos ir viendo.
+
+214
+00:10:39,000 --> 00:10:41,000
+Permite estabilizar.
+
+215
+00:10:41,000 --> 00:10:42,000
+Las.
+
+216
+00:10:42,000 --> 00:10:44,000
+Las variaciones.
+
+217
+00:10:44,000 --> 00:10:45,000
+En las predicciones.
+
+218
+00:10:45,000 --> 00:10:46,000
+Bien.
+
+219
+00:10:46,000 --> 00:10:47,000
+Y.
+
+220
+00:10:47,000 --> 00:10:48,000
+Genera.
+
+221
+00:10:48,000 --> 00:10:49,000
+Modelos mucho más estrictos.
+
+222
+00:10:49,000 --> 00:10:50,000
+Ya.
+
+223
+00:10:50,000 --> 00:10:51,000
+Y finalmente después como decía.
+
+224
+00:10:51,000 --> 00:10:52,000
+Vamos a ir practicando.
+
+225
+00:10:52,000 --> 00:10:53,000
+Así que.
+
+226
+00:10:53,000 --> 00:10:54,000
+Al igual que en el comentario.
+
+227
+00:10:54,000 --> 00:10:55,000
+Los árboles en general tienden a ser.
+
+228
+00:10:55,000 --> 00:10:56,000
+Inestables.
+
+229
+00:10:56,000 --> 00:10:57,000
+En el sentido de que ustedes.
+
+230
+00:10:57,000 --> 00:10:58,000
+Hacen pequeños cambios.
+
+231
+00:10:58,000 --> 00:10:59,000
+Bien.
+
+232
+00:10:59,000 --> 00:11:00,000
+Acá tienen una muestra A y una muestra B.
+
+233
+00:11:00,000 --> 00:11:01,000
+Y pueden tener.
+
+234
+00:11:01,000 --> 00:11:02,000
+Dos árboles tales como los que tenemos acá.
+
+235
+00:11:02,000 --> 00:11:03,000
+Bien.
+
+236
+00:11:03,000 --> 00:11:04,000
+Muy.
+
+237
+00:11:04,000 --> 00:11:05,000
+Muy ejemplo.
+
+238
+00:11:05,000 --> 00:11:06,000
+Como de juguete.
+
+239
+00:11:06,000 --> 00:11:07,000
+Pero simplemente para mostrar que si tengo dos muestras.
+
+240
+00:11:07,000 --> 00:11:08,000
+Los árboles.
+
+241
+00:11:08,000 --> 00:11:09,000
+Y.
+
+242
+00:11:09,000 --> 00:11:10,000
+Los árboles.
+
+243
+00:11:10,000 --> 00:11:11,000
+Y.
+
+244
+00:11:11,000 --> 00:11:12,000
+Los árboles.
+
+245
+00:11:12,000 --> 00:11:13,000
+Y.
+
+246
+00:11:13,000 --> 00:11:14,000
+Los árboles.
+
+247
+00:11:14,000 --> 00:11:15,000
+Y.
+
+248
+00:11:15,000 --> 00:11:16,000
+Los árboles.
+
+249
+00:11:16,000 --> 00:11:17,000
+Y.
+
+250
+00:11:17,000 --> 00:11:18,000
+Los árboles.
+
+251
+00:11:18,000 --> 00:11:19,000
+Como de juguete.
+
+252
+00:11:19,000 --> 00:11:20,000
+Si tengo dos muestras.
+
+253
+00:11:20,000 --> 00:11:21,000
+Los árboles pueden cambiar mucho.
+
+254
+00:11:21,000 --> 00:11:22,000
+Bien.
+
+255
+00:11:22,000 --> 00:11:23,000
+Aquí parte con variables distintas.
+
+256
+00:11:23,000 --> 00:11:24,000
+Y aparecen además.
+
+257
+00:11:24,000 --> 00:11:25,000
+Variables distintas también.
+
+258
+00:11:25,000 --> 00:11:26,000
+En cada uno de los lados.
+
+259
+00:11:26,000 --> 00:11:27,000
+Ya.
+
+260
+00:11:27,000 --> 00:11:28,000
+Pueden cambiar a menos modificar también.
+
+261
+00:11:28,000 --> 00:11:29,000
+En el largo del árbol.
+
+262
+00:11:29,000 --> 00:11:30,000
+En las decisiones que toman.
+
+263
+00:11:30,000 --> 00:11:31,000
+Ect.
+
+264
+00:11:31,000 --> 00:11:32,000
+Entonces el árbol.
+
+265
+00:11:32,000 --> 00:11:33,000
+Puede.
+
+266
+00:11:33,000 --> 00:11:34,000
+Tener mucha inestabilidad.
+
+267
+00:11:34,000 --> 00:11:35,000
+Eh.
+
+268
+00:11:35,000 --> 00:11:36,000
+Cuando uno tiene distintas muestras.
+
+269
+00:11:36,000 --> 00:11:37,000
+Ya.
+
+270
+00:11:37,000 --> 00:11:38,000
+De distintos datos.
+
+271
+00:11:38,000 --> 00:11:39,000
+Y cómo entonces nosotros hacemos.
+
+272
+00:11:39,000 --> 00:11:40,000
+Cómo se vuelven a cambiar.
+
+273
+00:11:40,000 --> 00:11:41,000
+Vemos que en la muestra B.
+
+274
+00:11:41,000 --> 00:11:42,000
+Se vuelven a cambiar.
+
+275
+00:11:42,000 --> 00:11:43,000
+En el arbol que se lleva.
+
+276
+00:11:43,000 --> 00:11:44,000
+Y.
+
+277
+00:11:44,000 --> 00:11:45,000
+El árbol.
+
+278
+00:11:45,000 --> 00:11:46,000
+Y.
+
+279
+00:11:46,000 --> 00:11:47,000
+El árbol.
+
+280
+00:11:47,000 --> 00:11:53,880
+nosotros hacemos para que esa inestabilidad no nos preocupe y tener un mejor modelo predictivo
+
+281
+00:11:53,880 --> 00:12:00,400
+como ya les acabo de mencionar, no en general no tiene buena capacidad predictiva un árbol
+
+282
+00:12:00,400 --> 00:12:11,000
+de decirlo. Entonces lo que hacemos es, tenemos nuestros datos, les dije hacemos varias muestras
+
+283
+00:12:11,000 --> 00:12:18,360
+busstrap, por mostrar que vamos a ocupar, en cada uno de ellos yo voy a aplicar un modelo
+
+284
+00:12:18,360 --> 00:12:26,840
+o aquí dice modelo BDSS3 y después cada uno de ellos va a aportar con su predicción,
+
+285
+00:12:26,840 --> 00:12:33,600
+entonces yo después a ellos voy a pasar datos nuevos, les paso el modelo 1 y les voy a decir
+
+286
+00:12:33,600 --> 00:12:38,600
+bueno que cuál es tu predicción, me va a entregar la suya, después el modelo 2 también, el modelo 3
+
+287
+00:12:38,600 --> 00:12:44,280
+y va a crear una función de agregación que me va a permitir generar una predicción final,
+
+288
+00:12:44,280 --> 00:12:52,560
+o sea esa función de agregación lo único que hace es que combina en una única predicción las
+
+289
+00:12:52,560 --> 00:12:57,680
+predicciones de todos los modelos que usted busca. Todo este proceso es el que se llama esanblado.
+
+290
+00:13:01,680 --> 00:13:07,680
+Bien, entonces como dice abajo el beneficio que genera esto, es que si yo tengo un solo modelo,
+
+291
+00:13:09,480 --> 00:13:17,720
+se equivoca, entonces no tengo mucho que hacer, tengo que vivirlo más con esa equivoca, pero aquí
+
+292
+00:13:17,720 --> 00:13:18,800
+como voy a tener muchos,
+
+293
+00:13:26,120 --> 00:13:33,440
+perdón, dice como tenemos muchos modelos, bien, cada uno de ellos se va a equivocar,
+
+294
+00:13:33,640 --> 00:13:37,840
+en distintos lados,
+
+295
+00:13:40,480 --> 00:13:46,080
+y entonces al equivocarse en distintos lados van aprendiendo distintos lados también, por ende,
+
+296
+00:13:47,760 --> 00:13:58,400
+van a poder entonces aprender en general más de lo que se equivocan, y ahí es donde viene en el
+
+297
+00:13:58,400 --> 00:14:05,080
+fondo que la agregación reduce ya el error que uno puede tener en una muestra en particular,
+
+298
+00:14:06,160 --> 00:14:09,240
+ese es un poco la idea que está por detrás de todo esto.
+
+299
+00:14:11,440 --> 00:14:18,960
+Entonces ahora sí, para que quede un poquito más claro qué es lo que uno entiende por el
+
+300
+00:14:18,960 --> 00:14:26,120
+muestreo a bootstrap, uno ve la primera línea y tiene los datos originales,
+
+301
+00:14:29,400 --> 00:14:38,960
+entonces ustedes tienen aquí datos originales, entonces 1, 2, 3, 4, 5, 6, 7, 8, bien lo que sea,
+
+302
+00:14:38,960 --> 00:14:44,960
+entonces lo que hace ustedes toman una muestra y van y toman uno aleatorio,
+
+303
+00:14:44,960 --> 00:14:50,480
+y vuelven, no solo va a hacerlo siempre, lo devuelven, vuelven a tomar otro,
+
+304
+00:14:51,480 --> 00:14:57,440
+perfecto, lo devuelvo, vuelvo a tomar otro y aquí se fijan, vuelvo a tomar el 2,
+
+305
+00:14:57,440 --> 00:15:08,040
+y después tomo el 4, nuevamente el 6, 7 y 8, entonces aquí en este caso tengo una muestra del mismo
+
+306
+00:15:08,040 --> 00:15:11,840
+tamaño que el original, no necesariamente tiene que ser una muestra del mismo tamaño original,
+
+307
+00:15:11,840 --> 00:15:19,880
+porque ahí además estaría obligatoriamente, o me quedo con los mismos datos, o necesariamente
+
+308
+00:15:19,880 --> 00:15:29,200
+estaría repitiendo, entonces genera lo que se hace, que se toma una muestra un poquito más pequeña,
+
+309
+00:15:31,040 --> 00:15:37,960
+y entonces después se puede fijar que tiene este que es el 1, 1, 3, 3, 4, 5, 6, 7, y al final el dado,
+
+310
+00:15:37,960 --> 00:15:43,920
+entonces las repeticiones crean conjuntos de datos que son distintos entre ellos,
+
+311
+00:15:43,920 --> 00:15:49,800
+por supuesto tienen cierta coincidencia en la información que tienen, eso no es un problema,
+
+312
+00:15:49,800 --> 00:15:56,880
+pero nos permite en el fondo tener varios conjuntos de datos para entrenar sin tener
+
+313
+00:15:56,880 --> 00:16:02,480
+la necesidad de ir a buscar nuevos datos, uno podría pensar en principio que tengo unos datos
+
+314
+00:16:02,480 --> 00:16:05,280
+que lo entrenaré y si después que lo entrenaré a otro modelo, bueno tendría que ir a buscar más
+
+315
+00:16:05,280 --> 00:16:14,120
+datos, bueno esta técnica permite que con los mismos datos nosotros podamos entrenar muchos modelos,
+
+316
+00:16:15,000 --> 00:16:25,560
+como dice el Layton, en general cuando uno tiene muestras de los datos, pensemos en datos grandes,
+
+317
+00:16:25,560 --> 00:16:32,840
+esto es un ejemplo muy pequeñito solo para industrial, pero se espera que nosotros tengamos
+
+318
+00:16:32,840 --> 00:16:43,840
+un 63% de observaciones únicas en una muestra, de verdad esperamos que se repitan, esperamos
+
+319
+00:16:43,840 --> 00:16:56,520
+que sea todo uno. Víctor pregunta, por eso la IA no da la misma respuesta a la misma pregunta
+
+320
+00:16:56,520 --> 00:17:09,320
+repetida varias veces, no creo que eso tenga mucho que ver con esto,
+
+321
+00:17:13,840 --> 00:17:24,680
+en general la IA le deberían entregar una respuesta muy similar, cuando usen las preguntas
+
+322
+00:17:26,680 --> 00:17:43,640
+distintas veces y sin memoria, puede empezar a darte distintas respuestas cuando tú le
+
+323
+00:17:43,640 --> 00:17:52,800
+vas haciendo preguntas sobre preguntas y en el fondo él por el contexto que tiene de la conversación
+
+324
+00:17:52,800 --> 00:18:00,120
+contigo empieza a tratar de ir como por otro lado, es como cuando yo a mí me preguntan algo, yo doy
+
+325
+00:18:00,120 --> 00:18:04,880
+una respuesta, si alguien me dice oye ¿sabes qué? no te entendí, me lo puedes explicar de nuevo, no
+
+326
+00:18:04,880 --> 00:18:08,520
+voy a responder exactamente igual porque ya no me entendió, entonces voy a tratar de hacerlo de
+
+327
+00:18:09,200 --> 00:18:17,640
+los algoritmos en general funcionan muy de ese estilo, esto de Bustrap no tiene mucho que ver en
+
+328
+00:18:17,640 --> 00:18:25,520
+el fondo con la pregunta que hace Víctor, pero es lo que comenta, es muy efectivo, si uno dentro de la
+
+329
+00:18:25,520 --> 00:18:30,040
+misma conversación pregunta varias veces lo mismo va a recibir respuestas que debiesen ser similares
+
+330
+00:18:30,040 --> 00:18:36,240
+salvo cuando uno lo fuerza, ustedes saben que le pueden preguntar y decirle no, estás equivocado,
+
+331
+00:18:36,400 --> 00:18:44,840
+contestas lo que yo digo y pueden lograr eso, pero caso contrario en general las respuestas
+
+332
+00:18:44,840 --> 00:18:53,560
+debiesen ser similares, ok entonces nosotros debiésemos esperar una muestra Bustrap que
+
+333
+00:18:53,560 --> 00:19:01,480
+concentren alrededor del 63% de los valores únicos de mi dataset original, ya eso es un poco lo que
+
+334
+00:19:01,480 --> 00:19:04,800
+se espera, entonces
+
+335
+00:19:07,120 --> 00:19:21,400
+qué es lo que pasa con todo lo que no está, por ejemplo tenemos la muestra Bustrap 1, tiene el 1, el 2, el 4, el 6, el 7 y el 8, por ejemplo acá quedó fuera el 3 y quedó fuera el 5, ya
+
+336
+00:19:22,600 --> 00:19:30,200
+en el caso de ésta tenemos el 1, el 3, el 4, el 5, el 7, entonces quedó fuera el 2, quedó fuera el 6 y quedó fuera el 8,
+
+337
+00:19:30,480 --> 00:19:38,160
+y en ésta quedó fuera el 1, el 7, el 1 y el 7, no estoy viendo,
+
+338
+00:19:40,520 --> 00:19:51,840
+entonces qué es lo que pasa con esa información que queda fuera, bueno esa fuera se llama OOB
+
+339
+00:19:51,840 --> 00:19:59,680
+que significa Out of Bag o fuera como de la bolsa y son las filas en el fondo que pertenecen a nuestro
+
+340
+00:19:59,680 --> 00:20:10,120
+dataset pero que no entran a una muestra Bustrap específica, ya y esos datos en general se ocupan
+
+341
+00:20:10,120 --> 00:20:15,560
+ya como una dataset de validación interna del modelo,
+
+342
+00:20:17,960 --> 00:20:25,600
+entonces tenemos el Bustrap aquí como dice para un árbol, tenemos el árbol B y el modelo genera
+
+343
+00:20:25,600 --> 00:20:33,520
+predicciones pero además este mismo árbol yo puedo utilizarlo sobre estos datos que no los
+
+344
+00:20:33,520 --> 00:20:38,320
+vio para entrenar, todas estas filas quedaron fuera de la muestra Bustrap, por lo tanto no
+
+345
+00:20:38,320 --> 00:20:42,760
+está siendo utilizada para el entrenamiento y cuando ustedes tienen un modelo Machine Learning
+
+346
+00:20:42,760 --> 00:20:49,000
+siempre dividen el dataset en entrenamiento y testeo donde utilizan el entrenamiento para que el
+
+347
+00:20:49,000 --> 00:20:56,200
+modelo aprenda y el de test para ver cómo el modelo está desempeñando, bien, lo importante en
+
+348
+00:20:56,200 --> 00:21:02,880
+ese proceso es que ustedes entrenan con unos datos y testen en datos que el modelo nunca vio en su
+
+349
+00:21:02,880 --> 00:21:14,720
+entrenamiento por lo tanto están simulando cómo sería el funcionamiento de su modelo en una situación
+
+350
+00:21:14,720 --> 00:21:22,040
+como real, ya, en una situación donde está recibiendo datos nuevos, si ustedes tienen su
+
+351
+00:21:22,040 --> 00:21:27,000
+modelo de manera productiva y todos los días están llegando datos nuevos, bueno el modelo nunca lo ha
+
+352
+00:21:27,000 --> 00:21:33,240
+visto y eso es queremos ver ahí es como el modelo desempeña no en los que se entrenan, entonces en ese
+
+353
+00:21:33,240 --> 00:21:38,680
+sentido cuando uno tiene estos datos los out of back, bueno como el modelo nunca los vio para
+
+354
+00:21:38,680 --> 00:21:45,440
+entrenar a nosotros nos sirve para poder medir el error que se genera del modelo en esos datos y
+
+355
+00:21:45,440 --> 00:21:54,160
+tener una medición extra como anticipada al proceso realmente de evaluación, ya, entonces nos permite
+
+356
+00:21:56,520 --> 00:22:01,440
+ir haciendo esa pre-example, como dice acá, nos permite estimar el desempeño sin reservar un
+
+357
+00:22:01,440 --> 00:22:10,520
+conjunto de evaluación adicional cuando el modelo implementa esta técnica, por supuesto yo podría
+
+358
+00:22:10,520 --> 00:22:16,440
+perfectamente tener una muestra bootstrap que tenga los ocho números por inventar al suelo,
+
+359
+00:22:17,880 --> 00:22:25,040
+si ese fuese el caso no tendría out of back y para ese árbol en particular no tendría la forma de
+
+360
+00:22:25,040 --> 00:22:30,480
+medir ese error, entonces no es como que yo pueda eliminar el proceso de validación,
+
+361
+00:22:30,480 --> 00:22:37,200
+el test de todo eso, sino que simplemente es un extra que lo permite esta técnica de
+
+362
+00:22:37,200 --> 00:22:45,040
+bootstrap junto al fondo con las técnicas de ensamblaje, como decía, bueno como el 63%
+
+363
+00:22:45,040 --> 00:22:53,520
+queda dentro de cada muestra bootstrap hay un 37% de elementos aproximadamente que quedan fuera,
+
+364
+00:22:55,120 --> 00:22:56,520
+eso es lo típico.
+
+365
+00:22:59,480 --> 00:23:05,600
+Bien, entonces vamos con el primer modelo, que nosotros vamos a ver que es Vagin,
+
+366
+00:23:05,600 --> 00:23:17,480
+Vagin significa el bootstrap aggregating, son modelos que utilizan, refondo esto al
+
+367
+00:23:17,480 --> 00:23:24,720
+resumen de todo lo que acabo de decir, ustedes tienen el modelo, las muestras de bootstrap,
+
+368
+00:23:26,200 --> 00:23:36,720
+en cada una de ellas entreno un modelo y después ocupo alguna fusión de agregación para combinar
+
+369
+00:23:36,720 --> 00:23:44,880
+los resultados de todos los modelos en una única predicción, entonces por ejemplo si yo
+
+370
+00:23:44,880 --> 00:23:52,640
+tengo una cantidad B de modelos base, entonces voy a tener H1, H2 hasta HB donde H está denotando
+
+371
+00:23:52,640 --> 00:24:04,280
+el modelo y en el caso de clasificación yo voy a quedarme con la predicción final como la moda de
+
+372
+00:24:04,280 --> 00:24:09,560
+todas mis predicciones, lo que equivale, si por ejemplo tenemos un problema de clasificación binaria,
+
+373
+00:24:09,760 --> 00:24:18,600
+lo que equivale en el fondo es el que aparece en la mayoría, por mayoría de votos.
+
+374
+00:24:18,600 --> 00:24:24,920
+Algunos modelos también entregan probabilidades, probabilidades de pertenecer a la clase 1,
+
+375
+00:24:24,920 --> 00:24:31,160
+probabilidades de pertenecer a la clase 0, en esos casos también ustedes pueden agregar
+
+376
+00:24:31,160 --> 00:24:35,360
+como el promedio de las probabilidades, son más o menos equivalentes.
+
+377
+00:24:35,360 --> 00:24:43,080
+Y en el caso de regresión, bueno lo más fácil, lo más clásico es simplemente considerar el
+
+378
+00:24:43,080 --> 00:24:48,560
+promedio de todas las predicciones individuales, podría poner alguna otra métrica así, podría
+
+379
+00:24:48,560 --> 00:24:53,520
+poner la mediana o podría poner la que se le ocurra en el fondo, pero el promedio es la que es más típica.
+
+380
+00:24:55,360 --> 00:25:02,760
+Acá usualmente vamos a hablar de las cosas más típicas porque el modelo
+
+381
+00:25:05,360 --> 00:25:14,000
+los modelos vienen ya con cierta estructura, vienen implementados de una cierta forma particular,
+
+382
+00:25:14,000 --> 00:25:20,680
+entonces si nosotros nos queremos salir un poquito de ahí, bueno vamos a tener que ir a
+
+383
+00:25:20,680 --> 00:25:24,560
+ver si es que la implementación lo permite y en caso contrario vamos a tener que hacer nosotros
+
+384
+00:25:24,560 --> 00:25:31,520
+de manera poco manual el modelo, en caso contrario vamos a tener que respetar las cosas que ya están.
+
+385
+00:25:32,240 --> 00:25:36,480
+Ya están implementadas.
+
+386
+00:25:39,640 --> 00:25:45,160
+Entonces el algoritmo de Bind, típicamente lo que se hace primero es que se generan muestras,
+
+387
+00:25:45,160 --> 00:25:52,480
+ya por supuesto esto lo hacemos nosotros, esto lo hace el computador, ya lo vamos a ver, pero
+
+388
+00:25:56,720 --> 00:26:01,120
+ustedes generan todas las muestras, entonces tienen sus datos y van generando distintas muestras,
+
+389
+00:26:01,120 --> 00:26:05,960
+muestra 1, muestra 2, muestra 3, muestra 4, tantas muestras como uno indique.
+
+390
+00:26:06,840 --> 00:26:11,680
+Cómo el computador va a saber eso, pues no, todos estos modelos tienen un parámetro,
+
+391
+00:26:11,680 --> 00:26:17,000
+esto que se llaman hiperparámetros de los modelos, donde nosotros le vamos a indicar
+
+392
+00:26:17,000 --> 00:26:19,960
+cuántos muestras nosotros queremos obtener.
+
+393
+00:26:22,800 --> 00:26:28,560
+Una vez que nosotros creamos todas las muestras boostrap, entonces vamos al proceso de entrenamiento,
+
+394
+00:26:28,960 --> 00:26:34,520
+donde lo que hacemos es ajustar un árbol de decisión, sea de clasificación o de
+
+395
+00:26:34,520 --> 00:26:39,480
+regresión dependiendo del caso, en cada una de las muestras, por tanto si por inventar algo
+
+396
+00:26:39,480 --> 00:26:43,760
+ese B fuese mío, o sea tuviese mil muestras boostrap, entonces en el paso 2 voy a entrenar
+
+397
+00:26:43,760 --> 00:26:47,520
+mil árboles de decisión, uno por cada muestra.
+
+398
+00:26:50,880 --> 00:26:55,480
+¿De qué depende el número de muestra? pregunta Antonieta, de una.
+
+399
+00:26:56,000 --> 00:27:04,840
+Bien, existen números más o menos estándar que se piden, vamos a ver cómo el número de muestras
+
+400
+00:27:04,840 --> 00:27:12,160
+puede ayudar a bajar la variabilidad de nuestras predicciones, pero además también vamos a ver
+
+401
+00:27:12,160 --> 00:27:20,160
+técnicas de, el número de muestras es un parámetro del modelo, y como todo parámetro del modelo,
+
+402
+00:27:20,160 --> 00:27:28,120
+nosotros vamos a poder utilizar técnicas de optimización de hiperparámetros para escoger
+
+403
+00:27:28,120 --> 00:27:40,800
+el mejor parámetro posible. Entonces la verdad es que a la respuesta debiese ser, depende única y
+
+404
+00:27:40,800 --> 00:27:48,360
+exclusivamente de los datos, y eso es lo que vamos a ver las técnicas de cómo nosotros poder sacarlo.
+
+405
+00:27:50,960 --> 00:27:56,560
+Bien, entonces tenemos, un segundo,
+
+406
+00:28:00,320 --> 00:28:06,960
+entonces tenemos ya nuestras muestras, tenemos nuestros árboles entrenados y después toca
+
+407
+00:28:06,960 --> 00:28:17,760
+hacer predicciones, entonces cuando yo obtengo, por ejemplo tengo datos nuevos, me trajeron un
+
+408
+00:28:17,760 --> 00:28:28,600
+nuevo sujeto y me dicen que tienes que probarlo, ya, entonces que es lo que hago, yo le paso el
+
+409
+00:28:28,600 --> 00:28:35,400
+sujeto nuevo a esto, esto dice ok, y tenemos mil árboles y le pasa esa observación a cada uno de
+
+410
+00:28:35,400 --> 00:28:44,240
+los mil árboles, cada uno de ellos entrega su predicción y por lo tanto obtengo mil predicciones
+
+411
+00:28:44,240 --> 00:28:49,920
+en este caso y después viene el proceso final que viene es agregar, en el caso que hubiese sido
+
+412
+00:28:49,920 --> 00:28:56,920
+un problema de clasificación, entonces voy a ver ok, por ejemplo si era clasificación minaria,
+
+413
+00:28:56,920 --> 00:29:07,960
+cuántos unos hay? 870, cuántos 0 hay? 130, bueno hay más unos que ceros, por lo tanto mi predicción
+
+414
+00:29:07,960 --> 00:29:15,760
+final es un 1, así de siempre, ya, insisto todo esto el computador lo hace uno solo tiene que entender
+
+415
+00:29:15,760 --> 00:29:20,000
+que lo que está haciendo por detrás para que sepa que cuando un random forest o un vallin más digan
+
+416
+00:29:20,000 --> 00:29:27,920
+que la predicción es 1 significa que los árboles dentro de la mayoría votaron por el 1, ok,
+
+417
+00:29:27,920 --> 00:29:35,400
+y en el caso de que sea un modelo de regresión, entonces ahí el valor se agrega por el problema,
+
+418
+00:29:35,400 --> 00:29:43,000
+el promedio de los valores, por ejemplo, si estamos tratando de predecir la temperatura de mañana
+
+419
+00:29:43,880 --> 00:29:49,920
+vemos que cada modelo de los mil me entregó una temperatura en específico y después yo promedio
+
+420
+00:29:49,920 --> 00:29:56,240
+esas mil temperaturas y eso es lo que voy a entregar con valor de predicción, ya,
+
+421
+00:29:56,240 --> 00:30:02,640
+bueno, una cosa interesante acá y lo vamos a ocupar bastante,
+
+422
+00:30:04,200 --> 00:30:08,840
+es que los árboles no dependen unos con otros porque ustedes tienen una muestra, después tienen
+
+423
+00:30:08,840 --> 00:30:14,200
+otra muestra, acá ponen un árbol, acá ponen otro árbol y estos dos acá no conversan, ya,
+
+424
+00:30:14,200 --> 00:30:22,200
+conversan en el sentido de tienen un cierto grado de dependencia, en el sentido de que los datos se
+
+425
+00:30:22,200 --> 00:30:27,960
+traspapelan en algún punto, digamos, no son completamente, no son todas las muestras gustas,
+
+426
+00:30:27,960 --> 00:30:35,560
+no son todas separadas entre sí, si tienen una intersección y en ese sentido los árboles también
+
+427
+00:30:35,560 --> 00:30:41,160
+van a tener una cierta dependencia, pero no su entrenamiento, el entrenamiento de cada árbol
+
+428
+00:30:41,160 --> 00:30:50,200
+es independiente uno del otro, ya, el árbol 2, el entrenamiento de la muestra 2, no le importa nada
+
+429
+00:30:50,200 --> 00:30:58,040
+la muestra 1 ni la muestra 3, el solo ve la muestra 2, en ese sentido nosotros podemos generar en este
+
+430
+00:30:58,040 --> 00:31:05,240
+tipo de modelos entrenamientos en paralelo, significa eso que ustedes van a ocupar todo el
+
+431
+00:31:05,240 --> 00:31:12,880
+poder de su computador para entrenar el modelo de manera más eficiente, cómo se hace eso?
+
+432
+00:31:12,880 --> 00:31:22,160
+por ejemplo mi computador tiene 10 procesadores, entonces en vez del computador por defecto,
+
+433
+00:31:22,160 --> 00:31:29,560
+qué es lo que haría? si yo tengo que entrenar 1000 o pongamos 10, más fácil, tenemos 10 muestras y
+
+434
+00:31:29,560 --> 00:31:34,680
+tenemos que entrenar 10 modos, qué es lo que haría el computador? le diría mira ahí está la primera muestra
+
+435
+00:31:34,680 --> 00:31:41,600
+entrenar el primer árbol, cuando terminas, ahí tiene la segunda muestra, segundo árbol, y cuando termina la
+
+436
+00:31:41,600 --> 00:31:49,600
+tercera muestra y así sudecibamos, entonces va a ser de manera secuencial, en la muestra 1 entreno, después la muestra 2, después la muestra 3 y así sudecibamos hasta que termine
+
+437
+00:31:49,600 --> 00:32:01,600
+eso es lo que el computador sudece, no lleva acento en inglés o en español, y tampoco la O no lleva acento, tiene que estar de esta manera
+
+438
+00:32:01,600 --> 00:32:09,600
+entonces como le voy a decir, procesador 1, ahora vamos a dar click 2, 3, 4, 3 y así sudecibamos hasta que termine, entrenen
+
+439
+00:32:09,600 --> 00:32:19,600
+y entrenen finalmente todos al mismo tiempo y por lo tanto voy a reducir mi tiempo en 10 veces de entrenamiento, eso se llama entrenamiento en paralelo
+
+440
+00:32:19,600 --> 00:32:35,600
+así que eso es muy bueno, sobre todo cuando uno tiene hartos datos, en el fondo tengo hartos árboles y hartos datos
+
+441
+00:32:35,600 --> 00:32:44,600
+el entrenamiento en paralelo me puede permitir bajar mucho los tiempos de entrenamiento de este tipo de iguales
+
+442
+00:32:44,600 --> 00:32:53,600
+sobre todo por ejemplo si ustedes tienen, porque mi computador tiene 10, a lo mejor de ustedes tiene 4 o alguno tiene con 20 procesadores, no tengo idea
+
+443
+00:32:53,600 --> 00:33:02,600
+a lo mejor algunos aquí para la clase están corriendo esto en colab y colab creo que te entrega 12px, entonces es super poquito
+
+444
+00:33:02,600 --> 00:33:09,600
+pero cuando uno tiene una cantidad de datos masiva y tiene una gran cantidad de árboles que quiere entrenar
+
+445
+00:33:09,600 --> 00:33:18,600
+entonces por ejemplo se puede aprovechar de las bondades de la computación elástica y tener por ejemplo un computador en la nube
+
+446
+00:33:18,600 --> 00:33:36,600
+y hoy día por ejemplo, solo porque trabajo con esa nube en particular, en AWS, hoy día ustedes pueden tener una máquina virtual con 384 procesadores creo que es lo máximo que está permitido hoy día
+
+447
+00:33:36,600 --> 00:33:50,600
+entonces imaginen si yo les dije aquí estoy bajando el tiempo en 10 veces porque tengo 10 procesadores, bueno si pues tenemos una máquina con 380 procesadores
+
+448
+00:33:50,600 --> 00:34:03,600
+entonces vamos a bajar el tiempo en 380 veces, eso es super bueno y eso pueden lograr en el fondo pasar de entrenamientos que a lo mejor
+
+449
+00:34:03,600 --> 00:34:08,600
+porque aquí todo lo que vamos a hacer se demora unos segundos, hay algunas cosas que se demora un par de minutos
+
+450
+00:34:08,600 --> 00:34:20,600
+pero en general estas cosas con muchos datos pueden demorarse muchas horas incluso días entonces reducir de días a un par de horas es una buena ganada
+
+451
+00:34:20,600 --> 00:34:22,600
+ya?
+
+452
+00:34:23,600 --> 00:34:33,600
+en entrenamiento en paralelo uno lo puede gestionar uno o lo puede gestionar dentro de las mismas funciones que vamos a ocupar aquí vamos a mostrar como se gestionan dentro de las mismas funciones
+
+453
+00:34:33,600 --> 00:34:43,600
+aquí totalmente en vivo a mi me salió un error entonces yo tenía instalado un office pero en el error me decía que tenía que desinstalar
+
+454
+00:34:44,600 --> 00:34:54,600
+como se llama esto? entonces viene con la implementación cuando uno sabe que algo es paralelizable es cuando las
+
+455
+00:34:54,600 --> 00:35:02,600
+lo que hay que hacer, en el fondo el operatorio que hay que hacer entre uno y otro no tiene independencia
+
+456
+00:35:03,600 --> 00:35:13,600
+pero si por ejemplo el árbol 2 el entrenamiento del árbol 2 ocupa información que sale del entrenamiento del árbol 1 entonces no lo puedo hacer en paralelo
+
+457
+00:35:13,600 --> 00:35:23,600
+porque necesariamente este necesita que este de acá haya terminado entonces necesito hacer este y cuando este termine puedo hacer este
+
+458
+00:35:23,600 --> 00:35:32,600
+eso se llama procesamiento secuencial y en esos casos no se puede paralelizar por eso hay que estar bien claro cuando se puede y cuando no es cuando se puede aprovechar
+
+459
+00:35:35,600 --> 00:35:43,600
+entonces porque el vallin ya les decía y en la cantidad de árboles aquí según lo que preguntan tiendas ayuda ya?
+
+460
+00:35:44,600 --> 00:35:53,600
+es porque permite suavizar un poco los errores individuales ya? y si ustedes calculan
+
+461
+00:35:55,600 --> 00:36:05,600
+si ustedes calculan el valor promedio ya? y ven la variabilidad de ese valor el promedio recuerden que es la predicción
+
+462
+00:36:05,600 --> 00:36:21,600
+entonces ustedes ven la variabilidad de eso que en el fondo es cuanto esto se puede mover o sea que tan inseguro estoy de mi predicción estamos dando una suerte de medición
+
+463
+00:36:21,600 --> 00:36:31,600
+a la inserción que hay detrás de una predicción en ese caso bueno tenemos que es la variabilidad del proceso usual por este ponderador que está acá
+
+464
+00:36:31,600 --> 00:36:43,600
+donde rho denota la correlación entre los errores ya? un menor valor del rho o sea menor correlación entonces es todo acá
+
+465
+00:36:43,600 --> 00:36:51,600
+olvidense de la parte que está por acá ya? olvidense por un segundo imagínense que esto fuese solo la varianza multiplicada por este rho
+
+466
+00:36:51,600 --> 00:37:01,600
+la correlación es un número que va entre menos uno y uno ya? entonces aquí siempre podemos ver la correlación para el lado positivo
+
+467
+00:37:01,600 --> 00:37:13,600
+la podemos ver en valor absoluto o en ningún problema solo nos interesa la magnitud no la dirección y en ese sentido si ustedes tienen una correlación igual a uno
+
+468
+00:37:13,600 --> 00:37:23,600
+entonces la varianza no cambia nada pero si nuestros valores nuestros errores de los árboles son más o menos independientes eso quiere decir que cada uno se está equivocando
+
+469
+00:37:23,600 --> 00:37:33,600
+en cosas distintas entonces mis errores van a ser mucho más independientes o no correlacionados ya? y este número va a ser menor que uno por lo tanto
+
+470
+00:37:33,600 --> 00:37:43,600
+entonces sabes que cuando tengo un número positivo lo multiplico por algo menor que uno ese número se achica por lo tanto esto va a estar achicando la varianza ya?
+
+471
+00:37:43,600 --> 00:37:53,600
+por otro lado tenemos un sumando acá y este dice uno menos rho bueno es lo contrario si la correlación es baja este número acá es más alto más cercano a uno
+
+472
+00:37:53,600 --> 00:38:03,600
+pero el V es la cantidad de los árboles por lo tanto a mayor cantidad de árboles cuando yo tengo un número super grande este número aquí está también entre 0 y 1
+
+473
+00:38:03,600 --> 00:38:13,600
+si el rho está entre 0 y 1 el uno menos rho está entre 0 y 1 también entonces si yo divido por ejemplo y pongo mil árboles este número ya es super chiquitito
+
+474
+00:38:13,600 --> 00:38:31,600
+bien y por lo tanto cuando tengo hartos árboles elimino la componente que está acá al lado o sea la rebusco todo lo que yo quiera y por otro lado este de aquí va a funcionar bien si es que efectivamente cada una de las muestras está funcionando de manera correcta
+
+475
+00:38:31,600 --> 00:38:45,600
+entonces en síntesis si la correlación es alta significa que los errores están muy correlacionados si los errores están correlacionados significa que casi todos los árboles están cometiendo los mismos errores
+
+476
+00:38:45,600 --> 00:38:57,600
+si están cometiendo los mismos errores entonces el ensamblado va a cometer los mismos errores y por lo tanto no hay nada mucho que hacer ahí no estamos ganando tanto y como les decía y como dice acá
+
+477
+00:38:57,600 --> 00:39:13,600
+en ese caso como este es alto que hagamos este muy chico realmente no aporta nada ahí no el tener muchos árboles realmente no no no no no no elimina en el fondo el problema que está generando la correlación entre los errores
+
+478
+00:39:13,600 --> 00:39:29,600
+en general lo que uno espera en todos estos modelos es que los errores entre los modelos sean poco correlacionados eso es lo que dice la teoría y así están creados
+
+479
+00:39:29,600 --> 00:39:31,600
+Claudia tiene una pregunta
+
+480
+00:39:31,600 --> 00:39:43,600
+Hola buenas noches todo este proceso ayuda también a que se baje lo que es la sobreestimación del modelo o el sobrejuste mejor dicho
+
+481
+00:39:43,600 --> 00:39:59,600
+sí sí en algún sentido pero igual hay que ayudarlos ya o sea el hecho de que tengas un modelo ensamblado hace que tus probabilidades de sobre ajustes sean menores ya
+
+482
+00:39:59,600 --> 00:40:14,600
+porque porque estás suavizando todo estás promediando estás agregando y eso va a permitir en el fondo que haya menos susceptibilidad al sobre ajuste aún así igual podría ocurrir ya
+
+483
+00:40:14,600 --> 00:40:28,600
+pero al igual que ustedes me imagino que tienen que haber visto los árboles de decisión existen parámetros que controlan el sobre ajuste en particular por ejemplo limitar la profundidad que tiene el árbol en las divisiones
+
+484
+00:40:28,600 --> 00:40:41,600
+existen los parámetros de control de complejidad y así como ya hay más digamos que limitar la cantidad mínima de elementos que tiene que tener uno para ser terminada etc etc
+
+485
+00:40:41,600 --> 00:40:56,600
+entonces como esto usa muchos árboles tú puedes ocupar los mismos parámetros para también prevenir el sobre ajuste entonces si bien el solo hecho de promediar bien de combinar los árboles mediante un promedio mediante votos
+
+486
+00:40:56,600 --> 00:41:08,600
+ya baja tu probabilidad de sobre ajuste si tú además lo controlas con algún parámetro casi que lo eliminas del todo así que la respuesta en general es como sí
+
+487
+00:41:08,600 --> 00:41:17,600
+sí bien estos modelos tienen a sobre ajustar mucho menos o mucho más controlados y no no debiese ser en general un problema
+
+488
+00:41:17,600 --> 00:41:20,600
+ok gracias
+
+489
+00:41:25,600 --> 00:41:33,600
+cómo saber eso habría que calcularlo jorge pregunta cómo saber el valor de la correlación entre errores eso se calcula
+
+490
+00:41:34,600 --> 00:41:43,600
+tú puedes tener todos los árboles puedes hacer las predicciones y puedes ver el fondo cómo es el error bien en una por ejemplo en un sujeto
+
+491
+00:41:43,600 --> 00:41:48,600
+hace las predicciones cocar un los árboles calcula las correlaciones
+
+492
+00:41:49,600 --> 00:41:55,600
+perdón la calcula los errores y después ver en el fondo si esos están
+
+493
+00:41:55,600 --> 00:42:01,600
+estando correlacionados general es algo es
+
+494
+00:42:02,600 --> 00:42:15,600
+esto es la forma en cómo uno entiende de manera teórica cómo el modelo está ayudando a suavizar y a bajar la variabilidad y la incertidumbre en tu predicción
+
+495
+00:42:15,600 --> 00:42:22,600
+más no es algo que en general uno mide ya porque esto se sabe de manera teórica no más
+
+496
+00:42:22,600 --> 00:42:32,600
+va a ver en el fondo como uno se da cuenta de si está ocurriendo esto es cuando realmente por ejemplo tú haces un árbol solo y después haces un bagging y te das cuenta que no mejoras casi nada
+
+497
+00:42:32,600 --> 00:42:44,600
+y cuando eso ocurre lo más probable es que la correlación entre los errores sea alta y por eso por lo tanto a pesar de que está cocinando muchos árboles son todos muy parecidos porque todos se equivocan en lo mismo
+
+498
+00:42:44,600 --> 00:42:56,600
+así que en tu predicción que es combinada igual se va a seguir lo mismo que si hubiese tenido uno solo así es como uno lo va notando después pero en general no es algo que uno calcula mucho
+
+499
+00:43:02,600 --> 00:43:04,600
+bien
+
+500
+00:43:04,600 --> 00:43:08,600
+alguien está poniendo cositas aquí me puse un check
+
+501
+00:43:08,600 --> 00:43:10,600
+bien
+
+502
+00:43:16,600 --> 00:43:32,600
+entonces ese es bagging ok bagging ya dijimos muchas muestras gustras en cada una de ellas tenemos un árbolito combinamos las predicciones mediante promedios o votos ya
+
+503
+00:43:32,600 --> 00:43:52,600
+el random forest hace lo mismo que el bagging en esencia pero agrega un dato adicional ya que es que ustedes en el bagging tenían la muestra aleatoria muestra de los datos originales y sobre ese hacía un árbol ocupando todo esa muestra
+
+504
+00:43:52,600 --> 00:44:18,600
+ahora no solo va a ser esa muestra sino que además va a ser una selección aleatoria de las variables ya entonces si ustedes tienen un data set por ejemplo de mil registros y 20 variables cuando hacen una muestra bustra por ejemplo toman 500 de esos mil 500 registros de esos mil y sobre eso para el bagging aplicaban el árbol
+
+505
+00:44:18,600 --> 00:44:38,600
+lo que va a agregar el random forest es que va a tomar esos 500 pero además de esos 500 va a decir no voy a tomar las 20 variables voy a tomar 4 y las va a tomar de manera aleatoria ya
+
+506
+00:44:38,600 --> 00:44:50,600
+entonces eso es lo que hace ya selecciona cada árbol va a tener una muestra bustra y además también va a tener una muestra de las variables no las va a considerar todas
+
+507
+00:44:50,600 --> 00:45:04,600
+porque hace eso bueno porque uno de los problemas que estábamos visualizando es que justamente si es que los errores eran correlacionados entonces el ensamble no me ayudaba mucho ya
+
+508
+00:45:04,600 --> 00:45:11,600
+y eso en el fondo es uno dice ya pero cómo pueden estar correlacionados los errores si al final del día son distintos árboles
+
+509
+00:45:11,600 --> 00:45:27,600
+si son distintos árboles son distintos árboles pero son sobre son son son sobre muestras si cada una de esas muestras entre ellas tienen un cierto grado intersección porque son muestras con reemplazo ya
+
+510
+00:45:27,600 --> 00:45:43,600
+y además ocupan todos los árboles las mismas variables entonces bueno que se lo ocurrió una persona dijo qué pasa si además de hacer la muestra seleccionamos variables entonces ahora cuando ves el árbol 1 y el árbol 2 del random forest las muestras
+
+511
+00:45:43,600 --> 00:46:13,600
+sobre las cuales se van a entrar son distintas vale tener una cierta coincidencia van a ser distintas porque son muestras bustras pero además las variables las cuales va a tener cada uno de las variables ya no son las mismas ya porque uno a lo mejor va a seleccionar la variable 1, 5 y 8 y la otra va a seleccionar la 7, la 15 y la 20 entonces ya los datos se empiezan a ser completamente distintos y eso el objetivo principal y en lo que se traduce usualmente es que tienen árboles más indescriptibles
+
+512
+00:46:13,600 --> 00:46:28,600
+dependientes ya por ende reducen la correlación entre árboles si reducen la correlación entre árboles reducen la variabilidad de mis predicciones y por ende el grado de circunstancia así que queda aún más suave que lo que hacía by
+
+513
+00:46:28,600 --> 00:46:29,600
+la pregunta cuál es el criterio para descatar variables del random forest es aleatorio dice selecciona la teoría variables entonces en lo que uno entrega como parámetros cuántas variables el modelo tiene que seleccionar para cada muestra con eso lo entrega y luego por ejemplo cada muestra selecciona cinco variables entonces va seleccionando en cada una de las muestras cinco variables de manera aleatoria ya si tuviese un criterio definido
+
+514
+00:46:58,600 --> 00:47:15,600
+entonces todo sería un proceso y cuando entra un proceso digamos que tiene ciertas definiciones tú pierdes ya por definición la independencia la independencia es que las cosas no están ligadas existen un proceso están ligadas ya
+
+515
+00:47:16,600 --> 00:47:27,600
+cambios y las elecciones aleatoria tú estás introduciendo un mayor grado de dependencia entre las entre los errores de este caso ya después juan viches dice
+
+516
+00:47:27,600 --> 00:47:28,600
+pero sumo que se conserva la misma variable respuesta es que la cuando uno se refiere a variables nunca está hablando de la variable respuesta están tus variables y tu variable objetivo todo lo que estamos viendo es en las variables que entran al modelo para poder predecir la objetivo jamás se descarta esa es algo que está completamente aparte de hecho usted lo tiene que haber hecho en los árboles de decisión que cuando usted en el caso de la variable respuesta
+
+517
+00:47:57,600 --> 00:48:27,560
+define su modelo y después lo quieren ajustar hacían el nombre del modelo que sea punto fit y le entregaban dos dataset uno que típicamente se le pone x o un nombre con x y la y es el objetivo y ahí ustedes ya están separando el mundo donde va a actuar esta selección de variables y la selección de filas solo en ese conjunto x en la y también por supuesto de la selección de filas si lo va a ayudar pero ahí no hay selección de variables por
+
+518
+00:48:27,600 --> 00:48:40,480
+que esa es la objetivo y eso no se puede eliminar ya así que muy bien juan y si esto dice la cantidad de variables que va a seleccionar también es aleatorio entonces no
+
+519
+00:48:42,160 --> 00:48:56,840
+la selección la cantidad bueno eso depende de la implementación pero las implementaciones más clásicas lo que uno define es la cantidad de variables entonces yo defino 5 y en todos los árboles va a tomar 5 variables ya
+
+520
+00:48:57,240 --> 00:49:03,240
+pero por ejemplo en python creo que tiene implementaciones que son más modernas donde
+
+521
+00:49:04,920 --> 00:49:13,280
+uno determina el número máximo de variables que puede ocupar un árbol y en ese caso eventualmente
+
+522
+00:49:13,280 --> 00:49:24,040
+podría algunos tener menos pero la versión como usual es que todos tengan la misma cantidad de árboles y yo defino ese número
+
+523
+00:49:26,840 --> 00:49:27,760
+y
+
+524
+00:49:33,280 --> 00:49:45,560
+entonces random forest básicamente es bail más seleccionar la variedad de variables las filas se seleccionan por el bustra las variables se hacen un subconjunto que se
+
+525
+00:49:45,560 --> 00:49:55,920
+escoge de manera aleatoria donde yo entrego la cantidad de variables para el subconjunto y el resultado de todo esto es que los árboles se parecen cada vez menos entre sí
+
+526
+00:49:56,400 --> 00:50:05,920
+porque ya no se están entrando ni con los mismos registros ni con las mismas variables entonces los está haciendo cada vez más independientes por decirlo
+
+527
+00:50:14,640 --> 00:50:17,200
+bien entonces acá
+
+528
+00:50:17,200 --> 00:50:23,920
+acá solo para hacer esto de manera super gráfica
+
+529
+00:50:32,760 --> 00:50:42,000
+tenemos acá ocho variables en un data set, imagínese edad, ingreso, zona, canal, saldo, uso, antigüedad y mora
+
+530
+00:50:42,000 --> 00:50:53,880
+y aquí hay un parámetro que se llama Mtry en Python se llama de otra forma Mtry se llama cuando uno ocupa esto en S
+
+531
+00:50:56,560 --> 00:51:02,160
+en Python se llama max features lo vamos a ver
+
+532
+00:51:03,680 --> 00:51:09,000
+entonces aquí por ejemplo nosotros ocupamos ese valor que yo le decía entregamos 3 esto va a
+
+533
+00:51:09,000 --> 00:51:15,960
+entregar tres variables aleatorias o sea de las ocho va a elegir tres aleatorias y en este caso están
+
+534
+00:51:15,960 --> 00:51:26,280
+seleccionadas saldo, ingreso y antigüedad y con esas tres hace un árbol y después en el segundo árbol va a elegir otras tres va a elegir edad,
+
+535
+00:51:26,280 --> 00:51:36,280
+zona y antigüedad por ejemplo también pueden coincidir ya no es que tienen que ser todas distintas pueden coincidir al igual que las muestras bustra pueden coincidir
+
+536
+00:51:39,560 --> 00:51:48,080
+así que eso es cómo funciona en edades y van tomando algunas ya entonces como dice ahí
+
+537
+00:51:48,080 --> 00:51:54,440
+cuando de repente uno tiene variables que son más dominantes pueden
+
+538
+00:51:58,120 --> 00:52:05,480
+controlar necesariamente los árboles entonces la gracia es que esto elimina un poco de ese efecto
+
+539
+00:52:09,000 --> 00:52:10,720
+me dan un segundo por favor
+
+540
+00:52:30,720 --> 00:52:36,560
+ok entonces eso es un poco lo que se espera con esto y es en el fondo el avance que genera
+
+541
+00:52:36,720 --> 00:52:39,160
+tener un random forest a tener una
+
+542
+00:52:41,040 --> 00:52:43,120
+perdón de bagging a random forest
+
+543
+00:52:44,400 --> 00:52:51,840
+pues los vamos a cuando los metamos a todo esto al computador vamos a hacer competir y vamos a ir viendo en general que
+
+544
+00:52:53,160 --> 00:53:00,880
+el random forest tiende a tener mejores resultados que hay bagging no son resultados
+
+545
+00:53:01,040 --> 00:53:09,040
+y vamos a ver que wow que mejor pero general mejor entonces vamos a ir escalando en el fondo los resultados
+
+546
+00:53:10,560 --> 00:53:16,680
+Matías pregunta si uno de los modelos tomó variables pocos significativos con una mala calidad de predicción
+
+547
+00:53:18,120 --> 00:53:21,800
+de qué forma se descarta o no entra el promedio bien
+
+548
+00:53:22,800 --> 00:53:27,400
+entra el promedio como como cualquiera ya
+
+549
+00:53:29,080 --> 00:53:35,800
+pues vamos a ver que eso no es tan malo además porque los modelos que vamos a ver la siguiente clase que
+
+550
+00:53:35,800 --> 00:53:43,600
+son los de boosting son modelos que van entregando feedback de cómo le fue al modelo que se va a
+
+551
+00:53:43,600 --> 00:53:48,920
+entrenar después de él son modelos secuenciales o son los de boosting por eso el fondo boosting es como
+
+552
+00:53:49,920 --> 00:53:57,200
+que uno va a ir potenciando entonces cada modelo va a ir potenciando el que sigue diciéndole mira yo
+
+553
+00:53:57,200 --> 00:54:00,760
+me equivoqué acá aprende esto mejor ok
+
+554
+00:54:05,400 --> 00:54:12,040
+entonces esa es un poco la idea ya en este caso para lo que estamos acá no hay ninguno que se descarte
+
+555
+00:54:12,040 --> 00:54:20,560
+es parte de cómo se llama de los que los modelos también se equivoquen
+
+556
+00:54:20,560 --> 00:54:28,000
+si los modelos se equivocan ya el y otra cosa que es importante es que bueno aquí
+
+557
+00:54:28,000 --> 00:54:33,840
+matías menciona variables poco significativas las variables que entran al modelo
+
+558
+00:54:33,840 --> 00:54:44,560
+son las seleccionadas por mí entonces si el modelo está entrando con variables poco significativas
+
+559
+00:54:44,560 --> 00:54:55,640
+también es culpa mía más que del modelo ya eso se puede trabajar con una buena exploración de datos
+
+560
+00:54:55,640 --> 00:55:03,400
+existen modelos de selección de variables como para no tratar de meter todas las variables de la
+
+561
+00:55:03,400 --> 00:55:10,040
+juguera porque esa idea de que agarro todo lo meto a la juguera y que el árbol se encargue de ver
+
+562
+00:55:10,040 --> 00:55:14,120
+qué es lo que le sirve que es lo que no hay que me entregar mejor respuesta es la peor estrategia
+
+563
+00:55:14,120 --> 00:55:23,200
+que uno puede tener en este mundo uno debe meter al modelo lo que de verdad va a aportar ya no metamos
+
+564
+00:55:23,200 --> 00:55:31,240
+todo y vemos que sale si ustedes le meten basura un modelo va a tener basuras como respuesta es como
+
+565
+00:55:31,240 --> 00:55:33,000
+el lema más típico en todo esto
+
+566
+00:55:36,800 --> 00:55:40,760
+Ignacio pregunta que modelo de selección de variables recomendaría existen varios
+
+567
+00:55:40,760 --> 00:55:49,440
+primero pueden tener cosas simples como correlación después existen métodos más avanzados como la
+
+568
+00:55:49,440 --> 00:55:55,480
+regresión lazo por ejemplo permite selección de variables existen los métodos que se llaman como
+
+569
+00:55:55,480 --> 00:56:00,640
+stepwise forward y backward que son modelos que van metiendo variables de a poco y van viendo como
+
+570
+00:56:00,640 --> 00:56:06,640
+el desempeño del modelo va cambiando y dicen bueno y en algún momento te cortan y te dicen
+
+571
+00:56:06,640 --> 00:56:10,800
+bueno considera sólo estas porque si tú agregas cualquiera otra de las que tienes vas a tener un
+
+572
+00:56:10,800 --> 00:56:21,840
+peor desempeño y así y existen otros modelos como por ejemplo hay uno que se llama RFE que
+
+573
+00:56:21,840 --> 00:56:28,520
+viene de Recursive Feature Elimination que utiliza justamente árbol y las importancias que las
+
+574
+00:56:28,520 --> 00:56:35,240
+variables de los árboles para seleccionar variables y lo otro que uno puede hacer también es reducir
+
+575
+00:56:35,240 --> 00:56:42,200
+dimensiones y dimensionalidad utilizando por ejemplo componentes principales eso permite
+
+576
+00:56:42,200 --> 00:56:49,880
+también bajar la cantidad de variables del modelo pero sin perder poder predictivo y al
+
+577
+00:56:49,880 --> 00:56:57,240
+tú bajar la dimensionalidad el modelo puede mejorar en desempeño ya tiene la misma cantidad
+
+578
+00:56:57,240 --> 00:57:02,440
+de registros menos variables con la misma capacidad predictiva y al tener menos variables
+
+579
+00:57:02,440 --> 00:57:09,880
+automáticamente el modelo tiene crece en la cantidad de registros de manera como así como
+
+580
+00:57:10,880 --> 00:57:15,720
+artificialmente hablando ya ustedes tienen que entender que mientras más variables el modelo
+
+581
+00:57:15,720 --> 00:57:22,840
+necesita más registros para poder lograr encontrar todos los patrones que existen existen entonces yo
+
+582
+00:57:22,840 --> 00:57:28,560
+tengo una cantidad usualmente la cantidad registros es limitada si yo tengo que bajo la cantidad de
+
+583
+00:57:28,560 --> 00:57:35,880
+variables entonces automáticamente la cantidad de registros ahora tienen más para poder encontrar
+
+584
+00:57:35,880 --> 00:57:41,680
+los mismos patrones porque es más fácil con menos variables en ese sentido es que se gana entonces
+
+585
+00:57:41,680 --> 00:57:48,640
+todas esas técnicas pueden ayudar en la parte de selección de variables. Bien después dice Javier
+
+586
+00:57:49,000 --> 00:57:53,800
+si la idea es abarcar todo en teoría no sería mejor probar todas las iteraciones con todas
+
+587
+00:57:53,800 --> 00:57:57,160
+las combinaciones de variables posibles más que aleatorias
+
+588
+00:58:02,280 --> 00:58:07,920
+es que eso no te garantiza a ver cuando tú tienes hartos árboles por ejemplo si tú tienes
+
+589
+00:58:07,920 --> 00:58:12,960
+20 variables y tienes que vas a hacer mil árboles tú vas a ocupar todas las variables en las
+
+590
+00:58:12,960 --> 00:58:21,480
+iteraciones ahora usar todas las combinaciones posibles con las variables eso computacionalmente
+
+591
+00:58:21,480 --> 00:58:27,840
+se te ha vuelto una pesadilla entonces esto también tiene está pensado desde un punto de vista que
+
+592
+00:58:29,200 --> 00:58:37,240
+no tiene que ser eficiente computacionalmente eso va a quedar súper claro quizás espero con
+
+593
+00:58:37,240 --> 00:58:41,160
+los ejemplos porque cuando ustedes vean lo del computador y vean que vamos a optimizar el parámetro
+
+594
+00:58:41,160 --> 00:58:46,360
+y vamos a tener un dataset con 20 mil registros van a ver que se va a demorar no sé 7 minutos
+
+595
+00:58:48,360 --> 00:58:53,960
+7 minutos con 20 mil registros imagínense cuando lo metan esto y con no sé eran altas variables
+
+596
+00:58:53,960 --> 00:59:01,440
+igual pero se va a demorar mucho imagínense cuando tengan más variables y además tengan
+
+597
+00:59:01,440 --> 00:59:09,280
+millones y millones de registros en coca cola nosotros tenemos modelos que
+
+598
+00:59:11,800 --> 00:59:19,640
+ocupamos las transacciones con seis años de historia entonces los modelos de repente
+
+599
+00:59:19,640 --> 00:59:27,520
+reciben el dataset inicial para los modelos tiene algo como 380 millones de registros
+
+600
+00:59:28,000 --> 00:59:32,360
+cuando usted le mete 380 millones registro a uno de estos modelos sumándole muchas variables
+
+601
+00:59:33,720 --> 00:59:38,840
+créanme que hacer todas las combinaciones cualquier computador va a explotar entonces
+
+602
+00:59:38,840 --> 00:59:45,960
+en ese sentido es muy impracticable la idea de hacer todas las combinaciones y el hecho de que
+
+603
+00:59:45,960 --> 00:59:54,320
+esto sea aleatorio sí va a hacer que igual tú el modelo vea todo ya no todo al mismo tiempo pero lo
+
+604
+00:59:54,320 --> 00:59:57,680
+va a ver todo bien
+
+605
+01:00:00,920 --> 01:00:07,200
+rodrigo dice tiene que ver el análisis de información mutua no sé a qué te refieres con eso
+
+606
+01:00:17,400 --> 01:00:21,520
+es que nunca escuchaba menos con ese nombre análisis de información mutua
+
+607
+01:00:21,520 --> 01:00:24,280
+tiene que ver específicamente aquí te refieres
+
+608
+01:00:39,280 --> 01:00:39,720
+bien
+
+609
+01:00:43,600 --> 01:00:44,560
+ya entonces
+
+610
+01:00:51,720 --> 01:00:56,520
+esto es así como simplemente para para un poco
+
+611
+01:00:59,400 --> 01:01:04,600
+poner ambos en perspectiva y un poco como un contexto
+
+612
+01:01:08,000 --> 01:01:19,160
+tenemos el bagging y el random forest ambos utilizan para mostrar filas bustra en las
+
+613
+01:01:19,160 --> 01:01:26,440
+variables utiliza bagging utiliza todas las variables en el caso de random forest tenemos
+
+614
+01:01:26,440 --> 01:01:31,640
+un subconjunto aleatorio la correlación entre los árboles puede mantenerse alta si es que no
+
+615
+01:01:31,640 --> 01:01:38,720
+no está digamos logrando en general nada al bustra el caldo del random forest tiene dos modalidades
+
+616
+01:01:38,720 --> 01:01:46,720
+que me hacen tratar de reducir la correlación entre los árboles ya así que debiese tener
+
+617
+01:01:47,480 --> 01:01:55,560
+el nivel de agregación es en ambos bien la misma que por voto por promedio lo más clásico y en el
+
+618
+01:01:55,560 --> 01:02:01,600
+caso del uso del obb que era el out of bag está disponible para ambos modelos porque ambos utilizan
+
+619
+01:02:01,600 --> 01:02:11,240
+bustra los modelos que veamos la próxima clase que son los de boosting esos modelos ya pierden el
+
+620
+01:02:11,240 --> 01:02:21,000
+obb ya porque ya no utilizan bussas a entrar con todos los datos así que la diferencia clave
+
+621
+01:02:21,000 --> 01:02:26,480
+como dice acá es básicamente que el random forest tiene un parámetro que me permite manejar
+
+622
+01:02:26,480 --> 01:02:33,600
+esta similitud entre los árboles y por ende puede lograr disminuir la correlación entre ellos y
+
+623
+01:02:33,600 --> 01:02:44,640
+eso como ya lo vimos por las ecuaciones determina un poco el nivel de variabilidad en mis respuestas
+
+624
+01:02:44,640 --> 01:02:49,480
+a menor nivel de variabilidad las respuestas son más estables y estoy más seguro también
+
+625
+01:02:49,480 --> 01:03:03,960
+así como un ejemplo muy muy simples ustedes tienen árboles para estimar si es que un cliente
+
+626
+01:03:03,960 --> 01:03:11,800
+responde una campaña tienen arbol 1 2 3 4 5 cada uno de ellos entrenado lo que haya sido si es un
+
+627
+01:03:11,800 --> 01:03:18,760
+bagging entonces tenemos cinco muestras bussas si es un random forest tienen también cinco muestras
+
+628
+01:03:18,760 --> 01:03:23,200
+bussas pero además tienen en cada uno de ellos una selección de variables lo importante es que a
+
+629
+01:03:23,200 --> 01:03:29,280
+cada uno de ellos yo les puedo pasar después de que están entrenados un sujeto nuevo bien va a tener
+
+630
+01:03:29,280 --> 01:03:34,560
+un nuevo cliente y quiero saber si es que ese cliente va a responder a alguna campaña que voy a
+
+631
+01:03:34,560 --> 01:03:39,880
+enviar le mando y el árbol 1 me dice que sí el árbol 2 me dice que no el árbol 3 me dice que sí
+
+632
+01:03:39,880 --> 01:03:46,520
+los 4 me dice que sí 5 me dice que no entonces tienen tres votos con que sí dos votos con que
+
+633
+01:03:47,160 --> 01:03:48,760
+la predicción es por voto
+
+634
+01:03:52,720 --> 01:03:58,480
+entonces la predicción es finalmente que sí se refiere con votos y en caso también lo que se
+
+635
+01:03:58,480 --> 01:04:06,560
+puede hacer es que se puede estimar la probabilidad la probabilidad estimada por votos es 3 sobre 5
+
+636
+01:04:06,560 --> 01:04:12,560
+sea 1.6 pero uno también podría tener las probabilidades de cada uno de estos son las
+
+637
+01:04:12,560 --> 01:04:22,480
+dos formas que uno podría trabajar esta parte y dentro de las cosas que uno puede manejar
+
+638
+01:04:22,480 --> 01:04:30,080
+en los árboles porque los modelos es como es un modelo que ya lo vimos con su estructura
+
+639
+01:04:30,080 --> 01:04:41,920
+random forest es otro modelo y también tiene su estructura pero yo puedo ir adaptándolo a los datos
+
+640
+01:04:42,960 --> 01:04:48,120
+cómo puedo adaptar el modelo en los datos bueno moviendo los parámetros que tiene es como que
+
+641
+01:04:48,120 --> 01:04:54,320
+ustedes tienen una máquina y ustedes van manejando ciertos parámetros para que nos
+
+642
+01:04:54,320 --> 01:05:01,040
+imagínense que una máquina cortadora de caja o de lo que sea y entonces ustedes van a ver en el
+
+643
+01:05:01,040 --> 01:05:05,960
+fondo puede controlar el ancho en el que corta en el largo en el que corta cierto la fuerza con la
+
+644
+01:05:05,960 --> 01:05:11,640
+que corta entonces se va adaptando así tiene que hacer una caja grande una caja chica o tienen que
+
+645
+01:05:11,640 --> 01:05:16,520
+cortar un papel que es más delicado sólo por por un ejemplo digamos de cualquier cosa pero es
+
+646
+01:05:16,520 --> 01:05:20,920
+una máquina ustedes tienen ciertos parámetros que los pueden ir modificando y eso les va a ir
+
+647
+01:05:20,920 --> 01:05:28,880
+adaptando el trabajo de la máquina a lo que tiene que hacer ya y con el output de esperado por su
+
+648
+01:05:28,880 --> 01:05:36,120
+vuelta en este caso esas perillas y nuestra máquina son los modelos ya en la máquina son random forest
+
+649
+01:05:36,120 --> 01:05:43,400
+y el y el bail y estas perillitas con las que yo puedo ir haciendo cosas son estos que se conocen
+
+650
+01:05:43,400 --> 01:05:50,360
+como los hiperparámetros ya hiperparámetros o parámetros digamos pueden ser las dos pero
+
+651
+01:05:50,360 --> 01:05:54,840
+hiperparámetros usualmente por ejemplo cuando ustedes tienen regresión lineal
+
+652
+01:05:56,640 --> 01:06:03,160
+ustedes tienen los parámetros del modelo son los que acompañan a la de los betas que acompañan
+
+653
+01:06:03,160 --> 01:06:10,840
+acá una misma variable ya entonces para hacer esa diferenciación de que por ejemplo un modelo de
+
+654
+01:06:10,840 --> 01:06:16,880
+regresión lineal no tiene parámetros pero si tiene parámetros entonces esto se lo coloque de esa
+
+655
+01:06:16,880 --> 01:06:23,720
+forma ya y aquí hay varios está este que se llama en estimator max features max de min sample lift
+
+656
+01:06:24,360 --> 01:06:32,840
+bus trap max samples y el class wave ya entonces en estimator es la cantidad de árboles ya
+
+657
+01:06:35,040 --> 01:06:40,120
+como ya vimos la cantidad de árboles reduce una de las partes del sumando que estaba en esa
+
+658
+01:06:40,120 --> 01:06:46,840
+ocasión con la variabilidad entonces uno tendría a pensar a mayor cantidad de árboles bajo esa parte
+
+659
+01:06:46,840 --> 01:06:54,120
+y sólo queda la parte de la correlación de los errores la respuesta es sí pero a mayor cantidad
+
+660
+01:06:54,120 --> 01:06:59,000
+de árboles por supuesto estoy estabilizando el resultado pero estoy por otro lado porque no todo
+
+661
+01:06:59,000 --> 01:07:05,400
+es gratis estoy aumentando el costo de mi modelo a mayor cantidad de árboles por supuesto tengo que
+
+662
+01:07:05,400 --> 01:07:12,240
+hacer más más mostreos más selección de variables en el caso de random forest más entrenamientos
+
+663
+01:07:12,400 --> 01:07:16,800
+cada vez que predigo tengo que hacer más predicciones tengo que combinar más valores
+
+664
+01:07:16,800 --> 01:07:24,160
+entonces todo es más todo es más pesado todo se hace más difícil ya entonces hay uno tiene que
+
+665
+01:07:24,160 --> 01:07:31,080
+tratar de controlar de fondo si quiero subirlo para mantener mis valores súper estables y
+
+666
+01:07:31,080 --> 01:07:37,840
+independiente del costo que hay que pagar por eso ya max features es la cantidad de variables
+
+667
+01:07:37,840 --> 01:07:47,240
+candidatas por no bien menos variables reducen correlación ya esta es la máxima cantidad de
+
+668
+01:07:47,240 --> 01:07:53,280
+variables es la variable que va a seleccionar el cada muestra para cada árbol el random forest
+
+669
+01:07:53,280 --> 01:07:58,080
+entonces como dicen menos variables reducen la correlación por supuesto porque va a ser más
+
+670
+01:07:58,080 --> 01:08:03,440
+fácil que los árboles se entrenen sobre conjuntos completamente distintos pero podría llegar a
+
+671
+01:08:03,440 --> 01:08:09,720
+entrar a sesgo en porque en el fondo voy a estar entregando por ejemplo si doy una sola variable
+
+672
+01:08:09,720 --> 01:08:16,880
+va a estar haciendo predicciones en base a un solo valor entonces como para ya el roncas extremo ya
+
+673
+01:08:16,880 --> 01:08:23,600
+esto no es tan preocupante porque general no es algo que digamos siempre el sesgo es algo
+
+674
+01:08:23,600 --> 01:08:28,840
+que proviene mucho del mostreo bien pero como general aquí el mostreo aleatorio después vamos
+
+675
+01:08:28,840 --> 01:08:35,640
+promediando todo esto finalmente se estabiliza y no genera tanto problema pero igual es importante
+
+676
+01:08:38,040 --> 01:08:43,160
+de hecho muchas veces y ustedes pueden leer en internet hay una recomendación de que el max
+
+677
+01:08:43,160 --> 01:08:49,000
+features sea igual a uno o sea que selecciona puros árboles con una sola variable y yo lo he
+
+678
+01:08:49,000 --> 01:08:54,640
+probado y efectivamente en muchos casos entrega modelos muchísimo pero muchísimo mejores
+
+679
+01:08:55,600 --> 01:09:00,560
+cuando uno selecciona más igual es interesante digamos esa parte
+
+680
+01:09:02,160 --> 01:09:09,920
+después tenemos el max depth esos parámetros con el min sample lift son parámetros de complejidad
+
+681
+01:09:09,920 --> 01:09:12,920
+de los modelos aquí se preguntó
+
+682
+01:09:17,000 --> 01:09:21,600
+no acuerdo quién preguntó pero alguien me preguntó por el sobre ajuste
+
+683
+01:09:24,640 --> 01:09:28,600
+bueno estos son los parámetros que ayudan a prevenir el sobre ajuste en cualquier caso
+
+684
+01:09:28,600 --> 01:09:35,360
+el max depth es la máxima profundidad del árbol por lo tanto yo limito hasta donde el árbol se
+
+685
+01:09:35,360 --> 01:09:42,680
+puede seguir dividiendo y el min sample lift controla en el fondo cuán pequeñas pueden ser
+
+686
+01:09:42,680 --> 01:09:48,760
+las hojas entonces ambos apuntan al mismo sentido porque cuando el modelo se va a sobre ajustar
+
+687
+01:09:48,760 --> 01:09:59,720
+cuando se va se extiende se hace demasiadas divisiones caso extremo sería que partiera con
+
+688
+01:09:59,720 --> 01:10:03,960
+un nuevo y se dividiera tantas veces que cada nuevo terminal contiene un ajuste de observación
+
+689
+01:10:03,960 --> 01:10:10,040
+eso sería un caso extremo de un árbol sería súper sobre ajustado entonces si yo inmediatamente
+
+690
+01:10:10,040 --> 01:10:16,400
+lo corto o digo no pueden haber nuevos terminales con menos de 20 elementos automáticamente por
+
+691
+01:10:16,440 --> 01:10:21,960
+ejemplo limiré esa parte entonces esto hacen que el árbol se divida menos y eso automáticamente
+
+692
+01:10:21,960 --> 01:10:28,880
+controla un poco el control sobre ajuste porque está controlando la complejidad del modelo ya
+
+693
+01:10:30,080 --> 01:10:32,640
+el boost trap y el max samples en el fondo
+
+694
+01:10:35,960 --> 01:10:42,440
+controla cómo se muestra las filas si el boost trap o no define si hay reemplazo yo puedo
+
+695
+01:10:42,440 --> 01:10:48,680
+usar boost trap o no ya eso de hecho los parámetros de estos modelos permiten elegirlo
+
+696
+01:10:48,680 --> 01:10:52,960
+los modelos están diseñados con boost trap pero ustedes podrían decir bueno no quiero usar boost trap
+
+697
+01:10:52,960 --> 01:10:57,400
+y el max sample también es cuánto es la muestra ya
+
+698
+01:11:00,160 --> 01:11:05,520
+y este que se llama class weight es cuando tenemos que la variable objetivo está desbalanceada
+
+699
+01:11:06,360 --> 01:11:14,160
+y entonces por desbalance cuando una de las clases usualmente el desbalance de clases se
+
+700
+01:11:14,160 --> 01:11:20,920
+trabaja más cuando es binario pero también podría ser cuando es multicategoría
+
+701
+01:11:22,400 --> 01:11:30,280
+imagínense que ustedes tienen dos clases 0 y 1 y tienen que los 1 corresponden a un 2% del total
+
+702
+01:11:31,280 --> 01:11:37,560
+y los 0 a un 98 eso se dice que están desbalanceados el problema de eso es que el modelo le va a costar
+
+703
+01:11:37,560 --> 01:11:41,720
+muchísimo aprender de los unos porque hay muy pocos y lo más probable es que el uno sea la clase
+
+704
+01:11:41,720 --> 01:11:46,720
+de interés no el 0 siempre dentro de una clasificación binaria hay una clase de interés
+
+705
+01:11:48,400 --> 01:11:49,600
+entonces en ese sentido
+
+706
+01:11:52,000 --> 01:11:57,760
+el modelo le va a costar mucho y hay técnicas que permiten ayudar un poquito al modelo de
+
+707
+01:11:57,800 --> 01:12:04,400
+manera de que pueda aprender de los que están en binaria y en el caso de los de estos modelos
+
+708
+01:12:04,400 --> 01:12:11,600
+viene con implementado ciertas técnicas automáticas en el fondo de pesos para clases que le pones más
+
+709
+01:12:11,600 --> 01:12:18,520
+peso a alguna u otra o hacen muestreos para aumentar artificialmente en porcentaje y en
+
+710
+01:12:18,520 --> 01:12:25,760
+cantidad las variables que están en binaria ya prioridad como práctica dice acá creo que
+
+711
+01:12:25,760 --> 01:12:32,280
+el estimator el max feature y los tamaños mínimos de hoja junto con el max depth son dentro de los
+
+712
+01:12:32,280 --> 01:12:40,800
+parámetros que son más importantes estos parámetros en general son o del árbol o son del
+
+713
+01:12:40,800 --> 01:12:47,400
+del del del bagging o del random forest ya entonces en general son comunes
+
+714
+01:12:47,400 --> 01:12:48,720
+eso que a punto
+
+715
+01:12:51,960 --> 01:12:59,040
+algunos puntos interesantes que uno tiene que dar acá esta ventaja de limitaciones es la ventaja
+
+716
+01:12:59,040 --> 01:13:06,360
+es primero es que tienen en general buen desempeño ya no suponer ningún tipo de relación lineal
+
+717
+01:13:07,240 --> 01:13:09,880
+la diferencia es que no se lo podría hacer una regresión lineal
+
+718
+01:13:10,680 --> 01:13:20,440
+entonces se adapta muy bien a cualquier situación son modelos sin supuestos ya tiene supuesto no
+
+719
+01:13:20,440 --> 01:13:24,040
+tan limitado a relaciones lineales sino que también pueden tener relaciones lineales entre
+
+720
+01:13:24,040 --> 01:13:32,400
+los valores así que en ese sentido anda muy bien menos varianza que un árbol individuales son lo que
+
+721
+01:13:32,400 --> 01:13:40,720
+vimos en esa ocasión bien así que en el peor de los casos debies andar igual captura interacciones
+
+722
+01:13:40,720 --> 01:13:45,680
+y umbrales de forma automática eso en el fondo es las interacciones entre las variables dado
+
+723
+01:13:45,680 --> 01:13:51,600
+como la que está hablando es poco sensible el escalamiento de datos estos modelos a diferencia
+
+724
+01:13:51,600 --> 01:13:57,960
+de otros no requieren escalados de datos ya cuando ustedes tienen modelos como por ejemplo knn super
+
+725
+01:13:57,960 --> 01:13:58,520
+vector machine
+
+726
+01:14:03,040 --> 01:14:09,080
+no sé camis yendo a otro lado todo eso va a todos esos modelos están basados en distancias y las
+
+727
+01:14:09,080 --> 01:14:14,360
+muelas basadas en distancias son muy sensibles a la escala de los valores ya si ustedes tienen
+
+728
+01:14:14,360 --> 01:14:20,800
+una escala en uno de millones y en el otro valores entre menos uno y uno entonces van a tener muchos
+
+729
+01:14:20,800 --> 01:14:27,280
+problemas en los modelos estos de acá no tienen problema ya no sólo eso sino que además son
+
+730
+01:14:27,280 --> 01:14:32,120
+modelos que son los capaz de ocupar cualquier tipo de datos ya super vector machine
+
+731
+01:14:34,360 --> 01:14:40,440
+y por ejemplo knn son modelos que sólo pueden ocupar variables numéricas cambio estos de acá
+
+732
+01:14:40,440 --> 01:14:46,920
+pueden ocupar variables categóricas sin ningún problema ya además también están hechos para
+
+733
+01:14:46,920 --> 01:14:53,520
+hacer predicción y regresión o sea clasificación y regresión y como hayamos visto el este o o b
+
+734
+01:14:57,840 --> 01:15:06,480
+y ofrece una forma de estimación interna del error ya así que
+
+735
+01:15:09,760 --> 01:15:14,680
+esos son como las ventajas dentro de las limitaciones no son tantas ya
+
+736
+01:15:14,680 --> 01:15:29,200
+tenemos una no sé si menor interpretabilidad la palabra o es prácticamente interpretación
+
+737
+01:15:29,200 --> 01:15:34,160
+nula pero dejémoslo como menor interpretación porque igual algo que se puede hacer con un
+
+738
+01:15:34,160 --> 01:15:39,320
+solo árbol el árbol es un modelo ultra interpretable y es uno de los modelos más
+
+739
+01:15:39,320 --> 01:15:47,200
+interpretables que existe junto con la regresión lineal entonces en ese sentido claro pierdo un
+
+740
+01:15:47,200 --> 01:15:56,720
+montón cuando hago ensamblados porque pierdo esa interpretabilidad otra cosa claramente son más
+
+741
+01:15:56,720 --> 01:16:04,600
+costosos términos computacionales ya sea de memoria no de predicción una importancia pero eso
+
+742
+01:16:05,080 --> 01:16:10,800
+si bien es una limitación hoy día como se nos mencionaba antes con el mundo de la nube y la
+
+743
+01:16:10,800 --> 01:16:18,080
+computación elástica eso tampoco es tan terrible hoy día tenemos capacidad cuando antes uno tenía
+
+744
+01:16:18,080 --> 01:16:22,280
+que entrenar todo esto de su computador o de servidores locales donde los recursos los super
+
+745
+01:16:22,280 --> 01:16:31,800
+limitados puxas sí pero hoy día como pagando un poquito uno tiene la capacidad de tener acceso
+
+746
+01:16:31,800 --> 01:16:39,920
+a computadores ultra potentes ya no está entarrollado la importancia por impureza puede
+
+747
+01:16:39,920 --> 01:16:46,680
+inducir error eso ocurre siempre ya la impureza no es eso las formas en cómo los árboles deciden
+
+748
+01:16:46,680 --> 01:16:54,480
+cuáles son las preguntas que hacen y en el fondo aquí en este particular puede generar mayores
+
+749
+01:16:54,480 --> 01:17:01,600
+errores porque están con menos variables también entonces y algo que es bien importante y si me
+
+750
+01:17:01,600 --> 01:17:07,200
+preguntan dentro de las cosas que están acá como limitaciones hay dos que son a mi gusto
+
+751
+01:17:08,800 --> 01:17:14,920
+no sé si graves pero quizás son las que más a uno adecuen que van en la cabeza y tener la
+
+752
+01:17:14,920 --> 01:17:21,200
+súper cuenta que sería uno la interpretabilidad que es algo que uno tiene que estar súper conciente
+
+753
+01:17:21,200 --> 01:17:26,320
+que lo va a perder y el otro es que no extrapo la vía fuera del rango observado en regresión
+
+754
+01:17:26,320 --> 01:17:31,040
+eso que quiere decir que si ustedes tienen datos y están creciendo por ejemplo
+
+755
+01:17:32,680 --> 01:17:40,560
+precios de una casa en millones y tienen casas desde 100 millones hasta 500 millones este modelo
+
+756
+01:17:40,560 --> 01:17:47,520
+sólo va a permitir predecir valores entre 100 y 500 millones si ustedes les llega una casa de 600 no
+
+757
+01:17:47,520 --> 01:17:53,920
+va a poder ser capaz de algún momento decir 600 millones o 700 o 50 ya entonces
+
+758
+01:17:54,800 --> 01:18:00,280
+el modelo se estrenó con un rango de valores de precio y queda todas mis predicciones que justo
+
+759
+01:18:00,280 --> 01:18:07,520
+adentro de ese rango no se escapa nunca ya no así otros modelos como por ejemplo la regresión
+
+760
+01:18:07,520 --> 01:18:15,840
+lineal la regresión lineal tiene esa capacidad de poder salir desde donde estamos entonces
+
+761
+01:18:15,840 --> 01:18:21,720
+hay que tener harto cuidado porque hay veces que eso es un problema y hay veces que no por ejemplo
+
+762
+01:18:21,720 --> 01:18:27,080
+las casas puede ser porque por supuesto que si yo entreno con casas 500 millones voy a encontrar
+
+763
+01:18:27,080 --> 01:18:33,040
+casas que cuestan 700 y 800 y 1000 y 5000 millones ya pero por ejemplo si estoy haciendo
+
+764
+01:18:35,600 --> 01:18:41,800
+por ejemplo predicciones con las mediciones no sé de hueso y cartílagos de un niño hacer
+
+765
+01:18:41,800 --> 01:18:46,840
+prevención cuánto va a medir los 18 años bueno lo más probable es que cuando vea mis datos voy
+
+766
+01:18:46,840 --> 01:18:54,920
+a tener niños que miren no sé es 1 60 hasta 2 metros sabemos que ese rango es mucha es bien
+
+767
+01:18:54,920 --> 01:19:00,440
+exhaustivo digamos un poco los que miren más de 2 metros entonces vamos a más o menos considerar
+
+768
+01:19:00,440 --> 01:19:09,560
+todo el rango de estaturas que existen entonces algunos casos esto es más importante que nosotros
+
+769
+01:19:09,560 --> 01:19:15,600
+y definitivamente es algo que yo tengo que tener súper en cuenta cuando hago modelos de regresión
+
+770
+01:19:18,120 --> 01:19:18,760
+bien
+
+771
+01:19:20,960 --> 01:19:24,160
+bueno esto se puede aplicar a lo que sea bien
+
+772
+01:19:24,160 --> 01:19:33,240
+usualmente se ocupa ejemplo aquí dice tenemos para clasificar transacciones con señales
+
+773
+01:19:34,080 --> 01:19:38,520
+de urgenia podemos ver para riesgo y fraude podemos identificar fraude con esto
+
+774
+01:19:41,080 --> 01:19:46,880
+para salud podemos hacer predicciones clínicas por ejemplo mediciones de sangre y podemos nosotros
+
+775
+01:19:46,880 --> 01:19:53,080
+determinar si la persona va a ser diabético no en operaciones podemos predecir fallas podemos
+
+776
+01:19:53,080 --> 01:20:01,040
+predecir demandas y marketing bueno estimar respuestas abandono de clientes por ejemplo se
+
+777
+01:20:01,040 --> 01:20:05,840
+puede calcular el valor de los clientes entre otras cosas esto funciona súper bien con
+
+778
+01:20:05,840 --> 01:20:12,920
+datos tabulares eso que les quería una tabla variables y registros las cuales tienen cualquier
+
+779
+01:20:12,920 --> 01:20:20,160
+tipo de relación como ya vimos no se limita a una relación lineal y tiene una prioridad
+
+780
+01:20:20,160 --> 01:20:30,080
+alta en el desempeño predictivo ya hay un tema pero no mencionamos nunca aquí pero los modelos
+
+781
+01:20:31,040 --> 01:20:32,040
+e
+
+782
+01:20:33,440 --> 01:20:34,200
+actualmente
+
+783
+01:20:36,040 --> 01:20:42,400
+uno tiene modelos que son interpretables y modelos que no y usualmente los que son
+
+784
+01:20:42,400 --> 01:20:49,440
+interpretables son de un poder predictivo más bajo y a mayor nivel de no interpretabilidad
+
+785
+01:20:49,440 --> 01:20:54,400
+por eso lo así mayor nivel predictivo también tiene eso es como ha sido como la regla general
+
+786
+01:20:54,400 --> 01:21:01,040
+en los modelos que existen actualmente ya entonces eso es lo que dice acá al final
+
+787
+01:21:02,120 --> 01:21:09,600
+este tipo de modelos es cuando uno tiene una prioridad alta sobre el desempeño predictivo más allá de la
+
+788
+01:21:12,040 --> 01:21:16,640
+de la interpretabilidad bien si yo quiero un modelo interpretable a random forest no es
+
+789
+01:21:18,920 --> 01:21:23,040
+entonces eso es algo que tiene que tener súper presente pero si ya uno le dice que no me interesa
+
+790
+01:21:23,040 --> 01:21:29,560
+saber cómo porque se me va a ir una persona simplemente quiero estar súper seguro que
+
+791
+01:21:29,560 --> 01:21:35,960
+cuando tú me digas este se va a ir eso sea así y yo puede atacarlo también
+
+792
+01:21:37,360 --> 01:21:38,600
+según no le interesa
+
+793
+01:21:39,960 --> 01:21:47,480
+el la interpretación solo interesa que sea súper predictivo entonces ahí uno va con el
+
+794
+01:21:47,480 --> 01:21:52,800
+caso contrario hay veces que uno le interesa saber cómo uno llega a la predicción bueno y
+
+795
+01:21:52,800 --> 01:21:58,880
+en esos casos tiene que jugar otro tipo de modo bien
+
+796
+01:22:01,560 --> 01:22:12,160
+el flujo de trabajo típico que se hace con esto es se separa los datos en una parte de
+
+797
+01:22:12,160 --> 01:22:18,960
+entrenamiento y una parte de test hay veces que se separa el entrenamiento validación y
+
+798
+01:22:18,960 --> 01:22:23,160
+los teo nosotros no vamos a decir así porque vamos a utilizar variación cruzada en el
+
+799
+01:22:24,600 --> 01:22:30,800
+en el tránsito de entrenamiento que es equivalente cuando uno se para define típicamente las métricas
+
+800
+01:22:30,800 --> 01:22:36,960
+de desempeño por las cuales nosotros vamos a ir a buscar los modelos y después vamos a ajustar
+
+801
+01:22:36,960 --> 01:22:41,840
+los modelos vamos a utilizar variación cruzada para hacer la optimización de los parámetros
+
+802
+01:22:41,840 --> 01:22:48,240
+y también vamos a ocupar el auto bag para ir viendo cómo el modelo funciona y finalmente cuando
+
+803
+01:22:48,240 --> 01:22:54,240
+ella quiere el modelo que va a ocupar evalúa en el entrenamiento y explica en el fondo cómo no fue ya
+
+804
+01:22:56,880 --> 01:23:02,960
+bien cosas a evitar cuando uno está trabajando en este tipo de cosas filtración de información
+
+805
+01:23:02,960 --> 01:23:06,880
+a preparar los datos antes de separar los conjuntos aquí quiere decir que yo empiezo a hacer
+
+806
+01:23:08,480 --> 01:23:14,560
+manipulación de los datos que puedan entregar información del data set de test al data set
+
+807
+01:23:14,560 --> 01:23:19,440
+de entrenamiento recuerda cuando uno divide el data set de entrenamiento con el test la idea es
+
+808
+01:23:19,440 --> 01:23:25,360
+que el detest va a ser una simulación de cómo el modelo va a funcionar en la vía real o sea cómo
+
+809
+01:23:25,360 --> 01:23:31,840
+se va a enfrentar a datos que nunca visto ya entonces si hay filtración desde el data set de test
+
+810
+01:23:31,840 --> 01:23:37,080
+no data set de entrenamiento vamos a estar haciendo un poco vamos a estar un poco perdiendo esa
+
+811
+01:23:37,080 --> 01:23:43,360
+simulación porque algo va a saber al al entrenar con mi entrenamiento valga redundancia va a saber
+
+812
+01:23:43,360 --> 01:23:52,360
+algo del data set de test entonces eso hay que tener cuidado ya elegir elegir las métricas hay
+
+813
+01:23:52,360 --> 01:23:59,400
+que tener alto cuidado cómo se toman en cuenta ya en el caso de regresión por ejemplo las métricas
+
+814
+01:23:59,400 --> 01:24:12,080
+típicas son el mae el rmce y el mape el r cuadrado ya hay métricas que son intrínsecas del modelo y
+
+815
+01:24:12,400 --> 01:24:19,480
+y de su contexto y hay otras que son como más entendibles sin ningún contexto el mae y el rmce
+
+816
+01:24:19,480 --> 01:24:26,320
+dependen del contexto ya yo digo que un modelo tiene un mae de 10 yo no puedo decir si es bueno
+
+817
+01:24:26,320 --> 01:24:34,800
+es malo ya porque si es un mae que es 10 dentro de una de un valores de predicción que van entre 0
+
+818
+01:24:34,800 --> 01:24:41,840
+y 100 bueno es un 10% de error me estoy equivocando bastante pero si son 10 pesos para una predicción
+
+819
+01:24:41,840 --> 01:24:46,480
+de una casa de 100 millones bueno entonces nada entonces el modelo super bueno entonces ahí es que
+
+820
+01:24:46,480 --> 01:24:53,040
+está depende del contexto mientras que el r cuadrado o el mape no necesitan el contexto porque están en
+
+821
+01:24:53,040 --> 01:24:59,240
+porcentaje ya entonces hay que tener cuidado con eso y en el caso de cuando ustedes tengan un
+
+822
+01:24:59,240 --> 01:25:04,880
+modelo de clasificación y tengan clases de clasificación minaria en particular y tengan
+
+823
+01:25:04,880 --> 01:25:09,880
+que la clase positiva es muy raro o sea que esté demasiado desbalanceada tienen que tener cuidado con
+
+824
+01:25:09,920 --> 01:25:14,680
+que el aquira si sea su métrica de desempeño porque general ahí no va a funcionar bien ahí lo que
+
+825
+01:25:14,680 --> 01:25:22,000
+uno tiene que ir a mirar son otras métricas como el ricó la precisión o el f1 ya interpretar la
+
+826
+01:25:22,000 --> 01:25:31,120
+importancia por impureza como causalidad ya la importancia por impureza es un tema matemático
+
+827
+01:25:31,120 --> 01:25:39,000
+es como los modelos es como los modelos eligen cuáles son las variables que van a ir haciendo
+
+828
+01:25:39,000 --> 01:25:45,840
+las preguntas que corresponden eso no es más nada más que eso ya es un tema matemático entonces
+
+829
+01:25:45,840 --> 01:25:52,440
+no hay que confundirlo con otro tipo de proceso ya y ajustar y per parámetros mirando repetidamente
+
+830
+01:25:52,440 --> 01:25:58,120
+conjunto prueba como ya les dije conjunto prueba no debiese nunca mirarse ya nunca
+
+831
+01:26:00,000 --> 01:26:05,000
+siempre se debía hacer al final cuando yo terminé y tengo mi modelo ahora lo voy a probar bien
+
+832
+01:26:05,000 --> 01:26:08,560
+entonces para el ajuste y per parámetro usualmente se utiliza
+
+833
+01:26:08,560 --> 01:26:16,320
+valiación cruzada para poder hacer los ajustes de los parámetros medirlos y nunca mirar el conjunto
+
+834
+01:26:20,040 --> 01:26:22,000
+entonces que lo que uno debiese
+
+835
+01:26:23,920 --> 01:26:29,840
+llevarse para la casa el boot trap crea diversidad al cambiar las filas el vallen reduce variable
+
+836
+01:26:30,480 --> 01:26:35,920
+reduce variante a mediante creación y el random forest reduce también la correlación además de
+
+837
+01:26:35,920 --> 01:26:41,760
+lo anterior entre los árboles al ir seleccionando variables de manera natural ya
+
+838
+01:26:43,400 --> 01:26:44,520
+bien entonces
+
+839
+01:26:47,240 --> 01:26:49,640
+eso es lo que sería como la parte teórica
+
+840
+01:26:52,560 --> 01:26:58,600
+y lo sé si playan o gimnasio va a ayudar ¿cuánto de rato desde recreo usualmente?
+
+841
+01:27:00,840 --> 01:27:09,840
+generalmente como 20 minutos o algo así más o menos y a esto se le estica si son las 8 10
+
+842
+01:27:09,840 --> 01:27:14,800
+básicamente entonces si le estica si nos vamos recreo y a las 8 volvemos a las ocho y media y
+
+843
+01:27:14,800 --> 01:27:19,040
+ya vamos con la parte computacional como ejemplo ya si aprovechamos de descansar
+
+844
+01:27:19,040 --> 01:27:19,880
+ya aprovechamos
+
+845
+01:27:19,880 --> 01:27:20,520
+necesito comer algo
+
+846
+01:27:20,520 --> 01:27:21,760
+ok
+
+847
+01:27:21,760 --> 01:27:25,640
+ya entonces nos vemos 8 y media
+
+848
+01:28:19,040 --> 01:28:28,560
+voy a agrandar esta pestaña y vamos a ir configurando
+
+849
+01:36:49,320 --> 01:36:49,800
+y
+
+850
+01:37:02,800 --> 01:37:03,800
+é
+
+851
+01:49:49,040 --> 01:50:00,040
+ahora
+
+852
+01:50:00,040 --> 01:50:03,760
+parte un poco más práctica
+
+853
+01:50:03,760 --> 01:50:06,760
+es
+
+854
+01:50:09,360 --> 01:50:12,800
+aquí con Python en un notebook
+
+855
+01:50:12,800 --> 01:50:16,040
+entonces tenemos
+
+856
+01:50:16,520 --> 01:50:22,760
+todos dentro de esto mismo vamos a hacer un modelo de clasificación
+
+857
+01:50:22,760 --> 01:50:27,640
+un dataset asociado al diagnóstico de enfermedades cardíacas
+
+858
+01:50:27,640 --> 01:50:36,720
+se llama her.xlsx y una regresión que es el precio de venta de casas en esta
+
+859
+01:50:36,720 --> 01:50:41,840
+que es un dataset que se llama Ames housing que son a veces una ciudad en
+
+860
+01:50:41,840 --> 01:50:44,840
+eeuu
+
+861
+01:50:44,840 --> 01:50:50,320
+los dataset están subidos a la web así que los pueden descargar
+
+862
+01:50:50,320 --> 01:50:55,360
+bien y en ambos casos vamos a usar esta misma secuencia vamos a hacer una
+
+863
+01:50:55,360 --> 01:50:59,280
+exploración de datos
+
+864
+01:50:59,280 --> 01:51:04,480
+breve algún tipo de procesamiento de los datos
+
+865
+01:51:04,480 --> 01:51:09,760
+vamos a ver modelos bases vamos a compararlos
+
+866
+01:51:09,800 --> 01:51:15,040
+y después vamos a utilizar grid search y randomize search para mejorar los
+
+867
+01:51:15,040 --> 01:51:20,240
+modelos mediante optimización de sus parámetros y finalmente una evaluación
+
+868
+01:51:20,240 --> 01:51:26,400
+final cuando digo comparación en el fondo en cada caso tanto de clasificación
+
+869
+01:51:26,400 --> 01:51:30,760
+como regresión vamos a tener bagging y random forks
+
+870
+01:51:30,760 --> 01:51:33,920
+vamos viendo cómo funcionan
+
+871
+01:51:33,920 --> 01:51:38,760
+las comparaciones usan el mismo set de conjuntos de entrenamiento y prueba
+
+872
+01:51:39,440 --> 01:51:46,840
+y no que uno tenga una ventaja sobre el otro simplemente por un tema de muestra
+
+873
+01:51:49,480 --> 01:51:53,960
+la selección del modelo optimizado se hace mediante evaluación cruzada
+
+874
+01:51:56,920 --> 01:52:00,240
+eligiendo el parámetro en la evaluación cruzada y nunca mirando el
+
+875
+01:52:00,240 --> 01:52:05,400
+test de pruebas, el conjunto de pruebas que son de las cosas que pusimos como que había que evitar
+
+876
+01:52:06,360 --> 01:52:12,160
+entonces la preparación primero el notebook tiene un montón de módulos que son los típicos
+
+877
+01:52:12,160 --> 01:52:17,880
+pandas para manipulación de datos, numpy para operaciones matemáticas, mathplotly y cpourn
+
+878
+01:52:17,880 --> 01:52:23,160
+ambos para gráficas, scikit-learn que tiene que ver todo lo que con machine learning
+
+879
+01:52:25,040 --> 01:52:31,480
+scipy que sirve mucho para operaciones que tienen que ver con estadística
+
+880
+01:52:31,480 --> 01:52:35,440
+y este openpy que sirve para traer
+
+881
+01:52:35,440 --> 01:52:39,480
+además tiene un parámetro que dice fastmode
+
+882
+01:52:39,480 --> 01:52:50,120
+que cambia algunas cosas en el código, esto está simplemente hecho pensando en que si alguien
+
+883
+01:52:50,120 --> 01:52:55,920
+por ejemplo lo está haciendo en colab algunas cosas se van a enamorar muchísimo más que a mí
+
+884
+01:52:56,320 --> 01:53:05,200
+entonces quienes estén en colab ponen este fastmode que está por aquí, lo cambian a verdadero y
+
+885
+01:53:05,200 --> 01:53:12,720
+entonces hay varias cosas que bajan bajando iteraciones y en ese sentido van a poder
+
+886
+01:53:15,320 --> 01:53:21,360
+tener mejor, no se va a demorar tanto, no van a tener los mismos resultados que yo
+
+887
+01:53:21,360 --> 01:53:27,920
+lo puse con el fastmode false, pero van a poder en el fondo
+
+888
+01:53:32,280 --> 01:53:38,720
+todo un, van a poder seguir todo el código y ejecutarlo completo, un estado dice no me abrió el código
+
+889
+01:53:38,720 --> 01:53:46,760
+solo abre un txt, tienes que bajarlo con la extensión correspondiente, dependiendo de cómo
+
+890
+01:53:46,760 --> 01:53:53,560
+lo leas te lo va a leer, el notebook por detrás no es nada más que un txt, lo que pasa es que
+
+891
+01:53:54,520 --> 01:54:02,680
+si lo abres con vscode por ejemplo tú tienes que tener un plugin que se llama jupyter, es la única
+
+892
+01:54:02,680 --> 01:54:11,680
+forma en que esto pueda interpretarlo, bien, si tú no tienes esto por ejemplo en vscode en tu
+
+893
+01:54:11,680 --> 01:54:18,760
+computador no lo va a interpretar y te lo abrir como un txt, ya como por ahí dicen si lo subes a colab
+
+894
+01:54:18,760 --> 01:54:24,760
+va a deber de funcionar perfecto porque eso ya tiene todo lo necesario para que interprete el archivo
+
+895
+01:54:31,200 --> 01:54:36,880
+bien, entonces aquí hay un montón de cosas que son librerías, hay estas cosas de scikitle,
+
+896
+01:54:37,240 --> 01:54:43,960
+bien, en particular vamos a ocupar los transformadores que son para usarlo en pipeline,
+
+897
+01:54:43,960 --> 01:54:51,760
+eso significa que vamos a hacer preprocesamiento en un pipeline de procesos y no como todo separado,
+
+898
+01:54:51,760 --> 01:54:58,400
+one-hole encoder que sirve para transformar las variables categóricas a una codificación que las
+
+899
+01:54:58,400 --> 01:55:04,000
+permita de meter al modelo, vamos a hacer imputaciones cuando corresponda, tenemos los árboles de
+
+900
+01:55:04,000 --> 01:55:11,600
+decisión de clasificación y de regresión, tenemos bagging y en los modos asamblados tenemos
+
+901
+01:55:11,600 --> 01:55:19,120
+los bagging y los random forest tanto clasificación como para regresión, en modo selection vamos a
+
+902
+01:55:19,120 --> 01:55:25,680
+tener el traincess split que se sirve para hacer la división de entrenamiento y testeo, grid search,
+
+903
+01:55:25,680 --> 01:55:30,840
+randomize search que son las funciones que vamos a utilizar para hacer la búsqueda de hiperparámetros,
+
+904
+01:55:31,320 --> 01:55:39,360
+stratify, kfolds y kfolds que son en esencia funciones que permiten generar la validación
+
+905
+01:55:39,360 --> 01:55:46,160
+cruzada que va a entrar tanto al grid search como al randomize search, y acá tenemos muchas métricas de desempeño,
+
+906
+01:55:49,120 --> 01:55:56,160
+bien, hay algunas cosas que probablemente no vamos a ocupar, esto en general es como un bloque de código
+
+907
+01:55:56,160 --> 01:56:04,720
+ya como medio establecido en mis cosas entonces, bien aquí está, fija algunas cosas como que
+
+908
+01:56:04,720 --> 01:56:16,160
+digamos algunas cosas, algunos warning, los elimine, setea algunas formas de desplegar las tablas y
+
+909
+01:56:16,160 --> 01:56:23,640
+algunas formas en cómo se ven los gráficos, fija random state para que no tengamos que estarnos
+
+910
+01:56:23,640 --> 01:56:30,520
+preocupándonos de cada lugar, random state recuerden es la semilla, es la que determina en el fondo cuál es el
+
+911
+01:56:30,520 --> 01:56:36,480
+proceso que va a generar los números seudoratorios de cualquier cosa que hagamos, fastmod que ya se
+
+912
+01:56:36,480 --> 01:56:41,840
+los explique, por ejemplo en particular nosotros tenemos aquí este niterrandom que es cuando vamos
+
+913
+01:56:41,840 --> 01:56:48,240
+randomize search, uno le dice cuántas veces quiere que haga la búsqueda, si ustedes ponen que el fastmod
+
+914
+01:56:48,240 --> 01:56:58,320
+es true va a tomar 6 mientras que si le ponen false va a tomar 30, entonces ahí se va a demorar
+
+915
+01:56:58,320 --> 01:57:07,080
+bastante más, lo mismo con los estimadores para el número estimadores, ya, el njobs, el njobs sirve
+
+916
+01:57:07,080 --> 01:57:13,360
+para hacer trabajo en paralelo, ya, el njobs-1 significa que el computador va a ocupar todos los
+
+917
+01:57:13,360 --> 01:57:20,800
+procesadores disponibles del computador para trabajar, si su computador está con muchas cosas
+
+918
+01:57:20,800 --> 01:57:27,200
+abiertas si ustedes hacen eso corren el riesgo de que se les pegue, ya, porque va a trabajar a toda
+
+919
+01:57:27,200 --> 01:57:33,480
+máquina, si no tienen nada mucho abierto no se ocurre nada extraño, pero siempre ustedes pueden saber
+
+920
+01:57:35,720 --> 01:57:40,600
+por ejemplo si ustedes saben la cantidad de procesadores, yo tengo 10 por ejemplo en vez de
+
+921
+01:57:40,600 --> 01:57:48,240
+de menos uno, que va a ocupar los 10 yo podría perfectamente ponerle nueve y que deje uno
+
+922
+01:57:48,240 --> 01:57:53,080
+disponible para que haga todas las cosas, pero yo ya lo he probado y esto funciona con menos uno perfecto
+
+923
+01:57:55,600 --> 01:58:01,120
+esto es cuántas false vamos a ocupar en la variación es cruzada, todo esto está
+
+924
+01:58:01,120 --> 01:58:05,280
+parametrizado de antes, cosa que será más fácil después para ir trabajando, bien de la regresión
+
+925
+01:58:06,000 --> 01:58:10,520
+si quieren bajenlo a 3 porque es más pesada, son más datos
+
+926
+01:58:16,720 --> 01:58:25,440
+entonces aquí como les decía, el niterrandom es para random research, el estimator es la cantidad de
+
+927
+01:58:25,440 --> 01:58:31,720
+árboles que vamos a ocupar ya sea en bagging o en random forest, también cambia, si ustedes usan el
+
+928
+01:58:31,720 --> 01:58:37,640
+fast mode van a ocupar 100, 300, perdón, si usan el fast mode true van a ocupar 60 y 120 en caso contrario
+
+929
+01:58:37,640 --> 01:58:45,760
+van a tener 100, 300 y 600, realmente 300 y 600 es mucho más pega que estos, después viene el
+
+930
+01:58:45,760 --> 01:58:51,120
+directorio como les dije, bueno este es el directorio de mi computador, es donde yo tengo las
+
+931
+01:58:51,120 --> 01:58:56,000
+cosas y después les estoy diciendo que ahí van a encontrar estos dos archivos, eso lo tienen que
+
+932
+01:58:56,400 --> 01:59:03,320
+cambiar por el directorio de su computador, o si usan colab tienen que dar la dirección que les da colab
+
+933
+01:59:03,320 --> 01:59:11,600
+en colab en el caso de que lo suban en el notebook tienen que además subir los dos archivos de los
+
+934
+01:59:11,600 --> 01:59:18,320
+datos para poder leerlo, ok? así que bien, entonces vamos a correr esto, vamos a seleccionar aquí el
+
+935
+01:59:18,320 --> 01:59:26,720
+terminal y esto corre y tenemos que en mi caso el modo rápido está desactivado y que las interacciones
+
+936
+01:59:26,720 --> 01:59:34,080
+para el search por modelo van a ser 30, entonces aquí algunas funciones auxiliares que nada más que
+
+937
+01:59:35,280 --> 01:59:43,880
+resumen de cosas, ya por ejemplo acá esta función va a colapsar todas las métricas de desempeño para
+
+938
+01:59:43,880 --> 01:59:49,080
+el modelo clasificación, esta actúa para las métricas de desempeño para el modelo clasificación,
+
+939
+01:59:49,080 --> 01:59:58,600
+bien esto es para obtener digamos cuáles son los mejores modelos en la validación cruzada,
+
+940
+01:59:58,600 --> 02:00:05,280
+cómo escoger el tema de la validación cruzada, cómo sacar el feature importance que es una
+
+941
+02:00:06,240 --> 02:00:11,960
+de las cosas interesantes que tienen los modelos de árboles es que tienen una
+
+942
+02:00:11,960 --> 02:00:20,880
+dan una un ranking de las variables según importancia como el modelo la recibe por detrás,
+
+943
+02:00:22,760 --> 02:00:28,120
+ustedes las pueden leer pero no es nada más que eso que les acabo de mencionar, bien? entonces ahora
+
+944
+02:00:28,120 --> 02:00:38,960
+así con el read excel vamos a traer los hertz, bien? entonces en este caso traemos esto tiene 303
+
+945
+02:00:38,960 --> 02:00:47,840
+filas y 14 columnas, bien? donde tenemos esto que es tenemos la A, sexo, chest pain, este es el dolor
+
+946
+02:00:47,840 --> 02:00:56,440
+de pecho por supuesto, esto es la presión arterial en reposo, colesterol, esto no sé qué es, este es
+
+947
+02:00:56,440 --> 02:01:01,080
+el electrocardiograma en reposo, estas son las máximas pulsaciones y así sucesivamente
+
+948
+02:01:05,960 --> 02:01:12,520
+así que esos son nuestros datos bien? y la ahd es nuestra variable objetivo, que es sino,
+
+949
+02:01:12,520 --> 02:01:22,280
+entonces acá esta parte lo único que hace es un poco ver cómo están los datos, primero va a entregar
+
+950
+02:01:22,360 --> 02:01:26,840
+el nombre de la variable después nos entrega el tipo de variable que es siempre importante saber
+
+951
+02:01:26,840 --> 02:01:33,920
+cuántos si aquí hay datos faltantes o no y también cuántos valores únicos hay, ya?
+
+952
+02:01:36,040 --> 02:01:42,600
+entonces eso nos permite nosotros saber varias cosas, particular por ejemplo, este tiene cinco
+
+953
+02:01:42,600 --> 02:01:46,680
+valores únicos, hay cuatro valores faltantes, este es un string por lo tanto estos son los que vamos
+
+954
+02:01:46,680 --> 02:01:53,760
+a tener que, estos son los que vamos a tener que tratar como variables categóricas en particular
+
+955
+02:01:53,760 --> 02:02:00,840
+todos los que dicen string, además hay algunos que tienen dos valores ya? como por ejemplo este,
+
+956
+02:02:00,840 --> 02:02:07,600
+este, este que también si bien están en números son categorías, y ya después vienen estos que
+
+957
+02:02:07,600 --> 02:02:13,360
+tienen muchos valores únicos y eso es porque ya son valores en general, bueno desde aquí en adelante
+
+958
+02:02:13,480 --> 02:02:17,800
+estos y estos de acá se pueden considerar numéricos
+
+959
+02:02:19,800 --> 02:02:27,120
+ok otra cosa que es importante siempre que uno tiene sobre todo una clasificación minaria o
+
+960
+02:02:27,120 --> 02:02:28,280
+clasificación múltipla también
+
+961
+02:02:31,040 --> 02:02:39,200
+es revisar cómo se equilibran las respuestas las distintas categorías de mi variable respuestas
+
+962
+02:02:39,200 --> 02:02:50,560
+en este caso tengo que hay 164 no y 139 si, o sea hay un poquito más de no que si pero al final del día
+
+963
+02:02:50,560 --> 02:02:59,240
+casi que están 50 y 50 por ende lo es algo que a mí me debía ser preocupado
+
+964
+02:03:03,200 --> 02:03:07,840
+si ustedes quieren sacarlo porcentaje simplemente hacen el heart
+
+965
+02:03:10,080 --> 02:03:10,580
+y
+
+966
+02:03:12,640 --> 02:03:15,120
+hd punto
+
+967
+02:03:16,960 --> 02:03:20,640
+value counts y entre 40 y 40 porcentaje
+
+968
+02:03:21,880 --> 02:03:29,960
+y ahí entra entonces hay un 54 por ciento de no y un 56 por ciento así ya así que les digo esto está perfecto
+
+969
+02:03:29,960 --> 02:03:35,520
+está equilibrado perfectamente pero esto se entiende equilibrado bien y aunque fuese más ya
+
+970
+02:03:35,600 --> 02:03:43,040
+así fuese en 70 30 también se entiende que está en un desequilibrio completamente normal no hay que hacer mucho al respecto
+
+971
+02:03:45,920 --> 02:03:51,400
+aquí algunos valores estos son en gráfico del fondo la cantidad de sí y no de enfermedades
+
+972
+02:03:51,400 --> 02:03:57,120
+cardíacas y un gráfico para los valores faltantes que sólo hay dos variables que tienen valores
+
+973
+02:03:57,120 --> 02:04:03,880
+faltantes ok y después vamos a considerar estas como las variables numéricas que es
+
+974
+02:04:03,880 --> 02:04:08,680
+las que yo les dije arriba que son las que tienen más valores únicos como el colesterol el max
+
+975
+02:04:08,680 --> 02:04:20,120
+heart rate el rest blood pressure la da el all pick bien esos son 5
+
+976
+02:04:22,280 --> 02:04:23,240
+no sé a donde están
+
+977
+02:04:23,240 --> 02:04:35,520
+acá está la 5 bien entonces son mis variables numéricas y todas las otras las van a entender
+
+978
+02:04:35,520 --> 02:04:43,400
+como variables categoricas y tienen variables numéricas entonces lo que hicimos acá un poco
+
+979
+02:04:43,400 --> 02:04:49,680
+de la exploración es ver cómo se comportan las distribuciones de los números de estas variables
+
+980
+02:04:49,680 --> 02:04:57,160
+en comparación a si la persona tiene o no problemas al corazón entonces el gráfico en azul es una
+
+981
+02:04:57,160 --> 02:05:04,760
+persona son personas sin problemas al corazón y la que es como media naranja son personas que
+
+982
+02:05:04,760 --> 02:05:11,920
+tienen problemas al corazón entonces se fijan por ejemplo las distribuciones son básicamente las mismas
+
+983
+02:05:11,920 --> 02:05:18,200
+en el caso de la presión arterial en reposo
+
+984
+02:05:19,880 --> 02:05:26,040
+lo mismo que el colesterol general es levemente un colesterol más alto para las personas que
+
+985
+02:05:26,040 --> 02:05:32,080
+sí tienen problemas que no pero no hay algo muy significativo en cambio sí cuando uno ve la edad
+
+986
+02:05:32,080 --> 02:05:39,520
+tienden a ser más extensa aquellos que tienen no mientras que las personas con problemas al corazón
+
+987
+02:05:39,520 --> 02:05:47,760
+si se concentra alrededor de los más tirados de los 50 60 años entonces aquí esa la variable edad
+
+988
+02:05:47,760 --> 02:05:54,920
+al parecer tiene algo que decir lo mismo las pulsaciones de corazón máximo de fondo cuando
+
+989
+02:05:54,920 --> 02:06:03,520
+uno tiende a tener una capacidad del corazón máxima inferior al normal digamos lo que se
+
+990
+02:06:03,520 --> 02:06:11,040
+diría en el azul también al parecer influye ya entonces eso es un poco lo que uno puede sacar de
+
+991
+02:06:11,040 --> 02:06:19,560
+la de esto tenemos equilibrado nuestra variable categorías el álvaro objetivo tenemos muy poco
+
+992
+02:06:19,560 --> 02:06:25,120
+datos faltantes los vamos a imputar en la parte digamos del procesamiento que se hace mediante
+
+993
+02:06:25,120 --> 02:06:36,640
+un pipeline y al parecer digamos aparenta nada de esto es necesariamente verdad al tiro pero si uno
+
+994
+02:06:36,640 --> 02:06:50,240
+aquí podría pensar que la edad el max y el olpic van a tener más influencia y más importancia al
+
+995
+02:06:50,240 --> 02:06:55,720
+momento de hacer las predicciones que la presión arterial del reposo o que el colesterol eso es lo
+
+996
+02:06:55,720 --> 02:07:02,000
+que aparenta y a lo mejor puede salir otra cosa entonces aquí vamos a preparar los datos en la
+
+997
+02:07:02,000 --> 02:07:08,120
+preparación tenemos que aquí es lo que yo decía siempre se separa lo que son las variables
+
+998
+02:07:08,120 --> 02:07:11,360
+o sea todo sin la variable objetivo y la variable objetivo por separado
+
+999
+02:07:14,320 --> 02:07:22,520
+entonces acá tenemos la nuestra data set y hacemos un drop a la variable a hd que es la variable
+
+1000
+02:07:22,520 --> 02:07:28,800
+objetivo entonces acá me quedan todas menos la variable objetivo y en y guardo solo la variable
+
+1001
+02:07:28,800 --> 02:07:35,040
+objetivo que además le hago con la función más voy a cambiar los no por 0 y los sí por 1 ya para
+
+1002
+02:07:35,040 --> 02:07:42,120
+que me quede codificado y que el modo computador no tenga problemas bien entonces además después
+
+1003
+02:07:43,800 --> 02:07:51,280
+tenemos todas nuestras variables categóricas que son el sexo el dolor de pecho fbs electrocardiograma
+
+1004
+02:07:51,280 --> 02:08:01,080
+reposo x slope y tal bien todas esas son las categóricas y las numéricas son todas las que
+
+1005
+02:08:01,080 --> 02:08:07,680
+no están arriba bien pues aquí estamos agarrando se fijan todas las que están en las columnas
+
+1006
+02:08:08,680 --> 02:08:17,680
+del x que no están en las que ya definí como categóricas ok entonces acá separamos entre
+
+1007
+02:08:17,680 --> 02:08:22,600
+numéricas y categóricas porque porque el procesamiento de los datos a nivel numérico
+
+1008
+02:08:22,600 --> 02:08:28,480
+y categórico es distinto entonces acá después vamos a generar este column transformer que es
+
+1009
+02:08:28,480 --> 02:08:35,080
+el que va a generar el pipeline de entrenamiento de procesamiento y aquí vamos a tener distintos
+
+1010
+02:08:35,080 --> 02:08:41,880
+transformadores primero para los numéricos vamos a hacer dos una cosa en este caso que vamos a
+
+1011
+02:08:41,880 --> 02:08:47,800
+imputar bien si es que necesitamos imputar entonces tenemos un computador que va a ser
+
+1012
+02:08:47,800 --> 02:08:52,680
+un computador simple y la estrategia simplemente en los valores faltantes va a colocar la mediana
+
+1013
+02:08:52,680 --> 02:08:58,280
+bien para quién va a hacer eso sólo para los valores numéricos y después va a tener otro
+
+1014
+02:08:59,600 --> 02:09:05,960
+otro bloque en el pipeline para las variables categóricas y generamos otro pipeline donde
+
+1015
+02:09:06,080 --> 02:09:12,480
+obtener un computador nuevo y puto el simple que la estrategia va a ser la moda va a reemplazar el
+
+1016
+02:09:12,480 --> 02:09:18,160
+que falta por la moda y va a tener después de eso el proceso de codificación con el
+
+1017
+02:09:18,160 --> 02:09:21,800
+one-hole encoder que nos permite entregar esto a los modelos sin ningún problema
+
+1018
+02:09:21,800 --> 02:09:28,520
+bien y de eso va a aplicarse sobre los datos categóricos bien
+
+1019
+02:09:29,520 --> 02:09:36,120
+bien entonces eso me genera todo un proceso de transformación de columnas ya
+
+1020
+02:09:37,240 --> 02:09:45,280
+y otras cosas típicamente se agregan acá usualmente en las numéricas por ejemplo se agrega la
+
+1021
+02:09:48,480 --> 02:09:53,680
+la estandarización de los datos ya dado que estamos trabajando con árboles la estandarización
+
+1022
+02:09:53,680 --> 02:09:58,880
+no es necesaria entonces por eso lo emitimos pero podríamos perfectamente entregarla acá
+
+1023
+02:09:58,880 --> 02:10:08,480
+también después con el train test split voy a hacer entrenamiento y separar mi conjunto en
+
+1024
+02:10:08,480 --> 02:10:18,400
+entrenamiento y test ya entonces acá le entregamos los x los y test-ride que en este caso voy a
+
+1025
+02:10:18,400 --> 02:10:23,280
+coger 25 por ciento así que va a quedar un 75 por ciento para entrenar y un 25 por ciento para
+
+1026
+02:10:23,280 --> 02:10:28,960
+destear voy a stratificar mi muestra que significa eso que voy a mantener las proporciones de los si
+
+1027
+02:10:28,960 --> 02:10:38,880
+y los no ya eso era si ustedes si lo se acuerdan de acá fíjense la proporción del positivo no más como
+
+1028
+02:10:38,880 --> 02:10:45,160
+46 por ciento ya esa es la que hay que recordar entonces cuando ustedes dejan que esto sea
+
+1029
+02:10:45,160 --> 02:10:51,520
+stratificado eso significa que tanto en el set de test como en el set de entrenamiento la
+
+1030
+02:10:53,080 --> 02:11:01,280
+la categoría si o uno después de la cualificación que hicimos aquí va a ser 46 por ciento y fijamos
+
+1031
+02:11:01,280 --> 02:11:08,880
+el random state porque si fijamos el random state vamos a poder nosotros reproducir lo que estamos
+
+1032
+02:11:08,880 --> 02:11:14,960
+haciendo bien ya casi simplemente son los prensa son de ciertas cosas que ocurren acá entonces vamos
+
+1033
+02:11:14,960 --> 02:11:20,960
+a tener para entrenamiento 227 registros con 13 variables y para probar este 76 registros con
+
+1034
+02:11:20,960 --> 02:11:29,000
+13 variables se fijan la proporción positivo del 1 o del sí en entrenamiento 0 45 8 y en el de prueba
+
+1035
+02:11:29,000 --> 02:11:37,600
+es 0 46 1 o sea ambos rondan en 0 46 que es lo que habíamos hablado ya y ahora sí vamos a los
+
+1036
+02:11:37,600 --> 02:11:44,240
+modelos base entonces agregamos los pipeline con los que ya teníamos bien entonces acá tenemos el
+
+1037
+02:11:44,240 --> 02:11:52,480
+clasificador de bag entonces o si hacemos un pipeline y tenemos preprocesamiento que es el
+
+1038
+02:11:52,480 --> 02:11:56,960
+preprocesamiento que definimos arriba que es el que está acá que es el que las parales numéricas
+
+1039
+02:11:56,960 --> 02:12:01,880
+le imputa por la media a las categóricas le imputa por la moda y demás la codifica con el
+
+1040
+02:12:01,880 --> 02:12:07,560
+webjodencoder y después de eso vamos a tener un segundo bloque que es el modelo en ese modelo
+
+1041
+02:12:07,760 --> 02:12:14,760
+vamos a ocupar en el primer caso by classifier donde esto tiene un montón de parámetros muy
+
+1042
+02:12:14,760 --> 02:12:19,200
+parecido a los que ya vimos en la clase pero hay uno en particular que no lo vimos que es el estimator
+
+1043
+02:12:20,960 --> 02:12:29,480
+y genera el el bagging en particular es un modelo muy general porque yo dije vamos a tener varias
+
+1044
+02:12:29,480 --> 02:12:35,960
+muestras busstrap y en cada una de ellas vamos a ajustar árboles bueno esa es la forma base del
+
+1045
+02:12:35,960 --> 02:12:41,720
+bagging pero realmente yo podría poner cualquier modelo en las muestras busstrap no necesariamente
+
+1046
+02:12:41,720 --> 02:12:46,240
+tiene que ser un árbol podría ser una regresión lineal podría ser una regresión logística podría
+
+1047
+02:12:46,240 --> 02:12:52,760
+ser un subóctel machín lo que a mí se me ocurra ya en ese sentido pero
+
+1048
+02:12:56,520 --> 02:13:01,480
+es un modelo súper general ya permite harta flexibilidad aspecto pero nosotros no vamos a
+
+1049
+02:13:01,480 --> 02:13:06,320
+llevar sólo árboles de decisión porque son más rápido y general que otros modelos
+
+1050
+02:13:07,600 --> 02:13:14,840
+ok entonces el estimador lo dejamos como el árbol de decisión clasificado el estimator que
+
+1051
+02:13:14,840 --> 02:13:20,320
+es la cantidad de árboles que voy a hacer son 120 voy a decir que vamos a ocupar busstrap o sea
+
+1052
+02:13:20,320 --> 02:13:28,440
+vamos a hacer muestras con el reemplazo el oob score creemos que lo calcula le dije que sí el
+
+1053
+02:13:28,440 --> 02:13:33,640
+random state lo fijamos igual que antes da lo mismo es un número que ponemos para que todo
+
+1054
+02:13:33,640 --> 02:13:37,440
+esto sea reproducible y el en el jobs que es la cantidad de procesadores y yo le estoy diciendo
+
+1055
+02:13:37,440 --> 02:13:42,680
+que los ocupe todos bien con eso defino el pipeline completo para entrenar mi modelo de bagging
+
+1056
+02:13:43,520 --> 02:13:49,280
+hasta el momento todo esto son definiciones no hemos hecho nada de entrenamiento y lo mismo para
+
+1057
+02:13:49,280 --> 02:13:53,720
+el pipeline pero del random forest entregar el procesamiento y después entregamos el random
+
+1058
+02:13:53,720 --> 02:14:01,880
+forest que si se fijan no tiene el parámetro estimator como el bagging porque acá no puedo
+
+1059
+02:14:01,880 --> 02:14:09,840
+elegir los random forest son árboles podría no ocupar árboles sí podría pero tendría que hacerlo
+
+1060
+02:14:09,840 --> 02:14:16,520
+por mi cuenta bien entonces tenemos random forest vamos a ocupar los mismos 120 estimadores el max
+
+1061
+02:14:16,520 --> 02:14:23,080
+feature es raíz cuadrada ya de la cantidad de variables en nuestro caso tenemos 13 variables
+
+1062
+02:14:23,080 --> 02:14:31,280
+así que la raíz cuadrada de 13 debe rondar es como tres como algo no no es el 3 como algo y esto
+
+1063
+02:14:31,280 --> 02:14:37,040
+redondea a son número entero las cantidades de variable así que en el fondo le estamos diciendo
+
+1064
+02:14:37,040 --> 02:14:46,280
+que puede escoger tres variables por arbol como max esto ya lo entregamos y aquí le puse que en el
+
+1065
+02:14:46,280 --> 02:14:54,120
+fondo las clases este de acá cierto el class weight puede ser balanceado o balanceado con un
+
+1066
+02:14:54,120 --> 02:15:06,800
+subsam y que ocupe todos los estimadores a todos los procesadores bien entonces acá ahora sí pongo
+
+1067
+02:15:06,800 --> 02:15:13,360
+en una especie de diccionario como mis dos modelos y ahora los voy a entrenar bien entonces voy a
+
+1068
+02:15:13,360 --> 02:15:18,200
+entrar acá en un for esto es porque está pensado en que esto después lo voy a aplicar a muchos
+
+1069
+02:15:18,200 --> 02:15:24,280
+más modelos entonces esto se va a pasear por este objeto y va a ir buscando que es lo que hay bien
+
+1070
+02:15:24,280 --> 02:15:32,280
+entonces esto va a ir buscando el modelo y va a decir a bagging base entonces va a agarrar y
+
+1071
+02:15:32,280 --> 02:15:36,800
+lo va a entrenar va a agarrar el modelo le va a poner fit y le va a entregar los datos de entrenamiento
+
+1072
+02:15:36,800 --> 02:15:45,200
+bien que son los mismos que están ahora ok va a calcular los tiempos de que se demora en hacer la
+
+1073
+02:15:49,680 --> 02:15:55,600
+tiempo que se demora en hacer el entrenamiento y después va a anotar los scores de clasificación
+
+1074
+02:15:55,600 --> 02:16:03,000
+que está con la función que resume todos los indicadores del modelo ya entonces después me
+
+1075
+02:16:03,000 --> 02:16:11,160
+entrega el tiempo ajuste y también me entrega el o ove score y a eso le voy a pegar todo bien lo
+
+1076
+02:16:11,160 --> 02:16:16,200
+que entregan las métricas de clasificación ya que son las que están arriba que hayan varias
+
+1077
+02:16:17,160 --> 02:16:22,400
+que entonces todo va a ser para los dos modelos y lo va a pegar en este data set que después
+
+1078
+02:16:22,400 --> 02:16:27,560
+lo vamos aquí a desplegar eso es lo que va a ser todo el código entonces aquí lo corremos
+
+1079
+02:16:27,760 --> 02:16:29,320
+se demora muy poquito
+
+1080
+02:16:30,640 --> 02:16:37,760
+y ahí está un poquito más de tres segundos tenemos que esto entrenó los dos modelos tenemos
+
+1081
+02:16:37,760 --> 02:16:45,920
+el bagging base y el random forest base ahora tienen una accuracy de 0.81 y 0.86 efectivamente
+
+1082
+02:16:45,920 --> 02:16:51,440
+la accuracy es un buen indicador si es que los datos son relativamente equilibrados como lo son
+
+1083
+02:16:51,440 --> 02:16:59,360
+en este caso así que estamos bien y aquí es donde uno puede ir viendo lo que estábamos hablando
+
+1084
+02:16:59,360 --> 02:17:06,840
+antes el random forest tiende a tener un desempeño mejor el accuracy balanceado que está penalizado
+
+1085
+02:17:06,840 --> 02:17:12,400
+por el desbalance de clase también anda mejor cuando ve la precisión también es mejor para
+
+1086
+02:17:12,400 --> 02:17:20,240
+random forest con también por ende el f1 y en el rock aoc también además es más rápido pero
+
+1087
+02:17:20,240 --> 02:17:31,400
+esto ese ese el score en el auto pack que es el único lado donde ganó un poco el ove score ya
+
+1088
+02:17:32,840 --> 02:17:37,580
+esto de acá es en lo que sobra cuando está entrenando mientras que estos valores de acá
+
+1089
+02:17:37,580 --> 02:17:42,400
+están sobre el set de testeo fíjense que acá cuando hago el classification scores
+
+1090
+02:17:43,120 --> 02:17:49,240
+entregó los data set de test acá entrelo y acá testeo bien
+
+1091
+02:17:50,760 --> 02:17:57,360
+acá uno puede decir a pero random forest se demoró 0.1 segundos y el otro se demoró 1.2 entonces
+
+1092
+02:17:57,360 --> 02:17:59,960
+mucho más pesado y la verdad es que no ya
+
+1093
+02:18:02,560 --> 02:18:08,760
+de general siempre estas cosas o puede ser pero de general muchas veces estos comandos
+
+1094
+02:18:09,720 --> 02:18:16,320
+se demoran en partir entonces si yo lo corro de nuevo si se fijan ahora se demoró 0.3 segundos
+
+1095
+02:18:16,320 --> 02:18:22,000
+tengo los mismos resultados y ahora los tiempos de ajustes son casi iguales ya en general cuando
+
+1096
+02:18:22,000 --> 02:18:28,320
+corran esto como tiene que definir muchas cosas tiene que es como poner en marcha ya el asunto
+
+1097
+02:18:28,320 --> 02:18:33,520
+entonces por eso el primero tenía un tiempo ajuste mucho mayor que el segundo y si lo corran
+
+1098
+02:18:33,520 --> 02:18:37,000
+de nuevo ya los tiempos en fondo se ve que son exactamente iguales
+
+1099
+02:18:43,120 --> 02:18:46,520
+aquí un poco gráficamente como se ve en las matrices de confusión
+
+1100
+02:18:46,520 --> 02:18:53,160
+confusión recuerden es en la diagora principal está lo que la apuntaron bien tanto para sí
+
+1101
+02:18:53,160 --> 02:18:59,400
+o para no entonces acá hay 32 que el modelo dijo que sí que perdón que no y que efectivamente
+
+1102
+02:18:59,400 --> 02:19:05,160
+eran que no y 30 que el modelo dijo que sí y que efectivamente así mientras que los otros son
+
+1103
+02:19:05,160 --> 02:19:15,440
+los errores tenemos que el modelo predijo 5 elementos como no y en realidad eran que sí y
+
+1104
+02:19:15,440 --> 02:19:23,800
+9 que dijo que sí y en realidad eran no ya y al rando de fores es 34 y 32 en la diagora principal
+
+1105
+02:19:23,800 --> 02:19:30,640
+y si hay 3 entonces aquí claramente también se ve la mejoría aquí una cosa una cosa importante
+
+1106
+02:19:30,640 --> 02:19:37,040
+es que hay algunos valores de estos que son más importantes en el sentido del contexto ya
+
+1107
+02:19:38,640 --> 02:19:45,520
+por ejemplo en este contexto son problemas al corazón entonces el médico envasa ciertos
+
+1108
+02:19:45,520 --> 02:19:51,800
+o quien sea digamos en base a ciertos exámenes los pasó por este modelo
+
+1109
+02:19:51,800 --> 02:19:57,320
+predictivo y por eso puede lograr determinarse que la persona va a tener un problema al corazón o no
+
+1110
+02:19:57,320 --> 02:20:01,320
+entonces cuando ustedes se fijan en este error que está abajo a la izquierda
+
+1111
+02:20:02,520 --> 02:20:06,760
+me está diciendo que no va a tener problema al corazón pero en realidad sí lo va a tener
+
+1112
+02:20:08,040 --> 02:20:12,080
+mientras que esté acá el modelo está diciendo que sí va a tener problema al corazón pero en
+
+1113
+02:20:12,080 --> 02:20:19,000
+realidad no lo va a tener ya entonces si esto fue a ser ustedes que prefieren en que creen que es
+
+1114
+02:20:19,000 --> 02:20:23,960
+más importante o cuál error es más grave que otro decirle que alguien va a tener problemas
+
+1115
+02:20:23,960 --> 02:20:27,520
+corazón y después tener que deshacerse decirles hay que hubo un error en realidad no tiene ningún
+
+1116
+02:20:27,520 --> 02:20:32,880
+problema o decirle no sabes que no tiene ningún problema y después al final si lo tenía y a lo
+
+1117
+02:20:32,880 --> 02:20:40,720
+mejor terminó muerto entonces claramente este error es muchísimo más grave de cometer que este de acá
+
+1118
+02:20:41,680 --> 02:20:50,680
+entonces uno también puede manejar eso utilizando los umbrales de corte para clasificar entre sí y no
+
+1119
+02:20:53,080 --> 02:20:58,240
+finalmente acá está la curva rock la curva rock en el fondo determina cómo se mueve las tasas de
+
+1120
+02:20:58,240 --> 02:21:05,560
+verdaderos positivos contra los falsos positivos típicamente da una noción muy clara de cómo es
+
+1121
+02:21:05,560 --> 02:21:11,600
+si el modelo es bueno o malo la curva rock significa esta línea en diagonal que aparece es el azar
+
+1122
+02:21:11,600 --> 02:21:16,240
+o sea si yo dijese que va a tener problemas corazón o no va a tener problemas corazón tirando una
+
+1123
+02:21:16,240 --> 02:21:24,000
+moneda y si es que se llegue se pegara aquí a la izquierda y arriba en el fondo como haciendo un
+
+1124
+02:21:24,000 --> 02:21:28,280
+triángulo con esa diagonal entonces sería un modelo perfecto entonces mientras estas curvas
+
+1125
+02:21:28,280 --> 02:21:33,640
+que aparecen ahí en azul y naranjo sea lo más arriba posible más evidencia de un mejor modelo
+
+1126
+02:21:35,640 --> 02:21:42,120
+y la métrica típica para poder medir eso es el AUC que es el área bajo esa curva en el caso
+
+1127
+02:21:42,120 --> 02:21:46,720
+de Baggins ser 90 en el caso de Randolph Farris ser 92 lo que es consistente con todo lo que hemos
+
+1128
+02:21:46,720 --> 02:21:51,680
+visto para atrás bien y qué más
+
+1129
+02:21:54,240 --> 02:21:58,800
+bien en la curva por supuesto el AUC siempre tiene que ser mayor que un medio porque si fuese
+
+1130
+02:21:58,800 --> 02:22:03,640
+menor que un medio estaríamos bajo el azar y eso entonces para que tenemos un modelo si es mejor
+
+1131
+02:22:03,640 --> 02:22:04,640
+tiene una moneda bien
+
+1132
+02:22:07,040 --> 02:22:15,560
+entonces ahí tenemos los modelos base ya tenemos buenas métricas pero podemos mejorarlas aún más
+
+1133
+02:22:15,560 --> 02:22:24,760
+y es para eso nos ayuda estos métodos de grid search entonces para el grid search para clasificación
+
+1134
+02:22:24,760 --> 02:22:26,720
+vamos a generar la clasificación
+
+1135
+02:22:29,880 --> 02:22:35,680
+la validación cruzada usamos este stratifycouples que genera la
+
+1136
+02:22:35,680 --> 02:22:41,880
+validación los conjuntos que van a estar en la validación cruzada le decimos cuantas divisiones
+
+1137
+02:22:41,880 --> 02:22:49,640
+en este caso este 5 y vamos a fijar el random state para que esto sea reproducible después
+
+1138
+02:22:49,640 --> 02:22:57,040
+vamos a entregar las grillas ambos modelos bien entonces las grillas significa valores distintos
+
+1139
+02:22:57,040 --> 02:23:04,960
+para los parámetros en este caso vamos a tener el n estimators como yo estoy en el fast mode igual
+
+1140
+02:23:04,960 --> 02:23:13,320
+true yo voy a entregar para el estimator 100 300 y 600 para el max samples voy a entregar 0 7 y 1
+
+1141
+02:23:13,920 --> 02:23:21,480
+el 70% cada muestra gusta para hacer el 70% de lo original o todo o el mismo tamaño en realidad
+
+1142
+02:23:21,480 --> 02:23:27,840
+no todo max depth a la profundidad máxima va a ser non o 5 no significa que no hay límite
+
+1143
+02:23:29,200 --> 02:23:36,800
+y el mínimo de muestras para que sea una hoja terminal va a ser 1 o 3 ya y valores similares
+
+1144
+02:23:37,760 --> 02:23:43,800
+pero random forest tiene otros parámetros adicionales como el max features entonces ahí
+
+1145
+02:23:43,800 --> 02:23:49,960
+vamos a poner el 70% de las variables recuerden que aquí eran como 13 variables entonces 70%
+
+1146
+02:23:49,960 --> 02:23:59,480
+va a ser algo como 9 mientras que la raíz cuadrada de 13 ya dijimos que era 13 entonces
+
+1147
+02:23:59,480 --> 02:24:04,280
+estamos diciendo como 13 y 9 más o menos la máxima cantidad de variables profundidad máxima
+
+1148
+02:24:04,280 --> 02:24:11,640
+va a ser sin profundidad máxima o con 6 y el max el min sample left es lo mismo ya 1 y 3 y la
+
+1149
+02:24:11,640 --> 02:24:17,400
+cantidad estimadores es lo mismo en mi caso 300 y 600 ustedes vayan viendo si es que se les
+
+1150
+02:24:17,400 --> 02:24:23,080
+queda muy pegado con el fast mode igual true y entonces después ahora esto le entregamos
+
+1151
+02:24:26,120 --> 02:24:33,480
+el cómo se llama esto el modelo aquí definimos los grid search le entregamos el bagging en
+
+1152
+02:24:33,480 --> 02:24:39,720
+este clon es simplemente para que haga una copia y no se quede pegado como en el objeto anterior
+
+1153
+02:24:40,880 --> 02:24:45,720
+ya es para que quede todo nuevo que sabe que está ocupando exactamente lo mismo está definido
+
+1154
+02:24:45,720 --> 02:24:50,400
+arriba pero que no quiere que ocupe ese objeto le pasamos la grilla que acabamos de definir el
+
+1155
+02:24:50,400 --> 02:24:56,480
+scoring bien con que con que este modelo va a elegir cuál es el mejor yo tengo que decirle
+
+1156
+02:24:56,480 --> 02:25:02,280
+tienes que medir los corales y ese me dieron con algo es el rock a uc en este caso bien
+
+1157
+02:25:03,480 --> 02:25:07,480
+la variación cruzada es de acuerdo a las clases estratificadas que acabamos de definir
+
+1158
+02:25:07,480 --> 02:25:15,080
+acá arriba vamos a utilizar trabajos paralelos así que está el lecho es igual menos uno y este
+
+1159
+02:25:15,080 --> 02:25:23,840
+parámetro refit es siempre que se olviden de tener la documentación acá
+
+1160
+02:25:33,480 --> 02:25:33,980
+y
+
+1161
+02:25:52,360 --> 02:26:00,560
+ya este cuente lo que cuando se hace el refit parte de esto cuando está haciendo los modelos se está
+
+1162
+02:26:00,560 --> 02:26:07,040
+entrenando cada uno de los modelos lo hace utilizando la variación cruzada ya
+
+1163
+02:26:13,840 --> 02:26:15,760
+es la variación cruzada se ve así
+
+1164
+02:26:18,520 --> 02:26:23,920
+entonces ustedes tienen toda su data ustedes la dividen en set de entrenamiento y test y después
+
+1165
+02:26:23,920 --> 02:26:28,080
+dividen en la variación cruzada que lo que acabamos de dividir en cinco pedacitos iguales
+
+1166
+02:26:28,080 --> 02:26:36,280
+que son estos cinco y cuando entonces esto está buscando parámetros es lo que hace hace todas
+
+1167
+02:26:36,280 --> 02:26:40,880
+las combinaciones posibles que las que existen acá entonces aquí yo tengo tres acá y dos acá y 12
+
+1168
+02:26:40,880 --> 02:26:47,320
+acá y 12 tienen dos por los cuatro por 28 por 3 24 entonces son 24 combinaciones de parámetros
+
+1169
+02:26:47,320 --> 02:26:54,720
+que yo puedo hacer por lo tanto van a ser 24 entrenamientos de modelo ya cada uno de ellos se
+
+1170
+02:26:54,720 --> 02:27:01,680
+va a entrenar aquí bien en estas cinco divisiones los clips del 1 al 5 donde la primera se va a
+
+1171
+02:27:01,680 --> 02:27:08,920
+entrenar con los fons del 1 al 5 del 2 al 5 perdón y se va a medir en el 1 después va a hacer basar
+
+1172
+02:27:08,920 --> 02:27:16,160
+el 1 el 3 4 y 5 y va a medir en el 2 después el 2 1 2 4 y 5 va a medir en el 3 y sucesivamente
+
+1173
+02:27:16,160 --> 02:27:21,520
+entonces lo va a hacer cinco veces y va a tener entrenamientos con cuatro de estas partes y
+
+1174
+02:27:21,520 --> 02:27:26,600
+validación con una y finalmente va a reportar la métrica de desempeño como el promedio de las
+
+1175
+02:27:28,240 --> 02:27:33,760
+entonces que es lo que pasa cuando esto termina de correr esos 24 modelos y todos ya fueron
+
+1176
+02:27:33,760 --> 02:27:42,360
+entrenados en cerrar sus indicadores el modelo en la validación este grid search los ranquea y dice
+
+1177
+02:27:42,360 --> 02:27:49,520
+este es el mejor este que le sigue entonces el que gana nunca fue entrenado con toda la data de
+
+1178
+02:27:49,520 --> 02:28:00,360
+entrenamiento porque se entrenó con esto después con el 1 2 3 4 y 5 perdón no el 2 después el 1 2
+
+1179
+02:28:00,360 --> 02:28:06,360
+4 y 5 así sucesivamente todos los indicadores fueron sacados desde ahí pero si ya ganó entonces
+
+1180
+02:28:06,360 --> 02:28:10,440
+después me gustaría que ese modelo se entrenara con todo el set de entrenamiento y eso es lo que
+
+1181
+02:28:10,440 --> 02:28:17,760
+hace el refit y el verbose para que esto entregue información mientras está corriendo y uno no
+
+1182
+02:28:17,760 --> 02:28:22,880
+quede que se quedó pegado ya entonces aquí están definidos los dos grid search el otro es exactamente
+
+1183
+02:28:22,880 --> 02:28:28,240
+igual no lo voy a repetir y después para cada uno de los grid search yo le voy a hacer el punto fit
+
+1184
+02:28:28,240 --> 02:28:34,440
+entonces esta parte de acá va a primero agarrar este y lo va a ajustar eso significa que se van
+
+1185
+02:28:34,440 --> 02:28:44,560
+a correr los 24 modelos ojo para que empiecen a considerar el peso que tiene esto son 24
+
+1186
+02:28:44,560 --> 02:28:50,560
+combinaciones de parámetros que tenemos en cada una de las grillas eso significa que por cada
+
+1187
+02:28:50,560 --> 02:28:57,080
+combinación de parámetros un modelo cada modelo se va a entrenar por variación cruzada 5 veces por
+
+1188
+02:28:57,080 --> 02:29:04,480
+lo tanto tienen 120 entrenamientos del modelo es un problema muy simple pero esto escala muy
+
+1189
+02:29:04,480 --> 02:29:09,000
+rápido en la cantidad de veces que esto va a entrenar por eso es que se empieza a demorar
+
+1190
+02:29:09,000 --> 02:29:12,400
+bastante y después simplemente tenemos un resumen de lo que ocurre
+
+1191
+02:29:15,280 --> 02:29:16,360
+esto no demora mucho
+
+1192
+02:29:16,360 --> 02:29:40,000
+aquí tienen los procesadores de mi computador ahí están los 10 se fijan están todos al 100%
+
+1193
+02:29:40,000 --> 02:29:46,080
+ocupado en este momento porque está trabajando de manera y ahí se se ocuparon bien estaba
+
+1194
+02:29:46,080 --> 02:29:51,600
+trabajando de manera paralela haciendo que cada uno de estos 120 entrenamientos que
+
+1195
+02:29:51,600 --> 02:29:57,040
+estábamos hablando por cada grid se ha hecho son 240 entrenamientos en total se están haciendo
+
+1196
+02:29:57,040 --> 02:30:01,880
+de a 10 de manera simultánea y eso hace que esto se demore bastante menos ok
+
+1197
+02:30:01,880 --> 02:30:10,280
+bien entonces acá tenemos los tiempos como les dije primero siempre demora más y tenemos
+
+1198
+02:30:10,280 --> 02:30:16,720
+que el rando el mejor score en la variación cruzada es nuevamente para el rando ofertes
+
+1199
+02:30:16,720 --> 02:30:24,680
+así que rando ofertes sigue ganando bien y después tenemos la búsqueda para
+
+1200
+02:30:24,680 --> 02:30:33,080
+el grid search busca en el fondo como les acabo de decir ustedes le dan combinación de parámetros
+
+1201
+02:30:33,080 --> 02:30:37,760
+valores para cada uno y esto hace todas las combinaciones posibles ya
+
+1202
+02:30:39,440 --> 02:30:45,680
+otra forma de hacer variación cruzada perdón busque a hiperparámetros es con esta función
+
+1203
+02:30:45,680 --> 02:30:51,600
+que se llama random el ser y random el ser lo que hago yo en vez de entregarle valores
+
+1204
+02:30:51,600 --> 02:30:58,000
+específicos lo que yo hago es entregarle distribuciones entonces por ejemplo la
+
+1205
+02:30:58,000 --> 02:31:06,480
+cantidad de estimadores yo le voy a entregar un entero aleatorio que va entre 50 y 700 entonces
+
+1206
+02:31:06,480 --> 02:31:12,440
+ahora esto va a ir muestreando y va sacando distintos valores el max samples que es la
+
+1207
+02:31:12,440 --> 02:31:15,320
+proporción de valores que va a tomar el
+
+1208
+02:31:19,240 --> 02:31:27,120
+el busstrap va a ir entre 0 45 y 0 55 ya y así sucesivamente hay algunos que los voy a dejar con
+
+1209
+02:31:27,120 --> 02:31:31,040
+valores más fijos y otros que de nuevo los voy a dejar por ejemplo el min sample left va a ser un
+
+1210
+02:31:31,040 --> 02:31:40,200
+número aleatorio entre 1 y 7 ya y así sucesivamente entonces esto es lo que hace el rando de search y en vez
+
+1211
+02:31:40,200 --> 02:31:47,560
+entonces de todo lo demás sigue todo es igual la única diferencia es que esto tiene una
+
+1212
+02:31:47,560 --> 02:31:53,440
+cantidad de iteraciones que eso es lo que estaba arriba en el fastmove son 30 y en el caso contrario
+
+1213
+02:31:53,440 --> 02:31:59,400
+perdón el fastmove son 6 y en el caso contrario son 3 y entonces qué es lo que va a hacer este cuando yo le
+
+1214
+02:31:59,400 --> 02:32:05,760
+digo a 30 iteraciones significa que va a tomar 30 combinaciones de parámetros donde en cada una
+
+1215
+02:32:05,760 --> 02:32:14,040
+de ellas para este es para todos en realidad va a ir tomando valores aleatorios ya y va a ir
+
+1216
+02:32:14,040 --> 02:32:19,480
+generando así las combinaciones de parámetros en vez del grid search que las tomaba todas esto va
+
+1217
+02:32:19,480 --> 02:32:24,080
+buscando los parámetros de manera aleatoria en ciertas distribuciones que yo les voy diciendo
+
+1218
+02:32:24,080 --> 02:32:37,640
+beneficio de esto es que tiene al estar buscando de manera aleatoria como los muestreo son aleatorios
+
+1219
+02:32:37,640 --> 02:32:43,640
+simples va a ir como que rellenando el intervalo si yo le digo busca
+
+1220
+02:32:46,400 --> 02:32:53,440
+número aleatorio entre 50 y 700 y ustedes le dan la suficiente cantidad de iteraciones a esto
+
+1221
+02:32:54,280 --> 02:32:59,960
+entonces va en algún momento a ser súper exaustivo en la búsqueda o sea va a buscar cerca de 50 cerca
+
+1222
+02:32:59,960 --> 02:33:07,800
+de 100, 200, 500, etcétera no es tan limitado como el caso del grid search que buscó solo entre los que yo
+
+1223
+02:33:07,800 --> 02:33:15,840
+les dije buscó dijo 100, 300 y 600 y si hubiese estado el óptimo en 533 bueno nunca lo hubiese
+
+1224
+02:33:15,840 --> 02:33:22,320
+encontrado acá en cambio este el random by search sí se puede acercar bien se puede acercar a esos
+
+1225
+02:33:22,320 --> 02:33:29,600
+valores dado que va a estar tomando valores aleatorios todo el rato así que esa es la única diferencia
+
+1226
+02:33:29,600 --> 02:33:38,840
+bien por supuesto mientras más iteraciones yo le entrego más más valores va a buscar y más cerca
+
+1227
+02:33:38,840 --> 02:33:46,680
+va a estar del real óptimo todo lo demás que sigue hacia abajo es igual entonces ahí nuevamente si quieren
+
+1228
+02:33:46,680 --> 02:33:51,360
+fíjense en las procesadoras del computador están funcionando todos completamente a tope
+
+1229
+02:33:56,320 --> 02:34:02,480
+si ustedes les sacan ahí están si ustedes les sacan el jobs o le ponen igual a uno van a ver
+
+1230
+02:34:02,480 --> 02:34:07,360
+que sólo uno se llena ya o pueden llenarse más porque computadoras pesan trabajar en otras cosas
+
+1231
+02:34:09,000 --> 02:34:10,320
+y ahí se desocuparon
+
+1232
+02:34:10,320 --> 02:34:21,120
+y nuevamente en este caso por muy pero muy muy muy poco
+
+1233
+02:34:22,320 --> 02:34:26,280
+el que ganó fue baguí bien pero básicamente son lo mismo
+
+1234
+02:34:29,160 --> 02:34:35,440
+así que ahí tenemos nuestros modelos ya acá está como la clasificación final
+
+1235
+02:34:35,440 --> 02:34:44,240
+ya nuestros modelos tenemos el bagín base el random forest base el bagín optimizado y el
+
+1236
+02:34:44,240 --> 02:34:53,680
+random forest optimizado ya todo esto en los datos de test ahora ya porque arriba buscamos los
+
+1237
+02:34:53,680 --> 02:35:00,560
+parámetros se optimizaron y se sacaron indicadores en base a la variación cruzada y después se
+
+1238
+02:35:00,560 --> 02:35:04,800
+retiraron con todo el dato de entrenamiento pero ahora faltaba ver en el fondo cómo esto
+
+1239
+02:35:04,800 --> 02:35:14,000
+actuaría en datos donde nunca los ha visto ya y en ese caso tenemos esto ya y acá por ejemplo
+
+1240
+02:35:14,000 --> 02:35:23,080
+la cura así el random forest base y el baguín optimizado andan igual el balance aquí es y ganó
+
+1241
+02:35:23,080 --> 02:35:29,840
+random forest base en la precisión gana el baguín optimizado rico el f1 anda mejor el random forest
+
+1242
+02:35:29,840 --> 02:35:39,120
+y en el rock aus anda mejor el baguín optimizado bien entonces el baguín seleccionado fue
+
+1243
+02:35:41,360 --> 02:35:42,520
+como el mejor baguín
+
+1244
+02:35:45,520 --> 02:35:49,560
+el mejor baguín fue seleccionado desde el random y ser mientras que el mejor
+
+1245
+02:35:49,560 --> 02:35:53,800
+random forest fue seleccionado con grid search ok
+
+1246
+02:35:53,800 --> 02:36:05,040
+y una cosa importante que yo les decía es que estos modelos van a instalar la rock y se está
+
+1247
+02:36:05,040 --> 02:36:21,400
+calculando ahí está y algo importante que tienen las estas estos modelos ya es que me permiten me
+
+1248
+02:36:21,400 --> 02:36:27,360
+entregan como un ranking de variables según importancia para el modelo ya ese ranking de
+
+1249
+02:36:27,360 --> 02:36:33,560
+importancia según el modelo tiene harto que ver con cómo los árboles van desgranando o sea como
+
+1250
+02:36:33,560 --> 02:36:48,000
+se van ampliando ya y no necesariamente muchas veces implica como alguien dice que es como lo
+
+1251
+02:36:48,000 --> 02:36:52,840
+que explica dentro de modelos esas cosas pero la verdad más que nada la importancia para el
+
+1252
+02:36:52,840 --> 02:36:57,440
+modelo en cómo el modelo y empezó a hacer sus predicciones y tipo cosas
+
+1253
+02:37:02,680 --> 02:37:08,160
+hoy les pido disculpas pero estoy con que esten ahí sino voy a empezar a hablar demasiado gangoso
+
+1254
+02:37:10,840 --> 02:37:15,600
+bien entonces esto lo tienen todos los árboles y todos los modelos relacionados con árboles a
+
+1255
+02:37:15,600 --> 02:37:19,920
+todos los modelos de asambleje tienen estos gráficos y los árboles en sí también así
+
+1256
+02:37:25,240 --> 02:37:33,240
+bien entonces bueno va bien anduvo bastante bien genera random forest también todo lo que vimos
+
+1257
+02:37:33,240 --> 02:37:38,520
+ya la diferencia observada entre los modelos depende por supuesto de la muestra de la métrica
+
+1258
+02:37:38,520 --> 02:37:42,640
+que estemos considerando de los parámetros que hemos considerado ya
+
+1259
+02:37:45,640 --> 02:37:49,400
+en general todo esto debe justificarse como decía con variación cruzada para
+
+1260
+02:37:49,400 --> 02:37:53,000
+los camisetas del hypermanámetro y el desempeño en el conjunto de prueba ya
+
+1261
+02:37:53,960 --> 02:38:00,280
+no por el nombre de algoritmo sea no por que random forest sea en el papel un mejor modelo
+
+1262
+02:38:00,280 --> 02:38:11,480
+que va a ir simplemente no lo vamos a utilizar o sea a dar por ganar bien de hecho si uno se
+
+1263
+02:38:11,480 --> 02:38:18,880
+fijara en un indicador no sé en la que hubiera sí no es cuando fuese el que gana o si uno se
+
+1264
+02:38:18,880 --> 02:38:24,280
+quiera por ejemplo por si eligiéramos por el rock rock ausee entonces estaríamos eligiendo el
+
+1265
+02:38:24,280 --> 02:38:33,400
+baile optimizado bien entonces lo anterior fue para un modelo de reciclificación ya no nos queda
+
+1266
+02:38:33,400 --> 02:38:39,880
+mucho tiempo así que no más probable es que no vamos poder correr mucho del ames del modelo de
+
+1267
+02:38:39,880 --> 02:38:47,840
+regresión pero está todo pero se consulta pero en la vida real te da eso a ese nivel de accuracy
+
+1268
+02:38:47,840 --> 02:38:57,400
+o es sólo para este test puede que en los otros modelos que no había mostrado los profesores
+
+1269
+02:38:57,400 --> 02:39:08,040
+me decían que era como que te dé arriba de 80 85 igual es un excelente modelo o sea sí de todas maneras
+
+1270
+02:39:09,960 --> 02:39:24,400
+en el fondo tú tienes que esto partió alto 81 y 86 entonces si uno dijese bueno con eso me quedo no
+
+1271
+02:39:26,200 --> 02:39:32,640
+como se llama no haría nada más pero si tu base es 086 bueno entonces de todas maneras podemos
+
+1272
+02:39:32,640 --> 02:39:39,120
+llegar a ser 90 se tiene que ser como el objetivo por eso siempre se hace como los bases y después
+
+1273
+02:39:39,120 --> 02:39:44,480
+empezamos a optimizar para también saber la optimización no es algo que va a tu a tener un
+
+1274
+02:39:44,480 --> 02:39:51,440
+modelo se corre a que 070 y va a optimizarle y va a llegar a ser 95 jamás en la vida para
+
+1275
+02:39:51,440 --> 02:40:00,000
+lograr eso los parámetros logran corregir pequeñas cosas y podrá subir un 5 en 5 puntos
+
+1276
+02:40:01,000 --> 02:40:10,840
+7 bien entonces si tenís el 86 llegar a ser 90 ser 92 no es una buena meta digamos ya
+
+1277
+02:40:12,240 --> 02:40:18,840
+pero hay que saber en el fondo hasta donde uno puede dar pero claramente un modelo con 086 ya
+
+1278
+02:40:18,840 --> 02:40:27,520
+es un buen modelo así si yo hubiese eso obtenido con la optimización y me doy vuelta y ya estoy
+
+1279
+02:40:27,520 --> 02:40:33,360
+aburrido de hacer optimizaciones y de cambiar datos y no sube 086 bueno es un buen número para
+
+1280
+02:40:33,360 --> 02:40:44,720
+conformarse si es que uno lo quiere ver así bien victor si hay un modelo favorito por industria
+
+1281
+02:40:47,840 --> 02:40:53,440
+no existe tal cosa como el favorito hay gente que tiene su modelo favorito y eso es un problema
+
+1282
+02:40:53,440 --> 02:40:54,240
+la gente
+
+1283
+02:40:59,560 --> 02:41:00,560
+los modelos
+
+1284
+02:41:02,400 --> 02:41:08,360
+todos dependen del problema de los datos de cómo están configurados no existe un modelo
+
+1285
+02:41:08,360 --> 02:41:16,800
+mejor en cualquier situación ya y quien diga lo contrario está raro los modelos se prueban ya
+
+1286
+02:41:17,440 --> 02:41:22,920
+y uno va viendo cuál es el mejor modelo eso es lo que decía la frase un poco acá ya
+
+1287
+02:41:27,440 --> 02:41:33,520
+el ganador se debe justificar por cómo se optimizó por cómo se desempeñó en pruebas
+
+1288
+02:41:33,520 --> 02:41:39,480
+y no por el nombre entonces tener un favorito es ponerle un nombre al ganador cuando realmente
+
+1289
+02:41:39,480 --> 02:41:51,480
+tú tienes que probarlo lo único importante que uno debe hacer es lograr generar una buena solución
+
+1290
+02:41:51,480 --> 02:42:00,240
+dependiente del modelo y leí que es el creador de ways es siempre andaba con una bolera que
+
+1291
+02:42:00,240 --> 02:42:07,240
+decía enamórate del problema no de la solución y entonces el análogo acá sería no se enamoren de
+
+1292
+02:42:07,240 --> 02:42:15,760
+un modelo ya simplemente conozcan los todos y cuando tengan que buscar una solución tengan
+
+1293
+02:42:15,760 --> 02:42:22,680
+distintas opciones y algunos se van a andar mejor y otros peor algunos para ser interpretables otros
+
+1294
+02:42:22,680 --> 02:42:28,840
+no y van a tener que ir tomando decisiones a medida que vayan los datos guiando eso meterse
+
+1295
+02:42:28,840 --> 02:42:34,200
+en el mundo de ciencia datos es hacer que las decisiones sean guiadas por datos y no porque
+
+1296
+02:42:34,200 --> 02:42:42,960
+a mí me gusta tal y cual modelo ya robrío y pero eso en el caso de que se tenga un conjunto
+
+1297
+02:42:42,960 --> 02:42:50,600
+inmenso de datos se puede probar así de fácil distintos modelos como como se hace
+
+1298
+02:42:54,040 --> 02:42:56,480
+depende de la capacidad computación las que tú tengas
+
+1299
+02:42:58,680 --> 02:43:03,080
+lo que se puede hacer en muchos de esos casos es cuando tienen una cantidad inmensa
+
+1300
+02:43:03,400 --> 02:43:09,600
+tomar una muestra que sea como representativa y en la muestra probar varias cosas
+
+1301
+02:43:11,360 --> 02:43:17,080
+ejemplo imagínate que tiene 500 millones de registros bueno no tomemos clientes
+
+1302
+02:43:17,080 --> 02:43:23,040
+millones tomemos 10 millones una muestra que sea estratificada que tenga que sea
+
+1303
+02:43:23,040 --> 02:43:28,440
+representativo en todas tus variables y en ese puedes probar estos modelos y al que ande mejor
+
+1304
+02:43:28,600 --> 02:43:34,920
+después poder ir subiendo a lo mejor por ejemplo la cantidad de datos para generar la optimización y
+
+1305
+02:43:34,920 --> 02:43:40,200
+hasta después finalmente poder hacer un entrenamiento en todos los datos bien son las típicas estrategias
+
+1306
+02:43:40,200 --> 02:43:51,800
+que se utilizan cuando cuando tú tienes un conjunto demasiado masivos porque a lo mejor
+
+1307
+02:43:51,800 --> 02:43:57,360
+aunque tengas un gran poder computacional te va a tomar una cantidad excesiva de tiempo entonces
+
+1308
+02:43:57,400 --> 02:44:04,160
+está probando muchas cosas al final del día va a ser el que todo estas cosas uno también tiene que
+
+1309
+02:44:04,160 --> 02:44:08,640
+estar haciendo los modelos no porque simplemente a moralarse sino que alguien se los pidió alguien
+
+1310
+02:44:08,640 --> 02:44:14,120
+lo necesita y alguien le va a tener que responder y va a tener que lograr manejar esos tiempos
+
+1311
+02:44:16,960 --> 02:44:18,600
+en el mucho gracias
+
+1312
+02:44:18,720 --> 02:44:26,560
+bien muchachos quedan tres minutos no vamos a hablar absolutamente nada de esto
+
+1313
+02:44:26,560 --> 02:44:33,960
+voy a correr los datos pero lo que podemos hacer es que como ya lo tienen que los datos córralos
+
+1314
+02:44:33,960 --> 02:44:43,560
+de aquí al miércoles bien y cualquier pregunta al inicio de la próxima clase las respondemos
+
+1315
+02:44:43,560 --> 02:44:52,080
+para por si quedaron con alguna duda de esto ya en particular en este de acá las
+
+1316
+02:44:52,080 --> 02:45:00,480
+valía las optimizaciones de los parámetros se demoran bastante por ejemplo la random search
+
+1317
+02:45:00,480 --> 02:45:09,320
+se demora el orden de 8 minutos en mi computador con todos los procesadores a tope ya si ustedes
+
+1318
+02:45:09,520 --> 02:45:16,320
+por ahí es cobrarte importancia que pongan este fast mode igual true para que
+
+1319
+02:45:19,840 --> 02:45:24,640
+baje un poco la carga del computador y lo puedan tener en menos menores tiempos ya
+
+1320
+02:45:24,640 --> 02:45:31,880
+como les digo córralo para que vean el fondo cómo funciona y cualquier duda que salga damos un
+
+1321
+02:45:34,360 --> 02:45:35,680
+damos un espacio
+

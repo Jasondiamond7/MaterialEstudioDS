@@ -1,0 +1,440 @@
+# S38. Evaluación y selección en regresión y clasificación: R nativo.
+# Archivo completo, con las mismas secciones 00-12 que Python.
+# VS Code: Run Chunk en cada tramo # %%, o Ctrl+Shift+Enter.
+# Mantener una misma terminal R; observar la salida antes de avanzar.
+# Guardar este script, el archivo Python y los dos CSV juntos. El PDF no es necesario para ejecutar.
+# Usar el editor o entorno de preferencia y ejecutar los tramos en orden desde 00.
+# Instalación previa en R: install.packages(c("ranger", "jsonlite"))
+# Dependencias: ranger y jsonlite. No llama Python ni otros scripts.
+
+# %% 00. Entorno y funciones comunes ----
+# Preparar una vez. Este tramo define funciones; no ajusta modelos.
+# Dejar vacío para detectar el material. Si hace falta, cambiar SOLO esta línea:
+# RUTA_MATERIAL <- "C:/mis clases/S38"  # carpeta de los scripts y CSV
+RUTA_MATERIAL <- ""
+
+faltan <- c("ranger", "jsonlite")[!vapply(c("ranger", "jsonlite"), requireNamespace,
+    logical(1), quietly = TRUE)]
+if (length(faltan)) stop("Instalar antes de clase: install.packages(c(",
+    paste(sprintf('"%s"', faltan), collapse = ","), "))")
+
+# Prioridad: ruta indicada, ubicación del script, directorio actual y workspace.
+# No cambia el directorio de trabajo; busca datos junto a la presentación.
+carpeta_clase <- function() {
+    buscar <- function(inicio, subir = TRUE) {
+        if (!nzchar(inicio) || !file.exists(path.expand(inicio))) return(NULL)
+        base <- normalizePath(path.expand(inicio), winslash = "/", mustWork = TRUE)
+        if (!dir.exists(base)) base <- dirname(base)
+        padres <- base
+        while (subir && dirname(base) != base) {
+            base <- dirname(base); padres <- c(padres, base)
+        }
+        for (padre in padres) for (candidata in c(padre, file.path(padre, "clase"),
+            file.path(padre, "sesiones/38_2026-09-24_evaluacion_seleccion/clase"))) {
+            for (datos in c(candidata, file.path(candidata, "datos"))) {
+                archivos <- file.path(datos, c("hormigon_s38.csv", "spam_s38.csv"))
+                presentes <- file.exists(archivos) & !dir.exists(archivos)
+                if (all(presentes)) return(list(
+                    material = normalizePath(candidata, winslash = "/", mustWork = TRUE),
+                    datos = normalizePath(datos, winslash = "/", mustWork = TRUE)))
+                if (any(presentes)) stop("Material incompleto en ", datos, ": faltan ",
+                    paste(basename(archivos[!presentes]), collapse = ", "),
+                    ". Guardar ambos CSV juntos.", call. = FALSE)
+            }
+            if (file.exists(file.path(candidata, "DipDS_2026_S38.pdf")))
+                stop("Material incompleto en ", candidata,
+                    ": faltan hormigon_s38.csv y spam_s38.csv.", call. = FALSE)
+        }
+        NULL
+    }
+    manual <- trimws(RUTA_MATERIAL)
+    if (nzchar(manual)) {
+        encontrada <- buscar(manual, subir = FALSE)
+        if (!is.null(encontrada)) return(encontrada)
+        stop("RUTA_MATERIAL no contiene el material completo: ", manual,
+            "\nIndicar la carpeta con hormigon_s38.csv y spam_s38.csv.",
+            call. = FALSE)
+    }
+    archivos <- unlist(lapply(sys.frames(), function(fr) fr$ofile), use.names = FALSE)
+    archivos <- c(rev(archivos), sub("^--file=", "", grep("^--file=", commandArgs(), value = TRUE)))
+    for (inicio in c(archivos, getwd(), Sys.getenv("DIPDS_WORKSPACE"))) {
+        encontrada <- buscar(inicio)
+        if (!is.null(encontrada)) return(encontrada)
+    }
+    stop("No se encontró el material desde ", getwd(),
+        "\nTrabajar desde la carpeta de los scripts y CSV, o completar RUTA_MATERIAL en el tramo 00.",
+        "\nConservar hormigon_s38.csv y spam_s38.csv junto a los scripts.",
+        call. = FALSE)
+}
+rutas <- carpeta_clase()
+SESION <- rutas$material
+DATOS <- rutas$datos
+RAIZ_RESULTADOS <- file.path(Sys.getenv("DIPDS_RESULTADOS",
+    unset = file.path(SESION, "resultados")), "r")
+dir.create(RAIZ_RESULTADOS, recursive = TRUE, showWarnings = FALSE)
+cat("Material:", SESION, "\nDatos:", DATOS, "\nResultados R:",
+    normalizePath(RAIZ_RESULTADOS, winslash = "/"), "\n")
+MOSTRAR <- interactive() && Sys.getenv("DIPDS_MOSTRAR_FIGURAS", "1") == "1"
+AZUL <- "#4067A0"; NARANJA <- "#C66A25"; VERDE <- "#247D72"; TINTA <- "#104D64"
+
+# Claves internas de los CSV; los nombres legibles se usan al mostrar resultados.
+nombre_modelo <- function(clave) {
+    nombres <- c(MEDIA="Media de entrenamiento", LINEAL="Regresión lineal",
+        FRECUENCIA="Frecuencia de spam", LOGISTICA_C1="Logística (C=1)",
+        BOSQUE_8="Bosque (profundidad 8)", SIEMPRE_NO_SPAM="Siempre no spam")
+    vapply(clave, function(z) if (startsWith(z,"Q_A"))
+        paste0("Cuadrática: alfa=",sub("Q_A","",z)) else unname(nombres[z]), character(1))
+}
+mostrar <- function(tabla) {
+    t <- tabla
+    if ("modelo" %in% names(t)) t$modelo <- nombre_modelo(t$modelo)
+    print(t, row.names = FALSE, digits = 4)
+}
+
+figura <- function(nombre, dibujar, ancho = 10, alto = 4) {
+    # Una misma función dibuja en archivos y en el visor interactivo de R.
+    for (ext in c("pdf", "png")) {
+        archivo <- file.path(salida, paste0(nombre, ".", ext))
+        if (ext == "pdf") pdf(archivo, width = ancho, height = alto, bg = "transparent")
+        else png(archivo, width = ancho, height = alto, units = "in", res = 160,
+                 bg = "transparent", type = "cairo")
+        par(mar = c(4.2, 4.4, 2.5, 1), col = TINTA, col.axis = TINTA,
+            col.lab = TINTA, col.main = TINTA, bty = "l", las = 1, cex = .9)
+        dibujar(); invisible(dev.off())
+    }
+    if (MOSTRAR) {
+        par(mfrow = c(1,1), mar = c(4.2,4.4,2.5,1), bty = "l", las = 1)
+        dibujar()
+    }
+}
+guardar <- function(nombre, tabla) write.csv(tabla, file.path(salida,
+    paste0(nombre, ".csv")), row.names = FALSE, fileEncoding = "UTF-8")
+metricas <- function(real, predicha) {
+    e <- real - predicha
+    list(RMSE = sqrt(mean(e^2)), MAE = mean(abs(e)),
+         R2 = 1 - sum(e^2) / sum((real - mean(real))^2))
+}
+escala_ajuste <- function(x) {
+    x <- as.matrix(x); centro <- colMeans(x)
+    z <- sweep(x, 2, centro, "-")
+    escala <- sqrt(colMeans(z^2)); escala[escala == 0] <- 1
+    list(centro = centro, escala = escala)
+}
+transformar <- function(x, e) sweep(sweep(as.matrix(x), 2, e$centro, "-"), 2, e$escala, "/")
+cuadratico <- function(x) {
+    # Mismo orden que PolynomialFeatures(2): 8 lineales y 36 productos i <= j.
+    pares <- list()
+    for (i in seq_len(ncol(x))) for (j in i:ncol(x))
+        pares[[length(pares) + 1L]] <- x[, i] * x[, j]
+    cbind(x, do.call(cbind, pares))
+}
+ajustar_regresion <- function(nombre, x, y) {
+    obj <- list(nombre = nombre, media = mean(y))
+    if (nombre == "MEDIA") return(obj)
+    obj$e1 <- escala_ajuste(x); z <- transformar(x, obj$e1)
+    if (startsWith(nombre, "Q_A")) {
+        z <- cuadratico(z); obj$e2 <- escala_ajuste(z); z <- transformar(z, obj$e2)
+    }
+    obj$centro <- colMeans(z); z <- sweep(z, 2, obj$centro, "-")
+    des <- svd(z); alfa <- if (nombre == "LINEAL") 0 else as.numeric(sub("Q_A", "", nombre))
+    peso <- if (alfa > 0) des$d / (des$d^2 + alfa) else
+        ifelse(des$d > max(dim(z)) * .Machine$double.eps * max(des$d), 1/des$d, 0)
+    obj$beta <- drop(des$v %*% (peso * drop(crossprod(des$u, y - obj$media))))
+    obj
+}
+predecir_regresion <- function(obj, x) {
+    if (obj$nombre == "MEDIA") return(rep(obj$media, nrow(x)))
+    z <- transformar(x, obj$e1)
+    if (!is.null(obj$e2)) z <- transformar(cuadratico(z), obj$e2)
+    drop(obj$media + sweep(z, 2, obj$centro, "-") %*% obj$beta)
+}
+curvas <- function(y, p) {
+    orden <- order(-p); yy <- y[orden]; pp <- p[orden]
+    # Procesar juntos los empates de probabilidad.
+    finales <- which(!duplicated(pp, fromLast = TRUE))
+    tp <- cumsum(yy)[finales]; fp <- finales - tp
+    list(recall = c(0, tp/sum(y)), fpr = c(0, fp/sum(y == 0)),
+         precision = c(1, tp/finales))
+}
+probabilisticas <- function(y, p) {
+    q <- pmin(pmax(p, .Machine$double.eps), 1 - .Machine$double.eps)
+    curva <- curvas(y, p); n1 <- sum(y == 1); n0 <- sum(y == 0)
+    list(log_loss = -mean(y*log(q) + (1-y)*log1p(-q)), Brier = mean((y-p)^2),
+         ROC_AUC = (sum(rank(p)[y == 1]) - n1*(n1+1)/2)/(n1*n0),
+         AP = sum(diff(curva$recall) * curva$precision[-1]))
+}
+decision <- function(y, p, t) {
+    pred <- as.integer(p >= t)
+    vn <- sum(y == 0 & pred == 0); fp <- sum(y == 0 & pred == 1)
+    fn <- sum(y == 1 & pred == 0); vp <- sum(y == 1 & pred == 1)
+    list(umbral = t, VN = vn, FP = fp, FN = fn, VP = vp,
+         accuracy = (vn+vp)/length(y), precision = if (vp+fp) vp/(vp+fp) else 0,
+         recall = vp/(vp+fn), F1 = 2*vp/(2*vp+fp+fn), costo = (5*fp+fn)/length(y))
+}
+ajustar_clasificador <- function(nombre, x, y) {
+    if (nombre == "FRECUENCIA") return(list(nombre = nombre, media = mean(y)))
+    if (nombre == "LOGISTICA_C1") {
+        e <- escala_ajuste(x); z <- cbind(1, transformar(x, e))
+        # Misma pérdida logística L2: suma de log loss + ||beta||^2 / (2*C), C=1.
+        # El intercepto no se penaliza; se divide todo por n para optimizar.
+        fn <- function(b) {
+            eta <- drop(z %*% b)
+            (sum(pmax(eta, 0) + log1p(exp(-abs(eta))) - y*eta) + sum(b[-1]^2)/2)/length(y)
+        }
+        gr <- function(b) (drop(crossprod(z, plogis(z %*% b)-y)) + c(0, b[-1]))/length(y)
+        fit <- optim(rep(0, ncol(z)), fn, gr, method = "BFGS",
+                     control = list(maxit = 3000, reltol = 1e-10))
+        stopifnot(fit$convergence == 0)
+        return(list(nombre = nombre, escala = e, beta = fit$par,
+                    convergencia = fit$convergence, objetivo = fit$value))
+    }
+    fit <- ranger::ranger(x = as.data.frame(x, check.names = FALSE),
+        y = factor(y, levels = c(0,1)), probability = TRUE, num.trees = 150,
+        max.depth = 8, min.node.size = 1, min.bucket = 5, mtry = floor(sqrt(ncol(x))),
+        splitrule = "gini", replace = TRUE, sample.fraction = 1,
+        seed = 20260924, num.threads = 1, oob.error = FALSE)
+    list(nombre = nombre, modelo = fit)
+}
+predecir_probabilidad <- function(obj, x) {
+    if (obj$nombre == "FRECUENCIA") return(rep(obj$media, nrow(x)))
+    if (obj$nombre == "LOGISTICA_C1")
+        return(drop(plogis(cbind(1, transformar(x, obj$escala)) %*% obj$beta)))
+    drop(predict(obj$modelo, data = as.data.frame(x, check.names = FALSE),
+                 num.threads = 1)$predictions[, "1"])
+}
+matriz <- function(fila, titulo) {
+    plot.new(); plot.window(xlim = c(-.5,1.5), ylim = c(-.5,1.5), asp = 1)
+    valores <- matrix(c(fila$VN, fila$FP, fila$FN, fila$VP), 2, byrow = TRUE)
+    for (i in 1:2) for (j in 1:2) {
+        xx <- j-1; yy <- 2-i
+        rect(xx-.5, yy-.5, xx+.5, yy+.5, col = adjustcolor(if (i == j) AZUL else NARANJA, .25), border = NA)
+        text(xx, yy, valores[i,j], cex = 1.3)
+    }
+    axis(1, 0:1, c("No spam", "Spam")); axis(2, 0:1, c("Spam", "No spam"))
+    title(main = titulo, xlab = "Predicha", ylab = "Real")
+}
+
+# %% 01. Regresión: la pregunta determina la partición ----
+# Observar: tamaños y composiciones separadas. La prueba queda reservada.
+salida <- file.path(RAIZ_RESULTADOS, "hormigon"); dir.create(salida, showWarnings = FALSE)
+datos <- read.csv(file.path(DATOS, "hormigon_s38.csv"), check.names = FALSE)
+variables <- c("cemento", "escoria", "ceniza", "agua", "superplastificante",
+               "agregado_grueso", "agregado_fino", "edad")
+entrenamiento <- datos[datos$conjunto == "entrenamiento", ]; prueba <- datos[datos$conjunto == "prueba", ]
+stopifnot(nrow(entrenamiento) == 806, nrow(prueba) == 224,
+          !length(intersect(entrenamiento$grupo, prueba$grupo)),
+          all(tapply(entrenamiento$fold, entrenamiento$grupo, function(z) length(unique(z))) == 1),
+          setequal(entrenamiento$fold, 1:5), all(prueba$fold == 0))
+cat("Entrenamiento:", nrow(entrenamiento), "filas; prueba:", nrow(prueba), "\n")
+figura("10_hormigon_datos", function() {
+    par(mfrow = c(1,2))
+    plot(entrenamiento$edad, entrenamiento$resistencia, log = "x", pch = 16,
+         col = adjustcolor(AZUL,.5), xlab = "Edad (días, escala log)", ylab = "Resistencia (MPa)", main = "Solo entrenamiento")
+    hist(entrenamiento$resistencia, breaks = 20, col = AZUL, border = NA,
+         xlab = "Resistencia (MPa)", ylab = "Número de mediciones", main = "La respuesta es continua")
+})
+
+# %% 02. Regresión: pérdida, referencia y candidatos ----
+# Observar: qué cambia entre las siete alternativas.
+modelos <- c("MEDIA", "LINEAL", paste0("Q_A", c(.1,1,10,100,1000)))
+print(nombre_modelo(modelos))
+# Menor RMSE OOF; empate exacto por el orden anterior. MAE y R2 describen.
+
+# %% 03. Regresión: una predicción fuera de ajuste por observación ----
+# Observar: una predicción OOF por fila y candidato; todavía sin prueba.
+x <- entrenamiento[variables]; y <- entrenamiento$resistencia
+resumen <- por_fold <- predicciones <- list()
+for (nombre in modelos) {
+    oof <- rep(NA_real_, length(y)); cobertura <- integer(length(y))
+    sse_ajuste <- 0; n_ajuste <- 0
+    for (k in 1:5) {
+        valida <- entrenamiento$fold == k
+        stopifnot(!length(intersect(entrenamiento$grupo[valida], entrenamiento$grupo[!valida])))
+        ajuste <- ajustar_regresion(nombre, x[!valida, ], y[!valida])
+        oof[valida] <- predecir_regresion(ajuste, x[valida, ]); cobertura[valida] <- cobertura[valida]+1L
+        pred_train <- predecir_regresion(ajuste, x[!valida, ])
+        sse_ajuste <- sse_ajuste + sum((y[!valida]-pred_train)^2); n_ajuste <- n_ajuste+sum(!valida)
+        por_fold[[length(por_fold)+1L]] <- data.frame(modelo = nombre, fold = k,
+            n = sum(valida), as.data.frame(metricas(y[valida], oof[valida])))
+    }
+    stopifnot(all(cobertura == 1), all(is.finite(oof)))
+    resumen[[nombre]] <- data.frame(modelo = nombre, orden = match(nombre, modelos)-1,
+        as.data.frame(metricas(y,oof)), RMSE_ajuste = sqrt(sse_ajuste/n_ajuste))
+    predicciones[[nombre]] <- data.frame(modelo = nombre, id = entrenamiento$id,
+        grupo = entrenamiento$grupo, fold = entrenamiento$fold, real = y, predicha = oof)
+}
+ranking <- do.call(rbind, resumen); ranking <- ranking[order(ranking$RMSE,ranking$orden), ]
+por_fold <- do.call(rbind, por_fold); oof <- do.call(rbind, predicciones)
+ganador <- ranking$modelo[1]; mostrar(ranking)
+cat("Elegido por CV:", nombre_modelo(ganador), "\n")
+
+# %% 04a. Regresión: leer el ranking de validación ----
+# Leer el ranking antes de avanzar a la curva.
+figura("11_ranking_hormigon", function() {
+    par(mar = c(4,10,3,2))
+    plot(ranking$RMSE, rev(seq_len(nrow(ranking))), yaxt = "n", pch = 19, col = AZUL,
+         xlab = "RMSE OOF (MPa; menor es mejor)", ylab = "", main = "Siete candidatos, mismos pliegues")
+    axis(2, rev(seq_len(nrow(ranking))), nombre_modelo(ranking$modelo), las = 1)
+}, 8,4)
+# %% 04b. Regresión: comparar ajuste y validación ----
+# Comparar los dos errores antes de avanzar al siguiente gráfico.
+q <- ranking[startsWith(ranking$modelo,"Q_A"), ]; q$alpha <- as.numeric(sub("Q_A","",q$modelo)); q <- q[order(q$alpha), ]
+figura("12_curva_validacion", function() {
+    plot(q$alpha, q$RMSE, type = "b", log = "x", col = NARANJA, pch = 19,
+         ylim = range(c(q$RMSE,q$RMSE_ajuste)), xlab = "alpha", ylab = "RMSE (MPa)", main = "Ajuste y validación")
+    lines(q$alpha,q$RMSE_ajuste,type = "b",col = VERDE,pch = 19)
+    legend("topleft",c("Ajuste", "Validación OOF"),col = c(VERDE,NARANJA),lty = 1,bty = "n")
+},8,4)
+# %% 04c. Regresión: examinar diferencias entre pliegues ----
+# Leer el signo de las diferencias; no son réplicas independientes.
+mejores <- ranking$modelo[1:2]
+delta <- por_fold$RMSE[por_fold$modelo == mejores[1]] - por_fold$RMSE[por_fold$modelo == mejores[2]]
+figura("13_diferencias_hormigon", function() {
+    barplot(delta, names.arg = 1:5, col = ifelse(delta<0,AZUL,NARANJA),
+        xlab = "Pliegue", ylab = "Diferencia RMSE (MPa)", main = paste(nombre_modelo(mejores),collapse = " menos "))
+    abline(h = 0)
+},8,4)
+cat("Diferencia de RMSE:",diff(ranking$RMSE[1:2]),"\n")
+
+# %% 05. Regresión: reajustar y evaluar una vez ----
+# Aplicar la elección cerrada; observar el error en datos reservados.
+modelo_final <- ajustar_regresion(ganador, entrenamiento[variables], entrenamiento$resistencia)
+pred_prueba <- predecir_regresion(modelo_final, prueba[variables])
+pred_base <- rep(mean(entrenamiento$resistencia),nrow(prueba))
+evaluacion <- data.frame(modelo = ganador, as.data.frame(metricas(prueba$resistencia,pred_prueba)))
+referencia <- data.frame(modelo = "MEDIA",as.data.frame(metricas(prueba$resistencia,pred_base)))
+mostrar(evaluacion); mostrar(referencia)
+figura("14_prueba_hormigon",function() {
+    par(mfrow = c(1,2))
+    plot(prueba$resistencia,pred_prueba,pch = 16,col = adjustcolor(AZUL,.6),
+         xlab = "Real (MPa)",ylab = "Predicha (MPa)",main = "Predicciones en prueba"); abline(0,1,col = NARANJA,lty = 2)
+    barplot(c(referencia$RMSE,evaluacion$RMSE),names.arg = c("Media",gsub(": ","\n",nombre_modelo(ganador))),
+        col = c(NARANJA,AZUL),ylab = "RMSE (MPa)",main = "Referencia fijada")
+})
+
+# %% 06. Regresión: diagnosticar y comunicar límites ----
+# Leer residuos y guardar el caso de regresión.
+residuos <- prueba$resistencia-pred_prueba
+figura("15_diagnostico_hormigon",function() {
+    par(mfrow = c(1,2))
+    plot(pred_prueba,residuos,pch = 16,col = adjustcolor(AZUL,.6),
+         xlab = "Predicha (MPa)",ylab = "Real - predicha (MPa)",main = "Residuos"); abline(h = 0,col = NARANJA,lty = 2)
+    plot(prueba$edad,abs(residuos),log = "x",pch = 16,col = adjustcolor(AZUL,.6),
+         xlab = "Edad (días, escala log)",ylab = "Error absoluto (MPa)",main = "Errores según edad")
+})
+guardar("comparacion_cv",ranking); guardar("metricas_por_fold",por_fold); guardar("predicciones_oof",oof)
+guardar("evaluacion_final",evaluacion); guardar("referencia",referencia)
+guardar("predicciones_test",data.frame(id = prueba$id, grupo = prueba$grupo, real = prueba$resistencia,
+    predicha = pred_prueba, referencia = pred_base, residuo = residuos))
+
+# %% 07. Clasificación: datos, referencia y protocolo ----
+# Observar: clases, candidatos y costos; todavía sin evaluar prueba.
+salida <- file.path(RAIZ_RESULTADOS,"spam"); dir.create(salida,showWarnings = FALSE)
+datos <- read.csv(file.path(DATOS,"spam_s38.csv"),check.names = FALSE)
+variables <- grep("^(word_freq_|char_freq_|capital_run_)", names(datos),value = TRUE)
+tr <- datos[datos$conjunto == "entrenamiento", ]; te <- datos[datos$conjunto == "prueba", ]
+stopifnot(length(variables) == 57,nrow(datos) == 4601,nrow(tr) == 3680,nrow(te) == 921,
+    !length(intersect(tr$grupo,te$grupo)),setequal(tr$fold,1:5),all(te$fold == 0),
+    all(tapply(tr$fold,tr$grupo,function(z) length(unique(z))) == 1))
+x <- tr[variables]; y <- tr$spam
+modelos <- c("FRECUENCIA","LOGISTICA_C1","BOSQUE_8"); umbrales <- round(seq(.05,.95,.05),2)
+cat("Entrenamiento:",nrow(tr),"Prueba:",nrow(te),"Spam:",mean(y),"\n")
+figura("30_spam_frecuencia",function() barplot(table(y),col = c(AZUL,NARANJA),
+    names.arg = c("No spam (0)","Spam (1)"),ylab = "Correos",main = "Frecuencia en entrenamiento"),8,4)
+
+# %% 08. Clasificación: probabilidades fuera de pliegue ----
+# Leer log loss OOF y el modelo elegido.
+resumen <- predicciones <- por_fold <- list()
+for (nombre in modelos) {
+    p <- rep(NA_real_,length(y)); cobertura <- integer(length(y))
+    for (k in 1:5) {
+        valida <- tr$fold == k
+        stopifnot(!length(intersect(tr$grupo[valida],tr$grupo[!valida])))
+        ajuste <- ajustar_clasificador(nombre,x[!valida, ],y[!valida])
+        p[valida] <- predecir_probabilidad(ajuste,x[valida, ]); cobertura[valida] <- cobertura[valida]+1L
+        por_fold[[length(por_fold)+1L]] <- data.frame(modelo = nombre,fold = k,n = sum(valida),
+            as.data.frame(probabilisticas(y[valida],p[valida])))
+    }
+    stopifnot(all(cobertura == 1),all(is.finite(p)),all(p>=0 & p<=1))
+    resumen[[nombre]] <- data.frame(modelo = nombre,orden = match(nombre,modelos)-1,as.data.frame(probabilisticas(y,p)))
+    predicciones[[nombre]] <- data.frame(modelo = nombre,id = tr$id,grupo = tr$grupo,fold = tr$fold,real = y,probabilidad = p)
+}
+ranking <- do.call(rbind,resumen); ranking <- ranking[order(ranking$log_loss,ranking$orden), ]
+oof <- do.call(rbind,predicciones); por_fold <- do.call(rbind,por_fold)
+ganador <- ranking$modelo[1]; p <- oof$probabilidad[oof$modelo == ganador]
+mostrar(ranking); cat("Modelo elegido:",nombre_modelo(ganador),"\n")
+figura("31_spam_modelos",function() {
+    par(mfrow = c(1,2),mar = c(4,10,3,1))
+    for (metrica in c("log_loss","Brier")) barplot(rev(ranking[[metrica]]),horiz = TRUE,
+        names.arg = rev(nombre_modelo(ranking$modelo)),las = 1,col = c(AZUL,AZUL,VERDE),xlab = metrica)
+})
+
+# %% 09a. Clasificación: leer ROC y precision-recall ----
+# Leer los ejes y el ordenamiento antes de mirar calibración.
+curva <- curvas(y,p); medidas <- probabilisticas(y,p)
+figura("32_spam_roc_pr",function() {
+    par(mfrow = c(1,2))
+    plot(curva$fpr,curva$recall,type = "l",col = AZUL,xlab = "Tasa de FP",ylab = "Recall",
+         main = sprintf("ROC: AUC = %.3f",medidas$ROC_AUC)); abline(0,1,lty = 2,col = "gray")
+    plot(curva$recall,curva$precision,type = "l",col = VERDE,xlab = "Recall",ylab = "Precision",
+         ylim = c(0,1),main = sprintf("PR: AP = %.3f",medidas$AP)); abline(h = mean(y),col = NARANJA,lty = 2)
+})
+# %% 09b. Clasificación: comparar probabilidades y frecuencias ----
+# Comparar probabilidad media y frecuencia observada.
+bin <- cut(p,breaks = unique(quantile(p,seq(0,1,length.out = 6),type = 7)),include.lowest = TRUE)
+cal <- do.call(rbind,lapply(split(seq_along(p),bin,drop = TRUE),function(i)
+    data.frame(media_probabilidad = mean(p[i]),fraccion_spam = mean(y[i]),n = length(i))))
+figura("33_spam_calibracion",function() {
+    par(mfrow = c(1,2))
+    plot(cal$media_probabilidad,cal$fraccion_spam,type = "b",pch = 19,col = AZUL,
+        xlim = c(0,1),ylim = c(0,1),xlab = "Probabilidad media",ylab = "Fracción de spam",main = "Calibración OOF")
+    abline(0,1,lty = 2,col = "gray")
+    hist(p,breaks = seq(0,1,.1),col = AZUL,border = NA,xlab = "Probabilidad OOF",ylab = "Correos",main = "Distribución de probabilidades")
+})
+print(cal,row.names = FALSE)
+
+# %% 10a. Clasificación: elegir el umbral por costo ----
+# Leer el umbral elegido antes de examinar sus errores.
+costos <- do.call(rbind,lapply(umbrales,function(t) as.data.frame(decision(y,p,t))))
+eleccion <- costos[order(costos$costo,-costos$umbral), ][1, ]; umbral <- eleccion$umbral
+cat("Umbral:",umbral,"Costo OOF:",eleccion$costo,"\n")
+figura("34_spam_umbral",function() {
+    plot(costos$umbral,1000*costos$costo,type = "b",pch = 19,col = AZUL,
+        xlab = "Umbral",ylab = "Costo por 1000 correos",main = "FP=5; FN=1")
+    abline(v = .5,lty = 2,col = "gray"); abline(v = umbral,lty = 2,col = NARANJA)
+},8,4)
+# %% 10b. Clasificación: leer el intercambio entre FP y FN ----
+# Leer FP y FN; la prueba se evalúa recién en el tramo 11.
+figura("35_spam_decisiones",function() {
+    par(mfrow = c(1,2))
+    for (t in c(.5,umbral)) { rr <- decision(y,p,t)
+        matriz(rr,sprintf("OOF: t=%.2f; costo/1000=%.1f",t,1000*rr$costo)) }
+})
+
+# %% 11. Clasificación: reajustar y evaluar regla cerrada ----
+# Evaluar una vez el modelo y umbral ya elegidos.
+modelo_final <- ajustar_clasificador(ganador,x,y)
+pt <- predecir_probabilidad(modelo_final,te[variables])
+final <- data.frame(modelo = ganador,as.data.frame(c(probabilisticas(te$spam,pt),decision(te$spam,pt,umbral))))
+referencia <- data.frame(modelo = "SIEMPRE_NO_SPAM",as.data.frame(decision(te$spam,rep(0,nrow(te)),.5)))
+mostrar(final); mostrar(referencia)
+figura("36_spam_prueba",function() {
+    par(mfrow = c(1,2)); matriz(final,sprintf("Prueba R: t=%.2f",umbral))
+    barplot(1000*c(referencia$costo,final$costo),names.arg = c("Siempre no spam","Regla elegida"),
+        col = c(NARANJA,AZUL),ylab = "Costo por 1000 correos",main = "Mismos costos declarados")
+})
+guardar("comparacion_cv",ranking); guardar("metricas_por_fold",por_fold); guardar("predicciones_oof",oof)
+guardar("calibracion",cal); guardar("costos_umbrales",costos); guardar("evaluacion_final",final)
+guardar("referencia",referencia); guardar("predicciones_test",data.frame(id = te$id,
+    grupo = te$grupo,real = te$spam,probabilidad = pt,predicha = as.integer(pt>=umbral)))
+jsonlite::write_json(list(modelo = ganador,umbral = umbral,costo_FP = 5,costo_FN = 1,
+    orden = "log loss OOF; costo OOF; reajuste; prueba",implementacion = "R nativo: ranger"),
+    file.path(salida,"regla_elegida.json"),auto_unbox = TRUE,pretty = TRUE)
+
+# %% 12. Resumen y versiones de esta ejecución ----
+# Consultar dónde quedaron los archivos y qué versiones se usaron.
+jsonlite::write_json(list(lenguaje = "R",version = R.version.string,
+    ranger = as.character(packageVersion("ranger")),jsonlite = as.character(packageVersion("jsonlite"))),
+    file.path(RAIZ_RESULTADOS,"versiones.json"),auto_unbox = TRUE,pretty = TRUE)
+cat("R: ambos casos completos. Resultados en",RAIZ_RESULTADOS,"\n")
+cat("Mismo protocolo que Python; los bosques nativos no son idénticos entre bibliotecas.\n")

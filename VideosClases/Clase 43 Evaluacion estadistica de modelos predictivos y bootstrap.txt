@@ -1,0 +1,1385 @@
+Me escucho bien, ¿sí?
+Sí, profesor. Me disculpe que se me fue a mi...
+Me disculpe.
+¿Ya?
+Pero me escucho bien, ¿sí?
+Sí, perfecto.
+Sí, profesor.
+Sí.
+Por ejemplo, vamos a poner un ejemplo muy sencillo acá en que uno va a usar una regresión logística.
+Yo estoy llamando acá regresión logística simple.
+simple, podría ser sí o no una covariable, con una covariable, ya, y una más amplia,
+con 3, 4, 5 o más covariables, sí.
+Entonces, un ejemplo hipotético de modelos evaluados en los mismos casos, pero con un
+modelo más sencillo, modelo más general.
+Calculamos las métricas, log loss, esta métrica ya conocen, ya fue
+y la reducción observada ahí fue muy pequeña de 0.02.
+Hay una diferencia muy pequeña entre las dos métricas, por cual de las dos debemos ir.
+Otra muestra de una evaluación podría producir una diferencia distinta
+o una mejora pequeña puede ser relevante como segundo el objetivo.
+Entonces básicamente acá no es suficiente para aparecer, ok,
+Ok, tengo una métrica, tengo otra métrica, la diferencia fue muy chica.
+¿Cómo tomo esta decisión?
+¿Puedo construir un intervalo?
+¿Puedo tomar algún decisión mejor?
+Y ahí viene la idea de, bueno, podemos empezar a hacer un tipo de penalización acá para
+ver si hay una ganancia o no de información, por ejemplo con la penalización AIC, con
+la penalización BIC, o podemos de alguna manera utilizar nuestro conjunto de validación,
+hacer varios muestreos con bootstrap y construir un intervalo para esta métrica.
+Por lo que construir un intervalo para la diferencia entre los dos elementos.
+Si este intervalo contiene 0, podemos asumir que no hay diferencia significativa entre
+estos dos modelos.
+Y la idea por temas de parsimonia es ir con el modelo más sencillo.
+Entonces vamos a seguir un poco la carta.
+Por eso una cosa que es importante.
+estamos revisitando el método, bueno hoy tenemos menos tiempo entonces
+vamos a intentar avanzar un poco más rápido. Pero una cosa que es
+importante recordar, una cosa que es muy importante es aprendizaje supervisado
+cuando vamos a trabajar con modelos de aprendizado máquina, Support Vector Machine,
+redes neuronales, Random Forest, entre otros, es importante hacer bien la
+una división de nuestra base, una división entre entrenamiento, dentro de esta división
+entre entrenamiento vamos a hacer la validación y después evaluamos en la prueba. Algunos
+alumnos tenían un poco de... creo que no se quedó muy claro la última vez, pero vamos
+a intentar ahora hacer solamente un repaso de cómo funciona de una forma sencilla la
+estructura. Una pregunta que podemos dejar ahí, si cambiamos la receta mirando la prueba,
+deja de ser una evaluación final independiente.
+Acá básicamente lo que queremos es que es importante dejar la prueba al final porque
+no debemos usar la prueba para poder ajustar el modelo.
+Eso debe ser independiente para que se pueda evaluar esta receta al final y ver si funciona bien.
+Bueno, si tenemos por ejemplo para una base de Wisconsin, que es la base que estamos trabajando
+y es la base que tenemos lo que vamos a pasar ahora.
+vamos a hacer los ajustes acá en la clase básicamente en esa base para que se recuerden
+básicamente estamos evaluando ahí a un tipo de cáncer ya que era maligno o benigno y tenemos
+varias covariables que queremos evaluar si está influenciando o no para poder hacer la predicción
+entonces tenemos una base original de 569 observaciones la dividimos en 398 para hacer el
+entrenamiento y 171 para hacer la prueba. Entonces, en una validación cruzada de 5 pliegues,
+uno de 80 casos es valido y otros 318 se ajustan al modelo. Lo que queremos discutir
+acá básicamente es que vamos dividir esto, esta base acá, en 5 folds, en 5 pliegues o 5
+carpetas, vamos a ajustar el modelo con 318 y vamos a evaluar en 80 casos. Después que hacemos
+esto dejamos estos valores que fueron ajustados acá de lado. Entonces tenemos 80 observaciones que
+fueron ajustadas inicialmente. Ajustamos el modelo con 318, después de ajustar el modelo con 318
+evaluamos cómo está funcionando en estas ochenta observaciones.
+Y ahí tengo ahí si es un problema de clasificación,
+si clasificamos malo o bien o por ejemplo las probabilidades,
+el log score, el Brier score, el log loss o Brier score,
+no importa cuál es la meta que vamos a poner,
+dejamos ella al lado, puede ser por ejemplo la exactitud,
+ya voy a dejar esa exactitud de lado, ochenta observaciones.
+ahora voy a poner nuevamente estas 80 observaciones, me escuchan?
+acá me parece que la internet está instable
+me parece 80 observaciones, pero voy a cambiar
+ahora
+cómo hacemos eso? inicialmente dejé 80 observaciones acá
+y ajuste con 318
+ahora voy a poner nuevamente estas 80 observaciones acá
+y voy a ajustar el modelo
+poniendo de vuelta estas 80 y voy sacar otras 80 observaciones ya mira que estas 80 observaciones
+que estaban acá no serán las mismas que estarán acá yo la dividí en cinco folds ya en cinco
+pliegues o acá uno va a llamar eso de OOF, out of fold, fuera de la carpeta ya entonces
+dejamos esta observación fuera de la carpeta y lo ajustamos mira que interesante es que
+Acá voy a ajustar nuevamente el modelo con 318 valores, 318 observaciones.
+Pero ahora va a ser parámetros distintos.
+Por qué van a ser parámetros distintos?
+Porque estoy poniendo de vuelta estas observaciones
+y estoy sacando las observaciones que estaban acá, en este grupo.
+O sea, voy a ajustar con estas cuatro carpetas y voy a evaluar en este grupo.
+Mira que antes yo tenía 80, ahora voy a tener 80 que viene de estos valores acá.
+Y yo sé que de esta forma logré clasificar 80 observaciones y tuve 80 errores.
+Ahora voy a tener más 80.
+Entonces voy a juntar las dos. 80 con 80, 160.
+Y voy haciendo esto con todos.
+Acá 80, acá 80, acá de nuevo, acá de nuevo y acá de nuevo.
+Al final voy a tener exactamente 398 valores calculados.
+Entonces voy a alcanzar y evaluar cómo funcionaría si ajustábamos y dejáramos una parte de fuera.
+Y ahí calculamos la exactitud final.
+Y ahí ven la idea, por ejemplo, cuando hablaba de los... para ustedes de tunar parámetros.
+Por ejemplo, en una regresión logística con Lasso tenemos un lambda.
+Entonces voy a asumir un lambda igual a 0.1.
+Y voy a calcular todos esos valores acá.
+con lambda igual a 0.1 y después voy a tener por ejemplo la exactitud o la área sobre la curva ROC
+con lambda igual a 1, 0.1. Después voy a cambiar lambda igual a 0.2 y voy a recalcular todo isso.
+Después hago nuevamente con lambda igual a 3 recalculo nuevamente con todo esto. Lambda igual a 4,
+lambda igual a 5 y por ahí adelante. Ustedes van a ver que al final,
+Si estamos mirando por ejemplo el error cuadrático medio que más sencillo más fácil de entender
+vamos a tener acá que el error cuadrático medio algún punto va a ser bajo y después va a aumentar
+y ahí sabemos exactamente cuál es el lambda que debemos ajustar acá.
+Entonces es muy importante tener en cuenta de que los hiperparámetros acá se van a estimar
+exactamente en este proceso.
+O sea, nos vamos a considerar algunos valores para ajustar acá
+y voy a hacer esto de una forma interativa, pero la base o el conjunto que tengo de prueba
+no está acá, va a estar al final solamente.
+Por eso que lo que tenemos que hacer es
+ajustar los coeficientes, escalas y otras partes del modelo.
+vamos a hacer la validación, elegir las variables y preparamos y sintonizamos, hacemos ese entrenamiento,
+esa validación a lo largo de ese proceso acá, y ahí encontramos el Lambda, por eso que
+cuando se ajusta el modelo lo hacen de esa forma, sí? Y ahí uno puede me preguntar,
+ya profesor, pero yo ajusté, esos dos acá encontré que el Lambda lo que mejora el control
+entrenamiento fue el lambda igual a uno. Seguimos con una regresión logística con lambda igual a uno.
+Ahora vamos a evaluar este modelo y hacer una comparación con otros modelos en nuestro conjunto
+de prueba. Y la diferencia fue muy chica, muy chica, con 0.98, 0.97, 0.96. Es posible que
+esta diferencia me salió solamente porque tengo este conjunto de entrenamiento y tengo este conjunto de
+prueba, se cambió un poco la estructura del conjunto de prueba, cómo se cambian los valores.
+Por supuesto, tenemos valores distintos en el conjunto de prueba, los valores de la área sobre
+la curva roc, los errores cuadráticos medios, van a ser distintos, pero lo cuanto va a cambiar,
+es posible que se cambie un valor específico, algunas observaciones, ahora Random Forest
+pasa a ser mejor que la regresión logística en una análise. Entonces vamos a ver una forma para construir
+hay intervalos acá, los que tomaron un curso que vieron la parte de estadística,
+ven la importancia, no solamente se basar en una estimativa pontuada,
+vamos a basar solamente en un valor promedio, no en un error cuadrático medio,
+o una área sobre la curva ROC.
+Vamos tener un intervalo para mirar y comparar distintos intervalos.
+Y ahí uno puede tomar la decisión de que si hubo una ganancia de información
+de la lista de aprendizaje.
+Algunas cosas que son muy importantes a hacer
+a lago de este proceso, siempre cuando vamos a hacer
+esto, porque estoy reforzando esto, bueno, porque
+parte del contenido tenemos que revisar este punto,
+pero además esto porque muchos alumnos no toman este cuidado.
+Vamos a hacer la estandardización en estos cuatro puntos
+y calcular el error cuadrático medio en este grupo.
+En este otro punto hacemos la estandarización en estos individuos y calculamos el error cuadrático medio en este grupo.
+En el otro hacemos la estandarización con estas cuatro carpetas y hacemos la evaluación en este grupo.
+Porque si hacemos la estandarización de forma general vamos a tener una fuga o un leak de información.
+y eso es malo porque siempre cuando vamos a entrenar nuestro modelo no podemos tener un
+vazamento de información. Muchas veces el alumno no va a tener cuidado con eso y solamente se da cuenta
+del final y es, aunque parezca una tarea muy sencilla, siempre eso pasa.
+Tuve una reunión ahora con un alumno de un MBA que trabajaba con él en Brasil.
+Después de 7 meses, el alumno se le cuenta que la exactitud que tenía el 95% venía de una fuga de información
+porque una de las covariables no había estandarizado correctamente y estaba teniendo fuga de información ahí.
+Entonces cuando sacaba y hacía la estandarización correcta, lograba y bajaba harto como 0.8.
+Entonces hay que tener mucho cuidado con la forma que uno hace la estandarización.
+¿Cierto?
+Estandarizar toda la base antes de separar.
+¿Incorrecto?
+Estimar la media de la escala solo con las filas de ajuste.
+Eligir las variables con las etiquetas de prueba.
+Eso nunca se puede hacer.
+Seleccionar dentro del conjunto de entrenamiento y validación.
+¿Correcto?
+Escoger el mejor umbral en prueba.
+el correcto es fijar el umbral antes de la evaluación final. Entonces he hablado harto
+para ustedes y es super importante que repasen si van a tomar después una evaluación o
+si van a tener que trabajar con eso. No es una información muy sencilla, muchas veces
+que no está acostumbrado o la persona que no tiene mucho conocimiento siempre acaba
+haciendo alguna confusión en esos puntos.
+Eh, Profes?
+Si?
+En el chat preguntan si es que hay algún tamaño mínimo que deba tener como cada
+Fold para que sea válido?
+No, bueno, yo sé, no porque la idea es que muchos, bueno, generalmente los softwares
+ellos hacen como cada Fold, generalmente los dividen 10 o 5, ya?
+el tema es que lo que va a cambiar de
+estos folders,
+lo que veo cuando ajusto estos modelos es que
+conforme vamos teniendo más folders, más preciso va a ser el ajuste porque
+estamos poniendo más información, pero lo que vale costar, le vale costar el
+tiempo que va a tener de ajuste. Vamos a suponer que ahora ustedes tienen que hacer
+eso con cinco folds. O sea, el modelo de forma interna va a tener que correr
+cinco veces. Bueno, se va a variar, o sea, hiperparámetros a ser estimados, va a
+tener que correr estas cinco veces, va a tener que hacer estos cinco ajustes.
+no sé si va a variar lambda en 20 o en una grilla de 0.1 0.2 0.3 hasta 5 va a tener ahí como 50
+ajustes que tiene que hacer ya entonces son 5 x 50 250 ajustes me parece no me parece que me
+que va a dar mucho trabajo. Ok, uno va allá e aumenta de 100 observaciones para 100 mil.
+Y después de 100 mil, usted decide hacer, no sé, lo que le había comentado,
+Leave-One-Out Cross Validation. La idea es que uno puede hacer estas divisiones de las carpetas hasta
+lo tanto cuanto quiera de alguna forma que al final va a tener. Si tenemos 100 observaciones,
+tenemos 99 carpetas, voy a ajustar con 99 e evaluar en ese punto, voy a ajustar ahora
+las otras 99 y evaluar en ese punto.
+El tema es que conforme ustedes van haciendo eso, por supuesto va a mejorar la...
+lo cuanto el modelo está logrando ajustar porque está evaluando solamente un punto
+y ajustando todos los otros, pero lo malo es que va tener que ajustar ese modelo un
+montón de veces.
+Para hacer observaciones no es un problema, pero si tienen 100.000 observaciones va tener
+que correr un modelo 50 x 99999. Su computadora va a quedar correndo
+esto varios días. Depende del tamaño de la muestra va a tomar toda su vida.
+Entonces es importante que evalúen el tiempo computacional que van a tomar.
+Entonces generalmente los softwares lo que hacen lo dividen en 10 folds o 5 folds.
+Si ustedes tienen pocas observaciones, pero muy pocas observaciones, mi sugerencia es hacer el
+Leave-One-Out Cross Validation. A hacer ajuste con 99 y evalúa en lo primero, después ajusta los
+otros 99 y avalia o evalúa el segundo, después ajusta con los otros 99 y evalúa en el tercero.
+O sea, va a ser una cosa que es Leave-One-Out, va a dejar uno de fuera y va a ajustar todos los
+otros. Lo malo es que va a tener que hacer una cosa de 100, pero
+desde el punto de vista computacional no le va a tener un costo computacional.
+Es muy poco porque son pocas observaciones, la maximización es pequeña y
+generalmente eso le va a correr muy rápido.
+Entonces, mucho de eso le va a tomar más o menos, va a cambiar del tanto que tiene de muestras.
+Entonces, si se está trabajando con pocas bases de datos, con muchas bases de datos,
+le va a depender de eso. Entonces es siempre importante que usted evaluase.
+Si yo tengo pocas observaciones, tengo tiempo, hago
+Leave-One-Out Cross Validation. Ah no, yo tengo 50 mil observaciones,
+10 mil observaciones. Bueno, hace un k-fold igual a 10,
+que es el estándar, que la mayoría de los software ya tiene, y listo.
+Bien? Entonces, va a ser más o menos... Sí, sí claro.
+Profesor, una pregunta. Lo que usted está haciendo alucinadora está relacionado porque algunos datos
+se han clasificado en datos de entrenamiento y de prueba y otros datos están clasificados en
+entrenamiento, validación y prueba. Entonces, ¿cómo hay que definir cómo segmentar cuando es necesario
+dejar datos para validación, entrenamiento y prueba o simplemente tomar entrenamiento y prueba
+siempre así lo que es lo que ustedes tienen que decidir va a ser lo que vamos a hacer entre
+entrenamiento y prueba y ser el primer paso ya entonces me llegó 569 observaciones vamos a hacer
+una división con 80 o 70 por ciento, ustedes van a tener que decidir cuándo es la base,
+generalmente lo hacen con 80 por ciento o con 70 por ciento, y cuando dividimos con ese 70 a 80
+por ciento vamos a tener una parte para el integramento y una parte para prueba. Ya?
+Esta parte de prueba, listo, ya me va a quedar allá separado, no voy a entrar con ella básicamente
+hasta el final entonces esto acá no me va a servir para nada para encontrar los parámetros del modelo
+y eso solamente será el final para que yo pueda comparar los modelos finales, si yo ajuste
+un Random Forest, si ajusté una red neuronal, un KNN entre otros, yo no voy a utilizarlo para elegir parámetros
+dentro de este conjunto de entrenamiento voy a hacer una otra division
+dentro de este conjunto de entrenamiento lo voy a dividir entre entrenamiento y validación
+podría haber puesto otro nombre pero generalmente utilizo eso
+dentro del entrenamiento se divide para entrenamiento y validación
+entonces acá tiene 80 y 20, uno va a hacer alguna cosa como 60, 20 y 20
+o sea 60% para entrenamiento, 20% para validación y 20% para prueba
+será más o menos esa idea, pero esta división que estoy comentando de K-Fold
+se hace exactamente dentro de este grupo de 398
+pero dentro de este conjunto de entrenamiento
+tengo que hacer una otra división para encontrar los hiperparámetros
+y esta división viene exactamente con esta idea
+con los 398 voy a dejar algunos de fuera y voy a mostrar el modelo
+Voy a dejar otros de fuera y voy a mostrar el modelo y voy a encontrar el parámetro, por ejemplo, λ de una regresión logística o el γ de un Support Vector Machine.
+Exactamente con ese proceso.
+¿Por qué no puedo ajustar todo y después encontrar el λ?
+Porque nos va a llevar siempre el super ajuste. Conforme ponemos más información vamos a tener aquel problema de disminuir los errores cuadráticos medios en el conjunto de entrenamiento.
+Pero profesor, usted ya está trabajando con el conjunto de entrenamiento?
+Sí, pero necesito encontrar un parámetro. Por eso que hacemos una división dupla.
+Si hacemos el ajuste solamente con ese acá, e intento estimar un parámetro,
+no me va a funcionar, siempre me va a aparecer o me va a dar la impresión de que
+más parámetros me va a traer el menor error cuadrático medio, que no es el caso.
+Entonces el lambda que elegimos, por ejemplo el lazo,
+va a venir exactamente haciendo esta división acá.
+Y pongo en 5 folds y voy variando el lambda
+y voy evaluando este error cuadratico médio con lambda fijo
+exactamente en un conjunto que no fue utilizado.
+Entonces, esta idea de validar acá, ajustar y validar, no tiene de ninguna manera la información de la prueba.
+La prueba son 171 observaciones que están afuera.
+De las 398 que se quedaron, voy a hacer nuevamente una división y esa división voy a ajustar el modelo y evaluar.
+Ajustar el modelo y evaluar. Y voy a hacer esto varias veces.
+Entonces, es importante dentro de este control de entrenamiento hacer de nuevo una división.
+y esta división será para estimar los parámetros.
+La lambda, una gamma, dependiendo del modelo de Random Forest,
+será la complejidad del árbol
+y la cantidad de árboles que tendremos ahí.
+Entonces cada uno de los métodos de Machine Learning
+tienen parámetros a ser tunados.
+Y acá viene la estimación de estos parámetros
+con el cross validation.
+El cross validation uno hace solamente con el conjunto de entrenamiento.
+Entonces siempre cuando dividimos hacemos el cross validation, cross validation en el conjunto de entrenamiento, encontramos el lambda que va a minimizar
+estas observaciones que se quedaron de fuera.
+Y la pregunta puede ser exactamente, ¿cuánto va a ser mejor hacer la división?
+En 5, 10, si tengo 100 observaciones, hago la división en 99 carpetas, 100 carpetas, o sea 99 para entrenar en una y voy a hacer esto 99 veces.
+Sí, se puede hacer.
+generalmente los softwares ya lo tienen implementado, como ellos lo implementan?
+con esta idea acá utilizando k-folds con cinco en algunos casos y 10 en otros
+conforme vamos aumentando la cantidad de divisiones vamos a tener un costo
+contracional mucho más elevado
+no se si se quedó claro Claudia?
+Sí, escucho. O no quiero el clavo.
+Entonces la idea va a ser ser este tipo de división, ¿cierto?
+Entonces, es muy importante, no es una idea muy sencilla, la primera vez que fui a empezar
+a trabajar con Machine Learning, son como ustedes, 10 años atrás, 8, 9 años, cuando
+empecé a hacer los ajustes, yo no entendía porque tenía un CV en el conjunto de entrenamiento,
+cuando uno va a ajustar eso en, con el GLM por ejemplo, si vamos a ajustar GLM, tenemos
+cv.glmnet acá para encontrar eso. Entonces, ese cv.glmnet hace exactamente esta división,
+pero siempre hace con el conjunto de entrenamiento. Dentro del conjunto de entrenamiento lo dividimos
+y hacemos cross validation. O sea, si usted ve un curso que están enseñando que tiene que ser
+solamente la división entre entrenamiento y prueba, y no le comentan que dentro de ese conjunto de
+hay que hacer una nueva división que es conocida como cross validation,
+le están enseñando malo y ahí están enseñando exactamente como funciona la cosa.
+Dentro de ese proceso, é la forma correcta de hacer.
+Hay un libro de Tibshirani, creo que está como referencia, que es como la Biblia,
+de Statistical Learning, ahí solamente hay un capítulo informando,
+informando de wrong way and the right way to do cross validation, la forma mala y la forma buena de hacer validación cruzada.
+Exactamente eso, hacer la división entre tres partes, entrenamiento, validación y prueba.
+Dividimos en prueba, se va una parte específica, hacemos los ajustes con el culto de entrenamiento y validación.
+y muchas veces eso que nos va a costar principalmente cuando el
+persona trabaja con bases de dados grandes entonces una persona con 100 mil observaciones
+se va a hacer un Leave-One-Out en un cross validation o es imposible.
+¿Cuál es la mejor forma? Utiliza lo que ya tiene el software, realmente un k-fold,
+un pliegue de 5 o 10 capetas, tener una división en 5 o 10 capetas y hace esta forma de ajuste.
+Una cosa que no puede llegar a que hacemos esta división de entrenamiento o validación
+cuando voy mirar ahora el final el conjunto de prueba que tan buenas son las probabilidades
+que me salieron ahí. Ajuste el modelo y ahora voy a hacer la comparación entre la área
+sobre la curva ROC, Brier score, log loss, exactitud, sensibilidad, error cuadratico
+medio, error absoluto medio, entre otros.
+¿Cuál de estos vamos a elegir?
+Bueno, ya sabemos que de las métricas log loss, Brier, el mejor es lo que tiene el menor
+valor.
+La exactitud, sensibilidad y precisión lo mejora cuando tiene un valor mayor.
+Y al final el error cuadrático medio menor es el mejor.
+Bueno, acá vamos a depender del umbral.
+Ya tuvimos esta discusión en algún momento cómo definir este umbral.
+Pero la duda es qué tan buenas son estas probabilidades y cómo podemos compararlas.
+Bueno, le presenté un ejemplo muy hipotético acá, que dependiendo de la métrica, una
+métrica penaliza un poco más y un poco menos los resultados.
+Por ejemplo, el error cuadrático medio.
+Muchas, muchas veces las personas pensan que esto es lo mismo, el error medio absoluto
+y el error cuadrático medio van a informar la misma cosa.
+Entonces, sinceramente, cuando va a ser algún trabajo o algún alumno negativo a hacer una
+él decide apreciar solamente uno. La raíz cuadrada es el error cuadrático medio, solamente el error medio absoluto.
+Uno, recuerda que uno es calculando el sumatorio de lo ajustado menos el observado.
+Uno va a ser el cuadrado, que después sacamos la raíz cuadrada acá, otra.
+hacemos el sumatorio en los cuadrados, después sacamos la raíz cuadrada, dividimos por n.
+En otro caso, en vez de sacar el valor, sacamos el valor absoluto.
+Bueno, podemos sacar la raíz, vamos a sacar la raíz, y en este caso acá no estamos haciendo
+y se va haciendo esto.
+Y tenemos acá.
+Entonces, estas métricas informan lo mismo,
+va a tener el mismo resultado? No.
+Entonces, es muy importante que tengamos en esta idea.
+Algunas de ellas van a penalizar un poco más errores mayores.
+Entonces, una métrica como el MAE,
+le va a presentar, por ejemplo, acá un ejemplo sencillo,
+tenemos los valores que fueron observados,
+con los valores preditos, ¿cierto? Tengo acá 1, menos 2, 3, menos 4 y menos 5, ¿sí?
+Cuando voy a calcular esto, voy a hacer la diferencia entre uno y el otro y voy a hacer
+la soma, estoy sacando el valor absoluto acá, recuerda que es el error medio
+por el valor absoluto, entonces pongo acá un absoluto, si es un absoluto, todo esto
+se cambia como más, ¿cierto?
+Y acá.
+Si eso pasa, voy a calcular esa métrica como 1 más 2 más 3 más 4 más 5 partido 5 acá
+y me va a salir el valor 3.
+Por otro lado, el error cuadrático, medio, después sacamos la raíz,
+va a tener una otra mirada, va a sacar ese valor al cuadrado más ese al cuadrado,
+que será 4, más 3 al cuadrado que será 9, más 4 al cuadrado que será 16,
+y más 5 al cuadrado que será 25.
+Calculamos la medida y luego sacamos la raíz cuadrada.
+Uno acaba siendo 3 y uno será 3.31.
+Lo que está cambiando, la raíz cuadrada del error cuadrático medio penaliza un poco más valores muy discrepantes.
+Entonces ellos informarán una diferencia entre lo que fue predicho y lo que fue observado,
+pero en uno de los métodos va a estar penalizando un poco más errores muy grandes.
+¿Cuál de los dos se puede utilizar? Bueno, necesitan también evaluar cuál de los dos le acomoda más.
+Ustedes pueden informar ya, la empresa que trabaja tiene una pérdida muy grande cuando los errores son muy grandes.
+Entonces se va a penalizar un poco más esos errores grandes.
+Y me voy con la raíz cuadrada del error cuadrático medio.
+Por otro lado, no hay una penalización tan grande, pero solo no quiero errar tanto.
+Podemos ir con el MAE. Algunos de ellos pueden traer, dependiendo de cuál es la métrica que está elegiendo,
+puede también al final acabar elegiendo otro modelo específico.
+Algunas veces tal vez con el error cuadratico medio me salió random forest.
+cuando cambio para el MAE me salió un KNN. Entonces es necesario definir esto antes del inicio del experimento.
+Ambas quedan en las unidades de la respuesta, pero el error cuadrático medio da más peso a errores grandes.
+LogLoss usa la probabilidad de la clase real.
+Entonces tomaron la clase con Eloy.
+como Eloy, entonces Eloy le había comentado cómo funciona el log loss la
+clase real acá en la clase 1 entonces basamos en la probabilidad de la clase 1
+cuando vamos a mirar en la clase 0 tenemos que calcular uno menos la
+probabilidad de que la clase 1 cuando voy a calcular la probabilidad de la
+clase real hace 0.9 0.6 0.35 0.8 porque no tiene menos uno acá porque la
+clase real es uno como estamos hablando con la clase 0 tenemos que hacer el
+complementar y no siempre va a recordar que la probabilidad de Y ser igual a 0
+es igual a 1 menos la probabilidad de Y ser igual a 1.
+Entonces salimos exactamente en esta clase acá.
+Básicamente como se calcula no necesito quedar muy preocupado con
+esto porque al final no tendremos el valor final acá.
+El log loss se calcula, por ejemplo, para una situación donde tengamos distintas probabilidades de clasificar al individuo en la clase específica, dado por ese valor.
+Cuanto más cerca de cero, más cerca de lo verdadero valor, o de lo valor que esperábamos, es mejor.
+Por ejemplo, esto acá, más cerca de 1, o sea, la probabilidad de estar en la clase 1 más cerca de 1, ya va a ser mejor.
+¿Por qué? Porque log de 1 es igual a 0. O sea, la probabilidad de clasificar malo un individuo,
+la probabilidad de clasificar un individuo como 1, acá, es muy alta, 0.9.
+Entonces log de 0.9 es 0.10. ¿Cuánto? Mayor la probabilidad en la clase 1,
+más cerca del valor 1 acá, y más cerca ese valor va a estar de 0.
+Sólo para tener una idea después de por qué calculamos el promedio.
+Seleccionar y evaluar son tareas distintas.
+Es importante definir la unidad de separación y la métrica relevante.
+Por eso ya le comenté.
+Tenemos que definir cómo vamos a hacer esta separación
+y cuál métrica es relevante para nosotros.
+No es siempre una tarea muy sencilla.
+Muchas veces no es bueno dejar
+en la mano de una inteligencia artificial para que lo haga.
+Ya no va a meter los datos ahí,
+un programa como un Codex o un Claude, le pide para hacer los ajustes, le va a salir algunos resultados,
+y no sabe por qué elegieron esa métrica, cuáles son los resultados, lo que esto está influenciando,
+lo que cambia cuando salimos del error cuadrático medio, del absoluto.
+Entonces, los detalles son lo que hace la diferencia.
+Y entonces, es importante que conozcan los detalles porque muchas veces eso le va a pasar.
+Es importante. Sí, Gustavo?
+Sí, profesor, ¿puede explicar nuevamente, por favor, qué es lo que calcula el log loss exactamente?
+Bueno, el log loss va a tener la clase real y va a calcular la probabilidad de la clase real.
+Acá la probabilidad de la clase real es probabilidad de la clase 1 y las clases observadas.
+Entonces, él quiere calcular la probabilidad de que Y sea igual a 1.
+Entonces, la probabilidad es la clase real, queremos intentar maximizar esta probabilidad.
+Entonces, vamos a calcular, por ejemplo, para un caso específico, la probabilidad de Y ser igual a 1 fuera de 0.35.
+Es decir, es más probable que el individuo esté acerca de ser una clase estimada, va a ser igual a 0 o que va a ser igual a 1.
+1, ya, eso va a depender del umbral que tenemos, pero ese valor acá le va a poner más cerca de 0.
+La probabilidad de Y ser igual a 1 para ese individuo fue de 0.8, ya. Entonces,
+ese log loss va a medir exactamente la probabilidad de la clase ser igual a 1. Básicamente eso.
+Perfecto. Ok, o sea, el logaritmo final...
+¿Por qué tiene el mismo formato acá? ¿Por qué? ¿Sí?
+Sí, creo que ya lo entendí, profesor, el logaritmo al final premia mientras la probabilidad es más alta, o sea, más cercana a uno, premia eso y castiga cuando la probabilidad es más baja.
+Mira, por ejemplo, acá la probabilidad era muy baja, entonces se castigó alto, se ha tenido un castigo muy alto, un valor de 1.0.
+Si el valor es muy pequeño, como 0.10, ese valor acaba siendo muy grande.
+De hecho, conforme muy pequeño, ese valor va tendiendo al infinito.
+Entonces, él castiga muy grande ese tipo de probabilidad.
+Ok, super. Gracias, Gustavo.
+Entonces, bueno, tenemos que hacer el ajuste con nuestro conjunto de entrenamiento disponible.
+Vamos a ajustar nuestro modelo solamente con nuestro conjunto de entrenamiento.
+vamos a evaluar en un conjunto de prueba sin volver a elegir nada.
+En el conjunto de prueba no se estiman parámetros,
+no se va a hacer selección de modelos acá en términos de
+ya me voy con un A, con una regresión logística, con 3, 4, 5 parámetros.
+Y eso si vamos a hacer regularización, tiene que ser hecho dentro del conjunto de entrenamiento.
+Entonces, evaluar el desempeño en prueba sin volver a elegir esos hiperparámetros.
+Al final vamos a cuantificar la incertidumbre de esta evaluación.
+Este paso hasta acá, paso 4, ustedes ya vieron en clases anteriores.
+Pero le va a que uno por informar a mi queda saber cómo evaluar la incertidumbre de esta evaluación.
+Me salió un AUC de 0.98.
+¿Qué puedo hacer con eso?
+Yo tengo otro modelo que tiene un AUC de 0.94.
+¿Son distintos?
+Me parece que sí, pero tenemos que evaluar la incertidumbre que tenemos en nuestra muestra.
+Entonces hoy vamos a profundizar el quinto paso.
+Bueno, un ejemplo muy sencillo acá para que tenga una idea de cómo va a funcionar más
+o menos cuando vamos haciendo una cosa que es conocida como bootstrap.
+Yo ajusteo el modelo con un conjunto de entrenamiento.
+Ajusteo el modelo con un conjunto de entrenamiento, pero no utilicé solamente el entrenamiento,
+utilicé la validación para encontrar los hiperparámetros. Entonces acá ya tengo el
+modelo ajustado. Este paso acá ya me va a dar el modelo ajustado y con ese modelo me voy a seguir adelante.
+Bueno, ahora me llegó a... yo tengo el conjunto de prueba. Este conjunto de prueba que tengo son
+son 100 observaciones. La exactitud de este valor, la exactitud que tengo con estas 100 observaciones
+me salió de 0.9. O sea, yo dividí entre entrenamiento y validación. Dejé como 800 observaciones
+para hacer el entrenamiento y 100 observaciones para hacer la prueba.
+80 para entrenar, 800 observaciones para entrenar, 100 observaciones para hacer la prueba.
+Cuando yo calculé la exactitud, la acuracia, en ese modelo me salió con una acuracia de
+0.9 en esas observaciones.
+Y la pregunta que uno puede tener, si yo cambio un poco esa muestra, si cambio un poco esa
+Si cambia un poco esta muestra de prueba, como me va a salir?
+Lo que yo acabé haciendo fue una cosa conocida como bootstrap.
+La idea de bootstrap es la siguiente.
+Voy a tener que avanzar un poco para que veas lo que es bootstrap.
+Después voy a ver anteriormente para que tenga una idea.
+Vamos a suponer que yo tengo 5 observaciones.
+2, 4, 5, 7 y 8, me salieron esos valores.
+En ese grupo, yo quiero construir una nueva muestra.
+Yo tengo la muestra original que tiene los valores 2, 4, 5, 7 y 8.
+Lo que hace bootstrap,
+va a construir una nueva muestra
+por medio de un muestreo con reposición.
+Es decir, voy a poner todo esto dentro de una caja y voy a sacar uno
+y el primero que me salió fue 4, ya?
+Ahora me salió 4, voy a dejar acá este valor, pero voy a poner de vuelta.
+Yo tengo allá que esta observación fue la 2, me salió la 2 con esta punta de 4.
+Pero es con reposición, entonces voy a poner nuevamente dentro de la caja.
+Voy a seleccionar los puntos, después de me salió la misma observación,
+fue lo que me pasó acá, me salió la misma.
+Ya? Entonces, nuevamente, 4 e 4.
+Después me salió el 2, cuando fui sacar.
+Después el 8 y después el 5.
+Mira que acá me quedó de fuera el 7.
+Pero no hay problema, acá ya tengo una muestra.
+Esa es la primera muestra que tengo bootstrap.
+Ahora voy a hacer el mismo paso de nuevo con reposición.
+Saqué la primera muestra, fue 8.
+Saqué la segunda, 8. Saqué la tercera, 7.
+Saqué la cuarta, 5.
+Y saqué la quinta, la muestra cinco, y me salió ocho.
+Mira que tengo ocho acá tres veces. Uno, dos, tres.
+Tengo un siete, tengo un cinco, y me quedó de fuera dos y cuatro.
+Ya, no importa. Tengo ahora acá una nueva muestra.
+Cada una de esas muestras deberían ser distintas,
+o la mayoría de las muestras van a ser distintas.
+Yo puedo repetir ese paso un montón de veces, ¿cierto?
+O sea, por evaluar cómo esto va a funcionar en distintas muestras o submuestras que fueron construidas de la muestra originaria.
+Algunas muestras van a ser muy extremas.
+Por tener una situación, voy a tener 8, 8, 8, 8 y 8.
+En nuestra situación 2, 2, 2, 2, 2. No me importa.
+Ellos van a tener métricas distintas.
+mira que el promedio acá fue 4,6, 7,2, 4,
+pero esto va a ocurrir o puede ocurrir o debería ocurrir
+si vamos sacando dentro del universo
+o dentro de nuestra población,
+si vamos sacando pequeñas muestras ahí.
+Entonces, esto podría ser una buena representación.
+¿Por qué le comento eso?
+Porque acá cuando sacamos 100 observaciones,
+voy calculando nuevamente la exactitud o la acuracia en cada una de estas nuevas observaciones
+que construimos, algunas van a ocurrir casi con una gran frecuencia de veces 0.9, pero
+en algunas situaciones se va cambiando un poco los valores y se va alejando del valor
+promedio, pero lo cuanto se va alejando, entonces uno puede construir la distribución de esta
+exactitud con base en un mostreo con 100 observaciones, ¿cierto?
+Lo que puede pasar conforme voy aumentando el número de replicaciones que voy haciendo,
+vamos teniendo un poco más de información y un poco más de acuración, entonces va
+a ser quedando más preciso en termos de un promedio que debería ser el verdadero, el
+promedio va a ser el verdadero, 0.9, pero yo puedo saber hasta dónde él está variando,
+Esto es genial porque ahora, con base en una idea como esta,
+de poder intentar empezar a construir intervalos para la exactitud,
+intervalos para los errores cuadráticos medios,
+intervalos para las áreas sobre la curva ROC,
+y por comparar distintos modelos.
+Este modelo no salió bien, solamente en este punto de prueba,
+si cambia un poco el punto de prueba, cómo va a funcionar.
+Podemos hacer este tipo de comparación.
+Bueno, uno puede intentar construir intervalos aproximados, ustedes saben cómo construir
+intervalos, esos intervalos aproximados por supuesto, van a depender del tamaño de cuantas
+replicaciones lo hacemos, conforme vamos teniendo más replicas más se va acercando en termos
+de lo verdadero, pero nuestro objetivo acá es que estos intervalos son aproximados y
+bueno la dependencia entre los casos va a exigir un otro análisis, esa no va a ser la
+mejor forma de construir los intervalos.
+Básicamente yo estaba mirando el valor P, la exactitud y estaba intentando calcular el
+error cuadrático medio con base en esta información, pero ahí no estoy evaluando exactamente
+los puntos distintos. Voy a enseñar cómo calcular eso
+del punto de vista de bootstrap, que ahí sí va a ser mirando distintas muestras.
+Bueno, la cantidad, vamos a hacer la desviación estándar de los datos, que varía las diferencias
+entre las observaciones. El error estándar de una estimación, que varía la media, el
+log loss o otra estadística al cambiar la muestra. Podemos hacer distintas compras acá entre sí e estimar
+su media con bastante precisión, si tenemos muchas observaciones independientes.
+Esto es cuando yo quiero calcular un intervalo de confianza para la media.
+Entonces, es importante que ustedes entendan más o menos cómo funcionan los intervalos.
+Recuerden que el intervalo es, voy a calcular el valor promedio, después voy a calcular
+más o menos un valor de una distribución normal, veces un error estándar.
+Conforme tengo más observaciones, menor va a ser el intervalo.
+Y cómo construir intervalos de confianza acá,
+con por ejemplo 95% de confianza, más o menos como las encuestas que hacemos para las elecciones,
+uno espera que algunas veces este valor o el verdadero valor va a estar,
+no va a estar incluido, no va a estar dentro del intervalo.
+O sea, acá lo que yo intenté hacer fue
+generé valores con una media 0 de una distribución normal y una desviación estándar con valor 1.
+Una muestra de... el valor era una muestra de tamaño 30 y yo repití eso con 40 muestras normales.
+Ya entonces acá usted una muestra, acá usted otra muestra, acá usted otra, otra hasta tener 40,
+acá. Cada una de esas muestras tenían 30 observaciones, podrían tener 100,
+poder tener 200, pero yo elegí tener 30. Son 40 que estoy replicando solamente para que vean lo que pasa.
+De esas 40 observaciones, cuando fui construyendo los intervalos de confianza, dos de ellos no tenían el valor 0.
+Fueron intervalos más extremos. Un de los intervalos tenía valor en 0.01 hasta 0.8.
+En otro caso tenía menos 0.1 hasta menos 0.8. Son valores extremos.
+Entonces, cuando vamos a hacer la repetición en este proceso,
+esperamos al final que 95% de los intervalos
+deben contener el verdadero parámetro.
+Es solamente un repaso de lo que es intervalo de confianza.
+Bueno.
+Ahora tenemos hasta la nuevementos, una hora y diez,
+y después tenemos que pasar un poco más.
+[Pausa: recreo hacia 0:47:31 del video aprox. El video no contiene el tramo del descanso (no hay silencio ni audio intermedio); la clase continúa directamente con el regreso del recreo.]
+Bueno, los modelos se comparan en los mismos casos.
+Vamos a suponer que hay un caso difícil acá para hacer la comparación.
+Tengo casos 1, 2, 3 y 4. La clase real fue 1, parece caso 2, la clase real fue 0,
+parece caso 3, la clase fue 1 y 4 fue 0.
+Cuando fui a ajustar con modelos, modelos distintos, por ahí acababa
+llevando a distintos o puede ser que fine.
+Entonces vamos a poner que en esta clase acá, la clase real fue 1.
+tanto el modelo A como el modelo B me dieron altas probabilidades de estar incluidos en la clase 1.
+Entonces la probabilidad fue alta,
+estoy calculando la probabilidad de ser igual a 1 acá,
+entonces este valor vamos a clasificar como 1.
+Siempre acabo de calcular la probabilidad de que Y es igual a 1.
+Entonces siempre recuerden que estos modelos que ajustamos
+siempre calculan este tipo de probabilidad.
+Estoy resumiendo que en el modelo se puede calcular esta probabilidad, por ejemplo, un
+suporte vector machine no se puede hacer eso. Pero vamos a suponer que ustedes están
+con una regresión logística, random forest, una árbol, KNN o alguna cosa así. En el
+caso cero, por ejemplo, la clase real es cero. La probabilidad de ese igual a uno fue
+muy pequeño 0.2 0.5 por supuesto todo va a depender de umbral, es muy
+probable que vamos a clasificar este individuo como 0 en ambos los casos
+estos dos primeros casos muy sencillos pero estas situaciones acá ya me
+complica un poco más en este modelo la clase real es uno y el
+modelo ambos están indicando que si ponemos un umbral de 0.5, que vamos a
+clasificar este individuo como cero, ya, pues vamos a ver un error acá. Y acá lo mismo,
+si la clase es cero, vamos a tener ahí una indicación alta de que, o mayor que 0.5,
+de que ser igual a 1. Entonces, las dos comunes están empareadas por observación. Vamos a mirar
+eso y podemos intentar tener que poner, voy a dejar acá de observación, un caso muy difícil
+por hacer que ambos los modelos fallen, uno fácil por favorecer a ambos, ya, pues muchas
+veces podemos tener casos muy difíciles y modelos van a tener distintos valores o pueden llegar en
+un consenso. Por eso es importante de alguna manera evaluar, bueno vamos a evaluar los intervalos de
+esos valores. Ahora el objetivo que tenemos es medir este tipo de variabilidad.
+Una de las cosas que debemos tener cuidado es que la variabilidad se va a calcular de una forma distinta,
+no voy simplemente a calcular el error cuadrático medio de estos valores.
+Dentro de estos valores voy a mirar la variancia, lo cuanto están variando en términos del promedio,
+ya, y calculo la desviación estándar y después voy a construir intervalos más o menos con ese valor.
+Entonces, el desvío describe las diferencias entre esas evaluaciones. Los modelos de los
+pliegues comparten gran parte del entrenamiento, pero no tratamos los cinco resultados como
+cinco muestras independientes. Bueno, la media, más o menos un desvío, no es un intervalo
+de confianza de 95% que hay en esta situación. Entonces, acá lo que quiero comentar es que
+a mí me gustaría intentar construir un intervalo para este error cuadrático medio, pero no vamos
+Vamos a hacer simplemente como ok, saco el promedio, tengo la deviación, voy a calcular
+como la media más o menos la deviación, no va a funcionar así.
+Que incertidumbre queremos estudiar, entonces este paso es muy importante, cuanto varía
+la evaluación de este modelo fijo, que debemos cambiar, en los casos de evaluación manteniendo
+el modelo, entonces vamos a mantener siempre el mismo modelo que fue ajustado y ahí vamos
+evaluar cómo él cambia con base en un cambio en la base de la prueba.
+¿Cuánto varía el modelo si lo vuelvo a entrenar?
+Bueno, eso podría ser una pregunta, los dados de entrenamiento y el proceso de ajuste.
+Ahí tenemos que cambiar estas informaciones.
+Pero acá no vamos a entrar mucho en esta discusión para que no se complique mucho
+la cosa.
+Bueno, vamos a hablar exactamente como hacemos eso, pero antes una información que es muy
+importante que no sé si le pasaron acá, una forma de evaluar modelos de una forma
+un poco distinta, teniendo en cuenta la penalización.
+Esta es una media que es muy importante porque muchas veces ustedes van a encontrar esto
+en varios artículos de estadística, artículos de modelos de comparación, siempre va a haber
+una media conocida como el AIC, es un ajuste o una forma de ajustar el modelo
+que va a tener un tipo de penalización específica, entonces el modelo ya tiene una forma de
+penalización cuando vamos a ajustarlo de forma a intentar tener un modelo más parsemonioso,
+modelo más adecuado. Una de las formas puede ser por el error cuadrático medio,
+Una otra forma que muchos estadísticos les gustan utilizar es por medio del AIC.
+¿Cuál es la mejor? Bueno, ellos van a tener ideas distintas, pero muchas veces...
+Bueno, no van a tener que elegir eso antes de hacer el experimento.
+Realmente el AIC es una métrica un poco más complicada de se ajustar, principalmente cuando uno va a trabajar con modelos no paramétricos.
+Por ejemplo, estas métricas no son comparables en varios tipos de modelos que vamos a utilizar.
+Entonces, por qué me está presentando? Porque varios de los modelos paramétricos o algunas estructuras de modelos semi-paramétricos utilizan esta idea de AIC.
+Entonces, si ustedes van a evaluar trabajos, van a dar una mirada entre los que otras personas lograron hacer,
+es una métrica que va a intentar que es utilizada que intenta utilizar el
+equilibrio entre ajuste y complejidad. Bueno, cuál va a ser la idea acá?
+La complejidad del modelo va a ser escrita, el ajuste del modelo va a ser
+descrito exactamente por el valor que viene de la verosimilitud maximizada.
+Tenemos que aclarar acá el estimador de máxima verosimilitud. Por ejemplo, me llega
+una distribución, yo quiero intentar hacer predicciones en un modelo específico, con
+regresión logística por ejemplo, yo construo la verosimilitud, encuentro el punto que maximiza
+la verosimilitud, ya, y bueno tenemos que hacer selección de variables acá, una forma
+que yo le comenté es por medio de regularización, una otra forma es por medio del AIC, ya,
+usted puede ajustar todos los modelos posibles ahí, puede ser varias selecciones de los
+va a tener que hacer un montón de ajustes, pero al final el mejor modelo va a ser lo que va a tener
+este menor métrica. Lo que ella hace, ella va a penalizar la adición de parámetros, entonces ella hace
+un tipo de penalización exactamente por ese 2p. Vamos a ver entonces el log de la verosimilito
+maximizado, la cantidad de parámetros estimados incluido el intercepto, la recompensa por el ajuste
+venir por esta parte, esta parte acá. Entonces, esta parte me va a dar la recompensa del ajuste.
+Y es una cosa muy importante porque si yo tengo 1, 2, 3, 4, 5 parámetros, este valor va a ser
+siempre menor que éste, y va a ser menor que éste, y menor que éste, y menor que éste.
+Entonces, el log maximizado, el menos 2 log, en el conjunto de entrenamiento,
+siempre va a ser menor conforme va aumentando los parámetros.
+Por que? Cuando yo agrego un parámetro,
+ese parámetro puede tener una ganancia muy pequeña,
+pero está mejorando un poquito el modelo.
+Y va a ser con que ese valor sea menor.
+Pero ustedes van a ver que,
+a veces, voy a tener un valor acá.
+O perdón, este es...
+ese es menor que ese, ese valor va a ser menor, menos 2 log
+el problema es que tenemos que elegir lo que tiene el menor valor
+pero si vamos a elegir lo que tiene el menor valor acá
+ah no, entonces es al revés
+siempre será mejor si multiplicamos por menos
+este valor será cada vez menor conforme vamos haciendo más información
+entonces conforme tenemos un parámetro, vamos a tener un valor de 300
+ya? me confundí con eso
+cuando voy a ajustar con 2
+este valor será un poco menor
+258
+este es mayor que este, exacto
+Entonces conforme voy agregando más parámetros ese valor
+debería ir indo para cero. Entonces ese va a ser siempre mayor que ese, va a ser
+siempre mayor que ese, va a ser siempre mayor que ese por adelante. El AIC uno va a
+elegir lo que tiene el menor AIC. Entonces usted podría decir, ¿que es profesor?
+Entonces tenemos que hacer eso, tenemos que elegir el modelo que tiene más
+parámetros. Conforme vamos poniendo más parámetros se va a quedar mejor el
+ajuste y va a ser menor. Pero el problema es que en algún momento
+el empieza a sumar valores acá, 2p. Entonces vamos a suponer que yo tengo
+primeramente 300, acá más 2. Cuando ajuste el modelo me caí para 290, más 4,
+ser 294 cuando ahora tengo tres parámetros me caí para 289
+mira que el cambio que te ve de acá para acá fue muy grande te veo una
+diferencia de 10 pero el cambio que tuve de acá para acá
+fue muy pequeño fue solamente de uno ya pero ahora yo tengo tres parámetros
+Entonces cuando adiciono 6, este acá pasa a ser menor que este, acá voy a tener 295 y acá 294.
+Entonces este modelo de alguna manera va penalizando la complejidad, entonces este más 2 penaliza la complejidad.
+si tengo tres parámetros ok la verosimilitud de una ganancia de información pero la penalización
+ahora es muy grande de forma que hace con que ese modelo sea el mejor de algún punto acá vamos a
+encontrar que el mejor modelo es lo que tiene menor AIC ya bueno eso ese modelo hace un tipo de
+penalización uno puede formar ya por qué está utilizando la penalización 2p acá y que fue la
+persona que proponió este método Akaike Information Criterion que es el AIC y lo
+acabó proponiendo después venido otras personas informando ya eso no me parece
+una buena penalización y demuestro que otra penalización puede ser más
+interesante ya como elegimos el modelo el menor AIC es el preferible ya lo que
+tiene mejor ajuste es lo que tiene menor AIC
+Entonces es un posible modelo. Bueno, por ejemplo, en el ejemplo de la regreso logística
+vamos a ajustar el modelo, cuando fui a ajustar el log de la verosimilitud con el punto máximo
+me salió ahí menos 1.88. Fui calcular el log loss acá, me salió 0.47. Una logística
+con intercepto con p igual a 3, acá voy a calcular ahora esta regresión logística
+con diferentes tipos de parámetros. Vamos a suponer que acá tengo el máximo de la
+regresión logística que fue ajustada con determinado tipo de parámetro.
+Con tres parámetros me salió menos 80. Cuando voy a calcular el AIC me salió 166.
+la cuenta va a ser el log más la penalización, dos veces este punto acá, dos veces este punto acá
+ahora voy a calcular el modelo B que tiene cinco parámetros, entonces necesito agregar un poco más de covariables ahí
+ya con cinco parámetros menos dos veces
+lo que me sale en la verosimilitud en este punto acá o en esa cuando podemos estos valores acá
+en esta verosimilitud me salió menos 76, entonces cuando calcule la regresión logística con 5 parámetros
+el log verosimilitud es menos 76, entonces voy a calcular menos 2 veces menos 76 me va un valor positivo
+y después va a ser 152 y después hago una penalización de 10, entonces el valor me salió 162
+pero mira ahora cuando voy a intentar adicionar 8 parámetros acá la ganancia de información fue
+pequeña solamente bajó de 76 para 75.5 entonces cuando voy a calcular menos dos veces de ese
+vamos más la penalización vuelve aumentar y ahí el modelo me va a informar que lo que está teniendo
+la mejor o la mejor mejor ganancia de información acá es el modelo b un modelo con cinco parámetros
+Entonces tenemos acá tres modelos hipotéticos ajustados por máxima verosimilitud con
+cien observaciones. C tiene la mayor log de verosimilitud,
+C tiene la mayor información de verosimilitud pero tiene muchos parámetros.
+Entonces cuando vamos a utilizar la penalización el B me sale mejor.
+La mejora de ajuste de C no compensa su mayor número de parámetros según el AIC,
+el modelo va a penalizar la complejidad. Bueno, esta es una forma de hacer la penalización,
+derivar una otra versión, simplemente cambiando acá 2p por p,
+veces log n. Entonces ahora la penalización también va a depender del tamaño de la muestra.
+Esto es conocido como BIC, o Bayesian Information Criteria.
+entonces ellos tienen diferentes formas de penalización en este caso n va a ser la
+cantidad de observaciones utilizadas en el ajuste, p va a ser la cantidad de parámetros
+ajustados igual estamos haciendo anteriormente pero ahora en cuanto el AIC
+suma solamente 2p, BIC va a penalizar por log de n, ya, como logaritmo natural.
+lo que eso implica, es decir, lo que BIC intenta informar es conforme vamos a tener más observaciones
+no quiero tener un modelo tan complejo, entonces el AIC no penaliza, por ejemplo, siempre cuando
+tengo mucha información, si usted tiene una verosimilitud con 200 mil observaciones,
+el valor va a ser muy grande, entonces penalizar solamente con 2p ahí puede no ser interesante,
+Entonces, en especial, es más importante penalizar teniendo alguna métrica basada
+en el tamaño de la muestra.
+Es decir, si tenemos muchas observaciones, vamos por un modelo más sencillo o por un
+modelo más completo.
+El AIC va a informar, si usted tiene muchas observaciones, si hay una pequeña ganancia
+de información, aún vale la pena.
+En cuanto el BIC lo va a penalizar de forma muy grande en tamaños de muestras.
+ejemplo con observaciones de tamaño 100 la penalización ya me sale 4.6
+en cuanto el AIC me sale solamente 2 o si tengo 1000 observaciones acá la
+penalización es mucho mayor si tengo 100 mil observaciones la penalización es muy
+grande, entonces él de alguna manera penaliza modelos conforme tenemos
+muestras muy grandes, intenta buscar modelos más sencillos entonces entre
+modelos comparables, nuevamente un BIC menor es preferible. Acá penaliza más la complejidad
+del modelo, entonces si tenemos muchas observaciones, va a penalizar mucho más modelos completos.
+Entonces el mismo ejemplo que tenemos acá, lo que me pasa es que el BIC acaba elegiendo el
+modelo A. Entonces vamos a poner con los mismos datos, modelo A, modelo B, modelo C y cien observaciones.
+Tenemos los mismos valores de verosimilitud, los mismos números de parámetros, pero cuando voy a
+calcular el BIC me sale un valor de menos acá, 173, acá 175 y acá 187. Entonces con el AIC
+elegimos el modelo B, pero si miramos vía BIC, debemos ir con el modelo A.
+Entonces BIC favorece el modelo A, la mejora del ajuste no va a compensar su penalización adicional.
+Entonces él intenta buscar un modelo más sencillo, con una menor penalización, informando que eso
+debería ser el mejor. Entonces el AIC y BIC por elegir distintos tipos de modelos. El AIC busca
+equilibrar el ajuste y la complejidad con enfoque predictivo, en cuanto BIC tiene una motivación de
+evidencia entre modelos. Bajo supuestos, aquí favorece más la parcimonia. Entonces el BIC
+tenta tener un modelo con más parcimonia. No comparamos un valor de AIC con un valor de BIC,
+siempre importante calcular el BIC para todos los modelos o el AIC para todos los modelos. No hay
+hay un ganador universal entre los criterios, si el objetivo es predecir, contrastamos con
+la validación fuera del ajuste.
+Y entonces, esto puede ser una forma, pero acá vamos a mirar también, desde el punto
+de vista evaluando la base, el conjunto de validación.
+Hace ese momento no le comenté nada sobre el conjunto de validación, el conjunto de
+prueba.
+¿Por qué?
+Muchos estadísticos utilizan eso para describir el pasado.
+Entonces ponemos toda la base y ajustamos y eso va a ser lo que tiene mejor ajuste y a penalización del modelo.
+Entonces varios de los trabajos voy a encontrar los ajustes vía AIC o vía BIC.
+Bueno, uno va a tener también la dificultad informaria.
+Muchas veces la ganancia de información es pequeña.
+Por ejemplo, de un modelo para el otro me salen 166 y 162.
+tenemos que elegir lo que tiene el menor AIC o lo que tiene el menor BIC.
+Pero muchos van a ver que muchas veces la diferencia es de 4, o por ejemplo en
+otro caso 5. Esto es conocido como Delta AIC.
+Bueno, no existe, no va a existir un AIC o un BIC absoluto que va a garantizar un buen modelo.
+Todos los candidatos podrían predecir mal, y eso es una información muy importante
+los que utilizan el AIC o BIC. He hecho varias revisiones de artículos, encuentro que uno
+apresenta el AIC, el BIC y forma ya, el mejor es lo que tiene el menor valor, sí, pero
+una situación es que todos ellos pueden ser malos para hacer la predicción, porque no
+está describiendo bien el conjunto que valoramos fuera del ajuste, sí, entonces ese modelo
+es muy bueno para describir el pasado, pero puede no ser muy bueno para hacer las predicciones,
+Por eso que realmente vamos por otras métricas, como el error cuadrático medio,
+el área sobre la curva ROC, entre otros, ya, en el conjunto de validación.
+Profesor, si usted está comentando que vamos ya con los otros métodos o con las otras métricas,
+por qué me está presentando el AIC y el BIC?
+Porque es una métrica que muchos estadísticos, que mucha gente utiliza para hacer selección de parámetros,
+selección de modelos.
+Y bueno, como ustedes están conociendo todas estas métricas, es muy importante que conozcan el AIC y el BIC.
+Bueno, yo tengo 100 artículos publicados.
+De estos 100 artículos publicados que tengo, 670 artículos, yo utilizo el AIC o el BIC para hacer la selección de los modelos.
+Es una métrica muy común que muchos estadísticos utilizan.
+Si uno va más por la mirada de Machine Learning, solamente de Machine Learning, miramos por otras métricas como el AUC,
+el RMSE, entre otros. Pero si ven el AIC en algún momento ya saben que tiene esa idea.
+¿Cuándo comparar AIC y BIC? La misma respuesta, las mismas observaciones para todos los modelos.
+Y las verosimilitudes tienen que ser comparables y ajustadas por máxima verosimilitud.
+Entonces estas métricas son muy restritivas, por eso que ustedes no van a ver con mucha frecuencia.
+Por ejemplo, no por aplicar esto indiscriminadamente, un modelo como Support Vector Machine Isolation Forest,
+Random Forest, o regresiones logísticas penalizadas.
+Por ejemplo, el Support Vector Machine no me va a salir en el AIC, porque no tengo una verosimilitud en el Support Vector Machine.
+Entonces, ni siempre vamos a alcanzar a calcular esto.
+En esta clase, logísticas sin penalización, con éstos predictores podemos utilizar, pero
+no aplicamos éstos criterios habituales indiscriminadamente, en Support Vector Machine, Random Forest, entre
+otros.
+E ésto es importante, a la vez, yo cometí un error, cuando no conocía muy bien esta
+idea, yo ajusté un modelo semi-paramétrico, me salió un AIC menor, y yo pensaba que era
+el mejor modelo porque tenía el menor AIC.
+la verosimilito no era comparable, entonces yo no podría haber hecho esta comparación,
+¿cierto? Pues eso no se puede hacer. La verosimilito tiene que ser comparable, por eso que mucha
+gente no va a ver estos métodos indiscriminadamente durante las comparaciones con modelos no paramétricos.
+Por ejemplo, vamos a mirar un ejemplo sencillo acá, donde tenemos una variable de respuesta
+Y, en el caso de Wisconsin, con tres modelos comparables.
+Vamos a ver un modelo simple que va a tener solamente dos variables, radio y textura,
+un modelo intermedio que tiene tres y un modelo amplio que tiene radio, textura, suavidad y concavidad.
+Acá yo tengo tres parámetros a ser considerados.
+Pero profesor, tenemos la variable respuesta Y.
+¿Por qué tenemos tres parámetros acá? ¿Alguien tiene alguna idea?
+Tenemos el beta 0, más beta 1, x1, más beta 2, x2.
+Entonces tenemos 1, 2 y 3.
+x1 será radio, x2 será textura.
+entonces tengo 1 2 3 parámetros, voy a adicionar ahora una x3 acá
+x3 voy a tener 4 parámetros y por allá adelante
+entonces es por eso que p igual a 3 y no va a ser lo mismo que tener acá, tener intercepto también
+entonces voy a calcular la verosimilitud con la regresión logística, me salió eso
+me salió esto con el AIC cuando fui a considerar la penalización y estos acaban de ser el BIC.
+Una cosa interesante es que en esta situación específica ambos los modelos dieron el mejor
+valor para el modelo amplio. Entonces con cuatro covariables radio, textura, suavidad y concavidad
+y yo tuve el mejor ajuste. Ambos favorecen al amplio entre estos candidatos. Bueno, los
+171 casos de prueba no intervienen acá, entonces acá no estoy me preocupando en hacer la selección
+o elegir el modelo en ese conjunto total acá. Bueno, ajusté, elegí el parámetro y el
+el conjunto de entrenamiento, pero la prueba acá no me está influenciando nada.
+Nos recuerda que hacemos el ajuste en el conjunto de entrenamiento.
+Acabé elegiendo acá el modelo amplio en el conjunto de entrenamiento
+y después evaluamos cómo va a salir el conjunto de prueba.
+Como no puedo calcular eso, en R uno ya tiene bien implementado,
+me va a salir exactamente con el A y C y pongo los modelos que ajuste.
+Acá vamos para donde yo tengo la función AIC, también ustedes verán en el código,
+va a salir simplemente con el modelo simple el .aic, se pone después ajustar el modelo
+.aic le va a salir lo ajuste, ya?
+El BIC me sale con la función BIC, modelo y pongo los modelos que quiero ajustar, lo
+que sería el modelo simple, va a ser el modelo que viene ajustado con un glm, ¿certo?
+un modelo glm, después de ajustar el modelo glm solamente escribo en R, BIC, él me
+pasar el ajuste, y voy a mostrar eso en un ratito.
+Cuando estén en la base acá, déjenme abrir.
+Es la misma que compartí con ustedes.
+Pego la base de Wisconsin y logre la división de entrenamiento y
+la validación, ajusté varios modelos glm acá, un modelo simple, un modelo intermedio
+y un modelo amplio. Voy a calcular el AIC, le va a salir AIC, modelo simple, modelo intermedio,
+modelo amplio. Tabla AIC, tabla BIC y hago un print en tres. Vas a ver exactamente los
+resultados que tenéis ahí.
+Bueno, ahora vamos para la idea de bootstrap.
+Bueno, partimos por la muestra observada, la funcionalidad acaba de ser, ok.
+Y quiero volver las métricas originales que estamos calculando,
+el error cuadrático medio o la área sobre la curva ROC,
+pero quiero medir, quiero tener una idea de la incertidumbre,
+quiero calcular un intervalo para ella.
+Entonces, vamos a utilizar la idea de bootstrap que comenté.
+Temos la muestra original, voy a crear varias nuevas muestras,
+o sea, remuestra acá, con reposición.
+Cada una de estas muestras va a ser distinta,
+si por ejemplo, yo calculo un promedio de la muestra original,
+con n igual a 5, va a ser 5.2.
+Cuando voy calculando nuevas muestras,
+van a tener valores distintos.
+Esta muestra acá, fue construida con base en esta,
+pero su promedio es 4.6.
+Esta también fue construida con base en esta, pero su promedio es 7.2.
+En promedio vamos a tener exactamente el valor de 5.2.
+Realmente acá el punto con mayor frecuencia va a ser exactamente este, 5.2.
+Pero yo puedo dibujar la distribución, o sea, acá yo puedo tener la distribución de lo que yo puedo esperar,
+esperar por ejemplo para la media o para la área sobre la curva ROC o para por
+por medio del error cuadrático medio y con base a eso por construir sus intervalos
+y no se que tener un intervalo de confianza para la media acá
+simplemente voy mirar en los cuantiles, entonces una remuestra produce una
+estadística, las B estadísticas forman una distribución bootstrap, basicamente
+lo que ustedes hacen en árboles.
+Random Forest, como construimos un Random Forest?
+Vamos tener la muestra original, vamos construir varias,
+nuevas muestras, remuestras, submuestras,
+de cada una de estas vamos construir una árbol.
+Después juntamos esta árbol y tenemos un Random Forest.
+Entonces, Random Forest también utiliza la idea de bootstrap.
+Bueno, este ejemplo que le apresente,
+vamos suponer acá que tengo valores 2, 4, 5, 7, 8,
+fue calcular el promedio, me salió 5.2, sí? Pero dependiendo de cómo me salen las muestras,
+voy a tener valores como de la muestra original era 2, 4, 5, 7 y 8. Los IDs eran 2, 2, 1, 5 y 3.
+Me salió la muestra 2, después la muestra 2, después 1, 5 y 3. Mira que acá no tengo la muestra 4,
+o sea no tengo el valor 7, si?
+fue básicamente lo que tenemos en la figura anterior
+o sea los valores son exactamente 4 que viene de lo ID2
+4 que viene de lo ID2
+o sea el ID2 acá es 4
+se estrenan 2 4, el valor 2, 8 y 5
+la media es 4.6
+cuando yo saco otra muestra
+me salió esos valores
+y ahora tengo una media de 7.2
+una otra muestra
+4.0, miren que los valores ahí están variados
+al final se va a construir una distribución bootstrap con 2000 replicaciones
+voy a tener exactamente este formato acá
+lo interesante es que el bootstrap nos ayuda a construir exactamente la distribución que debería para este tipo de muestra
+Entonces mira que ya tiene un formato no regular, no es exactamente una normal porque no tenemos muchas observaciones,
+pero es una buena representación, entonces acá es el promedio 5.2, pero si yo quiero construir intervalos,
+voy a mirar los cuantiles y puedo saber exactamente cuál es el intervalo de confianza de la media.
+Entonces el histograma muestra las medias de las remuestras, los 5 dados originales,
+si no vamos a usar los 5 dados originales pero de varios de los valores mira que en casi 250 de las
+muestras que yo generé y estaba cerca de los 5.2 si la gran cantidad de veces va a estar cerca
+de donde debería pero va a tener valores ahí muy discrepantes que va a acabar llevando situaciones
+donde por ejemplo yo tengo una situación donde tengo 8 8 8 8 8 va a ser 5 valores 8 entonces el promedio
+va a ser este valor extremo. En otra situación tengo solamente valores 2,
+entonces el promedio también va a ser 2.
+Entonces pueden tener estas situaciones.
+Bueno, el error estándar de la distribución bootstrap.
+Sólo para ilustrar tenemos 5 estimaciones bootstrap.
+4.6, fue lo que salió acá.
+7.2, fue lo que me salió acá.
+4.0 fue lo que me salió acá y después yo rendí más dos, dos muestras, de esas dos muestras saqué 5.2 y 6.0.
+Bueno, cuando voy a sacar un promedio de esas muestras, yo espero que él empiece a estar cerca
+del verdadero promedio que tenía acá, del original. Entonces, como tengo pocas submuestras,
+este valor está un poco lento, 5.4
+y bueno, por calcular el intervalo
+acá, este valor me va a ser 1.24
+mira que lo interesante es que
+conforme voy aumentando, diferente del
+intervalo que yo había comentado anteriormente acá
+esto va a tener una distribución, ¿cierto?
+conforme voy aumentando para 2.000 valores
+voy alcanzando a estimar exactamente
+cuál es la variancia de esta distribución
+eso no va a ser, entonces el boost-tep no va, me va a generar exactamente la distribución de la
+media de la muestra para estas cinco observaciones, este valor no va a ser,
+él va a converger para la verdadera variancia, con cinco observaciones solo, tuve un valor de 1.24,
+pero cuando corremos 2000 remuestras del programa, el resultado me sale 0.96,
+Entonces con base a eso yo puedo construir los intervalos de confianza para la media con esos 5 puntos.
+Osea puedo sacar un intervalo de confianza, 95% con el percentil, y la media va a ser 5.2 y debería estar entre 3.4 y 7.0.
+Después yo puedo aumentar, 2000 para 3000, 4000, 5000, básicamente ese valor no va a cambiar.
+Yo creo que hago eso acá.
+Por ejemplo, después de un punto más remuestras no va a significar más datos.
+Esta reamuestra no es más información en términos de datos.
+O sea, con 100 remuestras tuve una deviación de 1.02.
+Entonces en un intervalo percentil de 3.3 es 7.4.
+Con 500, percentil de 3.4 es 7.1.
+Con 2000, percentil de lo mismo es 3.4 y 7.0.
+Entonces después de un momento, esto no va a cambiar más.
+Como lo calculamos, simplemente vamos a hacer un sample de estas cinco observaciones originales
+y voy a calcular después la media y los cuantiles.
+Como hacemos acá?
+Vamos a hacer lo que queremos hacer ahora, vamos a ir a este punto acá.
+El punto 4. Tenemos estos valores, voy a calcular 2.000 submuestras,
+definir una semilla, voy a almacenar las medias y ahora voy a hacer varios nuevos
+amostreos, ya cuando voy a hacer el plot, vamos a tener un gráfico, bueno no se que no está tan
+parecido pero es porque yo tengo menos... vamos a ver si algo vamos a meter un 20
+y salió ese valor, ya? bueno el otro gráfico tiene un poco más de divisiones pero cuando
+lo montamos un poco más, él va a tener esta forma. O sea, valores muy poco probables en 2 o 8,
+divididos en torno de 5.2 y el intervalo va a estar más o menos acá y en ese punto.
+Entonces puedo construir los intervalos de confianza de la media. Lo que yo acabé haciendo acá,
+tengo estos valores acá, voy a sacar una muestra de estos cinco valores, voy a calcular la media y
+y voy a almacenar. Voy a sacar una otra muestra, voy a calcular la media, voy a sacar una otra muestra y por ahí adelante.
+Bueno, si fué a correr otra vez de nuevo me va a salir un poco distinto. ¿Por qué no tengo semillas?
+En el chat preguntan ¿Qué justificaría usar un bootstrap en vez de validación cruzada y viceversa?
+Sí, vamos a llegar a ese punto. ¿Por qué estoy comentando exactamente eso?
+Vamos a tener que... vamos a tener un tiempo. ¿Por qué estoy hablando exactamente eso?
+Porque el bootstrap es una herramienta muy poderosa que me posibilita obtener la distribución de esta estadística específica.
+Pero no es un intervalo de confianza asintótico.
+Yo voy a poder obtener la distribución exactamente un poco más adelante de la área sobre la curva ROC.
+¿Cómo vamos a hacer eso? Vamos a hacer la división entre entrenamiento y prueba, ¿cierto?
+Vamos a entrenar el modelo, entrenamos el modelo como ustedes saben hacer,
+pero después vamos a evaluar eso en un punto de prueba, si? Me salió 0.9.
+Ajusto otro modelo me salió 0.91.
+¿Cuál de los dos puedo ir? ¿Hay una diferencia muy grande entre los dos métodos?
+Vamos a utilizar bootstrap acá y vamos a construir un intervalo de confianza
+para la área sobre la curva ROC.
+Después de construir un intervalo de confianza,
+comparamos los dos métodos y vemos si tienen una diferencia significativa.
+Entonces, un poquito más adelante voy a utilizar bootstrap,
+voy a utilizar esta idea en las métricas que ustedes conocen.
+Pero antes de llegarmos a este punto,
+es importante que comprendan cómo funciona bootstrap.
+Para la media, porque acá voy a cambiar después la media
+para el error cuadrático medio, en el conjunto de prueba.
+Bueno, ya que esta la pregunta, vamos a adelantar un poco, pero mira, conforme voy generando nuevos valores,
+el gráfico va cambiando, ¿Cierto? Deja generar de nuevo.
+Se genera de nuevo, va a tener otras formas, ¿Ya? Pero va a siempre aparecer de forma muy parecida.
+Conforme va aumentando el tamaño, va a tener, pero siempre básicamente los intervalos van a estar acá, entre 3 y 7.
+Entonces después de algún momento, si pongo 10 mil acá, no debería cambiar más.
+¿Cierto? A ser correr de nuevo, debería ser una cosa un poco parecida, va a ser un poco parecida, pero no tanto.
+entonces mira ahora con 10 mil ya no cambia tanto, la diferencia es muy pequeña
+mira que la diferencia básicamente es ninguno
+entonces cuando ponemos o creo acá 100 mil de esos valores tengo exactamente la distribución
+de la media de esos valores.
+Por que estamos haciendo esto? Porque más adelante ustedes van a crear el intervalo de confianza
+del AUC o del error cuadrático medio. Y ahí podré comparar los dos.
+Entonces, vamos a llegar a ese punto.
+considera el conjunto de datos de Wisconsin, vamos a ajustar 398 observaciones del conjunto de entrenamiento
+y vamos a dejar 171 para hacer la prueba
+lo que vamos a hacer después, vamos a crear nuevas muestras del conjunto de prueba
+entonces de ese 171 acá, cuando formos hacer la prueba
+Voy a utilizar varios bootstraps y voy a lograr construir el intervalo de la AUC, el intervalo de confianza de log loss.
+Entonces, esto es lo que es muy importante porque ustedes pueden decir, ya, yo tengo la AUC.
+Para aquel conjunto Wisconsin, ajustamos un modelo de regresión logística, por ejemplo, y con el modelo simple me salió 0.93.
+Ya? Con el modelo amplio me salió 0.97.
+Si uno va a comentar que el otro ya, este acá me parece mayor que este, me voy con el modelo amplio.
+Pero hay una diferencia entre estos dos, en el conjunto de prueba,
+podemos construir un intervalo de confianza para este, un intervalo de confianza para este,
+si el intervalo contiene los dos, me voy con el modelo más sencillo.
+Mejor trabajar con el modelo más sencillo porque ahí tienen la menor variabilidad.
+de la variabilidad. Entonces para estos 171 casos, 107 benignos, 64 malignos, este fue sobre el AUC.
+También puedo calcular el log loss, me salió este valor, nuevamente me informa que el modelo mejor
+es el amplio, la acuracia 0.94, la sensibilidad 0.9, y adelante. Para que yo te exagere,
+si no me preguntan, como calculamos el intervalo de confianza del log loss? No tengo idea.
+La teoría asintótica para entender esto no es esencial, pero con bootstrap lo puedo construir sin problemas.
+Entonces lo que voy a hacer es, voy a hacer, esto acá no es exactamente aplicado al conjunto de Wisconsin, pero por el tiempo,
+y a ver seguir ya para ese para ese con él lo que vamos a hacer acá va a ser el boot
+strap vamos a aplicar eso en el conjunto de
+de prueba entonces en el conjunto de prueba voy por ejemplo elegir cinco pares en el
+conjunto de prueba ya y voy a ser bueno va a ser varios remuestreos o en este caso
+calculé cinco de esos valores específicos y fui calculado por ejemplo el error cuadrático medio
+ya esto no es exactamente para el conjunto Wisconsin vamos a llegar a ya pero mira vamos a poner que acá
+tengo una base específica una miniatura hipotética para mostrar ese ejemplo específico ya quiero
+evaluar el modelo de punto de vista de de MAE o del error cuadrático medio yo sé que el error
+que el MAE o error medio absoluto es de 3, el error cuadrático medio es de 3.31,
+pero solamente esta información cuando voy a comparar entre ellas, bueno, cuando quiero construir
+un intervalo entre este error cuadrático medio acá y comparar con otro modelo, cuál es la
+variabilidad que tengo, entonces voy a crear nuevas muestras y voy a calcular estos errores en
+en estas nuevas muestras y voy a tener un intervalo.
+Entonces, por ejemplo, para esta estadística específica, el intervalo percentil, o sea,
+no solamente la estimativa puntual, pero ahora tengo una estimativa intervalal.
+Entonces yo sé que el valor observado fue 3, y su intervalo de confianza debe estar
+entre 1.8 y 4.2.
+Para el error cuadrático medio, 3.31, la intervalo de confianza será 1.94 y 4.31
+¿Vas a comparar los dos? No, porque son métricas distintas, pero yo voy a comparar el error cuadrático medio de una regresión logística
+con el error cuadrático medio de una red neuronal, por ejemplo
+Si los intervalos se cruzan, no hay diferencia entre los modelos
+por ejemplo para log loss, voy a calcular el log loss, voy a aplicar en varios conjuntos nuevos
+pero voy variando estos conjuntos y voy a tener la distribución acá, y construo una distribución para esta estadística
+Esto está un poco complicado. Vamos al conjunto de datos específicos que tenemos en Wisconsin.
+Vamos a ver si está por acá. Esta es la base de datos para Wisconsin.
+Entonces, ahora vamos a suponer que sí. Queremos...
+Ahora vamos a calcular para la base de datos de Wisconsin.
+Entonces, para la base de datos de Wisconsin, yo aplique el bootstrap y calcule por ejemplo los intervalos de confianza,
+el AUC, la área sobre la curva ROC, para el modelo simple y para el modelo amplio.
+cuando fui calcular las de estos dos valores uno era 0.94 el otro 0.975 más o menos,
+ellos son muy distintos, vamos a cambiar un poco la base de prueba haciendo bootstrap
+y vamos a construir los intervalos de confianza de estos dos modelos,
+entonces acá tengo el intervalo percentil de esta métrica acá,
+y tengo este intervalo de este modelo amplio.
+Mira que cuando vamos a mirar el AUC
+del punto de vista intervalar,
+los dos modelos no tienen una diferencia significativa.
+O sea, ambos acá
+van a cruzar.
+Mira que este valor va hasta 97, ese va hasta 95.
+Entonces creamos los límites acá,
+esta es la estimación original, tenemos los límites que fueron creados,
+y cuando vamos comparando el modelo más sencillo con el modelo más amplio,
+va a ver que la variabilidad en el conjunto de prueba
+hace con que los modelos al final tengan un desempeño similar.
+O sea,
+bueno, como lo aplico eso, en el bootstrap acá.
+Ya, entonces,
+un otro propietario, profesor, se acabó de informar que no hay diferencia entre ellos.
+Sí, podemos calcular esta variación,
+¿Cierto? Es decir,
+genero una muestra, yo tengo la muestra original,
+genero una submuestra de esa muestra original,
+calculo el AUC para el modelo amplio
+y después calculo el AUC para el modelo simple, ya?
+Y calculo la diferencia, y ahora acá
+voy a almacenar la diferencia entre el modelo simple y el modelo amplio.
+Vamos a suponer que la primera diferencia me fue de
+para acá el modelo amplio va a ser mayor, vamos a suponer que el modelo amplio tenía un valor mayor, entonces me salió menos 5, ¿ya?
+Ahí fue, ahí generé una otra muestra, ajusté, aplique el modelo ajustado en esa nueva muestra
+y calculé ese valor tanto para el modelo simple como para el modelo amplio, y me salió ahí una cosa como 3, ¿ya?
+Es decir, el modelo simple tenía un AUC mayor que el modelo amplio.
+Entonces, algunas veces va a ser menor, otras veces va a ser mayor.
+De alguna manera, al final ellos no tenían una diferencia muy grande.
+Solamente fue diferente en la muestra que ustedes estaban evaluando.
+con base a esto entonces podemos calcular la intervalo para la diferencia
+lo que voy a hacer ahora, voy a aplicar bootstrap, exactamente en esto
+es una cosa, nuevamente, es muy importante, acá, lo que vamos a hacer
+Estoy entrenando el modelo. Ustedes dividieron el conjunto acá desde el inicio.
+Dividí el conjunto entre entrenamiento y prueba.
+En entrenamiento no cambia nada. Entrené el modelo, elegí el hiperparámetro.
+Acá tengo el modelo ajustado, ¿cierto?
+Pero ahora voy a aplicar este modelo ajustado en esta prueba,
+pero no solamente en esta prueba exacta.
+Voy a construir varias pruebas distintas
+con base en la prueba original.
+Entonces, la única cosa que me va a cambiar acá va a ser la prueba.
+El modelo entrenado no hago bootstrap dentro del modelo entrenado.
+El modelo fue entrenado con esta base.
+Tengo el modelo entrenado.
+Ahora quiero evaluar cómo este modelo funciona en esta prueba.
+Sí?
+fue hacer un bootstrap en esta prueba acá, por qué?
+porque solamente informar que el AUC
+solamente informar que el AUC en este modelo fue de 0.93
+no estaba informando mucha cosa
+yo sé que es mejor, pero
+él simplemente salió 0.94
+hay una diferencia grande en estos modelos?
+no sé, usted no me presentó el intervalo de este AUC
+Lo que quiero comentar acá es que es importante no solamente evaluar en estadística,
+esto es muy importante, muchos de ustedes solamente se enfocan en la estimativa puntual.
+Es muy importante tenerlo en cuenta, la estimativa puntual es importante,
+pero necesito la estimativa intervalar, necesito de un intervalo de confianza para esta estimativa.
+El candidato A tiene 10% de ansia de vencer la elección.
+El candidato A tiene 10%.
+El candidato B tiene 80%.
+Pero si yo no conozco, bueno, si tenés tres candidatos podría ser 10, 50 y el otro candidato sería 40.
+o por ejemplo no tener 20% deben ser solamente dos candidatos 20% para el
+candidato a y 80% para el candidato b pero si yo no conozco la variabilidad
+por ser que se tenga solamente tres o cuatro personas recalcula y eso la
+variabilidad es muy grande, entonces el intervalo de confianza
+va a ser muy grande por ser que el candidato b tenga menos de ansias de
+ganar que el candidato a entonces la estimativa puntual 0.2 0.8
+no me informa mucha cosa, si no conozco la variabilidad. Por eso que una encuesta,
+ellos siempre informan, ya el candidato A tiene 50, 40% de salir vencedor, con
+un nivel de confianza de 2 puntos percentuales para más o para menos, es decir,
+usted puede construir un intervalo, en 95% de las veces debería estar entre 38 y 42.
+De hecho acá en Brasil, un candidato estaba en la frente cuando el otro
+estaba abajo pero los intervalos eran se cruzaban ya de hecho uno debería salir con 48 con 48 el
+otro con 40 y 48 46 el otro con 44 no estaba con 48 con 44 al final la cosa se invirtió lo que
+que estaba con 44 subió para 46,
+y lo que estaba con 48 bajó.
+Entonces lo que parecía que uno estaba muy lejos del otro
+que había una diferencia al final, los intervalos se cruzaban.
+Entonces puede tener ese error
+cuando uno no mira la estimativa intervalaria.
+Entonces 0.97, pero el intervalo de eso, ¿cierto?
+0.973, 0.972 o 0.811
+entonces el intervalo acá
+para el AUC
+por el intervalo me va a salir 0.9611
+o en otro caso el intervalo podría ser 0.811
+es la misma cosa, no, este acá es mucho más preciso
+me ayuda a hacer la comparación
+Entonces necesito saber si este está dentro del intervalo, pero ok, me informó 0.97,
+pero no el intervalo de confianza, para poder comparar con las otras estimativas,
+como fue solamente en este punto específico. El intervalo acá es muy importante.
+Como construimos este intervalo? Voy a generar varias muestras,
+el conjunto de prueba y voy a obtener la distribución de la AUC.
+Vamos a ver si alguien tiene alguna duda.
+eso fue la evaluación cruzada, entonces, eso que justifica exactamente hacer el bootstrap en la validación, en el conjunto de prueba, ya?
+bueno, no puede utilizar el bootstrap y la validación cruzada, eso no se puede hacer, usted va a hacer el ajuste con el modelo, va a hacer la validación cruzada en el modelo, va a ajustar el modelo,
+Después de ajustar el modelo, ahí sí va a sacar el conjunto de pruebas y el conjunto de pruebas va a ser el bootstrap.
+¿Verdad?
+Es como me sale. Vamos a ver acá.
+Voy a generar 2.000 valores,
+de esta muestra original,
+y voy a calcular la diferencia para cada uno de ellos, ¿cierto?
+Entonces, en el modelo más sencillo, con el modelo amplio,
+y yo tuve una diferencia, un delta, en la métrica log loss, entonces acá estoy mirando la métrica log loss,
+¿cierto? entonces tengo dos modelos, uno modelo más sencillo y otro modelo más completo.
+Voy a tener que comparar estos dos modelos con alguna cosa, puedo calcular el AUC,
+puedo calcular log loss, puedo calcular el Brier, la exactitud,
+y en este caso acá primero vamos a mirar con el log loss, ya?
+entonces miramos acá log loss.
+Hay una diferencia significativa entre estos modelos?
+En el log loss, cuando fue calcular cada una de las veces el log loss que tenemos con el modelo simple,
+el log loss que tenemos con el modelo amplio, el delta LL me salió 0.11.
+Ya?
+Y el intervalo de confianza percentil del delta LL me salió 0.05 y 0.18.
+Hay una diferencia? Hay una diferencia?
+Bueno, pregunta para ustedes.
+¿Cuál es el modelo que está me dando más, que está siendo mejor acá?
+Bueno, el valor me sale un delta de 0.11.
+Yo construí la diferencia, la distribución
+de esta diferencia acá, haciendo bootstrap varias veces al conjunto de prueba
+hay una diferencia de los modelos en el conjunto de prueba pero mira antes
+si exactamente antes ustedes estaban elegiendo el modelo más
+el modelo amplio creo que log loss también me sale eso, voy a confirmar, log loss creo que también tiene eso
+Si vamos por ejemplo por el AUC, el modelo amplio me parece que mejora.
+Pero cuando vamos a evaluar por medio de sus intervalos,
+hubo una diferencia significativa pero para el modelo simple.
+Acá si vamos por el modelo amplio, o si vamos con el AUC.
+Ah, y eso es una cosa interesante.
+Por eso que es importante elegir la métrica que quieren tener en cuenta antes.
+Acá es log loss.
+Entonces recuerda que log loss penaliza de una forma distinta que la AUC.
+La AUC mira las probabilidades de una forma general sin tomar en cuenta el umbral.
+El log loss va a mirar de otra forma y va a ser penalizaciones mayores para errores.
+Entonces el log loss acá, él eligió el modelo más sencillo, pero la área sobre la curva ROC,
+mira, cuando voy a calcular ahora, el delta AUC de la área sobre la curva ROC con el modelo amplio
+amplio y el modelo simple, la diferencia fue de 0.03 y los intervalos no contienen 0.
+Si el intervalo contiene 0, no hay diferencia significativa, ¿cierto?
+Si este valor acá, fosse negativo, dado esta diferencia, tenía una indicación
+mayor para el modelo simple, pero para el delta AUC, si al final, tenía una
+diferencia de 0.35 y la diferencia significativa entre sus términos cometa y
+a
+tiene esta diferencia caíten esa diferencia acá es significativa si ahora
+si ese valor fuese más o menos como 5 acá en vez de 3
+Si fuera 0.9959, era muy probable que la diferencia, aunque tenga una diferencia de 1 punto o algo así,
+cuando fuéramos a calcular el intervalo acá de la diferencia entre los AUC, ese valor no iba a ser significativo.
+Entonces muchas veces ser valores pequeños no tenemos una muestra muy grande, hay una fuerte indicación de que no va a tener diferencia entre ir con el modelo más sencillo o ir con el modelo más completo.
+En este caso la diferencia era de 0.4, 0.035, pero esa diferencia en intervalo en algunos casos llegó a ser 0.012 y en otros casos 0.06.
+De todas formas, ella no contiene cero, bueno, la única situación que contenía cero acá fue muy rara,
+entonces básicamente hay una diferencia significativa y el modelo amplio nos muestra al menos por el AUC, que es lo más adecuado.
+Profesor, bueno, usted me comentó que log loss, vamos con el modelo más simple, con el AUC, vamos con el modelo amplio,
+¿Cuál de los dos debemos ir?
+Va a depender de los costos, la penalización que está queriendo tener.
+El AUC, elige un modelo.
+El log loss, elige un otro.
+Por eso que es importante que definan cuál es la métrica que va a ser utilizada
+antes de hacer el experimento.
+El log loss me hace más sentido acá porque toma en cuenta la penalización así
+y para nosotros este tipo de penalización es más importante.
+Me voy con la área sobre la curva ROC porque me gusta esta métrica, es más informativa.
+Si les pongo la área sobre la curva ROC, el modelo amplio, el modelo más amplio, sería el mejor.
+Un ejemplo hipotético acá, donde tengo un delta.
+Vamos para un ejemplo hipotético. Vamos a suponer que en alguna situación le toca tener un delta de 0.01.
+que va a ocurrir varias veces cuando tenés modelos de comparación con, no sé,
+Random Forest, con boosting, o Random Forest, con redes neuronales. La diferencia muchas veces es muy pequeña, 0.01.
+Cuando voy a calcular el intervalo, no hay diferencia, entonces no hay
+evidencia clara de superioridad o no prueba equivalencia, no hay
+diferencia significativa de superioridad entre los dos modelos.
+En un caso como este hay una diferencia positiva, pero menor que la mejora relevante que hay acá.
+Entonces básicamente acá hay una diferencia significativa, pero es muy pequeña.
+En un caso como este ya tenemos una diferencia positiva y por encima hay una mejora relevante.
+Si valorizamos la segunda casa decimal, se ve que hay una mejora razonable.
+Bueno, para cerrar, como tuvimos una pausa, fui al tiro, exactamente porque tuvimos una
+clase más chica, entonces no quería que tuviese menos contenido.
+Lo importante va a ser evaluar.
+Del punto de vista de bootstrap, ahora usted ya sabe una nueva forma de hacer isso.
+Bueno, yo calculé, generalmente eso no funciona.
+Entrené mi modelo, voy a evaluar eso ahora conjunto de prueba.
+tengo aquella métrica que me gusta, el error cuadrático médio. Ok?
+¿Vai comparar con otro modelo? Calcula los intervalos.
+Via Bootstrap, si lo hace eso, puede compararlo con los métodos sin tener ningún tipo de dificultad.
+Ya, hubo un ganho de información de 0.02.
+¿Es significativo? Osea, hubo un ganho de información de 0.01.
+Cuando Redes Neuronales me salió con 0.97,
+y Random Forest me salió con 0.96.
+Pero Random Forest es mucho más sencillo de ajustar
+que Redes Neuronales.
+Y cuando fui a evaluar el Delta AUC,
+no hay diferencia significativa entre los dos.
+Los dos al final tienen en un bootstrap,
+cuando voy a calcular el intervalo,
+los dos no hay evidencia clara de superioridad
+de las redes neuronales relacionadas a Random Forest. Mi sugerencia va con Random Forest.
+Entonces, siempre vamos con el modelo más sencillo de ajustar, que tiene un mejor ajuste,
+que le muestra que tiene un mejor ajuste. Entonces, es importante que ahora usted
+pueda medir de alguna manera, pueda mensurar, pueda evaluar si la diferencia entre los dos métodos
+son significativos o no. Antes, usted no podría hacer eso. Había ajustado un Support Vector Machine,
+le salió un valor, ajustó una regresión logística, le salió otro valor, la diferencia es pequeña,
+pero cuál es el mejor, ya vamos lo que tiene el mayor valor, pero de hecho es significativo,
+no, entonces podría ir con el modelo más sencillo que tiene mejor ajuste, que tenga una facilidad
+mayor de ajustar, que tiene interpretación y ahí no va a tener problemas, sí. Bueno, con ese modelo,
+Acá dejé algunas comparaciones con el log loss del modelo amplio.
+Yo tuve esta estimación por el log loss.
+Por eso que es interesante, porque yo tengo el valor del log loss.
+Y ustedes pueden construir el intervalo de confianza para este valor.
+Me sale 0.3 para el modelo simple.
+Cuando voy a construir su intervalo está entre 0.21 y 0.4.
+Modelo amplio 0.18.
+¿Es menor? Sí.
+por los intervalos acá contienen el modelo simple
+entonces hubo una mejora, pero...
+la mejora de log loss, bueno, este es otro
+la área sobre la curva ROC con el modelo simple 0.93
+la área sobre la curva ROC 0.97
+la mejora entre ellos 0.3, pero fue significativo
+Esta mejora de log loss acá no me parece que la diferencia de la anterior estaba un poco distinta.
+Houve una mejora pero para el modelo más simple, entonces eso es lo que demostró.
+Houve una mejora pero para el modelo más simple, sí.
+Entonces calculábamos la diferencia entre el log loss del modelo simple menos ese.
+La diferencia entre los dos fue 0.11 y la diferencia fue significativa.
+Entonces fue eso que acabamos haciendo allá.
+Vamos por el modelo más simples cuando miramos el log loss, vamos por el modelo amplio cuando miramos el AUC.
+Bueno, era eso que quería comentar hoy.
+Profesor, pero no me salió con la fórmula mágica, cuál de las métricas tengo que utilizar.
+Sí, va a depender del problema, ya no es tan sencillo.
+Por eso, lo que es importante es que ustedes comprendan cómo funciona el método, cómo se estima y cómo se construyen los intervalos.
+Esta será la diferencia de ustedes que están aprendiendo esto de una persona que simplemente va a correr
+un programa de inteligencia artificial y va a salir una métrica y la persona va a informar
+Ya me salió 0.97, esta red neuronal con 25 capas, 50 neuronas,
+En cuanto a este modelo Random Forest, me salió 0.965, ya?
+Entonces ajustamos acá una red neuronal
+El modelo es mucho más complejo. Hay diferencia? Bueno, ahora ustedes saben cómo evaluar.
+Generalmente, un programa de inteligencia artificial lleva soltadamente que no vale preocupar más con eso.
+Ahora ustedes pueden hacer preguntas un poco más profundas.
+Hay diferencia entre los dos métodos? De hecho, las mejores como una red neuronal,
+un programa como un Codex o un Claude, no va a formarse porque uno es mayor que el otro.
+Entonces ahora ustedes son más críticos y pueden tomar las mejores decisiones, no solamente
+presionar un botón ahí.
+Entonces esa es la idea y eso es lo que quería pasar.
+Es una idea sencilla?
+No.
+Bootstrap tiene una complejidad.
+Construir una distribución para el conjunto de prueba, también no es una idea sencilla,
+pero una idea muy importante.
+Es una forma muy poderosa de utilizar Bootstrap para construir los intervalos para las métricas
+que necesita.
+Ahora solamente, ahora usted no sabe solamente cómo calcular el AUC, sabe cómo construir el intervalo de confianza del AUC.
+El modelo más complejo, no solamente va a calcular el AUC del modelo más complejo, va a calcular su intervalo de confianza.
+Ya, tener la estimación de su intervalo de confianza es fundamental.
+Sí?
+Eso es lo que quería presentar para ustedes hoy.
+¿Dudas? ¿Preguntas?
+Sí, Claudia?
+¿Se puede decir cuál es el uso de un hospital si estamos en un hospital?
+Bueno, ahí la pregunta es exactamente de la métrica, ¿no?
+El modelo está causando más falsos positivos.
+Si un modelo detecta más tumores malignos, por ejemplo, pero también genera más falsos positivos,
+el modelo está causando más falsos positivos
+el modelo detecta más tumores malignos pero también genera más falsos positivos
+está generando falsos positivos
+que se están en el hospital, qué se decide? por ejemplo, caso hipotético
+Si estás generando falsos positivos,
+bueno, en mi percepción voy a intentar ponderar un poco sobre
+lo cuanto está generando de falsos positivos,
+yo voy a intentar tener una métrica que tome en cuenta ya, los falsos positivos
+y los verdaderos positivos.
+porque si, si estás generando muchos falsos positivos, no debería ser un buen modelo,
+porque si eres un falso positivo, vas a tener que después hacer un examen más, como más detallista.
+Usted va a tener que tomar en cuenta exactamente, la situación es exactamente así,
+Tendremos que preguntar, los falsos positivos con los verdaderos, con los verdaderos falsos positivos,
+pero cuando la persona tiene, la persona tiene, es decir, tiene un positivo, un verdadero,
+los falsos positivos la persona tiene y no identificó.
+Ahora el problema es cuando la persona tiene y no está identificando.
+Identificando, van a ser verdaderos los negativos o, oye me perdí, los falsos positivos.
+Bueno, va a tener que hacer la comparación de lo que está pasando con la situación donde la persona tiene la enfermedad y él está no está detectando, sí?
+Y ahí tomar en cuenta eso, hacer una apodilación entre los dos.
+porque bueno, a veces tienen muchos falsos positivos, pero la persona que tiene la enfermedad
+no está dejando pasar ninguna vez.
+O sea, podría ser más malo para el hospital informar, ya la persona tiene la enfermedad
+pero este examen no está identificando.
+Entonces la persona tiene la enfermedad y no detectó.
+y ahí tiene que hacer esa ponderación algunas veces tener un falso positivo pero si el modelo
+está clasificado muy bien las personas que tienen la enfermedad no hay un problema porque
+después esas personas que son falsos positivos va a tener que hacer un examen más detallado y
+ahí se descubre que no no tiene la enfermedad. Bueno, es una situación complicada pero lo que
+que va a tener que hacer es ponderar las dos métricas. Por ejemplo, a mí no me gustaría
+de informar para una persona que no tiene una enfermedad como contagiosa, no sé, sida,
+como se llama, HIV, informar a la persona que no tiene nada, que la persona está infectando
+otros, sí, de lo que informar a la persona que posiblemente tiene, me sale un falso positivo,
+pero después voy a hacer un examen más detallado y detecto que la persona no tiene.
+A lo general creo que es lo que muchos exámenes lo hacen.
+Puede tener falsos positivos, pero eso es barato.
+Pero lo importante es que si la persona tiene, no va a descartar.
+Entonces, ese modelo es...
+Los verdaderos positivos son 100% precisos.
+Los falsos positivos, después, antes de informar a la persona que entiende esta enfermedad, hacemos un examen más detallado.
+Entonces tienen que evaluar el costo. Pero los falsos positivos yo no veo mucho como un problema.
+Yo veo más como un problema los falsos, los verdaderos, los falsos negativos.
+O sea, los falsos positivos, la persona tiene... No, espera.
+La persona es falso positivo.
+La persona tiene la HIV y no está identificada.
+Ah, sí, entonces ahí sería un problema muy grande, que es lo que estaba comentando.
+Si la persona tiene HIV, tiene positivo.
+Entonces, este método está informando.
+Esta persona no tiene la HIV.
+Ahí es un caso muy grande.
+Entonces Claudia, en esta situación, bueno, tenés que evaluar y cambiar la estructura del método.
+Si? Falsos positivos en una situación como...
+La persona tenga una enfermedad... Ah bueno, Claudia, voy a mandar un detalle para podremos discutir exactamente como es, porque ahora me pedí nuevamente.
+No, pero se entiende más o menos el contexto a lo que quiere llevar la respuesta.
+¿Qué quiero comentar? que si tiene que evaluar, no de la idea, ese falso positivo y ese negativo, pero la ponderación entre los dos.
+No que es más malo en una situación como esa.
+La persona tiene la enfermedad y informa que ella no tiene.
+La persona se va a la casa e infecta a todos los otros.
+O bueno, la persona tiene la enfermedad, la persona no tiene la enfermedad, pero detectó que la persona tiene la enfermedad.
+después de hacer otro examen. Entonces realmente ellos toman en cuenta estos tipos de costos para poder
+tomar en cuenta. Yo me recuerdo de algún momento que, una vez que leí, que los exames por ejemplo de
+HIV lo hacen exactamente como eso. Ellos son muy precisos para las personas que tienen la enfermedad.
+Si, son muy precisos para la persona que tiene la enfermedad, porque si la persona
+tener la enfermedad, le sale un negativo, la persona sale infectada a otra persona, si?
+Pero todas formas, si salen positivos, ellos hacen un double check para poder informar a la
+persona, porque también tiene toda esta situación de informar que la persona tiene este tipo de
+enfermedad. Ya? Entonces generalmente estas cosas de vamos con uno, vamos con otro, uno tiene que
+sentar con la empresa e informar, ya, es mejor emprestar plata para un malo pagador o no vamos
+de emprestar plata para un malo pagador.
+¿Cuáles son las perdidas que están involucradas?
+Muchas veces es mucho peor emprestar plata para un malo pagador.
+Pero si dejamos de emprestar plata para ese individuo,
+perdemos muchas personas.
+Generalmente hacemos un modelo que va a tener un costo
+de hacer una clasificación de un malo,
+una mala clasificación de un malo
+o una mala clasificación de un bueno.
+Y con base en esta función costo,
+el mejor modelo, el mejor equipamiento, el equipo.
+Siempre hay un costo involucrado.
+Creo que sería básicamente eso. Pero si hay un problema, no es un problema sencillo.
+Ok.
+Si quieren ver, me envían un correo, necesito contestar.
+Me envían otro correo con ese punto que discutimos exactamente eso.
+Le contesto mañana.
+y ahora escriba exactamente centro, es esta situación, si eso le acontece mejor.
+Pero acá lo interesante es que, si usted está intentando medir exactamente esta métrica,
+ahora puede medir ella por medio de un intervalo de confianza.
+Y yo tengo la exactitud, o sea, la acuracia que está clasificando correctamente las
+personas que tienen la enfermedad, o está clasificando correctamente que esta persona
+no tiene la enfermedad. Entonces la exactitud me fue de 0.97.
+Alcanza el intervalo de confianza de la exactitud.
+Y no puedo comparar diferentes modelos para eso.
+Bueno, era eso que quería pasar por hoy. Más preguntas?
+¿Dudas?
+Bueno, si nadie más tiene ninguna duda, cerramos por hoy y nos vemos por la última vez,
+va a ser mi última clase, creo que con ustedes, en el repaso.
+Muchas gracias por la paciencia, fue un gusto que tengan buena noche y nos vemos el sábado.
+Muchas gracias a todos.

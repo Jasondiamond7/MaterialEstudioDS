@@ -1,0 +1,1567 @@
+¿Cómo o bajo qué criterio, qué métrica vamos a estar decidiendo qué es lo que nosotros vamos a llamar el mejor modelo bajo cierto contexto?
+Entonces, primero tenemos que preguntar, ¿qué estamos estimando? ¿Qué es lo que nosotros estábamos modelando?
+estaba modelando un número, estaba modelando una categoría.
+En la sesión pasada con Pedro, ustedes vieron la matriz de confusión.
+Ya, aquí vieron lo que eran los falsos positivos, falsos negativos y métricas
+asociadas a esta...
+¿cómo se llama esto?
+A esta clasificación, ya. Y en general vieron los clasificadores clásicos,
+ya sea una regla de su logística,
+algún
+soporte vector machine o más que nada de soporte vectorial
+con algún distinto kernel pero la salida de eso era efectivamente
+una clasificación y decía era a o b para clases o 0 o 1 para clases binarias o a b o c para multiclasos
+y trataban en particular para el caso binarios
+lo que hacían era tratar de tener una métrica y decir
+la precisión, cuánto se equivoca, cómo se está equivocando porque no es lo mismo, pero si se fijan
+ahí estamos en un proceso de clasificación, ya que tenemos que tener ciertas métricas para decidir
+lo que hicimos ya con ese modelo u otro porque hay más modelos de clasificación, es una buena métrica,
+es un buen indicador de decisión del modelo, o de decisión del modelo,
+es decir, recuerden que cuando uno está en la práctica, que uno va a tener
+distintas metodologías, distintas herramientas, con lo cual va a poder hacer
+o va a tratar de atacar el problema. Pero cuando ya tengo que tomar eso y llevarlo
+tengo que decidir decidirme por alguna de esas de algunos de esos modelos y ahí tengo que entrar
+en el proceso de evaluación qué voy a evaluar cómo lo voy a evaluar cómo voy a decidir en el caso de
+la clasificación binaria qué tipo de error es el que yo voy a sopesar más ya pensemos el típico
+ejemplo de fraude. El tipo de ejemplo de fraude es que es peor que una
+transacción yo la detecte como fraude y no era fraude o al revés, decir que no
+era fraude y efectivamente era fraude. Entonces el segundo tiene un peso mayor
+dentro de ese contexto. Entonces no tiene el mismo
+peso el tipo de error. Entonces para efectos de esta sesión nosotros vamos a
+trabajar con dos ejemplos de los cuales están, la base de datos están en el Moodle. Primero vamos
+a trabajar con un modelo que trabaja con, o sea que presenta resistencias de una mezcla de hormigón
+para distintos compuestos y la idea de ese modelo, que nosotros vamos a hablar de varios, es predecir
+digamos, la resistencia bajo los distintos
+compuestos que tiene esa sustancia.
+Lo que nosotros en general vamos a querer, si se fijan en ese contexto, es un
+modelo que trata de estimar, trata de modelar una cantidad numérica,
+cuantitativa. En general nosotros tenemos una métrica usual, que basada en la
+diferencia entre lo observado y lo que yo estoy prediciendo, o estoy modelando.
+Hay que hacer todas las métricas que están asociadas a la discrepancia entre lo
+observado y lo predicho. Puedo dar suma cuadrada de error, el error medio cuadrático,
+la raíz del error medio cuadrático, y así sumisíguelo que puedo tener distintas métricas,
+incluso coeficientes de determinación como lo son el R cuadrado, el R cuadrado ajustado.
+Pero tenemos que ver y tener claridad de cuáles de esto nos sirven.
+En cambio, si estoy tomando esto en un proceso de clasificación,
+un problema de clasificación, voy a tener otras métricas de las cuales yo voy a tomar parte y voy
+a tener como criterios para decidir qué modelo voy a escoger yo cuando
+efectivamente tenga que tomar una decisión.
+La gran mayoría de estos modelos, sobre todo en ciencia de datos,
+objetivo principal es predecir con vistas a tomar una decisión, por
+consecuencia tenemos que tener bastante claridad de qué modelos ocupamos para
+realizar una acción. Ahora, en el caso idóneo, todas nuestras opciones nos
+entregan la misma respuesta, no obstante en la práctica cuando uno hace estas
+cosas, dependiendo del modelo yo voy a probablemente tomar distintas
+decisiones porque voy a estar sopesando
+distintas cosas que yo voy a considerar malas o peores ya en términos de
+errores ya por ejemplo qué tanto voy a penalizar el error
+errores pequeños lo voy a tratar de dar un mayor una mayor magnitud en el
+sentido de que quiero equivocarme muy poco o qué tan laxo soy ya en el
+sentido de voy a permitir equivocarme al punto de que pueda mejorar mi
+precisión o mi predicción de manera global que lo deben haber visto de
+manera tan especial cuando vieron máquinas de soporte espectorial.
+Así entonces este concepto de mejor modelo es un poco etéreo. Tenemos que
+definir qué es y formalizar qué es un mejor modelo porque no siempre no hay un
+modelo que le gana todo va a depender mucho del contexto cuál es el objetivo
+de lo que ustedes quieren realizar o quieren resolver o modelar con las
+distintas opciones que van a tener ya sea revisión, el super vector machine
+o el rayo de neuronorales etcétera todas esas herramientas a la larga me
+entregan una misma predicción o me entregan predicciones distintas
+pero me entregan predicciones. Entonces, la pregunta que va a guiar esta sesión es,
+¿cómo decido cuál de esas predicciones de los distintos modelos es mejor?
+Uno siempre intenta o tiene cierta tendencia a trabajar con las mismas métricas que le han
+resultado anteriormente, pero para hacer un proceso más o menos adecuado, tengo que evaluar las
+metodologías con distintas métricas, que en esencia es tener una imagen completa
+de lo que estoy modelando. Entonces, este concepto de mejor modelo lo vamos a
+tener que definir de alguna manera. ¿Qué tipo de errores van a importar? ¿Por qué
+los voy a usar? Y en principio tenemos que también considerar la literaridad de
+cómo estamos probando. Ustedes vieron con el martes con Pedro la noción de
+validación cruzada ya y la noción de los pies. Entonces, ese concepto va a ser fundamental cuando nosotros queramos evaluar la predicción.
+Siguiendo entonces.
+Los modelos que nosotros vamos a trabajar, o los problemas que nosotros vamos a trabajar, en principio es
+es la modelación o la estimación de una resistencia en términos de los
+compuestos de concreto.
+Avisionalmente, en el caso de probabilidad, cuando nosotros estamos
+modelando la clasificación de correos, que es la otra problemática que vamos a
+ver dentro de esta sesión es yo no voy a estar modelando si es que es un sí o un no, sino voy a
+estar modelando la probabilidad de que sea de la clase 1 o sea de la clase 2.
+Adicionalmente, ya cuando modelo la probabilidad yo voy a tener que tener una regla de decisión
+porque esos modelos me van a entregar una probabilidad de que pertenezca a la clase 1
+o una probabilidad de que tenga la clase 2, entonces posterior a ello voy a
+necesitar una regla o definir un umbral en el cual yo voy a considerar esa
+probabilidad como 1 y esa probabilidad como 0. Si me dan 5 segundos
+necesito atender algo un poco urgentes.
+Entonces, tenemos las dos problemáticas, tenemos la moderación de la resistencia,
+la moderación de los modelos que quieren clasificar, pero que en principio no clasifican
+en los labels, en las marcas entre 0 y 1 positivo y negativo o distintas clases, sino que lo
+estiman es la una probabilidad esa probabilidad tiene que ser digamos evaluada porque dependiendo
+del umbral es lo que me va a hacer pasar a una acción entonces esa probabilidad que
+nos que nos la podemos la podemos obtener desde los problemas de clasificación en
+principio binarios ya si bien puede ser extendido a multiclase expresa esta incertidumbre no
+obstante luego de ello está el siguiente paso pasar a una acción tomar una
+decisión entonces la evaluación probablemente tal de los modelos es
+bastante fundamental cuando estoy resolviendo un problema porque es el
+último paso que efectivamente tienen una interacción con lo real ya no es
+simplemente el modelar que tiene una relevancia súper súper alta pero una
+vez que tengo muchos modelos tengo que ver cómo paso efectivamente a la acción
+hace un plan de decisión, una regla y ello implica tener buenas métricas y en
+principio seleccionar el modelo correcto para la problemática que yo estoy
+planteando.
+En esa en esa noción de evaluar correctamente la
+el modelo en el contexto y problemática que estoy analizando, si solo me guío
+por una pura métrica, ya, pensemos los problemas de regresión, siempre trabajamos con R cuadrado,
+R cuadrado o la IC o el criterio valleciano o alguna otra métrica que venga en función de la
+verosimilitud o en términos de la suma cuadrada de errores. Si siempre trabajo con los mismos,
+mis resultados van a estar bastante cercados. Es lo bueno de trabajar con muchas métricas,
+Lo bueno es que si las cosas andan bien y los resultados que estoy encontrando
+tienen efectivamente una evidencia sustancial de que están siendo modelados correctamente,
+entonces todas las métricas van a tender a reflejar lo mismo. El problema está en cuando
+esas métricas no son del todo absolutistas, en el sentido de que todo me dice lo mismo y dependiendo
+de la métrica voy a escoger un distinto modelo. Entonces, si escojo distintos modelos dependiendo
+de la métrica tengo que tener bastante claridad en por qué estoy ocupando esa métrica, cuáles
+son los pros y los contras de ocupar esa métrica y decidir, ya, decidir acorde al objetivo
+de mi problemática. Entonces, ¿cómo voy a escoger esa métrica? Y en principio yo
+tengo que definir un plan antes de realizar toda la metodología, voy a tener que plantear,
+yo voy a escoger el mejor modelo con una métrica, pensemos, de suma a cuadrado de error. Voy a
+tener que definir que el modelo, voy a tener que identificar dónde se va a utilizar el modelo.
+En principio, la gran mayoría de los casos de las problemáticas modeladas mediante herramientas
+de esencia de datos tienden a priorizar la predicción. Entonces tenemos que tener
+bien claro cuáles van a ser los casos futuros. Las nuevas observaciones que
+nosotros vamos a estar utilizando se comportan igual que los mismos datos que
+estamos utilizando para generar el modelo, es decir, nuestro conjunto de
+entrenamiento se va a parecer efectivamente a las observaciones con
+las cuales en el futuro vamos a evaluar el modelo. Tenemos que evaluar la
+importancia de cada error, sobre todo en el caso de clasificación, no es lo mismo
+equivocarse con un falso positivo, decir que algo no era y si lo era, que decir
+que si lo era y no lo era. Dependiendo del contexto puede cambiar
+mucho la interpretación y evaluación de ese modelo.
+Finalmente voy a tener que dejar un conjunto de datos para validar
+lo que yo estoy haciendo. Entonces todas las métricas que vamos a ver y vamos a mencionar hoy, de alguna manera
+tratan de cuantificar el error
+en lo que eso sea en un principio, digamos, porque principio el error lo consideramos como, bueno,
+los datos observados menos lo que yo digo que me está diciendo o me está entregando el modelo.
+Y en función a ese valor yo
+le le aplicó funciones, ya sea el cuadrado, la suma, etcétera, pero son funciones de esa discrepancia
+que le pueden dar distinto orden de importancia a valores pequeños o valores grandes.
+En ese contexto yo siempre voy a tener que dejar un conjunto afuera, un conjunto afuera que al principio
+le llamamos prueba, pero que va a funcionar como oráculo en principio, en el
+sentido de yo hago todas mis cosas, aplico todas las herramientas
+metodológicas que tengo para generar los distintos modelos y una vez que defino
+los modelos voy a tener que evaluarlo en el conjunto de prueba. En principio yo
+genero y ajusto los modelos con el conjunto de entrenamiento y selecciono
+entre modelos con el conjunto de
+mucho el error de entrenamiento podemos mejorar mucho la forma en que se ajustan
+los datos que nosotros tenemos pero nunca podemos asegurar que eso va a
+funcionar en nuevos datos. Nosotros esperamos que sí porque decimos si estos
+datos que tenemos son buenos ya o representan el fenómeno que queríamos
+evaluar y luego llegan nuevos datos ya o se evalúa o este modelo es aplicado en
+nuevos datos que esperamos sean similares a los datos con los cuales
+nosotros generamos nuestro modelo entonces el modelo debería comportarse bien
+No obstante, no podemos asegurarlo fielmente porque puede cambiar la dinámica,
+pueden haber problemas con el modelo mismo o que justo la muestra que tenemos era una muestra
+inusual y nosotros la consideramos que era representativa de la población.
+Entonces, en ese sentido nosotros tratamos de hacer lo mejor posible pero no podemos asegurar
+que los modelos en términos de predicción van a ser necesariamente buenos.
+Nosotros podemos coger un modelo en términos de ciertas métricas con
+nuestros datos y desechar otros y cuando lo evaluamos en la prueba
+debísemos haber escogido otro. Entonces tenemos que tener claridad de eso,
+tener una buena idea del contexto en el cual está, digamos, inmerso en la
+problemática que estamos haciendo, tener una muy buena claridad del conjunto de
+datos con el que estamos trabajando. Entonces, porque esa claridad que
+vamos a tener respecto del tipo de datos, o la problemática
+que estamos tratando de evaluar, nos va a ayudar de cierta manera a
+decidir de mejor manera una métrica o criterio para la selección del modelo
+y para evaluarlo probablemente.
+Chau bien.
+Hola, buenas tardes profesor. Según su experiencia, algunas métricas comunes en
+casos como en el caso bancario, fraude, no fraude, o en los casos médicos si es un
+tomor benigno maligno algo que se
+transacciones no son fraude y pocas son
+pocas en comparación al total son fraude el caso de exámenes por ejemplo
+en lo que mencionaba la gran mayoría de las detecciones de alguna enfermedad
+tienden a ser no tan graves, digamos, o sea, sobre todo si una enfermedad un poco más rara.
+Entonces, cuando la clasificación o el evento de clasificación es muy anómalo,
+nosotros hablamos de que probablemente nuestro conjunto no va a estar balanceado,
+es decir, si tengo mil datos, o si pensé en transacciones nuevamente,
+tengo mil transacciones yo esperaría no sé que 5 o 10 o pongamos un exceso 20
+sean transacciones fraudulentas y en ese sentido nuestro modelo de cierta manera
+tiene tiene que aprender de esas 20 observaciones pero a su vez tiene muchas
+más observaciones que le están diciendo lo contrario entonces ahí tenemos que
+entrar en metodologías de balanceo de datos de la clase
+que va a depender un poco de la metodología propiamente tal, hay
+distintas formas de balancearlo y ahí cuando trabajamos por ejemplo en
+clasificación binaria usualmente podemos hacer cosas bastante más sofisticadas
+pero tratamos de trabajar con la matriz de confusión pero no por ejemplo con la
+con el accuracy porque la accuracy toma sopesa digamos los los dos tipos de
+eventos correctos, es decir que no era fraude y efectivamente no era fraude y
+decir que si era fraude y efectivamente lo era. Entonces no tienen el mismo peso y
+general ahí nosotros incluso podemos hacer problemas de optimización etcétera
+pero ahí trabajamos con métricas que
+vienen desde la matriz de confusión ya que lo vamos a tocar un poco hoy.
+Las problemáticas que son anómalas tienden a ser todo un problema en general
+porque como pasan poco es difícil reconocer o predecir cuando van a pasar
+y ese es el gran problema cuando tengo datos que son muy nuevos o eventos que
+son muy nuevos
+ok
+entonces siempre creo que deben estar un poco más familiarizados con esta
+separación, entrenamiento, variación y prueba siempre tenemos que tener claro
+que la prueba es el último caso y la prueba no se puede ocupar o los datos de prueba no se pueden ocupar en ningún
+en ninguna etapa antes de eso, pero si no es como hacer trampas, si yo voy a evaluar o voy a utilizar los
+datos con los cuales voy a evaluar mis modelos, en generar mis modelos, entonces los modelos van a aprender de esos datos
+y se van a tratar de acercar a esas observaciones, entonces la prueba tiene que ser, se saca al principio y no se toca hasta el final
+Así entonces, ya, volvamos al caso de esta predicción.
+Entonces, pensemos que tenemos la resistencia de hormigón, ya, en el caso, en el Moodle
+está disponible el CSB, están los códigos que lo vamos a ver un poquito más adelante.
+En esencia, ahí se expresa la resistencia en megapascales, ya, aquí hay una unidad de
+presión y nos preguntamos cuánto nos equivocaremos en una composición que
+quedó fuera del ajuste es decir una mezcla, por lo que en esta
+en este hormigón digamos en esta composición tiene distintos compuestos y
+puede que haya una proporción distinta de compuestos que no está dentro del
+conjunto de datos. Entonces es una observación ya hipotética, diga ser, que
+no pertenece al conjunto de entrenamiento por lo cual el modelo no la
+conoce, no la ha visto. Entonces de cierta manera un modelo cuando lo
+tratamos de lo evaluamos con el conjunto de prueba,
+replican este conjunto de pruebas, replican esa situación. Es decir, yo
+genero un modelo con mi conjunto de entrenamiento? Bueno, qué tan bueno es la
+generalización? Cómo se comporta ese modelo con nuevos datos que no conoce?
+Esa es una de las grandes mentiras que nosotros vamos a tratar de definir y ahí vamos a ver cómo nos vamos a definir.
+Entonces, si fijan acá en el gráfico tengo la edad, que en esencia son la
+resistencia de hormigón por la composición que tiene la sustancia y
+además la edad del compuesto. Se fijan en los días en escala
+eucarístmica y la resistencia propiamente tal, pareciera que hay
+cierta fatiga de material con muchos días y cuando es el tiempo es muy
+corto aún así tienen menos en promedio digamos menos resistencia. Entonces
+hay, pareciera haber un número de días óptimo donde ese hormigón estaría en el mejor
+estado posible. Y también pudo trabajar, si se fijan, la
+resistencia, pudo verlo, cómo se comporta y esto es parte del análisis proletario de datos
+que es en esencia es entender con los datos que estoy trabajando, saber a
+cabalidad lo que estoy haciendo, lo que estoy tratando de
+muela. La resistencia es un número que está prácticamente sobre 5 y llegando un
+poquito sobre 80 y se fijan mis observaciones están
+más menos centradas en 30 40 y tengo observaciones en las colas, digamos
+observaciones con resistencia muy baja observaciones con resistencia muy alta
+tengo que tener claridad esto porque si mi modelo cualquiera sea y se fijan todo
+lo que estoy haciendo acá yo es un poco agnóstico de
+qué modelo estamos trabajando porque nosotros vamos a considerar que todos
+modelos me entregan una predicción y la forma en que lo hacen es parte de ese
+modelo en principio. Cuando nosotros trabajamos y tratamos de alguna
+problemática real, en general nosotros nos vamos con un modelo a ganar, digamos.
+Entonces probamos distintos modelos y después los evaluamos y en función a
+esa evaluación que es lo que vamos a formalizar hoy, yo empiezo a decidir qué
+modelo me sirve, qué modelo no me sirve, pero no voy con una predisposición.
+Entonces, en estos datos tienen que ser relativamente diversos porque si tengo,
+por ejemplo, si tengo sólo datos entre 30 y 40, mi modelo nunca me van a
+predecir fuera de su umbral, llegamos mucho más lejanos a eso. Entonces, tengo que
+tener una claridad, tengo que acelerar, digamos, que mi conjunto de
+entrenamiento se va a parecer al conjunto de prueba, digamos, los datos futuros los
+cuáles se van a evaluar. Entonces, no, todo esto nos acaba, digamos, con
+simplemente hacer una predicción, porque si fuese así es fácil, yo siempre
+ocupo el mismo modelo y en un acto de fédigo, este es el modelo mejor, el
+mejor modelo y con este me quedo. Pero en la práctica no siempre es así, a veces hay
+modelos que son sobre tener una complejidad mayor, que entregan menos
+nivel de predicción que un modelo que es bastante más sencillo. Pensemos
+regresión logística en comparación con una red neuronal o un supervector machine.
+Entonces el supervector machine tiene una complejidad bastante mayor que
+una simplemente una regresión logística y hay muchos casos los cuales
+simplemente una regresión, que es algo bastante común, bastante base que
+usualmente se ocupa como modelo a vencer, es decir, si tengo ese modelo dado que lo
+puedo interpretar a cabalidad, si no que no un nivel de predicción sustancial no
+voy a cambiarlo, entonces no puedo ir con una predisposición a que este modelo
+siempre gana porque para ello tengo que tener evidencia de que efectivamente
+gana respecto a una métrica y en principio estamos tratando de responder
+esta pregunta de cuál es el mejor modelo en algún sentido. Entonces, en ningún caso, yo hago la
+predicción y hago el modelo, que a veces nos concentramos mucho en esa parte de modelar bien,
+de cómo se programa, de cómo tengo que hacer las cosas, pero en el general, digamos, cuando uno lo vea
+a tono amplio, yo voy a tener, siempre voy a tener muchos modelos, entonces voy a tener que tomar una
+decisión más global. Entonces tengo que comparar todos esos modelos, nunca voy con una predisposición.
+En este conjunto de datos que yo le puse a disposición que es los datos de hormigón, yo tengo 7
+ingredientes que están en unidad de kilogramos metro cúbico y tengo la edad en días. Entonces
+voy a tener mi vector de predictores que son 8, 7 ingredientes y la edad y de
+alguna manera voy a hacer un ajuste y si se fijan ese ajuste no estoy imponiendo
+una forma funcional sobre ese F estimado sino que estoy diciendo hay algún
+procedimiento que me entrega un ajuste, una predicción de esa función
+puede ser regresión, regresión múltiple, regresión logística, SVM, cualquier
+cualquier modelo que en este caso dado que lo que nosotros queremos modelar es
+resistencia y es un número puede ser
+cualquier cualquier modelo que me mida o me modele una respuesta
+cuantitativa. Ese procedimiento de ajuste me va a entregar en esencia muchos y
+sub y para las distintas observaciones ajustados porque cuando yo le aplica
+nuevos datos en términos de predicción, yo voy a conocer los ingredientes y su
+edad y yo voy a meter eso al modelo y me va a entregar
+una predicción. Entonces cada modelo me va a entregar un vector de
+predicciones que yo voy a tener que evaluar.
+En el caso de esta base de datos tengo 1030 mediciones, 8 predictores numéricos
+que son los 7 ingredientes y la respuesta es continua que es la resistencia.
+Los ingredientes son cementos, coria, ceniza, agua superplastificante y
+agregado de grueso y fino para tener un poco más de contexto. Entonces, I sub I
+sin el gorrito, digamos, es la observación que yo tengo y observo en mi conjunto de
+entrenamiento. El I sub I con la estimación es la
+predicción que me entrega los distintos modelos, pero en particular uno.
+y el identificador digamos que no va a ser un predictor porque al final me va a estar diciendo
+si es que pertenece o no al conjunto de entrenamiento o no o si es que tengo algún identificador de
+otra índole digamos que me de otra característica para efectos de este de este de esta baseados ya
+el identificador hace referencia a qué conjunto de datos pertenece recuerden que la separación
+entre entrenamiento y validación y prueba tampoco es trivial, hay que tener
+ciertas precauciones, por ejemplo, qué pasa si mis datos están indexados
+temporalmente, no puedo hacer simplemente una separación en términos de muestra
+aleatoria, por ejemplo, tengo que mantener esas ventanas de
+temporales, porque en ningún caso puedo ocupar información del futuro para
+predecir el pasado, no tiene sentido dentro de ese contexto, entonces tengo que
+tener ciertas precauciones cuando tengo de dependencia entre los datos que son
+ya sea temporal, ya sea espacial, ya sea algún otro tipo. O sea, no puedo
+simplemente llegar y hacer un muestreo y separarlo de manera aleatoria.
+Ahora, en este conjunto de datos pasa que
+hay observaciones que tienen la misma composición pero sólo difieren en la
+edad. Entonces, es un problema bien especial y cómo tratamos ese
+problema en este contexto es que voy a agruparlos, que los voy a considerar
+agrupar cuando tienen igualdad exacta porque sino puede pasar que uno de esos
+conjuntos de observaciones se cole digamos a la prueba entonces van a ver
+una observación en entrenamiento que en siete de sus ocho predictores se parece a
+la a una observación que está en la prueba. Entonces tenemos que tener cuidado
+con esas tareas en general cuando los predictores son continuos.
+Es muy raro que pase eso por eso estoy hablando de un caso bien anómano
+respecto de esta base A.
+Así entonces, tengo modelos que me entregan predicciones, me entregan un vector de predicciones
+y que yo lo ajusto con un conjunto de entrenamiento a definir.
+Lo típico que se hace es hacer una separación 80-20, pero como les comentaba, dependiendo
+de las características de la base A, y si es por ejemplo serie de tiempo, no puedo hacer
+el 80-20 como si nada.
+Yo tengo que hacer por ejemplo ventanas incrementales.
+principio los modelos se van a entrenar con el conjunto de entrenamiento
+que estuviese bien definido. Voy a ajustar ese procedimiento con mi conjunto
+de entrenamiento y voy a considerar, una vez que tengo el modelo, nuevamente de
+manera vira-gnóstica, cuál es el modelo, no hemos dicho, porque todas estas
+metodologías van a ser aplicables a todos los otros modelos y
+otras metodologías que han visto, digamos, en el continuo.
+Y yo voy a evaluar eso en un nuevo dato, un nuevo dato que no conoce el modelo.
+Entonces estoy tratando de cierta manera evaluar el poder de
+generalización que tienen los distintos modelos en particular.
+Y en este concepto sale la noción de pérdida. Y pérdida, si se fijan acá,
+lo voy a llamar una función L que depende del valor observado y que es mi
+variable de interés y mi valor predicho de la variable de interés, es decir, y es lo
+que yo observé en mis datos y este y gorrito es lo que el modelo me entregó.
+Yo voy a definir la pérdida en este caso, yo la puedo generalizar también, como la
+diferencia del cuadrado y si se fijan tiende a ser la discrepancia, es decir, lo
+que era efectivamente con lo que yo dije o el modelo dijo que era, entonces
+es cuánto me equivoqué lo que está dentro del numerador
+y al cuadrado cuál es la finalidad que tiene es penalizar, equivocarse mucho
+porque al final yo voy a tratar de que este número sea lo más chico posible
+entonces
+si esta discrepancia es muy grande, es decir, me equivoqué o el modelo me está
+entregando predicciones que están muy lejanas de la realidad del dato
+observado, ese cuadrado me va a amplificar esa discrepancia, ese número,
+esa magnitud y por consecuencia voy a identificar bastante más rápido que el
+modelo no está haciendo bueno, se está equivocando mucho.
+esto es lo que nosotros vamos a llamar la función de perdida
+y debido a que estos i estimados son los valores
+que se obtienen a través de la estimación del modelo, este f sub t es
+simplemente el modelo que yo entrené, que yo realicé, utilicé y que cuando lo
+valúo en nuestros datos x, que son, pensemos, nuevas composiciones y nueva edad,
+me va a entregar como un todo este i estimado. Cuando tengo ese i estimado
+voy a poder evaluar la función de pérdida y se fijan yo puedo evaluar la
+función de pérdida en varios conjuntos, por ejemplo el conjunto de entrenamiento
+yo lo puedo separar en distintos subconjuntos y evaluar esta cantidad en
+distintas, en distintos datos previamente de datos. Entonces voy a tener una noción de
+variabilidad y en principio voy a poder sacar una esperanza condicional respecto
+de este valor de entrenamiento y a esa esperanza nosotros le vamos a decir que
+es, le vamos a llamar riesgo, que es el promedio de la pérdida que acabamos de
+definir como L, es la población de interés, si fijan la población de
+interés que tenemos que tener claro.
+Ahora
+formas que yo tengo de evaluar esta discrepancia o una métrica para definir que tanto se equivocas
+en modelo y poder comparar porque al final eso es lo que quiero recuerden que siempre van a tener
+distintos modelos que pueden hacer incluso si ustedes escogen un mismo tipo de metodología
+pensemos en regresión múltiple, ustedes también pueden tener
+muchas regresiones múltiples porque pueden tener distintos
+predictores asociados, distintas penalizaciones y así sumisiguen con
+todas las variantes que está dentro de la metodología. Entonces, cuando uno abarca
+o trata de solucionar o analizar un problema un poco más complejo, la
+cantidad de modelos individuales que uno evalúa son bastantes porque si solo
+evalúo regresiones múltiples ya me estoy acotando entonces y en la
+regresión múltiples puedo tener muchos tipos de regresión conforme cuántos
+predictores tenga y cuántas que tan sofisticado quiero que sea la regresión
+puedo hacer distintos tipos de penalización el lazo, reach, puedo hacer spline,
+puedo hacer un sinfín de cosas dentro del conjunto un poco más deterioro de lo que
+son modelos lineales o lo que son
+familia de metodologías, en la práctica uno tiene muchas otras, entonces con la
+experiencia uno va entendiendo más menos que qué modelo funciona mejor que
+otros en los distintos contextos, pero en principio si yo no tuviese una
+experiencia digamos sobre la problemática en particular, yo debiese
+evaluar todos esos modelos, entonces tengo que tener claridad en cómo los voy a
+a evaluar cuáles son métricas comparables y en ese contexto tal en dos métricas particulares
+el error absoluto medio o el error medio absoluto y la raíz del error cuadrático medio o el
+error medio cuadrático que por su sigla Nikleli llamamos MAE y RMSE
+si se fijan acá, el MAE define la discrepancia entre el valor observado y el valor predicho
+en valor absoluto porque yo me puedo equivocar sobreestimando y subestimando. Entonces, para
+sacarnos el problema del signo, le aplico el valor absoluto y saco su promedio. Si se
+fijan acá el error tiene un peso lineal no le doy más peso si es que
+esa discrepancia es más grande en cambio en la raíz del error cuadrático
+medio tengo la discrepancia el cuadrado entonces a mayores discrepancias entre
+lo observado y lo predicho esa cantidad va a ser mayor y por consecuencia al ser
+mayor el RMSE pasa el mayor por consecuencia cuando evaluó esa cantidad
+voy a estar dándole una mayor magnitud entonces si leo al cuadrado o la
+apética estar al cuadrado voy a estar en principio la filosofía que está detrás
+o la idea más bien es penalizar errores muy grandes, esa es la idea.
+Así entonces, ¿por qué es importante las distintas métricas?
+Hay una pregunta aquí, dice en la práctica cuando se utiliza uno y el otro, a eso
+vamos, ese es como todo al dejar de lo que queremos ver, como que veamos, pero
+porque como tantos modelos tengo,
+lo que yo me preguntaría para definir si voy a ocupar más de ORMCE es qué tanto
+quiero penalizar errores graves, ya, errores de mucha distancia, discrepancia, ya. Si yo de verdad no me
+quiero equivocar tanto y quiero que sea una predicción más menos consistente en términos
+de el conjunto entrenamiento, voy a querer penalizar cuando esa discrepancia es muy grande, ya.
+Entonces esa es la forma, la forma de verlo digamos, porque una está al cuadrado y la otra está no,
+entonces la que está al cuadrado viraliza más cuando hay discrimación
+mayor en términos de magnitud, pero lo que se hace en realidad es ver el
+abanico de cosas, usualmente uno no elige solo o no evalúa solo una
+métrica, sino que yo puedo por ejemplo antes de evaluar la metodología yo puedo
+definir, bueno, voy a ocupar cinco métricas para evaluar, para evaluar la
+la abundancia los modelos y voy a escoger y esto lo hago previo a obtener
+los resultados porque si no es como hacer trampa digamos, o sea no puedo ver los
+resultados y decir ah ya ese porque voy a estar tratando de convencer
+sino que yo lo tengo que definir a priori, digo si tengo cinco métricas de
+evaluación ya sea el mal, el r cuadrado, el aic, cualquiera que ustedes lo que
+lo vamos a ver un poco más adelante yo puedo decir bueno es que gana
+4 de 5 entonces es el que voy a escoger. Entonces me externalizo un poco de la
+decisión porque definí la regla de definir cuál es el mejor modelo con
+ellas previo a ver los resultados. Entonces yo aprende lo sabía, entonces
+definí un plan de acción previo a ajustar con los datos.
+Ahora
+la métrica, vamos aquí a mostrar en el contexto de que voy a escoger una
+métrica pero uno podría también decir si es que ganan dos métricas es mejor
+que ganen que ganan sólo una pero vamos a trabajar con una métrica
+porque porque si yo cojo sólo una métrica como la de verdad y en función
+a ese es cómo voy a escoger el mejor modelo si yo lo escojo bien ya o las
+repercusiones que tiene escoger una métrica sobre otra o el mar en este caso
+sobre la raíz del error cuadrático medio, puedo escoger un modelo distinto, ya, para
+tomar una decisión. Si se fijan acá, el error absoluto es para los distintos casos
+y en el modelo A tengo un más de 2 y una raíz del error cuadrático medio de 4 y el
+el modelo B tiene un maé de 3 y un error cuadrático, una raíz del error
+cuadrático medio de 3. Entonces, con el maé vamos a escoger el 2 porque es menor
+y con el rmce vamos a escoger el B
+porque el rmce es 3. Entonces va a depender mucho de
+la noción que tengo yo de la función de pérdida y al final todo ahí, qué tanto
+estoy yo dispuesto a equivocarme en la clasificación que la voy a mover a otro tema
+pero qué tanto estoy yo dispuesto a equivocarme más y en la
+predicción o el moveramiento continuo ese equivocarme más hace referencia a
+que tanto es la discrepancia entre lo
+de clasificación es exactamente clasificar mal. Y si ustedes lo vieron,
+la vislación de Pedro, cuando vieron
+el margen máximo, uno puede, digamos, definir, equivocarse un poco tal que a
+nivel global tenga mejor ajuste.
+Ahora, vimos el MAE, vimos la raíz del error cuadrático medio, otro que quizás están
+familiarizados que es el R cuadrado. El R cuadrado en esencia, por su definición, digamos
+formal, es la proporción de variabilidad que es explicada por el modelo. Entonces,
+es un número que está entre 0 y 1. Si está 1 es que el R cuadrado explica de manera perfecta
+la variabilidad. Y si no se han dado cuenta, toda la estadística ronda en tratar de cuantificar
+la variabilidad y la incertidumbre, porque al final eso es en principio. Entonces, el
+recuadrado trata de cuantificar la variabilidad explicada. En estadística en
+general y en sencilla, todos están bien, ustedes sabrán el concepto de sobreajuste
+que lo vamos a ver un poquito más adelante, pero yo creo que ya deben estar
+familiarizados. Si las cosas andan muy bien, tengo ajustes muy buenos, muy
+buenos en general, tiende a ser malo, porque si algo es muy bueno
+probablemente en realidad no lo era, y estoy entrando en un sobreajuste, ya, que a mí me gusta
+definirlo como no estoy modelando el fenómeno, el problema, sino que estoy
+modelando mis datos, y ahí ya es una particularización de algo que debiese
+ser mayor. Entonces, en esta métrica de R cuadrado
+la evaluamos como uno menos, si se fijan acá arriba en el numerador, es la
+discrepancia entre lo observado y lo predicho al cuadrado entre la suma en
+todas las observaciones y abajo lo mismo pero con el promedio de
+observaciones evaluadas
+este número es tanto es 0 y 1 ya
+y digamos va a ser otra otro insumo de métrica que nosotros vamos a utilizar en
+conjunto con el MAI y la raíz del ero cuadrático medio para definir y decidir
+qué o cuál es el mejor modelo. Una cosa que tenemos que tener cuidado en
+cualquiera sea los modelos y sobre todo con estas métricas es si los datos están
+correlacionados. Si han estudiado regresiones múltiples estarán familiarizados con el
+concepto de multicolinearidad y esa multicolinearidad no es sólo un
+problema en las metodologías de modelos lineales y las metodologías de
+de relaciones múltiples, sino que también en otros tipos de modelos.
+Por ejemplo, si acá tengo una correlación muy fuerte,
+dígase 1, entre lo observado y lo predicho,
+si se fijan son los mismos datos que difieren en 10 unidades,
+me da una correlación 1, el RMC me da 10 y el R cuadrado me da un
+número negativo.
+Y al tener un número negativo significa que aquí hay
+problemas.
+Entonces, esta problemática tiene que ser vista y evaluada con cuidado.
+¿Ya?
+Ahora, volviendo al conjunto de datos de hormigón,
+el conjunto de datos de hormigón, yo tenía estos compuestos y les dije que
+muchas observaciones tenían lo mismo porcentaje, los mismos predictores en
+términos de su cantidad en los distintos componentes, pero diferían en la
+cantidad de días. Y para ello les dije voy a juntarlos. Y al juntarlos
+voy a quedar con 342 composiciones distintas y que hacen o que
+representan 806 mediciones de las 1.030 que yo tenía en un inicio
+entonces
+esas composiciones que voy a tener acá
+yo las voy a separar, no voy a mostrar tanto en detalle cómo se separaron
+porque vamos queremos el foco de esta clase es
+digamos concentrarnos en la evaluación y la selección pero el tema de separar el
+conjunto de datos no es menor porque si tengo particularidades como yo les
+mencionaba de si tengo datos por ejemplo indexado en el tiempo la separación no
+simplemente 80 20 y se acabó ya hay una segunda iteración que
+que realizar puesto que no puedo el principio ocupar datos del futuro para
+decir cosas del pasado tienen que tener una coherencia la forma en que
+evaluo y ajusto mis modelos con la realidad
+entonces a una separación entre un conjunto de entrenamiento que lo voy a
+utilizar con validación cruzada que lo mencionaron y lo vieron con Pedro
+voy a utilizar cinco pliegues y voy a dejar una prueba de 224
+mediciones.
+En total voy a tener 428 composiciones distintas y voy a reservar el 20%
+de los grupos para la prueba propiamente tal, que va a ser la noción del
+conjunto oráculo con el que yo efectivamente voy a evaluar los modelos.
+En el entrenamiento yo los puse a parar en validación y entrenamiento para
+mejorar, digamos, la forma en que yo voy a definir los parámetros y voy a hacer el
+ajuste voy a generar el modelo pero la prueba última es la evaluación y larga
+la redundancia en el conjunto de prueba. La idea es que en este caso la idea es que
+ninguna composición de los distintos de los siete distintos sustancias que están
+en el hormigón no aparecen las distintas particiones es decir una
+observación no puede estar en el entrenamiento y en prueba a la vez, ya
+porque si no, estoy replicando información en la prueba que no debiese
+conocerla y como el modelo la conoció en el entrenamiento va a tratar de
+acercarse a ella cuando lo valúen el modelo, cuando se ajusta el modelo y
+después posteriormente se valúen el conjunto de pruebas. Entonces, de cierta
+manera es como un poquito hacer trampa, la idea es ajustar con cosas que
+o sea probar el modelo con cosas que no ha visto antes para analizar la noción de generalización del modelo.
+Ahora,
+yo puedo evaluar mis modelos en un subconjunto del conjunto de entrenamiento que es
+que nosotros llamamos el la avaliación, o lo puedo hacer el conjunto de entrenamiento en principio, sobre todo cuando hago
+ligación cruzada y en general cuando
+voy a tener resultados mejor de lo que debiesen ser, es muy raro que pasa el
+revés. Si es que pasa, digamos. Entonces, si se fijan acá, ya, en este ejemplo, digamos,
+hipotético, ya, conocemos algo que en un problema real no conoceríamos, ya.
+Tenemos los seis candidatos, o estos seis, uno, dos, tres, cuatro, cinco, seis, tienen el mismo
+error esperado
+si te fijan acá todos están centrados en términos de su valor esperado del
+error en 10
+sin embargo cuando valúo ese error en la muestra de validación me va a dar
+distintos valores
+¿Qué es lo que me provoca esto? de que la separación particular que yo hice
+para el conjunto entrenamiento y validación me está favoreciendo esta
+cantidad que está acá. Entonces todos los modelos tienen
+aquí dice 6 pero en realidad son 7, los 6 modelos tienen el error esperado 10
+y vamos a elegir el modelo, ah no, son 6 porque este es de la leyenda
+elegimos el modelo 5, que es el que está acá, porque su error de
+evaluación es 8,7 que es el menor en términos de la escala I.
+Y eso también hay que considerarlo, puede que el modelo que
+nosotros estamos escogiendo, solo ganó por una cosa aleatoria,
+digamos, porque la muestra a la cual lo estamos evaluando le salió favorable.
+No quiere decir que en toda muestra posible va a ganar eventualmente o
+consistentemente.
+Y esto es el conjunto de validación. Entonces, nosotros hacemos la metodología
+con entrenamiento y validación, pero nuevamente la prueba, la evaluación en el
+conjunto de prueba es el examen último, digamos, para definir cuál vendría a
+ser mejor porque evaluamos su poder de generalización.
+Entonces, ¿cómo ocupamos estos conjuntos de entrenamiento y
+variación? Con el entrenamiento, dentro de los distintos candidatos que son los
+distintos modelos, yo voy a querer estimar los coeficientes,
+medias y escalas, el martes ustedes vieron la penalización reach, ya hay la penalización reach
+o los distintos tipos de penalización
+tienen digamos que estandarizar, ya al estandarizar le resto una media, le digo una
+de que es un estándar, puedo cambiar de escala las cosas, ya pero todo tiene que
+ser hecho, por ejemplo si a todos, a mis predictores, a mis datos, le quiero
+restar una media para centrarlos entonces no puedo sacar el promedio que
+le voy a restar a cada uno de los datos con todos los datos, no puedo sacarlos
+porque si ocupo todos los datos estoy incluyendo los datos de prueba y eso
+sería ocupar datos que no debía ser o el modelo no debía ser, entonces el ajuste
+dentro de los distintos candidatos que son los modelos va, voy a realizarlo
+digamos con el conjunto de prueba. Y para las elecciones, para seleccionar entre
+los distintos modelos de distintos candidatos, yo voy a utilizar el error de
+evaluación en los distintos pliegues.
+Cada modelo, cada candidato que yo evalúe y lo ponga como un posible futuro
+modelo a utilizar para tomar una decisión, es una receta completa. Es decir, yo puedo
+tener dos modelos de regresión y uno es centrado y el otro no, uno tiene penalización y el
+otro no, entonces yo tengo que evaluar todas esas combinaciones posibles. Ahora, ¿cuál
+es el problema cuando tengo muchos predictores y muchos modelos a disposición? Y esto por
+eso es la noción de entender esta problemática y no simplemente automatizar todo y probar
+todos los casos posibles o todos los modelos posibles, porque no se puede, a decir si tengo
+100 predictores tengo un sinfín de combinaciones, por ejemplo, no puedo ocupar solo un predictor,
+el primero y el segundo, el primero y el tercer, el primero y el cuarto, y así sumisí, y
+no puedo tomar las combinaciones posibles. Y hoy en día, cuando tengo un conjunto de
+datos muy grandes y con muchos predictores, cuando combino toda la combinación para la
+reunanza de predictores posibles, más las distintas metodologías, más las distintas
+particularidades dentro de cada metodología, la cantidad de modelos a
+probar o de posibles candidatos sube exponencialmente. Entonces no puedo
+probar todo para definir cuál es el mejor. Tengo que tener un una noción
+predefinida de cuáles van a ser las cosas que voy a probar y eso es una
+mezcla entre el quiz experto entender la problemática y entender la
+metodología subyacente que estamos ocupando, ya sea metodología más estadística, metodología
+más de cienciatros, que en la práctica tienden a competir entre sí, ya, y ahí tenemos una
+diferenciación entre el objetivo principal, si ya sea más predecir o si ya sea más interpretar.
+Entonces cada candidato tiene una receta completa, es decir, no es sólo un modelo, es decir, hizo una
+regresión múltiple, sino que es, hizo una regresión múltiple con estos
+predictores, es ahí que hice estas transformaciones y así sumisibles, toda una
+receta prácticamente tal.
+Esa misma receta es la que yo utilizo en el conjunto de pre-a.
+Siguiendo entonces, ¿qué modelos voy a comparar a lo largo de esta sesión?
+Voy a comparar un modelo constante, ya que simplemente tomo las
+observaciones que yo observe y le saqué el promedio, voy a modelar una regresión
+múltiple y una regresión cuadrática con penalización reach. Si se fijan la
+penalización reach tiene todos sus parámetros lineales
+con los parámetros al cuadrado y además 28 interacciones. Entonces es bastante más
+complicada en términos de parámetros, en el número de parámetros que tiene y
+además esta misma regresión la voy a evaluar con distintos candidatos de
+penalización ya sea alfa o lambda como le pusieron cualquiera de los dos es
+valido digamos es el parámetro de costo digamos de penalización de reach y
+hablar con 0 1 1 10 100 y 1000 y se fijan cuando empieza a hacer todas las
+combinaciones entre los distintos modelos distintos pre-editorio distinta
+interacciones, distintos hiperparámetros, ya las cosas son, digamos, muchas para probar
+manualmente, sobre todo si por ejemplo tengo que hacer diagnóstico, hablar y cosas de
+ese tipo. Entonces, ¿cómo ajustamos este modelo rich?
+Ya, si se fijan acá, esto es lo observado menos lo predicho, el beta 0 más la combinación
+lineal de los beta al cuadrado, es decir, tengo estos por definición una suma
+cuadrado del error y las penalizaciones al cuadrado
+grids que vienen dadas por este tipo de metodología. Si el landa es pequeño se
+permite un coeficiente de mayor magnitud, si el landa es grande se contraen de
+manera más rápida porque penaliza, penaliza en esencia que los betas sean
+muy grande. Nunca nos lleva a cero, como por ejemplo la penalización lazo, pero
+digamos nunca voy a tener, sobre todo con los betas muy grandes, porque va a
+haber un dado que está al cuadrado, una penalización mucho mayor. Y esto se
+minimiza, esto es un problema de optimización.
+si se fijan acá los coeficientes los ajusto pero el lambda los comparo o los cojo al evaluar los
+errores de evaluación y volviendo un poco a lo que mencionaba antes que era la noción de sobreajuste
+la noción de sobreajuste que ya overfitting que quizás están ya familiarizados pero aquí
+entra dentro del contexto de la evaluación que nosotros vamos a hacer, si se fijan acá,
+si yo os cojo como que la métrica de definir que algo es el mejor modelo, no es agnóstico a otros
+conceptos que son un poco más generales. Por ejemplo, si yo os cojo la raíz del error cuadrático medio
+en una regresión con grado 2, si se fijan esto tiene un número 0,67 con los datos de entrenamiento
+y cuando lo pruebo con datos nuevos es 0.64, de hecho es raro que pasa y se equivoca menos
+pero si hago el mismo modelo pero con un polinomio de grado o un parámetro, un predictor con grado 12
+el ajuste va a ser mejor porque dado que tengo un mayor grado de polinomio tengo
+mayor flexibilidad para ajustar menos datos pero cuando lo evaluó en datos
+nuevos
+esa raíz del error cuadrático medio es mayor ¿por qué? porque estoy
+restringiendo, estoy haciendo un trade-off entre
+ajustar mejor mis datos pero voy a bajar el nivel de generalización porque el
+polinomio o la revisión con gravo 12 o con un coeficiente de gravo 12 va a
+ajustar por el mayor permeabilidad de flexibilidad que tiene de ajustarse a
+los distintos puntos es decir un gravo, un polinomio de gravo 2 tiene cierta forma
+un polinomio de grau 12 puede tener bastante más curvas y bastante mayor flexibilidad para la redundancia.
+Pero esa flexibilidad viene con un costo. Y ese costo es predecir datos que no se conocen bien.
+Porque este polinomio, este modelo aprendió muy bien de estos datos.
+Y solo modela muy bien esos datos. Entonces entra un problema sobre ajuste que a mí me gusta definirlo como
+modelar los datos y no modelar el fenómeno que tengo interés en particular.
+Entonces, en este caso, el poder de generalización viene con un modelo menos complejo, porque
+el de grado 12 va a tener una mayor complejidad, sobre todo computacional y en términos de
+analíticos, en principio. Entonces, esto está englobado dentro de tres conceptos que
+son los principales en términos de este tipo de error. El sesgo, la varianza y el ruido. Son
+las tres formas que me puedo estar equivocando. El error cuadrático esperado va a ser el sesgo
+al cuadrado, su varianza y un ruido. Empecemos por el ruido. El ruido no me lo puedo sacar nunca
+porque siempre hay una electoridad de por medio que está inherente. El sesgo es la distancia entre
+la señal que es lo que yo observe y el ajuste promedio y la varianza es que
+tanto varía ese ajuste conforme yo cojo distintos datos para ajustarlo
+entonces todos estos modelos igual pueden ser visto como una función más
+un ruido yo le puedo dar supuestas distribucionales el ruido pero en
+principio es algo que no me puedo sacar un río que está ahí y va a estar
+permanentemente ahí que tenemos que lidiar lo que nosotros queremos hacer es
+que no haya un ruido adicional o una una fuente de variabilidad adicional que se
+mezcle con eso. Entonces, aumentar esta flexibilidad con por ejemplo los
+grados mayores, un grado 12, puede reducir el sesgo, es decir, entre lo que yo
+observé y el ajuste promedio, esto de acá,
+puede decir va a tener un mejor ajuste pero va a aumentar la variabilidad porque
+cuando lo evalúo en una nueva muestra, en los nuevos dados, quien no conoce el
+modelo, estoy excedo exactamente esto, estoy cambiando la muestra, entonces
+quiero tener un buen balance entre sesgo y varianza, el ruido está idio, está
+permanente
+Así entonces, yo quiero estar interesado en las predicciones, y en las predicciones
+fuera de un pliegue, que le voy a llamar OUF, que es Out of Fold, fuera del pliegue.
+¿Qué quiere decir eso?
+Con cada ajuste que yo hago, siempre voy a sacar un pliegue, es decir, yo les comentaba
+que el conjunto de entrenamiento lo separé en 5 pliegue, es decir, ese 80%, lo separé
+en cinco conjuntos, ya de 20. Si, 2, 4, 6, 8, no, de 80 y 5.
+Y ahora ese conjunto de estos cinco conjuntos yo voy a sacar uno y voy a
+evaluar con cuatro, después voy a sacar otro y voy a incorporar el primero y así
+sumo a siguiente. Entonces voy a quedar con todas las observaciones evaluadas fuera del
+pliegue, es decir, voy a estar sacando predicciones que lo que hacen son
+es evaluar la función estimada, la función que estoy realizando, con todos
+los datos menos el pliegue yésimo, y con ello voy a obtener y puedo calcular la
+raíz del error cuadrático medio con todos esos datos, los voy a juntar y puedo
+calcular esa cantidad.
+que no es, si se fijan acá, lo junto y saco el error cuadrático medio
+que no es lo mismo que promediar los error cuadrático medio
+sino que es el error cuadrático, la raíz del error cuadrático medio
+fuera de pie, dan números distintos
+no son uno mejor que otro, sino que son decisiones distintas
+porque la raíz no es lineal y si yo saco el promedio y lo saco la raíz
+lo mismo que sacar el primero la raíz y luego el 9, el orden va a importar en este caso.
+O sea, nosotros nos vamos a quedar en este sentido con esta cantidad, el 2.2 y se fijan
+no es tan distinto pero va a depender mucho de los valores con los cuales yo estoy trabajando.
+Entonces estas recetas que van a ser los distintos candidatos, los distintos modelos,
+van a tener, sobre todo con la metodología de validación cruzada que es muy usada,
+digamos, dentro de este contexto, es una prescripción clara de qué es lo que
+conlleva todo el modelo. Por ejemplo, hay modelos que yo no voy a necesitar
+necesitar no necesitar estigmatizar pero voy a tener otras particularidades ya
+entonces yo voy a querer evaluar y hacer el ajuste con el con los distintos
+pliegues voy a estimar voy a transformar voy a hacer efectivamente el modelo lo
+voy a generar y voy a tener parámetros fijos ya voy a estimar luego de ello
+voy a, suponiendo que tenemos los cinco pliegues con cuatro voy a hacer todo eso
+la prescripción que les he mencionado y luego voy a aplicar todas las
+transformaciones a el conjunto de validación y luego de ello voy a
+calcular alguna métrica de error, en particular aquí la raíz del error
+cuadrativo médico. Entonces todas esas prescripciones
+tienen que tener una receta. ¿Qué es lo que nosotros queremos hacer?
+debemos evitar la fuga de datos o data leakage que en esencia es ocupar en el
+ajuste datos que no debiesen ser vistos. Por ejemplo, ocupar datos
+de evaluación en el ajuste de entrenamiento o ocupar datos de prueba
+en el conjunto de entrenamiento para generar los modelos porque la idea es no
+no hacer trampa, ocupar que evaluar los modelos en datos
+que no conoce en principio, ya pueden ser similares pero no conoce, ya no los tiene en su poder digamos cuando se hizo el ajuste
+entonces
+¿Cuál es el protocolo general? primero tengo que definir qué es lo que voy a hacer y la métrica con la cual voy a evaluar
+voy a comparar de manera interna con validación cruzada
+voy a escoger el modelo y voy a reajustar una vez que escogí el modelo voy a decir ya este es el modelo que voy a utilizar
+utilizar. Ahora voy a ocupar todo el conjunto de entrenamiento sin hacer discrepancia entre
+o diferencia entre el entrenamiento y la validación. Lo voy a evaluar con todo y finalmente voy
+a utilizar el conjunto de pre-o y ahí voy a tener recién una métrica de el modelo
+que yo estaba utilizando y una buena evaluación de qué tan bueno es mi modelo.
+Ahora, una vez que hago la evaluación y no me dieron buenos resultados, no puedo coger
+otro, ya, porque si no voy a hacer trampos, o sea, por eso uno planifica en un principio
+cuál va a ser tu criterio de aceptación. Y algo que toma tiempo, digamos, definir,
+ya, más que simplemente hacer los modelos, toma más tiempo definir el plan de acción
+que se va a hacer antes de hacer el modelamiento per se, pero tengo que definir criterios de
+decir si el mae o la raíz del error cuadrático medio, el conjunto prueba supera o es menor a tal valor, entonces
+puede utilizarlo, pero sin antes, pero eso se tiene que hacer, digo, antes de hacer todo el resto, tengo que
+tener un criterio predefinido y adecuarme a eso.
+Ahora creo que podemos ir al break, creo que estamos en la hora, vamos a cerrar?
+Si
+Así que, ¿cuánto dura? Creo que dura 15 o media hora, me recuerda
+Creo que es como 20 minutos
+Ya, dejémoslo en 20 minutos, vamos un poquito a las 9.05 a PP, ¿les parece?
+Des 마.
+¡Tenemos Behind!
+Ya, vamos a continuar.
+más.
+.
+Bueno, continuada con este segundo módulo.
+En el módulo están disponibles
+cuatro archivos más la presentación, son 50 total.
+Dos de estos son códigos y los dos restantes son
+la base de datos de esta sección 38 en principio.
+ambos códigos están en R y en Python, en ese se son lo mismo, o intentan hacer lo mismo,
+pueden haber pequeñas discrepancias debido a la implementación computacional que tienen los
+distintos paquetes o módulos, pero el principio sigue siendo el mismo, la metodología es exactamente
+igual. Entonces para ello, ustedes pueden utilizar el editor, digamos, o el entorno que ustedes
+prefieran, yo tengo mis propias
+pero quizás puedo re-encontrar, de hecho, que vamos a ver ahora.
+En general, uno tiende a trabajar
+estadísticas más en R y cosas más de esencia de datos en Python, pero
+la decisión, digamos, es personal, cada uno tiene sus pro y sus contras.
+Ambos son lenguajes
+de alto nivel, por lo que por debajo en los paquetes tienen que igual utilizar
+códigos de bajo nivel como C o Fortran o cosas de ese estilo para poder hacer
+computó un poquito más sofisticado, digamos, para que no sean tan lentos.
+Ya, entonces vamos a comenzar con
+cómo implementamos esto, cómo tomamos estas decisiones, cómo
+evaluamos los modelos y recuerden que
+diferencia grande entre los problemas
+de movilamiento numérico, ya, en el sentido de movilamiento cuantitativo,
+es decir, la variable respuesta es un número, ya, y se entiende como un número,
+no una clasificación o una categoría que está categorizada o evaluada,
+identificada con números.
+Por ejemplo, serie 1, si todas son serie 1, por mucho que sean números, siguen
+siendo categóricas y los problemas de clasificación porque vamos a utilizar
+métricas distintas y en eso es parte de lo que tenemos que entender
+qué métrico ocupar y cuándo
+entonces tenemos el código de R, tenemos código Python, ambos son válidos para
+está para replicar esto y lo vamos a ir viendo. Entonces, vamos a cerrar esto un poco.
+Así entonces, si lo pueden bajar y me confirma si lo pueden ejecutar sería
+idóneo. Yo les voy a compartir en R, porque me acomodo un poco más, pero
+lo tengo todo abierto. Y les puedo dar una recomendación también de otro
+software que yo utiliza al menos. No sé si todos están familiarizados con RStudio, que es como el
+software para R, que usualmente se utiliza, a menos que lo ocupen por consolas, pero la misma
+empresa tiene un software que se llama Positron y sirve para Python y R.
+Entonces no tengo que andar cambiándome de software ni mi cosa de ese estilo, solo que puedo ocupar
+uno para él mismo. Si se fijan acá, esto está, lo que estoy compartiendo es en R.
+y si ustedes dejan toda la... pueden poner la ruta del material acá,
+están más o menos tanto explicativo con comentarios,
+pero pueden ejecutar todo el paquete, digamos, todo el código y les va a tirar un circuit de plot
+que vamos viendo poco a poco. Y si ustedes quieren hacerlo con
+Python, ya,
+si lo quieren hacer con Python, debería ser esto.
+Colab no lo reconoce por el hecho de que Colab está hecho para archivos de
+Jupiter, ya al principio. Entonces la extensión es IpyNV o Notebook de Python.
+Eso está en códigos, digamos, directos. Ahora, de igual manera tú puedes ir copiando el
+bloque a bloque, como dice Juan, digamos.
+Esto es válido, cualquiera de las... Si lo quieren ocupar de manera cloud, lo quieren ocupar de
+manera local. Se puede ir copiando fácilmente. Para la próxima sesión yo creo que
+me lo voy a pasar el código en Jupyter para que lo puedan llegar y abrirlo.
+Así entonces, si se fijan ahora, creo que estoy compartiendo el código en Python.
+Si se fijan acá es otra ventana
+y me ejecuta exactamente lo mismo pero en pipe. Pues tengo un, al menos yo esto lo recomiendo
+porque así tengo todo de manera unificada, de hecho yo pudiese abrirlo en el mismo tab
+pero para efectos de orden propio lo ocupo en este acampo.
+hasta aquí, esto es en R y en Python estoy compartiendo el de Python que es el de acá
+si se fijan
+me realiza todos los códigos que están en los archivos de disposición
+de hecho
+vamos a ponerlo con blanco para que se vea mejor
+ya
+el programa lo va a escribir por si le interesa, se llama Positron
+es de la misma empresa que hizo RStudio que es Posit
+Almas acomoda mucho más porque si uno trabaja solo con el estudio que, digamos, está un poco más obsoleto, uno se encasilla mucho.
+Y la verdad es que hay que tener cierta versatilidad porque hay cosas en las que Python es preferible por sobre R y cosas que R es preferible por sobre Python.
+Entonces, hay que tener esa flexibilidad de ir cambiando de lenguaje conforme sea necesario.
+Entonces, voy a compartir en R.
+Y si fijan acá, todos pudieron, alguien tuvo algún problema para ejecutar el código.
+Todos bien.
+Vamos a volver a la presentación.
+Lo pueden ir ejecutando conforme vamos avanzando en la presentación.
+Ya.
+Entonces, si ustedes ejecutan, si se fijan, los códigos están por secciones.
+Las primeras dos secciones son de configuración en principio,
+y la primera sección de metodología es en la sección 03, que yo puse como comentario.
+Entonces, esa sección lo que hace es ajustar cada modelo pero sin considerar el pliegue
+en particular porque eso se le tiene que ocupar para hacer la validación.
+Entonces nosotros ajustamos con los modelos, o sea con los pliegues que son del entrenamiento
+pero no con el pliegue propiamente tal que voy a utilizar en esa iteración para la avaliación.
+Por eso estoy haciendo un anidado de 4 entre 1 y 6, porque aquí hay la diferencia 5, ¿cierto?
+Y dijimos en un principio que van a ser 5 pliegues, ¿ya?
+Entonces, en Python, nosotros vamos a hacer este fit, digamos, y vamos a hacer la predicción
+con este conjunto que le vamos a llamar, que se llama, valida. Y vamos, si se fijan acá,
+voy a ocupar este subconjunto valida con su negación, que es la tilde, para ajustarlo.
+Si se fijan acá, este modelo que es el clone, ajusto con los X, que son los predictores que no están en el pliegue de validación y con los Y que no están en el pliegue de validación.
+y calculo con la función predict
+la raíz del error cuadrático medio fuera del pliegue y los voy guardando
+si se fijan acá lo que estoy haciendo es exactamente esta fórmula que está aquí
+es exactamente esta fórmula que definimos un poquito más atrás
+que está aquí, pero evaluando correctamente en la
+en el conjunto o subconjunto de validación, que es lo que nosotros queremos
+hacer porque después queremos hacer eso e iterarlo a través de todos los
+conjuntos de validación para obtener efectivamente la raíz del error
+cuadrático medio de nuestro proceso de ajuste, digamos. Y en R, algo muy similar,
+defino cuál es el fold y respecto a esa variable que voy a ir iterando voy a
+ajustar con los datos que no están en el fold de validación, ya por eso te hacen la
+negación de esta validación, es decir, los X que no están en este
+subconjunto X y los Y que no están en este conjunto Y
+y voy a predecir con los conjuntos del pliegue en particular y voy a hacer eso
+cinco veces porque son cinco pliegues. Luego voy a juntarlos y voy a sacar la raíz del promedio de
+estas distancias al cuadrado, de esta discrepancia al cuadrado que en esencia es la raíz del error
+cuadrático medio. Entonces todas estas transformaciones, todas estas modelos se aprenden dentro del ajuste
+y yo voy a ir calculando la raíz del error cuadrático medio en los distintos pliegues.
+ambas son equivalentes. Si hacemos eso con los modelos que acabamos de mencionar,
+si se fijan, cuando lo hicimos un poquito más atrás, dijimos que íbamos a evaluar
+7 candidatos, el modelo constante, modelo de regresión de línea múltiple y regresiones
+cuadráticas con penalización rich, con distintos parámetros de costo de esta penalización.
+Así entonces, cuando lo iteramos, si se fijan, ustedes pueden...
+Voy a volver ahora a R.
+Ustedes ejecutan.
+En particular, pueden ir ejecutando por bloques si tienen este programa.
+A pesar de no ser interactivo, uno puede ejecutar todos los barrios.
+se fijan acá, vamos a ver un poco más grande
+acá replico los mismos datos que están en la presentación ya y si lo hago en R
+o sea en Python perdón también voy a tener
+la misma cantidad. Vamos a volver entonces lo que vi en la presentación para que esté
+un poco más fácil de entender. Entonces acá tengo el resumen, tengo el resumen al hacer
+el proceso, digamos, al evaluar estos cambios. Y recuerden que todo lo que estamos haciendo
+es de cierta manera un poco agnóstico el modelo que vamos a utilizar, ya, porque tal como hacemos
+regresión lineal o una regresión cuadrática o con las distintas penalizaciones, yo podría tener
+otros modelos, podría tener una red neuronal, podría tener un SBM, podría tener alguna otra
+metodología que me sirva para atacar, digamos, tratar de evaluar y predecir la variable de interés.
+Entonces, en ese sentido estos ejemplos son bastante anecdóticos porque pueden ser
+todas las metodologías que ustedes saben y conforme uno va estudiando más uno va aprendiendo
+más metodologías pero en la práctica cuando queremos tomar decisiones tenemos que llevar
+digamos a la evaluación y contrastar unos con otros porque no porque va a ser más complicado
+otro modelo en el sentido de que más sofisticado tiene más parámetro necesariamente va a ser
+mejor. Entonces ahí está el juego, digamos, de
+modelar y tener, digamos, procesos iterativos de modelación que sean
+bastante razonables, porque si no voy a perder todo el tiempo en modelar y no
+voy a tomar efectivamente una decisión o una acción, probablemente. No puedo
+recomendar algo. Entonces, aquí voy a evaluar. Ya está
+la ordena, digamos, estos siete candidatos por la raíz del error cuadrático medio
+fuera de pliegue, de menor a mayor. Y también tengo el MAE.
+Ahora, las columnas muestran este RMSE y el MAE que están en los micropascales,
+me voy a buscar eso, el MPAC, la unidad de respuesta de nuestra variable de
+interés. No son coeficientes sino que simplemente los valores que nosotros
+evaluamos en los distintos modelos. Estas van a ser nuestras métricas, nuestras
+métricas que nosotros tenemos que tomar, analizar y en lo posible escoger un
+modelo a través de estas dos. También pudiese escoger el recuadrado de ese paso
+u otra métrica. Hay varias métricas que vamos a ver un poquito más adelante para
+los distintos problemas. Si se fijan acá, la media de entrenamiento,
+que se fijan, es el modelo que es un poco más ingenuo, que es
+simplemente tomar las respuestas y promediarlas, es el modelo que entrega
+los peores resultados. Y obvio, porque no estoy considerando
+en ningún aspecto los predictores. Entonces no tomo ningún aspecto, no tomo
+consideración los componentes ni la edad del hormigón
+probablemente tal para definir la resistencia. Entonces lo que estoy
+en este modelo es como si no subiesen nada, no subiesen nada más que simplemente la resistencia, es decir, yo les pregunto
+solo les digo una columna de resistencia si les pregunto, bueno, para una nueva observación
+cuál crees tú que será la nueva resistencia o cuál resistencia me aprendices
+lo mejor que tú puedes hacer es sacar el promedio. Y así se fijan, una
+regresión lineal con términos cuadráticos y un costo muy alto de 1000, lo cual
+significa que como habíamos dicho anteriormente
+penaliza bastante, por ahí está la definición, digamos, del parámetro de costo dentro de una
+revisión con penalización rich. Si se fijan, penalizó tanto que
+la raíz del error cuadrático medio fuera de pliegue salió muy mala,
+y sustancialmente mal, digamos, no tan malas como solo sacar el promedio porque igual está ocupando
+información de coeficientes y los coeficientes y predictores están parte, son parte de ese modelo
+debido a que Bridge no tira parámetros a cero, no lo, no lo, no lo, digamos, lleva a cero, sino que
+simplemente les baja una dimensión, entonces lo más probable es que cuando veamos los parámetros,
+coeficientes de separables que tengan betas muy pequeños o muy cercanos a cero.
+Siguiendo entonces una regresión lineal normal sin penalización, que tiende a
+ser el modelo base cuando quiero hacer predicción cuantitativa, ya, y
+por consecuencia cuando quiero hacer predicción o categorización en
+principio de cosas binarias, tengo como modelo base la regresión logística y se
+entiende que son modelos buenos conforme su objetivo, que es predecir
+correctamente, pero su principal característica es que son modelos que
+son muy interpretables. Yo sé exactamente qué es lo que pasa en cada uno de esos
+modelos. Por consecuencia, si es que necesito o quiero evaluar nuevos modelos,
+tengo que tener, a lo menos, un error de ajuste, ya, y por consecuencia una métrica
+menor en términos del euro cuadrado tipo medio en raíz, tiene que ser bastante menor que simplemente
+el módulo clásico. Porque siguen siendo los modelos básicos, los modelos van a ser cuando hago
+previsión cuantitativa, naturalmente voy a arbitrar a una regresión múltiple y cuando quiero hacer
+clasificación binaria voy a arbitrar a una regresión logística. Y una vez que hago ello,
+estos dos modelos, en cualquiera de los dos casos que estén, puedo
+empezar a tratar de mejorar. Vale la redundancia y les comento que yo puedo
+pasar de una predicción cuantitativa a una predicción binaria, de
+clasificación binaria, pero al revés no puedo, por la noción de escala de
+medición. ¿Qué quiere decir esto? Que si yo quiero predecir la resistencia,
+también yo me puedo hacer la pregunta, bueno, en vez de saber el valor de la
+resistencia y predecir el valor de la resistencia, voy a estar interesado en si
+la resistencia es mayor a cierto umbral o menor a cierto umbral y si es mayor a
+cierto umbral lo voy a clasificar como 1 y si es que no como 0 o viceversa y ahí
+pasé de una predicción cuantitativa a una predicción
+o una clasificación binaria. Al revés no puedo, puedo pasar el número a
+categoría pero no puedo pasar la categoría a número. Entonces en general
+siempre vamos a querer trabajar con cosas numericas, es la enseñanza que tenemos.
+Entonces aquí evaluamos nuevamente el error cuadratico medio para todo
+estas parámetros. En general, ¿cuál le gana? Gana la reglación
+lineal múltiple con una penalización de 0,1
+ahora esta es la forma en que nosotros hacemos, escogimos este coste de reach
+en esencia probar distintos alfas o lambda dependiendo de que no me
+conozca una notación utilizada o la conocen y vemos que
+la regresión lineal múltiple con una alfa 0,1 es el que tiene
+una raíz del error cuadrático medio menor y a su vez también tener el mal.
+Entonces este es un caso bien... bueno porque si nosotros a priori no sabemos
+como me habían preguntado antes qué métrica voy a escoger, incluso si yo no
+hubiese no la hubiese escogido en una primera instancia, independiente de cuál
+haya escogido, me van a estar dando el mismo resultado porque voy a estar
+elegiendo este modelo de regresión línea cuadrática con una alfa 0 1
+por sobre el resto. El problema viene cuando tengo bastante más métricas, que pasa
+si tengo cinco métricas y uno de los modelos ganan tres y el otro modelo ganan
+otras dos métricas que no son las primeras tres del primer modelo, el primer
+candidato. Ahí tengo que tener un mayor entendimiento de cuál o qué
+métrica le voy a dar más peso. Entonces, ¿cómo voy a leer esto?
+siempre voy a tener que tener la raíz del error cuadrático medio o alguna
+trámite fuera de play, si no es fuera de play entonces estoy haciendo trampa
+tengo un data leakage en principio, una fuga de datos.
+Y esto es el que va a elegir al candidato y a pesar de que yo pueda definir o
+pre-establecer cuál va a ser la métrica con la cual voy a escoger mi modelo, en la práctica
+también te culo las otras métricas para tener un mayor entendimiento de lo que está pasando,
+porque lo que hace el MAE en contraste a la raíz del error cuadrático medio es simplemente
+darme otra dimensión, otra cuantificación de ese error o de la problemática. Tienden a ser
+similares en términos de la decisión que se va a tomar puesto que ambos
+están realizados o se calculan desde la discrepancia entre lo observado y lo
+predicho pero no van a tener la misma magnitud
+ahora gana el alfa con 0 1 pero
+no gana por tanto con respecto a un
+de cierta manera algo arbitrario estoy diciendo alfa 0 1 en potencia de 10
+ahí vamos, diála a menú 1, diála a 0, diála a 1, diála a 2 y así, y diála a 3.
+Pero yo pudiese hacer un mallado un poco más fino y pudiese por ejemplo ver 001, 002 y
+así. Obviamente eso va a aumentar sustancialmente el costo computacional,
+entonces tengo que tener un balance entre el mallado que estoy haciendo en
+este parámetro de costo de la
+valorización REACH y efectivamente los
+distintos parámetros porque si se fijan
+acá tengo 7 candidatos pero si voy a
+evaluar un mallado mucho más fino voy a
+empezar a evaluar ahora o a escoger
+entre 30 candidatos, 50 candidatos y
+esto sin incorporar nueva metodología
+aquí en principio estamos haciendo 2
+modelos lineales, una revisión lineal
+múltiple, una revisión lineal múltiple
+cuadrática y sacar el promedio que también está incluido dentro de que lo
+mismo que una regresión sin coeficiente, solo con intercepto.
+Entonces estamos siempre dentro del contexto de modelos lineales o modelos
+de regresiones lineales. Entonces tengo que exceso pesar eso. Si
+pongo mucho un mallado muy fino para estos parámetros y empiezo a probar
+muchos mayados finos, irme muy al detalle, voy a tener un costo
+computacional bastante alto que me va a restringir
+el abanico de posibilidades de distintos modelos que tú puedes tener. Entonces, un
+primer buen acercamiento es no por ejemplo hacer algo de este estilo en el
+sentido de que voy a hacer muchas regresiones lineales cuadráticas con
+distintos parámetros, sino que voy a hacer un par de regresiones múltiples
+pero también voy a probar otras metodologías que sean distintas, entonces me
+den una un abanico de posibilidades en las cuales, por ejemplo, si gana la
+regresión lineal múltiple con términos cuadráticos, entonces empiezo a
+desentramar, digamos, y a ver más en detalle ese modelo, entonces voy como
+por paso, entonces si la regresión múltiple ganó, entonces bueno, puedo sofisticar y puedo
+mejorar esta regresión lineal múltiple dentro de la misma metodología de
+regresión múltiple que pasa si puedo hacer transformaciones que mejoran esto
+que pasa si agrego un término adicional y así sumi sigue entonces no nunca es en un
+primer etapa evaluar todos los modelos o todas las metodologías con todos los
+parámetros o parámetros adicionales configuraciones adicionales que tengo
+porque si no no me da el costo computacional y el tiempo también las
+cosas se demora. Entonces, este resultado que está acá y esta pequeña discrepancia
+entre alfa 0 1 y alfa 1, me sugiere que quizás este alfa no es el óptimo y por
+consecuencia debiese seguir probante.
+¿Cómo veo esto ahora? Voy a evaluar y seguir evaluando esto acá. Tengo en este
+gráfico y se fijan acá el alfa es lo que estoy evalando
+y lo tengo evaluado en las filas que fueron utilizadas para estimar y en la
+evaluación entonces tengo estos tres valores alfa 0 1 10 y 1000 y voy a
+tener el valor del ajuste y su raíz del error cuadrático medio fuera de pie
+8.22, 8.4 y 13. Entonces con un coste muy alto van a aumentar ambos
+los ambos errores, ya, el error de ajuste y el error fuera de pliegue, ya.
+Cuando digo el error de ajuste me refiero el error obtenido cuando solo utilizo en
+este caso cuatro pliegues, ya, y el cuarto es el conjunto de validación.
+Entonces esta penalización restringe demasiado
+el ajuste, digamos, en esta comparación. ¿Qué quiere decir eso? Que alfas muy
+altos me están entregando errores muy altos. Por consecuencia,
+veo la tendencia. Estoy diciendo que a menores alfas va a disminuir la raíz del
+error cuadrático médio. Pero esto, si se fijan más a la derecha, porque
+significa tener una mayor penalización, el error sube. Pero conforme voy a la
+izquierda el error baja pero de cierta manera se estabiliza ya entonces o los
+cambios no son tan sustanciales yo voy a querer buscar un mínimo entre estas y
+eso uno lo puede hacer computacionalmente probando el modelo como un
+mallado muy fino de alfas y encontrar un alfa de cierta manera óptimo siempre
+nos vamos a querer y vamos a evitar a utilizar las metrias que están fuera de
+pero en la práctica, por ejemplo, si acá es 0-1, yo me quedo con el 0-1 y después, porque me está dando el mejor resultado dentro de los candidatos que tengo,
+voy a tratar de evaluar otras metodologías, ya, y una vez que tengo candidatos que todos son relativamente buenos o van dentro del mismo, digamos,
+cercanía términos de error, ahí puedo empezar a hacer un cosa un poquito más
+sofisticada. En general uno nunca se va directamente a un modelo
+muy complicado, ya, puesto que
+puesto que
+nosotros igual tenemos un principio de parsemonia. Siempre nosotros vamos a
+querer hacer
+el modelo lo más sencillo que resuelve la problemática que nosotros queremos
+hacer, no queremos complicarnos porque sí.
+Gonzalo dice, si ya puede ser lento aplicar estos modelos de manera local y
+hacer los análisis, ¿cómo es que lo hacen los que trabajan con servidores
+dedicados que contienen un volumen mucho más alto de datos? Ese otro tema que es
+bastante delicado porque ahí convergen varias cosas. Primero,
+esta metodología de estimación y es parte de la computación estadística en
+principio, se pueden mejorar, ya se pueden hacer por ejemplo las
+aproximaciones muy buenas que son mucho menos costosas computacionalmente y dan
+buenas aproximaciones. No es exactamente lo mismo pero dan buenas aproximaciones.
+Y además, eso converge con el... o se mezcla también con los avances computacionales en términos de software y hardware.
+Por ejemplo, cuando quiero trabajar con muchos datos o un gran volumen de datos, no estoy trabajando ni en Excel,
+no estoy trabajando en SQL, sino que estoy trabajando en bases de datos distribuidas
+o alguna otra metodología o tecnología que están hechas para eso.
+Un ejemplo clásico son, yo estoy trabajando por ejemplo con metodologías de machine learning,
+bases de datos vectoriales, es una tecnología bien particular, digamos,
+sirve bastante para trabajar, digamos, análisis cuantitativos en términos de análisis cuantitativos
+con metodologías de caja negra, renoranálisis, cosas de ese estilo,
+por la concepción que tiene de cercanía entre puntos, ya.
+pero ahí convergen distintas cosas. Primero, yo puedo mejorar la metodología en términos de buenas aproximaciones o hacer de lleno otra metodología que son menos costosas computacionalmente
+y la mezcla de los amantes de software, digamos, y de tecnología de almacenamiento de datos y de procesamiento.
+Entonces, es una mezcla. Siempre se convergen, digamos, a tratar de mejorar ambos a la vez.
+Pero eso tiene como una cota, digamos. Yo por mucho que mejoro la metodología, por mucho que mejoro el costo computacional,
+el término de software y hardware, siempre voy a llegar a un límite, digamos.
+No es como que puedo hacer todas las cosas sencillas y rápidas, siempre hay como un límite teórico.
+Entonces, volviendo acá, tengo en estos modelos, en estos candidatos, tengo 7 candidatos y
+este lambda01 me está entregando el mejor de los resultados dentro de este candidato,
+en ningún caso estoy diciendo que es el mejor, sino que es el mejor dentro del conjunto de
+datos que yo estoy evaluando.
+vemos acá entonces que a mayor penalización la raíz del error cuadrático medio sube bastante
+y conforme bajo la penalización se va disminuyendo pero las ganancias en términos de la metría
+que decidí utilizar que es la raíz del error cuadrático medio se más o menos estabiliza
+Ahora, si entramos en detalle, porque recuerden que esto es el error cuadrático medio a través
+de todos los pliegues, yo puedo entrar en detalle, puedo decir, bueno, quiero ver qué tanto se está equivocando
+o qué tanto es la métrica que decidí para definir qué tan bueno es el modelo en la
+raíz del error cuadrático medio por pliegue, es decir, ahora estoy desagregando lo que
+me estoy equivocando o la medida que quiero utilizar porque también puedo
+tener entrar en el cuestionamiento de que quizás estos cinco pliegues
+de manera de lazar, digamos, la forma en que lo
+en que lo escogí se
+digamos mezclaron para yo tener un cierto resultado, es decir, quiero decir, quiero
+quiero que los resultados que yo tenga y la decisión que tome no haya sido
+necesariamente
+por la muestra que yo evalué porque se fijan los cinco pliegues fueron escogidos
+de manera aleatoria, qué pasa si hubiese escogido hago la misma selección con
+otros cinco conjuntos, los resultados me van a cambiar, se fijen ahí es lo que yo
+nosotros llamamos la varianza dentro de estos errores que puedo separar entre el
+sesgo, la varianza y el ruido. Entonces, quiero que mis resultados no dependan
+tanto de la muestra que yo estoy utilizando y por consecuencia la selección
+que yo hago dentro de entrenamiento y evaluación. Entonces, cuando veo por
+pliegue veo que para los distintos dos penalizaciones que los dos modelos que
+tenía con alfa 0 1 y con 0 y con 1, con 0 1, si se fijan en el primer pliegue
+pareciera andar muy similar. En el segundo ya hay pequeñas diferencias, en el
+tercero muy similar, en el cuarto muy similar y en el quinto bastante similar.
+Entonces, si se fijan, en el segundo pliegue la diferencia es bastante más
+sustancial que en contraste con el resto porque tengo 0,4
+digamos de diferencia absoluta. Entonces, el alfa que yo con esta
+primera con esta primera resumen yo diría bueno alfa 0 1 es el mejor
+pero eso es un primer nivel de análisis, entonces ahora voy al desagregado
+alfa 0 1 es mejor en tres de los cinco pliegues entonces no es el mejor
+en su totalidad porque acabamos de decir que con alfa 0 1 y alfa 1 la
+diferencia no es tanto, no es tan sustancial, o sea, es de 8.2 a 8.3
+entonces quiero analizar eso y cuando lo veo pliega a pliegue el alfa 0 1
+mejora en tres pliegues en el segundo,
+en el segundo, en el tercero y en el cuarto, según lo ve en este gráfico y en el
+primero y en el tercero gana alfa igual a 1, entonces no es que la elección de
+este costo de la relación rich
+gane siempre. Entonces, tengo que tener cuidado con eso, con aseverar que
+el modelo escogido a través de una métrica que es de resumen, como lo es la
+raíz del error cuadrático medio en fuera de pliegue a través de todos los
+pliegues significa que esa métrica en cada uno de los pliegues es mejor, entonces
+no puedo acelerar ese mejor siempre porque esa selección de los cinco
+pliegues puede haber sido por el azar y estos resultados pueden haber sido por el azar
+que pasa si cojo otra muestra y quizás alfa igual a 1 hubiese sido mejor
+entonces estos ajustes comparten datos porque ocupan los mismos pliegues
+entonces tengo que tener pequeñas particularidades respecto a ello
+entonces una regla de decisión o de elección más bien de entre modelos no
+implica que el modelo necesariamente es el mejor porque yo estoy decidiendo
+cuál es la métrica y cuál es la regla que yo voy a utilizar si yo digo voy a utilizar la
+raíz telerero cuadrático medio y voy a escoger el modelo que tiene esa métrica
+más baja, entonces esta es mi decisión, pero no significa que siempre
+que siempre va a ganar y sobre todo no va que si ese modelo va a tener mejor
+rendimiento en otros datos que no se conoce, la generalización es otro
+problema. Entonces ahí cuando tengo dos modelos que son muy similares, en términos
+de la evaluación fuera del pliegue, digamos, los resultados fuera del pliegue,
+trato de evaluar uno y tener el segundo como backup, porque son tan distintos
+que puede haber sido que simplemente la elección de la muestra haya generado
+esa decisión.
+Pero siguiendo, una vez que escojo el modelo, en este caso yo dije
+voy a escogerlo en términos de la raíz del error cuadrático y voy a escoger el
+modelo con alfa 0 1 yo lo decidí y ahora tengo que implementarlo
+aplicarlo a todos los datos de entrenamiento porque recuerden que
+cuando yo hice la selección y calculé esta la raíz del error cuadratico medio
+fuera de pliegue siempre dije un conchito fuera, ¿cierto?
+dije el conjunto de evaluación fuera para sacar la raíz del error
+cuadratico medio en ese pliegue, después ocupé otro pliegue, otro pliegue, otro pliegue, lo hice cinco veces y después
+calculé la raíz del error cuadratico medio fuera pliegue como un todo, que es la métrica de resumen que yo veo acá.
+Entonces por eso tengo cinco raíces de errores cuadratico medio por pliegue.
+Cuando lo resumo, yo vuelvo a la otra. Entonces una vez que escogí, digo ya, este es el modelo que voy a ocupar con una
+receta predefinida, porque es toda la configuración del modelo y ahora digo
+no voy a hacer discrepancia entre el entrenamiento y la validación y voy a
+ocupar todo el entrenamiento para ajustar ese modelo. Aquí es lo que se
+hace en esta parte del código, aquí en la sección 5, que está en Python y en R.
+Y ahora, si se fijan yo había escogido la revisión lineal múltiple con parámetros
+cuadráticos y una penalización rich con alfa 0 1, voy a tener entonces la métrica.
+Si se fijan, acá escogí o decidí utilizar la raíz del error cuadrático medio como
+métricas de elección del modelo, pero cuando lo evaluo, ya, en las 224
+observaciones de prueba, yo igual puedo calcular las otras métricas que no las
+utilicé para la selección del modelo, pero sí las puedo ocupar para la
+evaluación en la prueba, para tener un diagnóstico y una imagen, digamos, más
+clara de cómo se está comportando el modelo que escogí con nuevos datos.
+Entonces, si se fijan acá,
+comparándolo, la raíz de los cuadrados de comodidad da 8.8 y cuando
+lo hacemos en el entrenamiento es 8.2. Entonces, lo que pasa es que en
+en el entrenamiento siempre tenemos resultados un poco más favorables, pero ahora con todo y todo
+estos resultados en prueba tienden a ser bastante buenos. Si se fijan aquí uno puede hacer la
+predicción versus la resistencia real y hay digamos una correlación bastante razonable.
+También puedo analizar el MAE y el R cuadrado y voy a tener una esencia métrica bastante
+razonable, un r cuadrado 0,7 es bastante bueno dentro de muchos contextos, ya, que eso va a
+depender también de la problemática en particular. No son valores absolutos en
+el sentido de que no te puedo decir un r cuadrado más que 0,7 es bueno y bajo 0,7
+es malo porque va a depender mucho del contexto, por ejemplo en
+en áreas de ciencias sociales, tener un R cuadrado de 0.3 ya es bastante.
+Escas son cosas más cuantitativas tipo ingeniería, tener un R cuadrado de 0.3 es considerado bajo,
+o no muy bueno más bien, porque no explica, recuerden que el R cuadrado es el porcentaje de la probabilidad explicada por el modelo.
+30% explicado por un modelo en algo bien cuantitativo y bien concreto es no
+visto como algo bueno, pero en ciencia social explicar el 30%
+de la variabilidad con un modelo en ese contexto tiene otra interpretación un
+poquito más favorable. Ahora,
+veis acá, tengo el gráfico entre lo que yo predigo y el real. En esencia,
+estoy analizando que también se comporta y el predicho va a tener un
+el promedio va a estar centrado en cero en este caso, acá yo puedo ver residuos
+si tengo digamos residuos positivos significa que
+si tengo residuos positivos recuerden que esto es lo observado menos lo
+predicho entonces significa que es i sub i menos i sub i estimado. Cuando digo
+residuos positivos estoy diciendo que esa resta es mayor que cero, lo que
+significa que el valor observado es más grande que el valor que yo estoy
+estimando o estoy prediciendo, por consecuencia estoy subestimando y al
+revés al contrario si tengo residuos muy negativos estoy sobreestimando, mi
+predicción está solo estimando el valor real. Entonces yo voy a querer que esas
+predicciones, esos errores, esos residuos tengan un promedio más o menos a cero, más
+o menos cercano a cero, porque así a veces me equivoco por más, a veces me
+equivoco por menos, entonces no tengo una tendencia o un sesgo en la
+predicción que yo estoy realizando.
+Ahora, tienen que sacar, ¿cómo cerramos la parte de
+predicción cuatritativo. Tenemos que escoger la métrica de selección
+del modelo previamente, ya en el caso que estábamos viendo es la raíz del
+error cuadrático mediata y con esas escogimos, pero para la prueba
+podemos tener una un abanico, digamos, de métricas que me ayuden a efectivamente
+discernirse el modelo que estoy utilizando, el modelo que estoy
+escogiendo que es bueno, si es que no es bueno y no cumple cierto umbral
+digamos que yo predefino, entonces voy a tener que hacer un nuevo
+procedimiento para escoger otro modelo y analizar nuevas metodologías que
+quizás no tomen consideración, pero eso es la parte de predicción cuantitativa.
+Si yo quiero hacer ahora problemas de clasificación, ya, en donde, como lo vieron con Pedro el martes
+pasado, por ejemplo, la revisión logística, y en este contexto vamos a trabajar con la
+detección de spam, ya de correo de spam, que es lo que hace, digamos, todos los servidores
+o los servicios de correo electrónico
+la base de datos, si se fijan
+tiene algo relativamente balanceado
+es decir, dentro de mis datos
+el 60.6% son no-spam
+o ejemplos de no-spam
+y el 39.4% son ejemplos de spam
+ya, idóneamente nosotros tuviésemos 50-50
+pero eso no pasa
+y sobre todo si tengo eventos muy anómalos, como el caso de los fraudes que le mencionaba
+al inicio y cuando el evento de interés, en el caso del ejemplo de fraude, es muy anómalo,
+al modelo le cuesta aprender cuándo pasa ese evento anómalo.
+Entonces, idealmente nosotros queremos tener un cierto tipo de balanceo y hay técnicas para
+balancear estas cosas y tratar de aprenderlo de mejor manera. En este conjunto de datos,
+el objetivo es detectar spam y la clasificación o la forma en que voy a evaluarlo es el spam,
+que lo voy a categorizar como igual a 1 y cuando es un correo legítimo es un igual a 0. Ya todo
+no ha pasado y de repente nos mandan un correo que no es spam y está en el spam, que es un
+tipo de error bastante más grave que a tu bandeja entrada entre algo que fuese
+spam, ¿viste? Al uno, al mismo no, al mismo visión, digamos. Usted puede tener otra opinión.
+De hecho, podemos diseñar incluso en qué tan más malo es uno que otro.
+Pues en este conjunto de datos tengo 4601 correos, tengo 57 entradas
+numéricas, cuales que en esencia resumen el número de palabras, el número de caracteres,
+medias de mayúsculas y cosas que describen de cierta manera los correos. Vamos a conservar
+digamos esta separación y como en los problemas de clasificación uno no simplemente predice
+si es spam o no spam, sino que es un proceso dos etapas en el principio. En
+principio yo primero lo que yo estoy tratando de modelar es la probabilidad
+de cierta manera de que sea spam o no lo sea y luego yo voy a definir un
+umbral para definir si es spam o no. Dos cosas que habían visto con Pedro el
+martes que lo vamos a recomendar y lo vamos a tratar de publicizar un poco que son el
+concepto de falso positivo y falso negativo. En este contexto el falso
+positivo es el correo que es donde es legítimo y lo marqué como spam o el
+modelo lo marcó como spam que oculta un mensaje que quizás el dueño del
+correo lo quería leer. Y al revés, el falso negativo es un mensaje o
+correo que es spam y lo dejamos pasar. ¿Qué pasa con eso entonces a
+consecuencia del falso negativo me va a generar una bandeja de entrada del
+correo más llena y quizás voy a tener
+yo que manualmente es designarlo como spam y de hecho si ustedes han tenido
+correo en Gmail o cosas de ese estilo cuando pasa cuando pasa eso hay alguna
+una una opción para decir marcar como spam lo que hace eso es en esencia
+alimentar el mismo algoritmo de la empresa para que aprenda de mejor
+manera cuando los correos son spammy y cuando no.
+Con este problema de clasificación yo puedo hacer problemas de o puedo
+generar la matriz de confusión. Y de esa matriz de confusión yo puedo ver
+métricas. Entonces ustedes vieron los falsos positivos, la que ahora sí que lo
+con Pedro del Marte. Pero lo importante en este, dentro de este
+contexto, lo que queremos resaltar hoy que la evaluación de estos modelos y la
+selección por consecuencia es preguntarnos y una pregunta
+supernatural aquí, ¿qué es peor? o también que igual es válido,
+¿hay alguno que sea peor? ¿qué tipo de tipo de errores distinto? porque si
+se fijan el falso positivo y el falso negativo ambos son tipos de errores
+por consecuencia si son igual de malos, diga ser en cierto sentido
+voy a ocupar ciertas métricas y si no lo son voy a querer hacer otra metodología
+entonces pensémos acá que tengo cinco spam reales y 95 que son no spam
+las reglas predicen siempre no spam, por ejemplo yo tengo un bueno que siempre me
+dice nada es spam nada es spam nada es spam y todo lo pasa, todo pasa y ya deja de entrar
+no hay ninguna ninguna exigición digamos de spam, entonces si se fijan ahí
+si tengo de 100 correos y 5 son spam entonces
+la precisión o la accuracy va a ser el 95% porque describe la cantidad de
+aciertos, es decir de 100 95 le achuntó y 5 no le achuntó, pero esos 5 nunca hubo una
+decisión de marcarlo siquiera como spam porque nunca marcó nada como spam, en
+esta regla siempre se marca todo como no spam, como correo
+válido, entonces no estoy haciendo nada al principio, estoy simplemente diciendo
+nada es spam y lo que más me voy a equivocar son los spam probablemente tal
+que son reales, entonces no tengo un modelo en principio, simplemente te decimos
+regla. Ahora yo puedo hablar, cuando les comentaba hacer esta pregunta de
+qué tipo de error es peor, yo también lo puedo definir y lo puedo
+cuantificar qué tipo de error me cuesta más.
+Entonces yo puedo decir que el falso positivo que es el correo legítimo y lo
+marco como spam, el correo es lo debiese leer y pasar la bandeja
+a entrar y lo marqué como spam
+pesa cinco unidades más que el falso negativo que es cuando el correo se
+spam y lo dejó pasar y quizás todos podemos acordar o una gran mayoría
+podría decir yo prefiero que un correo que debiese haber llegado a mi
+bandeja de entrada
+o sea que un correo que debiese haber sido spam pase a mi bandeja de entrada
+que al revés, que un correo que debiese estar en bandeja de entrada está en spam,
+porque uno nunca revisa el spam. Entonces yo le estoy dando de manera
+arbitraria un costo 5, ya 5 veces mayor al falso positivo por el falso negativo.
+Y estoy enfatizando de que eso es arbitrario.
+entonces tengo un costo y voy a definir este costo estimado ahora yo puedo hacer
+una iteración con reglas de negocio incluso y puedo optimizar y tratar de
+llegar a algo un poquito más sofisticado en este estilo por ejemplo
+si yo tengo
+problemas o sea tengo la problemática de fraude
+y tengo el fraude que no he detectado y la transacción
+válida que es detectada como fraude.
+Entonces uno se pudiese preguntar en una entidad bancaria, ¿qué es más caro que una transacción
+válida fuera declarada como fraude, ya, o fuera marcada como fraude, o que un fraude
+fuese marcada como transacción válida? Yo creo que este último tiene un costo
+dicen, y uno si en una en una empresa uno puede cuantificar eso ya porque si hay un fraude y lo
+marqué como válido entonces va a haber un procedimiento que quizás va a tener costos
+operacionales, costos legales, etcétera, dependiendo de la magnitud del fraude probablemente
+tal, entonces yo puedo tratar de estimar el costo ya aquí le estoy dando cinco unidades por so a los
+falsos positivos por soles los falsos negativos pero en principio yo podría estimar esos costos
+términos del conocimiento del rule y la problemática del negocio que tengo en
+particular. Entonces, ¿qué estoy diciendo con esto? Estoy diciendo que bloquear un
+correo legítimo vale 5 o cuesta 5 y dejar pasar spam es 1 unidad. Entonces, ambos
+son malos pero no son igual de malos. Ya sepamos multiplicar esto por mil para
+comparar costos en una escala común.
+Esto es una razón 5-1 nuevamente es arbitrario.
+entonces si se fijan acá tengo ejemplos de dos matrices de confusión, ya tengo
+lo real y lo predicho
+el 890 es, yo dije que el modelo dijo que no era uno spam y efectivamente era
+no spam y cuando dije y aquí dije que 60 eran spam y 60 no lo fueron
+perdón y cuando dije que era spam y no era efectivamente spam
+era 10 entonces si fijan las métricas que ustedes vieron con Pedro el martes
+pasado si yo le hubiese y yo estuviese interesado más en el
+acierto ya que no tiene tanta relevancia porque si ustedes lo piensan
+si el modelo dice que un correo no era spam y efectivamente no lo era como que
+no pasó nada porque no hubo spam, no hubo nada y cuando era spam y efectivamente
+era spam, bueno ahí sí, ahí tiene una noción un poquito más beneficiosa
+porque estoy identificando el spam. Ahora si yo saco el
+el accuracy que estoy diciendo acá o la función de costo más bien, aquí
+en una cura si el 95% y acá también tengo una
+otro cura si el 95%
+en ese sentido ya lo único que estoy variando es la noción de costo entonces
+cuando lo valúo en la noción de costo que yo lo puse con dividido de n pero
+dije que le vamos a explicar por mil para tener
+en una misma escala, en el modelo A, ya, esa métrica
+se ha estimado, mi función de costo vale 90 y en la función B es 210.
+Entonces, yo esos costos los tengo que definir previamente, entonces
+una vez que lo defino, yo lo puedo estimar y lo puedo sofisticar porque en este caso
+ejemplo yo lo estoy definiendo de manera arbitraria. Yo también puedo ver otras métricas, por
+ejemplo la precisión, el recall, en donde le estoy dando distintos pesos a distintas cosas y el F1
+que lo vieron un poco más en detalle con Pedro, digamos, todas estas métricas con distintos ejemplos.
+Ahora, todos estos modelos me van a entregar de cierta manera probabilidades, probabilidades
+de que sea spam, probabilidades de que sea, no spam, probabilidades de que sea un evento
+positivo o un evento negativo.
+Aquí vamos a ver un ejemplo, dice un filtro asigna probabilidades de spam a tres correos,
+es decir, lo que me está entregando, me está entregando el I estimado, el I corrido.
+el correo A es 0,9, en el correo B es 0,6 y en el correo C es 0,2. Entonces esta es la
+probabilidad que me entrega el modelo de que sea
+de que el modelo lo considera que sea spam. ¿Qué realizamos primero? El correo A,
+luego el B o el C. ¿Es fiable 90% de probabilidad de que sea así?
+si yo estoy en 90% tengo una probabilidad y te digo este correo 90% o la probabilidad que creo que sea spam es 90%
+y general lo vamos a marcar como spam, pero con el 06 ya quizás sí
+02 ya empezamos a decirlo, entonces naturalmente
+empezamos o hacemos la diferencia del 05, el punto del medio, pero no en todas las problemáticas ese punto del medio va a ser
+válido. Entonces, este umbral que yo voy a hacer, que me va a hacer la
+pasar de probabilidades de clasificación a
+clasificaciones per se, va a depender mucho. Entonces, porque si se fijan, con
+un umbral de 0,5 el tercer, cuarto y quinto correo son marcados como spam y con una probabilidad
+de 0,8, con un umbral de 0,8, solo prácticamente 1 es marcado como spam. Entonces uno podría
+preguntarse también aquí en Transjuego, hacemos el ejemplo de
+fraudes.
+¿Qué tan seguro quiero estar yo para decir que una transacción es fraude?
+Porque si pongo 0.5 quizás voy a marcar muchas transacciones como fraudulentas,
+que también es un problema. Entonces tampoco quiero decir de cierta manera que
+cualquier hora extingir o al menos estar muy seguro que una transacción es
+fraudulenta para efectivamente realizar un plan de acción. Entonces esta
+decisión tiene que jugar, digamos, tiene que sopesarse con reglas de negocio, de
+la del industria o el contexto en el cual yo estoy trabajando.
+Fíjense acá que yo también puedo tener otras distintas métricas como es el
+LockLoss, la pérdida en escala logarítmica y que
+cuando veo, digamos, distintos modelos
+puedo tener en principio métricas similares o que en promedio son similares
+pero que para observaciones en particular son bastante distintas. Entonces
+tengo que tener tal como tuvimos la la certeza de que
+como lo vimos en el caso cuantitativo no simplemente gana siempre en todos los
+en todos los pliegues sino que puede ganar en unos cuantos y en otros no
+acá también puede pasar lo mismo sino que para cierta observación estima
+estima bien
+y para otras no estima también, o sobreestima o subestima las probabilidades de clasificación.
+Esta función de pérdida o esta métrica del lock-lock que las vamos a utilizar para los
+problemas de clasificación, lo que hace es penalizar probabilidades equivocadas.
+Y cuando uno lo ve teóricamente en términos gráficos, si se fijan acá,
+esta es la curva de no-spam y la curva de spam. En el 0,5 maximizo esa
+función, digamos, la mezcla de las dos funciones. Lo que hace esto es que
+defino una pérdida logarítmica
+y en general, como casi todas las pérdidas, mientras es menos es mejor.
+Entonces, si se fijan acá, la pérdida no es lineal a lo largo de toda la probabilidad.
+Entonces, ¿qué es lo que hace esto? Para una, por ejemplo, una probabilidad de 0,9 se va a aportar 0,1.
+Y para una probabilidad de 0,1 se va a aportar 2,3.
+entonces predecir con bajo nivel de probabilidad o una probabilidad muy baja aporta más en
+la pérdida digamos logarítmica. Otra métrica que también tenemos es el
+Breyer score o Breyer seca que lo que hace es la noción de error cuadrático pero aplicado
+a probabilidades y con ello entonces esto va a ser, si tengo una respuesta binaria el
+es corto va a ser binaria también y mientras menos es mejor es la definición digamos binaria
+del error cuadrativo medio. ¿Qué es lo que estoy dando aquí? Estoy de igual manera definiendo
+en esta y en la otra formas de cuantificar qué tanto me estoy equivocando, ¿ya? ¿Cuánto
+voy a sopesar una diferencia muy grande, una diferencia más pequeña? Y dándole distintas
+cantidades, digamos magnitudes. Entonces, si yo defino, digamos, una probabilidad de 0.8
+de clasificar con spam, nosotros esperamos que cerca del 80% de spam, si las probabilidades
+también cadiradas. Entonces, esto juega bastante con la identificación dentro del conjunto
+de entrenamiento, es decir, si yo tengo muchos spam en mi conjunto o mi muestra
+con el cual estoy analizando, voy a tratar o voy a atender al modelo a
+identificarlo correctamente. Si son datos muy anómalos y no tengo mucha
+información sobre esto, estas probabilidades o esta estimación de las
+probabilidades, las predicciones van a ser muy inestables y por consecuencia el
+modelo no va a ser generalizable porque va a aprender de tan poco datos que al
+ver un dato nuevo que puede ser muy distinto no va a saber identificarlo y
+lo más probable es que lo identifique erróneamente. Otra de las métricas que
+tenemos es la curva ROP que tiene el nombre reciben o predicten characteristic
+o la curva característica operativa y en esencia grafica métricas que vienen
+desde la matriz de confusión. Y en general aquí estamos interesados en una métrica bien particular
+que es el área bajo la curva, que es la curva que está dentro, o sea el área que está bajo la
+curva rock. Cuando lo grafico y veo la curva rock, mientras más áreas está debajo de eso, en general
+yo tengo mejores resultados. Si se fijan, estos los ejes son métricas que vienen
+desde la matriz de confusión. Lo que hace la curva ROCK y por consecuencia
+también la precisión promedio describen el ranking.
+Ahora, algo que le comentaba recién, que esta frecuencia de spam, es decir, la
+la prevalencia de que tantas veces se repite en mi conjunto de entrenamiento
+el evento de interés que en este caso es un correo spam va a cambiar la
+precisión, por consecuencia si tengo una misma sensibilidad del
+80% con una misma tasa de falsos positivos en mil correos voy a tener
+estas distintas métricas pero si es que tengo
+una distinta frecuencia en el conjunto de entrenamiento entonces me va a cambiar
+en principio los números que están dentro de la matriz de confusión
+entonces si hay pocos spam los negativos van a ser mucho ya y si hay más spam los
+positivos van a ser mucho en el sentido de que tengo más en mis datos tengo más
+ejemplos o observaciones que son spam, entonces el modelo va a aprender a
+reconocerlo de mejor manera y por consecuencia va a tratar de predecir, ya,
+si es que hay observaciones que se parezcan a esas observaciones, más
+spam. En cambio, cuando es muy anómalo o no es tan frecuente la observación de
+interés, el modelo tiende a predecir siempre lo contrario y por consecuencia
+quedarse con una tasa de acierto bastante buena a pesar de que no sea útil.
+Entonces, todo esto depende del conjunto de datos y este problema de clases
+desbalanceadas, es decir, que tengo, pensemos, 10.000 datos y la observación de
+interés o el evento de interés sólo son 10 es un problema súper grave porque
+es súper difícil sacar información de esos 10 observaciones. Si se fijan
+el evento de interés son 10 de los 1000 datos, entonces yo estoy
+interesado al principio en 10 observaciones más que los 9.990 restantes.
+los 9.990 restantes, simplemente me sirven para identificar cuándo no es el evento de interés,
+pero no cumplo un objetivo propiamente tal.
+Entonces, uno de los protocolos que yo podría plantear para la clasificación binaria,
+yo voy a definir con la cantidad de correos que tengo 921 para la prueba
+3680 para el ajuste y la selección, es decir, para hacer los pliegues
+voy a comparar ahora no voy a ocupar la raíz del error cuadrático medio porque
+la raíz del error cuadrático medio se entiende para respuestas cuantitativas
+en este caso voy a ocupar la pérdida cuadrática fuera de pliegue
+y voy a escoger el ganador, o el ganador respecto a esta métrica, voy a escoger
+distintos umbrales para el corto. Voy a remaluar cuando cojo el modelo con el
+conjunto de validación, voy a hacer la separación y voy a evaluar
+todo mi modelo escogido dentro de todo mi conjunto de entrenamiento
+y luego voy a pasar a evaluar el conjunto de pre-a.
+Si les fijan acá, la parte del costo de definir cuánto va a valor uno sobre otro es otro tema adicional,
+que tiene que ser, digamos, visto caso a caso, porque requiere saber mucho más del contexto del problema.
+Entonces, todos estos candidatos van a ser, digamos, modelos. Al final, cuando yo les
+comentaba todas estas metodologías son un poco agnósticas de qué modelo es el que
+yo voy a evaluar. La gracia de todo esto es que conforme uno va estudiando, uno va ampliando
+esas posibilidades. Entonces, tengo... Si tengo una probabilidad constante, es el
+equivalente de usar un modelo que era solo el promedio en el caso
+cuantitativo. Una regresión logística, que la vieron con Pedro el martes, y hay una
+petición de C, también me permite generar una clasificación minaria y un
+bosque aleatorio y que también me permite clasificar. Si se fijan acá son tres, estos
+son el símil para el problema de clasificación que teníamos de los
+siete modelos en el caso de clasificación continuo.
+Entonces en Python se fijan
+el código es bastante similar, simplemente estoy cambiando las formas
+que estoy haciendo un ajuste porque no estoy haciendo los mismos modelos en
+principio y hago nuevamente el ajuste para calcular estas probabilidades de
+predicción en el conjunto de validación porque aún no escojo el modelo y al igual que
+en el caso cuantitativo de predicción cuantitativa yo puedo resumir
+y si fijan acá tengo pequeñas discrepancias entre R y Python
+Tienden a ser de implementación y recuerden que NR y en Python para hacer una misma metodología
+usualmente tengo bastantes librerías y paquetes que hacen lo mismo, entonces la implementación y
+problemas numéricos pueden salir ya sobre todo en el bosque aleatorio, en el random forest que dado
+que tiene una profundidad 8 pueden haber discrepancias numéricas pero no me cambian la decisión. Si se
+fijan acá en términos de la frecuencia en Python y en R me dan lo mismo
+en cuanto a el estadístico o el score de Ryre también me dan lo mismo en un
+caso logístico me dan todo exactamente igual
+y en el bosque aleatorio o el random forest me entrega distintas métricas
+y aquí tengo una pequeña discrepancia en términos de el LogLoss y el Bright.
+No obstante, sigue siendo más chico en todos los casos que las otras, los otros dos modelos.
+Entonces, uno puede entrar en por qué son estas discrepancias, pero en esencia es de
+implementación computacional más que la implementación metodológica,
+el modelo que se está haciendo.
+Ahí Rodrigo menciona, dice, ¿R entrega mejores modelos? No es necesariamente
+mejor, sino que son dos formas de calcular distintos. El modelo
+teórico que está detrás es igual, o sea yo podría correr esto con otra semilla
+y pueden ser los resultados al revés, el punto es que me dan dos modelos
+distintos y si yo voy a evaluar por ejemplo
+no puedo evaluar para la redundancia este número con este número, si voy a
+hacer, voy a evaluar las métricas en Python, la evaluo en Python, entonces la
+implementación es consistente a lo largo de todo mi análisis. Son implementaciones
+de computacionales en vez de decir que uno es mejor que otro. El número en este
+caso, en esta realización es menor pero no significa que sea mejor, como
+probablemente tal, sino que una cosa de implementación computacional.
+Ahora, fíjense acá, esta es la curva ROCK y el precision recal y se fijan acá en la
+tasa de falsos positivos y el real, tengo la curva de ambas, en particular voy a
+estar interesado en la curva rock, el área bajo la curva de este gráfico,
+digamos, de esta métrica y se fijan 0.97 0.96 hay pequeñas discrepancias porque
+nuevamente es la clasificación, es la implementación, perdón, computacional de
+estas cosas. Es súper común que suceda eso, la idea es ser consistente, es decir,
+si hago las cosas en R, verificar que la implementación sean similares.
+Ya vamos un poquito finalizando, digamos, pero el AUC ya no garantiza que esté
+bien calibrado, ya en esencia yo quiero tener AUCs muy cercanos a unos, pero
+nuevamente la prueba real siempre es con la evaluación del conjunto del
+entrenamiento. Entonces, no que tenga un buen abuse significa que las
+probabilidades están siendo correctamente predichas.
+Ahora, volvemos al problema del costo en la clasificación. Si se fijan,
+podemos escoger el umbral usando el costo en la evaluación del conjunto de
+el conjunto de validación y si les dije acá esto es el costo fuera del pliegue
+por mil porque lo que estamos haciendo para comparar en el mil en la misma
+escala perdón y yo puedo ver el costo fuera del pliegue por cada mil correos
+ya y si pongo por ejemplo un umbral 0 5 el costo asociado va a estar en
+132, si pongo un costo o el umbral de la probabilidad en 0,6 el costo va a ser
+128 y cuando subí subiendo a 0,65 el costo empezó a subir entonces
+identifique que hay una especie de mínimo, ahora uno podría decir bueno
+qué pasa si es 0,61, ahí uno puede entrar y digamos sofisticar un poco más este
+este problema pero la idea es que, la idea principal es que hay un umbral
+óptimo en principio, que minimiza el costo asociado a la clasificación
+si se fijan las probabilidades acaso es la misma solamente estoy cambiando el
+umbral, es decir, desde qué valor voy a decir que sí y desde qué valor voy a
+decir que es no
+Ahora, si se fijan, tengo pequeña discrepancia entre implementaciones en Python y en R, pero
+tienden a ser implementaciones o discrepancias en la implementación, usualmente incluso
+dentro del mismo lenguaje, si uno ocupa dos librerías distintas, tienden a tener resultados
+un poco distintos. Entonces, hay que tener cuidado, la idea es ser consistente, es decir,
+no que un modelo lo aplique con cierto paquete, otro con otro, porque si no voy a estar mezclando
+cosas que son muy distintas. La idea es ocupar, si voy a ocupar una implementación, ocupar
+esa implementación a lo largo de todo mi análisis. Ahora, una última cosa ya para ir cerrando.
+En general, los costos asociados que yo puedo tener en estos problemas de clasificación,
+uno pudiese decir que hay un umbral teórico, es decir, el umbral óptimo que yo debiese
+empezar a escoger que el evento sea positivo y que el evento sea negativo.
+En general, uno puede hablar de eso si conoce la distribución, etc., pero en cosas que
+son más cercanas a la práctica, uno tiene que ir probando, llegar a ese umbral de manera
+empírica tal que el costo sea el mínimo.
+Entonces, la decisión de qué tanto, cuál es mi función de costo, que era en esencia este 5 fp
+más 1 fn, el costo o el ratio entre los falsos positivos y los falsos negativos, es súper
+importante. Entonces, conocer las repercusiones de las decisiones en términos de los costos y una
+cuantificación de esos costos súper relevante para la implementación de todas estas metodologías.
+Entonces, en este caso yo voy a escoger el random forest, digamos que tenía una
+profundidad 8 de manera arbitraria porque son, digamos, candidatos. Recuerden que
+todas estas cosas son un poco agnósticas al modelo que estamos
+definiendo, o sea, un poco agnóstica a los candidatos posibles. Voy a escoger un
+umbral de 0,6 porque vimos que eso minimiza el costo
+y luego que lo decidí, eso ya escogí el modelo, voy a revaluarlo en todo el
+conjunto de entrenamiento sin hacer
+entrenamiento y evaluación y voy a evaluarlo posteriormente en el conjunto de
+prueba y ahí recién voy a tener métricas digamos asociadas
+con voy a poder tratar de entender la generalización de mi modelo que tan
+bueno es
+si se fijan en este caso evalúo en los datos de prueba que son los datos
+reservado y veo que en este caso tengo un 93.7% de aciertos y las distintas
+métricas y puedo calcular también el costo asociado. Entonces al igual que
+hicimos en la predicción cuantitativa, cuando evaluó en el conjunto de prueba
+no me restringo sólo a la métrica que yo utilicé para
+para escoger el modelo, ya, yo aquí amplío digamos las métricas y ahí puedo
+poner más incluso para tener un panorama bien claro de cómo se están
+comportando y qué tan bueno es el modelo en datos que no conoce
+Finalmente, ya haciendo un poquito de síntesis, digamos, tenemos que evaluar,
+una vez que evaluadas en el conjunto de entrenamiento, tenemos que ser un poquito más honestos y
+no ocupar esa información para poder revaluar y rehacer, digamos, ocupando información
+que obtuvimos desde la evaluación de conjunto de pre-a. Entonces, si evaluamos la relargía
+y escojo un modelo y no es satisfactorio, tengo que hacer un procedimiento nuevo con
+nuevas selecciones, nueva evaluación independiente, nuevos modelos de tal manera que
+para el análisis mismo y la forma en que llegue al modelo mismo que voy a utilizar para tomar
+decisiones es digamos honesto en ese sentido de que no ocupa información que no debies ocupar.
+Entonces, fíjate acá, hay muchos paralelismo entre la predicción cuantitativa y la clasificación.
+Entonces, siempre tengo que predefinir lo que voy a hacer antes de hacerlo. Aquí está un poco la
+referencia y el material. Hay muchos datos que vienen de internet que ya están más o menos
+definido y a modo muy muy resumen
+cómo evaluaba y cómo seleccionaba el modelo que en esencia tomó la sesión de
+la clase. Tenemos que evaluar qué esperamos como
+error y en eso tenemos que definir métricas. Entonces voy a tener que definir
+qué es lo que quiero hacer, qué es lo que voy a evaluar y qué métrica voy a
+utilizar para escoger el modelo. En general voy a tratar de hacer
+valiación cruzada para poder escoger el modelo y una vez que lo escojo voy a
+reescutar con el entrenamiento, con todo conjunto de entrenamiento y finalmente
+evaluar. Entonces la selección se hace utilizando la valiación cruzada y el
+conjunto de entrenamiento. Por ejemplo en estos casos, en el caso de hormigón se
+tiende a escoger, sobre todo en problemas de predicción cuatrativa, la raíz del
+error cuadrático medio porque es bastante estándar, digamos, penaliza
+discrepancias muy grandes. Y en la clasificación se tiene a utilizar el
+lock-lock pero hay muchas más variantes porque el costo toma un valor, o sea, toma
+un un raw fundamental y el umbral también. Entonces, en ese sentido sí
+hay más variabilidad. Entonces, pequeñas recomendaciones. Tengo que definir bien
+la métrica que voy a utilizar y la referencia, de fin, distinguir probabilidades de decisión en
+clasificación, ya porque va a depender de varias cosas, no simplemente el método, verificar siempre
+que no tengo fuga de datos, no tengo que tener data liquid porque eso me mata en principio el
+problema, no puedo tener una fuga de datos porque si no mi modelo no está bien definido, o sea,
+estoy ocupando datos que no debiesen ocuparse, que ocupar es como ocupar
+información que es privilegiada, en principio, que estoy reservando para la prueba,
+que es mi oráculo, digamos, de cómo voy a evaluar efectivamente el desempeño de
+mi modelo. Tengo que decidir cuál es la configuración y la receta de cada uno de
+los candidatos y finalmente tengo que ver las estabilidades de mi modelo,
+cuando lo valúo tras evaluarlo más bien en el conjunto de prueba. Y una quinta, digamos,
+es siempre después de todas estas cosas se tiene que ver la utilidad porque todo esto llega a un
+repercute en una toma de decisión, en un plan de acción, en algo, digamos, o una recomendación.
+Entonces, siempre se tienen que sorprender estos resultados, estas formas metodológicas con la
+práctica, digamos, con la realidad, con lo que se pasa efectivamente. Eso por hoy. Me pasé un
+poquito pero ya estamos en la hora. No sé si hay alguna pregunta, duda,
+si no, volvemos el próximo jueves. Próximo martes tienen...

@@ -1,0 +1,5540 @@
+1
+00:00:00,000 --> 00:00:03,000
+Me escucho bien, ¿sí?
+
+2
+00:00:03,000 --> 00:00:05,000
+Sí, profesor. Me disculpe que se me fue a mi...
+
+3
+00:00:05,000 --> 00:00:07,000
+Me disculpe.
+
+4
+00:00:07,000 --> 00:00:09,000
+¿Ya?
+
+5
+00:00:10,000 --> 00:00:12,000
+Pero me escucho bien, ¿sí?
+
+6
+00:00:12,000 --> 00:00:14,000
+Sí, perfecto.
+
+7
+00:00:14,000 --> 00:00:16,000
+Sí, profesor.
+
+8
+00:00:16,000 --> 00:00:18,000
+Sí.
+
+9
+00:00:18,000 --> 00:00:23,000
+Por ejemplo, vamos a poner un ejemplo muy sencillo acá en que uno va a usar una regresión logística.
+
+10
+00:00:23,000 --> 00:00:26,000
+Yo estoy llamando acá regresión logística simple.
+
+11
+00:00:26,000 --> 00:00:32,000
+simple, podría ser sí o no una covariable, con una covariable, ya, y una más amplia,
+
+12
+00:00:32,000 --> 00:00:36,000
+con 3, 4, 5 o más covariables, sí.
+
+13
+00:00:36,000 --> 00:00:41,000
+Entonces, un ejemplo hipotético de modelos evaluados en los mismos casos, pero con un
+
+14
+00:00:41,000 --> 00:00:45,000
+modelo más sencillo, modelo más general.
+
+15
+00:00:45,000 --> 00:00:50,000
+Calculamos las métricas, log loss, esta métrica ya conocen, ya fue
+
+16
+00:00:50,000 --> 00:00:55,000
+y la reducción observada ahí fue muy pequeña de 0.02.
+
+17
+00:00:55,000 --> 00:01:05,000
+Hay una diferencia muy pequeña entre las dos métricas, por cual de las dos debemos ir.
+
+18
+00:01:05,000 --> 00:01:08,000
+Otra muestra de una evaluación podría producir una diferencia distinta
+
+19
+00:01:08,000 --> 00:01:12,000
+o una mejora pequeña puede ser relevante como segundo el objetivo.
+
+20
+00:01:12,000 --> 00:01:16,000
+Entonces básicamente acá no es suficiente para aparecer, ok,
+
+21
+00:01:16,000 --> 00:01:20,000
+Ok, tengo una métrica, tengo otra métrica, la diferencia fue muy chica.
+
+22
+00:01:20,000 --> 00:01:21,800
+¿Cómo tomo esta decisión?
+
+23
+00:01:21,800 --> 00:01:23,200
+¿Puedo construir un intervalo?
+
+24
+00:01:23,200 --> 00:01:25,700
+¿Puedo tomar algún decisión mejor?
+
+25
+00:01:25,700 --> 00:01:30,700
+Y ahí viene la idea de, bueno, podemos empezar a hacer un tipo de penalización acá para
+
+26
+00:01:30,700 --> 00:01:35,000
+ver si hay una ganancia o no de información, por ejemplo con la penalización AIC, con
+
+27
+00:01:35,000 --> 00:01:40,100
+la penalización BIC, o podemos de alguna manera utilizar nuestro conjunto de validación,
+
+28
+00:01:40,100 --> 00:01:46,460
+hacer varios muestreos con bootstrap y construir un intervalo para esta métrica.
+
+29
+00:01:46,460 --> 00:01:50,180
+Por lo que construir un intervalo para la diferencia entre los dos elementos.
+
+30
+00:01:50,180 --> 00:01:54,780
+Si este intervalo contiene 0, podemos asumir que no hay diferencia significativa entre
+
+31
+00:01:54,780 --> 00:01:56,700
+estos dos modelos.
+
+32
+00:01:56,700 --> 00:02:00,780
+Y la idea por temas de parsimonia es ir con el modelo más sencillo.
+
+33
+00:02:00,780 --> 00:02:03,500
+Entonces vamos a seguir un poco la carta.
+
+34
+00:02:03,500 --> 00:02:06,180
+Por eso una cosa que es importante.
+
+35
+00:02:06,180 --> 00:02:12,820
+estamos revisitando el método, bueno hoy tenemos menos tiempo entonces
+
+36
+00:02:12,820 --> 00:02:18,140
+vamos a intentar avanzar un poco más rápido. Pero una cosa que es
+
+37
+00:02:18,140 --> 00:02:22,660
+importante recordar, una cosa que es muy importante es aprendizaje supervisado
+
+38
+00:02:22,660 --> 00:02:27,740
+cuando vamos a trabajar con modelos de aprendizado máquina, Support Vector Machine,
+
+39
+00:02:27,740 --> 00:02:33,300
+redes neuronales, Random Forest, entre otros, es importante hacer bien la
+
+40
+00:02:33,300 --> 00:02:38,460
+una división de nuestra base, una división entre entrenamiento, dentro de esta división
+
+41
+00:02:38,460 --> 00:02:43,960
+entre entrenamiento vamos a hacer la validación y después evaluamos en la prueba. Algunos
+
+42
+00:02:43,960 --> 00:02:49,540
+alumnos tenían un poco de... creo que no se quedó muy claro la última vez, pero vamos
+
+43
+00:02:49,540 --> 00:02:55,920
+a intentar ahora hacer solamente un repaso de cómo funciona de una forma sencilla la
+
+44
+00:02:55,920 --> 00:03:02,580
+estructura. Una pregunta que podemos dejar ahí, si cambiamos la receta mirando la prueba,
+
+45
+00:03:02,580 --> 00:03:04,580
+deja de ser una evaluación final independiente.
+
+46
+00:03:04,580 --> 00:03:09,580
+Acá básicamente lo que queremos es que es importante dejar la prueba al final porque
+
+47
+00:03:09,580 --> 00:03:13,580
+no debemos usar la prueba para poder ajustar el modelo.
+
+48
+00:03:13,580 --> 00:03:19,580
+Eso debe ser independiente para que se pueda evaluar esta receta al final y ver si funciona bien.
+
+49
+00:03:21,580 --> 00:03:26,580
+Bueno, si tenemos por ejemplo para una base de Wisconsin, que es la base que estamos trabajando
+
+50
+00:03:26,580 --> 00:03:29,580
+y es la base que tenemos lo que vamos a pasar ahora.
+
+51
+00:03:29,580 --> 00:03:35,580
+vamos a hacer los ajustes acá en la clase básicamente en esa base para que se recuerden
+
+52
+00:03:35,580 --> 00:03:42,100
+básicamente estamos evaluando ahí a un tipo de cáncer ya que era maligno o benigno y tenemos
+
+53
+00:03:42,100 --> 00:03:47,780
+varias covariables que queremos evaluar si está influenciando o no para poder hacer la predicción
+
+54
+00:03:47,780 --> 00:03:55,580
+entonces tenemos una base original de 569 observaciones la dividimos en 398 para hacer el
+
+55
+00:03:55,580 --> 00:04:02,780
+entrenamiento y 171 para hacer la prueba. Entonces, en una validación cruzada de 5 pliegues,
+
+56
+00:04:02,780 --> 00:04:11,580
+uno de 80 casos es valido y otros 318 se ajustan al modelo. Lo que queremos discutir
+
+57
+00:04:11,580 --> 00:04:19,700
+acá básicamente es que vamos dividir esto, esta base acá, en 5 folds, en 5 pliegues o 5
+
+58
+00:04:19,700 --> 00:04:30,500
+carpetas, vamos a ajustar el modelo con 318 y vamos a evaluar en 80 casos. Después que hacemos
+
+59
+00:04:30,500 --> 00:04:37,260
+esto dejamos estos valores que fueron ajustados acá de lado. Entonces tenemos 80 observaciones que
+
+60
+00:04:37,260 --> 00:04:45,460
+fueron ajustadas inicialmente. Ajustamos el modelo con 318, después de ajustar el modelo con 318
+
+61
+00:04:45,460 --> 00:04:50,460
+evaluamos cómo está funcionando en estas ochenta observaciones.
+
+62
+00:04:50,460 --> 00:04:55,460
+Y ahí tengo ahí si es un problema de clasificación,
+
+63
+00:04:55,460 --> 00:04:59,460
+si clasificamos malo o bien o por ejemplo las probabilidades,
+
+64
+00:04:59,460 --> 00:05:02,460
+el log score, el Brier score, el log loss o Brier score,
+
+65
+00:05:02,460 --> 00:05:05,460
+no importa cuál es la meta que vamos a poner,
+
+66
+00:05:05,460 --> 00:05:08,460
+dejamos ella al lado, puede ser por ejemplo la exactitud,
+
+67
+00:05:08,460 --> 00:05:12,460
+ya voy a dejar esa exactitud de lado, ochenta observaciones.
+
+68
+00:05:12,460 --> 00:05:17,660
+ahora voy a poner nuevamente estas 80 observaciones, me escuchan?
+
+69
+00:05:17,660 --> 00:05:19,660
+acá me parece que la internet está instable
+
+70
+00:05:19,660 --> 00:05:23,660
+me parece 80 observaciones, pero voy a cambiar
+
+71
+00:05:23,660 --> 00:05:25,660
+ahora
+
+72
+00:05:25,660 --> 00:05:29,260
+cómo hacemos eso? inicialmente dejé 80 observaciones acá
+
+73
+00:05:29,260 --> 00:05:31,260
+y ajuste con 318
+
+74
+00:05:31,260 --> 00:05:34,860
+ahora voy a poner nuevamente estas 80 observaciones acá
+
+75
+00:05:34,860 --> 00:05:37,260
+y voy a ajustar el modelo
+
+76
+00:05:37,260 --> 00:05:45,620
+poniendo de vuelta estas 80 y voy sacar otras 80 observaciones ya mira que estas 80 observaciones
+
+77
+00:05:45,620 --> 00:05:51,100
+que estaban acá no serán las mismas que estarán acá yo la dividí en cinco folds ya en cinco
+
+78
+00:05:51,100 --> 00:06:01,620
+pliegues o acá uno va a llamar eso de OOF, out of fold, fuera de la carpeta ya entonces
+
+79
+00:06:01,620 --> 00:06:06,540
+dejamos esta observación fuera de la carpeta y lo ajustamos mira que interesante es que
+
+80
+00:06:06,540 --> 00:06:12,800
+Acá voy a ajustar nuevamente el modelo con 318 valores, 318 observaciones.
+
+81
+00:06:13,420 --> 00:06:15,300
+Pero ahora va a ser parámetros distintos.
+
+82
+00:06:15,320 --> 00:06:16,660
+Por qué van a ser parámetros distintos?
+
+83
+00:06:16,660 --> 00:06:19,960
+Porque estoy poniendo de vuelta estas observaciones
+
+84
+00:06:20,300 --> 00:06:23,860
+y estoy sacando las observaciones que estaban acá, en este grupo.
+
+85
+00:06:24,240 --> 00:06:29,300
+O sea, voy a ajustar con estas cuatro carpetas y voy a evaluar en este grupo.
+
+86
+00:06:29,760 --> 00:06:35,480
+Mira que antes yo tenía 80, ahora voy a tener 80 que viene de estos valores acá.
+
+87
+00:06:35,480 --> 00:06:42,480
+Y yo sé que de esta forma logré clasificar 80 observaciones y tuve 80 errores.
+
+88
+00:06:42,480 --> 00:06:45,480
+Ahora voy a tener más 80.
+
+89
+00:06:45,480 --> 00:06:48,480
+Entonces voy a juntar las dos. 80 con 80, 160.
+
+90
+00:06:48,480 --> 00:06:51,480
+Y voy haciendo esto con todos.
+
+91
+00:06:51,480 --> 00:06:56,480
+Acá 80, acá 80, acá de nuevo, acá de nuevo y acá de nuevo.
+
+92
+00:06:56,480 --> 00:07:03,480
+Al final voy a tener exactamente 398 valores calculados.
+
+93
+00:07:03,480 --> 00:07:09,480
+Entonces voy a alcanzar y evaluar cómo funcionaría si ajustábamos y dejáramos una parte de fuera.
+
+94
+00:07:09,480 --> 00:07:13,480
+Y ahí calculamos la exactitud final.
+
+95
+00:07:13,480 --> 00:07:18,480
+Y ahí ven la idea, por ejemplo, cuando hablaba de los... para ustedes de tunar parámetros.
+
+96
+00:07:18,480 --> 00:07:23,480
+Por ejemplo, en una regresión logística con Lasso tenemos un lambda.
+
+97
+00:07:23,480 --> 00:07:27,480
+Entonces voy a asumir un lambda igual a 0.1.
+
+98
+00:07:27,480 --> 00:07:31,480
+Y voy a calcular todos esos valores acá.
+
+99
+00:07:31,480 --> 00:07:40,120
+con lambda igual a 0.1 y después voy a tener por ejemplo la exactitud o la área sobre la curva ROC
+
+100
+00:07:40,120 --> 00:07:48,200
+con lambda igual a 1, 0.1. Después voy a cambiar lambda igual a 0.2 y voy a recalcular todo isso.
+
+101
+00:07:48,200 --> 00:07:54,880
+Después hago nuevamente con lambda igual a 3 recalculo nuevamente con todo esto. Lambda igual a 4,
+
+102
+00:07:54,880 --> 00:07:58,600
+lambda igual a 5 y por ahí adelante. Ustedes van a ver que al final,
+
+103
+00:07:58,600 --> 00:08:06,840
+Si estamos mirando por ejemplo el error cuadrático medio que más sencillo más fácil de entender
+
+104
+00:08:06,840 --> 00:08:12,600
+vamos a tener acá que el error cuadrático medio algún punto va a ser bajo y después va a aumentar
+
+105
+00:08:12,600 --> 00:08:17,000
+y ahí sabemos exactamente cuál es el lambda que debemos ajustar acá.
+
+106
+00:08:17,000 --> 00:08:25,840
+Entonces es muy importante tener en cuenta de que los hiperparámetros acá se van a estimar
+
+107
+00:08:25,840 --> 00:08:29,840
+exactamente en este proceso.
+
+108
+00:08:29,840 --> 00:08:34,840
+O sea, nos vamos a considerar algunos valores para ajustar acá
+
+109
+00:08:34,840 --> 00:08:40,840
+y voy a hacer esto de una forma interativa, pero la base o el conjunto que tengo de prueba
+
+110
+00:08:40,840 --> 00:08:44,840
+no está acá, va a estar al final solamente.
+
+111
+00:08:44,840 --> 00:08:49,840
+Por eso que lo que tenemos que hacer es
+
+112
+00:08:49,840 --> 00:08:54,840
+ajustar los coeficientes, escalas y otras partes del modelo.
+
+113
+00:08:54,840 --> 00:08:59,880
+vamos a hacer la validación, elegir las variables y preparamos y sintonizamos, hacemos ese entrenamiento,
+
+114
+00:08:59,880 --> 00:09:08,000
+esa validación a lo largo de ese proceso acá, y ahí encontramos el Lambda, por eso que
+
+115
+00:09:08,000 --> 00:09:13,600
+cuando se ajusta el modelo lo hacen de esa forma, sí? Y ahí uno puede me preguntar,
+
+116
+00:09:13,600 --> 00:09:24,040
+ya profesor, pero yo ajusté, esos dos acá encontré que el Lambda lo que mejora el control
+
+117
+00:09:24,040 --> 00:09:29,520
+entrenamiento fue el lambda igual a uno. Seguimos con una regresión logística con lambda igual a uno.
+
+118
+00:09:29,520 --> 00:09:34,440
+Ahora vamos a evaluar este modelo y hacer una comparación con otros modelos en nuestro conjunto
+
+119
+00:09:34,440 --> 00:09:44,280
+de prueba. Y la diferencia fue muy chica, muy chica, con 0.98, 0.97, 0.96. Es posible que
+
+120
+00:09:44,280 --> 00:09:50,320
+esta diferencia me salió solamente porque tengo este conjunto de entrenamiento y tengo este conjunto de
+
+121
+00:09:50,320 --> 00:09:56,960
+prueba, se cambió un poco la estructura del conjunto de prueba, cómo se cambian los valores.
+
+122
+00:09:56,960 --> 00:10:03,200
+Por supuesto, tenemos valores distintos en el conjunto de prueba, los valores de la área sobre
+
+123
+00:10:03,200 --> 00:10:07,440
+la curva roc, los errores cuadráticos medios, van a ser distintos, pero lo cuanto va a cambiar,
+
+124
+00:10:07,440 --> 00:10:13,680
+es posible que se cambie un valor específico, algunas observaciones, ahora Random Forest
+
+125
+00:10:13,680 --> 00:10:18,200
+pasa a ser mejor que la regresión logística en una análise. Entonces vamos a ver una forma para construir
+
+126
+00:10:18,200 --> 00:10:22,640
+hay intervalos acá, los que tomaron un curso que vieron la parte de estadística,
+
+127
+00:10:22,640 --> 00:10:27,800
+ven la importancia, no solamente se basar en una estimativa pontuada,
+
+128
+00:10:27,800 --> 00:10:32,840
+vamos a basar solamente en un valor promedio, no en un error cuadrático medio,
+
+129
+00:10:32,840 --> 00:10:34,840
+o una área sobre la curva ROC.
+
+130
+00:10:34,840 --> 00:10:40,440
+Vamos tener un intervalo para mirar y comparar distintos intervalos.
+
+131
+00:10:40,440 --> 00:10:45,840
+Y ahí uno puede tomar la decisión de que si hubo una ganancia de información
+
+132
+00:10:45,840 --> 00:10:48,840
+de la lista de aprendizaje.
+
+133
+00:10:50,840 --> 00:10:53,840
+Algunas cosas que son muy importantes a hacer
+
+134
+00:10:53,840 --> 00:10:56,840
+a lago de este proceso, siempre cuando vamos a hacer
+
+135
+00:10:56,840 --> 00:10:59,840
+esto, porque estoy reforzando esto, bueno, porque
+
+136
+00:10:59,840 --> 00:11:02,840
+parte del contenido tenemos que revisar este punto,
+
+137
+00:11:02,840 --> 00:11:05,840
+pero además esto porque muchos alumnos no toman este cuidado.
+
+138
+00:11:05,840 --> 00:11:09,840
+Vamos a hacer la estandardización en estos cuatro puntos
+
+139
+00:11:09,840 --> 00:11:14,840
+y calcular el error cuadrático medio en este grupo.
+
+140
+00:11:15,840 --> 00:11:24,840
+En este otro punto hacemos la estandarización en estos individuos y calculamos el error cuadrático medio en este grupo.
+
+141
+00:11:24,840 --> 00:11:32,840
+En el otro hacemos la estandarización con estas cuatro carpetas y hacemos la evaluación en este grupo.
+
+142
+00:11:32,840 --> 00:11:40,840
+Porque si hacemos la estandarización de forma general vamos a tener una fuga o un leak de información.
+
+143
+00:11:40,840 --> 00:11:47,300
+y eso es malo porque siempre cuando vamos a entrenar nuestro modelo no podemos tener un
+
+144
+00:11:47,300 --> 00:11:55,600
+vazamento de información. Muchas veces el alumno no va a tener cuidado con eso y solamente se da cuenta
+
+145
+00:11:55,600 --> 00:12:05,640
+del final y es, aunque parezca una tarea muy sencilla, siempre eso pasa.
+
+146
+00:12:05,640 --> 00:12:11,640
+Tuve una reunión ahora con un alumno de un MBA que trabajaba con él en Brasil.
+
+147
+00:12:11,640 --> 00:12:19,640
+Después de 7 meses, el alumno se le cuenta que la exactitud que tenía el 95% venía de una fuga de información
+
+148
+00:12:19,640 --> 00:12:25,640
+porque una de las covariables no había estandarizado correctamente y estaba teniendo fuga de información ahí.
+
+149
+00:12:25,640 --> 00:12:32,640
+Entonces cuando sacaba y hacía la estandarización correcta, lograba y bajaba harto como 0.8.
+
+150
+00:12:32,640 --> 00:12:38,760
+Entonces hay que tener mucho cuidado con la forma que uno hace la estandarización.
+
+151
+00:12:38,760 --> 00:12:39,760
+¿Cierto?
+
+152
+00:12:39,760 --> 00:12:44,320
+Estandarizar toda la base antes de separar.
+
+153
+00:12:44,320 --> 00:12:45,320
+¿Incorrecto?
+
+154
+00:12:45,320 --> 00:12:49,760
+Estimar la media de la escala solo con las filas de ajuste.
+
+155
+00:12:49,760 --> 00:12:52,480
+Eligir las variables con las etiquetas de prueba.
+
+156
+00:12:52,480 --> 00:12:53,800
+Eso nunca se puede hacer.
+
+157
+00:12:53,800 --> 00:12:56,480
+Seleccionar dentro del conjunto de entrenamiento y validación.
+
+158
+00:12:56,480 --> 00:12:58,480
+¿Correcto?
+
+159
+00:12:58,480 --> 00:13:00,320
+Escoger el mejor umbral en prueba.
+
+160
+00:13:00,320 --> 00:13:05,880
+el correcto es fijar el umbral antes de la evaluación final. Entonces he hablado harto
+
+161
+00:13:05,880 --> 00:13:12,060
+para ustedes y es super importante que repasen si van a tomar después una evaluación o
+
+162
+00:13:12,060 --> 00:13:17,220
+si van a tener que trabajar con eso. No es una información muy sencilla, muchas veces
+
+163
+00:13:17,220 --> 00:13:22,560
+que no está acostumbrado o la persona que no tiene mucho conocimiento siempre acaba
+
+164
+00:13:22,560 --> 00:13:25,760
+haciendo alguna confusión en esos puntos.
+
+165
+00:13:25,760 --> 00:13:26,760
+Eh, Profes?
+
+166
+00:13:26,760 --> 00:13:27,760
+Si?
+
+167
+00:13:27,760 --> 00:13:32,760
+En el chat preguntan si es que hay algún tamaño mínimo que deba tener como cada
+
+168
+00:13:32,760 --> 00:13:34,760
+Fold para que sea válido?
+
+169
+00:13:34,760 --> 00:13:44,760
+No, bueno, yo sé, no porque la idea es que muchos, bueno, generalmente los softwares
+
+170
+00:13:44,760 --> 00:13:49,760
+ellos hacen como cada Fold, generalmente los dividen 10 o 5, ya?
+
+171
+00:13:49,760 --> 00:13:56,160
+el tema es que lo que va a cambiar de
+
+172
+00:13:56,160 --> 00:13:59,760
+estos folders,
+
+173
+00:13:59,760 --> 00:14:04,400
+lo que veo cuando ajusto estos modelos es que
+
+174
+00:14:04,400 --> 00:14:10,160
+conforme vamos teniendo más folders, más preciso va a ser el ajuste porque
+
+175
+00:14:10,160 --> 00:14:15,720
+estamos poniendo más información, pero lo que vale costar, le vale costar el
+
+176
+00:14:15,720 --> 00:14:20,040
+tiempo que va a tener de ajuste. Vamos a suponer que ahora ustedes tienen que hacer
+
+177
+00:14:20,040 --> 00:14:27,160
+eso con cinco folds. O sea, el modelo de forma interna va a tener que correr
+
+178
+00:14:27,160 --> 00:14:33,120
+cinco veces. Bueno, se va a variar, o sea, hiperparámetros a ser estimados, va a
+
+179
+00:14:33,120 --> 00:14:38,400
+tener que correr estas cinco veces, va a tener que hacer estos cinco ajustes.
+
+180
+00:14:38,400 --> 00:14:51,100
+no sé si va a variar lambda en 20 o en una grilla de 0.1 0.2 0.3 hasta 5 va a tener ahí como 50
+
+181
+00:14:51,100 --> 00:15:01,800
+ajustes que tiene que hacer ya entonces son 5 x 50 250 ajustes me parece no me parece que me
+
+182
+00:15:01,800 --> 00:15:08,800
+que va a dar mucho trabajo. Ok, uno va allá e aumenta de 100 observaciones para 100 mil.
+
+183
+00:15:08,800 --> 00:15:14,800
+Y después de 100 mil, usted decide hacer, no sé, lo que le había comentado,
+
+184
+00:15:14,800 --> 00:15:21,800
+Leave-One-Out Cross Validation. La idea es que uno puede hacer estas divisiones de las carpetas hasta
+
+185
+00:15:21,800 --> 00:15:27,800
+lo tanto cuanto quiera de alguna forma que al final va a tener. Si tenemos 100 observaciones,
+
+186
+00:15:27,800 --> 00:15:33,240
+tenemos 99 carpetas, voy a ajustar con 99 e evaluar en ese punto, voy a ajustar ahora
+
+187
+00:15:33,240 --> 00:15:36,200
+las otras 99 y evaluar en ese punto.
+
+188
+00:15:36,200 --> 00:15:41,880
+El tema es que conforme ustedes van haciendo eso, por supuesto va a mejorar la...
+
+189
+00:15:41,880 --> 00:15:46,320
+lo cuanto el modelo está logrando ajustar porque está evaluando solamente un punto
+
+190
+00:15:46,320 --> 00:15:50,640
+y ajustando todos los otros, pero lo malo es que va tener que ajustar ese modelo un
+
+191
+00:15:50,640 --> 00:15:51,640
+montón de veces.
+
+192
+00:15:51,640 --> 00:15:57,240
+Para hacer observaciones no es un problema, pero si tienen 100.000 observaciones va tener
+
+193
+00:15:57,240 --> 00:16:04,680
+que correr un modelo 50 x 99999. Su computadora va a quedar correndo
+
+194
+00:16:04,680 --> 00:16:10,800
+esto varios días. Depende del tamaño de la muestra va a tomar toda su vida.
+
+195
+00:16:10,800 --> 00:16:16,960
+Entonces es importante que evalúen el tiempo computacional que van a tomar.
+
+196
+00:16:16,960 --> 00:16:25,160
+Entonces generalmente los softwares lo que hacen lo dividen en 10 folds o 5 folds.
+
+197
+00:16:25,160 --> 00:16:31,800
+Si ustedes tienen pocas observaciones, pero muy pocas observaciones, mi sugerencia es hacer el
+
+198
+00:16:31,800 --> 00:16:40,280
+Leave-One-Out Cross Validation. A hacer ajuste con 99 y evalúa en lo primero, después ajusta los
+
+199
+00:16:40,280 --> 00:16:47,920
+otros 99 y avalia o evalúa el segundo, después ajusta con los otros 99 y evalúa en el tercero.
+
+200
+00:16:47,920 --> 00:16:52,680
+O sea, va a ser una cosa que es Leave-One-Out, va a dejar uno de fuera y va a ajustar todos los
+
+201
+00:16:52,680 --> 00:16:58,280
+otros. Lo malo es que va a tener que hacer una cosa de 100, pero
+
+202
+00:16:58,280 --> 00:17:02,280
+desde el punto de vista computacional no le va a tener un costo computacional.
+
+203
+00:17:02,280 --> 00:17:07,080
+Es muy poco porque son pocas observaciones, la maximización es pequeña y
+
+204
+00:17:07,080 --> 00:17:09,080
+generalmente eso le va a correr muy rápido.
+
+205
+00:17:09,080 --> 00:17:17,080
+Entonces, mucho de eso le va a tomar más o menos, va a cambiar del tanto que tiene de muestras.
+
+206
+00:17:17,080 --> 00:17:21,480
+Entonces, si se está trabajando con pocas bases de datos, con muchas bases de datos,
+
+207
+00:17:21,480 --> 00:17:25,480
+le va a depender de eso. Entonces es siempre importante que usted evaluase.
+
+208
+00:17:25,480 --> 00:17:28,480
+Si yo tengo pocas observaciones, tengo tiempo, hago
+
+209
+00:17:28,480 --> 00:17:33,480
+Leave-One-Out Cross Validation. Ah no, yo tengo 50 mil observaciones,
+
+210
+00:17:33,480 --> 00:17:37,480
+10 mil observaciones. Bueno, hace un k-fold igual a 10,
+
+211
+00:17:37,480 --> 00:17:41,480
+que es el estándar, que la mayoría de los software ya tiene, y listo.
+
+212
+00:17:41,480 --> 00:17:46,480
+Bien? Entonces, va a ser más o menos... Sí, sí claro.
+
+213
+00:17:46,480 --> 00:17:55,720
+Profesor, una pregunta. Lo que usted está haciendo alucinadora está relacionado porque algunos datos
+
+214
+00:17:55,720 --> 00:18:03,480
+se han clasificado en datos de entrenamiento y de prueba y otros datos están clasificados en
+
+215
+00:18:03,480 --> 00:18:14,040
+entrenamiento, validación y prueba. Entonces, ¿cómo hay que definir cómo segmentar cuando es necesario
+
+216
+00:18:14,040 --> 00:18:22,200
+dejar datos para validación, entrenamiento y prueba o simplemente tomar entrenamiento y prueba
+
+217
+00:18:23,800 --> 00:18:29,000
+siempre así lo que es lo que ustedes tienen que decidir va a ser lo que vamos a hacer entre
+
+218
+00:18:29,000 --> 00:18:38,400
+entrenamiento y prueba y ser el primer paso ya entonces me llegó 569 observaciones vamos a hacer
+
+219
+00:18:38,400 --> 00:18:46,120
+una división con 80 o 70 por ciento, ustedes van a tener que decidir cuándo es la base,
+
+220
+00:18:46,120 --> 00:18:53,400
+generalmente lo hacen con 80 por ciento o con 70 por ciento, y cuando dividimos con ese 70 a 80
+
+221
+00:18:53,400 --> 00:18:57,120
+por ciento vamos a tener una parte para el integramento y una parte para prueba. Ya?
+
+222
+00:18:57,120 --> 00:19:05,880
+Esta parte de prueba, listo, ya me va a quedar allá separado, no voy a entrar con ella básicamente
+
+223
+00:19:05,880 --> 00:19:11,640
+hasta el final entonces esto acá no me va a servir para nada para encontrar los parámetros del modelo
+
+224
+00:19:11,640 --> 00:19:18,440
+y eso solamente será el final para que yo pueda comparar los modelos finales, si yo ajuste
+
+225
+00:19:18,440 --> 00:19:25,880
+un Random Forest, si ajusté una red neuronal, un KNN entre otros, yo no voy a utilizarlo para elegir parámetros
+
+226
+00:19:25,880 --> 00:19:32,440
+dentro de este conjunto de entrenamiento voy a hacer una otra division
+
+227
+00:19:32,440 --> 00:19:37,880
+dentro de este conjunto de entrenamiento lo voy a dividir entre entrenamiento y validación
+
+228
+00:19:37,880 --> 00:19:43,080
+podría haber puesto otro nombre pero generalmente utilizo eso
+
+229
+00:19:43,080 --> 00:19:47,240
+dentro del entrenamiento se divide para entrenamiento y validación
+
+230
+00:19:47,240 --> 00:19:55,880
+entonces acá tiene 80 y 20, uno va a hacer alguna cosa como 60, 20 y 20
+
+231
+00:19:55,880 --> 00:20:01,080
+o sea 60% para entrenamiento, 20% para validación y 20% para prueba
+
+232
+00:20:01,080 --> 00:20:05,880
+será más o menos esa idea, pero esta división que estoy comentando de K-Fold
+
+233
+00:20:05,880 --> 00:20:11,880
+se hace exactamente dentro de este grupo de 398
+
+234
+00:20:11,880 --> 00:20:15,560
+pero dentro de este conjunto de entrenamiento
+
+235
+00:20:15,560 --> 00:20:19,400
+tengo que hacer una otra división para encontrar los hiperparámetros
+
+236
+00:20:19,400 --> 00:20:22,840
+y esta división viene exactamente con esta idea
+
+237
+00:20:22,840 --> 00:20:28,200
+con los 398 voy a dejar algunos de fuera y voy a mostrar el modelo
+
+238
+00:20:28,200 --> 00:20:38,200
+Voy a dejar otros de fuera y voy a mostrar el modelo y voy a encontrar el parámetro, por ejemplo, λ de una regresión logística o el γ de un Support Vector Machine.
+
+239
+00:20:38,200 --> 00:20:40,200
+Exactamente con ese proceso.
+
+240
+00:20:40,200 --> 00:20:45,200
+¿Por qué no puedo ajustar todo y después encontrar el λ?
+
+241
+00:20:45,200 --> 00:20:55,200
+Porque nos va a llevar siempre el super ajuste. Conforme ponemos más información vamos a tener aquel problema de disminuir los errores cuadráticos medios en el conjunto de entrenamiento.
+
+242
+00:20:55,200 --> 00:20:59,200
+Pero profesor, usted ya está trabajando con el conjunto de entrenamiento?
+
+243
+00:20:59,200 --> 00:21:05,200
+Sí, pero necesito encontrar un parámetro. Por eso que hacemos una división dupla.
+
+244
+00:21:05,200 --> 00:21:11,200
+Si hacemos el ajuste solamente con ese acá, e intento estimar un parámetro,
+
+245
+00:21:11,200 --> 00:21:15,200
+no me va a funcionar, siempre me va a aparecer o me va a dar la impresión de que
+
+246
+00:21:15,200 --> 00:21:22,200
+más parámetros me va a traer el menor error cuadrático medio, que no es el caso.
+
+247
+00:21:22,200 --> 00:21:27,780
+Entonces el lambda que elegimos, por ejemplo el lazo,
+
+248
+00:21:27,780 --> 00:21:32,680
+va a venir exactamente haciendo esta división acá.
+
+249
+00:21:32,680 --> 00:21:37,240
+Y pongo en 5 folds y voy variando el lambda
+
+250
+00:21:37,240 --> 00:21:42,540
+y voy evaluando este error cuadratico médio con lambda fijo
+
+251
+00:21:42,540 --> 00:21:51,940
+exactamente en un conjunto que no fue utilizado.
+
+252
+00:21:51,940 --> 00:22:00,340
+Entonces, esta idea de validar acá, ajustar y validar, no tiene de ninguna manera la información de la prueba.
+
+253
+00:22:00,340 --> 00:22:03,300
+La prueba son 171 observaciones que están afuera.
+
+254
+00:22:03,300 --> 00:22:11,140
+De las 398 que se quedaron, voy a hacer nuevamente una división y esa división voy a ajustar el modelo y evaluar.
+
+255
+00:22:11,140 --> 00:22:14,980
+Ajustar el modelo y evaluar. Y voy a hacer esto varias veces.
+
+256
+00:22:14,980 --> 00:22:20,740
+Entonces, es importante dentro de este control de entrenamiento hacer de nuevo una división.
+
+257
+00:22:20,740 --> 00:22:24,240
+y esta división será para estimar los parámetros.
+
+258
+00:22:25,240 --> 00:22:29,240
+La lambda, una gamma, dependiendo del modelo de Random Forest,
+
+259
+00:22:29,240 --> 00:22:31,240
+será la complejidad del árbol
+
+260
+00:22:32,740 --> 00:22:34,740
+y la cantidad de árboles que tendremos ahí.
+
+261
+00:22:34,740 --> 00:22:36,740
+Entonces cada uno de los métodos de Machine Learning
+
+262
+00:22:36,740 --> 00:22:40,740
+tienen parámetros a ser tunados.
+
+263
+00:22:41,240 --> 00:22:43,740
+Y acá viene la estimación de estos parámetros
+
+264
+00:22:43,740 --> 00:22:45,740
+con el cross validation.
+
+265
+00:22:46,240 --> 00:22:50,240
+El cross validation uno hace solamente con el conjunto de entrenamiento.
+
+266
+00:22:50,740 --> 00:22:58,140
+Entonces siempre cuando dividimos hacemos el cross validation, cross validation en el conjunto de entrenamiento, encontramos el lambda que va a minimizar
+
+267
+00:22:58,140 --> 00:23:00,740
+estas observaciones que se quedaron de fuera.
+
+268
+00:23:00,740 --> 00:23:05,740
+Y la pregunta puede ser exactamente, ¿cuánto va a ser mejor hacer la división?
+
+269
+00:23:05,740 --> 00:23:16,740
+En 5, 10, si tengo 100 observaciones, hago la división en 99 carpetas, 100 carpetas, o sea 99 para entrenar en una y voy a hacer esto 99 veces.
+
+270
+00:23:16,740 --> 00:23:18,740
+Sí, se puede hacer.
+
+271
+00:23:18,740 --> 00:23:23,700
+generalmente los softwares ya lo tienen implementado, como ellos lo implementan?
+
+272
+00:23:23,700 --> 00:23:30,740
+con esta idea acá utilizando k-folds con cinco en algunos casos y 10 en otros
+
+273
+00:23:30,740 --> 00:23:36,180
+conforme vamos aumentando la cantidad de divisiones vamos a tener un costo
+
+274
+00:23:36,180 --> 00:23:39,300
+contracional mucho más elevado
+
+275
+00:23:39,700 --> 00:23:42,740
+no se si se quedó claro Claudia?
+
+276
+00:23:42,740 --> 00:23:51,740
+Sí, escucho. O no quiero el clavo.
+
+277
+00:23:51,740 --> 00:24:05,740
+Entonces la idea va a ser ser este tipo de división, ¿cierto?
+
+278
+00:24:05,740 --> 00:24:13,340
+Entonces, es muy importante, no es una idea muy sencilla, la primera vez que fui a empezar
+
+279
+00:24:13,340 --> 00:24:19,220
+a trabajar con Machine Learning, son como ustedes, 10 años atrás, 8, 9 años, cuando
+
+280
+00:24:19,220 --> 00:24:25,140
+empecé a hacer los ajustes, yo no entendía porque tenía un CV en el conjunto de entrenamiento,
+
+281
+00:24:25,140 --> 00:24:31,940
+cuando uno va a ajustar eso en, con el GLM por ejemplo, si vamos a ajustar GLM, tenemos
+
+282
+00:24:31,940 --> 00:24:37,180
+cv.glmnet acá para encontrar eso. Entonces, ese cv.glmnet hace exactamente esta división,
+
+283
+00:24:37,180 --> 00:24:45,860
+pero siempre hace con el conjunto de entrenamiento. Dentro del conjunto de entrenamiento lo dividimos
+
+284
+00:24:45,860 --> 00:24:51,020
+y hacemos cross validation. O sea, si usted ve un curso que están enseñando que tiene que ser
+
+285
+00:24:51,020 --> 00:24:56,980
+solamente la división entre entrenamiento y prueba, y no le comentan que dentro de ese conjunto de
+
+286
+00:24:56,980 --> 00:25:01,980
+hay que hacer una nueva división que es conocida como cross validation,
+
+287
+00:25:01,980 --> 00:25:06,980
+le están enseñando malo y ahí están enseñando exactamente como funciona la cosa.
+
+288
+00:25:06,980 --> 00:25:11,980
+Dentro de ese proceso, é la forma correcta de hacer.
+
+289
+00:25:11,980 --> 00:25:17,980
+Hay un libro de Tibshirani, creo que está como referencia, que es como la Biblia,
+
+290
+00:25:17,980 --> 00:25:21,980
+de Statistical Learning, ahí solamente hay un capítulo informando,
+
+291
+00:25:21,980 --> 00:25:28,620
+informando de wrong way and the right way to do cross validation, la forma mala y la forma buena de hacer validación cruzada.
+
+292
+00:25:28,620 --> 00:25:35,020
+Exactamente eso, hacer la división entre tres partes, entrenamiento, validación y prueba.
+
+293
+00:25:35,020 --> 00:25:42,380
+Dividimos en prueba, se va una parte específica, hacemos los ajustes con el culto de entrenamiento y validación.
+
+294
+00:25:42,380 --> 00:25:52,940
+y muchas veces eso que nos va a costar principalmente cuando el
+
+295
+00:25:52,940 --> 00:25:58,220
+persona trabaja con bases de dados grandes entonces una persona con 100 mil observaciones
+
+296
+00:25:58,220 --> 00:26:02,300
+se va a hacer un Leave-One-Out en un cross validation o es imposible.
+
+297
+00:26:02,300 --> 00:26:07,060
+¿Cuál es la mejor forma? Utiliza lo que ya tiene el software, realmente un k-fold,
+
+298
+00:26:07,060 --> 00:26:15,060
+un pliegue de 5 o 10 capetas, tener una división en 5 o 10 capetas y hace esta forma de ajuste.
+
+299
+00:26:15,060 --> 00:26:24,500
+Una cosa que no puede llegar a que hacemos esta división de entrenamiento o validación
+
+300
+00:26:24,500 --> 00:26:29,740
+cuando voy mirar ahora el final el conjunto de prueba que tan buenas son las probabilidades
+
+301
+00:26:29,740 --> 00:26:35,300
+que me salieron ahí. Ajuste el modelo y ahora voy a hacer la comparación entre la área
+
+302
+00:26:35,300 --> 00:26:43,100
+sobre la curva ROC, Brier score, log loss, exactitud, sensibilidad, error cuadratico
+
+303
+00:26:43,100 --> 00:26:48,940
+medio, error absoluto medio, entre otros.
+
+304
+00:26:48,940 --> 00:26:52,300
+¿Cuál de estos vamos a elegir?
+
+305
+00:26:52,300 --> 00:26:57,540
+Bueno, ya sabemos que de las métricas log loss, Brier, el mejor es lo que tiene el menor
+
+306
+00:26:57,540 --> 00:26:58,540
+valor.
+
+307
+00:26:58,540 --> 00:27:05,540
+La exactitud, sensibilidad y precisión lo mejora cuando tiene un valor mayor.
+
+308
+00:27:05,540 --> 00:27:11,540
+Y al final el error cuadrático medio menor es el mejor.
+
+309
+00:27:13,540 --> 00:27:17,540
+Bueno, acá vamos a depender del umbral.
+
+310
+00:27:17,540 --> 00:27:20,540
+Ya tuvimos esta discusión en algún momento cómo definir este umbral.
+
+311
+00:27:21,540 --> 00:27:26,540
+Pero la duda es qué tan buenas son estas probabilidades y cómo podemos compararlas.
+
+312
+00:27:26,540 --> 00:27:33,620
+Bueno, le presenté un ejemplo muy hipotético acá, que dependiendo de la métrica, una
+
+313
+00:27:33,620 --> 00:27:38,220
+métrica penaliza un poco más y un poco menos los resultados.
+
+314
+00:27:38,220 --> 00:27:41,420
+Por ejemplo, el error cuadrático medio.
+
+315
+00:27:41,420 --> 00:27:46,340
+Muchas, muchas veces las personas pensan que esto es lo mismo, el error medio absoluto
+
+316
+00:27:46,340 --> 00:27:49,340
+y el error cuadrático medio van a informar la misma cosa.
+
+317
+00:27:49,340 --> 00:27:54,220
+Entonces, sinceramente, cuando va a ser algún trabajo o algún alumno negativo a hacer una
+
+318
+00:27:54,220 --> 00:28:02,220
+él decide apreciar solamente uno. La raíz cuadrada es el error cuadrático medio, solamente el error medio absoluto.
+
+319
+00:28:04,220 --> 00:28:14,220
+Uno, recuerda que uno es calculando el sumatorio de lo ajustado menos el observado.
+
+320
+00:28:15,220 --> 00:28:21,220
+Uno va a ser el cuadrado, que después sacamos la raíz cuadrada acá, otra.
+
+321
+00:28:24,220 --> 00:28:30,720
+hacemos el sumatorio en los cuadrados, después sacamos la raíz cuadrada, dividimos por n.
+
+322
+00:28:30,720 --> 00:28:39,220
+En otro caso, en vez de sacar el valor, sacamos el valor absoluto.
+
+323
+00:28:39,220 --> 00:28:45,220
+Bueno, podemos sacar la raíz, vamos a sacar la raíz, y en este caso acá no estamos haciendo
+
+324
+00:28:45,220 --> 00:28:47,220
+y se va haciendo esto.
+
+325
+00:28:47,220 --> 00:28:51,220
+Y tenemos acá.
+
+326
+00:28:51,220 --> 00:28:55,220
+Entonces, estas métricas informan lo mismo,
+
+327
+00:28:55,220 --> 00:28:57,220
+va a tener el mismo resultado? No.
+
+328
+00:28:57,220 --> 00:28:59,220
+Entonces, es muy importante que tengamos en esta idea.
+
+329
+00:28:59,220 --> 00:29:03,220
+Algunas de ellas van a penalizar un poco más errores mayores.
+
+330
+00:29:03,220 --> 00:29:07,220
+Entonces, una métrica como el MAE,
+
+331
+00:29:07,220 --> 00:29:11,220
+le va a presentar, por ejemplo, acá un ejemplo sencillo,
+
+332
+00:29:11,220 --> 00:29:13,220
+tenemos los valores que fueron observados,
+
+333
+00:29:13,220 --> 00:29:20,420
+con los valores preditos, ¿cierto? Tengo acá 1, menos 2, 3, menos 4 y menos 5, ¿sí?
+
+334
+00:29:20,420 --> 00:29:26,100
+Cuando voy a calcular esto, voy a hacer la diferencia entre uno y el otro y voy a hacer
+
+335
+00:29:26,100 --> 00:29:31,540
+la soma, estoy sacando el valor absoluto acá, recuerda que es el error medio
+
+336
+00:29:31,540 --> 00:29:40,220
+por el valor absoluto, entonces pongo acá un absoluto, si es un absoluto, todo esto
+
+337
+00:29:40,220 --> 00:29:43,340
+se cambia como más, ¿cierto?
+
+338
+00:29:45,340 --> 00:29:46,340
+Y acá.
+
+339
+00:29:46,540 --> 00:29:55,740
+Si eso pasa, voy a calcular esa métrica como 1 más 2 más 3 más 4 más 5 partido 5 acá
+
+340
+00:29:55,740 --> 00:29:57,100
+y me va a salir el valor 3.
+
+341
+00:29:58,500 --> 00:30:02,900
+Por otro lado, el error cuadrático, medio, después sacamos la raíz,
+
+342
+00:30:03,300 --> 00:30:07,420
+va a tener una otra mirada, va a sacar ese valor al cuadrado más ese al cuadrado,
+
+343
+00:30:07,420 --> 00:30:13,420
+que será 4, más 3 al cuadrado que será 9, más 4 al cuadrado que será 16,
+
+344
+00:30:13,420 --> 00:30:15,420
+y más 5 al cuadrado que será 25.
+
+345
+00:30:15,420 --> 00:30:18,420
+Calculamos la medida y luego sacamos la raíz cuadrada.
+
+346
+00:30:18,420 --> 00:30:21,420
+Uno acaba siendo 3 y uno será 3.31.
+
+347
+00:30:21,420 --> 00:30:30,420
+Lo que está cambiando, la raíz cuadrada del error cuadrático medio penaliza un poco más valores muy discrepantes.
+
+348
+00:30:30,420 --> 00:30:36,420
+Entonces ellos informarán una diferencia entre lo que fue predicho y lo que fue observado,
+
+349
+00:30:36,420 --> 00:30:42,180
+pero en uno de los métodos va a estar penalizando un poco más errores muy grandes.
+
+350
+00:30:42,180 --> 00:30:48,900
+¿Cuál de los dos se puede utilizar? Bueno, necesitan también evaluar cuál de los dos le acomoda más.
+
+351
+00:30:48,900 --> 00:30:55,540
+Ustedes pueden informar ya, la empresa que trabaja tiene una pérdida muy grande cuando los errores son muy grandes.
+
+352
+00:30:55,540 --> 00:30:58,580
+Entonces se va a penalizar un poco más esos errores grandes.
+
+353
+00:30:58,580 --> 00:31:01,460
+Y me voy con la raíz cuadrada del error cuadrático medio.
+
+354
+00:31:01,460 --> 00:31:08,460
+Por otro lado, no hay una penalización tan grande, pero solo no quiero errar tanto.
+
+355
+00:31:08,460 --> 00:31:15,460
+Podemos ir con el MAE. Algunos de ellos pueden traer, dependiendo de cuál es la métrica que está elegiendo,
+
+356
+00:31:15,460 --> 00:31:20,460
+puede también al final acabar elegiendo otro modelo específico.
+
+357
+00:31:20,460 --> 00:31:25,460
+Algunas veces tal vez con el error cuadratico medio me salió random forest.
+
+358
+00:31:25,460 --> 00:31:33,460
+cuando cambio para el MAE me salió un KNN. Entonces es necesario definir esto antes del inicio del experimento.
+
+359
+00:31:35,460 --> 00:31:40,460
+Ambas quedan en las unidades de la respuesta, pero el error cuadrático medio da más peso a errores grandes.
+
+360
+00:31:42,460 --> 00:31:45,460
+LogLoss usa la probabilidad de la clase real.
+
+361
+00:31:45,460 --> 00:31:48,460
+Entonces tomaron la clase con Eloy.
+
+362
+00:31:48,460 --> 00:31:52,820
+como Eloy, entonces Eloy le había comentado cómo funciona el log loss la
+
+363
+00:31:52,820 --> 00:31:56,720
+clase real acá en la clase 1 entonces basamos en la probabilidad de la clase 1
+
+364
+00:31:56,720 --> 00:32:00,460
+cuando vamos a mirar en la clase 0 tenemos que calcular uno menos la
+
+365
+00:32:00,460 --> 00:32:04,080
+probabilidad de que la clase 1 cuando voy a calcular la probabilidad de la
+
+366
+00:32:04,080 --> 00:32:11,460
+clase real hace 0.9 0.6 0.35 0.8 porque no tiene menos uno acá porque la
+
+367
+00:32:11,460 --> 00:32:15,700
+clase real es uno como estamos hablando con la clase 0 tenemos que hacer el
+
+368
+00:32:15,700 --> 00:32:22,060
+complementar y no siempre va a recordar que la probabilidad de Y ser igual a 0
+
+369
+00:32:22,060 --> 00:32:27,660
+es igual a 1 menos la probabilidad de Y ser igual a 1.
+
+370
+00:32:27,660 --> 00:32:32,900
+Entonces salimos exactamente en esta clase acá.
+
+371
+00:32:32,900 --> 00:32:38,540
+Básicamente como se calcula no necesito quedar muy preocupado con
+
+372
+00:32:38,540 --> 00:32:41,420
+esto porque al final no tendremos el valor final acá.
+
+373
+00:32:41,420 --> 00:32:50,620
+El log loss se calcula, por ejemplo, para una situación donde tengamos distintas probabilidades de clasificar al individuo en la clase específica, dado por ese valor.
+
+374
+00:32:50,620 --> 00:32:59,220
+Cuanto más cerca de cero, más cerca de lo verdadero valor, o de lo valor que esperábamos, es mejor.
+
+375
+00:32:59,220 --> 00:33:10,220
+Por ejemplo, esto acá, más cerca de 1, o sea, la probabilidad de estar en la clase 1 más cerca de 1, ya va a ser mejor.
+
+376
+00:33:10,220 --> 00:33:18,500
+¿Por qué? Porque log de 1 es igual a 0. O sea, la probabilidad de clasificar malo un individuo,
+
+377
+00:33:18,500 --> 00:33:23,780
+la probabilidad de clasificar un individuo como 1, acá, es muy alta, 0.9.
+
+378
+00:33:23,780 --> 00:33:30,660
+Entonces log de 0.9 es 0.10. ¿Cuánto? Mayor la probabilidad en la clase 1,
+
+379
+00:33:30,660 --> 00:33:36,300
+más cerca del valor 1 acá, y más cerca ese valor va a estar de 0.
+
+380
+00:33:36,300 --> 00:33:39,300
+Sólo para tener una idea después de por qué calculamos el promedio.
+
+381
+00:33:41,940 --> 00:33:44,500
+Seleccionar y evaluar son tareas distintas.
+
+382
+00:33:44,500 --> 00:33:48,460
+Es importante definir la unidad de separación y la métrica relevante.
+
+383
+00:33:48,460 --> 00:33:49,940
+Por eso ya le comenté.
+
+384
+00:33:49,940 --> 00:33:52,300
+Tenemos que definir cómo vamos a hacer esta separación
+
+385
+00:33:52,300 --> 00:33:54,620
+y cuál métrica es relevante para nosotros.
+
+386
+00:33:54,620 --> 00:33:56,620
+No es siempre una tarea muy sencilla.
+
+387
+00:33:56,620 --> 00:33:58,740
+Muchas veces no es bueno dejar
+
+388
+00:33:58,740 --> 00:34:01,820
+en la mano de una inteligencia artificial para que lo haga.
+
+389
+00:34:01,820 --> 00:34:03,620
+Ya no va a meter los datos ahí,
+
+390
+00:34:03,620 --> 00:34:09,620
+un programa como un Codex o un Claude, le pide para hacer los ajustes, le va a salir algunos resultados,
+
+391
+00:34:09,620 --> 00:34:15,320
+y no sabe por qué elegieron esa métrica, cuáles son los resultados, lo que esto está influenciando,
+
+392
+00:34:15,320 --> 00:34:20,320
+lo que cambia cuando salimos del error cuadrático medio, del absoluto.
+
+393
+00:34:20,320 --> 00:34:23,820
+Entonces, los detalles son lo que hace la diferencia.
+
+394
+00:34:23,820 --> 00:34:27,320
+Y entonces, es importante que conozcan los detalles porque muchas veces eso le va a pasar.
+
+395
+00:34:29,120 --> 00:34:31,320
+Es importante. Sí, Gustavo?
+
+396
+00:34:31,320 --> 00:34:39,320
+Sí, profesor, ¿puede explicar nuevamente, por favor, qué es lo que calcula el log loss exactamente?
+
+397
+00:34:39,320 --> 00:34:46,320
+Bueno, el log loss va a tener la clase real y va a calcular la probabilidad de la clase real.
+
+398
+00:34:46,320 --> 00:34:52,320
+Acá la probabilidad de la clase real es probabilidad de la clase 1 y las clases observadas.
+
+399
+00:34:52,320 --> 00:34:55,320
+Entonces, él quiere calcular la probabilidad de que Y sea igual a 1.
+
+400
+00:34:55,320 --> 00:35:02,320
+Entonces, la probabilidad es la clase real, queremos intentar maximizar esta probabilidad.
+
+401
+00:35:02,320 --> 00:35:10,320
+Entonces, vamos a calcular, por ejemplo, para un caso específico, la probabilidad de Y ser igual a 1 fuera de 0.35.
+
+402
+00:35:10,320 --> 00:35:19,320
+Es decir, es más probable que el individuo esté acerca de ser una clase estimada, va a ser igual a 0 o que va a ser igual a 1.
+
+403
+00:35:19,320 --> 00:35:25,580
+1, ya, eso va a depender del umbral que tenemos, pero ese valor acá le va a poner más cerca de 0.
+
+404
+00:35:25,580 --> 00:35:33,800
+La probabilidad de Y ser igual a 1 para ese individuo fue de 0.8, ya. Entonces,
+
+405
+00:35:33,800 --> 00:35:39,880
+ese log loss va a medir exactamente la probabilidad de la clase ser igual a 1. Básicamente eso.
+
+406
+00:35:39,880 --> 00:35:43,080
+Perfecto. Ok, o sea, el logaritmo final...
+
+407
+00:35:43,080 --> 00:35:45,080
+¿Por qué tiene el mismo formato acá? ¿Por qué? ¿Sí?
+
+408
+00:35:45,080 --> 00:35:58,080
+Sí, creo que ya lo entendí, profesor, el logaritmo al final premia mientras la probabilidad es más alta, o sea, más cercana a uno, premia eso y castiga cuando la probabilidad es más baja.
+
+409
+00:35:58,080 --> 00:36:05,080
+Mira, por ejemplo, acá la probabilidad era muy baja, entonces se castigó alto, se ha tenido un castigo muy alto, un valor de 1.0.
+
+410
+00:36:05,080 --> 00:36:10,080
+Si el valor es muy pequeño, como 0.10, ese valor acaba siendo muy grande.
+
+411
+00:36:10,080 --> 00:36:15,080
+De hecho, conforme muy pequeño, ese valor va tendiendo al infinito.
+
+412
+00:36:15,080 --> 00:36:21,080
+Entonces, él castiga muy grande ese tipo de probabilidad.
+
+413
+00:36:21,080 --> 00:36:23,080
+Ok, super. Gracias, Gustavo.
+
+414
+00:36:23,080 --> 00:36:30,080
+Entonces, bueno, tenemos que hacer el ajuste con nuestro conjunto de entrenamiento disponible.
+
+415
+00:36:30,080 --> 00:36:34,080
+Vamos a ajustar nuestro modelo solamente con nuestro conjunto de entrenamiento.
+
+416
+00:36:34,080 --> 00:36:39,080
+vamos a evaluar en un conjunto de prueba sin volver a elegir nada.
+
+417
+00:36:39,080 --> 00:36:42,080
+En el conjunto de prueba no se estiman parámetros,
+
+418
+00:36:42,080 --> 00:36:48,080
+no se va a hacer selección de modelos acá en términos de
+
+419
+00:36:48,080 --> 00:36:53,080
+ya me voy con un A, con una regresión logística, con 3, 4, 5 parámetros.
+
+420
+00:36:54,080 --> 00:36:59,080
+Y eso si vamos a hacer regularización, tiene que ser hecho dentro del conjunto de entrenamiento.
+
+421
+00:36:59,080 --> 00:37:06,080
+Entonces, evaluar el desempeño en prueba sin volver a elegir esos hiperparámetros.
+
+422
+00:37:06,080 --> 00:37:10,080
+Al final vamos a cuantificar la incertidumbre de esta evaluación.
+
+423
+00:37:10,080 --> 00:37:16,080
+Este paso hasta acá, paso 4, ustedes ya vieron en clases anteriores.
+
+424
+00:37:16,080 --> 00:37:25,080
+Pero le va a que uno por informar a mi queda saber cómo evaluar la incertidumbre de esta evaluación.
+
+425
+00:37:25,080 --> 00:37:33,680
+Me salió un AUC de 0.98.
+
+426
+00:37:33,680 --> 00:37:35,480
+¿Qué puedo hacer con eso?
+
+427
+00:37:35,480 --> 00:37:38,680
+Yo tengo otro modelo que tiene un AUC de 0.94.
+
+428
+00:37:38,680 --> 00:37:40,280
+¿Son distintos?
+
+429
+00:37:40,280 --> 00:37:44,680
+Me parece que sí, pero tenemos que evaluar la incertidumbre que tenemos en nuestra muestra.
+
+430
+00:37:44,680 --> 00:37:47,880
+Entonces hoy vamos a profundizar el quinto paso.
+
+431
+00:37:47,880 --> 00:37:58,480
+Bueno, un ejemplo muy sencillo acá para que tenga una idea de cómo va a funcionar más
+
+432
+00:37:58,480 --> 00:38:03,600
+o menos cuando vamos haciendo una cosa que es conocida como bootstrap.
+
+433
+00:38:03,600 --> 00:38:07,720
+Yo ajusteo el modelo con un conjunto de entrenamiento.
+
+434
+00:38:07,720 --> 00:38:15,280
+Ajusteo el modelo con un conjunto de entrenamiento, pero no utilicé solamente el entrenamiento,
+
+435
+00:38:15,280 --> 00:38:20,840
+utilicé la validación para encontrar los hiperparámetros. Entonces acá ya tengo el
+
+436
+00:38:20,840 --> 00:38:26,920
+modelo ajustado. Este paso acá ya me va a dar el modelo ajustado y con ese modelo me voy a seguir adelante.
+
+437
+00:38:29,760 --> 00:38:35,480
+Bueno, ahora me llegó a... yo tengo el conjunto de prueba. Este conjunto de prueba que tengo son
+
+438
+00:38:35,480 --> 00:38:45,280
+son 100 observaciones. La exactitud de este valor, la exactitud que tengo con estas 100 observaciones
+
+439
+00:38:45,280 --> 00:38:57,360
+me salió de 0.9. O sea, yo dividí entre entrenamiento y validación. Dejé como 800 observaciones
+
+440
+00:38:57,360 --> 00:39:03,080
+para hacer el entrenamiento y 100 observaciones para hacer la prueba.
+
+441
+00:39:03,080 --> 00:39:11,080
+80 para entrenar, 800 observaciones para entrenar, 100 observaciones para hacer la prueba.
+
+442
+00:39:11,080 --> 00:39:16,560
+Cuando yo calculé la exactitud, la acuracia, en ese modelo me salió con una acuracia de
+
+443
+00:39:16,560 --> 00:39:19,520
+0.9 en esas observaciones.
+
+444
+00:39:19,520 --> 00:39:26,520
+Y la pregunta que uno puede tener, si yo cambio un poco esa muestra, si cambio un poco esa
+
+445
+00:39:26,520 --> 00:39:32,520
+Si cambia un poco esta muestra de prueba, como me va a salir?
+
+446
+00:39:32,520 --> 00:39:36,520
+Lo que yo acabé haciendo fue una cosa conocida como bootstrap.
+
+447
+00:39:36,520 --> 00:39:39,520
+La idea de bootstrap es la siguiente.
+
+448
+00:39:39,520 --> 00:39:45,520
+Voy a tener que avanzar un poco para que veas lo que es bootstrap.
+
+449
+00:39:45,520 --> 00:39:48,520
+Después voy a ver anteriormente para que tenga una idea.
+
+450
+00:39:48,520 --> 00:39:52,520
+Vamos a suponer que yo tengo 5 observaciones.
+
+451
+00:39:52,520 --> 00:39:57,000
+2, 4, 5, 7 y 8, me salieron esos valores.
+
+452
+00:39:58,040 --> 00:40:02,000
+En ese grupo, yo quiero construir una nueva muestra.
+
+453
+00:40:02,080 --> 00:40:05,880
+Yo tengo la muestra original que tiene los valores 2, 4, 5, 7 y 8.
+
+454
+00:40:06,720 --> 00:40:07,880
+Lo que hace bootstrap,
+
+455
+00:40:08,280 --> 00:40:11,840
+va a construir una nueva muestra
+
+456
+00:40:12,480 --> 00:40:16,360
+por medio de un muestreo con reposición.
+
+457
+00:40:16,800 --> 00:40:21,360
+Es decir, voy a poner todo esto dentro de una caja y voy a sacar uno
+
+458
+00:40:21,360 --> 00:40:24,360
+y el primero que me salió fue 4, ya?
+
+459
+00:40:24,360 --> 00:40:28,360
+Ahora me salió 4, voy a dejar acá este valor, pero voy a poner de vuelta.
+
+460
+00:40:28,360 --> 00:40:34,360
+Yo tengo allá que esta observación fue la 2, me salió la 2 con esta punta de 4.
+
+461
+00:40:34,360 --> 00:40:38,360
+Pero es con reposición, entonces voy a poner nuevamente dentro de la caja.
+
+462
+00:40:38,360 --> 00:40:41,360
+Voy a seleccionar los puntos, después de me salió la misma observación,
+
+463
+00:40:41,360 --> 00:40:43,360
+fue lo que me pasó acá, me salió la misma.
+
+464
+00:40:43,360 --> 00:40:47,360
+Ya? Entonces, nuevamente, 4 e 4.
+
+465
+00:40:47,360 --> 00:40:50,960
+Después me salió el 2, cuando fui sacar.
+
+466
+00:40:51,520 --> 00:40:53,920
+Después el 8 y después el 5.
+
+467
+00:40:54,320 --> 00:40:57,360
+Mira que acá me quedó de fuera el 7.
+
+468
+00:40:58,680 --> 00:41:00,640
+Pero no hay problema, acá ya tengo una muestra.
+
+469
+00:41:00,640 --> 00:41:02,920
+Esa es la primera muestra que tengo bootstrap.
+
+470
+00:41:04,040 --> 00:41:06,880
+Ahora voy a hacer el mismo paso de nuevo con reposición.
+
+471
+00:41:07,760 --> 00:41:09,720
+Saqué la primera muestra, fue 8.
+
+472
+00:41:09,720 --> 00:41:12,560
+Saqué la segunda, 8. Saqué la tercera, 7.
+
+473
+00:41:13,040 --> 00:41:15,000
+Saqué la cuarta, 5.
+
+474
+00:41:15,000 --> 00:41:20,600
+Y saqué la quinta, la muestra cinco, y me salió ocho.
+
+475
+00:41:20,600 --> 00:41:24,280
+Mira que tengo ocho acá tres veces. Uno, dos, tres.
+
+476
+00:41:24,280 --> 00:41:28,280
+Tengo un siete, tengo un cinco, y me quedó de fuera dos y cuatro.
+
+477
+00:41:28,280 --> 00:41:31,880
+Ya, no importa. Tengo ahora acá una nueva muestra.
+
+478
+00:41:31,880 --> 00:41:34,760
+Cada una de esas muestras deberían ser distintas,
+
+479
+00:41:34,760 --> 00:41:37,080
+o la mayoría de las muestras van a ser distintas.
+
+480
+00:41:37,080 --> 00:41:41,160
+Yo puedo repetir ese paso un montón de veces, ¿cierto?
+
+481
+00:41:41,160 --> 00:41:50,080
+O sea, por evaluar cómo esto va a funcionar en distintas muestras o submuestras que fueron construidas de la muestra originaria.
+
+482
+00:41:51,160 --> 00:41:54,640
+Algunas muestras van a ser muy extremas.
+
+483
+00:41:55,400 --> 00:41:59,160
+Por tener una situación, voy a tener 8, 8, 8, 8 y 8.
+
+484
+00:42:00,000 --> 00:42:03,120
+En nuestra situación 2, 2, 2, 2, 2. No me importa.
+
+485
+00:42:03,720 --> 00:42:05,680
+Ellos van a tener métricas distintas.
+
+486
+00:42:05,680 --> 00:42:10,440
+mira que el promedio acá fue 4,6, 7,2, 4,
+
+487
+00:42:11,520 --> 00:42:15,280
+pero esto va a ocurrir o puede ocurrir o debería ocurrir
+
+488
+00:42:15,280 --> 00:42:18,840
+si vamos sacando dentro del universo
+
+489
+00:42:19,320 --> 00:42:21,040
+o dentro de nuestra población,
+
+490
+00:42:21,040 --> 00:42:23,120
+si vamos sacando pequeñas muestras ahí.
+
+491
+00:42:24,120 --> 00:42:26,560
+Entonces, esto podría ser una buena representación.
+
+492
+00:42:29,480 --> 00:42:30,560
+¿Por qué le comento eso?
+
+493
+00:42:30,560 --> 00:42:33,040
+Porque acá cuando sacamos 100 observaciones,
+
+494
+00:42:33,040 --> 00:42:39,960
+voy calculando nuevamente la exactitud o la acuracia en cada una de estas nuevas observaciones
+
+495
+00:42:39,960 --> 00:42:46,640
+que construimos, algunas van a ocurrir casi con una gran frecuencia de veces 0.9, pero
+
+496
+00:42:46,640 --> 00:42:52,480
+en algunas situaciones se va cambiando un poco los valores y se va alejando del valor
+
+497
+00:42:52,480 --> 00:43:01,640
+promedio, pero lo cuanto se va alejando, entonces uno puede construir la distribución de esta
+
+498
+00:43:01,640 --> 00:43:08,640
+exactitud con base en un mostreo con 100 observaciones, ¿cierto?
+
+499
+00:43:08,640 --> 00:43:15,640
+Lo que puede pasar conforme voy aumentando el número de replicaciones que voy haciendo,
+
+500
+00:43:15,640 --> 00:43:21,240
+vamos teniendo un poco más de información y un poco más de acuración, entonces va
+
+501
+00:43:21,240 --> 00:43:25,760
+a ser quedando más preciso en termos de un promedio que debería ser el verdadero, el
+
+502
+00:43:25,760 --> 00:43:31,480
+promedio va a ser el verdadero, 0.9, pero yo puedo saber hasta dónde él está variando,
+
+503
+00:43:31,480 --> 00:43:35,320
+Esto es genial porque ahora, con base en una idea como esta,
+
+504
+00:43:35,320 --> 00:43:39,680
+de poder intentar empezar a construir intervalos para la exactitud,
+
+505
+00:43:39,680 --> 00:43:42,160
+intervalos para los errores cuadráticos medios,
+
+506
+00:43:42,160 --> 00:43:46,480
+intervalos para las áreas sobre la curva ROC,
+
+507
+00:43:46,480 --> 00:43:48,640
+y por comparar distintos modelos.
+
+508
+00:43:48,640 --> 00:43:53,280
+Este modelo no salió bien, solamente en este punto de prueba,
+
+509
+00:43:53,280 --> 00:43:56,240
+si cambia un poco el punto de prueba, cómo va a funcionar.
+
+510
+00:43:56,240 --> 00:43:59,240
+Podemos hacer este tipo de comparación.
+
+511
+00:43:59,240 --> 00:44:06,520
+Bueno, uno puede intentar construir intervalos aproximados, ustedes saben cómo construir
+
+512
+00:44:06,520 --> 00:44:12,560
+intervalos, esos intervalos aproximados por supuesto, van a depender del tamaño de cuantas
+
+513
+00:44:12,560 --> 00:44:21,300
+replicaciones lo hacemos, conforme vamos teniendo más replicas más se va acercando en termos
+
+514
+00:44:21,300 --> 00:44:32,500
+de lo verdadero, pero nuestro objetivo acá es que estos intervalos son aproximados y
+
+515
+00:44:32,500 --> 00:44:36,400
+bueno la dependencia entre los casos va a exigir un otro análisis, esa no va a ser la
+
+516
+00:44:36,400 --> 00:44:39,620
+mejor forma de construir los intervalos.
+
+517
+00:44:39,620 --> 00:44:45,260
+Básicamente yo estaba mirando el valor P, la exactitud y estaba intentando calcular el
+
+518
+00:44:45,260 --> 00:44:50,920
+error cuadrático medio con base en esta información, pero ahí no estoy evaluando exactamente
+
+519
+00:44:50,920 --> 00:44:54,360
+los puntos distintos. Voy a enseñar cómo calcular eso
+
+520
+00:44:54,360 --> 00:44:59,640
+del punto de vista de bootstrap, que ahí sí va a ser mirando distintas muestras.
+
+521
+00:44:59,640 --> 00:45:07,020
+Bueno, la cantidad, vamos a hacer la desviación estándar de los datos, que varía las diferencias
+
+522
+00:45:07,020 --> 00:45:12,360
+entre las observaciones. El error estándar de una estimación, que varía la media, el
+
+523
+00:45:12,360 --> 00:45:19,520
+log loss o otra estadística al cambiar la muestra. Podemos hacer distintas compras acá entre sí e estimar
+
+524
+00:45:19,520 --> 00:45:25,120
+su media con bastante precisión, si tenemos muchas observaciones independientes.
+
+525
+00:45:25,120 --> 00:45:30,200
+Esto es cuando yo quiero calcular un intervalo de confianza para la media.
+
+526
+00:45:30,200 --> 00:45:34,480
+Entonces, es importante que ustedes entendan más o menos cómo funcionan los intervalos.
+
+527
+00:45:34,480 --> 00:45:38,840
+Recuerden que el intervalo es, voy a calcular el valor promedio, después voy a calcular
+
+528
+00:45:38,840 --> 00:45:43,560
+más o menos un valor de una distribución normal, veces un error estándar.
+
+529
+00:45:43,560 --> 00:45:48,560
+Conforme tengo más observaciones, menor va a ser el intervalo.
+
+530
+00:45:49,560 --> 00:45:52,560
+Y cómo construir intervalos de confianza acá,
+
+531
+00:45:52,560 --> 00:45:59,560
+con por ejemplo 95% de confianza, más o menos como las encuestas que hacemos para las elecciones,
+
+532
+00:45:59,560 --> 00:46:04,560
+uno espera que algunas veces este valor o el verdadero valor va a estar,
+
+533
+00:46:04,560 --> 00:46:07,560
+no va a estar incluido, no va a estar dentro del intervalo.
+
+534
+00:46:08,560 --> 00:46:11,560
+O sea, acá lo que yo intenté hacer fue
+
+535
+00:46:11,560 --> 00:46:17,920
+generé valores con una media 0 de una distribución normal y una desviación estándar con valor 1.
+
+536
+00:46:17,920 --> 00:46:25,720
+Una muestra de... el valor era una muestra de tamaño 30 y yo repití eso con 40 muestras normales.
+
+537
+00:46:25,720 --> 00:46:32,400
+Ya entonces acá usted una muestra, acá usted otra muestra, acá usted otra, otra hasta tener 40,
+
+538
+00:46:32,400 --> 00:46:38,280
+acá. Cada una de esas muestras tenían 30 observaciones, podrían tener 100,
+
+539
+00:46:38,280 --> 00:46:45,520
+poder tener 200, pero yo elegí tener 30. Son 40 que estoy replicando solamente para que vean lo que pasa.
+
+540
+00:46:45,520 --> 00:46:55,040
+De esas 40 observaciones, cuando fui construyendo los intervalos de confianza, dos de ellos no tenían el valor 0.
+
+541
+00:46:55,040 --> 00:47:02,320
+Fueron intervalos más extremos. Un de los intervalos tenía valor en 0.01 hasta 0.8.
+
+542
+00:47:02,320 --> 00:47:07,720
+En otro caso tenía menos 0.1 hasta menos 0.8. Son valores extremos.
+
+543
+00:47:07,720 --> 00:47:10,380
+Entonces, cuando vamos a hacer la repetición en este proceso,
+
+544
+00:47:11,500 --> 00:47:14,880
+esperamos al final que 95% de los intervalos
+
+545
+00:47:15,440 --> 00:47:17,480
+deben contener el verdadero parámetro.
+
+546
+00:47:18,560 --> 00:47:21,040
+Es solamente un repaso de lo que es intervalo de confianza.
+
+547
+00:47:24,560 --> 00:47:25,560
+Bueno.
+
+548
+00:47:26,480 --> 00:47:29,040
+Ahora tenemos hasta la nuevementos, una hora y diez,
+
+549
+00:47:29,080 --> 00:47:30,760
+y después tenemos que pasar un poco más.
+
+550
+00:47:30,760 --> 00:47:30,761
+[Pausa: recreo hacia 0:47:31 del video aprox. El video no contiene el tramo del descanso (no hay silencio ni audio intermedio); la clase continúa directamente con el regreso del recreo.]
+
+551
+00:47:31,440 --> 00:47:34,080
+Bueno, los modelos se comparan en los mismos casos.
+
+552
+00:47:34,120 --> 00:47:37,560
+Vamos a suponer que hay un caso difícil acá para hacer la comparación.
+
+553
+00:47:37,720 --> 00:47:45,880
+Tengo casos 1, 2, 3 y 4. La clase real fue 1, parece caso 2, la clase real fue 0,
+
+554
+00:47:45,880 --> 00:47:50,280
+parece caso 3, la clase fue 1 y 4 fue 0.
+
+555
+00:47:50,280 --> 00:47:54,040
+Cuando fui a ajustar con modelos, modelos distintos, por ahí acababa
+
+556
+00:47:54,040 --> 00:47:58,280
+llevando a distintos o puede ser que fine.
+
+557
+00:47:58,280 --> 00:48:03,720
+Entonces vamos a poner que en esta clase acá, la clase real fue 1.
+
+558
+00:48:03,720 --> 00:48:10,080
+tanto el modelo A como el modelo B me dieron altas probabilidades de estar incluidos en la clase 1.
+
+559
+00:48:10,080 --> 00:48:12,580
+Entonces la probabilidad fue alta,
+
+560
+00:48:12,580 --> 00:48:18,660
+estoy calculando la probabilidad de ser igual a 1 acá,
+
+561
+00:48:18,660 --> 00:48:21,560
+entonces este valor vamos a clasificar como 1.
+
+562
+00:48:21,560 --> 00:48:24,860
+Siempre acabo de calcular la probabilidad de que Y es igual a 1.
+
+563
+00:48:24,860 --> 00:48:28,860
+Entonces siempre recuerden que estos modelos que ajustamos
+
+564
+00:48:28,860 --> 00:48:31,460
+siempre calculan este tipo de probabilidad.
+
+565
+00:48:31,460 --> 00:48:37,020
+Estoy resumiendo que en el modelo se puede calcular esta probabilidad, por ejemplo, un
+
+566
+00:48:37,020 --> 00:48:40,600
+suporte vector machine no se puede hacer eso. Pero vamos a suponer que ustedes están
+
+567
+00:48:40,600 --> 00:48:49,720
+con una regresión logística, random forest, una árbol, KNN o alguna cosa así. En el
+
+568
+00:48:49,720 --> 00:48:54,380
+caso cero, por ejemplo, la clase real es cero. La probabilidad de ese igual a uno fue
+
+569
+00:48:54,380 --> 00:49:01,140
+muy pequeño 0.2 0.5 por supuesto todo va a depender de umbral, es muy
+
+570
+00:49:01,140 --> 00:49:04,940
+probable que vamos a clasificar este individuo como 0 en ambos los casos
+
+571
+00:49:04,940 --> 00:49:09,840
+estos dos primeros casos muy sencillos pero estas situaciones acá ya me
+
+572
+00:49:09,840 --> 00:49:15,580
+complica un poco más en este modelo la clase real es uno y el
+
+573
+00:49:15,580 --> 00:49:20,820
+modelo ambos están indicando que si ponemos un umbral de 0.5, que vamos a
+
+574
+00:49:20,820 --> 00:49:25,260
+clasificar este individuo como cero, ya, pues vamos a ver un error acá. Y acá lo mismo,
+
+575
+00:49:25,260 --> 00:49:30,060
+si la clase es cero, vamos a tener ahí una indicación alta de que, o mayor que 0.5,
+
+576
+00:49:30,060 --> 00:49:36,940
+de que ser igual a 1. Entonces, las dos comunes están empareadas por observación. Vamos a mirar
+
+577
+00:49:36,940 --> 00:49:44,300
+eso y podemos intentar tener que poner, voy a dejar acá de observación, un caso muy difícil
+
+578
+00:49:44,300 --> 00:49:49,820
+por hacer que ambos los modelos fallen, uno fácil por favorecer a ambos, ya, pues muchas
+
+579
+00:49:49,820 --> 00:49:56,260
+veces podemos tener casos muy difíciles y modelos van a tener distintos valores o pueden llegar en
+
+580
+00:49:56,260 --> 00:50:06,580
+un consenso. Por eso es importante de alguna manera evaluar, bueno vamos a evaluar los intervalos de
+
+581
+00:50:06,580 --> 00:50:14,540
+esos valores. Ahora el objetivo que tenemos es medir este tipo de variabilidad.
+
+582
+00:50:14,540 --> 00:50:21,540
+Una de las cosas que debemos tener cuidado es que la variabilidad se va a calcular de una forma distinta,
+
+583
+00:50:21,540 --> 00:50:25,540
+no voy simplemente a calcular el error cuadrático medio de estos valores.
+
+584
+00:50:25,540 --> 00:50:32,540
+Dentro de estos valores voy a mirar la variancia, lo cuanto están variando en términos del promedio,
+
+585
+00:50:32,540 --> 00:50:38,540
+ya, y calculo la desviación estándar y después voy a construir intervalos más o menos con ese valor.
+
+586
+00:50:38,540 --> 00:50:45,620
+Entonces, el desvío describe las diferencias entre esas evaluaciones. Los modelos de los
+
+587
+00:50:45,620 --> 00:50:50,260
+pliegues comparten gran parte del entrenamiento, pero no tratamos los cinco resultados como
+
+588
+00:50:50,260 --> 00:50:56,220
+cinco muestras independientes. Bueno, la media, más o menos un desvío, no es un intervalo
+
+589
+00:50:56,220 --> 00:51:02,220
+de confianza de 95% que hay en esta situación. Entonces, acá lo que quiero comentar es que
+
+590
+00:51:02,220 --> 00:51:06,540
+a mí me gustaría intentar construir un intervalo para este error cuadrático medio, pero no vamos
+
+591
+00:51:06,540 --> 00:51:11,140
+Vamos a hacer simplemente como ok, saco el promedio, tengo la deviación, voy a calcular
+
+592
+00:51:11,140 --> 00:51:16,900
+como la media más o menos la deviación, no va a funcionar así.
+
+593
+00:51:16,900 --> 00:51:21,020
+Que incertidumbre queremos estudiar, entonces este paso es muy importante, cuanto varía
+
+594
+00:51:21,020 --> 00:51:28,020
+la evaluación de este modelo fijo, que debemos cambiar, en los casos de evaluación manteniendo
+
+595
+00:51:28,020 --> 00:51:33,020
+el modelo, entonces vamos a mantener siempre el mismo modelo que fue ajustado y ahí vamos
+
+596
+00:51:33,020 --> 00:51:38,180
+evaluar cómo él cambia con base en un cambio en la base de la prueba.
+
+597
+00:51:38,180 --> 00:51:41,660
+¿Cuánto varía el modelo si lo vuelvo a entrenar?
+
+598
+00:51:41,660 --> 00:51:46,500
+Bueno, eso podría ser una pregunta, los dados de entrenamiento y el proceso de ajuste.
+
+599
+00:51:46,500 --> 00:51:49,260
+Ahí tenemos que cambiar estas informaciones.
+
+600
+00:51:49,260 --> 00:51:53,180
+Pero acá no vamos a entrar mucho en esta discusión para que no se complique mucho
+
+601
+00:51:53,180 --> 00:51:54,180
+la cosa.
+
+602
+00:51:54,180 --> 00:52:03,140
+Bueno, vamos a hablar exactamente como hacemos eso, pero antes una información que es muy
+
+603
+00:52:03,140 --> 00:52:08,060
+importante que no sé si le pasaron acá, una forma de evaluar modelos de una forma
+
+604
+00:52:08,060 --> 00:52:11,660
+un poco distinta, teniendo en cuenta la penalización.
+
+605
+00:52:11,660 --> 00:52:16,440
+Esta es una media que es muy importante porque muchas veces ustedes van a encontrar esto
+
+606
+00:52:16,440 --> 00:52:22,420
+en varios artículos de estadística, artículos de modelos de comparación, siempre va a haber
+
+607
+00:52:22,420 --> 00:52:28,620
+una media conocida como el AIC, es un ajuste o una forma de ajustar el modelo
+
+608
+00:52:29,620 --> 00:52:36,580
+que va a tener un tipo de penalización específica, entonces el modelo ya tiene una forma de
+
+609
+00:52:36,580 --> 00:52:41,320
+penalización cuando vamos a ajustarlo de forma a intentar tener un modelo más parsemonioso,
+
+610
+00:52:41,320 --> 00:52:47,060
+modelo más adecuado. Una de las formas puede ser por el error cuadrático medio,
+
+611
+00:52:47,060 --> 00:52:51,060
+Una otra forma que muchos estadísticos les gustan utilizar es por medio del AIC.
+
+612
+00:52:51,060 --> 00:52:57,060
+¿Cuál es la mejor? Bueno, ellos van a tener ideas distintas, pero muchas veces...
+
+613
+00:53:00,060 --> 00:53:04,060
+Bueno, no van a tener que elegir eso antes de hacer el experimento.
+
+614
+00:53:05,060 --> 00:53:12,060
+Realmente el AIC es una métrica un poco más complicada de se ajustar, principalmente cuando uno va a trabajar con modelos no paramétricos.
+
+615
+00:53:12,060 --> 00:53:20,060
+Por ejemplo, estas métricas no son comparables en varios tipos de modelos que vamos a utilizar.
+
+616
+00:53:20,060 --> 00:53:29,060
+Entonces, por qué me está presentando? Porque varios de los modelos paramétricos o algunas estructuras de modelos semi-paramétricos utilizan esta idea de AIC.
+
+617
+00:53:29,060 --> 00:53:35,060
+Entonces, si ustedes van a evaluar trabajos, van a dar una mirada entre los que otras personas lograron hacer,
+
+618
+00:53:35,060 --> 00:53:40,940
+es una métrica que va a intentar que es utilizada que intenta utilizar el
+
+619
+00:53:40,940 --> 00:53:47,540
+equilibrio entre ajuste y complejidad. Bueno, cuál va a ser la idea acá?
+
+620
+00:53:47,540 --> 00:53:52,180
+La complejidad del modelo va a ser escrita, el ajuste del modelo va a ser
+
+621
+00:53:52,180 --> 00:53:57,780
+descrito exactamente por el valor que viene de la verosimilitud maximizada.
+
+622
+00:53:57,780 --> 00:54:01,460
+Tenemos que aclarar acá el estimador de máxima verosimilitud. Por ejemplo, me llega
+
+623
+00:54:01,460 --> 00:54:06,760
+una distribución, yo quiero intentar hacer predicciones en un modelo específico, con
+
+624
+00:54:06,760 --> 00:54:11,800
+regresión logística por ejemplo, yo construo la verosimilitud, encuentro el punto que maximiza
+
+625
+00:54:11,800 --> 00:54:17,080
+la verosimilitud, ya, y bueno tenemos que hacer selección de variables acá, una forma
+
+626
+00:54:17,080 --> 00:54:24,080
+que yo le comenté es por medio de regularización, una otra forma es por medio del AIC, ya,
+
+627
+00:54:24,080 --> 00:54:28,480
+usted puede ajustar todos los modelos posibles ahí, puede ser varias selecciones de los
+
+628
+00:54:28,480 --> 00:54:33,400
+va a tener que hacer un montón de ajustes, pero al final el mejor modelo va a ser lo que va a tener
+
+629
+00:54:33,400 --> 00:54:40,000
+este menor métrica. Lo que ella hace, ella va a penalizar la adición de parámetros, entonces ella hace
+
+630
+00:54:40,000 --> 00:54:45,640
+un tipo de penalización exactamente por ese 2p. Vamos a ver entonces el log de la verosimilito
+
+631
+00:54:45,640 --> 00:54:53,000
+maximizado, la cantidad de parámetros estimados incluido el intercepto, la recompensa por el ajuste
+
+632
+00:54:53,000 --> 00:54:59,180
+venir por esta parte, esta parte acá. Entonces, esta parte me va a dar la recompensa del ajuste.
+
+633
+00:54:59,180 --> 00:55:08,180
+Y es una cosa muy importante porque si yo tengo 1, 2, 3, 4, 5 parámetros, este valor va a ser
+
+634
+00:55:08,180 --> 00:55:14,620
+siempre menor que éste, y va a ser menor que éste, y menor que éste, y menor que éste.
+
+635
+00:55:14,620 --> 00:55:20,620
+Entonces, el log maximizado, el menos 2 log, en el conjunto de entrenamiento,
+
+636
+00:55:20,620 --> 00:55:24,620
+siempre va a ser menor conforme va aumentando los parámetros.
+
+637
+00:55:24,620 --> 00:55:26,620
+Por que? Cuando yo agrego un parámetro,
+
+638
+00:55:26,620 --> 00:55:29,620
+ese parámetro puede tener una ganancia muy pequeña,
+
+639
+00:55:29,620 --> 00:55:31,620
+pero está mejorando un poquito el modelo.
+
+640
+00:55:31,620 --> 00:55:34,620
+Y va a ser con que ese valor sea menor.
+
+641
+00:55:34,620 --> 00:55:36,620
+Pero ustedes van a ver que,
+
+642
+00:55:36,620 --> 00:55:38,620
+a veces, voy a tener un valor acá.
+
+643
+00:55:38,620 --> 00:55:41,620
+O perdón, este es...
+
+644
+00:55:41,620 --> 00:55:52,620
+ese es menor que ese, ese valor va a ser menor, menos 2 log
+
+645
+00:55:52,620 --> 00:55:58,620
+el problema es que tenemos que elegir lo que tiene el menor valor
+
+646
+00:55:58,620 --> 00:56:03,620
+pero si vamos a elegir lo que tiene el menor valor acá
+
+647
+00:56:03,620 --> 00:56:08,620
+ah no, entonces es al revés
+
+648
+00:56:11,620 --> 00:56:16,620
+siempre será mejor si multiplicamos por menos
+
+649
+00:56:16,620 --> 00:56:21,620
+este valor será cada vez menor conforme vamos haciendo más información
+
+650
+00:56:21,620 --> 00:56:25,620
+entonces conforme tenemos un parámetro, vamos a tener un valor de 300
+
+651
+00:56:25,620 --> 00:56:27,620
+ya? me confundí con eso
+
+652
+00:56:27,620 --> 00:56:31,620
+cuando voy a ajustar con 2
+
+653
+00:56:31,620 --> 00:56:33,620
+este valor será un poco menor
+
+654
+00:56:33,620 --> 00:56:35,620
+258
+
+655
+00:56:35,620 --> 00:56:39,620
+este es mayor que este, exacto
+
+656
+00:56:39,620 --> 00:56:44,880
+Entonces conforme voy agregando más parámetros ese valor
+
+657
+00:56:44,880 --> 00:56:50,500
+debería ir indo para cero. Entonces ese va a ser siempre mayor que ese, va a ser
+
+658
+00:56:50,500 --> 00:56:55,220
+siempre mayor que ese, va a ser siempre mayor que ese por adelante. El AIC uno va a
+
+659
+00:56:55,220 --> 00:56:59,700
+elegir lo que tiene el menor AIC. Entonces usted podría decir, ¿que es profesor?
+
+660
+00:56:59,700 --> 00:57:04,620
+Entonces tenemos que hacer eso, tenemos que elegir el modelo que tiene más
+
+661
+00:57:04,620 --> 00:57:08,920
+parámetros. Conforme vamos poniendo más parámetros se va a quedar mejor el
+
+662
+00:57:08,920 --> 00:57:14,220
+ajuste y va a ser menor. Pero el problema es que en algún momento
+
+663
+00:57:14,220 --> 00:57:19,660
+el empieza a sumar valores acá, 2p. Entonces vamos a suponer que yo tengo
+
+664
+00:57:19,660 --> 00:57:30,020
+primeramente 300, acá más 2. Cuando ajuste el modelo me caí para 290, más 4,
+
+665
+00:57:30,020 --> 00:57:38,220
+ser 294 cuando ahora tengo tres parámetros me caí para 289
+
+666
+00:57:38,220 --> 00:57:42,220
+mira que el cambio que te ve de acá para acá fue muy grande te veo una
+
+667
+00:57:42,220 --> 00:57:46,620
+diferencia de 10 pero el cambio que tuve de acá para acá
+
+668
+00:57:46,620 --> 00:57:52,320
+fue muy pequeño fue solamente de uno ya pero ahora yo tengo tres parámetros
+
+669
+00:57:52,320 --> 00:58:04,320
+Entonces cuando adiciono 6, este acá pasa a ser menor que este, acá voy a tener 295 y acá 294.
+
+670
+00:58:06,320 --> 00:58:14,320
+Entonces este modelo de alguna manera va penalizando la complejidad, entonces este más 2 penaliza la complejidad.
+
+671
+00:58:14,320 --> 00:58:20,840
+si tengo tres parámetros ok la verosimilitud de una ganancia de información pero la penalización
+
+672
+00:58:20,840 --> 00:58:27,040
+ahora es muy grande de forma que hace con que ese modelo sea el mejor de algún punto acá vamos a
+
+673
+00:58:27,040 --> 00:58:34,960
+encontrar que el mejor modelo es lo que tiene menor AIC ya bueno eso ese modelo hace un tipo de
+
+674
+00:58:34,960 --> 00:58:42,840
+penalización uno puede formar ya por qué está utilizando la penalización 2p acá y que fue la
+
+675
+00:58:42,840 --> 00:58:48,900
+persona que proponió este método Akaike Information Criterion que es el AIC y lo
+
+676
+00:58:48,900 --> 00:58:52,520
+acabó proponiendo después venido otras personas informando ya eso no me parece
+
+677
+00:58:52,520 --> 00:58:55,960
+una buena penalización y demuestro que otra penalización puede ser más
+
+678
+00:58:55,960 --> 00:59:03,040
+interesante ya como elegimos el modelo el menor AIC es el preferible ya lo que
+
+679
+00:59:03,040 --> 00:59:07,120
+tiene mejor ajuste es lo que tiene menor AIC
+
+680
+00:59:07,120 --> 00:59:15,880
+Entonces es un posible modelo. Bueno, por ejemplo, en el ejemplo de la regreso logística
+
+681
+00:59:15,880 --> 00:59:22,120
+vamos a ajustar el modelo, cuando fui a ajustar el log de la verosimilitud con el punto máximo
+
+682
+00:59:22,120 --> 00:59:32,520
+me salió ahí menos 1.88. Fui calcular el log loss acá, me salió 0.47. Una logística
+
+683
+00:59:32,520 --> 00:59:39,680
+con intercepto con p igual a 3, acá voy a calcular ahora esta regresión logística
+
+684
+00:59:39,680 --> 00:59:45,720
+con diferentes tipos de parámetros. Vamos a suponer que acá tengo el máximo de la
+
+685
+00:59:45,720 --> 00:59:50,320
+regresión logística que fue ajustada con determinado tipo de parámetro.
+
+686
+00:59:50,320 --> 00:59:59,400
+Con tres parámetros me salió menos 80. Cuando voy a calcular el AIC me salió 166.
+
+687
+00:59:59,400 --> 01:00:06,920
+la cuenta va a ser el log más la penalización, dos veces este punto acá, dos veces este punto acá
+
+688
+01:00:06,920 --> 01:00:13,640
+ahora voy a calcular el modelo B que tiene cinco parámetros, entonces necesito agregar un poco más de covariables ahí
+
+689
+01:00:13,640 --> 01:00:18,360
+ya con cinco parámetros menos dos veces
+
+690
+01:00:18,360 --> 01:00:25,800
+lo que me sale en la verosimilitud en este punto acá o en esa cuando podemos estos valores acá
+
+691
+01:00:25,800 --> 01:00:33,800
+en esta verosimilitud me salió menos 76, entonces cuando calcule la regresión logística con 5 parámetros
+
+692
+01:00:33,800 --> 01:00:41,800
+el log verosimilitud es menos 76, entonces voy a calcular menos 2 veces menos 76 me va un valor positivo
+
+693
+01:00:41,800 --> 01:00:50,800
+y después va a ser 152 y después hago una penalización de 10, entonces el valor me salió 162
+
+694
+01:00:50,800 --> 01:00:56,920
+pero mira ahora cuando voy a intentar adicionar 8 parámetros acá la ganancia de información fue
+
+695
+01:00:56,920 --> 01:01:04,040
+pequeña solamente bajó de 76 para 75.5 entonces cuando voy a calcular menos dos veces de ese
+
+696
+01:01:04,040 --> 01:01:10,560
+vamos más la penalización vuelve aumentar y ahí el modelo me va a informar que lo que está teniendo
+
+697
+01:01:10,560 --> 01:01:17,640
+la mejor o la mejor mejor ganancia de información acá es el modelo b un modelo con cinco parámetros
+
+698
+01:01:17,640 --> 01:01:22,560
+Entonces tenemos acá tres modelos hipotéticos ajustados por máxima verosimilitud con
+
+699
+01:01:22,560 --> 01:01:26,680
+cien observaciones. C tiene la mayor log de verosimilitud,
+
+700
+01:01:26,680 --> 01:01:30,680
+C tiene la mayor información de verosimilitud pero tiene muchos parámetros.
+
+701
+01:01:30,680 --> 01:01:34,640
+Entonces cuando vamos a utilizar la penalización el B me sale mejor.
+
+702
+01:01:36,520 --> 01:01:41,200
+La mejora de ajuste de C no compensa su mayor número de parámetros según el AIC,
+
+703
+01:01:41,200 --> 01:01:48,000
+el modelo va a penalizar la complejidad. Bueno, esta es una forma de hacer la penalización,
+
+704
+01:01:48,000 --> 01:01:55,200
+derivar una otra versión, simplemente cambiando acá 2p por p,
+
+705
+01:01:55,200 --> 01:02:00,800
+veces log n. Entonces ahora la penalización también va a depender del tamaño de la muestra.
+
+706
+01:02:00,800 --> 01:02:08,200
+Esto es conocido como BIC, o Bayesian Information Criteria.
+
+707
+01:02:08,200 --> 01:02:14,040
+entonces ellos tienen diferentes formas de penalización en este caso n va a ser la
+
+708
+01:02:14,040 --> 01:02:18,080
+cantidad de observaciones utilizadas en el ajuste, p va a ser la cantidad de parámetros
+
+709
+01:02:18,080 --> 01:02:22,000
+ajustados igual estamos haciendo anteriormente pero ahora en cuanto el AIC
+
+710
+01:02:22,000 --> 01:02:31,200
+suma solamente 2p, BIC va a penalizar por log de n, ya, como logaritmo natural.
+
+711
+01:02:31,200 --> 01:02:39,640
+lo que eso implica, es decir, lo que BIC intenta informar es conforme vamos a tener más observaciones
+
+712
+01:02:39,640 --> 01:02:46,760
+no quiero tener un modelo tan complejo, entonces el AIC no penaliza, por ejemplo, siempre cuando
+
+713
+01:02:46,760 --> 01:02:52,320
+tengo mucha información, si usted tiene una verosimilitud con 200 mil observaciones,
+
+714
+01:02:52,320 --> 01:02:57,680
+el valor va a ser muy grande, entonces penalizar solamente con 2p ahí puede no ser interesante,
+
+715
+01:02:57,680 --> 01:03:04,560
+Entonces, en especial, es más importante penalizar teniendo alguna métrica basada
+
+716
+01:03:04,560 --> 01:03:05,800
+en el tamaño de la muestra.
+
+717
+01:03:05,800 --> 01:03:11,760
+Es decir, si tenemos muchas observaciones, vamos por un modelo más sencillo o por un
+
+718
+01:03:11,760 --> 01:03:12,760
+modelo más completo.
+
+719
+01:03:12,760 --> 01:03:17,480
+El AIC va a informar, si usted tiene muchas observaciones, si hay una pequeña ganancia
+
+720
+01:03:17,480 --> 01:03:19,640
+de información, aún vale la pena.
+
+721
+01:03:19,640 --> 01:03:23,640
+En cuanto el BIC lo va a penalizar de forma muy grande en tamaños de muestras.
+
+722
+01:03:23,640 --> 01:03:29,760
+ejemplo con observaciones de tamaño 100 la penalización ya me sale 4.6
+
+723
+01:03:29,760 --> 01:03:36,660
+en cuanto el AIC me sale solamente 2 o si tengo 1000 observaciones acá la
+
+724
+01:03:36,660 --> 01:03:41,460
+penalización es mucho mayor si tengo 100 mil observaciones la penalización es muy
+
+725
+01:03:41,460 --> 01:03:46,720
+grande, entonces él de alguna manera penaliza modelos conforme tenemos
+
+726
+01:03:46,720 --> 01:03:52,000
+muestras muy grandes, intenta buscar modelos más sencillos entonces entre
+
+727
+01:03:52,000 --> 01:03:59,520
+modelos comparables, nuevamente un BIC menor es preferible. Acá penaliza más la complejidad
+
+728
+01:03:59,520 --> 01:04:07,200
+del modelo, entonces si tenemos muchas observaciones, va a penalizar mucho más modelos completos.
+
+729
+01:04:09,440 --> 01:04:16,440
+Entonces el mismo ejemplo que tenemos acá, lo que me pasa es que el BIC acaba elegiendo el
+
+730
+01:04:16,440 --> 01:04:22,560
+modelo A. Entonces vamos a poner con los mismos datos, modelo A, modelo B, modelo C y cien observaciones.
+
+731
+01:04:22,560 --> 01:04:28,960
+Tenemos los mismos valores de verosimilitud, los mismos números de parámetros, pero cuando voy a
+
+732
+01:04:28,960 --> 01:04:40,620
+calcular el BIC me sale un valor de menos acá, 173, acá 175 y acá 187. Entonces con el AIC
+
+733
+01:04:40,620 --> 01:04:49,860
+elegimos el modelo B, pero si miramos vía BIC, debemos ir con el modelo A.
+
+734
+01:04:49,860 --> 01:04:58,460
+Entonces BIC favorece el modelo A, la mejora del ajuste no va a compensar su penalización adicional.
+
+735
+01:04:58,460 --> 01:05:04,360
+Entonces él intenta buscar un modelo más sencillo, con una menor penalización, informando que eso
+
+736
+01:05:04,360 --> 01:05:11,320
+debería ser el mejor. Entonces el AIC y BIC por elegir distintos tipos de modelos. El AIC busca
+
+737
+01:05:11,320 --> 01:05:16,920
+equilibrar el ajuste y la complejidad con enfoque predictivo, en cuanto BIC tiene una motivación de
+
+738
+01:05:16,920 --> 01:05:22,600
+evidencia entre modelos. Bajo supuestos, aquí favorece más la parcimonia. Entonces el BIC
+
+739
+01:05:22,600 --> 01:05:27,620
+tenta tener un modelo con más parcimonia. No comparamos un valor de AIC con un valor de BIC,
+
+740
+01:05:27,620 --> 01:05:33,480
+siempre importante calcular el BIC para todos los modelos o el AIC para todos los modelos. No hay
+
+741
+01:05:33,480 --> 01:05:39,600
+hay un ganador universal entre los criterios, si el objetivo es predecir, contrastamos con
+
+742
+01:05:39,600 --> 01:05:41,160
+la validación fuera del ajuste.
+
+743
+01:05:41,160 --> 01:05:45,920
+Y entonces, esto puede ser una forma, pero acá vamos a mirar también, desde el punto
+
+744
+01:05:45,920 --> 01:05:50,520
+de vista evaluando la base, el conjunto de validación.
+
+745
+01:05:50,520 --> 01:05:55,320
+Hace ese momento no le comenté nada sobre el conjunto de validación, el conjunto de
+
+746
+01:05:55,320 --> 01:05:56,320
+prueba.
+
+747
+01:05:56,320 --> 01:05:57,320
+¿Por qué?
+
+748
+01:05:57,320 --> 01:06:00,400
+Muchos estadísticos utilizan eso para describir el pasado.
+
+749
+01:06:00,400 --> 01:06:05,900
+Entonces ponemos toda la base y ajustamos y eso va a ser lo que tiene mejor ajuste y a penalización del modelo.
+
+750
+01:06:06,900 --> 01:06:11,900
+Entonces varios de los trabajos voy a encontrar los ajustes vía AIC o vía BIC.
+
+751
+01:06:15,400 --> 01:06:19,900
+Bueno, uno va a tener también la dificultad informaria.
+
+752
+01:06:19,900 --> 01:06:22,900
+Muchas veces la ganancia de información es pequeña.
+
+753
+01:06:22,900 --> 01:06:27,900
+Por ejemplo, de un modelo para el otro me salen 166 y 162.
+
+754
+01:06:27,900 --> 01:06:31,900
+tenemos que elegir lo que tiene el menor AIC o lo que tiene el menor BIC.
+
+755
+01:06:31,900 --> 01:06:36,900
+Pero muchos van a ver que muchas veces la diferencia es de 4, o por ejemplo en
+
+756
+01:06:36,900 --> 01:06:42,900
+otro caso 5. Esto es conocido como Delta AIC.
+
+757
+01:06:42,900 --> 01:06:48,900
+Bueno, no existe, no va a existir un AIC o un BIC absoluto que va a garantizar un buen modelo.
+
+758
+01:06:48,900 --> 01:06:52,900
+Todos los candidatos podrían predecir mal, y eso es una información muy importante
+
+759
+01:06:52,900 --> 01:06:58,500
+los que utilizan el AIC o BIC. He hecho varias revisiones de artículos, encuentro que uno
+
+760
+01:06:58,500 --> 01:07:06,460
+apresenta el AIC, el BIC y forma ya, el mejor es lo que tiene el menor valor, sí, pero
+
+761
+01:07:06,460 --> 01:07:09,980
+una situación es que todos ellos pueden ser malos para hacer la predicción, porque no
+
+762
+01:07:09,980 --> 01:07:17,260
+está describiendo bien el conjunto que valoramos fuera del ajuste, sí, entonces ese modelo
+
+763
+01:07:17,260 --> 01:07:22,860
+es muy bueno para describir el pasado, pero puede no ser muy bueno para hacer las predicciones,
+
+764
+01:07:22,860 --> 01:07:27,040
+Por eso que realmente vamos por otras métricas, como el error cuadrático medio,
+
+765
+01:07:27,040 --> 01:07:31,640
+el área sobre la curva ROC, entre otros, ya, en el conjunto de validación.
+
+766
+01:07:32,300 --> 01:07:37,680
+Profesor, si usted está comentando que vamos ya con los otros métodos o con las otras métricas,
+
+767
+01:07:37,980 --> 01:07:40,340
+por qué me está presentando el AIC y el BIC?
+
+768
+01:07:40,760 --> 01:07:46,400
+Porque es una métrica que muchos estadísticos, que mucha gente utiliza para hacer selección de parámetros,
+
+769
+01:07:46,400 --> 01:07:47,380
+selección de modelos.
+
+770
+01:07:47,380 --> 01:07:53,740
+Y bueno, como ustedes están conociendo todas estas métricas, es muy importante que conozcan el AIC y el BIC.
+
+771
+01:07:53,740 --> 01:07:56,860
+Bueno, yo tengo 100 artículos publicados.
+
+772
+01:07:56,860 --> 01:08:06,060
+De estos 100 artículos publicados que tengo, 670 artículos, yo utilizo el AIC o el BIC para hacer la selección de los modelos.
+
+773
+01:08:06,060 --> 01:08:11,020
+Es una métrica muy común que muchos estadísticos utilizan.
+
+774
+01:08:11,020 --> 01:08:20,020
+Si uno va más por la mirada de Machine Learning, solamente de Machine Learning, miramos por otras métricas como el AUC,
+
+775
+01:08:20,020 --> 01:08:28,020
+el RMSE, entre otros. Pero si ven el AIC en algún momento ya saben que tiene esa idea.
+
+776
+01:08:28,020 --> 01:08:35,020
+¿Cuándo comparar AIC y BIC? La misma respuesta, las mismas observaciones para todos los modelos.
+
+777
+01:08:35,020 --> 01:08:40,020
+Y las verosimilitudes tienen que ser comparables y ajustadas por máxima verosimilitud.
+
+778
+01:08:40,020 --> 01:08:45,020
+Entonces estas métricas son muy restritivas, por eso que ustedes no van a ver con mucha frecuencia.
+
+779
+01:08:45,020 --> 01:08:51,020
+Por ejemplo, no por aplicar esto indiscriminadamente, un modelo como Support Vector Machine Isolation Forest,
+
+780
+01:08:51,020 --> 01:08:57,020
+Random Forest, o regresiones logísticas penalizadas.
+
+781
+01:08:57,020 --> 01:09:04,020
+Por ejemplo, el Support Vector Machine no me va a salir en el AIC, porque no tengo una verosimilitud en el Support Vector Machine.
+
+782
+01:09:04,020 --> 01:09:08,020
+Entonces, ni siempre vamos a alcanzar a calcular esto.
+
+783
+01:09:08,020 --> 01:09:14,220
+En esta clase, logísticas sin penalización, con éstos predictores podemos utilizar, pero
+
+784
+01:09:14,220 --> 01:09:19,460
+no aplicamos éstos criterios habituales indiscriminadamente, en Support Vector Machine, Random Forest, entre
+
+785
+01:09:19,460 --> 01:09:20,460
+otros.
+
+786
+01:09:20,460 --> 01:09:24,620
+E ésto es importante, a la vez, yo cometí un error, cuando no conocía muy bien esta
+
+787
+01:09:24,620 --> 01:09:30,660
+idea, yo ajusté un modelo semi-paramétrico, me salió un AIC menor, y yo pensaba que era
+
+788
+01:09:30,660 --> 01:09:34,220
+el mejor modelo porque tenía el menor AIC.
+
+789
+01:09:34,220 --> 01:09:38,720
+la verosimilito no era comparable, entonces yo no podría haber hecho esta comparación,
+
+790
+01:09:38,720 --> 01:09:45,380
+¿cierto? Pues eso no se puede hacer. La verosimilito tiene que ser comparable, por eso que mucha
+
+791
+01:09:45,380 --> 01:09:51,220
+gente no va a ver estos métodos indiscriminadamente durante las comparaciones con modelos no paramétricos.
+
+792
+01:09:51,220 --> 01:09:59,060
+Por ejemplo, vamos a mirar un ejemplo sencillo acá, donde tenemos una variable de respuesta
+
+793
+01:09:59,060 --> 01:10:06,060
+Y, en el caso de Wisconsin, con tres modelos comparables.
+
+794
+01:10:06,060 --> 01:10:13,060
+Vamos a ver un modelo simple que va a tener solamente dos variables, radio y textura,
+
+795
+01:10:13,060 --> 01:10:19,060
+un modelo intermedio que tiene tres y un modelo amplio que tiene radio, textura, suavidad y concavidad.
+
+796
+01:10:19,060 --> 01:10:25,060
+Acá yo tengo tres parámetros a ser considerados.
+
+797
+01:10:25,060 --> 01:10:28,060
+Pero profesor, tenemos la variable respuesta Y.
+
+798
+01:10:28,060 --> 01:10:35,060
+¿Por qué tenemos tres parámetros acá? ¿Alguien tiene alguna idea?
+
+799
+01:10:35,060 --> 01:10:47,060
+Tenemos el beta 0, más beta 1, x1, más beta 2, x2.
+
+800
+01:10:47,060 --> 01:10:52,060
+Entonces tenemos 1, 2 y 3.
+
+801
+01:10:52,060 --> 01:10:55,060
+x1 será radio, x2 será textura.
+
+802
+01:10:55,060 --> 01:10:58,980
+entonces tengo 1 2 3 parámetros, voy a adicionar ahora una x3 acá
+
+803
+01:11:00,420 --> 01:11:03,460
+x3 voy a tener 4 parámetros y por allá adelante
+
+804
+01:11:05,460 --> 01:11:12,340
+entonces es por eso que p igual a 3 y no va a ser lo mismo que tener acá, tener intercepto también
+
+805
+01:11:14,180 --> 01:11:19,420
+entonces voy a calcular la verosimilitud con la regresión logística, me salió eso
+
+806
+01:11:19,420 --> 01:11:28,700
+me salió esto con el AIC cuando fui a considerar la penalización y estos acaban de ser el BIC.
+
+807
+01:11:28,700 --> 01:11:35,300
+Una cosa interesante es que en esta situación específica ambos los modelos dieron el mejor
+
+808
+01:11:35,300 --> 01:11:43,700
+valor para el modelo amplio. Entonces con cuatro covariables radio, textura, suavidad y concavidad
+
+809
+01:11:43,700 --> 01:11:54,420
+y yo tuve el mejor ajuste. Ambos favorecen al amplio entre estos candidatos. Bueno, los
+
+810
+01:11:54,420 --> 01:12:01,700
+171 casos de prueba no intervienen acá, entonces acá no estoy me preocupando en hacer la selección
+
+811
+01:12:01,700 --> 01:12:10,140
+o elegir el modelo en ese conjunto total acá. Bueno, ajusté, elegí el parámetro y el
+
+812
+01:12:10,140 --> 01:12:14,140
+el conjunto de entrenamiento, pero la prueba acá no me está influenciando nada.
+
+813
+01:12:14,140 --> 01:12:19,140
+Nos recuerda que hacemos el ajuste en el conjunto de entrenamiento.
+
+814
+01:12:19,140 --> 01:12:24,140
+Acabé elegiendo acá el modelo amplio en el conjunto de entrenamiento
+
+815
+01:12:24,140 --> 01:12:27,140
+y después evaluamos cómo va a salir el conjunto de prueba.
+
+816
+01:12:27,140 --> 01:12:32,140
+Como no puedo calcular eso, en R uno ya tiene bien implementado,
+
+817
+01:12:32,140 --> 01:12:38,140
+me va a salir exactamente con el A y C y pongo los modelos que ajuste.
+
+818
+01:12:38,140 --> 01:12:42,640
+Acá vamos para donde yo tengo la función AIC, también ustedes verán en el código,
+
+819
+01:12:42,640 --> 01:12:47,380
+va a salir simplemente con el modelo simple el .aic, se pone después ajustar el modelo
+
+820
+01:12:47,380 --> 01:12:49,880
+.aic le va a salir lo ajuste, ya?
+
+821
+01:12:49,880 --> 01:12:55,640
+El BIC me sale con la función BIC, modelo y pongo los modelos que quiero ajustar, lo
+
+822
+01:12:55,640 --> 01:13:01,000
+que sería el modelo simple, va a ser el modelo que viene ajustado con un glm, ¿certo?
+
+823
+01:13:01,000 --> 01:13:06,260
+un modelo glm, después de ajustar el modelo glm solamente escribo en R, BIC, él me
+
+824
+01:13:06,260 --> 01:13:10,260
+pasar el ajuste, y voy a mostrar eso en un ratito.
+
+825
+01:13:10,260 --> 01:13:16,260
+Cuando estén en la base acá, déjenme abrir.
+
+826
+01:13:23,260 --> 01:13:27,260
+Es la misma que compartí con ustedes.
+
+827
+01:13:27,260 --> 01:13:31,260
+Pego la base de Wisconsin y logre la división de entrenamiento y
+
+828
+01:13:31,260 --> 01:13:36,940
+la validación, ajusté varios modelos glm acá, un modelo simple, un modelo intermedio
+
+829
+01:13:36,940 --> 01:13:42,900
+y un modelo amplio. Voy a calcular el AIC, le va a salir AIC, modelo simple, modelo intermedio,
+
+830
+01:13:42,900 --> 01:13:51,140
+modelo amplio. Tabla AIC, tabla BIC y hago un print en tres. Vas a ver exactamente los
+
+831
+01:13:51,140 --> 01:13:54,140
+resultados que tenéis ahí.
+
+832
+01:13:54,140 --> 01:13:59,140
+Bueno, ahora vamos para la idea de bootstrap.
+
+833
+01:13:59,140 --> 01:14:05,140
+Bueno, partimos por la muestra observada, la funcionalidad acaba de ser, ok.
+
+834
+01:14:05,140 --> 01:14:09,140
+Y quiero volver las métricas originales que estamos calculando,
+
+835
+01:14:09,140 --> 01:14:12,140
+el error cuadrático medio o la área sobre la curva ROC,
+
+836
+01:14:12,140 --> 01:14:15,140
+pero quiero medir, quiero tener una idea de la incertidumbre,
+
+837
+01:14:15,140 --> 01:14:18,140
+quiero calcular un intervalo para ella.
+
+838
+01:14:18,140 --> 01:14:21,140
+Entonces, vamos a utilizar la idea de bootstrap que comenté.
+
+839
+01:14:21,140 --> 01:14:26,140
+Temos la muestra original, voy a crear varias nuevas muestras,
+
+840
+01:14:26,140 --> 01:14:29,140
+o sea, remuestra acá, con reposición.
+
+841
+01:14:29,140 --> 01:14:32,140
+Cada una de estas muestras va a ser distinta,
+
+842
+01:14:32,140 --> 01:14:35,140
+si por ejemplo, yo calculo un promedio de la muestra original,
+
+843
+01:14:35,140 --> 01:14:38,140
+con n igual a 5, va a ser 5.2.
+
+844
+01:14:38,140 --> 01:14:41,140
+Cuando voy calculando nuevas muestras,
+
+845
+01:14:41,140 --> 01:14:43,140
+van a tener valores distintos.
+
+846
+01:14:43,140 --> 01:14:47,140
+Esta muestra acá, fue construida con base en esta,
+
+847
+01:14:47,140 --> 01:14:50,140
+pero su promedio es 4.6.
+
+848
+01:14:50,140 --> 01:14:56,140
+Esta también fue construida con base en esta, pero su promedio es 7.2.
+
+849
+01:14:56,140 --> 01:15:01,140
+En promedio vamos a tener exactamente el valor de 5.2.
+
+850
+01:15:01,140 --> 01:15:07,140
+Realmente acá el punto con mayor frecuencia va a ser exactamente este, 5.2.
+
+851
+01:15:07,140 --> 01:15:15,140
+Pero yo puedo dibujar la distribución, o sea, acá yo puedo tener la distribución de lo que yo puedo esperar,
+
+852
+01:15:15,140 --> 01:15:20,620
+esperar por ejemplo para la media o para la área sobre la curva ROC o para por
+
+853
+01:15:20,620 --> 01:15:25,140
+por medio del error cuadrático medio y con base a eso por construir sus intervalos
+
+854
+01:15:25,140 --> 01:15:29,140
+y no se que tener un intervalo de confianza para la media acá
+
+855
+01:15:29,140 --> 01:15:34,140
+simplemente voy mirar en los cuantiles, entonces una remuestra produce una
+
+856
+01:15:34,140 --> 01:15:39,500
+estadística, las B estadísticas forman una distribución bootstrap, basicamente
+
+857
+01:15:39,500 --> 01:15:41,500
+lo que ustedes hacen en árboles.
+
+858
+01:15:41,500 --> 01:15:44,500
+Random Forest, como construimos un Random Forest?
+
+859
+01:15:44,500 --> 01:15:48,500
+Vamos tener la muestra original, vamos construir varias,
+
+860
+01:15:48,500 --> 01:15:52,500
+nuevas muestras, remuestras, submuestras,
+
+861
+01:15:52,500 --> 01:15:55,500
+de cada una de estas vamos construir una árbol.
+
+862
+01:15:55,500 --> 01:15:59,500
+Después juntamos esta árbol y tenemos un Random Forest.
+
+863
+01:15:59,500 --> 01:16:03,500
+Entonces, Random Forest también utiliza la idea de bootstrap.
+
+864
+01:16:03,500 --> 01:16:05,500
+Bueno, este ejemplo que le apresente,
+
+865
+01:16:05,500 --> 01:16:08,500
+vamos suponer acá que tengo valores 2, 4, 5, 7, 8,
+
+866
+01:16:08,500 --> 01:16:15,980
+fue calcular el promedio, me salió 5.2, sí? Pero dependiendo de cómo me salen las muestras,
+
+867
+01:16:15,980 --> 01:16:26,260
+voy a tener valores como de la muestra original era 2, 4, 5, 7 y 8. Los IDs eran 2, 2, 1, 5 y 3.
+
+868
+01:16:26,260 --> 01:16:33,700
+Me salió la muestra 2, después la muestra 2, después 1, 5 y 3. Mira que acá no tengo la muestra 4,
+
+869
+01:16:33,700 --> 01:16:37,540
+o sea no tengo el valor 7, si?
+
+870
+01:16:37,540 --> 01:16:39,740
+fue básicamente lo que tenemos en la figura anterior
+
+871
+01:16:39,740 --> 01:16:44,380
+o sea los valores son exactamente 4 que viene de lo ID2
+
+872
+01:16:44,380 --> 01:16:46,380
+4 que viene de lo ID2
+
+873
+01:16:46,380 --> 01:16:49,100
+o sea el ID2 acá es 4
+
+874
+01:16:49,100 --> 01:16:52,740
+se estrenan 2 4, el valor 2, 8 y 5
+
+875
+01:16:52,740 --> 01:16:54,740
+la media es 4.6
+
+876
+01:16:54,740 --> 01:16:58,340
+cuando yo saco otra muestra
+
+877
+01:16:58,340 --> 01:17:00,940
+me salió esos valores
+
+878
+01:17:00,940 --> 01:17:04,620
+y ahora tengo una media de 7.2
+
+879
+01:17:04,620 --> 01:17:06,620
+una otra muestra
+
+880
+01:17:06,620 --> 01:17:10,620
+4.0, miren que los valores ahí están variados
+
+881
+01:17:12,620 --> 01:17:18,940
+al final se va a construir una distribución bootstrap con 2000 replicaciones
+
+882
+01:17:18,940 --> 01:17:22,940
+voy a tener exactamente este formato acá
+
+883
+01:17:22,940 --> 01:17:30,620
+lo interesante es que el bootstrap nos ayuda a construir exactamente la distribución que debería para este tipo de muestra
+
+884
+01:17:30,940 --> 01:17:39,460
+Entonces mira que ya tiene un formato no regular, no es exactamente una normal porque no tenemos muchas observaciones,
+
+885
+01:17:39,460 --> 01:17:47,000
+pero es una buena representación, entonces acá es el promedio 5.2, pero si yo quiero construir intervalos,
+
+886
+01:17:47,000 --> 01:17:53,440
+voy a mirar los cuantiles y puedo saber exactamente cuál es el intervalo de confianza de la media.
+
+887
+01:17:53,440 --> 01:18:00,300
+Entonces el histograma muestra las medias de las remuestras, los 5 dados originales,
+
+888
+01:18:00,300 --> 01:18:07,660
+si no vamos a usar los 5 dados originales pero de varios de los valores mira que en casi 250 de las
+
+889
+01:18:07,660 --> 01:18:14,260
+muestras que yo generé y estaba cerca de los 5.2 si la gran cantidad de veces va a estar cerca
+
+890
+01:18:14,260 --> 01:18:19,780
+de donde debería pero va a tener valores ahí muy discrepantes que va a acabar llevando situaciones
+
+891
+01:18:19,780 --> 01:18:27,660
+donde por ejemplo yo tengo una situación donde tengo 8 8 8 8 8 va a ser 5 valores 8 entonces el promedio
+
+892
+01:18:27,660 --> 01:18:32,020
+va a ser este valor extremo. En otra situación tengo solamente valores 2,
+
+893
+01:18:32,020 --> 01:18:35,060
+entonces el promedio también va a ser 2.
+
+894
+01:18:36,660 --> 01:18:38,460
+Entonces pueden tener estas situaciones.
+
+895
+01:18:41,580 --> 01:18:43,980
+Bueno, el error estándar de la distribución bootstrap.
+
+896
+01:18:43,980 --> 01:18:47,180
+Sólo para ilustrar tenemos 5 estimaciones bootstrap.
+
+897
+01:18:47,740 --> 01:18:50,180
+4.6, fue lo que salió acá.
+
+898
+01:18:51,740 --> 01:18:54,020
+7.2, fue lo que me salió acá.
+
+899
+01:18:54,020 --> 01:19:04,020
+4.0 fue lo que me salió acá y después yo rendí más dos, dos muestras, de esas dos muestras saqué 5.2 y 6.0.
+
+900
+01:19:04,020 --> 01:19:15,020
+Bueno, cuando voy a sacar un promedio de esas muestras, yo espero que él empiece a estar cerca
+
+901
+01:19:15,020 --> 01:19:23,020
+del verdadero promedio que tenía acá, del original. Entonces, como tengo pocas submuestras,
+
+902
+01:19:23,020 --> 01:19:26,020
+este valor está un poco lento, 5.4
+
+903
+01:19:26,020 --> 01:19:29,020
+y bueno, por calcular el intervalo
+
+904
+01:19:29,020 --> 01:19:32,020
+acá, este valor me va a ser 1.24
+
+905
+01:19:32,020 --> 01:19:35,020
+mira que lo interesante es que
+
+906
+01:19:35,020 --> 01:19:38,020
+conforme voy aumentando, diferente del
+
+907
+01:19:38,020 --> 01:19:40,020
+intervalo que yo había comentado anteriormente acá
+
+908
+01:19:40,020 --> 01:19:43,020
+esto va a tener una distribución, ¿cierto?
+
+909
+01:19:43,020 --> 01:19:46,020
+conforme voy aumentando para 2.000 valores
+
+910
+01:19:46,020 --> 01:19:48,020
+voy alcanzando a estimar exactamente
+
+911
+01:19:48,020 --> 01:19:50,020
+cuál es la variancia de esta distribución
+
+912
+01:19:50,020 --> 01:19:55,960
+eso no va a ser, entonces el boost-tep no va, me va a generar exactamente la distribución de la
+
+913
+01:19:55,960 --> 01:20:01,300
+media de la muestra para estas cinco observaciones, este valor no va a ser,
+
+914
+01:20:01,300 --> 01:20:07,580
+él va a converger para la verdadera variancia, con cinco observaciones solo, tuve un valor de 1.24,
+
+915
+01:20:07,580 --> 01:20:14,800
+pero cuando corremos 2000 remuestras del programa, el resultado me sale 0.96,
+
+916
+01:20:14,800 --> 01:20:21,800
+Entonces con base a eso yo puedo construir los intervalos de confianza para la media con esos 5 puntos.
+
+917
+01:20:21,800 --> 01:20:32,800
+Osea puedo sacar un intervalo de confianza, 95% con el percentil, y la media va a ser 5.2 y debería estar entre 3.4 y 7.0.
+
+918
+01:20:32,800 --> 01:20:39,800
+Después yo puedo aumentar, 2000 para 3000, 4000, 5000, básicamente ese valor no va a cambiar.
+
+919
+01:20:39,800 --> 01:20:42,800
+Yo creo que hago eso acá.
+
+920
+01:20:42,800 --> 01:20:49,160
+Por ejemplo, después de un punto más remuestras no va a significar más datos.
+
+921
+01:20:49,160 --> 01:20:52,800
+Esta reamuestra no es más información en términos de datos.
+
+922
+01:20:52,800 --> 01:21:01,480
+O sea, con 100 remuestras tuve una deviación de 1.02.
+
+923
+01:21:01,480 --> 01:21:05,080
+Entonces en un intervalo percentil de 3.3 es 7.4.
+
+924
+01:21:05,080 --> 01:21:08,560
+Con 500, percentil de 3.4 es 7.1.
+
+925
+01:21:08,560 --> 01:21:11,840
+Con 2000, percentil de lo mismo es 3.4 y 7.0.
+
+926
+01:21:11,840 --> 01:21:15,840
+Entonces después de un momento, esto no va a cambiar más.
+
+927
+01:21:15,840 --> 01:21:20,840
+Como lo calculamos, simplemente vamos a hacer un sample de estas cinco observaciones originales
+
+928
+01:21:20,840 --> 01:21:24,840
+y voy a calcular después la media y los cuantiles.
+
+929
+01:21:24,840 --> 01:21:26,840
+Como hacemos acá?
+
+930
+01:21:26,840 --> 01:21:32,840
+Vamos a hacer lo que queremos hacer ahora, vamos a ir a este punto acá.
+
+931
+01:21:32,840 --> 01:21:39,840
+El punto 4. Tenemos estos valores, voy a calcular 2.000 submuestras,
+
+932
+01:21:39,840 --> 01:21:45,560
+definir una semilla, voy a almacenar las medias y ahora voy a hacer varios nuevos
+
+933
+01:21:45,560 --> 01:21:52,020
+amostreos, ya cuando voy a hacer el plot, vamos a tener un gráfico, bueno no se que no está tan
+
+934
+01:21:52,020 --> 01:21:59,100
+parecido pero es porque yo tengo menos... vamos a ver si algo vamos a meter un 20
+
+935
+01:22:01,320 --> 01:22:06,320
+y salió ese valor, ya? bueno el otro gráfico tiene un poco más de divisiones pero cuando
+
+936
+01:22:06,320 --> 01:22:12,920
+lo montamos un poco más, él va a tener esta forma. O sea, valores muy poco probables en 2 o 8,
+
+937
+01:22:12,920 --> 01:22:18,440
+divididos en torno de 5.2 y el intervalo va a estar más o menos acá y en ese punto.
+
+938
+01:22:18,440 --> 01:22:23,480
+Entonces puedo construir los intervalos de confianza de la media. Lo que yo acabé haciendo acá,
+
+939
+01:22:23,480 --> 01:22:33,120
+tengo estos valores acá, voy a sacar una muestra de estos cinco valores, voy a calcular la media y
+
+940
+01:22:33,120 --> 01:22:39,280
+y voy a almacenar. Voy a sacar una otra muestra, voy a calcular la media, voy a sacar una otra muestra y por ahí adelante.
+
+941
+01:22:39,280 --> 01:22:46,000
+Bueno, si fué a correr otra vez de nuevo me va a salir un poco distinto. ¿Por qué no tengo semillas?
+
+942
+01:22:46,000 --> 01:22:52,480
+En el chat preguntan ¿Qué justificaría usar un bootstrap en vez de validación cruzada y viceversa?
+
+943
+01:22:52,480 --> 01:22:56,480
+Sí, vamos a llegar a ese punto. ¿Por qué estoy comentando exactamente eso?
+
+944
+01:22:56,480 --> 01:23:01,440
+Vamos a tener que... vamos a tener un tiempo. ¿Por qué estoy hablando exactamente eso?
+
+945
+01:23:01,440 --> 01:23:13,360
+Porque el bootstrap es una herramienta muy poderosa que me posibilita obtener la distribución de esta estadística específica.
+
+946
+01:23:13,360 --> 01:23:19,360
+Pero no es un intervalo de confianza asintótico.
+
+947
+01:23:19,360 --> 01:23:27,040
+Yo voy a poder obtener la distribución exactamente un poco más adelante de la área sobre la curva ROC.
+
+948
+01:23:27,040 --> 01:23:32,320
+¿Cómo vamos a hacer eso? Vamos a hacer la división entre entrenamiento y prueba, ¿cierto?
+
+949
+01:23:32,320 --> 01:23:37,040
+Vamos a entrenar el modelo, entrenamos el modelo como ustedes saben hacer,
+
+950
+01:23:37,040 --> 01:23:42,840
+pero después vamos a evaluar eso en un punto de prueba, si? Me salió 0.9.
+
+951
+01:23:42,840 --> 01:23:46,200
+Ajusto otro modelo me salió 0.91.
+
+952
+01:23:46,200 --> 01:23:49,880
+¿Cuál de los dos puedo ir? ¿Hay una diferencia muy grande entre los dos métodos?
+
+953
+01:23:49,880 --> 01:23:54,920
+Vamos a utilizar bootstrap acá y vamos a construir un intervalo de confianza
+
+954
+01:23:54,920 --> 01:23:56,920
+para la área sobre la curva ROC.
+
+955
+01:23:56,920 --> 01:23:58,920
+Después de construir un intervalo de confianza,
+
+956
+01:23:58,920 --> 01:24:02,920
+comparamos los dos métodos y vemos si tienen una diferencia significativa.
+
+957
+01:24:02,920 --> 01:24:05,920
+Entonces, un poquito más adelante voy a utilizar bootstrap,
+
+958
+01:24:05,920 --> 01:24:10,920
+voy a utilizar esta idea en las métricas que ustedes conocen.
+
+959
+01:24:10,920 --> 01:24:11,920
+Pero antes de llegarmos a este punto,
+
+960
+01:24:11,920 --> 01:24:14,920
+es importante que comprendan cómo funciona bootstrap.
+
+961
+01:24:14,920 --> 01:24:17,920
+Para la media, porque acá voy a cambiar después la media
+
+962
+01:24:17,920 --> 01:24:21,920
+para el error cuadrático medio, en el conjunto de prueba.
+
+963
+01:24:24,920 --> 01:24:31,420
+Bueno, ya que esta la pregunta, vamos a adelantar un poco, pero mira, conforme voy generando nuevos valores,
+
+964
+01:24:32,920 --> 01:24:36,420
+el gráfico va cambiando, ¿Cierto? Deja generar de nuevo.
+
+965
+01:24:40,920 --> 01:24:47,920
+Se genera de nuevo, va a tener otras formas, ¿Ya? Pero va a siempre aparecer de forma muy parecida.
+
+966
+01:24:47,920 --> 01:24:55,920
+Conforme va aumentando el tamaño, va a tener, pero siempre básicamente los intervalos van a estar acá, entre 3 y 7.
+
+967
+01:24:55,920 --> 01:25:03,920
+Entonces después de algún momento, si pongo 10 mil acá, no debería cambiar más.
+
+968
+01:25:03,920 --> 01:25:11,920
+¿Cierto? A ser correr de nuevo, debería ser una cosa un poco parecida, va a ser un poco parecida, pero no tanto.
+
+969
+01:25:11,920 --> 01:25:17,440
+entonces mira ahora con 10 mil ya no cambia tanto, la diferencia es muy pequeña
+
+970
+01:25:19,320 --> 01:25:22,360
+mira que la diferencia básicamente es ninguno
+
+971
+01:25:24,240 --> 01:25:32,480
+entonces cuando ponemos o creo acá 100 mil de esos valores tengo exactamente la distribución
+
+972
+01:25:32,480 --> 01:25:38,880
+de la media de esos valores.
+
+973
+01:25:38,880 --> 01:25:43,720
+Por que estamos haciendo esto? Porque más adelante ustedes van a crear el intervalo de confianza
+
+974
+01:25:43,720 --> 01:25:48,480
+del AUC o del error cuadrático medio. Y ahí podré comparar los dos.
+
+975
+01:25:48,480 --> 01:25:58,960
+Entonces, vamos a llegar a ese punto.
+
+976
+01:25:58,960 --> 01:26:07,160
+considera el conjunto de datos de Wisconsin, vamos a ajustar 398 observaciones del conjunto de entrenamiento
+
+977
+01:26:07,160 --> 01:26:11,160
+y vamos a dejar 171 para hacer la prueba
+
+978
+01:26:12,560 --> 01:26:18,160
+lo que vamos a hacer después, vamos a crear nuevas muestras del conjunto de prueba
+
+979
+01:26:18,960 --> 01:26:23,160
+entonces de ese 171 acá, cuando formos hacer la prueba
+
+980
+01:26:23,160 --> 01:26:32,160
+Voy a utilizar varios bootstraps y voy a lograr construir el intervalo de la AUC, el intervalo de confianza de log loss.
+
+981
+01:26:32,160 --> 01:26:37,160
+Entonces, esto es lo que es muy importante porque ustedes pueden decir, ya, yo tengo la AUC.
+
+982
+01:26:37,160 --> 01:26:47,160
+Para aquel conjunto Wisconsin, ajustamos un modelo de regresión logística, por ejemplo, y con el modelo simple me salió 0.93.
+
+983
+01:26:47,160 --> 01:26:51,160
+Ya? Con el modelo amplio me salió 0.97.
+
+984
+01:26:51,160 --> 01:26:57,160
+Si uno va a comentar que el otro ya, este acá me parece mayor que este, me voy con el modelo amplio.
+
+985
+01:26:57,160 --> 01:27:01,160
+Pero hay una diferencia entre estos dos, en el conjunto de prueba,
+
+986
+01:27:01,160 --> 01:27:06,160
+podemos construir un intervalo de confianza para este, un intervalo de confianza para este,
+
+987
+01:27:06,160 --> 01:27:11,160
+si el intervalo contiene los dos, me voy con el modelo más sencillo.
+
+988
+01:27:11,160 --> 01:27:16,160
+Mejor trabajar con el modelo más sencillo porque ahí tienen la menor variabilidad.
+
+989
+01:27:16,160 --> 01:27:25,200
+de la variabilidad. Entonces para estos 171 casos, 107 benignos, 64 malignos, este fue sobre el AUC.
+
+990
+01:27:25,200 --> 01:27:30,480
+También puedo calcular el log loss, me salió este valor, nuevamente me informa que el modelo mejor
+
+991
+01:27:30,480 --> 01:27:38,720
+es el amplio, la acuracia 0.94, la sensibilidad 0.9, y adelante. Para que yo te exagere,
+
+992
+01:27:38,720 --> 01:27:44,640
+si no me preguntan, como calculamos el intervalo de confianza del log loss? No tengo idea.
+
+993
+01:27:44,640 --> 01:27:51,640
+La teoría asintótica para entender esto no es esencial, pero con bootstrap lo puedo construir sin problemas.
+
+994
+01:27:51,640 --> 01:28:00,640
+Entonces lo que voy a hacer es, voy a hacer, esto acá no es exactamente aplicado al conjunto de Wisconsin, pero por el tiempo,
+
+995
+01:28:00,640 --> 01:28:08,200
+y a ver seguir ya para ese para ese con él lo que vamos a hacer acá va a ser el boot
+
+996
+01:28:08,200 --> 01:28:14,240
+strap vamos a aplicar eso en el conjunto de
+
+997
+01:28:14,240 --> 01:28:19,840
+de prueba entonces en el conjunto de prueba voy por ejemplo elegir cinco pares en el
+
+998
+01:28:19,840 --> 01:28:27,240
+conjunto de prueba ya y voy a ser bueno va a ser varios remuestreos o en este caso
+
+999
+01:28:27,240 --> 01:28:33,640
+calculé cinco de esos valores específicos y fui calculado por ejemplo el error cuadrático medio
+
+1000
+01:28:33,640 --> 01:28:38,580
+ya esto no es exactamente para el conjunto Wisconsin vamos a llegar a ya pero mira vamos a poner que acá
+
+1001
+01:28:38,580 --> 01:28:46,520
+tengo una base específica una miniatura hipotética para mostrar ese ejemplo específico ya quiero
+
+1002
+01:28:46,520 --> 01:28:53,320
+evaluar el modelo de punto de vista de de MAE o del error cuadrático medio yo sé que el error
+
+1003
+01:28:53,320 --> 01:29:01,640
+que el MAE o error medio absoluto es de 3, el error cuadrático medio es de 3.31,
+
+1004
+01:29:01,640 --> 01:29:07,560
+pero solamente esta información cuando voy a comparar entre ellas, bueno, cuando quiero construir
+
+1005
+01:29:07,560 --> 01:29:12,840
+un intervalo entre este error cuadrático medio acá y comparar con otro modelo, cuál es la
+
+1006
+01:29:12,840 --> 01:29:19,520
+variabilidad que tengo, entonces voy a crear nuevas muestras y voy a calcular estos errores en
+
+1007
+01:29:19,520 --> 01:29:22,180
+en estas nuevas muestras y voy a tener un intervalo.
+
+1008
+01:29:22,180 --> 01:29:28,120
+Entonces, por ejemplo, para esta estadística específica, el intervalo percentil, o sea,
+
+1009
+01:29:28,120 --> 01:29:32,520
+no solamente la estimativa puntual, pero ahora tengo una estimativa intervalal.
+
+1010
+01:29:32,520 --> 01:29:37,740
+Entonces yo sé que el valor observado fue 3, y su intervalo de confianza debe estar
+
+1011
+01:29:37,740 --> 01:29:40,680
+entre 1.8 y 4.2.
+
+1012
+01:29:40,680 --> 01:29:49,980
+Para el error cuadrático medio, 3.31, la intervalo de confianza será 1.94 y 4.31
+
+1013
+01:29:49,980 --> 01:29:56,380
+¿Vas a comparar los dos? No, porque son métricas distintas, pero yo voy a comparar el error cuadrático medio de una regresión logística
+
+1014
+01:29:56,380 --> 01:30:00,580
+con el error cuadrático medio de una red neuronal, por ejemplo
+
+1015
+01:30:00,580 --> 01:30:04,580
+Si los intervalos se cruzan, no hay diferencia entre los modelos
+
+1016
+01:30:04,580 --> 01:30:14,580
+por ejemplo para log loss, voy a calcular el log loss, voy a aplicar en varios conjuntos nuevos
+
+1017
+01:30:14,580 --> 01:30:23,580
+pero voy variando estos conjuntos y voy a tener la distribución acá, y construo una distribución para esta estadística
+
+1018
+01:30:23,580 --> 01:30:32,580
+Esto está un poco complicado. Vamos al conjunto de datos específicos que tenemos en Wisconsin.
+
+1019
+01:30:32,580 --> 01:30:38,580
+Vamos a ver si está por acá. Esta es la base de datos para Wisconsin.
+
+1020
+01:30:40,580 --> 01:30:43,580
+Entonces, ahora vamos a suponer que sí. Queremos...
+
+1021
+01:30:43,580 --> 01:30:55,580
+Ahora vamos a calcular para la base de datos de Wisconsin.
+
+1022
+01:30:55,580 --> 01:31:05,580
+Entonces, para la base de datos de Wisconsin, yo aplique el bootstrap y calcule por ejemplo los intervalos de confianza,
+
+1023
+01:31:05,580 --> 01:31:11,580
+el AUC, la área sobre la curva ROC, para el modelo simple y para el modelo amplio.
+
+1024
+01:31:11,580 --> 01:31:19,580
+cuando fui calcular las de estos dos valores uno era 0.94 el otro 0.975 más o menos,
+
+1025
+01:31:19,580 --> 01:31:26,580
+ellos son muy distintos, vamos a cambiar un poco la base de prueba haciendo bootstrap
+
+1026
+01:31:26,580 --> 01:31:30,580
+y vamos a construir los intervalos de confianza de estos dos modelos,
+
+1027
+01:31:30,580 --> 01:31:35,580
+entonces acá tengo el intervalo percentil de esta métrica acá,
+
+1028
+01:31:35,580 --> 01:31:38,900
+y tengo este intervalo de este modelo amplio.
+
+1029
+01:31:38,900 --> 01:31:41,700
+Mira que cuando vamos a mirar el AUC
+
+1030
+01:31:41,700 --> 01:31:43,700
+del punto de vista intervalar,
+
+1031
+01:31:43,700 --> 01:31:47,380
+los dos modelos no tienen una diferencia significativa.
+
+1032
+01:31:47,380 --> 01:31:50,100
+O sea, ambos acá
+
+1033
+01:31:50,100 --> 01:31:54,460
+van a cruzar.
+
+1034
+01:31:54,460 --> 01:31:57,940
+Mira que este valor va hasta 97, ese va hasta 95.
+
+1035
+01:31:57,940 --> 01:32:01,940
+Entonces creamos los límites acá,
+
+1036
+01:32:01,940 --> 01:32:05,340
+esta es la estimación original, tenemos los límites que fueron creados,
+
+1037
+01:32:05,340 --> 01:32:08,580
+y cuando vamos comparando el modelo más sencillo con el modelo más amplio,
+
+1038
+01:32:08,580 --> 01:32:11,500
+va a ver que la variabilidad en el conjunto de prueba
+
+1039
+01:32:11,500 --> 01:32:17,940
+hace con que los modelos al final tengan un desempeño similar.
+
+1040
+01:32:17,940 --> 01:32:19,620
+O sea,
+
+1041
+01:32:19,620 --> 01:32:25,060
+bueno, como lo aplico eso, en el bootstrap acá.
+
+1042
+01:32:25,060 --> 01:32:26,700
+Ya, entonces,
+
+1043
+01:32:26,700 --> 01:32:31,100
+un otro propietario, profesor, se acabó de informar que no hay diferencia entre ellos.
+
+1044
+01:32:31,100 --> 01:32:34,300
+Sí, podemos calcular esta variación,
+
+1045
+01:32:34,300 --> 01:32:37,260
+¿Cierto? Es decir,
+
+1046
+01:32:39,260 --> 01:32:42,500
+genero una muestra, yo tengo la muestra original,
+
+1047
+01:32:42,820 --> 01:32:45,820
+genero una submuestra de esa muestra original,
+
+1048
+01:32:46,500 --> 01:32:49,340
+calculo el AUC para el modelo amplio
+
+1049
+01:32:49,420 --> 01:32:52,420
+y después calculo el AUC para el modelo simple, ya?
+
+1050
+01:32:52,900 --> 01:32:55,100
+Y calculo la diferencia, y ahora acá
+
+1051
+01:32:55,660 --> 01:32:59,580
+voy a almacenar la diferencia entre el modelo simple y el modelo amplio.
+
+1052
+01:33:00,140 --> 01:33:02,620
+Vamos a suponer que la primera diferencia me fue de
+
+1053
+01:33:04,300 --> 01:33:14,300
+para acá el modelo amplio va a ser mayor, vamos a suponer que el modelo amplio tenía un valor mayor, entonces me salió menos 5, ¿ya?
+
+1054
+01:33:14,300 --> 01:33:23,300
+Ahí fue, ahí generé una otra muestra, ajusté, aplique el modelo ajustado en esa nueva muestra
+
+1055
+01:33:23,300 --> 01:33:31,300
+y calculé ese valor tanto para el modelo simple como para el modelo amplio, y me salió ahí una cosa como 3, ¿ya?
+
+1056
+01:33:31,300 --> 01:33:41,300
+Es decir, el modelo simple tenía un AUC mayor que el modelo amplio.
+
+1057
+01:33:41,300 --> 01:33:45,300
+Entonces, algunas veces va a ser menor, otras veces va a ser mayor.
+
+1058
+01:33:45,300 --> 01:33:49,300
+De alguna manera, al final ellos no tenían una diferencia muy grande.
+
+1059
+01:33:49,300 --> 01:33:53,300
+Solamente fue diferente en la muestra que ustedes estaban evaluando.
+
+1060
+01:33:53,300 --> 01:34:01,300
+con base a esto entonces podemos calcular la intervalo para la diferencia
+
+1061
+01:34:01,300 --> 01:34:09,300
+lo que voy a hacer ahora, voy a aplicar bootstrap, exactamente en esto
+
+1062
+01:34:09,300 --> 01:34:14,300
+es una cosa, nuevamente, es muy importante, acá, lo que vamos a hacer
+
+1063
+01:34:14,300 --> 01:34:24,300
+Estoy entrenando el modelo. Ustedes dividieron el conjunto acá desde el inicio.
+
+1064
+01:34:24,300 --> 01:34:29,300
+Dividí el conjunto entre entrenamiento y prueba.
+
+1065
+01:34:29,300 --> 01:34:36,300
+En entrenamiento no cambia nada. Entrené el modelo, elegí el hiperparámetro.
+
+1066
+01:34:36,300 --> 01:34:39,300
+Acá tengo el modelo ajustado, ¿cierto?
+
+1067
+01:34:39,300 --> 01:34:42,900
+Pero ahora voy a aplicar este modelo ajustado en esta prueba,
+
+1068
+01:34:43,140 --> 01:34:45,460
+pero no solamente en esta prueba exacta.
+
+1069
+01:34:45,700 --> 01:34:48,020
+Voy a construir varias pruebas distintas
+
+1070
+01:34:48,500 --> 01:34:50,100
+con base en la prueba original.
+
+1071
+01:34:51,060 --> 01:34:54,220
+Entonces, la única cosa que me va a cambiar acá va a ser la prueba.
+
+1072
+01:34:54,820 --> 01:34:58,780
+El modelo entrenado no hago bootstrap dentro del modelo entrenado.
+
+1073
+01:34:59,220 --> 01:35:01,620
+El modelo fue entrenado con esta base.
+
+1074
+01:35:01,900 --> 01:35:03,300
+Tengo el modelo entrenado.
+
+1075
+01:35:03,780 --> 01:35:06,900
+Ahora quiero evaluar cómo este modelo funciona en esta prueba.
+
+1076
+01:35:07,140 --> 01:35:08,140
+Sí?
+
+1077
+01:35:08,140 --> 01:35:12,140
+fue hacer un bootstrap en esta prueba acá, por qué?
+
+1078
+01:35:12,140 --> 01:35:14,140
+porque solamente informar que el AUC
+
+1079
+01:35:20,140 --> 01:35:24,140
+solamente informar que el AUC en este modelo fue de 0.93
+
+1080
+01:35:24,140 --> 01:35:26,140
+no estaba informando mucha cosa
+
+1081
+01:35:26,140 --> 01:35:28,140
+yo sé que es mejor, pero
+
+1082
+01:35:28,140 --> 01:35:31,140
+él simplemente salió 0.94
+
+1083
+01:35:31,140 --> 01:35:34,140
+hay una diferencia grande en estos modelos?
+
+1084
+01:35:34,140 --> 01:35:37,140
+no sé, usted no me presentó el intervalo de este AUC
+
+1085
+01:35:38,140 --> 01:35:43,340
+Lo que quiero comentar acá es que es importante no solamente evaluar en estadística,
+
+1086
+01:35:43,340 --> 01:35:50,140
+esto es muy importante, muchos de ustedes solamente se enfocan en la estimativa puntual.
+
+1087
+01:35:50,140 --> 01:35:54,140
+Es muy importante tenerlo en cuenta, la estimativa puntual es importante,
+
+1088
+01:35:54,140 --> 01:36:00,140
+pero necesito la estimativa intervalar, necesito de un intervalo de confianza para esta estimativa.
+
+1089
+01:36:00,140 --> 01:36:09,140
+El candidato A tiene 10% de ansia de vencer la elección.
+
+1090
+01:36:09,140 --> 01:36:12,640
+El candidato A tiene 10%.
+
+1091
+01:36:12,640 --> 01:36:16,640
+El candidato B tiene 80%.
+
+1092
+01:36:16,640 --> 01:36:26,140
+Pero si yo no conozco, bueno, si tenés tres candidatos podría ser 10, 50 y el otro candidato sería 40.
+
+1093
+01:36:26,140 --> 01:36:30,940
+o por ejemplo no tener 20% deben ser solamente dos candidatos 20% para el
+
+1094
+01:36:30,940 --> 01:36:36,740
+candidato a y 80% para el candidato b pero si yo no conozco la variabilidad
+
+1095
+01:36:36,740 --> 01:36:41,980
+por ser que se tenga solamente tres o cuatro personas recalcula y eso la
+
+1096
+01:36:41,980 --> 01:36:46,060
+variabilidad es muy grande, entonces el intervalo de confianza
+
+1097
+01:36:46,060 --> 01:36:49,700
+va a ser muy grande por ser que el candidato b tenga menos de ansias de
+
+1098
+01:36:49,700 --> 01:36:54,700
+ganar que el candidato a entonces la estimativa puntual 0.2 0.8
+
+1099
+01:36:54,700 --> 01:36:59,140
+no me informa mucha cosa, si no conozco la variabilidad. Por eso que una encuesta,
+
+1100
+01:36:59,140 --> 01:37:06,700
+ellos siempre informan, ya el candidato A tiene 50, 40% de salir vencedor, con
+
+1101
+01:37:06,700 --> 01:37:11,100
+un nivel de confianza de 2 puntos percentuales para más o para menos, es decir,
+
+1102
+01:37:11,100 --> 01:37:17,300
+usted puede construir un intervalo, en 95% de las veces debería estar entre 38 y 42.
+
+1103
+01:37:17,300 --> 01:37:22,660
+De hecho acá en Brasil, un candidato estaba en la frente cuando el otro
+
+1104
+01:37:22,660 --> 01:37:32,540
+estaba abajo pero los intervalos eran se cruzaban ya de hecho uno debería salir con 48 con 48 el
+
+1105
+01:37:32,540 --> 01:37:44,740
+otro con 40 y 48 46 el otro con 44 no estaba con 48 con 44 al final la cosa se invirtió lo que
+
+1106
+01:37:44,740 --> 01:37:49,740
+que estaba con 44 subió para 46,
+
+1107
+01:37:49,740 --> 01:37:52,740
+y lo que estaba con 48 bajó.
+
+1108
+01:37:52,740 --> 01:37:55,740
+Entonces lo que parecía que uno estaba muy lejos del otro
+
+1109
+01:37:55,740 --> 01:37:58,740
+que había una diferencia al final, los intervalos se cruzaban.
+
+1110
+01:37:58,740 --> 01:38:02,740
+Entonces puede tener ese error
+
+1111
+01:38:02,740 --> 01:38:05,740
+cuando uno no mira la estimativa intervalaria.
+
+1112
+01:38:05,740 --> 01:38:09,740
+Entonces 0.97, pero el intervalo de eso, ¿cierto?
+
+1113
+01:38:09,740 --> 01:38:15,740
+0.973, 0.972 o 0.811
+
+1114
+01:38:15,740 --> 01:38:18,740
+entonces el intervalo acá
+
+1115
+01:38:18,740 --> 01:38:21,740
+para el AUC
+
+1116
+01:38:21,740 --> 01:38:26,740
+por el intervalo me va a salir 0.9611
+
+1117
+01:38:26,740 --> 01:38:31,740
+o en otro caso el intervalo podría ser 0.811
+
+1118
+01:38:31,740 --> 01:38:35,740
+es la misma cosa, no, este acá es mucho más preciso
+
+1119
+01:38:35,740 --> 01:38:37,740
+me ayuda a hacer la comparación
+
+1120
+01:38:37,740 --> 01:38:44,980
+Entonces necesito saber si este está dentro del intervalo, pero ok, me informó 0.97,
+
+1121
+01:38:44,980 --> 01:38:50,340
+pero no el intervalo de confianza, para poder comparar con las otras estimativas,
+
+1122
+01:38:50,340 --> 01:38:54,980
+como fue solamente en este punto específico. El intervalo acá es muy importante.
+
+1123
+01:38:54,980 --> 01:38:58,580
+Como construimos este intervalo? Voy a generar varias muestras,
+
+1124
+01:38:58,580 --> 01:39:03,460
+el conjunto de prueba y voy a obtener la distribución de la AUC.
+
+1125
+01:39:03,460 --> 01:39:06,460
+Vamos a ver si alguien tiene alguna duda.
+
+1126
+01:39:07,740 --> 01:39:19,740
+eso fue la evaluación cruzada, entonces, eso que justifica exactamente hacer el bootstrap en la validación, en el conjunto de prueba, ya?
+
+1127
+01:39:19,740 --> 01:39:30,740
+bueno, no puede utilizar el bootstrap y la validación cruzada, eso no se puede hacer, usted va a hacer el ajuste con el modelo, va a hacer la validación cruzada en el modelo, va a ajustar el modelo,
+
+1128
+01:39:30,740 --> 01:39:37,740
+Después de ajustar el modelo, ahí sí va a sacar el conjunto de pruebas y el conjunto de pruebas va a ser el bootstrap.
+
+1129
+01:39:37,740 --> 01:39:38,740
+¿Verdad?
+
+1130
+01:39:39,740 --> 01:39:42,740
+Es como me sale. Vamos a ver acá.
+
+1131
+01:39:43,740 --> 01:39:46,740
+Voy a generar 2.000 valores,
+
+1132
+01:39:46,740 --> 01:39:48,740
+de esta muestra original,
+
+1133
+01:39:49,740 --> 01:39:54,740
+y voy a calcular la diferencia para cada uno de ellos, ¿cierto?
+
+1134
+01:39:54,740 --> 01:39:59,740
+Entonces, en el modelo más sencillo, con el modelo amplio,
+
+1135
+01:39:59,740 --> 01:40:08,380
+y yo tuve una diferencia, un delta, en la métrica log loss, entonces acá estoy mirando la métrica log loss,
+
+1136
+01:40:08,380 --> 01:40:13,060
+¿cierto? entonces tengo dos modelos, uno modelo más sencillo y otro modelo más completo.
+
+1137
+01:40:13,060 --> 01:40:18,700
+Voy a tener que comparar estos dos modelos con alguna cosa, puedo calcular el AUC,
+
+1138
+01:40:18,700 --> 01:40:22,780
+puedo calcular log loss, puedo calcular el Brier, la exactitud,
+
+1139
+01:40:22,780 --> 01:40:26,940
+y en este caso acá primero vamos a mirar con el log loss, ya?
+
+1140
+01:40:26,940 --> 01:40:28,940
+entonces miramos acá log loss.
+
+1141
+01:40:29,740 --> 01:40:33,740
+Hay una diferencia significativa entre estos modelos?
+
+1142
+01:40:33,740 --> 01:40:40,740
+En el log loss, cuando fue calcular cada una de las veces el log loss que tenemos con el modelo simple,
+
+1143
+01:40:40,740 --> 01:40:46,740
+el log loss que tenemos con el modelo amplio, el delta LL me salió 0.11.
+
+1144
+01:40:46,740 --> 01:40:48,740
+Ya?
+
+1145
+01:40:48,740 --> 01:40:53,740
+Y el intervalo de confianza percentil del delta LL me salió 0.05 y 0.18.
+
+1146
+01:40:53,740 --> 01:40:56,740
+Hay una diferencia? Hay una diferencia?
+
+1147
+01:40:56,740 --> 01:40:58,740
+Bueno, pregunta para ustedes.
+
+1148
+01:40:58,740 --> 01:41:03,740
+¿Cuál es el modelo que está me dando más, que está siendo mejor acá?
+
+1149
+01:41:13,740 --> 01:41:16,740
+Bueno, el valor me sale un delta de 0.11.
+
+1150
+01:41:16,740 --> 01:41:20,740
+Yo construí la diferencia, la distribución
+
+1151
+01:41:20,740 --> 01:41:27,980
+de esta diferencia acá, haciendo bootstrap varias veces al conjunto de prueba
+
+1152
+01:41:27,980 --> 01:41:34,140
+hay una diferencia de los modelos en el conjunto de prueba pero mira antes
+
+1153
+01:41:36,460 --> 01:41:42,300
+si exactamente antes ustedes estaban elegiendo el modelo más
+
+1154
+01:41:42,300 --> 01:41:49,620
+el modelo amplio creo que log loss también me sale eso, voy a confirmar, log loss creo que también tiene eso
+
+1155
+01:41:49,620 --> 01:41:53,620
+Si vamos por ejemplo por el AUC, el modelo amplio me parece que mejora.
+
+1156
+01:41:53,620 --> 01:41:57,620
+Pero cuando vamos a evaluar por medio de sus intervalos,
+
+1157
+01:41:57,620 --> 01:42:02,620
+hubo una diferencia significativa pero para el modelo simple.
+
+1158
+01:42:06,620 --> 01:42:11,620
+Acá si vamos por el modelo amplio, o si vamos con el AUC.
+
+1159
+01:42:11,620 --> 01:42:13,620
+Ah, y eso es una cosa interesante.
+
+1160
+01:42:13,620 --> 01:42:17,620
+Por eso que es importante elegir la métrica que quieren tener en cuenta antes.
+
+1161
+01:42:17,620 --> 01:42:19,620
+Acá es log loss.
+
+1162
+01:42:19,620 --> 01:42:24,620
+Entonces recuerda que log loss penaliza de una forma distinta que la AUC.
+
+1163
+01:42:24,620 --> 01:42:29,620
+La AUC mira las probabilidades de una forma general sin tomar en cuenta el umbral.
+
+1164
+01:42:29,620 --> 01:42:34,620
+El log loss va a mirar de otra forma y va a ser penalizaciones mayores para errores.
+
+1165
+01:42:34,620 --> 01:42:40,620
+Entonces el log loss acá, él eligió el modelo más sencillo, pero la área sobre la curva ROC,
+
+1166
+01:42:40,620 --> 01:42:46,620
+mira, cuando voy a calcular ahora, el delta AUC de la área sobre la curva ROC con el modelo amplio
+
+1167
+01:42:46,620 --> 01:42:55,500
+amplio y el modelo simple, la diferencia fue de 0.03 y los intervalos no contienen 0.
+
+1168
+01:42:55,500 --> 01:43:01,780
+Si el intervalo contiene 0, no hay diferencia significativa, ¿cierto?
+
+1169
+01:43:01,780 --> 01:43:06,100
+Si este valor acá, fosse negativo, dado esta diferencia, tenía una indicación
+
+1170
+01:43:06,100 --> 01:43:13,900
+mayor para el modelo simple, pero para el delta AUC, si al final, tenía una
+
+1171
+01:43:13,900 --> 01:43:19,540
+diferencia de 0.35 y la diferencia significativa entre sus términos cometa y
+
+1172
+01:43:19,540 --> 01:43:21,540
+a
+
+1173
+01:43:22,660 --> 01:43:27,540
+tiene esta diferencia caíten esa diferencia acá es significativa si ahora
+
+1174
+01:43:27,540 --> 01:43:36,140
+si ese valor fuese más o menos como 5 acá en vez de 3
+
+1175
+01:43:36,140 --> 01:43:47,140
+Si fuera 0.9959, era muy probable que la diferencia, aunque tenga una diferencia de 1 punto o algo así,
+
+1176
+01:43:47,140 --> 01:44:03,140
+cuando fuéramos a calcular el intervalo acá de la diferencia entre los AUC, ese valor no iba a ser significativo.
+
+1177
+01:44:03,140 --> 01:44:15,140
+Entonces muchas veces ser valores pequeños no tenemos una muestra muy grande, hay una fuerte indicación de que no va a tener diferencia entre ir con el modelo más sencillo o ir con el modelo más completo.
+
+1178
+01:44:15,140 --> 01:44:30,140
+En este caso la diferencia era de 0.4, 0.035, pero esa diferencia en intervalo en algunos casos llegó a ser 0.012 y en otros casos 0.06.
+
+1179
+01:44:30,140 --> 01:44:37,140
+De todas formas, ella no contiene cero, bueno, la única situación que contenía cero acá fue muy rara,
+
+1180
+01:44:37,140 --> 01:44:46,140
+entonces básicamente hay una diferencia significativa y el modelo amplio nos muestra al menos por el AUC, que es lo más adecuado.
+
+1181
+01:44:46,140 --> 01:44:56,140
+Profesor, bueno, usted me comentó que log loss, vamos con el modelo más simple, con el AUC, vamos con el modelo amplio,
+
+1182
+01:44:56,140 --> 01:44:58,140
+¿Cuál de los dos debemos ir?
+
+1183
+01:44:59,660 --> 01:45:03,980
+Va a depender de los costos, la penalización que está queriendo tener.
+
+1184
+01:45:04,620 --> 01:45:06,420
+El AUC, elige un modelo.
+
+1185
+01:45:07,140 --> 01:45:08,540
+El log loss, elige un otro.
+
+1186
+01:45:08,980 --> 01:45:13,820
+Por eso que es importante que definan cuál es la métrica que va a ser utilizada
+
+1187
+01:45:14,180 --> 01:45:16,100
+antes de hacer el experimento.
+
+1188
+01:45:17,060 --> 01:45:21,540
+El log loss me hace más sentido acá porque toma en cuenta la penalización así
+
+1189
+01:45:21,820 --> 01:45:24,900
+y para nosotros este tipo de penalización es más importante.
+
+1190
+01:45:24,900 --> 01:45:30,900
+Me voy con la área sobre la curva ROC porque me gusta esta métrica, es más informativa.
+
+1191
+01:45:30,900 --> 01:45:38,900
+Si les pongo la área sobre la curva ROC, el modelo amplio, el modelo más amplio, sería el mejor.
+
+1192
+01:45:40,900 --> 01:45:45,900
+Un ejemplo hipotético acá, donde tengo un delta.
+
+1193
+01:45:45,900 --> 01:45:50,900
+Vamos para un ejemplo hipotético. Vamos a suponer que en alguna situación le toca tener un delta de 0.01.
+
+1194
+01:45:50,900 --> 01:45:57,100
+que va a ocurrir varias veces cuando tenés modelos de comparación con, no sé,
+
+1195
+01:45:57,100 --> 01:46:04,100
+Random Forest, con boosting, o Random Forest, con redes neuronales. La diferencia muchas veces es muy pequeña, 0.01.
+
+1196
+01:46:04,100 --> 01:46:09,340
+Cuando voy a calcular el intervalo, no hay diferencia, entonces no hay
+
+1197
+01:46:09,340 --> 01:46:14,380
+evidencia clara de superioridad o no prueba equivalencia, no hay
+
+1198
+01:46:14,380 --> 01:46:18,900
+diferencia significativa de superioridad entre los dos modelos.
+
+1199
+01:46:18,900 --> 01:46:28,400
+En un caso como este hay una diferencia positiva, pero menor que la mejora relevante que hay acá.
+
+1200
+01:46:28,400 --> 01:46:33,400
+Entonces básicamente acá hay una diferencia significativa, pero es muy pequeña.
+
+1201
+01:46:33,400 --> 01:46:41,400
+En un caso como este ya tenemos una diferencia positiva y por encima hay una mejora relevante.
+
+1202
+01:46:41,400 --> 01:46:46,400
+Si valorizamos la segunda casa decimal, se ve que hay una mejora razonable.
+
+1203
+01:46:48,900 --> 01:46:56,060
+Bueno, para cerrar, como tuvimos una pausa, fui al tiro, exactamente porque tuvimos una
+
+1204
+01:46:56,060 --> 01:47:00,780
+clase más chica, entonces no quería que tuviese menos contenido.
+
+1205
+01:47:00,780 --> 01:47:06,380
+Lo importante va a ser evaluar.
+
+1206
+01:47:06,380 --> 01:47:10,180
+Del punto de vista de bootstrap, ahora usted ya sabe una nueva forma de hacer isso.
+
+1207
+01:47:10,180 --> 01:47:15,220
+Bueno, yo calculé, generalmente eso no funciona.
+
+1208
+01:47:15,220 --> 01:47:18,540
+Entrené mi modelo, voy a evaluar eso ahora conjunto de prueba.
+
+1209
+01:47:18,540 --> 01:47:22,980
+tengo aquella métrica que me gusta, el error cuadrático médio. Ok?
+
+1210
+01:47:22,980 --> 01:47:26,820
+¿Vai comparar con otro modelo? Calcula los intervalos.
+
+1211
+01:47:26,820 --> 01:47:32,500
+Via Bootstrap, si lo hace eso, puede compararlo con los métodos sin tener ningún tipo de dificultad.
+
+1212
+01:47:32,500 --> 01:47:39,380
+Ya, hubo un ganho de información de 0.02.
+
+1213
+01:47:39,380 --> 01:47:44,460
+¿Es significativo? Osea, hubo un ganho de información de 0.01.
+
+1214
+01:47:44,460 --> 01:47:49,700
+Cuando Redes Neuronales me salió con 0.97,
+
+1215
+01:47:49,700 --> 01:47:53,140
+y Random Forest me salió con 0.96.
+
+1216
+01:47:53,140 --> 01:47:56,100
+Pero Random Forest es mucho más sencillo de ajustar
+
+1217
+01:47:56,100 --> 01:47:58,300
+que Redes Neuronales.
+
+1218
+01:47:58,300 --> 01:48:00,740
+Y cuando fui a evaluar el Delta AUC,
+
+1219
+01:48:00,740 --> 01:48:03,100
+no hay diferencia significativa entre los dos.
+
+1220
+01:48:03,100 --> 01:48:06,100
+Los dos al final tienen en un bootstrap,
+
+1221
+01:48:06,100 --> 01:48:07,860
+cuando voy a calcular el intervalo,
+
+1222
+01:48:07,860 --> 01:48:12,460
+los dos no hay evidencia clara de superioridad
+
+1223
+01:48:12,460 --> 01:48:18,460
+de las redes neuronales relacionadas a Random Forest. Mi sugerencia va con Random Forest.
+
+1224
+01:48:18,460 --> 01:48:23,460
+Entonces, siempre vamos con el modelo más sencillo de ajustar, que tiene un mejor ajuste,
+
+1225
+01:48:23,460 --> 01:48:27,460
+que le muestra que tiene un mejor ajuste. Entonces, es importante que ahora usted
+
+1226
+01:48:27,460 --> 01:48:33,460
+pueda medir de alguna manera, pueda mensurar, pueda evaluar si la diferencia entre los dos métodos
+
+1227
+01:48:33,460 --> 01:48:39,460
+son significativos o no. Antes, usted no podría hacer eso. Había ajustado un Support Vector Machine,
+
+1228
+01:48:39,460 --> 01:48:46,580
+le salió un valor, ajustó una regresión logística, le salió otro valor, la diferencia es pequeña,
+
+1229
+01:48:46,580 --> 01:48:51,740
+pero cuál es el mejor, ya vamos lo que tiene el mayor valor, pero de hecho es significativo,
+
+1230
+01:48:51,740 --> 01:48:57,940
+no, entonces podría ir con el modelo más sencillo que tiene mejor ajuste, que tenga una facilidad
+
+1231
+01:48:57,940 --> 01:49:07,220
+mayor de ajustar, que tiene interpretación y ahí no va a tener problemas, sí. Bueno, con ese modelo,
+
+1232
+01:49:07,220 --> 01:49:13,300
+Acá dejé algunas comparaciones con el log loss del modelo amplio.
+
+1233
+01:49:13,300 --> 01:49:16,300
+Yo tuve esta estimación por el log loss.
+
+1234
+01:49:16,300 --> 01:49:20,300
+Por eso que es interesante, porque yo tengo el valor del log loss.
+
+1235
+01:49:20,300 --> 01:49:23,300
+Y ustedes pueden construir el intervalo de confianza para este valor.
+
+1236
+01:49:23,300 --> 01:49:26,300
+Me sale 0.3 para el modelo simple.
+
+1237
+01:49:26,300 --> 01:49:30,300
+Cuando voy a construir su intervalo está entre 0.21 y 0.4.
+
+1238
+01:49:30,300 --> 01:49:32,300
+Modelo amplio 0.18.
+
+1239
+01:49:32,300 --> 01:49:34,300
+¿Es menor? Sí.
+
+1240
+01:49:34,300 --> 01:49:40,300
+por los intervalos acá contienen el modelo simple
+
+1241
+01:49:40,300 --> 01:49:45,300
+entonces hubo una mejora, pero...
+
+1242
+01:49:45,300 --> 01:49:48,300
+la mejora de log loss, bueno, este es otro
+
+1243
+01:49:48,300 --> 01:49:52,300
+la área sobre la curva ROC con el modelo simple 0.93
+
+1244
+01:49:52,300 --> 01:49:55,300
+la área sobre la curva ROC 0.97
+
+1245
+01:49:55,300 --> 01:49:59,300
+la mejora entre ellos 0.3, pero fue significativo
+
+1246
+01:49:59,300 --> 01:50:05,300
+Esta mejora de log loss acá no me parece que la diferencia de la anterior estaba un poco distinta.
+
+1247
+01:50:05,300 --> 01:50:12,300
+Houve una mejora pero para el modelo más simple, entonces eso es lo que demostró.
+
+1248
+01:50:12,300 --> 01:50:15,300
+Houve una mejora pero para el modelo más simple, sí.
+
+1249
+01:50:15,300 --> 01:50:19,300
+Entonces calculábamos la diferencia entre el log loss del modelo simple menos ese.
+
+1250
+01:50:19,300 --> 01:50:23,300
+La diferencia entre los dos fue 0.11 y la diferencia fue significativa.
+
+1251
+01:50:23,300 --> 01:50:26,300
+Entonces fue eso que acabamos haciendo allá.
+
+1252
+01:50:26,300 --> 01:50:34,300
+Vamos por el modelo más simples cuando miramos el log loss, vamos por el modelo amplio cuando miramos el AUC.
+
+1253
+01:50:34,300 --> 01:50:37,300
+Bueno, era eso que quería comentar hoy.
+
+1254
+01:50:37,300 --> 01:50:43,300
+Profesor, pero no me salió con la fórmula mágica, cuál de las métricas tengo que utilizar.
+
+1255
+01:50:43,300 --> 01:50:46,300
+Sí, va a depender del problema, ya no es tan sencillo.
+
+1256
+01:50:46,300 --> 01:50:54,300
+Por eso, lo que es importante es que ustedes comprendan cómo funciona el método, cómo se estima y cómo se construyen los intervalos.
+
+1257
+01:50:54,300 --> 01:50:59,500
+Esta será la diferencia de ustedes que están aprendiendo esto de una persona que simplemente va a correr
+
+1258
+01:50:59,500 --> 01:51:04,300
+un programa de inteligencia artificial y va a salir una métrica y la persona va a informar
+
+1259
+01:51:04,300 --> 01:51:10,300
+Ya me salió 0.97, esta red neuronal con 25 capas, 50 neuronas,
+
+1260
+01:51:10,300 --> 01:51:15,300
+En cuanto a este modelo Random Forest, me salió 0.965, ya?
+
+1261
+01:51:15,300 --> 01:51:18,300
+Entonces ajustamos acá una red neuronal
+
+1262
+01:51:18,300 --> 01:51:25,300
+El modelo es mucho más complejo. Hay diferencia? Bueno, ahora ustedes saben cómo evaluar.
+
+1263
+01:51:25,300 --> 01:51:30,300
+Generalmente, un programa de inteligencia artificial lleva soltadamente que no vale preocupar más con eso.
+
+1264
+01:51:30,300 --> 01:51:33,300
+Ahora ustedes pueden hacer preguntas un poco más profundas.
+
+1265
+01:51:33,300 --> 01:51:37,300
+Hay diferencia entre los dos métodos? De hecho, las mejores como una red neuronal,
+
+1266
+01:51:37,300 --> 01:51:44,300
+un programa como un Codex o un Claude, no va a formarse porque uno es mayor que el otro.
+
+1267
+01:51:44,300 --> 01:51:49,460
+Entonces ahora ustedes son más críticos y pueden tomar las mejores decisiones, no solamente
+
+1268
+01:51:49,460 --> 01:51:50,460
+presionar un botón ahí.
+
+1269
+01:51:50,460 --> 01:51:53,980
+Entonces esa es la idea y eso es lo que quería pasar.
+
+1270
+01:51:53,980 --> 01:51:55,380
+Es una idea sencilla?
+
+1271
+01:51:55,380 --> 01:51:56,380
+No.
+
+1272
+01:51:56,380 --> 01:51:58,860
+Bootstrap tiene una complejidad.
+
+1273
+01:51:58,860 --> 01:52:04,220
+Construir una distribución para el conjunto de prueba, también no es una idea sencilla,
+
+1274
+01:52:04,220 --> 01:52:05,820
+pero una idea muy importante.
+
+1275
+01:52:05,820 --> 01:52:11,480
+Es una forma muy poderosa de utilizar Bootstrap para construir los intervalos para las métricas
+
+1276
+01:52:11,480 --> 01:52:12,480
+que necesita.
+
+1277
+01:52:12,480 --> 01:52:21,480
+Ahora solamente, ahora usted no sabe solamente cómo calcular el AUC, sabe cómo construir el intervalo de confianza del AUC.
+
+1278
+01:52:21,480 --> 01:52:27,480
+El modelo más complejo, no solamente va a calcular el AUC del modelo más complejo, va a calcular su intervalo de confianza.
+
+1279
+01:52:27,480 --> 01:52:32,480
+Ya, tener la estimación de su intervalo de confianza es fundamental.
+
+1280
+01:52:32,480 --> 01:52:33,480
+Sí?
+
+1281
+01:52:33,480 --> 01:52:36,480
+Eso es lo que quería presentar para ustedes hoy.
+
+1282
+01:52:36,480 --> 01:52:38,480
+¿Dudas? ¿Preguntas?
+
+1283
+01:52:38,480 --> 01:52:40,480
+Sí, Claudia?
+
+1284
+01:52:40,480 --> 01:52:45,480
+¿Se puede decir cuál es el uso de un hospital si estamos en un hospital?
+
+1285
+01:52:47,480 --> 01:52:51,480
+Bueno, ahí la pregunta es exactamente de la métrica, ¿no?
+
+1286
+01:52:52,480 --> 01:52:57,480
+El modelo está causando más falsos positivos.
+
+1287
+01:52:58,480 --> 01:53:04,480
+Si un modelo detecta más tumores malignos, por ejemplo, pero también genera más falsos positivos,
+
+1288
+01:53:04,480 --> 01:53:09,480
+el modelo está causando más falsos positivos
+
+1289
+01:53:09,480 --> 01:53:15,480
+el modelo detecta más tumores malignos pero también genera más falsos positivos
+
+1290
+01:53:16,480 --> 01:53:19,480
+está generando falsos positivos
+
+1291
+01:53:21,480 --> 01:53:27,480
+que se están en el hospital, qué se decide? por ejemplo, caso hipotético
+
+1292
+01:53:27,480 --> 01:53:31,480
+Si estás generando falsos positivos,
+
+1293
+01:53:31,480 --> 01:53:37,480
+bueno, en mi percepción voy a intentar ponderar un poco sobre
+
+1294
+01:53:37,480 --> 01:53:42,480
+lo cuanto está generando de falsos positivos,
+
+1295
+01:53:42,480 --> 01:53:49,480
+yo voy a intentar tener una métrica que tome en cuenta ya, los falsos positivos
+
+1296
+01:53:49,480 --> 01:53:53,480
+y los verdaderos positivos.
+
+1297
+01:53:53,480 --> 01:54:03,480
+porque si, si estás generando muchos falsos positivos, no debería ser un buen modelo,
+
+1298
+01:54:03,480 --> 01:54:11,480
+porque si eres un falso positivo, vas a tener que después hacer un examen más, como más detallista.
+
+1299
+01:54:11,480 --> 01:54:21,280
+Usted va a tener que tomar en cuenta exactamente, la situación es exactamente así,
+
+1300
+01:54:21,280 --> 01:54:30,280
+Tendremos que preguntar, los falsos positivos con los verdaderos, con los verdaderos falsos positivos,
+
+1301
+01:54:30,280 --> 01:54:38,280
+pero cuando la persona tiene, la persona tiene, es decir, tiene un positivo, un verdadero,
+
+1302
+01:54:38,280 --> 01:54:44,280
+los falsos positivos la persona tiene y no identificó.
+
+1303
+01:54:44,280 --> 01:54:49,280
+Ahora el problema es cuando la persona tiene y no está identificando.
+
+1304
+01:54:49,280 --> 01:54:57,280
+Identificando, van a ser verdaderos los negativos o, oye me perdí, los falsos positivos.
+
+1305
+01:54:57,280 --> 01:55:08,280
+Bueno, va a tener que hacer la comparación de lo que está pasando con la situación donde la persona tiene la enfermedad y él está no está detectando, sí?
+
+1306
+01:55:08,280 --> 01:55:11,280
+Y ahí tomar en cuenta eso, hacer una apodilación entre los dos.
+
+1307
+01:55:11,280 --> 01:55:19,480
+porque bueno, a veces tienen muchos falsos positivos, pero la persona que tiene la enfermedad
+
+1308
+01:55:19,480 --> 01:55:21,440
+no está dejando pasar ninguna vez.
+
+1309
+01:55:21,440 --> 01:55:28,800
+O sea, podría ser más malo para el hospital informar, ya la persona tiene la enfermedad
+
+1310
+01:55:28,800 --> 01:55:31,840
+pero este examen no está identificando.
+
+1311
+01:55:31,840 --> 01:55:36,920
+Entonces la persona tiene la enfermedad y no detectó.
+
+1312
+01:55:36,920 --> 01:55:45,080
+y ahí tiene que hacer esa ponderación algunas veces tener un falso positivo pero si el modelo
+
+1313
+01:55:45,080 --> 01:55:51,440
+está clasificado muy bien las personas que tienen la enfermedad no hay un problema porque
+
+1314
+01:55:51,440 --> 01:55:58,800
+después esas personas que son falsos positivos va a tener que hacer un examen más detallado y
+
+1315
+01:55:58,800 --> 01:56:05,800
+ahí se descubre que no no tiene la enfermedad. Bueno, es una situación complicada pero lo que
+
+1316
+01:56:05,800 --> 01:56:11,120
+que va a tener que hacer es ponderar las dos métricas. Por ejemplo, a mí no me gustaría
+
+1317
+01:56:11,120 --> 01:56:15,800
+de informar para una persona que no tiene una enfermedad como contagiosa, no sé, sida,
+
+1318
+01:56:15,800 --> 01:56:21,160
+como se llama, HIV, informar a la persona que no tiene nada, que la persona está infectando
+
+1319
+01:56:21,160 --> 01:56:27,960
+otros, sí, de lo que informar a la persona que posiblemente tiene, me sale un falso positivo,
+
+1320
+01:56:27,960 --> 01:56:33,160
+pero después voy a hacer un examen más detallado y detecto que la persona no tiene.
+
+1321
+01:56:33,160 --> 01:56:38,160
+A lo general creo que es lo que muchos exámenes lo hacen.
+
+1322
+01:56:38,160 --> 01:56:43,160
+Puede tener falsos positivos, pero eso es barato.
+
+1323
+01:56:43,160 --> 01:56:49,160
+Pero lo importante es que si la persona tiene, no va a descartar.
+
+1324
+01:56:49,160 --> 01:56:51,160
+Entonces, ese modelo es...
+
+1325
+01:56:51,160 --> 01:56:58,160
+Los verdaderos positivos son 100% precisos.
+
+1326
+01:56:58,160 --> 01:57:07,160
+Los falsos positivos, después, antes de informar a la persona que entiende esta enfermedad, hacemos un examen más detallado.
+
+1327
+01:57:07,160 --> 01:57:13,160
+Entonces tienen que evaluar el costo. Pero los falsos positivos yo no veo mucho como un problema.
+
+1328
+01:57:13,160 --> 01:57:22,160
+Yo veo más como un problema los falsos, los verdaderos, los falsos negativos.
+
+1329
+01:57:22,160 --> 01:57:27,160
+O sea, los falsos positivos, la persona tiene... No, espera.
+
+1330
+01:57:27,160 --> 01:57:30,160
+La persona es falso positivo.
+
+1331
+01:57:30,160 --> 01:57:35,160
+La persona tiene la HIV y no está identificada.
+
+1332
+01:57:35,160 --> 01:57:38,160
+Ah, sí, entonces ahí sería un problema muy grande, que es lo que estaba comentando.
+
+1333
+01:57:38,160 --> 01:57:42,160
+Si la persona tiene HIV, tiene positivo.
+
+1334
+01:57:42,160 --> 01:57:44,160
+Entonces, este método está informando.
+
+1335
+01:57:44,160 --> 01:57:46,160
+Esta persona no tiene la HIV.
+
+1336
+01:57:46,160 --> 01:57:48,160
+Ahí es un caso muy grande.
+
+1337
+01:57:48,160 --> 01:57:55,160
+Entonces Claudia, en esta situación, bueno, tenés que evaluar y cambiar la estructura del método.
+
+1338
+01:57:55,160 --> 01:57:59,160
+Si? Falsos positivos en una situación como...
+
+1339
+01:58:00,160 --> 01:58:11,160
+La persona tenga una enfermedad... Ah bueno, Claudia, voy a mandar un detalle para podremos discutir exactamente como es, porque ahora me pedí nuevamente.
+
+1340
+01:58:11,160 --> 01:58:16,160
+No, pero se entiende más o menos el contexto a lo que quiere llevar la respuesta.
+
+1341
+01:58:16,160 --> 01:58:24,160
+¿Qué quiero comentar? que si tiene que evaluar, no de la idea, ese falso positivo y ese negativo, pero la ponderación entre los dos.
+
+1342
+01:58:24,160 --> 01:58:27,160
+No que es más malo en una situación como esa.
+
+1343
+01:58:28,160 --> 01:58:32,160
+La persona tiene la enfermedad y informa que ella no tiene.
+
+1344
+01:58:32,160 --> 01:58:35,160
+La persona se va a la casa e infecta a todos los otros.
+
+1345
+01:58:36,160 --> 01:58:44,160
+O bueno, la persona tiene la enfermedad, la persona no tiene la enfermedad, pero detectó que la persona tiene la enfermedad.
+
+1346
+01:58:44,160 --> 01:58:50,400
+después de hacer otro examen. Entonces realmente ellos toman en cuenta estos tipos de costos para poder
+
+1347
+01:58:50,400 --> 01:58:55,680
+tomar en cuenta. Yo me recuerdo de algún momento que, una vez que leí, que los exames por ejemplo de
+
+1348
+01:58:55,680 --> 01:59:01,280
+HIV lo hacen exactamente como eso. Ellos son muy precisos para las personas que tienen la enfermedad.
+
+1349
+01:59:01,280 --> 01:59:08,600
+Si, son muy precisos para la persona que tiene la enfermedad, porque si la persona
+
+1350
+01:59:08,600 --> 01:59:13,600
+tener la enfermedad, le sale un negativo, la persona sale infectada a otra persona, si?
+
+1351
+01:59:13,600 --> 01:59:20,560
+Pero todas formas, si salen positivos, ellos hacen un double check para poder informar a la
+
+1352
+01:59:20,560 --> 01:59:24,480
+persona, porque también tiene toda esta situación de informar que la persona tiene este tipo de
+
+1353
+01:59:24,480 --> 01:59:31,200
+enfermedad. Ya? Entonces generalmente estas cosas de vamos con uno, vamos con otro, uno tiene que
+
+1354
+01:59:31,200 --> 01:59:38,160
+sentar con la empresa e informar, ya, es mejor emprestar plata para un malo pagador o no vamos
+
+1355
+01:59:38,160 --> 01:59:40,160
+de emprestar plata para un malo pagador.
+
+1356
+01:59:40,160 --> 01:59:43,160
+¿Cuáles son las perdidas que están involucradas?
+
+1357
+01:59:43,160 --> 01:59:47,160
+Muchas veces es mucho peor emprestar plata para un malo pagador.
+
+1358
+01:59:47,160 --> 01:59:50,160
+Pero si dejamos de emprestar plata para ese individuo,
+
+1359
+01:59:50,160 --> 01:59:52,160
+perdemos muchas personas.
+
+1360
+01:59:52,160 --> 01:59:56,160
+Generalmente hacemos un modelo que va a tener un costo
+
+1361
+01:59:56,160 --> 01:59:59,160
+de hacer una clasificación de un malo,
+
+1362
+01:59:59,160 --> 02:00:01,160
+una mala clasificación de un malo
+
+1363
+02:00:01,160 --> 02:00:03,160
+o una mala clasificación de un bueno.
+
+1364
+02:00:03,160 --> 02:00:05,160
+Y con base en esta función costo,
+
+1365
+02:00:05,160 --> 02:00:13,160
+el mejor modelo, el mejor equipamiento, el equipo.
+
+1366
+02:00:13,160 --> 02:00:17,160
+Siempre hay un costo involucrado.
+
+1367
+02:00:17,160 --> 02:00:22,160
+Creo que sería básicamente eso. Pero si hay un problema, no es un problema sencillo.
+
+1368
+02:00:22,160 --> 02:00:23,160
+Ok.
+
+1369
+02:00:23,160 --> 02:00:27,160
+Si quieren ver, me envían un correo, necesito contestar.
+
+1370
+02:00:27,160 --> 02:00:30,160
+Me envían otro correo con ese punto que discutimos exactamente eso.
+
+1371
+02:00:30,160 --> 02:00:32,160
+Le contesto mañana.
+
+1372
+02:00:32,160 --> 02:00:37,920
+y ahora escriba exactamente centro, es esta situación, si eso le acontece mejor.
+
+1373
+02:00:37,920 --> 02:00:44,160
+Pero acá lo interesante es que, si usted está intentando medir exactamente esta métrica,
+
+1374
+02:00:44,160 --> 02:00:47,400
+ahora puede medir ella por medio de un intervalo de confianza.
+
+1375
+02:00:47,400 --> 02:00:53,740
+Y yo tengo la exactitud, o sea, la acuracia que está clasificando correctamente las
+
+1376
+02:00:53,740 --> 02:00:58,680
+personas que tienen la enfermedad, o está clasificando correctamente que esta persona
+
+1377
+02:00:58,680 --> 02:01:02,680
+no tiene la enfermedad. Entonces la exactitud me fue de 0.97.
+
+1378
+02:01:02,680 --> 02:01:06,680
+Alcanza el intervalo de confianza de la exactitud.
+
+1379
+02:01:06,680 --> 02:01:10,680
+Y no puedo comparar diferentes modelos para eso.
+
+1380
+02:01:14,680 --> 02:01:18,680
+Bueno, era eso que quería pasar por hoy. Más preguntas?
+
+1381
+02:01:22,680 --> 02:01:24,680
+¿Dudas?
+
+1382
+02:01:28,680 --> 02:01:37,680
+Bueno, si nadie más tiene ninguna duda, cerramos por hoy y nos vemos por la última vez,
+
+1383
+02:01:37,680 --> 02:01:40,680
+va a ser mi última clase, creo que con ustedes, en el repaso.
+
+1384
+02:01:40,680 --> 02:01:49,680
+Muchas gracias por la paciencia, fue un gusto que tengan buena noche y nos vemos el sábado.
+
+1385
+02:01:49,680 --> 02:01:51,680
+Muchas gracias a todos.
+

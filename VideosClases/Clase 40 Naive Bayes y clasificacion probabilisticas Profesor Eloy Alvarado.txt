@@ -1,0 +1,1546 @@
+Hoy lo que veremos es Naive Bayes y clasificación probabilística. Va a estar muy relacionado
+con las métricas que nosotros hemos visto y vamos a hacer una pequeña diferencia con
+lo que trabajaron el martes pasado con Pedro.
+y creo que estoy compartiendo bien, sí
+perfecto
+creo que se ve mejor, ya
+bueno en la sesión pasada ustedes vieron la forma de encontrar grupos
+clasificar de cierta manera las observaciones conforme quedan similares eran entre sí ya si
+se fijan en esa en ese tipo de problemáticas que son de clasificación no tenían una variable
+respuesta y de cierta manera lo que hacían era buscar alguna métrica de similitud y juntarlos
+y a priori digamos decir cuántos grupos quieren, en el ejemplo específico que
+vieron con Pedro, que era con los conjuntos de datos de los vinos, intentaban ver los
+perfiles químicos de los vinos y tratar de agruparlos de alguna manera.
+Eso es súper útil para los aplicaciones reales, pero qué pasa si yo
+tengo información adicional yo ya los tengo clasificado
+pensemos en el ejemplo de los correos que lo vimos cuando vimos las métricas
+de la matriz de confusión y demás el jueves pasado
+pensamos que tenemos un conjunto de datos de correo y en esencia lo que hace todos
+los proveedores de correo electrónico y ya tengo correos que están
+marcados o etiquetados como correo no deseado, spam o correo legítimo. Yo ya
+tengo una clasificación, entonces adicional o a la información propia
+en este caso el correo, ya que uno lo puede caracterizar de distintas maneras,
+tengo ya una clasificación, entonces tengo una variable
+que ya no es una propiedad per se, en el sentido del mensaje en sí mismo, si no
+que es una etiqueta. Entonces, yo ya no voy a ver las características de este
+correo o los perfiles químicos solo como mi conjunto completo, sino que voy a
+tener un conjunto de variables, características, predictoras,
+covariables, puede serlo si uno quiere hacerlo, que vendría haciendo las
+características del perfil químico o las características de los mensajes de
+correo porque no además de tener toda esa información que cuando tenemos
+toda la información sólo podemos buscar cosas similares y tratar de ver qué
+observaciones se parecen entre sí lo que yo voy a querer hacer en este
+contexto es cuando qué pasa o preguntarme qué pasa cuando ya tengo
+clasificadas información cómo puedo ocupar esa información para por
+ejemplo, clasificar nuevos correos como correos de spam, como correo no deseado.
+Entonces lo que nosotros vamos a tratar es buscar señales
+que me permitan predecir de mejor manera los correos futuros. A todo nos ha
+pasado que nos llega un correo y en realidad de vez en vez de haber sido spam.
+Hoy en día estos modelos son bastante sofisticados y es raro que pase, pero
+hace muchos años atrás era algo bastante común. Entonces, en el contexto que vamos a trabajar hoy,
+nos vamos a poner una variable de respuesta o una etiqueta que le vamos a llamar y le vamos a definir
+como 1 si efectivamente era spam y está etiquetada como spam o 0 si no era spam o era un correo
+legítimo. ¿Cuáles van a ser nuestras características que sean, que es
+equivalente, digamos, a los perfiles químicos de los vinos? Acá vamos a hablar de,
+por ejemplo, si contiene palabras o no, creemos qué proporción de palabras
+utiliza, digamos, o qué proporción de palabras pertenecen o son una
+palabra en particular, y lo podemos clasificar de muchas, de varias maneras
+lo vamos a ver un poquito más adelante. Lo que queremos hacer hoy es
+definir o construir, ya vamos a modelar de alguna manera, una probabilidad de spam a
+partir de mis datos que yo ya tengo etiquetados, es decir, yo tengo un conjunto
+de datos que sé sus características, por ejemplo, la frecuencia, ciertas
+palabras, y sé que es spam o no.
+Entonces, vamos a querer crear un filtro, como lo hacen Gmail o Outlook, etcétera,
+para definir cuándo es spam a partir de las características.
+Entonces, vamos a pensar que un correo va, vamos a poner esta problemática, nos vamos a
+preguntar si es que tiene la palabra oferta, ¿ya?
+Y nuestro objetivo va a ser definir o modelar la probabilidad de spam,
+o qué probabilidad asignarle a spam y si conviene bloquearlo.
+Entonces, vamos a considerar por consecuencia las frecuencias de estas
+características o de estas clases de correo en nuestro conjunto de datos y
+vamos a ver cómo eso afecta y cómo podemos efectivamente estimar la
+probabilidad y vamos a hablar de probabilidades condicionales conforme
+los datos que tenemos. Entonces vamos a tener
+tres, digamos, aristas que tenemos que, digamos, definir. Entonces, primero vamos a
+tener que aprender de nuestro conjunto de datos.
+Entonces vamos a tener clases. Nosotros ya nos definimos las clases. Las clases son
+dos. Estamos haciendo una clasificación binaria y en principio no podría ser
+regresión logística, es decir, se estima. Pero nosotros tenemos que aprender estos
+correos y tenemos en este ejercicio, en este ejemplo, dos clases. El correo es spam o
+no lo es, o es un correo legítimo. Entonces, veremos de cierta manera
+caracterizar cómo se comportan los datos dentro de cada una de esas categorías.
+Entonces vamos a preguntarnos qué señales aparecen dentro de spam, qué
+señales aparecen dentro de correo legítimos. Entonces tenemos que preguntarnos
+cómo vamos a combinar esas frecuencias, esas características y qué tan
+fiables van a ser esas probabilidades. Y finalmente vamos a definir, vamos a hacer
+una diferencia. Nosotros queremos predecir, pero el acto de predecir y el
+acto de tomar una decisión son cosas distintas. Por ejemplo, yo puedo predecir
+de antemano, llevo un correo, yo no sé efectivamente si es spam o no, leo sus características,
+con esta metodología que vamos a desarrollar en la cátedra de hoy, voy a llegar a una
+probabilidad de que sea spam o no lo sea, o sea un correo legítimo, y yo, ese es el
+proceso de predecir, y luego voy a tomar una decisión que va a estar definida como una
+regla. Por ejemplo, tal como se hace en regresión logística, si la probabilidad
+de que sea spam es mayor al 80%, entonces lo voy a clasificar como spam.
+Si es que no, va a ser un correo legítimo. Entonces, vamos a definir
+una función de costos, ya en términos de los falsos positivos y los falsos
+negativos, que puede cambiar esa decisión. Tenemos que hacer una
+diferencia entre lo que es el predecir la probabilidad o predecir nuevas
+observaciones con su probabilidad de que sea spam o no y la decisión que se toma
+primero vamos a considerar 100 correos 100 correos esto digamos un ejemplo
+y vamos a analizar cómo calculamos estas probabilidades como las utilizamos que
+estamos utilizando por debajo y luego de eso una vez que lo tenemos definido lo
+vamos a ampliar una base un poco más real digamos que son el conjunto de datos
+que está disponible en
+en el Moodle
+entonces vamos a preguntar tres cosas para definir estas probabilidades
+primero la prior o la previa digamos que nos va a preguntar qué fracción de
+correos es spam y hacemos la referencia como spam porque estamos interesados en
+esa clase, ya por eso le pusimos igual a uno que sea spam. Si nosotros queremos
+justificar al revés, es decir, la probabilidad de que sea legítimo, que
+también podemos hacerlo en la clasificación minaria sobre todo,
+tenemos que observar cuantas observaciones son spam, cuantas observaciones no lo son.
+Entonces esta primera pregunta, antes de ver la clase, ya antes de ver las
+características que tienen los mensajes de spam y que tienen los
+mensajes legítimos nos vamos a preguntar qué tanto ocurre, cuál es su
+frecuencia, es decir, qué fracción de los correos y yo tengo disposición de estos
+100 que estoy planteando es SPAM. Ahí vamos a observar efectivamente la
+frecuencia de la clase, clase igual a 1, clase igual a 0.
+Segundo, vamos a considerar dentro de la clase, entonces entre la clase de
+interés, que en particular es spam, qué fracción contiene la palabra oferta.
+Nosotros estamos conjeturando cada que sí tiene la palabra oferta puede
+incidir en la probabilidad de que sea spam o no.
+Entonces, primero vemos la frecuencia de los corredores spam y los no spam y luego
+nos vamos a la clase de interés de dentro de spam. ¿Cuántas de esas contienen la
+palabra oferta. ¿Qué va a observar ahí? La característica de interés que nosotros
+estamos conjeturando que afecta esta probabilidad, que es si es que la palabra
+oferta está dentro o no del mensaje. Y a eso estamos haciendo una probabilidad
+condicional, es decir, ¿cuál es la probabilidad de que saca la palabra oferta
+dado que es spam? Y finalmente la tercera pregunta es la probabilidad posterior.
+Entonces, entre los correos con oferta, o la palabra oferta dentro de esos mensajes,
+¿qué fracción es spam?
+Si se fijan, la pregunta es al revés.
+Primero nos preguntábamos, dentro de los que son spam, ¿cuántos son oferta?
+¿Cuántos tiene la palabra oferta?
+Y ahora nos preguntamos, entre los correos que son oferta, ¿qué fracción es de spam?
+Son preguntas que parecen similares, digamos, en vocabulario, pero son totalmente distintas.
+vamos a formalizar. Entonces aquí queremos observar la clase al conocer la palabra
+oferta, por una observación. Entonces el teorema Bayes, y probabilidad
+condicional por consecuencia, nos va a permitir hacer esto. El naive va a
+salir por un supuesto que vamos a hacer. Entonces vamos a ocupar esta
+metodología para definir esa probabilidad. Entonces, vemos el ejemplo de los 100 correos.
+En los 100 correos tengo las dos clases spam o no spam, y al no spam le estamos llamando legítimo.
+Entonces, si se fijan acá, tengo 80 correos legítimos y 20 correos spam, que suman los 100
+correos del ejemplo dentro de spam que son los 20 yo voy a encontrar donde
+conjunto de datos tengo 16 con la palabra oferta si se fijan acá estoy
+hablando de si contiene o no la palabra oferta y no cuántas veces aparece la
+palabra oferta que lo vamos también a considerar, aquí estamos considerando
+simplemente la presencia o no, tiene la palabra oferta si o no, entonces dentro de
+spam que son 20 observaciones de las 100, 16 tienen la palabra oferta y por
+consecuencia 4 no la tiene porque es una categoría, dicotómica, o tiene la
+palabra o no la tiene, no pueden ser ambas ala vez, entonces necesariamente tiene que ser un 4.
+Y también en el caso de la clase no spam o legítimo 8 tiene la palabra oferta y
+72 no tienen la palabra oferta entonces si se fijan acá
+80 legítimos 20 con spam 24 con la palabra oferta y sabemos cómo
+se distribuye entonces a priori uno podría decir bueno si contiene la
+palabra oferta que es nuestra conjetura si tiene la palabra oferta
+entonces pareciera ser más probable que va a ser spam y si tiene la palabra si
+no tiene la palabra oferta pareciera ser que es más probable que sea legítimo
+pero tenemos que llegar a la probabilidad propiamente tal, cómo hacemos eso, cómo lo formalizamos
+entonces pensemos cómo calculamos estas cosas, preguntemos, cuál es la probabilidad según en
+términos frecuentistas esto, cuál es la probabilidad de que el mensaje o un correo contenga la palabra
+oferta dado que el correo está categorizado, está etiquetado como spam
+entonces si nos fijamos esto es simplemente el cociente entre 16 y 20
+porque 16 son con oferta de los 20 que son spam entonces aquí me estoy
+preguntando dado que el dado que el correo es spam entonces ya voy a estar
+trabajando en esta fila, cuántos son ofertas y por consecuencia esos son 16
+ya al ser 16 entonces me queda 16 sobre 20 que me da punto 8 de probabilidad
+hago el mismo ejemplo o el mismo ejercicio con la probabilidad de que sea
+oferta dado que es un correo legítimo y se fijen acá
+que tenga en esa es la palabra oferta son 8 sobre los 80 entonces me queda 8 sobre 80
+que es un 0 1 si se fijan acá esto no suma 1 porque estamos trabajando dentro
+de dos clases distintas
+si trabajásemos como la probabilidad de que no se oferta dado que es legítimo
+ahí sería 72 sobre 80 que me daría el 0,9 restante
+lo mismo acá con no oferta dado que es spam
+entonces
+en la primera cantidad nosotros consideramos
+todos los spams y en la segunda cantidad consideramos
+todos los legítimos
+entonces
+ahora nosotros estamos tratando de invertir la pregunta
+aquí nos preguntamos
+cual es la probabilidad de que sea oferta
+dado que es spam, o sea yo ya conozco que es spam
+y acá abajo me estoy pensándolo
+en al revés, estoy preguntando cuál es la probabilidad que sea spam dado que
+contiene la palabra oferta y el dado es lo que en la predicción será nuestra
+información ya cuando tengo nuevos nuevas observaciones nuevos correos yo voy
+a conocer el mensaje y en el mensaje voy a saber si contiene la palabra oferta o no
+pero no voy a saber a priori si es spam o no porque quiero definir esa
+probabilidad. Entonces, ¿cómo calculamos éste? La probabilidad de que sea spam
+dado que es oferta, si se fijan es 16 sobre 16 más 8. Entonces, dado que es oferta
+¿cuántos son spam? Dado que es oferta, entonces estamos viendo ahora la columna,
+¿cuántos son spam? 16. ¿De cuántos? De los 24. Y los 24 son el 16 más 8.
+16 más 8. Entonces se entiende que es la proporción de correos spam dentro de la
+categoría oferta, que en esencia es que el mensaje de correo contiene la palabra
+oferta. Calculamos esto y nos da 2 tercios. Entonces, como concluimos decimos que el 80%
+de los spams contiene la palabra oferta, que lo podemos ver dentro de esta matriz, 16 de 20 es el 80%,
+por ciento pero son los dos tercios de los correos con oferta es spam porque
+aquí nos estamos preguntando las cosas al revés es decir qué información estoy
+preguntando es información en la que estoy dando por hecho entonces para la
+primera pregunta veo los valores horizontales y cual para la segunda
+pregunta veo los valores verticales porque va a depender mucho estoy viendo
+dentro de la clase o dentro de la señal. Dentro de la clase todos son spam o no
+spam y dentro de la señal todos son con oferta o sin oferta, que
+son ambas categorías dicotómicas, no pueden pasar a la vez.
+¿Cómo utilizamos esta cosa? Con estas probabilidades podemos calcular
+nuestra probabilidad de interés, si fijan que es la probabilidad, o sea dado que voy a clasificar
+primero la y que es mi etiqueta de que sea spam o no, voy a aplicar el teorema de Bayes, el teorema
+Bayes me va a decir en este caso particular que la probabilidad de que sea spam dada oferta la puedo
+obtener como y tiene un poco de sentido esto como la probabilidad de spam por la probabilidad
+de que sea oferta dado spam sobre la misma probabilidad más
+la probabilidad que sea legítimo o no spam a su vez por la probabilidad de
+oferta dado que es legítimo. Si se fijan,
+esas son las cosas que calculamos. Entonces, la probabilidad de spam dado
+será 20 sobre 100 porque es la frecuencia de los de cuántos de los
+correos de los 100 que tengo disponibles son spam, entonces 20 de los 100
+se me da 0.2 y dentro de lo que son spam cuántos son oferta, entonces dentro de los
+que son spam cuántos son oferta 16, entonces esa proporción será 16 sobre 20
+Si se fijan, este número 0,2 por 0,8 es el mismo que está abajo. Entonces, esto está
+incluido arriba. Un número menor que 1 está definido bien la probabilidad. Y acá va a
+ser la probabilidad de que sea legítimo. 80 correos son legítimos, 20 correos son
+spam. Entonces, la proporción o probabilidad en este caso, que estamos haciendo esta equivalencia,
+es 80% o 08 de que sea legítimo. Y ahora, dentro de la clase legítimo, ¿cuántos son
+ofertas dentro de los que son legítimos, cuántos son ofertas? 8. Entonces 8 sobre 80
+me da el 0,1. Calculando esto voy a tener 0,16 sobre 0,24 que me da el
+2 tercios, que es este mismo 2 tercios.
+Ahora, esta es la forma general, esta es una forma un poco más intuitiva. Ahora, yo
+quiero ocupar esta y la vamos a generalizar un poco más adelante para, por
+ejemplo, qué pasa si tengo más de una clase o más de dos clases. Ya no es solo
+spam y correo legítimo, sino que sea spam, correo financiero y correo legítimo.
+Entonces, ya ahí no va a ser tan sencillo hacerlo con esta matriz, digamos, de las
+categorías, sino que tendremos que utilizar la definición.
+Entonces, vamos a seguir observando si los correos contienen la palabra oferta,
+porque en todo esto yo estoy asumiendo de que tiene alguna incidencia dentro de
+la probabilidad de que sea spam o no. Entonces, yo de alguna manera tengo una
+creencia que si tiene la palabra oferta probablemente es un spam, aunque podría
+ser, uno podría tener distinta creencia o podría estar interesado en
+identificar lo legítimo en vez de los correos que son spam.
+Entonces, si se fijan acá, para cuando hago el producto entre la clase y oferta
+estoy haciendo 80 dividido 100 porque son 80 correos legítimos de los 100 y
+dentro de los 80 correos legítimos 8 tienen oferta entonces eso me da 0.08
+hago el mismo ejemplo con spam 20 de los 100 son spam y dentro de los 20 16 son
+oferta entonces me da 0,16 y lo divido por el total que es la suma y me da en
+esencia las probabilidades que yo estoy separando. Entonces, si se fijan 0,24 es la probabilidad con
+que tengo oferta y la estoy separando entre la probabilidad de que sea legítimo con oferta o
+spam con oferta. Entonces ya tengo una noción de para dónde van a haber más oferta o correos con
+la palabra oferta y vemos que cuando contiene la palabra oferta, entonces tiene esa señal,
+hay una mayor probabilidad de que sea spam. Entonces nos vamos a tomar de eso y lo vamos
+a utilizar para predecir probabilidades de nuevos mensajes. Pero podemos en un caso hipotético,
+pensemos que en el ejemplo que nosotros teníamos, teníamos 100 correos. De los 100 correos 20 eran
+spam y 80 eran legítimos. 20 es una proporción baja conforme del 80% pero no
+ridículamente baja, entonces puedo aprender de esa probabilidad de esas
+frecuencias que tengo disponible en mis dados. Pensemos ahora que esos correos
+spam son mucho más anómalos en el sentido de que son raros que pasen.
+Entonces, si yo tengo 100 observaciones que son 100 correos, yo voy a definir qué
+pasa si el 2% de esos 100, es decir, 2 correos solamente, son spam.
+Entonces, inicialmente tenía 20 sobre 100.
+en el nuevo escenario voy a tener 2 sobre 100 o 0.02
+entonces la probabilidad de que sea legítimo va a ser el recíproco, o sea va a ser
+el complemento 1 menos 0.2 0.8 y en otro caso 1 menos 0.02 0.98
+y hago el mismo ejercicio de antes, la probabilidad de que sea spam por la
+probabilidad de que sea oferta dentro de spam
+Recuerden acá, la probabilidad de que sea oferta dentro de spam.
+La probabilidad de que sea oferta dentro de spam 16 sobre 20, 08.
+Y me da 0,16.
+En el caso hipotético que le estoy planteando,
+de que la proporción de correo de spam es solo el 2%,
+que vendría a significar dos observaciones de las 100 con spam,
+voy a tener entonces la proporción de spam dentro de mi conjunto de datos,
+que mis son mis 100 observaciones, entonces va a ser 2 sobre 100, 0.02 por
+la proporción de que sea oferta dado que
+dado que sea de que tenga la palabra oferta dado que es SPAM, ya, y aquí estoy
+asumiendo que esa proporción se mantiene, ya.
+Ahora, hago el mismo ejercicio con lo
+legítimo y oferta, recuerden que aquí yo estoy interesado en la señal que
+tenga la palabra oferta, luego la vamos a extender a dos señales, entonces
+cuál es la probabilidad que sea legítimo? 0.8 porque son 80 de los 100
+y dentro de los legítimos sólo el 10% tiene la palabra oferta entonces 0.08
+hago el mismo ejercicio acá dado que 2% simplemente es spam
+necesariamente el 98% restante tiene que ser legítimo porque nuevamente es una
+categoría dicotómica no pueden ser no pueden pasar las cosas a la vez pues una
+o la otra y dentro de esta clase vamos a seguir asumiendo que hay un 10% de las
+palabras de las mensajes que tienen la palabra oferta y ahora hacemos el mismo
+cálculo que acabamos de hacer acá 0.16 sobre 0.08 más 0.16
+lo calculamos con los valores iniciales y nos entregó en el momento, 2 tercios, pero ahora lo
+calculo con el nuevo supuesto, es decir que la frecuencia de spam dentro de mi conjunto de datos
+es sólo el 2% y si se fijan arriba no me va a cambiar, no me va a cambiar sustancialmente en el sentido de que
+salió un 16 pero hay un orden de magnitud distinto porque pasé de 20 a 2
+entonces me sale 0.016 y abajo tengo que reemplazarlo con el 0.098
+más el 0.016 y al calcular esa probabilidad me da que es 0.14
+entonces pasamos de tener casi 67% de probabilidad de que
+si es que el mensaje contiene la palabra oferta
+entonces la probabilidad va a ser dos tercios de que sea spam
+casi un 14% de que sea spam dado que contiene la palabra oferta y si se fijan
+yo deje todo constante exceptuando la proporción de spam
+probabilidad de que sea spam dentro de mi conjunto de datos, lo cual tiene todo el
+sentido si se fijan, pensemos acá, el ejemplo inicial, si el 20% de los mensajes
+es spam y yo veo que hay la señal de que tenga la palabra oferta,
+digamos, me indica de cierta manera una mayor probabilidad de que sea
+efectivamente spam, entonces es razonable de que si un mensaje contiene la palabra
+oferta, entonces es muy probable, aunque puede no serlo, que sea spam. Pero eso
+debido a que hay 20 observaciones de las 100 que eran spam. En el nuevo caso,
+sólo dos observaciones. Entonces, aquí ya la pregunta no es, si bien estamos
+haciendo la misma pregunta, la probabilidad de que sea spam dado que era
+oferta, de que contiene el mensaje oferta, ahora spam es un caso muy anómalo, solo
+dos de cien, entonces tenga o no la palabra, el mensaje la palabra oferta, no?
+Igual es difícil que pase porque con un correo sea spam es raro en este contexto
+entonces si se fijan baja sustancialmente la probabilidad de yo
+predecir un mensaje con oferta, con la palabra oferta, como es PAM,
+categorizarlo de esa manera. Entonces, importa mucho la frecuencia del conjunto
+de datos con el cual estoy trabajando, de la clase en interés en principio.
+Entonces, a mayor frecuencia voy a tratar de, o con el modelo, asignarle una mayor
+probabilidad porque el caso no es tan difícil que pase. En cambio, si en este
+caso utópico, diga si pasa porque hay mucho spam, es un caso muy anómalo, entonces
+tenga o no la palabra oferta es difícil que pase porque dado mi conjunto de datos
+tengo muy poca frecuencia, entonces, al bajar sustancialmente eso, entonces la
+frecuencia de la clase de interés que en nuestro caso es si un mensaje está
+etiquetado como spam o no, me va a cambiar esa probabilidad, ya, a pesar de que
+mantenga todas las probabilidades dentro de la misma clase.
+Y puedo graficar eso, si yo cambio la probabilidad de que sea spam, la
+frecuencia de los mensajes etiquetados como spam dentro de mi conjunto de datos,
+recuerden que acá yo lo hice como 2 de 100 y 20 de 100, si se fijan esa
+curva no es lineal y conforme va bajando la probabilidad previa, digamos la
+frecuencia de que sea spam, la probabilidad de que yo clasifique un
+mensaje como spam dado que contiene la palabra oferta baja sustancialmente
+de igual manera, vengamos al otro caso, ¿qué pasa si 98% de los correos son spam? estaríamos
+por acá, en ese caso, tenga o no la palabra oferta, es muy probable que sea spam, porque
+el 98% de los mensajes es spam, entonces la frecuencia en que ocurren, o la frecuencia
+de ocurrencia que ocurre cada clase, en este caso spam o no spam o legítimo, influye
+sustancialmente en cómo voy a definir yo la probabilidad de predicción que va a ser
+esta la probabilidad de spam dado que contiene la palabra oferta. Nosotros estamos poniendo
+de esta manera en términos de la señal de que contenga el mensaje, que el mensaje tenga
+la palabra oferta pero en principio yo podría hacerlo con otras cosas y de hecho con el
+conjunto de datos lo vamos a hacer con más variables. Entonces, la palabra ayuda, que
+es la palabra oferta, pero no decide por sí sola porque va a depender mucho de la frecuencia
+de la clase en la que yo estoy interesado. Entonces, eso es para una señal binaria,
+decir es spam o no es spam y dentro de spam veo si tiene la palabra oferta no y dentro
+de legítimo veo la palabra sin oferta no pero qué pasa si ahora agregó una nueva señal entonces
+voy a tener los correos que son spam y legítimos voy a preguntarme digamos dentro de legítimos
+8 tienen la palabra oferta dentro de spam 16 tienen la palabra oferta tal como antes pero ahora voy a
+agregar otra característica más si es que tiene un link o no un enlace entonces dentro de la clase
+legítima o la clase legítima digamos de no spam 16 correos tienen enlace y dentro de spam 14 no
+tienen enlace. ¿Qué es lo que nosotros queremos clasificar?
+Para ponerlo un poco más interesante, digamos, es
+que hay oferta presente pero que no tiene link.
+Queremos clasificar ese tipo de correos. Entonces necesitamos saber
+cómo ocurre cada señal con el mensaje oferta y si es que tiene el
+enlace por separado y necesitamos de alguna manera combinarlo porque yo no
+sé de esta tabla descriptiva si es que estos ocho de oferta
+pertenecen a los ocho con el enlace porque puede ser que estos ocho
+que tienen oferta no tengan el enlace yo no lo sé, solo sé la
+frecuencia. Entonces, vamos en esta noción de que esa
+señal está presente o no lo está, ya porque como les comentaba antes, yo estoy
+preguntándome aquí si es que tiene en algún lado la palabra oferta. No estoy
+preguntándome o no estoy analizando cuántas veces tiene la palabra oferta, que
+es una pregunta distinta. Entonces cuando yo me pregunto como variable, digamos, como
+características si es que contiene la palabra, el mensaje contiene la palabra
+oferta o no, o si es que tiene enlace o no, que a su vez tampoco me estoy
+preguntando cuántos enlaces o hipervínculos tiene.
+Nace naturalmente una variable aleatoria, digamos, de Bernoulli. Es decir, aparece o no aparece.
+O pasa o no pasa. No es cuántas veces pasa. Pasa o no pasa, es decir, contiene la
+palabra oferta o no la contiene, tiene hipervínculo o no, no tiene, no tiene enlace.
+Entonces todas las variables son de Bernoulli, en el sentido de que son dicotómicas,
+sí o no, 0 1, en ese sentido. Vamos a clasificar 1 para la presencia de esa señal,
+decir
+presencia de la palabra oferta o presencia de un enlace
+y ser el caso contrario, es decir, que no lo contenga, que no contenga enlace y que no
+tenga la palabra oferta.
+Entonces, en los 20 spond del ejemplo, recuerden que tenemos un conjunto de datos de 100,
+la categoría
+que yo clasifique como uno, que es cuando tiene un enlace presente, son 14.
+Estoy parado aquí.
+Por consecuencia, la probabilidad
+asociada a esto, es decir, la probabilidad que
+la probabilidad de que hay un enlace dado que es de spam,
+es los casos positivos
+sobre los casos totales, es decir, 14, porque 14 tiene un enlace, de los 20
+del ejemplo
+que estamos trabajando, entonces me da un 0,7 y puedo hacer al revés lo mismo, si no tiene enlace entonces
+o si digo si hay 14
+que tienen enlace
+dentro de los 20 con spam, necesariamente
+6 no tienen que tener enlace porque es el complemento, porque tienen que haber y yo sé que hay 20
+mensajes que son spam, por consecuencia estas probabilidades suman 1
+ahora vamos a empezar a definir que es entonces este naive Bayes, porque recuerden acá yo no sé y no
+tengo información de cómo se relacionan los mensajes con oferta con los mensajes con enlace
+yo no sé si de cuántos de estos 8 tienen enlace y no sé cuántos de estos 16 tienen oferta,
+la estamos viendo por separado. Entonces, queremos combinar estas probabilidades que podemos sacar,
+ya, que son en esencia, contiene una señal o no la contiene, y en este caso son más de una
+señal, porque estamos hablando de con la palabra oferta, y sí que contiene el enlace, ¿no? Y voy a
+definir un clasificador, un clasificador probabilístico, que va a decir que es simplemente
+una forma un poco más bonita de decir en términos de la frecuencia de mis datos
+voy a definir probabilidades y esas probabilidades
+en esencia utilizando el teorema de Bayes para clasificar nuevas
+observaciones entonces vamos a poder definir probabilidades
+para que en un futuro mensaje yo pueda definir si es spam o no
+y en el caso que está muy interesado que es si es que tiene oferta pero no tiene enlace
+es la clase que nosotros vamos a tener que usar
+entonces si se fijan acá tengo dos señales
+aparece oferta aparece enlace entonces tengo cuatro combinaciones
+no hay enlace no hay oferta no hay oferta pero si hay enlace
+si hay oferta pero no hay enlace que es la clase que yo estoy interesado
+y hay oferta y hay enlace
+y yo no sé cómo se comporta en esta dentro del conjunto de dos que tengo
+disponible, digamos, las tablas tabuladas
+cuántos de esos son legítimos, cuántos de esos son spam
+y si fijan, sólo tengo dos señales
+que en principio está calculado
+cómo llegamos a 4, con 2 a la 2
+si tuviese más señales, por ejemplo 10
+voy a tener
+1024 patrones posibles, ya, y ahí me va a ser super difícil clasificar porque voy a tener 1024
+formas de clasificar los mensajes, entonces tengo que tratar de caracterizar esto en términos,
+con esta metodología, en términos de categoría de manera redundancia o de grupos grandes, ya,
+no de muchos subgrupos porque si no son demasiadas opciones de clasificar que puede que mi conjunto
+de datos ni siquiera las tenga en términos de combinación, puede que no esté una combinación
+en particular, no esté presente en mi datos, entonces no voy a tener ninguna frecuencia
+con la cual yo saque la probabilidad porque nunca paso, entonces si no pasó en mi datos
+entonces la frecuencia es cero, y por consecuencia la probabilidad es cero, porque si se fija en acá,
+aquí estamos haciendo una equivalencia de una filosofía frecuentista, es decir, estamos pasando
+la frecuencia, es decir, cuántas veces pasa el evento con las distintas combinaciones de las
+señales en mi conjunto de datos, y digo, bueno, entonces esa es la probabilidad, que es en esencia
+el argumento frecuentista de la probabilidad estadística. Entonces, si yo tengo pocos correos,
+pueden haber patrones características, combinaciones de estos que no aparezcan en mis datos y por
+consecuencia no hay señal. Entonces, le voy a asignar una probabilidad cero. Y no queremos
+que pase eso porque pensemos si yo quiero poner una señal que diga
+cuenta, y dentro de mi conjunto de datos ningún mensaje tiene cuenta si yo le
+asigno una probabilidad 0 si estoy aseverando que no puede pasar que
+algún mensaje tenga la palabra cuenta no obstante nosotros sabemos que puede
+haber eso ya solamente no va a ser tan común digamos porque tiene las cuentas
+sí, por fin de mes. Entonces, no podemos asegurar que es imposible, pero cuando le asignamos una probabilidad 0, eso es lo que estamos haciendo, si no queremos hacer esa cosa.
+Por eso, tenemos que tener cuidado con definir muchas clases.
+entonces
+esta señal que yo tengo de en este caso dos señales
+es decir, tenga la palabra oferta y tenga el enlace, son dos señales distintas
+esta técnica de Naive Bayes va a tratar de combinar
+y hace un supuesto para eso, porque recuerden
+nosotros dentro de nuestros datos
+yo sé que dentro del legítimo hay 8 con oferta, con la palabra oferta, y dentro de los correos
+legítimos hay 16 con enlace. Yo no sé cómo se combina y no sé en estricto rigor formalmente
+esto es decir, no sé la distribución conjunta de estas cosas, sólo sé las distribuciones
+marginales separadas, es decir, sólo con oferta dentro de los legítimos, sólo con enlace dentro
+dentro de lo legítimo y lo mismo para spam. Tengo que mezclarla de alguna manera.
+Entonces yo quiero saber la distribución conjunta que es la probabilidad
+de que tenga el mensaje oferta y a su vez tenga no tenga enlace que es la
+clase de interés. Es esta, oferta presente y enlace ausente. Entonces esto es la
+probabilidad de que sí tenga el mensaje oferta pero no tenga enlace dado que es
+spam. El supuesto que hacen ahí Bayes y ahí viene lo ingenuo porque hacen un
+supuesto que usualmente no pasa, que es decir
+que esta probabilidad es separable en el sentido de que esta probabilidad
+conjunta es exactamente la multiplicación de las probabilidades por
+separado, es decir, la probabilidad de que sea
+que tenga el mensaje tenga la palabra oferta dado que es spam
+multiplicado por la probabilidad de que no tenga el enlace dado que es spam al multiplicar
+o obtener ese producto me da la probabilidad de que el mensaje tenga la palabra oferta y a su vez
+no tenga el enlace. Si se fijan son dos cosas distintas porque esta probabilidad de que tenga
+oferta desde que tenga el mensaje y tenga la palabra oferta dado que es spam no
+considera
+si es que tiene el enlace no y a su vez esta probabilidad no considera si es que
+es tiene la palabra oferta no pero de alguna manera estoy combinando y Naive Bayes
+ingenuamente define estas cosas se pueden separar es decir esta probabilidad
+conjunta la puedo separar como la multiplicación de las probabilidades y
+nada me asegura eso, nada me asegura eso, por eso es una metodología que es, digamos,
+ingenua, por eso naïve.
+Entonces,
+es un primer acercamiento a esta
+problemática, a este tipo de problema, funciona relativamente bien, pero
+podemos sofisticar nomás. Ahora, qué es lo bueno de esto?
+esta probabilidad yo no puedo calcular, y estas las puedo obtener fácilmente
+esta probabilidad es bastante más difícil
+entonces cada señal por separado me va a aportar a la probabilidad que yo estoy
+interesado o al tipo de correos que estoy interesado que son con oferta
+presente y enlace ausente
+entonces
+¿Qué pasa si tengo más variables? Por ejemplo, que tenga la palabra oferta, no tenga enlace y contenga la palabra cuenta, voy a hacer lo mismo.
+La probabilidad de oferta dado que es spam, la probabilidad de no enlace dado que es spam, por la probabilidad de que contenga la palabra cuenta dado que es spam.
+estoy asumiendo una noción de independencia estoy separando las cosas
+que en principio nada me asegura esto es un supuesto que estoy haciendo
+ahora
+estos supuestos es algo que yo no puedo demostrar que es lo que estoy
+suponiendo y en esencia es el supuesto de independencia
+y en general en estadística la independencia es una de las cosas más
+fuertes que uno puede tener. Si las cosas son independientes entonces puedo hacer
+muchas cosas en términos de observaciones. Si observaciones no son
+independientes entonces tengo un sinfín de trabas que me inhabilitan un sinfín
+de metodologías en estadística. Entonces la independencia uno de los supuestos más
+fuertes que tiene estadística porque tenemos mucho, digamos, metodología para
+Entonces, volviendo a Naive Bayes, hacemos este supuesto de que la probabilidad conjunta es la
+multiplicación de las probabilidades por separado y ahora si hago este supuesto ¿cómo puedo
+calcularlo? Pensemos, quiero calcular la probabilidad de que sea oferta, o sea que tenga el mensaje,
+tenga la palabra oferta y no tenga enlace, que si se fijan es lo que yo quiero clasificar,
+pero dentro de spam. Ahora, acabamos de decir que esto es,
+esta probabilidad que quiero calcular es la multiplicación de las probabilidades
+por separado. Entonces, primero esta probabilidad de que sea oferta,
+dado que tenga el mensaje tenga la palabra oferta dado que es spam, no volvemos,
+pero volvemos acá, dentro de las que son spam son 20 y cuántos son con oferta? 16
+por consecuencia 16 sobre 20 y ahora que debo calcular la probabilidad de que no
+hay enlace dado que es spam entonces que no hay enlace
+es 20 menos 14 porque aquí estoy definiendo 14 son con enlace dentro de spam
+entonces que no hay enlace necesariamente tiene que ser 6 y eso es
+lo que estoy haciendo acá 20 menos 14 sobre todo los que son de spam
+entonces me queda 0,8 por 0.3 que me da 0,24 y hago el mismo ejercicio pero
+dentro de la clase no-spam que es la clase legítima
+dentro de las 80 observaciones que son legítimas cuántos son con
+oferta o tiene la palabra oferta, perdón, 8 y dentro del legítimo cuántos no tienen enlace?
+Acá me definen que 16 tienen enlace de los 80, por consecuencia 80 menos 16
+son los que no tienen enlace dentro de los 80, que son los legítimos.
+va a ser 0.1 por 0.8 me da 0.08. Ahora, esto, estas probabilidades que
+calculo son las probabilidades o patrones conjuntos bajo el supuesto de
+independencia de naive Bayes dentro de cada clase, la clase spam y la clase
+legítimo o no spam. Ahora necesitamos incorporar las frecuencias, que nosotros
+dijimos anteriormente, la frecuencia de spam o las clases en general va a
+cambiar la respuesta porque aquí estamos trabajando dentro de las clases, ahora
+tenemos que subir un nivel, subir a cuántas veces pasa spam, cuántas
+veces pasa legítimo porque si no, no vamos a ver en qué parte de esta línea,
+en el parte de este eje estamos. Entonces,
+vamos a preparar estos factores. Nuevamente, queremos clasificar que
+el mensaje tiene una palabra que se llama oferta, solo tiene la presencia de esa
+palabra de ya se pasó, y que no hay enlace. Entonces, ¿cuánto es la frecuencia de la
+clase legítimo 80 sobre 100 porque son 80 mensajes etiquetados como legítimo
+0,8, dentro de spam 20 de 100, 0,2, oferta presente dentro de legítimo 8 sobre 80
+oferta presente sobre legítimo 8 sobre 80
+la misma idea pero dentro de la clase spam es decir cuántos
+mensajes tienen la palabra oferta de los 20 que son spam 16 sobre 20 y en el enlace
+ausente que lo acabamos de calcular si fijan hace referencia a estos
+a estos números digamos entonces hay 80 menos 16 correos sin enlace dentro de
+los 80 que son legítimos y 6 correos que no tienen enlace dentro de los 20 que son
+legítimos. Ahora, este supuesto, estas probabilidades las podemos calcular porque
+asumimos independencia, porque estamos calculando esta cantidad. Ahora tenemos
+que mezclarlo junto con ese supuesto en una gran probabilidad. Recuerden que yo
+quiero clasificar cuando es, el mensaje tiene la palabra oferta y no tiene enlace
+entonces, si fijan acá la ausencia de enlace es más frecuente entre legítimos
+usualmente los correos legítimos no tienen enlace
+sobre digamos el 0,3, esto no suma a 1 porque estoy trabajando dentro de distintas
+clases. Siguiendo entonces, oferta presente en las ausentes, recuerden, ese es lo que
+está muy interesado. Primero vamos a definir el producto S sub 0 y el S sub 1, el
+producto para legítimo o no spam y el producto para spam. Vamos al primer caso.
+Recuerden que yo quiero hacer esto. Ya, este es el nivel de clase y ahora
+estoy elevando un nivel al nivel total. Entonces, tal como hacíamos antes, si fijan
+acá, esto era la frecuencia que lo equiparábamos con la probabilidad de que
+sea spam, por la probabilidad de que tenga la palabra oferta dado que es spam.
+Y acá la frecuencia de que sea legítimo, por la probabilidad de que
+tenga la palabra oferta dado que es legítimo, ahora lo estoy extendiendo y
+cómo lo estiendo? lo estiendo de manera en términos de un producto, entonces
+primero cuánto es la probabilidad de que un mensaje sea clasificado como
+legítimo? 80 de 100 porque son 80 de mis 100 datos
+dentro de los mensajes que son legítimos cuántos tienen la oferta?
+la mensaje oferta, la palabra oferta dentro del mensaje, o sea 8 sobre 80 y
+dentro de esos 80 cuántos no tienen enlace 64 sobre 80 si se fijan estoy
+haciendo exactamente esto pero le multipliqué un peso
+esa expresión que está abajo es esta cantidad
+multiplicada por el peso de que sea legítimo o spam, ya en este caso empezamos
+por legítimo, estamos aquí, entonces primero probabilidad de que sea legítimo, probabilidad de que
+tenga el mensaje tenga la palabra oferta dentro de los legítimos, probabilidad de que no tenga
+enlace dentro de los legítimos y de igual manera hago lo mismo, cuánto es la probabilidad de que
+sea spam, 0.2 porque son 20 de 100, dentro de los que son spam, cuántos tienen la palabra oferta?
+0.8 porque son 16 de 20 y dentro de los 20 mensajes de spam, cuántos no tienen enlace?
+Que son 6 de 20. Multiplicando eso me da 0.064 para el producto de la categoría legítimo y 0.048
+para el producto para la clase spam
+ahora voy a volver a lo que al objetivo que yo quiero
+acuerdo yo estoy tratando tratar mi objetivo es clasificar las observaciones
+o nuevos correos que contienen la palabra oferta pero no tienen enlace
+entonces lo que yo tengo interés de hacer es obtener una probabilidad o
+predecir la probabilidad de que un correo sea spam
+dado que el mensaje tiene la palabra oferta y además no tiene el enlace
+porque si se fijan eso es algo que tiene utilidad el
+clasificar o no que un mensaje sea spam o no
+Así entonces, por eso esto lo sabemos.
+A ti te llega el mensaje y tú sabes y puedes decir, bueno,
+¿tienen la palabra oferta? Sí o no. Y ¿tienen enlace? Sí o no.
+Esto lo vas a saber, entonces lo estamos dando por dado, por hecho,
+por consecuencia está condicionado a eso. Es decir, la probabilidad, ahora entonces
+que estamos interesados en calcular, es la probabilidad de que sea spam,
+pero condicionado, aquí un mensaje tiene la palabra oferta y no tiene el enlace.
+¿Cómo calculamos eso?
+Dividimos el producto de spam, porque eso es lo que queremos calcular,
+sobre la suma de ambos productos que son todos los casos posibles.
+y esto nos va entonces .048 sobre la misma cantidad más .064
+y eso nos da un 42.86% de que clasifiquemos un correo que tiene la palabra oferta
+y no tiene enlace como spam. Ahora, esto es el predecir, estamos definiendo una probabilidad
+pero no hemos tomado una decisión porque yo voy a definir, bueno esta es una
+probabilidad alta o no, y eso va a depender del contexto del problema
+entonces
+vamos a considerar otros escenarios, pensemos que sólo es oferta, sólo oferta
+0.16 sobre 0.08 más 0.16 que fue el primer caso que vimos ya que sea spam
+dado que es que contiene la palabra oferta
+ahora
+si en un mensaje veo que
+tiene la palabra oferta pero no tiene enlace, hago el cálculo y voy a pasar a
+42%, 43 casi, de probabilidad de clasificarlo como spam.
+Ahora vamos al tercer caso, si es que observo un mensaje, tiene la palabra
+oferta y tiene enlace, entonces la probabilidad de ser clasificado como spam
+es de un 87.5%
+entonces es que tijan observar si es que hay enlace o no me detalló aún más las
+probabilidades
+entonces mientras claramente ese no siempre el caso ya porque
+puede que yo observe algo que no me afecte en nada
+la clasificación que yo estoy interesado en hacer.
+Entonces, si se fijan estos valores que están aquí, el punto medio es relativamente
+similar a este que está acá. No es exactamente lo mismo,
+exactamente, pero tienden a ser más menos en ese orden.
+entonces me está aportando preguntarme si el mensaje tiene hipervínculo o no
+como calculo la última de abajo ya que no la habíamos visto y se fijan acá es
+que primero ese 20 sobre 100 es la frecuencia y por
+consecuencia la probabilidad de que sea spam
+sobre la 16 sobre 20 que hace referencia a la oferta y 14 sobre 20 que son los que
+tienen enlace dentro de lo que son spam y el caso legítimo 80 sobre 100 porque
+es la frecuencia de que sea legítimo y que además tenga oferta la palabra oferta 8
+sobre 80 y 16 sobre 80 que ese 16 es la referencia a cuántas observaciones tiene
+mi enlace, hago la misma idea de arriba y voy a llegar al valor.
+Ahora, si se fijan, ¿qué es lo que tenemos? Podemos concluir acá. Si yo no observo y no,
+digamos, utilizo la información de si es que es enlace, hay enlace o no, por
+consecuencia, desconozco si es que el mensaje tiene un enlace o no. No es lo
+mismo que, digamos, no observar si es que tiene el enlace o no, porque aquí ni siquiera lo registro,
+aquí lo registro y digo no tiene el enlace o si tiene el enlace, entonces en este sentido esto me
+está dando unas probabilidades que son distintas en principio, no puedo decir cuál es mejor porque
+eso va a depender de las observaciones futuras. Ahora, estas probabilidades
+claramente son distintas y todas responden a lo mismo, la probabilidad de
+que un mensaje sea clasificado como spam, condicionado a ciertas cosas, el primero
+con que está la palabra oferta, el segundo con que está la palabra oferta y no hay enlace
+y el tercero con la palabra que está oferta y sí tiene enlace.
+Todas son probabilidades distintas pero son la forma en que yo lo estoy
+prediciendo aún no tomo esta decisión porque por ejemplo yo puedo decir si es
+que la probabilidad
+en el término de mi primer ejemplo la probabilidad de que sea spam dado que el
+mensaje tiene la palabra oferta es mayor que 0 5 mayor que el 50% entonces
+efectivamente lo voy a clasificar como spam
+pero lo podría clasificar como spam en el caso en donde sólo veo y estoy
+interesado y de registro si que tiene la palabra oferta y si que tiene la palabra
+oferta y además no tiene enlace. En este caso no lo clasificaría como un spam.
+Entonces va a depender mucho de su umbral la decisión, la predicción y la decisión
+son cosas distintas, una alimenta a la otra, eso sí.
+ahora algo que les comentaba antes qué pasa si
+una de las señales no están mi conjunto de datos
+pongamos el caso hipotético palabra premio que no podría decir bueno
+si sale la palabra premio es más probable que sea spam que un correo
+legítimo porque uno no se gana premios todos los días pero en spam siempre te
+ofrecen premios. Uno podría conjeturar eso. Entonces,
+pensemos que la palabra premio no salió en ninguna, en ninguno de los mensajes o
+de los 20 mensajes que están definidos como spam.
+Entonces, la probabilidad de que sea premio dado que es spam es 0 sobre 20
+porque nunca pasó. Entonces esto es 0. Ahora, si hay un correo futuro que no está
+mi conjunto de datos que sí contiene la palabra premio, cuando yo hago el cálculo
+que está acá, porque si se fijan es multiplicar cosas y una de estas en este
+nuevo caso que es la probabilidad de que sea que tenga premio dado que es spam
+va a ser 0, entonces me va a anular toda esa probabilidad
+y eso es un problema porque el ponerle el 0 significa que yo estoy asegurando que
+no puede pasar, siendo que en realidad simplemente no está en mi conjunto de
+datos. Entonces necesitamos evitar que pase eso y lo vamos a hacer con una metodología
+que se llama el suavizamiento de Laplace. Entonces, ¿qué es lo que voy a hacer?
+No voy a tirar las cosas a cero, sino que voy a darle un pequeño peso, pero voy a
+compensar todas las clases. Entonces, este suavizamiento de Laplace, voy a
+agregar 1 a presente de la señal y a 1 a ausente de la señal. Entonces, para el
+caso de premio, en el caso hipotético, nosotros sabemos que no en nuestro
+conjunto de datos no está la palabra premio. Por consecuencia, observe 0
+presencia de esa señal, este 0 que está aquí.
+Recuerden que estamos calculando la probabilidad de premio dado spam.
+entonces que en esencia es contar cuántas mensajes tiene la palabra
+premio dentro de los 20 que son spam y lo que habíamos hecho era sacar 0 sobre 20
+porque son 0 mensajes con la palabra premio dentro de los 20 que son spam
+pero ahora quiero hacer este suavizamiento entonces a este 0 presencia yo
+le voy a sumar 1, entonces voy a decir que no he observado nada pero voy a hacer como que
+observé uno, un mensaje con la palabra premio dentro de los 20 más 2 porque
+agregué uno a la presencia de señal y uno a la ausencia de señal
+entonces que estoy haciendo acá? estoy como inventándome un dato, pero no un dato
+porque esta es la probabilidad de que observe premio y no observe premio
+dentro de spam, eso es lo que estoy definiendo. ¿Qué me permite hacer eso?
+¿Cuál es la consecuencia? Es que no voy a tener una probabilidad 0 y por
+consecuencia no se me va a ganar toda la probabilidad
+pero igual esa probabilidad va a ser chica, si se fijan acá me entrega 0.0455
+y después cuando la multiplique por otra cosa va a ser más chico a 1.
+Entonces, pasé de una probabilidad cero, que no sirve de nada porque al final voy a predecir
+puras probabilidades ceros, a una probabilidad más chica, pero que no
+simplemente hace ver que es imposible que pase, sino que solamente le da o le asigna
+una probabilidad muy pequeña. Ahora, este 1 que le sumamos al peso del
+caso de la presencia de señal y la ausencia de señal, se fijan estoy
+sumando 2 por eso porque es 1 y 1, es un parámetro, un parámetro que yo le
+definí como lo voy a definir con alfa y aquí este alfa es 1, yo podría hacerlo
+con 2, con 3, con 4, cualquier otro número en este caso ni siquiera tiene que ser
+entero podría ser 0.5
+entonces esto es lo que nosotros llamamos el suavizado suavizamiento de
+Laplace, entonces ahora voy a reconstruir
+el ejemplo que habíamos visto con dos señales que habíamos calculado acá con
+oferta y enlace pero con el suavizamiento entonces
+habíamos visto que dentro de los mensajes legítimos no spam que eran
+80 de los 100 8 tenían la palabra oferta presente
+vamos a volver acá 8 tenían la palabra oferta dentro de los
+dentro de los 80 legítimos
+y así lo calculamos antes 8 sobre 80
+está aquí 8 sobre 80
+pero ahora quiero hacer este suavizamiento entonces 8 sobre 80 va a pasar con un
+alfa igual a 1 8 más 1 sobre 80 más 2
+y no es que tenga 82 observaciones legítimas pero uno podría decir bueno
+estoy como agregando dos observaciones pero lo que estoy cambiando es la
+porción
+así entonces ahora de pasar de 8 sobre 80, que me da 0,1, a un 9
+sobre 82 hago la misma idea la misma metodología con
+el enlace ausente le sumo 1 arriba le sumo 2 abajo le sumo 1 una unidad en el
+numerador y 2 en el denominador y así para todas estas cuatro valores
+y ahora entonces este 7 sobre 22 es el valor que está acá son spam sin enlace
+7 ya es spam sin enlace 6 perdón 6, que es 20 menos 14
+más uno del suavizado 20 de los spam que son observados son 80 de los 100 y el 2
+que viene del suavizamiento, si se fijan esto me cambia las probabilidades que
+voy a estar asignando. ¿Qué es lo que va a hacer?
+Va a hacer que los eventos que son muy atípicos no queden con
+probabilidad 0 y los eventos que son muy frecuentes sean considerados un poco
+menos frecuentes. Ahora, hago la misma idea, calculo el producto para
+legítimo, el producto para spam, si se fijan esto es el 0, que es el equivalente
+que hicimos acá, voy a calcularlo pero con estos nuevos valores, si se fijan es
+0.8 por 9 sobre 82 por 65 sobre 82 y antes que lo que hice
+0.8 por 8 sobre 80 ya que en la nueva versión suavizada es 9 sobre 82 y en el
+enlace 64 sobre 80 y acá en la nueva versión perdón es 65 sobre 82
+Si se fijan acá llegué a un 0.069 y antes llegué a un 0.064.
+Calculo, hago la misma metodología, el mismo cálculo para el producto de spam,
+probabilidad de que sea spam, por cuántos son ofertas dentro de los que son spam
+y aplicando el suavizamiento, es decir, sumo 1 arriba, sumo 2 abajo, lo mismo para
+enlace y me llega a 0.049, realizo el mismo caso, el mismo ejemplo, el mismo
+cálculo que lo que hace es clasificar, digamos, la prueba o definir, establecer
+la probabilidad de que sea spam dado que yo observe la señal de que hay un
+mensaje o el mensaje contiene la palabra oferta y además no tiene enlace, va a ser
+este cociente me va a dar 0,414, entonces pasé de un 0,4286 a un 0,414
+este es un suavizamiento para evitar 0, no va a haber probabilidades 0, pero me va a corregir
+estas probabilidades, en ningún caso va a arreglar la dependencia entre las
+señales porque nosotros estamos dentro del contexto de Naive Bayes, estamos bajo
+supuesto de independencia, por lo que este suavizamiento lo
+utilizamos cuando tengo alguna señal que es muy anómala, muy poco frecuente
+pero que sí pasa, porque así no hace ver que no puede pasar nunca.
+Entonces,
+ahora tenemos que hacer esta separación de
+predecidido y decidido. Entonces, ¿cómo voy a hacer eso? Yo voy a tener un conjunto de datos
+de correos, de correos que yo voy a clasificar y en principio voy a clasificar manualmente,
+que es lo que se hacía antiguamente. Voy a clasificar un correo y yo lo voy a definir como
+spam y de hecho por eso ustedes tienen, cuando ustedes ven su correo y tienen la opción botón
+derecho y poner marcar como es lo que están haciendo y es marcar un correo y
+clasificarlo o etiquetarlo, ya manualmente porque a priori
+estos modelos se basan en datos y estos datos me van a definir alguna probabilidad
+y yo tengo una decisión pero necesito esos datos entonces tengo que tener las
+características del mensaje o el mensaje mismo que lo puedo resumir en
+distintas características para definir si es que definir las probabilidades de
+que sea spam o no. Entonces cuando usted aprieta en esto marcar como spam lo que
+están haciendo es clasificar una observación más de esta cosa.
+Entonces primero hay que contar cuántos correos hay en cada clase. Ya nosotros
+hicimos la dicotomía spam y no spam o legítimo y dentro de cada
+una de estas clases, tengo que definir las distintas señales. En el ejemplo que
+nosotros vimos, vimos dos señales. Presencia de la palabra oferta y
+presencia de el enlace o no. Yo puedo contar esas cosas, obtener probabilidades,
+puedo hacer el suavizamiento de Laplace, que va a tener el modelo y con eso puedo
+estimar la probabilidad del clasificador de lo que yo quiero hacer.
+recuerden que estamos haciendo la probabilidad de que sea spam dado que
+estas tiene el mensaje tiene la palabra oferta y no tiene enlace. Ahora, eso me
+entrega una probabilidad, me entrega una probabilidad como esto 0.41
+y si fijan cómo lo voy a aplicar en un nuevo correo, imaginemos que esto que está acá
+para esta probabilidad entonces si yo hago un correo nuevo primero voy a ver
+tiene la palabra oferta? si y si no tiene y si no tiene enlace entonces
+voy a decir automáticamente entonces la probabilidad que sea spam es 41.4
+esa es la forma de utilizar esta metodología
+ahora con nuevos datos yo puedo recalcular estas cosas y con la cantidad
+de información que se tiene hasta el día de hoy bueno hay nuevas formas de
+de detectar el spam
+se ha, digamos, sofisticado bastante esto, pero yo lo hace con
+muchos datos, son bastante certeros, digamos, en el sentido de que tiene una precisión
+super alta.
+Así lo clasifico, dado que yo puedo analizar estas características de
+presencia o no, un nuevo correo puedo decir, puedo ver, tiene la señal 1, sí o
+tienen la señal 2 si o no, tienen la señal 3 si o no y con esta metodología
+yo puedo calcular todas esas posibles combinaciones
+y en base a eso definir una probabilidad, una vez que defino esa probabilidad yo
+me defino un umbral para clasificarlo efectivamente como
+spam o no. Ahora, yo puedo entrar ahí a lo que vamos a ver un poquito más adelante que es la
+función de costos. ¿Qué tan seguro quiero estar para clasificar un correo
+como spam. Y si se fijan acá en este en R y en Python lo puedo escribir
+fácilmente digamos en este ejemplo porque en esencia son cocientes ya son
+divisiones que las puedo calcular rápidamente sin entrar en ningún uso
+de un paquete si bien al final vamos a ver paquetes particulares que lo
+hacen de manera automática
+es simplemente divisiones y multiplicaciones de cosas
+entonces no tenía ningún problema
+en ambos lenguajes nos entrega el mismo valor
+porque no son cálculos complicados
+ahora, esta pequeña discrepancia que yo tengo
+si lo hago sin suavizado o sin suavizamiento
+y con un suavizamiento con un lambda igual a 1
+igual a 1 si se fijan sin suavizado la probabilidad de que sea oferta entre los
+datos que tiene un spam es de 0.8 y con el suavizamiento pasó a 0.77, y
+en el caso del enlace me lo pasó de 0.7 a 0.68 y a modo global me cambió casi en 1%
+el porcentaje de interés
+cuál es mejor, ya, en general un suavizamiento, sobre todo el suavizamiento de Laplace, lo ocupamos
+cuando estamos interesados en saber esa, en no, en considerar una señal que es anómala, porque si
+esa señal es muy indicadora de que por ejemplo sea spam, no se me ocurra algo en el momento de,
+de, por ejemplo, piensen en una página web que te sabe que es, digamos, estafa de alguna
+manera y yo pongo como señal el nombre de esa empresa si es que está presento o no en el mensaje
+puede que no pase mucho porque puede que no manden muchos mensajes pero cuando pasa yo sé y estoy
+muy seguro, por algo que él incorpora en el modelo, de que va a ser un spam.
+Entonces, si tengo muy pocas observaciones, voy a tener una probabilidad
+cero de que obtenga, de que tenga esa palabra que va a ser el nombre de la
+empresa que estafa, digamos, y por consecuencia no quiero que se vaya cero
+porque es un indicador, es una señal muy fuerte de que es spam, solo que esa
+señal pasa poco y cuando no quiero tirar esas señales que son fuertes de
+mi identificación y la predicción de mi clase de interés
+no la quiero tirar a ser y quiero mantenerla en el estudio entonces un
+suavizamiento es justificable si no estoy en ese caso las y sobre todo con un lambda
+pequeño, las probabilidades estimadas ya no difieren tanto. Entonces, en la mayoría
+de los casos un suavizamiento no es imperativo, solo es relevante cuando
+tengo clases que son muy anómalas y las quiero incorporar dentro del estudio.
+Entonces
+Si se fijan acá, yo puedo calcularlo de ambas maneras, ya puedo calcularlo con suavizamiento
+y sin suavizamiento y al final de esta sesión vamos a hablar de cuáles son los paquetes
+que tenemos de manera, o que tenemos disponibles en Python y R que realizan esto de manera
+un poquito más automatizada con funciones particulares.
+Entonces
+¿Cómo lo hacemos? Resumen de este naive Bayes.
+Si ocupo, pensemos en el correo. Estamos interesados en clasificar mensajes
+que tienen la palabra oferta y no tienen enlace y con un suavizamiento
+lambda igual a 1, o sea un alpha igual a 1. Entonces, ¿cuáles van a ser las cantidades de entradas?
+Primero, lo que observamos en los nuevos mensajes, es decir, para un nuevo mensaje
+voy a ver si es que tiene la palabra oferta y si es que tiene enlace. Si es que tiene la palabra oferta
+y no tiene enlace, entonces cae dentro de la probabilidad que yo estoy definiendo.
+antes de eso yo voy a tener que calcular las probabilidades de que sea spam y vimos que afectaba
+ya afectaba la probabilidad que sea spam no condicionada ya no condicionada que es 0.2
+porque si esa frecuencia es muy anómala también también me cambia la probabilidad y voy a ver
+dentro dentro de esa clase las distintas señales en este caso oferta en spam y voy a combinarlas
+de la manera que lo hicimos para estimar esa probabilidad de interés.
+Si se fijan lo que estoy haciendo en esto es una forma un poquito más
+sofisticada de esta pregunta. Utilizando oferta dado spam, oferta dado
+legítimo, quiero preguntar al revés. La probabilidad que sea spam dado que es
+dado que tiene oferta. Pero acá en el último ejemplo lo hice con más clases.
+Eso es lo que hacemos en general, en realidad para el
+ejemplo en particular. En general, pensemos que en nuestro ejemplo nosotros
+definimos dos clases, spam y no spam, porque lo que estábamos haciendo es un
+Bernoulli, que pasa o no pasa y lo que estamos haciendo es definir dos clases
+igual a 1 y igual a 0, es decir, si es spam o si el mensaje no es spam
+qué pasa si ahora tengo varias clases ya como yo les comentaba al principio
+spam, no spam o tipos de clase por ejemplo cuenta financiera, mensaje
+personal, correo académico
+ahí ya no tengo dos categorías, simplemente tengo tres clases y cómo lo hago para K
+clases ya entonces voy a tener K, voy a tener clase 1, clase 2 hasta la clase K
+por ejemplo spam, personal y trabajo y voy a tener entradas de correo, entonces
+qué es lo que voy a hacer yo voy a definir la probabilidad de que pertenezca
+a la clase K que va a ser que la y sea C sub K que es el equivalente de
+estas probabilidades que hemos definido 0,2 y 0,8, es decir cuánta es la
+frecuencia de esa clase dentro de mis datos
+y voy a definir f sub k que es la probabilidad de las entradas x dentro de esa clase que hace referencia
+el equivalente a esta cantidad, la multiplicación de estas cantidades que en esencia bajo Naive-Bayes
+la multiplico porque estoy bajo el supuesto de independencia
+y después la sumo, todas las posibles cantidades
+esto es la forma general de Naive Bayes pero para k clases
+antes el ejemplo que nosotros lo hicimos es para dos clases y lo único que va a
+cambiar ahí va a que va a tener que ser por ejemplo si tuviésemos acá una
+tercera clase sería s1 sobre s0 más s1 más s2
+tal como lo hacemos acá porque esto es para un k particular y esto sumado en
+todos los K, entonces si tengo tres, caigo en la tres, abajo voy a tener tres
+elementos, tres productos y arriba va a tener sólo uno.
+Es la generalización, acá clases es bastante natural, simplemente divido de
+una clase adicional y se fijan tiene sentido, si yo tengo
+señales de un mensaje por ejemplo
+de un correo y yo antes estaba en el ejemplo spam y no spam, entonces las probabilidades
+eran pensemos fijas, la definí como el 0.41, pero si ahora esta probabilidad que definí
+yo acá, oferta y no enlace dado que sea spam, spam en este ejemplo era una de dos clases,
+spam es 1, una sobre k clases, entonces tengo más opciones en las cuales clasificar y por
+consecuencia más opciones en las cuales equivocarnos, entonces como estas cantidades de abajo son
+positivas, este número va a tender a ser más chico porque hay más formas en las cuales me puedo
+equivocar, hay más formas en las cuales yo puedo clasificar un mensaje con una cierta configuración
+de señales. Entonces tiende a ser más
+chico cuando tengo más clases y por eso
+también quiero clasificar
+en general en pocas clases y de
+obviamente en una clase binaria. Es decir,
+paso no pasa. Entonces yo me tengo que
+preguntar bien qué es lo que quiero
+clasificar. Si bien lo puedo implementar
+para K clases, tengo que definir
+claramente las probabilidades dentro de cada clase y las clases.
+Entonces, en general es recomendable tener menos clases
+dentro de mi conjunto de datos que yo pueda estudiar. No obstante, en el ejemplo
+que vamos a ver, más adelante, es con muchas, o sea, con varias señales,
+a bastantes señales dentro. Entonces, ¿cómo lo formalizamos? En naive Bayes, porque esto,
+si se fijan acá, está definido como la distribución conjunta, entonces es sin el
+supuesto, es decir, esto es el equivalente de esta cantidad. Cuando lo hacemos en naive Bayes,
+que es lo que voy a hacer, ese f sub k es la multiplicación de estas distribuciones
+marginales, que es lo mismo que hicimos antes, solo que con d igual a 2, aquí es
+de modo general, entonces este f de k ahora va a ser reemplazado por una
+multiplicación de probabilidades, y sigue siendo la inmediata porque también lo
+reemplaza abajo. Si pongo de igual a 2 me encuentro en la expresión que tenía antes.
+Ahora tengo que poner a prueba esto, poner a prueba lo que hice, estas probabilidades.
+Nosotros dijimos que la probabilidad de que sea spam dado que tenga una cierta
+configuración es 0.414 con el suavizamiento y para un correo con
+oferta y sin enlace
+y ahora quiero volver a algo real ya entonces voy a ocupar el conjunto de datos
+que está disponible en el Moodle son 4.601 correos
+que vamos a hacer esta metodología y la vamos a implementar entonces ahora vamos a ir un
+pequeño break de unos 15 minutos más o menos, podemos volver a las 12.15 y a las
+12.15 implementamos esta metodología pero a nivel más mágico, ya no son no
+sólo 100 datos sino muchos más datos y tanto.
+Volvemos a unos 15 minutos.
+[Pausa: recreo hacia 1:26:33 del video aprox. El video no contiene el tramo del descanso (no hay silencio ni audio intermedio); la clase continúa directamente con el regreso del recreo.]
+Entonces, ya construimos, digamos, este clasificador, esta predicción en términos de las frecuencias
+observadas dentro de las distintas clases con sus distintas señales en un conjunto
+de datos.
+Ahora, tenemos que evaluar a los datos reales, ¿sí?
+No vamos a tener 100 datos, vamos a tener 4.600 datos.
+esta receta digamos que tenemos va a contener lo que acabamos de hacer, la misma metodología,
+pero ajustando obviamente las clases y las señales a lo que observemos en el conjunto
+de datos y este conjunto de datos va a tener 54 señales, ya, contiene bastante más señales que antes,
+tenemos un sinfín, 2 a la 54, observadas de distintas categorías por lo cual tenemos que tener cuidado,
+Ahora tenemos que implementar esto, lo vamos a implementar y le está el código disponible
+en el Moodle. Entonces, ¿qué tenemos en nuestra base de datos? Que en las bases de spam tenemos
+48 frecuencias de palabras. Es decir, ahora no estoy considerando la presencia o no de
+una o dos señales o una o dos palabras o si tiene un enlace o no, sino que estoy definiendo
+frecuencias, que también la puedo poner, o sea, si yo sé que pasó una palabra hasta
+diez veces, igual la puedo considerar que está presente, pero estamos de cierta manera
+no utilizando toda la información. Entonces, ¿qué vamos a utilizar? Las 48 columnas que
+son las frecuencias de las palabras que tenemos disponible.
+Entonces, vamos a ocupar esas frecuencias con distintas palabras dentro de los
+mensajes de los correos para describir su contenido.
+Vamos a tener seis frecuencias de caracteres, por consecuencia sumando los
+54 señales y vamos a tener etiquetados los correos.
+Entonces vamos a ver cuáles son spam y cuáles no lo son de antemano.
+Y esa es la diferencia de la clasificación que teníamos antes.
+Ya aquí tenemos una etiqueta antes cuando hacíamos k-means, que lo hicieron con Pedro
+o otro tipo de clasificadores no supervisados al principio.
+No teníamos esa clasificación y esto es lo que nos permite hacer este tipo de metodologías.
+¿Qué vamos a utilizar?
+Vamos a estar en el mismo contexto del problema, clasificar las mensajes como spam o no.
+entonces, si ustedes ven la base de datos, que la tenemos por acá, ustedes la pueden
+ver, si se fijan acá tengo señal, tres tipos de señales, o tres señales de las 54, por
+ejemplo la palabra free, tengo la frecuencia, el 0.32% de las palabras, en el primer mensaje
+0.32% de las palabras es free y ahí estaría ocupando la
+frecuencia pero con la metodología que nosotros hicimos nosotros necesitamos
+saber si es que la señal está presente o no ya no saber cuántas veces está la
+palabra free sino que si está presente la palabra free o no lo mismo para la
+palabra money significa no hay una frecuencia registrada y por consecuencia
+está ausente y el carácter de exclamación está presente el 0,778% de los caracteres y
+si lo defino con una indicadora, pasa o no pasa, caso Bernoulli, esto sería un 1.
+Ahora, vamos a ocuparlo con la presencia o no de las observaciones, para utilizar la
+metodología que hicimos antes. Entonces, si se fijan, ustedes lo pueden ir
+ejecutando, a la vez están los códigos disponibles.
+¿Y qué tenemos acá? Tengo un X que tiene 3.680
+correos y 54 frecuencias y el Y que son su etiqueta
+spam o legítimo, vamos a ocupar estas 54 frecuencias
+fíjense acá, porque es 3680? porque quiero probar qué tan bueno este
+clasificador, entonces voy a dejar un resto de 921 correos
+que no voy a utilizar para probar si lo que estoy haciendo
+está dando buenos resultados. Y aquí voy a ocupar la metodología de validación
+cruzada, por consecuencia voy a tener que, luego, voy a hacer y calcular, digamos,
+las predicciones fuera de pliegues. En este caso voy a hacer cinco pliegues y
+después lo voy a evaluar en estos cinco pliegues, voy a calcular el
+clasificador comillas y luego lo voy a evaluar en el conjunto de prueba de 921
+observaciones
+entonces
+cómo calculo la probabilidad voy a ocupar esta función que se llama
+ajustar predecir que la programada está en el código digamos y lo que hace es
+calcular que no tanto detalle porque ya describimos la metodología
+con la probabilidad de que sea spam dado las características que tiene el mensaje
+entonces para el ID1 por ejemplo vuelve con una probabilidad de 0.9954 de que sea spam
+y se fijan acá
+uno podría decir, bueno, con las otras señales en conjunto se puede llegar a un consenso
+eso digamos de que lo más probable es que sea spam y esta metodología de Naive Bayes
+no lo hace ver. Entonces,
+si se fijan,
+en esta metodología puedo hacerlo para cada observación, pero me voy a hacer una
+pregunta distinta. En toda la metodología de Naive Bayes nosotros definimos si es
+que está o no está la presencia, porque estamos siendo como, estábamos modelándolo
+como una variable Bernoulli. Y la frecuencia de la palabra free, en el primer id es 0.32.
+Ahora, ¿qué es mejor? ¿Utilizar el que sucede o no, es decir, la presencia o su frecuencia,
+que es 0.32%? 0.32%. Entonces, en la presencia voy a ver si es que está o no la palabra
+y en la frecuencia voy a ver la proporción que representa esa palabra dentro de todas
+las palabras posibles. Entonces para el caso de Bernoulli, si aparece una o cinco veces o
+diez veces es lo mismo, es la misma observación porque solo está viendo si es presente o
+no. En cambio la frecuencia me conserva, digamos, la proporción propiamente de la que yo voy
+tener a disposición cuando leo un correo y lo tabule en términos de las
+características y señales que yo define. Entonces, aquí hay un detalle, en la
+frecuencia que está viendo en la esencia 0.32 es
+más detalle porque si yo sé que pasó un 30% una vez, si yo sé que lo menos pasó
+una vez y por consecuencia está presente, entonces me está entregando una mayor
+información, pero para yo analizarlo voy a tener que hacer supuestos
+adicionales sobre los datos. Tenemos que ver empíricamente si es que
+efectivamente mejoran las probabilidades y yo estoy calculando.
+Entonces, antes estábamos viéndolo como sucede o no sucede, ahora
+voy a hacer que en lo que estábamos haciendo una variable Bernoulli, porque estaba
+pensando lo que en presencia y no presencia en una variable dicotómica
+ahora lo voy a ver cómo
+una... voy a utilizar la distribución gaussiana para describir ese pasar del
+pasa no pasa al cuántas veces, cuántas veces pasa en términos de una proporción
+eso le vamos a llamar Naive Bayes gaussiano
+los valores que toma esa variable la voy a describir como una curva normal
+dentro de todas las clases que yo estoy definiendo en este caso spam y legítimo
+que va a aprender que todo esto aprenden de las probabilidades o las frecuencias
+propiamente tal y en este caso de la de la frecuencia en términos relativos
+va a definir una media una dispersión en qué es lo que va a evaluar cómo lo va
+predecir, él es midiendo digamos las alturas o evaluando las alturas en cada
+uno de los correos, ya, de la densidad en principio.
+Esta altura es la densidad digamos que yo voy a haber observada, ya, y no
+necesariamente va a ser una, la probabilidad de un valor exacto, ya, por el hecho de que
+lo vamos a considerar continuo, ya. Entonces, ¿cómo lo definimos esto? Ahora, estas
+frecuencias, por definición son no negativas porque a lo más pueden ser 0 y a lo más pueden ser 1.
+0 significando que nunca no está la palabra y 1 que todo el mensaje en su totalidad es la misma palabra.
+Y estas frecuencias pueden ser de distinta magnitud porque va a depender de la longitud del mensaje,
+ya, entonces pueden ser muy grandes. Entonces en este caso gausiano, que lo vamos a utilizar,
+vamos a hacer una transformación. Esta frecuencia la vamos a incorporar dentro
+un logaritmo. El logaritmo de 1 más la frecuencia fundamental, 1 más X.
+Y ahora, tras esa transformación, si te fijan acá, en la palabra o la señal de
+la palabra free en el conjunto de datos tengo una frecuencia de 0.32 y ahora yo lo
+voy a transformar a 1 más 0.32 que va a ser logaritmo de 1.32 que me da 0.277
+y luego lo mismo con el con el con la palabra money que es 0 y si se fijan
+aquí sale el 1 porque si no haría el logaritmo de 0 ya que no puedo sacarlo
+entonces logaritmo de 1 por eso estoy sumando 1 para que la transformación
+tenga sentido entonces esta transformación que lo que hace los valores
+muy grandes los achica conserva los ceros lo que era 0 antes sigue siendo 0
+después y se fijan acá estos 0 sigue siendo 0 si algo no pasa no va a pasar
+después o no hay una sino no una no hay una tiene frecuencia 0 va a tener una
+nueva frecuencia 0 en esta nueva
+valor transformado z
+y vamos a aprender todas las cosas en
+términos de esa escala, esa va a ser la
+nueva nuestra nueva frecuencia con
+esa transformación. Transformar no me no me va a
+asegurar que voy a estar trabajando
+efectivamente con distribuciones
+normales, yo voy a utilizarlo de manera
+utilitaria para hacer Naive Bayes.
+Ahora
+Veamos, pensemos que tengo un mensaje que dice oferta hoy y otro mensaje que
+dice oferta oferta hoy, entonces ¿cómo lo voy clasificando?
+si el mensaje es oferta hoy, la frecuencia de oferta es 1, la frecuencia de
+reunión es 0, la frecuencia de hoy es 1, entonces 1 0 1
+para el mensaje oferta oferta hoy va a ser 2 0 1
+entonces si lo trabajase como en el caso Naive Bayes Bernoulli y estas dos estos dos
+mensajes tendrían la misma codificación sería 101 y 101 porque
+estoy viendo la presencia y en el caso multinomial ya es cada una de esas o
+cada aparición va a presentar o aportar un factor adicional.
+Entonces, en el caso multinomial voy a ir contando las palabras dentro de cada
+clase y voy a en esencia conservar esas repeticiones y en el caso Bernoulli
+no los voy a considerar igual, que parezca una o más veces para hacer la
+misma variable. Entonces, resumiendo, si tengo 54 frecuencias, o sea 54 señales
+perdón, allí dicen señales
+en la variante de Naive Bayes que es Bernoulli, voy a considerar si está
+presente o no las distintas señales, y la decisión en ese caso va a ser usar
+las frecuencias positivas o en
+equivalente a ser un suavizamiento en
+la variante gaussiana voy a tener
+mediciones numéricas que yo voy a
+transformar para hacer Naive Bayes y con
+eso calcula las probabilidades. Y en la
+variante multinomial voy a contar el
+número de veces que pasa en vez de
+considerar la frecuencia. Entonces aquí es
+uno o cero, aquí va a ser la
+transformación logaritmo uno más x, en
+donde X es la frecuencia y en la última, la multinomial, voy a considerar la frecuencia de
+las palabras y eso va a requerir información adicional. Entonces en general
+nos vamos a trabajar con Bernoulli o con Gaussian, porque si se fijan acá si
+trabajo directamente con un porcentaje ya
+no voy a saber si yo le digo el 50% del mensaje es
+la palabra hola. Ustedes no saben cuántas veces ocurrió hola, solo saben que la mitad
+del mensaje es hola. Entonces yo para la multinomial necesito saber cuántas veces
+ocurrió la palabra en términos absolutos y no relativos. Ya, entonces no son un
+conteo propiamente tal cuando digo la frecuencia, en el sentido en términos
+proporcionales o términos de porcentaje. Tengo que saber la longitud del
+intervalo.
+entonces si aplicamos la misma receta que hemos hecho antes con Naive Bayes
+porque la misma idea aplica para las dos metodologías lo único que voy a estar
+cambiando porque lo que vamos a estar haciendo en este caso va a ser esta
+misma, se me ha perdido la fórmula, vamos a estar haciendo esto ya solo que
+para los distintos casos estas probabilidades van a ser calculadas de
+de manera distinta, pero el esquema general es el mismo.
+Entonces, si veo la frecuencia de spam, voy a obtener una probabilidad sin usar señales,
+que sería el caso más, digamos, ingenuo de todos, es decir, no voy a considerar si
+tiene la palabra oferta o free o nada ni es que si tiene el enlace. No, simplemente voy a decir
+bueno si tengo 100 mensajes y 20 de los 100 son spam entonces la probabilidad que sea spam es 0,2.
+Ese es lo más fácil que podemos hacer porque ni siquiera necesitamos saber cuáles son las señales,
+que es el caso de clasificación sin no condicionada. Y eso lo vamos a ver como referencia.
+Porque, y aquí tiene todo el sentido práctico, porque si todas mis probabilidades me dan mal
+cuando lo evaluo en el conjunto de pruebas, en términos de simplemente sacar la frecuencia
+de la clase y simplemente jugarla con probabilidad y no hacer todo este enrollo, digamos, que estamos
+haciendo con Naive Bayes y vemos que la prueba no funciona entonces bueno
+por qué me voy a complicar la vida si simplemente puedo sacar hacer dos divisiones
+y me quede mejor ya como utilizado lo que he utilizado como clasificado no
+quiero complejizar las cosas porque si ahora Naive Bayes tiende a ser bastante
+mejor que esto porque es una referencia claramente no algo muy muy analítico
+es bastante primitivo. En el caso de la receta de Bernoulli, el Naive Bayes Bernoulli, voy a
+aprender las presencias y ausencias o presencias y no presencias y voy a
+ocupar opciones de suavizamiento. Si se fijan acá, tengo un alfa 0,5, yo puedo
+sumar, no necesariamente tengo que hacerlo en términos discreto, puedo sumarlo en
+términos de algún valor continuo. Y la receta gaussiana, lo que voy a aprender son
+las medias y las dispersiones de este logaritmo de 1 más x, que es donde x es la frecuencia.
+Entonces voy a hacer cinco candidatos y voy a ocupar una métrica para el término de la prueba
+y de la pérdida logarítmica, que la habíamos mencionado antes. Y voy a que lo que hace es
+penalizar cuando se asigna poca probabilidad a la clase que realmente ocurra. Esto lo voy a
+evaluar en el conjunto de prueba y vamos a volver a esta decisión
+porque recuerden todas estas metodologías, todo lo que me predicen ya en términos de
+que me van a dar una probabilidad para una nueva observación futura pero eso no
+necesariamente se ve traducido uno a uno con una decisión puesto que la decisión
+implica que tengo que definir un umbral y ese umbral puede cambiar en términos de
+los costos que yo define. Entonces, ¿cómo lo hacemos?
+Si se fijan acá, tengo los 3680 correos ya en nuestro entrenamiento y lo voy a
+repartir en cinco pliegues y voy a ajustar en cuatro pliegues y voy a
+predecir en el pliegue restante para tener predicciones fuera de pliegue y lo
+voy a repetir cinco veces para que cada tenga cinco pliegues o cinco
+predicciones fuera de pliegue. Luego de eso,
+voy a tener entonces las cinco recetas que son las cinco metodologías que voy a
+probar que están acá. La referencia, el Bernoulli con tres alfas y la receta de
+la gaussiana. Y por consecuencia voy a tener 25 ajustes,
+que son el cálculo de las probabilidades.
+Entonces, implemento esto, simplemente puedo hacerlo de manera iterativa, para el caso
+del Bernoulli yo simplemente voy a ir evaluando y cambiando el alfa que es la penalización
+o el suavizamiento, el parámetro de suavizamiento y voy a obtener en esencia las predicciones
+fuera de pliegue.
+estas predicciones fuera de pliegue las vamos a repetir para los distintos tipos de recetas,
+ya sea Bernoulli con los distintos parámetros, la referencia y además el caso de Naive Bayes es
+Gaussian. Entonces, cuando yo resumo eso, porque si se fijan, nuevamente son cálculos relativamente
+sencillos porque son cálculos de probabilidades multiplicadas y
+divididas, que lo vamos a ver al final como se calcula de manera un poco
+más automatizada. Y vamos a mencionar librerías que se tienen a disposición.
+Entonces, las predicciones fuera de pliegue, cuando las resumo en las cinco
+pliegues y las junto, para la frecuencia simplemente que el caso de referencia
+la pérdida logarítmica es 0,67, el brier es 0,239 y el área abajo de la curva es casi 0,5
+y si fijan tiene que ser malo porque no estamos haciendo mucho
+simplemente veo la frecuencia y eso lo asumo como la probabilidad de predicción
+sin considerar señales
+y cuando hago Bernoulli, que es el caso que andamos más hoy, con un parámetro
+del suavizamiento de Laplace 0,5, 1 y 2 me entregan valores bastante similares,
+bastante similares, entonces pareciera que el suavizamiento no es tan
+importante porque si se fijan el suavizamiento me suma en este caso a
+lo más 2 en el numerador
+y
+y 2 en el denominador, o sea 1 en el numerador y 2 en el denominador.
+Entonces el valor de esa fracción, de ese cociente, no va a cambiar mucho, por
+consecuencia las métricas de ajuste tampoco van a cambiar mucho porque las
+probabilidades de selección no van a cambiar mucho. Entonces, cuando lo
+evalúe estas metodologías en prueba, no hay mucha discrepancia entre ellas.
+Entonces, aquí cuando tengo muchos datos y las clases y las señales
+son más o menos balanceadas, el suavizamiento no es de mayor importancia.
+Por eso les comentaba que el suavizamiento lo utilizamos principalmente
+cuando tengo clases que son muy anómalas.
+Y en el caso gaussiano calcula el logaritmo de 1 más x y si se fijan me
+entrega bastante mal en términos de la
+Brier, cosas más o menos similares y el
+bastante similares, tienen discrepancia en
+muy muy pequeñas por lo cual puede ser
+eso puede ser debido a la selección de entrenamiento y prueba, por lo que
+pero en principio, si nos guiamos por esta métrica en particular, con un
+alfa 0,5 tenemos mejores, muy levemente resultados, en términos de la comparativa
+con otros Naive Bayes Bernoulli. Ahora, son muy cercanos estos
+suavizamientos, pues podemos pensar que quizás el suavizamiento no es tan
+necesario. Ahora, fíjense acá, si lo vemos
+gráficamente, los Naive Bayes son muy iguales, nos quedamos con el
+alfa 0.5, la frecuencia del spam es que nosotros dijimos que era
+ingenuo hacerlo, simplemente contar cuántos correos están etiquetados como
+spam y esa va a ser mi probabilidad. Eso nos entrega resultados mucho peores que
+hacer algo más complicado que
+general tenemos que tener cuidado de ahí
+estamos sobrecomplicando el problema
+y no nos está entregando ni siquiera uno
+de errores buenos
+que va a depender mucho también del
+umbral pero no nos está entregando muy
+buenos resultados en el Bayes gaussiano
+entonces
+si se fijan acá les planteo que el
+Bernoulli con alfa 0,5 es el mejor la
+mejor metodología y en general Bernoulli Naive Bayes tiende a ser la, al menos en
+esta, en este ejemplo, independiente, el mejor independiente del alfa. Ahora, yo les
+planteo un problema. ¿Qué pasa si yo una señal la copio? Es decir,
+para todas las observaciones, una de las señales era
+que
+era la proporción o presencia de la palabra
+free
+¿Qué pasa? si yo esa columna la copio y le pongo otro nombre
+¿Qué pasa? entonces voy a estar agregando una señal que me están entregando la misma información
+entonces, vamos a hacer un ejemplo controlado, tenemos 100 datos que son spam
+100 datos que son legítimos, por consecuencia tengo 200 correos en mi
+conjunto de datos, de los cuales 80 son spam
+una señal aparece en 80 spam y 20 legítimos
+cualquiera sea esa señal, entonces si se fijan yo hago el mismo calculo que de
+antes, la probabilidad que sea spam dado que esa señal está presente va a ser
+primero la presencia de que sea spam 100 sobre la frecuencia propiamente
+tal 100 sobre 200, 0,5 por la presencia de ese señal en spam 80 sobre 100 y abajo
+repito la misma cantidad más ahora la presencia de esa señal dentro de la
+otra clase que es legítimo 0,5 por 0,2 que es 20 sobre 100 eso me da un 0,8
+ahora yo voy a copiar esa señal es decir, señal 1 y señal 2 son exactamente lo mismo
+pero los voy a considerar distintos, si se fijan cuando hago eso y lo hacemos de la
+misma manera que lo hicimos anteriormente, como le hicimos acá, hago toda esta metodología
+de igual manera sin suavizamiento en este caso
+tendría que hacer esta cantidad 0,5 por 0,8 porque es la probabilidad de la primera clase
+recuerden que aquí estoy diciendo en Naive Bayes entonces estoy asumiendo independencia
+por la misma probabilidad de la señal 2 pero sabemos que es la misma que la primera porque
+la copia entonces estoy multiplicando 0,8 y abajo si se fijan multiplique en todos lados
+por 0,8 y acá por el 0,2 porque estoy simplemente duplicando esa presencia de la señal dentro
+de distintas clases y si fijan me subió la probabilidad de clasificar un correo spam
+ya con dos señales pero las dos señales son iguales si entonces aquí es un poco distinto
+porque antes usualmente cuando hacemos regresión y tenemos por ejemplo otro modelo y tengo
+dos predictores y son lo mismo porque me entregan la misma información, no me
+agrega mucho más en términos de la ajuste y la predicción. En cambio, en esta
+clasificación con Naive Bayes,
+la probabilidad aumenta.
+Entonces, contar dos veces una misma señal aumentó su certeza porque estoy
+dando el doble, no el doble de peso per se, pero estoy considerando
+que esas dos señales me están entregando información de identificar un
+correo como spam. Hay que tener cuidado con la representación.
+Entonces la clase la voy a mantener pero esa certeza con la que yo estoy
+prediciendo la probabilidad va a aumentar.
+Con cuatro copias de la misma clase este número aumenta
+sustancialmente entonces si yo identifico señales
+que el aprendizaje está comentario
+si yo sé de señales claras de identificación de spam entonces mi
+certeza de la probabilidad de que sea spam un mensaje en particular va a
+aumentar sustancialmente. Por eso yo quiero hacer
+naive Bayes con muchas señales porque en el conjunto, ya con muchas señales
+sin entrar a un problema que no tenga datos que lo puedan sostener, pero a lo
+menos unas tres o cuatro señales para ejemplo digamos mediano o de bajo
+problemática digamos real, porque en esa conjunción de señales yo voy a estar
+aprendiendo. Si bien una señal me puede identificar o me puede hacer que el
+porcentaje de clasificación de spam suba lo suficiente como para considerarlo,
+cuando agrego otras señales que me entregan información similar, que en
+esencia es otros comillas predictores, que le llamamos señales acá, para identificar
+la señal, la probabilidad no sube linealmente. Entonces por eso queremos
+ocupar distintas señales. Ahora, nuevamente eso es la predicción, no la
+decisión, porque yo si me pongo un umbral 0.5, 0.5 es menor que 0.99 por
+consecuencia lo clasifico como spam, porque esto me está entregando un
+número, un número de probabilidad de que sea spam. Entonces mi pregunta ahora es, ¿qué
+tan grande tiene que ser la probabilidad para que yo lo considere y lo
+clasifique como spam. Eso es el proceso de decisión y eso umbral puede cambiar.
+Si yo quiero contrastar la probabilidad que yo la asigné con lo que
+efectivamente ocurrió, si se fija acá, se fijan acá en el Bernoulli con un
+alfa 1, que era muy similar al alfa 0,5, esta línea que está en el centro es lo
+que efectivamente
+eeeh
+es cuando la probabilidad predicha y la frecuencia observada son iguales
+entonces si se fijan ahí Bernoulli está bastante más cercano que el caso
+gausiano y si fijan siempre o está muy seguro de que es spam o está muy poco
+seguro que es spam, en cambio el Bernoulli es un poco más mesurado de ese aspecto.
+Y el Log Loss lo que hace es penalizar esa sobreconfianza de tu
+clasificación.
+Siguiendo entonces, yo puedo reconstruir digamos en el conjunto de datos que
+estamos trabajando lo que hemos hecho antes. Voy a ocupar un alpha igual a 1 y
+estoy si se fijan acá estoy calculando las probabilidades de interés con
+el suavizamiento de Laplace y se fijan si yo tengo una señal que es la
+presencia o no de la palabra address favorece o pareciera favorecer el spam
+¿por qué 498 de 1450? si fijan vean en la probabilidad dentro de la clase 0,3 y la
+probabilidad dentro del legítimo 0,1 porque si dicen la dirección probablemente
+es un correo no deseado, un correo SPAM
+pero ahora eso solo de una clase yo tengo que considerar las otras 53
+señales. Romina.
+Es que le preguntaban en chat si es que no hay que hacer corrección de los datos
+dado que están desbalanceados.
+En general, si tengo clases que son muy desbalanceadas,
+voy a tener bastantes problemas porque es súper en general en estadísticas,
+si tengo observaciones que pasan
+muy anomalamente, son muy anomalas, no hay nada de lo que aprender porque recuerden
+que la estadística es de lo que yo tengo de mis datos, trato de caracterizarlo y
+predecir y todas estas metodologías son en funciones de la frecuencia
+y la única forma que tenemos de que la frecuencia o compensar las
+frecuencias que son muy anómalas son el suavizamiento y la otra forma, la única
+forma es
+modificar el conjunto de datos, ponerlo en metodologías de balanceo,
+que quiere decir que por ejemplo si tengo 20% que es spam y 80% que son no spam, yo
+voy a hacer un conjunto de datos que tengan la misma proporción, 50-50% por ejemplo,
+o subirle un poco digamos, y ahí puedo hacer, voy a escoger las 20% del spam y voy a escoger
+20 balanceos o puedo hacer un
+unas cosas un poquito más sofisticadas que voy a tratar de caracterizar esos 20
+esas 20 observaciones que son el spam y generar 30 para dejar 50 y 50 cosas de
+ese estilo ya pero luego de eso puedo ocuparlo pero después tengo que
+compensar ese balanceo que yo hice ya porque si no voy a sobreestimar cosas
+que son en realidad anómalas Claudia
+Hola, buenas noches. Volviendo dos o tres minutos atrás, cuando usted dice, cuando
+duplicó los datos, que se copió una columna sobre la otra, ¿eso no es una
+especie o lo puedo correlacionar con un sobre aprendizaje, un sobre ajuste del
+modelo? Bueno, nada que ver.
+estoy repitiendo una señal, ya, eso es lo que estoy haciendo, estoy diciendo que es como que
+observé dos cosas que en principio son iguales pero las estoy considerando distintas, ahora dado
+que yo sé que son la misma, sí es un sobre ajuste porque estoy contando dos veces lo mismo,
+que es el ejemplo que lo que quería mencionar ahí, es que si yo tengo señales que me están
+entregando, vale la redundancia, la misma señal de identificación de la clase de
+interés que en este caso es spam o no, la probabilidad no va a subir linealmente y
+va a mejorar sustancialmente. ¿Cómo lo ejemplificábamos acá?
+simplemente copiando una columna para ver o replicar el caso idóneo de que me
+entrega la misma información. Cuando tengo señales que me están entregando
+la misma información de identificación de spam, la probabilidad sube sustancialmente.
+Ahora, es sobre ajuste porque en principio porque yo sé que son iguales.
+¿Alguna otra pregunta? ¿Dudas? Ok, gracias.
+Ya, síguelo entonces. Lo de los balanceados, sí, cuando tengo de balanceamiento y hago técnicas,
+digamos, de balanceo de clases por parte de cosas muy anómalas, igual después
+tengo que considerar ese arreglo que hice, digamos, porque estoy...
+Lo que usualmente pasa cuando duplico esa metodología es que voy a
+sobreestimar las probabilidades. Después tengo que tener una forma de llevarlas al
+plano real de la frecuencia que efectivamente ocurre en esos eventos.
+Siguiendo entonces, aquí hay un pequeño gráfico de cómo se ven las distintas señales dentro de las distintas clases, es decir, la palabra free está presente en
+cincuenta y tanto por ciento de dentro de spam y casi 0,1 dentro de legítimo y así para el resto, ya estas son ocho señales dentro de las cincuenta y tres, de las cincuenta y cuatro para formar señales.
+Entonces nosotros tenemos que combinar todas esas cosas y lo hacemos de la metodología que vimos, que estamos uniendo independencia, entonces
+multiplicamos estas probabilidades que como lo vimos anteriormente
+Entonces
+para ese caso lo podemos calcular y simplemente basta
+realizar esta metodología
+Ahora hay una pregunta que es más interesante
+porque toda esta metodología independiente si ocupo en IPS,
+Bernoulli, Gaussiano, o ocupo un Bernoulli con distinto suavizamiento o la referencia misma
+van a entregar una probabilidad, van a tener una probabilidad de identificar la
+clase que yo estoy de interés, que es spam o no. Pero ahora, la pregunta más práctica
+cuándo conviene bloquear el correo antes de que entre a tu bandeja de correo y pase
+directamente a spam? porque ahora yo voy a definir si se fijan, esta era una
+clasificación binaria, por consecuencia hay dos formas de equivocar y entra una
+matriz de confusión, decir que era correo o predecir que era correo y que era
+correo spam y efectivamente lo era, que eso es acertarle, decir que no era
+correo a spam y no efectivamente no lo era nuevamente otra cierto y tengo la
+otra forma de que querés decir que era spam y cuando no lo era y decir que no
+era spam cuando si lo era entonces ahí estoy en los casos de
+falsos positivos y los falsos negativos que es peor en este caso porque no
+tienen la misma el mismo peso claramente es mucho peor bloquear un correo que si
+efectivamente era legítimo en cambio dejar pasar un spam a tu buzón de
+entrada, es tedioso si hay un coste que yo le estoy definiendo como un costo 1, pero que un
+correo legítimo pasa el spam tiene un costo bastante cinco veces mayor que lo estoy cuantificando.
+Ahora esas cuantificaciones son de ejemplo, yo la podría cuantificar en términos monetarios o
+importancia o alguna otra forma. Entonces, si la probabilidad, por ejemplo, yo voy a definir que
+los falsos positivos que son bloquear un correo legítimo tiene un costo 5 y los
+falsos negativos van a tener un costo 1 entonces yo ahora puedo definir con las
+probabilidades de predicción que calculé con algunas de las
+metodologías de Naive Bayes, el costo de bloquear, si se fijan acá es
+5 por la probabilidad ya 1 menos 0,9 ya que vendría siendo el complemento de
+esta probabilidad de no de que no sea spam que va a ser 0,5 que en esencia es
+bloquear el costo de bloquear y el costo de dejar pasar que tiene menor costo
+bloquear porque es 5 por 1 menos 0,9 me da 0,5
+y para el caso por ejemplo una probabilidad 0.7 que predigo entonces
+hago el mismo ejercicio 5 por 1 menos 0.7 me da un costo de 1.5 y para dejar
+pasar 1 por 0.7 me da un 0.7
+el menor costo el caso de dejar pasar el correo
+entonces esta probabilidad P es la probabilidad de que sea spam ya sea spam
+condicionado o no condicionado y yo le estoy definiendo, digamos, costos
+asociados a las distintas decisiones porque todas las metodologías anteriores
+meten una probabilidad pero la decisión no es sólo cuantitativa en el sentido de
+si la probabilidad es mayor que un número entonces sí, y si es que no lo es
+entonces no. Los problemas son más
+complicados y en ese sentido no es, no
+entramos en la misma métrica que habíamos dicho
+antes de la matriz de confusión y las
+formas distintas de equivocarse en
+clasificación binaria
+de que no, equivocarse de distinta
+manera no es lo mismo siempre.
+Hay distintas formas de equivocarse y
+hay equivocaciones que son peores que
+otras. Aquí lo estamos cuantificando en
+términos de un costo. Entonces yo podría calibrar, digamos, estos costos, pero
+usualmente vienen dentro de algún contexto económico financiero, digamos, o
+también lo podría definir en términos de tiempo. Un sinfín de cosas que va a
+depender mucho del contexto. Entonces, ese es el proceso de decisión. Yo, con la
+metodología en Naive Bayes predigo estas probabilidades y la decisión la tomo a
+nivel un poco más global, inmerso, digamos, dentro del contexto del problema.
+Entonces, yo puedo programar esto y definir el umbral. Yo puedo definir
+esto, cuál va a ser el umbral de decisión, que me voy a definirlo como
+si bloquear o no bloquear. Yo voy a clasificar esto, que aquí está el código claramente
+programado de manera un poco más manual, los distintos umbrales, que es en esencia
+el umbral es la pregunta de qué tan seguro en términos de la probabilidad tengo que
+estar yo para clasificar algo como spam o no.
+y se fijan acá, dado que yo me definí los costos para bloquear y no bloquear, o para
+los falsos positivos y los falsos negativos, yo voy a probar los distintos umbrales. Si
+elijo un umbral muy bajo, ¿qué es lo que voy a estar haciendo? Voy a estar bloqueando
+o voy a estar prediciendo muchos, que hay muchos mensajes para hacer spam. Entonces
+voy a ser un poco más laxo para decir que un mensaje es spam, ya?
+Y como un decir, si yo tengo la preferencia de decir,
+o tengo una mayor probabilidad de decir, no, este mensaje es spam,
+este mensaje es spam, dado que yo le puse un costo de 5
+a bloquear un legítimo, cuando digo que muchas cosas son spam,
+es muy fácil que yo me equivoque y diga que un legítimo era,
+lo clasifique como spam y efectivamente no lo era, porque es legítimo.
+entonces el costo va a tender a subir mucho pero conforme voy subiendo el
+umbral
+el costo va a ir bajando ¿por qué? porque ahora tengo que estar muy seguro en
+términos de la probabilidad de definir que es spam para clasificar un mensaje
+como spam. Ahora tampoco puedo irme tan a la
+derecha porque si me voy muy a la derecha entonces en la práctica no voy a
+clasificar nada como spam, ya, y voy a tener un costo base que va a ser el número de
+mensajes por uno, ya, por la cantidad de los costos, digamos, pero tengo un costo uno
+por cada mensaje que no clasifico mal. Entonces, tampoco me puedo ir tan arriba, ya.
+Quiero disminuir el costo, pero también quiero decir de vez en cuando y jugarme
+la, digamos, el modelo tiene que decir que clasifique que sea spam, ya, porque si no
+entraba otro problema, que no estamos clasificando nada. Si digo que todo no es spam,
+la verdad es que no estoy clasificando nada. Entonces puedo obtener el valor
+del costo por cada mil, digamos, observaciones. Va a ser 5 por los falsos positivos más 1 por 416
+Recuerden que 1 era el costo de los falsos negativos y voy a tener un 219 y este 219 es el
+umbral que está acá abajo, este número que hace el 0,95 donde está esta línea
+punteada. Yo podría plantearme otros umbrares un poco más finos, pero
+eso simplemente en términos de costo, no necesariamente el mejor umbral, y aparte
+podrían calibrar los costos asociados para cada falso positivo y para cada
+falso negativo. Ahora, lo que hicimos ahora lo queremos probar en el conjunto de prueba
+para la redundancia. Entonces, tenemos estos 921 correos históricos y aquí está la matriz de
+confusión. Para abajo, cuando es real, cuando era legítimo en el conjunto de datos y cuando era
+spam en el conjunto de datos y aquí estoy la predicción, estoy haciendo una predicción
+que me entregó mi modelo que hice entonces vemos que
+en 541 de las 921 veces predije que era legítimo y
+efectivamente era legítimo y 274 predije que era spam y efectivamente era spam
+pero ahora tengo
+las dos formas de equivocarme; si se fijan, si yo predigo que era spam
+y efectivamente era legítimo son 17 veces, que era el caso más costoso. Y el caso al revés,
+quiere decir que era legítimo y efectivamente era spam, es 89, que tiene un costo menor de 1.
+Entonces, en el conjunto de prueba, yo puedo calcular cuánto es el costo de esta clasificación,
+que va a ser 5 por los falsos positivos que en el caso del conjunto de prueba son 17
+más 1 por los falsos negativos que en el caso del conjunto de prueba son 89
+dividido en 921 correos por 1000 para estandarizarlo y hacerlo comparable y me
+queda 188 ahora vemos el caso que no nos sirve mucho
+si dejo pasar todos los correos y en principio no clasifico nada como
+el costo, cuando hago este mismo ejercicio, va a ser 394. Entonces tengo que
+clasificar para reducir el costo. Por eso, esta función de clasificación en
+términos de los costos y la calibración de cuántos el costo por cada falso
+positivo y por cada falso negativo es súper importante, tan importante como la
+estimación de las probabilidades, la predicción de las probabilidades.
+cuento que yo puedo tener probabilidades muy bajas pero si tengo un costo muy alto
+entonces en el costo global me va a cambiar mi decisión y usualmente esos
+costos vienen del contexto del problema. Entonces hay que separar la predicción
+de la decisión propiamente. En este caso es clasifico como spam o no lo clasifico
+como spam.
+ahora, ¿qué tengo que revisar, digamos, antes de usar este filtro que nosotros hicimos con Naive Bayes?
+en otro conjunto de datos que yo lo especifico como otra bandeja
+¿qué aprendimos, digamos?
+si la frecuencia importa, entonces si la frecuencia es muy baja
+entonces también va a bajar la probabilidad de predicción de esa clase
+entonces tiene que estar relativamente representado y eso está conectado con lo que preguntaba
+Romina con clases desbalanceadas
+si copio una señal que vendría haciendo
+no es sobre ajuste per se pero si la copio un momento y tal o tengo dos señales que me entregan la misma información
+e...
+me va a subir sustancialmente las probabilidades de clasificación de spam
+y todas estas cosas lo tengo que hacer siempre cuando genera esta metodología
+dejando el conjunto de pruebas afuera para
+digamos
+definir una métrica que en este caso es una métrica de costo
+cuál voy a escoger
+entonces
+eee
+tengo que escoger, yo podría hacer validación en este caso también
+pero dado que los Bernoulli eran sustancialmente mejores
+usted se planteó esa
+cuando defino
+el clasificador, el filtro de spam
+lo voy a aplicar en conjunto de datos de prueba, voy a sacar la métrica
+que en este caso lo definimos en términos de costos
+y luego
+ese filtro lo voy a ocupar
+para nuevos correos
+y este es un proceso iterativo, el Naive Bayes conforme tengo más datos que están más representados
+va a mejorar su nivel de predicción
+no obstante, tengo que tener especial cuidado en cómo defino las señales y qué señales voy a incorporar dentro del modelo
+porque tienen que ser señales que efectivamente me están entregando algún indicio de identificación de la clase de interés
+por ejemplo
+sí
+una señal es que tenga, por ejemplo,
+arroba
+no me va a traer esa señal porque casi todos los correos tienen un arroba en algún sentido
+sobre todo de cómo está mi mensaje o tengo una letra en particular
+esa señal tiene que ser de cierta manera pensada entre el contexto del problema
+de que efectivamente me está dando alguna información que me va a servir
+me va a servir para identificar la clase de interés, por ejemplo en este caso en
+este contexto, de que identificar que ahí están.
+Entonces
+tenemos nuestros datos, separamos en entrenamiento y prueba, hacemos nuestra
+validación cruzada, aprendemos digamos el modelo o el filtro con Naive Bayes en las
+distintas metodologías, puedo probar distintos suavizamientos, recuerden que yo
+puedo poner un alfa más grande también
+y tengo que definir digamos cuál de las metodologías será mejor con eso
+planteo el filtro y eso lo puedo implementar en nuevos datos
+claramente tengo que definir el umbral con el cual voy a tomar la decisión
+Naive Bayes llega hasta entregar una probabilidad de clasificación pero la
+decisión puede ser un poco menos natural cuando lo comparo con la probabilidad.
+Por ejemplo, si me entrega probabilidades 0,8 uno naturalmente tiende a decir
+bueno, si hay un 80% de probabilidad que se ha clasificado la clase de
+interés como positiva, por ejemplo, entonces
+voy a clasificarlo de esa manera. Pero dentro de distintos contextos no están así.
+por ejemplo si el costo de equivocarse es muy grande voy a querer estar muy muy
+seguro, pensemos clasificar si un diagnóstico tiene que ser, se va a
+definir que es cáncer o no, entonces con un 80% 70% quizás es bajo si el costo
+de esa decisión es muy alta, costo en términos generales, voy a esperar que la
+probabilidad predicha o estimada sea muy alta, digamos 95, 98 por ciento, para
+efectivamente clasificarlo como cáncer. Entonces va a depender mucho del contexto
+del problema donde vamos a definir ese umbral y ese contexto del problema
+va a estar muy ligado a la calibración de los costos que nosotros tenemos
+asociados en la regla de decisión cuando hacemos un prueba.
+estos numeritos que le ponemos acá que simplemente es el costo
+se ve como que es muy poco simplemente pero la verdad es que tiene mucha
+incidencia dentro de la decisión que yo efectivamente voy a tomar y todas estas
+metodologías sirven para algo, nosotros no estamos utilizando como una herramienta para algo
+entonces y ese algo es tomar esa decisión entonces aquí nosotros mezclamos
+lo que es la metodología estadística de ciencia de datos ya que hay varios, son
+distintas variantes con algo real que efectivamente es las repercusiones de
+tomar alguna decisión que están se ven reflejadas en los costos
+entonces como resumen digamos los códigos están todos en el Moodle ustedes
+lo pueden descargar y ejecutar
+y lo voy a compartir.
+Si se fijan acá, lo pueden ejecutar y está
+replicado cada uno de los gráficos que están disponibles en la presentación
+y además pueden entrar a los valores que nosotros calculamos en cada uno de estos
+pueden entrar en detalle y ustedes ya más o menos se manejan en cuanto a R
+Lo importante acá de toda esta metodología es que en el código nosotros lo hicimos manual
+ya pero hay metodologías que hay
+paquetes que hacen esto de manera
+automatizada, entonces, primero
+esto lo que la última iteración que nosotros hicimos
+tuvimos que una probabilidad de que sea spam muy muy alta
+entonces las señales que tenemos en nuestro conjunto de
+dato favorecen mucho la identificación de spam, entonces es una buena base de datos.
+No necesariamente podemos decir que esa proporción y esa predicción va a ser válida para nuevas
+observaciones, tampoco nos va a servir uno a uno en la calibración para la toma de decisiones en términos de
+sus costos
+y dice acá un clasificador reparte probabilidad entre sus clases aunque el
+caso resulte extraño porque si nosotros sobre todo hacemos suavizamiento le
+estamos dando un peso adicional a algo que es muy anómalo
+entonces aquí no hablo esta probabilidad no significa que la clasificación, estoy dando
+probabilidad de clasificación, en ningún caso estoy hablando de la frecuencia que eso suceda,
+si es que pasan ciertas señales yo tengo esta probabilidad de clasificar esta clase,
+son preguntas totalmente distintas, no hablo de la anomalía.
+Finalmente, y esto es lo que habíamos hablado recién, quiero comentarles sobre las herramientas
+disponibles para esto. Tal como casi todas las metodologías de ciencia de datos y las metodologías
+de estadística, tengo distintos paquetes para realizar lo mismo. Y a veces las formas
+de implementación son un poco distintas y entregan números que son ligeramente distintos.
+En R yo tengo una librería que se llama Naive Bayes y tiene las tres metodologías
+que nosotros acabamos de ver. Bernoulli-Naive Bayes, Gaussian-Naive Bayes y Multinomial-Naive Bayes
+Sobre todo que nosotros vimos las primeras dos. Y en Python tengo el Scikit-Learn
+que tiene un sinfín de herramientas en las cuales tengo BernoulliNB, de Naive Bayes,
+GaussianNB y MultinomialNB.
+R ocupa Predict al ser un lenguaje funcional, por lo cual Predict ocupa
+muchos paquetes, digamos. Y en Python ocupo el método
+predict_proba para definir estas probabilidades de las nuevas
+observaciones. Estoy empezando acá en el conjunto de prueba utilizando estas
+estas funciones, yo puedo automatizar este clasificador e incluso puedo
+automa... este filtro, más bien, este clasificador, puedo automatizar la
+retroalimentación de nuevos datos para reestimar estas probabilidades. Se entiende
+que yo obtuve las probabilidades con cierto conjunto de datos.
+Pensemos el caso del spam que lo hemos visto a lo largo de toda la cátedra.
+si dejo pasar un mes voy a tener nuevos correos que van a estar clasificados o
+etiquetados correctamente y voy a querer incorporar esos
+esos nuevos correos dentro del conjunto datos para precisar más aún
+el filtro que yo estoy calculando y en principio las predicciones que estoy
+haciendo para clasificar cada uno de la clase, en particular en
+este caso la clase de interés que es si es spam o no. Toda esta metodología es
+aplicable para multiclase y además para cualquiera sea la clase. En general la
+clasificación binaria es la más interesante, la más relevante puesto que
+lleva directamente una acción. ¿Es así o no es así? Entonces yo puedo
+binarizar estas cosas y me facilito de cierta manera una decisión. Entonces por
+eso en ciencia de datos y en estadística nos focalizamos bastante en cosas binarias por el
+por el simple hecho de que tiene una implicancia directa en realizar o no una acción, cualquiera
+sea esto, cualquiera sea el contexto. Entonces independiente si ocupan más Python o R en ambos
+metodologías porque son metodologías que están ya establecidas y son bastante utilizadas,
+como países sobre todo, podemos implementarlas, digamos, en cualquiera de los dos lenguajes
+fácilmente. Simplemente hay que ver, digamos, la documentación y la verdad es que no es mucho
+lo que hay que hacer, es simplemente definir cuál es mi conjunto de datos, cuáles mis etiquetas y
+cuáles son mis señales. Ya con eso automáticamente esto lo calcula. Entonces van a tener, puede tener
+tres inputs dentro de cada de estas funciones.
+¿Alguna pregunta, duda que les haya surgido en la cátedra?
+Sí, no.
+Una
+pequeña información respecto al calendario
+recuerden que el 8 de octubre está el taller número 3 para que lo tengan
+presente
+no queda tanto por eso se los menciono es el próximo jueves entonces
+téngalo digamos presente dentro de su calendario para que no lo estén haciendo
+digamos para no tomarlos tan desprevenidos
+en fin entonces damos por finalizada esta cátedra nos volvemos a encontrar el
+próximo jueves en el taller

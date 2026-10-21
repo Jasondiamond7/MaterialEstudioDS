@@ -1,0 +1,5680 @@
+1
+00:00:00,000 --> 00:00:07,000
+Hoy empezamos nuestra clase, creo que la 39, si me parecía bien allá, vamos a hablar un poco sobre clustering.
+
+2
+00:00:07,000 --> 00:00:19,000
+Bueno, es una clase que me gusta bastante porque los métodos que vamos a escuchar acá son extremamente sencillos pero muy poderosos para poder trabajar de punto de vista de aprendizaje no supervisado.
+
+3
+00:00:19,000 --> 00:00:23,000
+Entonces hoy vamos a hablar un poco sobre K-means, K-modes y K-prototypes.
+
+4
+00:00:23,000 --> 00:00:32,040
+Bueno, voy presentando el contenido, si ustedes tienen alguna duda, me comenten que ahí paro
+
+5
+00:00:32,040 --> 00:00:35,000
+y bueno, y ahí seguimos.
+
+6
+00:00:35,000 --> 00:00:37,000
+Yo solamente...
+
+7
+00:00:37,000 --> 00:00:39,000
+Vamos a hacer acá una pausa.
+
+8
+00:00:47,000 --> 00:00:49,000
+Seguimos entonces.
+
+9
+00:00:49,000 --> 00:00:57,000
+¿Cuál es la diferencia acá para la clase que vamos a empezar a hacer, para las clases que seguimos anteriormente?
+
+10
+00:00:57,000 --> 00:01:02,000
+Bueno, yo hablé con seres sobre regresión rígica, support vector machine,
+
+11
+00:01:02,000 --> 00:01:11,000
+vieron la idea de árboles, y todo nuestro enfoque está básicamente entrar con modelos de punto de vista de aprendizaje supervisado.
+
+12
+00:01:11,000 --> 00:01:16,200
+Entonces, lo que vamos a intentar hacer ahora acá es una otra mirada
+
+13
+00:01:16,200 --> 00:01:18,800
+del punto de vista de pensaje no supervisado.
+
+14
+00:01:18,800 --> 00:01:24,000
+Es una mirada del punto de vista de pensaje no supervisado.
+
+15
+00:01:24,000 --> 00:01:27,000
+Lo que vamos a intentar hacer es...
+
+16
+00:01:27,000 --> 00:01:29,000
+Sólo un ratito.
+
+17
+00:01:29,000 --> 00:01:32,000
+Vamos a cerrar acá un momento.
+
+18
+00:01:41,000 --> 00:01:46,000
+y
+
+19
+00:01:46,000 --> 00:01:51,000
+y
+
+20
+00:01:51,000 --> 00:01:56,000
+y
+
+21
+00:01:56,000 --> 00:02:01,000
+y
+
+22
+00:02:01,000 --> 00:02:06,000
+y
+
+23
+00:02:06,000 --> 00:02:14,800
+Bueno, lo que vamos a seguir es que en la última clase o en las dos clases interiores
+
+24
+00:02:14,800 --> 00:02:17,200
+hablamos sobre la idea de pensaje no supervisado.
+
+25
+00:02:17,200 --> 00:02:23,020
+En esta clase, o pensaje supervisado, en esta clase vamos a tener una mirada un poco distinta.
+
+26
+00:02:23,020 --> 00:02:27,280
+Nuestro objetivo acá es asumir que no tenemos la variable respuesta.
+
+27
+00:02:27,280 --> 00:02:33,200
+Entonces anteriormente, no sé, yo conocí la información de que era un malo o un bueno
+
+28
+00:02:33,200 --> 00:02:39,560
+pagador o quien o sea si quiere hacer una previsión de sueldo, si el valor estaba subiendo,
+
+29
+00:02:39,560 --> 00:02:46,560
+si estaba bajando, siempre tenía esta información. Entonces de alguna manera yo tenía acá,
+
+30
+00:02:46,560 --> 00:02:57,120
+tenemos nuestra variante de respuesta e intentábamos ajustar el modelo gdx y después nuestro objetivo
+
+31
+00:02:57,120 --> 00:03:02,320
+Al final es intentar sacar acá E de RDX.
+
+32
+00:03:03,280 --> 00:03:05,320
+Discutimos varias formas de hacer eso.
+
+33
+00:03:05,640 --> 00:03:08,040
+Arbos, ramofoles, suporte vector machine.
+
+34
+00:03:08,400 --> 00:03:10,400
+Vamos a ver un poco más adelante Rays Neuronales.
+
+35
+00:03:11,320 --> 00:03:13,360
+Son formas de tener una mirada como esta.
+
+36
+00:03:13,800 --> 00:03:18,720
+Intentar ajustar esta función RDX.
+
+37
+00:03:20,360 --> 00:03:23,680
+Pero muchas veces no vamos a tener exactamente
+
+38
+00:03:23,680 --> 00:03:27,680
+este label o nuestro IE.
+
+39
+00:03:27,680 --> 00:03:31,680
+Entonces, generalmente lo dividimos,
+
+40
+00:03:31,680 --> 00:03:34,680
+el curso de Machine Learning o Pensar Supervisado,
+
+41
+00:03:34,680 --> 00:03:36,680
+en algunas clases.
+
+42
+00:03:36,680 --> 00:03:39,680
+Una clase de clasificación supervisada,
+
+43
+00:03:39,680 --> 00:03:42,680
+una clasificación semisupervisada,
+
+44
+00:03:42,680 --> 00:03:44,680
+que no vamos a hablar por ahora,
+
+45
+00:03:44,680 --> 00:03:47,680
+y una clase que es clasificación, o bueno,
+
+46
+00:03:47,680 --> 00:03:51,680
+un tipo de clasitarización que va a tener
+
+47
+00:03:51,680 --> 00:03:57,020
+va a tener una mirada de un aprendizaje no supervisado. Básicamente acá vamos a llamar
+
+48
+00:03:57,020 --> 00:04:04,020
+eso de clustering. Lo que vamos a intentar hacer es, de alguna manera, ver si ya tengo
+
+49
+00:04:04,020 --> 00:04:11,480
+la figura acá delante, es hacer una proyección en nuestros dados e intentar encontrar un
+
+50
+00:04:11,480 --> 00:04:18,180
+padrón, un grupo, intentar encontrar centros informales. Ya, estos individuos pertenecen
+
+51
+00:04:18,180 --> 00:04:25,660
+a este grupo. Bueno, un ejemplo que siempre me gusta utilizar, Romina fue una amiga y
+
+52
+00:04:25,660 --> 00:04:30,900
+vio este curso, debes recordar un ejemplo, un ejemplo que me gusta siempre utilizar es
+
+53
+00:04:30,900 --> 00:04:37,780
+una cosa que siempre pasa conmigo cuando un banco intenta pedir para hacer algún tipo
+
+54
+00:04:37,780 --> 00:04:43,260
+de inversión en una carteira o en un área muy específica. Vamos a suponer que ustedes
+
+55
+00:04:43,260 --> 00:04:47,760
+tienen un poco de plata en su cuenta. El banco va a dar cuenta y va a formar ya
+
+56
+00:04:47,760 --> 00:04:52,620
+que le parece si usted saca un millón de pesos, dos millones de pesos y pone acá
+
+57
+00:04:52,620 --> 00:04:58,480
+en esa carteira o en ese grupo específico y deje ahí por más o menos
+
+58
+00:04:58,480 --> 00:05:03,620
+un, dos años que va a tener una ganancia de una porcentaje específica.
+
+59
+00:05:03,620 --> 00:05:08,620
+Bueno, ustedes empiezan a tener un poco de plata, van a querer hacer inversión y el
+
+60
+00:05:08,620 --> 00:05:13,020
+banco va a querer de alguna manera clasificar a ustedes como unas personas
+
+61
+00:05:13,020 --> 00:05:18,220
+que les gustan de bajo riesgo, inversión de bajo riesgo, inversión de medio riesgo o
+
+62
+00:05:18,220 --> 00:05:22,700
+una inversión de alto riesgo. Por ejemplo, vamos a suponer, ellos empezaron a hacer un
+
+63
+00:05:22,700 --> 00:05:30,220
+par de preguntas para ustedes y al final se dan cuenta de que no se, por ejemplo, yo después
+
+64
+00:05:30,220 --> 00:05:36,180
+de hacer un par de preguntas me clasifico como una persona que no me gusta hacer inversión
+
+65
+00:05:36,180 --> 00:05:44,420
+en áreas muy peligrosas, por ejemplo poner plata en una criptomoneda instable o no sé
+
+66
+00:05:44,420 --> 00:05:50,620
+un grupo que tiene una empresa que está con una clasificación muy baja.
+
+67
+00:05:50,620 --> 00:05:58,020
+Sabemos que conforme ponemos plata más riesgo, mayor va a ser posiblemente la ganancia, pero
+
+68
+00:05:58,020 --> 00:06:01,060
+mucha gente le gusta una inversión más segura.
+
+69
+00:06:01,060 --> 00:06:03,300
+Pero el banco no puede llegar para ustedes a preguntar.
+
+70
+00:06:03,300 --> 00:06:13,580
+de qué grupo usted es el grupo que le gusta el bajo riesgo medio riesgo o alto riesgo acá bajo
+
+71
+00:06:13,580 --> 00:06:22,380
+medio y alto riesgo pero miren este perro como volvió lleno de caca acá entonces
+
+72
+00:06:26,820 --> 00:06:30,540
+lo que seguimos es blake bueno nuestro objetivo acaba de ser
+
+73
+00:06:30,540 --> 00:06:40,140
+de alguna manera. Digamos seguir. Discutir métodos en que podemos de alguna manera hacer
+
+74
+00:06:40,140 --> 00:06:47,660
+una sugerencia de un tag para la persona o una sugerencia de un label. Hace eso con varias,
+
+75
+00:06:47,660 --> 00:06:53,040
+una frecuencia muy grande en clientes, con frecuencia de compra, con gasto en canal
+
+76
+00:06:53,040 --> 00:06:57,780
+preferido, en vino, si queremos hacer clasificaciones de vinos, en documentos,
+
+77
+00:06:57,780 --> 00:07:03,200
+varios métodos que utilizan hoy tienen como una mirada a pensar en nuestro
+
+78
+00:07:03,200 --> 00:07:08,360
+organizado. Por ejemplo todo tipo de publicidad que van a hacer los productos
+
+79
+00:07:08,360 --> 00:07:12,560
+que están buscando de alguna manera ellos no conocen muy bien lo que
+
+80
+00:07:12,560 --> 00:07:16,360
+necesitan pero vamos a sacar un par de información, vamos a poder ustedes de un grupo
+
+81
+00:07:16,360 --> 00:07:20,320
+muy específico y informar ya para esa persona tenemos que hacer este tipo de
+
+82
+00:07:20,320 --> 00:07:25,760
+publicidad o vamos a ofrecer este producto. El tema es que acá no conocemos el label,
+
+83
+00:07:25,760 --> 00:07:29,760
+No conocemos la variable respuesta. No sé si la persona va a ser un mal o bueno pagador.
+
+84
+00:07:29,760 --> 00:07:31,760
+Eso no fue observado.
+
+85
+00:07:31,760 --> 00:07:37,760
+Esta variable Y acá no va a venir junto con nuestros X.
+
+86
+00:07:37,760 --> 00:07:41,760
+Generalmente una base de dados de un banco va a llegar todas las covariables,
+
+87
+00:07:41,760 --> 00:07:45,760
+pero al final ustedes van a saber que la persona es un mal o bueno pagador.
+
+88
+00:07:45,760 --> 00:07:51,760
+Llegan varias informaciones, ustedes saben si hubo una ganancia o una pérdida.
+
+89
+00:07:51,760 --> 00:07:53,760
+o en términos de sueldo
+
+90
+00:07:55,760 --> 00:07:57,760
+conocemos por ejemplo una variable real
+
+91
+00:07:57,760 --> 00:07:59,760
+conocemos exactamente
+
+92
+00:07:59,760 --> 00:08:01,760
+cuales fueron las covariables acá
+
+93
+00:08:03,760 --> 00:08:05,760
+el x, después de pasar en esa función
+
+94
+00:08:05,760 --> 00:08:07,760
+que nos devolvó a tener la variable respuesta
+
+95
+00:08:07,760 --> 00:08:09,760
+si? entonces
+
+96
+00:08:09,760 --> 00:08:11,760
+eso es aprendizaje supervisado
+
+97
+00:08:11,760 --> 00:08:13,760
+cuando tenemos esa información
+
+98
+00:08:13,760 --> 00:08:15,760
+muchos de los problemas que vamos a tener ahora
+
+99
+00:08:15,760 --> 00:08:17,760
+o en varias situaciones
+
+100
+00:08:17,760 --> 00:08:19,760
+no conocemos el label pero podemos crear
+
+101
+00:08:19,760 --> 00:08:30,240
+un meibo específico. Entonces un ejemplo sencillo, por ejemplo, sería tener acá dos variables,
+
+102
+00:08:30,240 --> 00:08:37,220
+voy a hacer una proyección y voy a tener distintos puntos acá. Una figura como esta es muy sencilla,
+
+103
+00:08:37,220 --> 00:08:43,240
+ustedes pueden tener una mirada. Ya, esta acá me parece que es un grupo, esta acá me parece que es
+
+104
+00:08:43,240 --> 00:08:49,120
+otro grupo y acá me parece que es otro grupo. Pero muchas veces, o la gran mayoría de las veces,
+
+105
+00:08:49,120 --> 00:08:53,980
+no vamos a tener solamente dos variables, vamos a tener un montón de variables, generalmente los
+
+106
+00:08:53,980 --> 00:09:00,960
+grupos no se van a separar tan bonito como está acá. Con una situación como esta no necesito ser
+
+107
+00:09:00,960 --> 00:09:06,800
+una no necesito de una computadora para informar ya posiblemente ese un cluster, ese es un otro
+
+108
+00:09:06,800 --> 00:09:11,840
+cluster y ese es un otro cluster. Ese podrían ser personas que le gustan de bajo riesgo, de hacer
+
+109
+00:09:11,840 --> 00:09:17,500
+inversión en bajo riesgo, ese es hacer inversión en medio riesgo y ese es hacer inversión en alto
+
+110
+00:09:17,500 --> 00:09:23,940
+riesgo. Bueno, como un toexempo iniciaremos con una situación más o menos mirada como
+
+111
+00:09:23,940 --> 00:09:32,100
+esta. ¿Cuál es la dificultad? La dificultad acá en esta clase va a ser definir el número
+
+112
+00:09:32,100 --> 00:09:39,180
+de cluster que debemos que es necesario proponer y cómo encontramos los centroides o los centros
+
+113
+00:09:39,180 --> 00:09:45,020
+de estos clusters. Porque una imagen como esta ya puedo pensar, voy a pensar por acá,
+
+114
+00:09:45,020 --> 00:09:50,420
+más o menos por acá y por acá, pero como le comenté, no van a tener solamente dos variables,
+
+115
+00:09:50,420 --> 00:09:55,820
+si ustedes tienen tres, cuatro, cinco variables que básicamente es siempre ahora, hoy básicamente
+
+116
+00:09:55,820 --> 00:10:00,860
+no trabajamos más con dos variables solamente, pasa a ser muy complejo mirar eso de un punto
+
+117
+00:10:00,860 --> 00:10:07,260
+de vista geométrico, o hacer algún tipo de proyección ahí de tal forma que van a estar
+
+118
+00:10:07,260 --> 00:10:13,660
+están bien separados. Entonces, si tenemos los dados un poco más mezclados, ¿cómo
+
+119
+00:10:13,660 --> 00:10:16,900
+definimos el centro? ¿Cuántos, cuántos posibles?
+
+120
+00:10:16,900 --> 00:10:30,220
+Ay, profe, perdón, le vas a pasar a llevar su micrófono, pero a mí me tiene que redactearlo.
+
+121
+00:10:30,220 --> 00:10:32,300
+Ahí sí, se movió.
+
+122
+00:10:32,300 --> 00:10:40,300
+Entonces, vamos a suponer que por acá lo que quiero hacer es crear clústeres específicos.
+
+123
+00:10:40,300 --> 00:10:48,300
+Inicialmente me parece un ejemplo muy sencillo, pero vamos a seguir un poco más adelante y vamos a ver que no es una tarea sencilla.
+
+124
+00:10:48,300 --> 00:10:54,300
+Bueno, una misma base puede producir agrupamientos distintos según las variables.
+
+125
+00:10:54,300 --> 00:10:56,800
+Hablamos de esto un poco.
+
+126
+00:10:56,800 --> 00:11:05,300
+Una idea es que hay diferentes métodos de clasización dependiendo de cómo funcionan nuestras covariables.
+
+127
+00:11:05,300 --> 00:11:12,300
+Entonces, tenemos covariables que son solamente numéricas, por ejemplo, sueldo, altura, peso,
+
+128
+00:11:12,300 --> 00:11:19,300
+informaciones que están contenidas en valores reales o naturales,
+
+129
+00:11:19,300 --> 00:11:27,460
+valores que van de 0 1 2 3 4 5 hasta infinito o valores reales ahí el sueldo es 1.324.000 pesos
+
+130
+00:11:27,460 --> 00:11:38,980
+la altura 1.64 ya peso 57 kilos punto 20 gramos trabajamos solamente con camins camins es una forma
+
+131
+00:11:38,980 --> 00:11:48,540
+de hacer clasización para variables numéricas ya una otra forma puede ocurrir o siempre es una
+
+132
+00:11:48,540 --> 00:11:55,020
+situación que siempre pasa, pero de que vamos a tener variables categóricas, por ejemplo,
+
+133
+00:11:55,020 --> 00:12:02,980
+una división entre hombres y mujeres, una variable categórica, ser uno, ya, una color muy específica
+
+134
+00:12:02,980 --> 00:12:13,940
+de un grupo, situaciones no sé, incluso tener un grupo de malos y buenos pagadores, son variables
+
+135
+00:12:13,940 --> 00:12:19,900
+categoricas. Uno puede agregar una forma de clasificación basada en estos grupos, solamente
+
+136
+00:12:19,900 --> 00:12:25,220
+mirando los individuos desde el punto de vista categórico. La forma de decisión es un poco
+
+137
+00:12:25,220 --> 00:12:30,220
+distinta. Vamos a ser representados en este grupo por la moda, o sea, lo que ocurre con
+
+138
+00:12:30,220 --> 00:12:36,980
+mayor frecuencia. Y variables numéricas, vamos a intentar trabajar con la media y después
+
+139
+00:12:36,980 --> 00:12:41,060
+podemos llegar a una estructura que generalmente es lo que ocurre en la gran mayoría de los
+
+140
+00:12:41,060 --> 00:12:45,060
+en que vamos a tener variables mixtas, ¿de acuerdo?
+
+141
+00:12:45,060 --> 00:12:47,060
+Un grupo de variables numéricas,
+
+142
+00:12:47,060 --> 00:12:49,060
+otro grupo de variables categóricas
+
+143
+00:12:49,060 --> 00:12:52,060
+y vamos a intentar crear clusters,
+
+144
+00:12:52,060 --> 00:12:56,060
+crear grupos o encontrar los grupos específicos
+
+145
+00:12:56,060 --> 00:12:58,060
+con base en estas dos variables.
+
+146
+00:13:00,060 --> 00:13:02,060
+Cada uno de ellas fue construido de una forma distinta
+
+147
+00:13:02,060 --> 00:13:06,060
+y después se puede mezclar ellas de una forma muy particular.
+
+148
+00:13:07,060 --> 00:13:10,060
+Bueno, como ejemplo, vamos a considerar una base muy sencilla,
+
+149
+00:13:11,060 --> 00:13:20,940
+de vinos con 13 mediciones. Entonces, en este curso, compartiré lo que Romina ya envió
+
+150
+00:13:20,940 --> 00:13:26,300
+los archivos. Ustedes pueden bajar ahí, van a tener un archivo en R, un en Python y las
+
+151
+00:13:26,300 --> 00:13:35,700
+bases, estas bases contienen 177 vinos y dentro de esos 177 vinos sacamos algunas métricas
+
+152
+00:13:35,700 --> 00:13:44,020
+relacionadas a estos vinos, por ejemplo, álcool, ácido homálico, ceniza, alcalinidad, magnesio,
+
+153
+00:13:44,020 --> 00:13:53,780
+fenóles, flavonoides y otras mediciones. Entonces tenemos ahí varias métricas relacionadas a
+
+154
+00:13:53,780 --> 00:14:00,260
+estos vinos. Nuestro objetivo es, ya con base en estas informaciones, yo puedo hacer una clasificación
+
+155
+00:14:00,260 --> 00:14:07,060
+de un vino específico o no. Hay diferencias, bueno, acá en Chile, todos o mucha gente le gusta,
+
+156
+00:14:07,060 --> 00:14:11,620
+están acostumbrados a tomar vinos, se sabe muy bien la diferencia, pero en otros países no hay
+
+157
+00:14:11,620 --> 00:14:17,180
+un costumbre como este. En Brasil, por ejemplo, es un país que no toma tanto vino, entonces mucha
+
+158
+00:14:17,180 --> 00:14:22,980
+gente no sabe evaluar la diferencia. Bueno, hay algunos que tienen un poco menos de alcohol,
+
+159
+00:14:22,980 --> 00:14:30,940
+algunos otros tienen un poco más de alcohol, tienen diferentes niveles de flavonoides, color,
+
+160
+00:14:30,940 --> 00:14:36,300
+entonces sabemos que algunos tipos de vino son vinos blancos, entonces uno puede clasificar
+
+161
+00:14:36,300 --> 00:14:45,060
+esos vinos con base en esas informaciones. Por supuesto, la idea acá es que los vinos,
+
+162
+00:14:45,060 --> 00:14:49,460
+bueno, ya existen una clasificación para esos vinos, pero vamos a suponer que no existisse,
+
+163
+00:14:49,460 --> 00:14:56,460
+Vamos a intentar evaluar para hacer una proyección y evaluar si de hecho esos vinos son o no son distintos
+
+164
+00:14:56,460 --> 00:15:01,460
+con base en sus características químicas.
+
+165
+00:15:03,460 --> 00:15:09,460
+Entonces vamos a utilizar los centros de cernilidad de vinos, vamos a tener estas métricas y después vamos a hacer la clasificación.
+
+166
+00:15:10,460 --> 00:15:18,460
+Una cosa que es importante cuando vamos a trabajar con métodos basados en camins, por ejemplo, es hacer una estandarización de los datos.
+
+167
+00:15:19,460 --> 00:15:23,760
+Algunas de las... vamos, en este caso, porque esto va a ser importante?
+
+168
+00:15:23,760 --> 00:15:27,760
+Porque cuando vamos a empezar a hablar de caminos, vamos a intentar evaluar distancias acá.
+
+169
+00:15:27,760 --> 00:15:32,060
+Queremos evaluar puntos que están distantes, si no están distantes de un centroide específico.
+
+170
+00:15:32,060 --> 00:15:38,460
+Y cuando vamos a calcular estas distancias, si esta base no está estandarizada,
+
+171
+00:15:38,460 --> 00:15:42,760
+una información como un millón de pesos chilenos para dos millones de pesos chilenos
+
+172
+00:15:42,760 --> 00:15:46,760
+puede básicamente dominar toda la métrica de la distancia.
+
+173
+00:15:46,760 --> 00:15:54,600
+Entonces, es importante hacer una estandarización para que una variable solamente no domine toda la análisis
+
+174
+00:15:54,600 --> 00:16:00,400
+y si eso pasa es posible que ustedes van a tener clústeres que no están bien representados.
+
+175
+00:16:00,400 --> 00:16:07,760
+Entonces, hacer la estandarización es muy importante antes de hacer la clasterización.
+
+176
+00:16:07,760 --> 00:16:14,240
+La estandarización va a igualar las escalas, pero no va a eliminar puntos atípicos de correlaciones.
+
+177
+00:16:14,240 --> 00:16:18,520
+Entonces, esto también es una cosa importante, solamente nos va a ayudar a no tener problemas cuando
+
+178
+00:16:18,520 --> 00:16:22,640
+fuemos a calcular las métricas de distancia. Por ejemplo, el ejemplo sencillo acá es,
+
+179
+00:16:22,640 --> 00:16:32,960
+voy a hacer la estandarización de la variable alcor, que sale 1.14, acá valor 14, y su promedio era 13,
+
+180
+00:16:32,960 --> 00:16:37,880
+entonces 14 menos 13, dividimos por su dirección estándar, me sale el valor 1.25.
+
+181
+00:16:37,880 --> 00:16:46,560
+y bueno para iniciar los datos vamos a empezar la lectura con R, después vamos a correr en Python
+
+182
+00:16:46,560 --> 00:16:52,760
+pero vamos a usar algunas librerías cluster, calar, cluster mix, type para poder hacer el ca
+
+183
+00:16:52,760 --> 00:17:00,120
+prototype y bueno yo acabo poniendo en mi computadora la base de dados dentro de un disco duro D
+
+184
+00:17:00,120 --> 00:17:06,880
+una carpeta códigos y ahí tengo una otra carpeta con el nombre cluster, ustedes pueden crear la que
+
+185
+00:17:06,880 --> 00:17:12,040
+quieren su computadora simplemente tienen que poner todos los archivos ahí ya inicialmente
+
+186
+00:17:12,040 --> 00:17:15,240
+vamos a hacer la lectura de la base de los fins
+
+187
+00:17:15,240 --> 00:17:23,000
+bueno acá es como se va como vamos a hacer también en python ya entonces para hacer
+
+188
+00:17:23,000 --> 00:17:29,320
+la lectura de los datos y bueno antes de corremos es importante entender o empezar a hacer la
+
+189
+00:17:29,320 --> 00:17:34,900
+análisis que es importante de cómo funciona la idea de camins ya bueno la idea de camins
+
+190
+00:17:34,900 --> 00:17:39,020
+es, vamos a intentar mirar nuevamente los puntos
+
+191
+00:17:40,100 --> 00:17:44,500
+que van a estar distribuidos con base en las variaciones X
+
+192
+00:17:44,940 --> 00:17:49,300
+y necesitamos intentar crear algunos clústeres específicos
+
+193
+00:17:49,420 --> 00:17:50,940
+basados en los centroides.
+
+194
+00:17:51,060 --> 00:17:54,740
+Entonces, ustedes necesitan o necesitaríamos definir
+
+195
+00:17:55,180 --> 00:17:58,300
+un valor específico que va a ser conocido como centroide
+
+196
+00:17:58,700 --> 00:18:01,700
+y ese valor va a ser calculado con la distancia
+
+197
+00:18:01,780 --> 00:18:03,980
+entre un punto específico y su centro.
+
+198
+00:18:04,900 --> 00:18:08,900
+Inicialmente ponemos valores aleatorios ahí
+
+199
+00:18:08,900 --> 00:18:11,900
+y lo vamos actualizando poco a poco.
+
+200
+00:18:11,900 --> 00:18:15,900
+Antes de comentar cómo funciona acá y acá teniendo una interacción,
+
+201
+00:18:15,900 --> 00:18:23,900
+voy a presentar la idea básica de cómo separar en un activo, un ejemplo,
+
+202
+00:18:23,900 --> 00:18:28,900
+para que tenga una idea de cómo funciona de una forma muy sencilla la idea de clústeres.
+
+203
+00:18:28,900 --> 00:18:31,900
+Entonces acabé de ser un dibujo separado,
+
+204
+00:18:31,900 --> 00:18:37,340
+pero bueno, después tienen un material en la clase que demuestra las interacciones
+
+205
+00:18:37,340 --> 00:18:44,580
+intenté presentar un archivo con una información un poco menor porque facilita mirar un poco cómo funciona la idea
+
+206
+00:18:44,580 --> 00:18:46,380
+en términos de actualización
+
+207
+00:18:46,380 --> 00:18:49,980
+vamos a suponer que tengo diferentes puntos acá, ¿cierto?
+
+208
+00:18:49,980 --> 00:18:52,060
+punto B, punto C
+
+209
+00:18:52,060 --> 00:18:56,460
+D, E, F, A, G, H
+
+210
+00:18:56,460 --> 00:19:01,580
+tenemos nuestra variable X1 que estaba acá, X2 que estaba acá
+
+211
+00:19:01,580 --> 00:19:07,940
+Necesitamos, nuestro datos están acá, que elevado a la posibilidad de encontrar clusters acá.
+
+212
+00:19:07,940 --> 00:19:12,120
+No sé cuáles son los posibles grupos, pero necesito definir un algoritmo que
+
+213
+00:19:12,120 --> 00:19:19,220
+va a me ayudar a tener esta actualización para ir haciendo las cuentas y
+
+214
+00:19:19,220 --> 00:19:25,300
+llegar en clusters específicos, ¿certo? La idea es parte de un punto muy sencillo.
+
+215
+00:19:25,300 --> 00:19:28,620
+Tengo varios puntos, voy a elegir uno de los puntos a lanzar.
+
+216
+00:19:28,620 --> 00:19:32,780
+ustedes pueden definir un punto que quieren acá decidí poner estos dos
+
+217
+00:19:32,780 --> 00:19:36,820
+puntos como puntos iniciales del cluster, ¿Cierto?
+
+218
+00:19:36,820 --> 00:19:42,020
+Entonces, uno de los clusters, voy a asumir en este caso que tenemos dos clusters
+
+219
+00:19:42,020 --> 00:19:46,820
+pero por qué dos clusters, después podemos evaluar si son tres, si son cuatro, en esta clase
+
+220
+00:19:46,820 --> 00:19:53,420
+vamos a discutir y eso también, cuál es el número ideal de clusters
+
+221
+00:19:53,420 --> 00:19:59,980
+Entonces acá por ahora solamente como otro ejemplo vamos a dar una mirada en dos clústeres.
+
+222
+00:19:59,980 --> 00:20:04,620
+Voy a asumir que tienen dos clústeres, no sé cuáles son los puntos específicos iniciales.
+
+223
+00:20:04,620 --> 00:20:10,380
+Una computadora inicialmente va a elegir ese punto de forma aleatoria, podemos poner cuáles son los puntos iniciales.
+
+224
+00:20:10,380 --> 00:20:15,820
+Yo estoy asumiendo que el G y el H son los dos puntos iniciales.
+
+225
+00:20:15,820 --> 00:20:20,780
+Entonces, éstos van a ser nuestros centroides iniciales, nuestros centros.
+
+226
+00:20:20,780 --> 00:20:27,780
+Bueno, después de definir cuáles son nuestros centros, uno va a ser R y otro va a ser A,
+
+227
+00:20:27,780 --> 00:20:32,780
+tengo que calcular las distancias entre cada uno de estos puntos,
+
+228
+00:20:32,780 --> 00:20:36,780
+tanto estos puntos acá, en relación a este centróidico,
+
+229
+00:20:36,780 --> 00:20:40,780
+y todos estos puntos en relación a este centróidico.
+
+230
+00:20:40,780 --> 00:20:46,780
+Entonces tengo un centróidico, tengo otro centróidico, este va a ser C1, este va a ser C2,
+
+231
+00:20:46,780 --> 00:20:53,740
+tengo varios puntos acá 1 2 3 4 5 6 7 8 8 puntos voy a calcular la distancia de
+
+232
+00:20:53,740 --> 00:20:59,780
+esos 8 puntos en relación a nuestros centroides ya
+
+233
+00:20:59,780 --> 00:21:07,180
+bueno el primer punto que voy a mirar va a ser la distancia entre C y D o C y H
+
+234
+00:21:07,180 --> 00:21:12,700
+ya, entonces tengo que calcular esta distancia, tengo X1, tengo X2 y puedo
+
+235
+00:21:12,700 --> 00:21:17,560
+calcular la distancia entre este punto con este punto y voy a tener un valor ahí
+
+236
+00:21:17,560 --> 00:21:22,220
+fíjate, va a salir un punto específico. Después voy a calcular la
+
+237
+00:21:22,220 --> 00:21:28,960
+distancia entre C y H acá, entonces calculo entre C y D y C y H. Vamos a
+
+238
+00:21:28,960 --> 00:21:33,520
+suponer que me salió valores 8 cuando calculo esta distancia y acá me salió 9
+
+239
+00:21:33,520 --> 00:21:39,020
+voy a clasificar este individuo C en relación al individuo que está más
+
+240
+00:21:39,020 --> 00:21:45,020
+más cerca de un cluster específico, entonces este C está más cerca de R, no está más cerca de A.
+
+241
+00:21:45,020 --> 00:21:54,020
+Entonces voy a poner allá como, acá está como rojo, acá no está como está rosado,
+
+242
+00:21:54,020 --> 00:21:58,020
+entonces acá me parece que debería ser rojo pero está rosado.
+
+243
+00:21:58,020 --> 00:22:01,020
+Vamos a poner un rosado acá en este valor.
+
+244
+00:22:01,020 --> 00:22:07,020
+Lo mismo para B, voy a calcular la distancia entre este grupo o este cluster y este cluster,
+
+245
+00:22:07,020 --> 00:22:12,420
+centroide y este centroide y al final lo clasifique en este clúster específico
+
+246
+00:22:12,420 --> 00:22:16,820
+de hecho si voy haciendo todos estos puntos uno va a hacer dar cuenta de que
+
+247
+00:22:16,820 --> 00:22:21,700
+todos los puntos están más cerca de re y h se queda solo ya
+
+248
+00:22:21,700 --> 00:22:26,420
+y eso es una cosa mala no porque ahora ya tengo la primera iteración del algoritmo
+
+249
+00:22:26,420 --> 00:22:32,380
+después de calcular todos los puntos la distancia entre todos los puntos y
+
+250
+00:22:32,380 --> 00:22:40,740
+cada uno de estos puntos relacionado a un grupo o otro, me voy a ir y actualizo el centróide calculando
+
+251
+00:22:40,740 --> 00:22:50,380
+el promedio de los hechos, los labels de los X que tenemos, el promedio de acá y el promedio de acá
+
+252
+00:22:50,380 --> 00:22:57,380
+voy a actualizar este valor. Inicialmente yo tengo un punto acá, X1 y X2, esta proyección me sale acá.
+
+253
+00:22:57,380 --> 00:23:01,380
+Cuando saco un promedio entre todos estos posibles valores acá,
+
+254
+00:23:01,380 --> 00:23:05,380
+debería se mover un poco para acá, o para acá o para acá,
+
+255
+00:23:05,380 --> 00:23:08,380
+pero para algún local se va a mover.
+
+256
+00:23:09,380 --> 00:23:13,380
+¿Por qué? Porque tengo puntos muy lejos, B y C,
+
+257
+00:23:13,380 --> 00:23:16,380
+que están influenciando, entonces va a tener un punto promedio
+
+258
+00:23:16,380 --> 00:23:18,380
+entre todos estos individuos.
+
+259
+00:23:20,380 --> 00:23:23,380
+Si calculo el promedio que estaba acá,
+
+260
+00:23:23,380 --> 00:23:31,120
+este valor, este punto central se movió para acá, ¿cierto? Entonces ahora este es mi centróide,
+
+261
+00:23:31,120 --> 00:23:37,920
+este es el mi que voy a presentar un poquito más adelante, pero este es el punto central acá,
+
+262
+00:23:37,920 --> 00:23:43,840
+el punto que va a ser utilizado para calcular la distancia con los otros puntos.
+
+263
+00:23:43,840 --> 00:23:51,960
+Bueno, el átio estaba solo, continuó lo mismo, pero ahora yo tengo un centróide acá y tengo un centróide acá.
+
+264
+00:23:51,960 --> 00:23:55,800
+Necesito nuevamente calcular las distancias.
+
+265
+00:23:55,800 --> 00:23:57,960
+Entonces tengo este centroide,
+
+266
+00:23:57,960 --> 00:23:59,240
+voy a evaluar.
+
+267
+00:23:59,240 --> 00:24:01,640
+Este B está más cerca de este punto
+
+268
+00:24:01,640 --> 00:24:03,640
+o este B está más cerca de este punto.
+
+269
+00:24:03,640 --> 00:24:06,200
+Está más cerca de este punto acá.
+
+270
+00:24:06,200 --> 00:24:09,800
+De este punto acá, de este clúster, de este grupo.
+
+271
+00:24:09,800 --> 00:24:12,120
+C también está más cerca de este grupo.
+
+272
+00:24:12,120 --> 00:24:15,160
+A también está más cerca de este grupo
+
+273
+00:24:15,160 --> 00:24:16,840
+y F también está más cerca de este grupo.
+
+274
+00:24:16,840 --> 00:24:18,200
+Pero mira que ahora
+
+275
+00:24:18,200 --> 00:24:30,200
+Algunos individuos, algunas personas como C, D y H no están más tan cerca de este centroide acá, ahora están cerca de este centroide.
+
+276
+00:24:30,200 --> 00:24:41,200
+Entonces antes este punto estaba solo, ahora ya tienen tres personas. Bueno, el E aún está perteneciendo a este grupo.
+
+277
+00:24:41,200 --> 00:24:48,200
+Después de hacer la clasificación para todos ellos, tengo que nuevamente actualizar el punto medio,
+
+278
+00:24:48,200 --> 00:24:54,200
+el centróide de este grupo acá, ¿cierto? Mira que ahora no tengo más estos dos elementos,
+
+279
+00:24:54,200 --> 00:24:58,200
+no tengo más estas dos personas, entonces cuando for calcular este centróide,
+
+280
+00:24:58,200 --> 00:25:05,200
+él se va más para acá, se movió para acá, ¿cierto?
+
+281
+00:25:05,200 --> 00:25:13,840
+En cuanto a la hora, como tengo dos puntos cercanos, este centroide se movió para el punto medio entre ellos.
+
+282
+00:25:13,840 --> 00:25:21,800
+Ahora cuando fue calcular la distancia, yo creo que este E va a estar más cerca de este centroide
+
+283
+00:25:21,800 --> 00:25:28,000
+que este E va a estar cerca de este grupo. De hecho, se va a hacer en la interacción 3.
+
+284
+00:25:28,000 --> 00:25:36,640
+Ahora el E, este otro punto D, también todos pertenecen a este cluster acá, este grupo 2.
+
+285
+00:25:36,640 --> 00:25:44,560
+En cuanto al grupo 1 o al cluster, nuestro centro de acá se movió un poco más y ahora
+
+286
+00:25:44,560 --> 00:25:54,880
+estos individuos aún estaban cerca de ese, pero ahora yo creo que ese A y F van a estar más cerca del grupo 2.
+
+287
+00:25:54,880 --> 00:26:02,680
+Entonces cuando for nuevamente calcular la distancia e evaluar esos puntos, uno al final,
+
+288
+00:26:02,680 --> 00:26:07,760
+después de calcular la distancia, va a ver que esos puntos están más cerca de ese individuo.
+
+289
+00:26:07,760 --> 00:26:14,160
+Esos dos puntos están cerca de ese, actualizo nuevamente el centroide y el centroide acá
+
+290
+00:26:14,160 --> 00:26:18,160
+se va a mover para ese punto y ese va a ser mover para ese punto.
+
+291
+00:26:18,160 --> 00:26:23,600
+Uno se va a dar cuenta que después de la iteración 4, yo puedo recalcular esto lo
+
+292
+00:26:23,600 --> 00:26:31,580
+o cuanto quiero, no va a cambiar más. Entonces tuve una convergencia para dos clusters muy
+
+293
+00:26:31,580 --> 00:26:37,720
+específicos. Un cluster que va a ser dado por el grupo BIC y un otro cluster que va a
+
+294
+00:26:37,720 --> 00:26:44,460
+contener a esos individuos. Entonces yo estoy saliendo de una información que no tengo
+
+295
+00:26:44,460 --> 00:26:53,580
+nada de información, un cluster aleatorio y voy a llegar en dos clusters específicos.
+
+296
+00:26:53,580 --> 00:27:00,540
+La idea es intentar crear clusters con esta estructura. Bueno, varias preguntas pueden
+
+297
+00:27:00,540 --> 00:27:07,620
+venir acá, si les dejo una imagen, tener la imagen adelante. Una de las preguntas es,
+
+298
+00:27:07,620 --> 00:27:13,900
+iniciamos con un punto inicial acá y un punto inicial acá. Si cambiamos esos puntos iniciales,
+
+299
+00:27:13,900 --> 00:27:19,700
+llegar a clústeres distintos? sí, eso puede ocurrir, entonces un ejemplo muy sencillo acá es
+
+300
+00:27:19,700 --> 00:27:28,300
+yo tengo esos individuos 1, 2, 3 y 4, dependiendo del punto inicial que ponemos, eso puede ser un
+
+301
+00:27:28,300 --> 00:27:33,460
+clúster, eso puede ser otro, eso puede ser otro y ese puede ser otro, o dependiendo del punto inicial
+
+302
+00:27:33,460 --> 00:27:38,460
+que vamos a coger, eso puede ser un clúster, ese puede ser otro, ese puede ser otro y ese puede ser
+
+303
+00:27:38,460 --> 00:27:44,860
+Pero generalmente cuando intentamos esto con varios puntos iniciales, tenemos una buena
+
+304
+00:27:44,860 --> 00:27:47,380
+convergencia para los clústeres que necesitamos.
+
+305
+00:27:47,380 --> 00:27:54,020
+Y también los algoritmos son actualizados para... bueno, Fumina, hay varias preguntas
+
+306
+00:27:54,020 --> 00:27:56,580
+que usted está contestando, ¿cierto?
+
+307
+00:27:56,580 --> 00:27:57,580
+Sí.
+
+308
+00:27:57,580 --> 00:28:01,620
+Bueno, por ejemplo, Gustavo dejó una buena pregunta.
+
+309
+00:28:01,620 --> 00:28:06,820
+definimos cuántos clústeres, cuántos centroides se debe definir inicialmente.
+
+310
+00:28:06,820 --> 00:28:13,020
+Es una excelente pregunta, ya vamos a discutir eso ahora durante la clase.
+
+311
+00:28:13,020 --> 00:28:19,700
+Inicialmente lo que vamos a intentar hacer es hacer un testeo, asumiendo que no hay ningún
+
+312
+00:28:19,700 --> 00:28:24,220
+clúster, que tenemos solamente una estructura general, una estructura con dos clústeres,
+
+313
+00:28:24,220 --> 00:28:29,380
+una estructura con tres clústeres, con cuatro clústeres, y después vamos a hacer un punto
+
+314
+00:28:29,380 --> 00:28:35,500
+de corte ahí y define ya, este acá el número de clusters ideal solamente para avanzar un poco
+
+315
+00:28:35,500 --> 00:28:41,940
+la para que vea una imagen por ejemplo, este sería el número de grupos o de clusters, voy a empezar
+
+316
+00:28:41,940 --> 00:28:46,700
+con un cluster, o sea no hay ningún grupo específico todos están juntos, los grupos,
+
+317
+00:28:46,700 --> 00:28:52,900
+tres grupos y ahí tiene una métrica reformada, ya con base a esta información yo creo que tenemos
+
+318
+00:28:52,900 --> 00:28:59,900
+tenemos tres clústeres, y uno puede estimar el número de clústeres.
+
+319
+00:28:59,900 --> 00:29:05,900
+Entonces, esa es una idea muy sencilla pero muy poderosa.
+
+320
+00:29:05,900 --> 00:29:12,900
+¿Cómo calculamos esta distancia entre estos puntos y nuestros centroides?
+
+321
+00:29:12,900 --> 00:29:18,900
+Vamos a basar en una métrica conocida como la distancia euclidiana.
+
+322
+00:29:18,900 --> 00:29:23,660
+distancia utilizado acto básicamente la distancia entre ex y su centroide
+
+323
+00:29:23,660 --> 00:29:28,460
+este ex inicialmente solamente un punto pero si tenemos 20 covariables vamos
+
+324
+00:29:28,460 --> 00:29:33,740
+calcular la distancia de cada uno de estos ex en relación a su
+
+325
+00:29:33,740 --> 00:29:39,260
+eixo principal en el centro entonces podemos tener las 20 covariables ahí y
+
+326
+00:29:39,260 --> 00:29:43,740
+no vamos a tener problemas por ejemplo acá tengo 2 mas ese punto con ese
+
+327
+00:29:43,740 --> 00:29:52,780
+este punto con este, cada punto tiene un centroide específico, por ejemplo 2, 3 y 1, sería más o menos una visión acá
+
+328
+00:29:56,940 --> 00:30:05,900
+sería por ejemplo algo como 3 y 1 acá, entonces acá sería el valor 3 y acá sería el valor 1, entonces el centroide empezaría por ejemplo acá
+
+329
+00:30:05,900 --> 00:30:15,260
+Bueno, para esta base de datos muy sencilla, un valor inicial a kx igual a 1 y 2 y un
+
+330
+00:30:15,260 --> 00:30:21,180
+centróleo igual a 3 y 1, voy a calcular la distancia euclidiana, saco el 5, o sea,
+
+331
+00:30:21,180 --> 00:30:28,660
+la distancia r cuadrado entre éste, después saco la raíz cuadrada de esta cosa acá.
+
+332
+00:30:28,660 --> 00:30:33,540
+Comence isso botando la distancia euclidiana, individuos que están más cerca, esta distancia
+
+333
+00:30:33,540 --> 00:30:38,380
+va a estar más cerca de cero, es decir, si tengo un punto que está muy cerca de donde
+
+334
+00:30:38,380 --> 00:30:44,420
+debería estar el centro, este otro punto también está muy cerca de ese acá, va a ser 1 menos
+
+335
+00:30:44,420 --> 00:30:51,080
+un centro por ejemplo 1, 1 menos 1, cero y 2 menos 2, cero. Entonces la distancia ocliidiana
+
+336
+00:30:51,080 --> 00:30:59,940
+va a ser exactamente cero. Cuanto más cerca de cero, más cercanos ellos están, deberían
+
+337
+00:30:59,940 --> 00:31:05,940
+estar en un cluster específico. Individuos que están muy lejos se espera que deberían estar en
+
+338
+00:31:05,940 --> 00:31:12,820
+clusters distintos. Entonces la idea de CAMINS es minimizar la suma de distancias euclidianas al
+
+339
+00:31:12,820 --> 00:31:20,680
+cuadrado. Además de eso vamos a evaluar eso en relación a grupos específicos. Para eso vamos a
+
+340
+00:31:20,680 --> 00:31:26,940
+hacer una métrica muy específica. Vamos a buscar minimizar una cosa que se llama WSS. Vamos a
+
+341
+00:31:26,940 --> 00:31:31,940
+buscar grupos acá que nos son nuestros clúster puede ser un grupo dos grupos
+
+342
+00:31:31,940 --> 00:31:35,940
+como aquel ejemplo que yo estaba utilizando dos grupos específicos
+
+343
+00:31:35,940 --> 00:31:42,500
+tenemos entonces c igual a 2 acá 1 y 2 entonces grupo igual a 2 además de tener
+
+344
+00:31:42,500 --> 00:31:47,740
+dos grupos vamos a tener los centros de estos grupos ya entonces cada uno de
+
+345
+00:31:47,740 --> 00:31:51,780
+estos grupos deben tener un centro específico
+
+346
+00:31:51,780 --> 00:31:56,580
+Y bueno, vamos a calcular algunas métricas en relación a estos grupos.
+
+347
+00:31:56,580 --> 00:31:59,980
+Vamos a tener los EIs que fueron estandarizados.
+
+348
+00:31:59,980 --> 00:32:01,980
+Por suerte, ¿qué son estos EIs?
+
+349
+00:32:01,980 --> 00:32:06,980
+Recuerda que los EIs son estos puntos acá que ya estandarizamos.
+
+350
+00:32:06,980 --> 00:32:12,480
+Y vamos a subtraer por la media del grupo específico.
+
+351
+00:32:12,480 --> 00:32:13,980
+¿Cuál es la media?
+
+352
+00:32:13,980 --> 00:32:20,680
+Bueno, vamos a poner un punto inicial ahí, un valor inicial, o calcular, no sé.
+
+353
+00:32:20,680 --> 00:32:23,680
+Hay distintas formas de definir valores iniciales,
+
+354
+00:32:23,680 --> 00:32:25,280
+el algoritmo ya lo hace,
+
+355
+00:32:25,280 --> 00:32:29,580
+ya tiene formas de intentar obtener buenos valores iniciales para eso,
+
+356
+00:32:29,580 --> 00:32:33,480
+pero la idea es poder intentar también con distintos puntos iniciales.
+
+357
+00:32:33,480 --> 00:32:37,580
+Este miJk va a empezar como si fuese puntos iniciales.
+
+358
+00:32:37,580 --> 00:32:41,980
+Y después vamos haciendo exactamente lo que fui intentando hacer en la imagen,
+
+359
+00:32:41,980 --> 00:32:45,680
+ya acerré acá, pero la imagen que había demostrado.
+
+360
+00:32:45,680 --> 00:32:47,880
+La imagen que había demostrado,
+
+361
+00:32:47,880 --> 00:32:53,320
+vamos actualizando a cada paso vamos actualizando este mi1 y mi2
+
+362
+00:32:53,320 --> 00:32:56,160
+entonces empiezo con mi1 igual a un punto específico
+
+363
+00:32:56,960 --> 00:32:58,960
+Deja que me vea acá de nuevo
+
+364
+00:33:04,760 --> 00:33:07,280
+el mi1 acá será exactamente este punto
+
+365
+00:33:07,480 --> 00:33:10,160
+después voy a actualizar este mi1 para un otro valor
+
+366
+00:33:10,680 --> 00:33:14,200
+que se va actualizando, que se va actualizando hasta que no tenga más actualizaciones
+
+367
+00:33:14,200 --> 00:33:16,760
+entonces el mi1 va a ser exactamente este punto acá
+
+368
+00:33:16,760 --> 00:33:18,760
+mi2 será exactamente este punto
+
+369
+00:33:18,760 --> 00:33:20,760
+¿Cuál será el valor que empezamos?
+
+370
+00:33:20,760 --> 00:33:22,760
+Podemos poner un valor aleatorio
+
+371
+00:33:22,760 --> 00:33:24,760
+que empezó con R y A
+
+372
+00:33:24,760 --> 00:33:26,760
+y lo vamos actualizando
+
+373
+00:33:32,760 --> 00:33:34,760
+Para un grupo dado, el centro
+
+374
+00:33:34,760 --> 00:33:36,760
+al final vamos actualizando
+
+375
+00:33:36,760 --> 00:33:38,760
+como si fuera el centro que va a minimizar
+
+376
+00:33:38,760 --> 00:33:40,760
+un valor específico
+
+377
+00:33:40,760 --> 00:33:42,760
+podemos empezar con valor inicial
+
+378
+00:33:42,760 --> 00:33:44,760
+y después vamos actualizando con base
+
+379
+00:33:44,760 --> 00:33:48,760
+los promedios relacionados al individuo que está más cerca.
+
+380
+00:33:48,760 --> 00:33:52,760
+Entonces vamos calculando estas distancias y vamos agrupando
+
+381
+00:33:52,760 --> 00:33:55,760
+y calculamos el promedio de estos individuos.
+
+382
+00:33:55,760 --> 00:34:00,760
+Bueno, un VWSS menor significa mayor compacidad
+
+383
+00:34:00,760 --> 00:34:03,760
+bajo esta escala y este criterio.
+
+384
+00:34:03,760 --> 00:34:07,760
+Bueno, demuestra por sí solo que encontramos grupos reales o útiles.
+
+385
+00:34:07,760 --> 00:34:11,760
+Es decir, el camino uno va a poder elegir
+
+386
+00:34:11,760 --> 00:34:18,840
+y elegir varios o 1, 2, 3, 4, 5, varios grupos pero bueno tenemos formas de
+
+387
+00:34:18,840 --> 00:34:22,480
+intentar estimar eso pero no puedo te garantizar que son exactamente los
+
+388
+00:34:22,480 --> 00:34:28,080
+grupos reales porque no tenemos como evaluar esos grupos reales.
+
+389
+00:34:28,080 --> 00:34:31,840
+Eso es desconocido, no existe, es una información que no tenemos.
+
+390
+00:34:31,840 --> 00:34:37,760
+No sé si a las personas le gustan bajo riesgo o alto riesgo. De hecho esas personas
+
+391
+00:34:37,760 --> 00:34:41,200
+tampoco conocen esa información, ellas no pueden ser clasificadas como a mí me
+
+392
+00:34:41,200 --> 00:34:44,800
+hacer inversión de bajo riesgo, en cuanto en realidad,
+
+393
+00:34:45,000 --> 00:34:48,720
+él está más cerca de un grupo que hace inversiones de medio riesgo.
+
+394
+00:34:48,920 --> 00:34:52,400
+Ya entonces la variable Y no es conocida,
+
+395
+00:34:52,760 --> 00:34:56,200
+nunca va a ser conocida, es imposible tener esa información.
+
+396
+00:34:58,200 --> 00:35:01,920
+No podemos poner esa información de ninguna manera.
+
+397
+00:35:02,200 --> 00:35:05,880
+Lo que intentamos hacer es la estimamos o intentamos crear
+
+398
+00:35:05,880 --> 00:35:14,080
+esos grupos, esos clústeres y evaluarnos si eso tiene sentido, esos grupos. Bueno, varias empresas
+
+399
+00:35:14,080 --> 00:35:20,200
+lo utilizan o eso es muy conocido exactamente para hacer publicidad. Entonces vamos a intentar
+
+400
+00:35:20,200 --> 00:35:26,840
+poner ustedes en determinados grupos específicos. Este grupo acá que le gusta esas cosas, vamos a
+
+401
+00:35:26,840 --> 00:35:35,240
+hacer una publicidad de computadores. O este grupo acá le gusta, no sé, celulares. Entonces vamos a
+
+402
+00:35:35,240 --> 00:35:39,960
+hacer otro tipo de publicidad. Entonces ellos intentan sacar información, le agregar un grupo
+
+403
+00:35:39,960 --> 00:35:45,320
+específico y formar a ese individuo acá le gusta este tipo de publicidad. O se va a hacer inversión,
+
+404
+00:35:45,320 --> 00:35:50,560
+bueno con base en las informaciones que la persona me contestó, tiene pertenencia a un grupo
+
+405
+00:35:50,560 --> 00:35:56,640
+específico 2 y al final comprendemos que este grupo 2 son personas que le gustan hacer inversión
+
+406
+00:35:56,640 --> 00:36:09,240
+de medio riesgo. Por ejemplo acá dejo algunos ejemplos muy específicos, tengo datos 1, 2, 3, 8, 9 y 10.
+
+407
+00:36:09,240 --> 00:36:16,360
+Vamos a empezar asumiendo que para estos individuos X acá tengo dos grupos, tengo dos clusters
+
+408
+00:36:16,360 --> 00:36:24,320
+y vamos a poner algunos centros iniciales, vamos a asumir que el centro inicial está en 1 y que
+
+409
+00:36:24,320 --> 00:36:31,840
+nuestro centro inicial está en 8. Entonces voy a calcular acá para los individuos 1, 2, 3, 8, 9, 10.
+
+410
+00:36:31,840 --> 00:36:42,960
+La distancia entre el centro 1 y la distancia entre el centro 2. La distancia entre el centro 1 va a ser 0,
+
+411
+00:36:42,960 --> 00:36:50,920
+el centro 2 49. Para el individuo 2 está más cerca de ese punto acá. La distancia va a ser 2 menos 1,
+
+412
+00:36:50,920 --> 00:36:57,480
+1, 2 menos 1 al cuadrado, 1, 3 menos 1, 2, 2 al cuadrado, 4.
+
+413
+00:36:57,480 --> 00:37:02,600
+Cuando comparo 3 con 8 va a ser 5, 5 al cuadrado, 25.
+
+414
+00:37:02,600 --> 00:37:08,160
+Por otro lado, estos puntos acá pasan a estar más lejos de este centro,
+
+415
+00:37:08,160 --> 00:37:10,280
+más cercanos a este punto.
+
+416
+00:37:10,280 --> 00:37:13,000
+Entonces, estos individuos pertenecen al grupo 1,
+
+417
+00:37:13,000 --> 00:37:14,920
+y estos individuos pertenecen al grupo 2.
+
+418
+00:37:14,920 --> 00:37:20,520
+Bueno, como yo conozco que ahora estos individuos están entre 1, 2 y 3,
+
+419
+00:37:20,520 --> 00:37:30,520
+Yo empecé con centro inicial 1, acabe poniendo este individuo acá, pero ahora voy a hacer una actualización, entonces voy a calcular nuevos centros.
+
+420
+00:37:30,520 --> 00:37:38,520
+Entonces, en el paso de la interacción 2, empecé con, inicialmente con la interacción 1, empecé con el valor 1,
+
+421
+00:37:38,520 --> 00:37:41,520
+y la interacción 2, ahora vamos a actualizarla.
+
+422
+00:37:41,520 --> 00:37:48,520
+Como actualizamos, estos individuos están más cerca de ese centro 1, calculo su promedio, ya?
+
+423
+00:37:48,520 --> 00:37:54,300
+el promedio de uno, dos y tres va a ser exactamente dos, el promedio de estos individuos acá
+
+424
+00:37:54,300 --> 00:37:59,240
+va a ser exactamente nueve, y ahora puedo hacer lo que quiero que no voy a alcanzar más
+
+425
+00:37:59,240 --> 00:38:06,540
+actualizar estos individuos, ellos siempre van a estar en grupo uno, y ellos siempre van a estar en grupo dos,
+
+426
+00:38:06,540 --> 00:38:13,700
+por temas de la distancia no tenemos más lo que hacer. Bueno, en la práctica va a
+
+427
+00:38:13,700 --> 00:38:20,700
+Vamos a poner puntos aleatorios o algún punto relacionado a un dato.
+
+428
+00:38:20,700 --> 00:38:24,700
+Y vamos a empezar a hacer iteraciones, o sea, vamos a evaluar
+
+429
+00:38:24,700 --> 00:38:30,700
+Estos individuos están cerca de este centro o de este centro, están cerca de este grupo acá.
+
+430
+00:38:30,700 --> 00:38:34,700
+En cuanto a algunos puntos en verde, cerca de este punto acá.
+
+431
+00:38:34,700 --> 00:38:39,700
+El azul, casi todos están cerquidos, pero hay un individuo que está más cerca de acá.
+
+432
+00:38:39,700 --> 00:38:45,740
+acá. Bueno, después de evaluar eso voy recalcular el centro. Si antes estaba acá, ahora el centro
+
+433
+00:38:45,740 --> 00:38:50,500
+debería mover al tiro para algún punto más o menos acá, ¿Cierto? Y es lo que pasa mismo,
+
+434
+00:38:50,500 --> 00:38:59,620
+antes estaba acá, cuando acabé recalculando me salió ese punto, sí, el X estaba acá, ya estaba
+
+435
+00:38:59,620 --> 00:39:05,580
+muy cerca de los puntos, cuando recalcule solamente subió un poquito más, ya. Y acá no cambió casi
+
+436
+00:39:05,580 --> 00:39:10,880
+porque básicamente sólo tiene un punto que está más clasificado. Ahora, nuevamente,
+
+437
+00:39:10,880 --> 00:39:15,020
+este individuo está más cerca de este clúster o está más cerca de este? Ahora está más cerca
+
+438
+00:39:15,020 --> 00:39:20,540
+de este, entonces clasifico con azul. Aún tenemos algunos verdes que están más cerca,
+
+439
+00:39:20,540 --> 00:39:26,440
+algunos puntos acá que están más cerca del verde, que están de acá, pero después de algunas
+
+440
+00:39:26,440 --> 00:39:31,340
+interacciones, acá 20 interacciones, llegamos exactamente en los clústeres específicos,
+
+441
+00:39:31,340 --> 00:39:35,340
+más o menos como la estructura que le apresentei.
+
+442
+00:39:35,340 --> 00:39:39,340
+Entonces la idea es empezar en puntos aleatorios
+
+443
+00:39:39,340 --> 00:39:43,340
+y vamos seguido calculando su promedio hasta llegar
+
+444
+00:39:43,340 --> 00:39:47,340
+en los centros de cada uno de los clústeres.
+
+445
+00:39:47,340 --> 00:39:51,340
+Una cosa que le comenté es que los mismos dados
+
+446
+00:39:51,340 --> 00:39:55,340
+con tres clústeres pueden tener valores distintos.
+
+447
+00:39:55,340 --> 00:39:59,340
+Es una situación acá, eso son los, varia aquella distancia
+
+448
+00:39:59,340 --> 00:40:04,740
+distancia entre los puntos de los clusters o no va a ver que ella cambia un poquito
+
+449
+00:40:05,260 --> 00:40:07,260
+dependiendo del punto inicial que ponemos
+
+450
+00:40:08,500 --> 00:40:11,180
+pero llegó una situación muy específica acá
+
+451
+00:40:11,820 --> 00:40:14,180
+no sé lo que pasó creo que
+
+452
+00:40:15,140 --> 00:40:20,260
+ella acabó clasificando muy malo los clusters es posible que no se
+
+453
+00:40:20,900 --> 00:40:23,460
+definió un cluster como un punto acá
+
+454
+00:40:23,460 --> 00:40:30,100
+un otro cluster, dos puntos acá y un cluster puede ser definido como esos puntos acá,
+
+455
+00:40:30,100 --> 00:40:36,460
+¿cierto? Entonces es posible que ella o uno de los valores iniciales acabó haciendo con que
+
+456
+00:40:36,460 --> 00:40:42,780
+esos clusters fuesen clasificados como solamente un cluster específico o esos o no sé, algún
+
+457
+00:40:42,780 --> 00:40:48,140
+de esos específicos. Esto le va a tocar algunas veces cuando for poner algún valor inicial,
+
+458
+00:40:48,140 --> 00:40:55,140
+Entonces, en esos puntos iniciales uno puede tener esos problemas.
+
+459
+00:40:55,140 --> 00:41:03,140
+Y bien, cómo vamos a correr esto varias veces con valores de inicialización distintos?
+
+460
+00:41:03,140 --> 00:41:08,140
+No vamos a tener problemas, porque se espera que conforme corremos esto varias veces,
+
+461
+00:41:08,140 --> 00:41:13,140
+el algoritmo va a convertir en la mayoría de las veces para el verdadero clúster.
+
+462
+00:41:13,140 --> 00:41:19,340
+Y después evaluamos cuáles fueron los clústeres que más aparecieron, que más ocurrieron,
+
+463
+00:41:19,340 --> 00:41:23,860
+y definimos esos como nuestros clústeres finales.
+
+464
+00:41:23,860 --> 00:41:29,380
+Conservamos el ajuste del menor WSS entre varias inicializaciones.
+
+465
+00:41:29,380 --> 00:41:31,540
+Una de ellas me sale super mal.
+
+466
+00:41:31,540 --> 00:41:39,100
+Es solamente capaz de mostrar que en algunas situaciones la inicialización influencia.
+
+467
+00:41:39,100 --> 00:41:40,660
+Y hay que tener cuidado.
+
+468
+00:41:40,660 --> 00:41:44,500
+no fue solamente porque cogieron un K-means una vez,
+
+469
+00:41:44,820 --> 00:41:47,020
+tuvieron clústeres que se cogieron nuevamente
+
+470
+00:41:47,100 --> 00:41:48,820
+y va a ser el mismo clúster.
+
+471
+00:41:52,420 --> 00:41:56,820
+Bueno, para eso vamos a mirar...
+
+472
+00:41:57,380 --> 00:41:59,060
+A ver si tienen preguntas.
+
+473
+00:42:02,140 --> 00:42:04,060
+No, hay una buena pregunta, Antonio.
+
+474
+00:42:05,100 --> 00:42:06,380
+Antonio dejó una pregunta.
+
+475
+00:42:06,460 --> 00:42:08,660
+¿El número de iteraciones definimos nosotros?
+
+476
+00:42:08,660 --> 00:42:14,740
+y general no vamos actualizando hasta que no tenga más ningún cambio por ejemplo acá
+
+477
+00:42:15,540 --> 00:42:17,540
+tengo estos valores promedios
+
+478
+00:42:18,860 --> 00:42:20,700
+Corrió una interacción
+
+479
+00:42:20,700 --> 00:42:21,820
+bueno
+
+480
+00:42:21,820 --> 00:42:25,300
+fue posible actualizar el centro de la interacción 12
+
+481
+00:42:26,100 --> 00:42:32,900
+en la interacción 20 a hora de 20 adelante no me importa lo que haga voy a calcular la distancia
+
+482
+00:42:32,900 --> 00:42:39,140
+voy a intentar actualizar el centróide pero no va a no va a no va a acontecer más nada entonces la
+
+483
+00:42:39,140 --> 00:42:46,500
+iteración 20 21 22 23 24 5 6 hasta 1 milhão va a ser siempre el mismo cluster es decir llegamos
+
+484
+00:42:46,500 --> 00:42:52,740
+o nuestro nuestro algoritmo convergiu, teve una convergencia, llegamos en la convergencia nada más
+
+485
+00:42:52,740 --> 00:42:58,580
+hacer, es importante que vayan haciendo la iteración hasta que tenga una convergencia en algún
+
+486
+00:42:58,580 --> 00:43:03,540
+momento principalmente si ustedes tienen muchas observaciones van a tener que tener varias
+
+487
+00:43:03,540 --> 00:43:08,980
+interacciones ahí ya conforme almente el número de observaciones va a aumentar el número de
+
+488
+00:43:08,980 --> 00:43:14,540
+interacciones si tengo muchas observaciones es posible que va a tener muchas interacciones pero
+
+489
+00:43:14,540 --> 00:43:23,100
+en algún momento esta interacción así como esta acá en la iteración 4 no me importa lo que haga acá
+
+490
+00:43:23,100 --> 00:43:28,740
+si fuera una interacción 5 no tiene más como actualizar eso porque ese ya está en el centro
+
+491
+00:43:28,740 --> 00:43:34,220
+de 6 puntos, ese ya está en el centro de 6 puntos, si coger eso nuevamente no va a cambiar nada.
+
+492
+00:43:36,020 --> 00:43:41,340
+Entonces, ¿cuántas interacciones debemos seguir? hasta llegar a la convergencia. Entonces,
+
+493
+00:43:41,340 --> 00:43:46,800
+varios algoritmos van a correr allí 50 mil veces, 60 mil veces, 70,
+
+494
+00:43:46,800 --> 00:43:53,840
+si tiene muchas observaciones va a tener un montón de interacciones, entonces no debe parar solamente
+
+495
+00:43:53,840 --> 00:44:03,600
+cuando tiene la convergencia. Y bueno, vamos a describir entonces algunas métricas que realmente
+
+496
+00:44:03,600 --> 00:44:10,640
+utilizamos, va a ser nuestro WSS, que es una métrica que va a medir la variabilidad dentro de un grupo,
+
+497
+00:44:10,640 --> 00:44:18,000
+dentro de los grupos, es decir, lo cuanto estos valores están variando dentro de este grupo.
+
+498
+00:44:18,000 --> 00:44:26,960
+Si tenemos centróides muy malos, esta distancia va a ser muy grande, este VW va a ser muy grande.
+
+499
+00:44:26,960 --> 00:44:34,080
+Entonces la idea es actualizar ello hasta que este valor sea lo menor posible.
+
+500
+00:44:34,080 --> 00:44:38,960
+Pero vamos a tener una variancia dentro de nuestros grupos, es decir,
+
+501
+00:44:38,960 --> 00:44:43,760
+en este punto acá, va a tener una variancia entre los centros y sus puntos,
+
+502
+00:44:43,760 --> 00:44:49,960
+además de eso va a tener una variancia entre el centro y los otros centros específicos,
+
+503
+00:44:49,960 --> 00:44:52,960
+que es exactamente lo que va a mostrar acá.
+
+504
+00:44:52,960 --> 00:44:59,960
+La media general relaciona cada uno de los centroides o de la media de los grupos.
+
+505
+00:44:59,960 --> 00:45:06,960
+Entonces consigo la variancia total se puede componer por medio de la variancia dentro
+
+506
+00:45:06,960 --> 00:45:15,640
+y la variancia entre estos considerando un centro promedio final acá.
+
+507
+00:45:15,640 --> 00:45:20,880
+Si calculas un valor promedio debería ser algo como un puntito acá.
+
+508
+00:45:20,880 --> 00:45:22,880
+Voy a ponerlo.
+
+509
+00:45:27,880 --> 00:45:29,880
+La primera color.
+
+510
+00:45:29,880 --> 00:45:32,880
+Voy a tener un valor acá.
+
+511
+00:45:32,880 --> 00:45:36,880
+Este va a ser nuestro Z.
+
+512
+00:45:36,880 --> 00:45:40,380
+este es el punto K promedio entre ellos
+
+513
+00:45:40,380 --> 00:45:46,380
+y evaluo la distancia, está en el centro, debe ser algo así
+
+514
+00:45:46,380 --> 00:45:56,880
+voy a calcular la diferencia entre este y este, este y este, este y este más los pesos que tienen en relación a estos puntos
+
+515
+00:45:56,880 --> 00:46:01,380
+entonces de alguna manera evaluo la variabilidad total a Kaph
+
+516
+00:46:01,380 --> 00:46:05,380
+Entonces es una forma muy sencilla de hacer la composición.
+
+517
+00:46:05,380 --> 00:46:08,380
+La variencia dentro de este grupo que tenemos
+
+518
+00:46:08,380 --> 00:46:11,380
+y después el punto medio en relación a
+
+519
+00:46:11,380 --> 00:46:14,380
+cuanto está distinto del valor general.
+
+520
+00:46:14,380 --> 00:46:18,380
+Y la variencia final es una composición o la suma entre los dos.
+
+521
+00:46:18,380 --> 00:46:22,380
+Entonces para esas medidas y las mismas observaciones
+
+522
+00:46:22,380 --> 00:46:28,380
+uno puede componer ese TSS como si fuese la composición entre esas dos sumas.
+
+523
+00:46:28,380 --> 00:46:35,380
+BSS compara cada centro con la media global y ponderan por el tamaño del grupo.
+
+524
+00:46:35,380 --> 00:46:41,380
+En cuanto a BSS, no es el promedio de las distancias entre todos los pares.
+
+525
+00:46:41,380 --> 00:46:45,380
+Bueno, básicamente eso no es el promedio de la distancia de todos los pares.
+
+526
+00:46:45,380 --> 00:46:48,380
+Va a tener un valor de Z promedio general ahí,
+
+527
+00:46:48,380 --> 00:46:52,380
+y vamos a evaluar ese me en relación a ese promedio final.
+
+528
+00:46:52,380 --> 00:46:56,380
+Pero bueno, tenemos también ese BSS.
+
+529
+00:46:56,380 --> 00:47:01,100
+Un ejemplo específico acá de los dados que había representado anteriormente
+
+530
+00:47:01,100 --> 00:47:07,660
+Tenemos valores 1, 2, 3, 8, 9, 10 y centros 2 y 9
+
+531
+00:47:07,660 --> 00:47:12,140
+Si calculamos la media global acá vamos a tener valores 5.5
+
+532
+00:47:12,140 --> 00:47:18,140
+Mira que el WSS va a ser la distancia entre ese y ese
+
+533
+00:47:18,140 --> 00:47:22,140
+S menos S al cuadrado
+
+534
+00:47:22,140 --> 00:47:31,020
+después sacamos la raíz, va a ser 1. S por S menos S, 0 al cuadrado y sacamos la raíz, 0.
+
+535
+00:47:31,020 --> 00:47:39,900
+S menos S, 1 al cuadrado y sacamos la raíz, 1. Entonces tenemos acá la distancia entre ese punto y
+
+536
+00:47:39,900 --> 00:47:48,780
+y ese lo mismo acá ese con ese va a ser más uno ese con ese cero y ese con ese
+
+537
+00:47:48,780 --> 00:47:56,420
+entonces el wss es la distancia entre esos tres puntos y relaciona su centro
+
+538
+00:47:56,420 --> 00:48:04,780
+lo mismo para eso entonces el wss es 4 ya pero cuando yo voy a calcular el dss
+
+539
+00:48:04,780 --> 00:48:14,380
+voy a tener 2 que es el centro que tengo acá ya menos la media global entonces 2 menos la media
+
+540
+00:48:14,380 --> 00:48:24,220
+global que la media de esos puntos 5.5 o sea 2 menos 5.5 al cuadrado multiplicamos por 3 tenemos
+
+541
+00:48:24,220 --> 00:48:33,020
+acá un valor específico lo mismo tenemos tres puntos acá el centro es 9 ya menos la media global
+
+542
+00:48:33,020 --> 00:48:38,020
+Entonces 9 menos 5.5, veces 3 que son 3 puntos que tengo acá.
+
+543
+00:48:38,020 --> 00:48:46,020
+Entonces voy a tener estos dos elementos, calculo la suma, ese va a ser 73.5.
+
+544
+00:48:46,020 --> 00:48:54,020
+Nuestro TSS, o la variancia global, va a ser la suma de este punto con ese, 77.5.
+
+545
+00:48:58,020 --> 00:49:02,020
+La buena pregunta que me hicieron es cómo elegimos el número de clústeres.
+
+546
+00:49:02,020 --> 00:49:07,680
+Hay algunos métodos muy conocidos para hacer la elección de los clústeres.
+
+547
+00:49:07,680 --> 00:49:11,680
+Uno de ellos es por el método del codo.
+
+548
+00:49:11,680 --> 00:49:18,180
+El método del codo busca una disminución cada vez menor dentro de nuestro WSS.
+
+549
+00:49:18,180 --> 00:49:25,980
+Hay otro método conocido como silueta, que va a comparar la cercanía al propio grupo y al grupo vecino.
+
+550
+00:49:25,980 --> 00:49:31,980
+Y hay otro método conocido como GAP, que va a contrastar la compasidad con una referencia simulada.
+
+551
+00:49:31,980 --> 00:49:36,980
+El GAP va a generar grupos distintos de forma aleatória.
+
+552
+00:49:36,980 --> 00:49:41,980
+Yo tengo los clústeres, voy a generar valores aleatórios y voy a hacer una comparación de cómo deberían ser
+
+553
+00:49:41,980 --> 00:49:48,980
+esos puntos con valores aleatórios y conseguir al final llegar a un número de clústeres específicos.
+
+554
+00:49:48,980 --> 00:49:54,180
+En el primer caso, el menor WSS favorece más grupos.
+
+555
+00:49:54,180 --> 00:50:02,180
+En el extremo, un grupo por fila de WSS va a ser cero.
+
+556
+00:50:02,180 --> 00:50:08,980
+Es decir, en una situación muy rara o muy extrema, ustedes podrían tener que,
+
+557
+00:50:08,980 --> 00:50:10,980
+o no pueden llegar a una información ya,
+
+558
+00:50:10,980 --> 00:50:12,980
+profesor, yo tengo 50 observaciones.
+
+559
+00:50:12,980 --> 00:50:14,980
+Voy a asumir que,
+
+560
+00:50:14,980 --> 00:50:18,480
+de estas 50 observaciones cada uno de ellos es un cluster
+
+561
+00:50:19,480 --> 00:50:22,480
+entonces cada uno de estos puntos acá va a ser un grupo específico
+
+562
+00:50:22,480 --> 00:50:23,980
+¿eso puede ocurrir?
+
+563
+00:50:23,980 --> 00:50:26,980
+sí, puede ocurrir, no es razonable pero puede ocurrir
+
+564
+00:50:26,980 --> 00:50:30,980
+de hecho no está haciendo clusterizaciones, está simplemente informando
+
+565
+00:50:30,980 --> 00:50:33,980
+tenemos 50 observaciones cada uno de ellos es un individuo específico
+
+566
+00:50:33,980 --> 00:50:37,980
+en esta situación muy extrema su WSS va a ser 0
+
+567
+00:50:37,980 --> 00:50:42,980
+es decir, el punto acá menos su centro que va a ser el mismo punto
+
+568
+00:50:42,980 --> 00:50:52,340
+punto va a ser igual a cero. Entonces nuestro objetivo no es tener pocos clústeres,
+
+569
+00:50:52,340 --> 00:50:58,100
+sino tener 50 clústeres. Queremos encontrar grupos que están más cerca y que de hecho comparten
+
+570
+00:50:58,100 --> 00:51:05,740
+alguna similitud, los datos, información en común, para exactamente poder agruparlos.
+
+571
+00:51:05,740 --> 00:51:15,540
+una de las formas es por método del código, entonces vamos a cargar ahora inicialmente
+
+572
+00:51:15,540 --> 00:51:24,340
+la base de los libros, acá tengo el estudio, bueno, los que fueran a correr la clase, van
+
+573
+00:51:24,340 --> 00:51:33,820
+a tener ahí la librería Cluster, Cargar los datos, dar una mirada en cómo están los
+
+574
+00:51:33,820 --> 00:51:42,100
+vamos a ver la imagen acá, vamos a ver varias informaciones que he comentado, alcohol, ácido,
+
+575
+00:51:42,100 --> 00:51:49,540
+ceniza, alcalinidad, entre otros, sí, bueno, en esa base por ahora no conozco cuáles son los vinos,
+
+576
+00:51:49,540 --> 00:51:54,180
+después esa información existe, después vamos a agregar esa información y hacer una comparación,
+
+577
+00:51:54,180 --> 00:52:03,420
+de hecho se puede encontrar los grupos específicos, ya, pero bueno, cargamos la base, voy a hacer
+
+578
+00:52:03,820 --> 00:52:11,660
+la estandarización, entonces ahora tengo acá los dados estandarizados, ya igual había comentado,
+
+579
+00:52:11,660 --> 00:52:17,420
+es decir, estoy sacando su promedio y dividiendo por la deviación estándar, estoy calculando LZ,
+
+580
+00:52:17,420 --> 00:52:24,300
+esto se hace con la escala Z. Y voy a intentar ahora, bueno, estoy haciendo algunas informaciones acá,
+
+581
+00:52:24,300 --> 00:52:31,740
+definiendo cuántos posibles clústeres vamos a tener de uno a ocho y vamos a calcular los camins
+
+582
+00:52:31,740 --> 00:52:38,780
+los WSS y después hacer el gráfico del codo igual tiene en la imagen, va a ser el
+
+583
+00:52:38,780 --> 00:52:51,200
+codo y la silueta. La idea del gráfico del codo es, voy a tener la información del
+
+584
+00:52:51,200 --> 00:52:56,880
+WSS, la idea más esencial, conforme voy agregando más clusters, lo cuanto
+
+585
+00:52:56,880 --> 00:53:05,520
+esto está cambiando la variabilidad dentro de los grupos. Si no tengo ningún clúster, tengo una alta variabilidad.
+
+586
+00:53:05,520 --> 00:53:13,400
+Si tengo dos clúster, ahora dos grupos, aún tengo una alta variabilidad. Pero la ganancia de información
+
+587
+00:53:13,400 --> 00:53:21,720
+acá fue muy grande, me bajó desde ese punto. Ahora con tres clúster, me parece que también tuve una muy buena ganancia de información.
+
+588
+00:53:21,720 --> 00:53:26,040
+Ya? Ustedes van a ver que después de un punto específico,
+
+589
+00:53:26,800 --> 00:53:28,800
+esta ganancia pasa a ser muy pequeña.
+
+590
+00:53:29,160 --> 00:53:32,240
+O sea, la idea acá es que se parezca con un codo.
+
+591
+00:53:32,760 --> 00:53:35,000
+Si vamos a poner el codo para abajo,
+
+592
+00:53:35,240 --> 00:53:38,600
+y la idea es cuando tenemos un cambio acá.
+
+593
+00:53:38,680 --> 00:53:41,400
+Esta es la parte inicial del codo.
+
+594
+00:53:41,800 --> 00:53:45,440
+Y acá es cuando tenemos el cambio.
+
+595
+00:53:46,120 --> 00:53:47,680
+Entonces, en este punto acá,
+
+596
+00:53:48,080 --> 00:53:50,440
+uno puede ver que hay un cambio muy significativo.
+
+597
+00:53:51,720 --> 00:54:00,560
+en acá, uno puede ver que hay cambios muy significativos, sí? Entonces,
+
+598
+00:54:02,920 --> 00:54:09,240
+una cosa que es importante ver es, cómo definimos acá? Cuando tenemos la mayor diferencia entre
+
+599
+00:54:09,240 --> 00:54:15,440
+nuestro VWSS, de acá para acá no me parece tener una buena ganancia de información,
+
+600
+00:54:15,440 --> 00:54:24,000
+Entonces definimos este punto como el posible número de clústeres. Pero profesor, tengo que
+
+601
+00:54:24,000 --> 00:54:29,440
+ajustar todo esto si ajustamos el modelo con un clúster, asumiendo que no tenemos ningún clúster,
+
+602
+00:54:29,440 --> 00:54:34,880
+después ajustamos, asumiendo que tenemos dos clústeres, con tres clústeres, cuatro, cinco,
+
+603
+00:54:34,880 --> 00:54:40,960
+hasta ocho. Una cosa buena es que los algoritmos ya son muy bien optimizados, entonces calcular
+
+604
+00:54:40,960 --> 00:54:49,720
+eso no me tomó nada de hecho corremos acá con ocho posibles clusters e vamos a correr de nuevo
+
+605
+00:54:49,720 --> 00:54:57,240
+ahora voy a correr todos los clusters 1 2 3 3 segundos más o menos me tomó para correr con
+
+606
+00:54:57,240 --> 00:55:05,160
+1 2 3 4 5 6 7 8 clusters entonces y logró hacer todas esas cuentas para los 8 posibles clusters
+
+607
+00:55:05,160 --> 00:55:11,160
+en tres segundos entonces este método es muy utilizado y entonces pero uno tiene que calcular
+
+608
+00:55:11,160 --> 00:55:16,680
+exactamente para 8, professor quería evaluar para más, no hay problema ponemos acá
+
+609
+00:55:19,040 --> 00:55:21,720
+20 y entonces podemos evaluar para 20
+
+610
+00:55:23,560 --> 00:55:25,320
+y no va a ser mi sala de gráfico
+
+611
+00:55:25,320 --> 00:55:39,120
+y nuevamente con 20 gráficos lo mismo va a pasar, este después tiene un cambio acá,
+
+612
+00:55:39,120 --> 00:55:45,680
+cuanto más clusters ponemos menor va a ser la variencia dentro de los grupos, pero la
+
+613
+00:55:45,680 --> 00:55:52,000
+ganancia de información es muy pequeña, si? y vamos a ver para otro acá para que ustedes
+
+614
+00:55:52,000 --> 00:55:57,000
+y cada noche.
+
+615
+00:55:57,000 --> 00:56:03,000
+O sea, volviendo a 8 clusters, lo que tenemos con el método del codo,
+
+616
+00:56:03,000 --> 00:56:07,000
+no sale con eso, posiblemente tenemos 3 clusters.
+
+617
+00:56:07,000 --> 00:56:11,000
+Hay un otro método que es conocido como la silueta.
+
+618
+00:56:11,000 --> 00:56:17,000
+La regla decisión acá es que debemos elegir el cluster que tiene el mayor punto acá,
+
+619
+00:56:17,000 --> 00:56:20,000
+lo que maximizó esta métrica.
+
+620
+00:56:20,000 --> 00:56:25,300
+Le voy a presentar las cuentas un poquito más adelante, pero acá también me da la sensación,
+
+621
+00:56:25,300 --> 00:56:30,920
+o bueno, el valor acá nos indica que posiblemente tenemos tres clústeres.
+
+622
+00:56:30,920 --> 00:56:35,280
+Entonces inicialmente con esos dos métodos tenemos eso,
+
+623
+00:56:37,500 --> 00:56:39,500
+y después vamos a ver el gap.
+
+624
+00:56:40,340 --> 00:56:42,340
+¿Cómo calculamos la silueta?
+
+625
+00:56:42,340 --> 00:56:45,040
+La silueta, la interpretación, es un ejemplo.
+
+626
+00:56:45,040 --> 00:56:50,040
+La cilita va a calcular la distancia media a los otros puntos de su grupo.
+
+627
+00:56:50,040 --> 00:56:55,040
+Entonces vamos a tener la i que va a calcular la distancia media a los otros puntos de su grupo
+
+628
+00:56:55,040 --> 00:57:00,040
+y bi va a ser la menor distancia media a los puntos de otro grupo.
+
+629
+00:57:00,040 --> 00:57:04,040
+Entonces él hace estas cuentas. Por ejemplo, si tenemos acá 2 y 6,
+
+630
+00:57:04,040 --> 00:57:09,040
+va a calcular 2 menos 6 partido del máximo entre estos puntos, 6.
+
+631
+00:57:09,040 --> 00:57:12,040
+Y tiene el valor 0.66 acá.
+
+632
+00:57:12,040 --> 00:57:17,840
+La idea es que cerca de 1 mayor la separación respecto a su grupo vecino,
+
+633
+00:57:17,840 --> 00:57:25,520
+o sea, si estos puntos están muy cerca, la distancia entre este y este será cerca de 0.
+
+634
+00:57:25,520 --> 00:57:35,800
+Si tengo aquí 2 y 2, la distancia será 2 menos 2, 0 partido 2, 0 partido 2 será exactamente 0.
+
+635
+00:57:35,800 --> 00:57:40,340
+Cerca de 0 las observaciones en una zona de superposición,
+
+636
+00:57:40,340 --> 00:57:48,700
+es decir, ellos están muy cerca o básicamente ahí está muy mezclado la cosa.
+
+637
+00:57:48,700 --> 00:57:53,860
+Entonces la idea acá es que cuanto más cerca de uno, mayor la separación, más cerca de
+
+638
+00:57:53,860 --> 00:57:59,700
+cero está una zona de superposición. Bueno, negativo, en promedio, está más cerca del
+
+639
+00:57:59,700 --> 00:58:04,700
+otro grupo. Entonces, quiere decir que ese punto acá fue más clasificado y debería
+
+640
+00:58:04,700 --> 00:58:09,700
+estar el otro grupo. Vamos a calcular cada uno de esos individuos y después saco su promedio.
+
+641
+00:58:10,340 --> 00:58:17,340
+porque sacamos el promedio, porque vamos a evaluar básicamente las distancias, no exactamente una distancia, pero las distancias acá
+
+642
+00:58:17,340 --> 00:58:23,340
+con un punto específico, cada uno de esos valores va a ser distinto para los Ais y los Bs
+
+643
+00:58:23,340 --> 00:58:29,340
+vamos a tener varios valores, sacamos el promedio y acá es exactamente la silueta media
+
+644
+00:58:29,340 --> 00:58:35,340
+entonces saco la silueta media acá, este valor fue de 0, casi 0.36
+
+645
+00:58:35,340 --> 00:58:42,340
+Entonces, con dos grupos tenemos una silueta media de 0.26, con cuatro grupos y por ahí adelante.
+
+646
+00:58:42,340 --> 00:58:46,340
+Elijimos la que maximiza eso.
+
+647
+00:58:46,340 --> 00:58:49,340
+Entonces la silueta media en los vinos.
+
+648
+00:58:49,340 --> 00:58:57,340
+Acá, el valor sale un poco distinto, o no? Sabe lo mismo que los expositores de la base.
+
+649
+00:58:57,340 --> 00:59:00,340
+Entonces tenemos posiblemente ahí tres grupos.
+
+650
+00:59:00,340 --> 00:59:07,380
+grupos, es el mejor de esos candidatos, aunque exista una superposición entre los grupos.
+
+651
+00:59:07,380 --> 00:59:16,220
+Y el último es conocido como GEP, o una referencia sin estructura de grupos. Vamos a comparar los
+
+652
+00:59:16,220 --> 00:59:23,860
+VWSS observados con el datos simulados de una región de referencia. Básicamente acá vamos a mirar
+
+653
+00:59:23,860 --> 00:59:30,980
+comparar el UWSS y comparar con valores que deberían venir al azar. Acá tenemos la forma
+
+654
+00:59:30,980 --> 00:59:35,580
+que se calcula el gap, pero básicamente lo que ajustamos es, ajustamos los caminos a los dados
+
+655
+00:59:35,580 --> 00:59:44,380
+reales para cada K, simulamos B bases y calculamos el UWSS para los mismos valores de K, entonces
+
+656
+00:59:44,380 --> 00:59:49,460
+comparamos aquí la idea comparar el UW con B bases que fueron generadas de forma aleatória.
+
+657
+00:59:49,460 --> 00:59:54,960
+y comparamos el costo observado con el promedio en la escala logarítmica.
+
+658
+00:59:54,960 --> 00:59:57,460
+En forma matemática demostra que esto funciona bien,
+
+659
+00:59:57,460 --> 01:00:01,960
+y aquí usamos una referencia uniforme en el rango de cada columna estandarizada.
+
+660
+01:00:01,960 --> 01:00:07,460
+Entonces, esto es una forma que no es tan sencilla de interpretar la ecuación,
+
+661
+01:00:07,460 --> 01:00:09,960
+pero básicamente usar la sencilla por comparación,
+
+662
+01:00:09,960 --> 01:00:13,460
+un grupo con un grupo que fue generado de una forma aleatória.
+
+663
+01:00:13,460 --> 01:00:21,460
+Es muy interesante, bueno, tenéis un artículo de Tibi Shirani y Rasti Walter acá, que los muestran,
+
+664
+01:00:21,460 --> 01:00:24,460
+discuten varias formas de clasalización, fue publicado en una excelente revista,
+
+665
+01:00:24,460 --> 01:00:29,460
+no es un site, es un artículo muy bueno, y discuten cada uno de estos métodos,
+
+666
+01:00:29,460 --> 01:00:33,460
+muy detalles, y su derivación matemática para lo que quieren dar una mirada.
+
+667
+01:00:33,460 --> 01:00:39,460
+La idea, cómo debemos seguir con el gap? El gap va a ser,
+
+668
+01:00:39,460 --> 01:00:47,660
+Vamos a evaluar, cuanto tuvimos de cambio en cada uno de esos saltos que tenemos específico,
+
+669
+01:00:47,660 --> 01:00:55,140
+él va a mirar exactamente el próximo salto menos un Sk que es un valor residual anterior.
+
+670
+01:00:55,140 --> 01:01:00,420
+Eligimos el primero k que cumple esa siguiente desigualdad.
+
+671
+01:01:00,420 --> 01:01:05,980
+Un ejemplo hipotético tenemos para cada uno de estos clústeres, el gap que se fue calculado
+
+672
+01:01:05,980 --> 01:01:14,900
+de cada uno, ya, 1sk que es un valor específico acá para cada uno y vamos poniendo ese valor
+
+673
+01:01:14,900 --> 01:01:24,380
+comparando ese valor con s más s, ya, ese valor con s más s y por ahí adelante. Por
+
+674
+01:01:24,380 --> 01:01:33,740
+ejemplo para k igual a 1 vamos mirar 0.4 es menor de que 0.62 menos 0.5, o sea 0.4 es
+
+675
+01:01:33,740 --> 01:01:41,460
+menor que 0.55? Si, eso no cumple, seguimos para el punto 2.
+
+676
+01:01:41,460 --> 01:01:49,460
+Ahora vamos para el gap 2, 0.62. 0.62 es mayor que 0.64 menos 0.4?
+
+677
+01:01:49,460 --> 01:01:56,300
+Si, entonces elegimos o bueno seguimos acá y definimos, vamos correndo este
+
+678
+01:01:56,300 --> 01:02:02,420
+algoritmo hasta que aquella situación va a parar exactamente en una regla acá
+
+679
+01:02:02,420 --> 01:02:11,380
+donde K igual a 4. Entonces para esta métrica específica, el gráfico nos indicó que deberíamos
+
+680
+01:02:11,380 --> 01:02:17,620
+tener cuatro clústeres. Bueno, vimos en los otros métodos anteriores que teníamos una indicación de
+
+681
+01:02:17,620 --> 01:02:22,340
+tres clústeres, este es un método que nos muestra que tiene cuatro clústeres, podemos tener una
+
+682
+01:02:22,340 --> 01:02:27,580
+indicación entonces de que se puede trabajar con o tres o cuatro clústeres. Uno puede ver que la
+
+683
+01:02:27,580 --> 01:02:32,340
+distancia del gap de 3 para 4 no cambia tanto. Entonces fue una situación
+
+684
+01:02:32,340 --> 01:02:36,580
+como un poco rara de su pasado. Generalmente define exactamente el 3,
+
+685
+01:02:36,580 --> 01:02:41,220
+pero para esta regla, una regla automática, me salió ese número 4.
+
+686
+01:02:41,220 --> 01:02:46,820
+Entonces con la silueta salimos con tres grupos. Con gap, con esta referencia
+
+687
+01:02:46,820 --> 01:02:51,740
+30 simulaciones, tuvimos un k igual a 4, tanto en R como en Python.
+
+688
+01:02:51,740 --> 01:02:55,900
+Trajamos con tres grupos porque fue lo que nos indicó los otros métodos.
+
+689
+01:02:55,900 --> 01:03:03,700
+vamos por la mayoría y también se puede ver que alguna cosa acá puede tener pasado o la ganancia
+
+690
+01:03:03,700 --> 01:03:09,780
+de información es muy pequeña. Nosotros también se podríamos definir tres. Por ahora voy a definir tres
+
+691
+01:03:09,780 --> 01:03:19,900
+asumiendo exactamente estos dos formatos. Pero profesor, usted me presentó tres métodos, no
+
+692
+01:03:19,900 --> 01:03:24,900
+No, la misma forma de claserización.
+
+693
+01:03:24,900 --> 01:03:32,840
+Una cosa que es importante que sepa, pero me envolverá la clase, es que este algoritmo
+
+694
+01:03:32,840 --> 01:03:36,900
+es un algoritmo específico para hacer claserización.
+
+695
+01:03:36,900 --> 01:03:42,980
+Hay una infinidad de algoritmos para hacer claserización.
+
+696
+01:03:42,980 --> 01:03:48,180
+De hecho, como la mitad del departamento de la Facultad de Matemática y de mi departamento
+
+697
+01:03:48,180 --> 01:03:53,660
+de estadística, trabaja proponiendo métodos de clasterización. Ya fue en una infinidad
+
+698
+01:03:53,660 --> 01:03:59,120
+de charlas en que ellos proponen, estoy proponiendo un nuevo método de clasterización para esta
+
+699
+01:03:59,120 --> 01:04:06,660
+estructura de datos. KAMINS es el más sencillo y el más conocido, pero hay un montón de
+
+700
+01:04:06,660 --> 01:04:13,580
+variaciones. Un otro que siempre se ve también es conocido como DBSCAN. Acá no vamos a verlo,
+
+701
+01:04:13,580 --> 01:04:20,100
+es un método que tiene una mirada un poco distinta y intenta no evaluar los puntos medios
+
+702
+01:04:20,100 --> 01:04:25,820
+pero los que tienen mayor densidad. Entonces acá no va a evaluar exactamente por ese tipo de métrica,
+
+703
+01:04:25,820 --> 01:04:30,220
+por distancia en términos del centro, pero va a mirar los puntos o clústeres que tienen una mayor
+
+704
+01:04:30,220 --> 01:04:37,260
+densidad. O tener un montón de puntos ahí es un clúster. Puede ser que al final tenga dos clústeres
+
+705
+01:04:37,260 --> 01:04:42,860
+acá, si tengo muchas observaciones en ese grupo. Si, entonces debes escanear y mira por medio de la
+
+706
+01:04:42,860 --> 01:04:47,860
+idea de densidad. Hay otros métodos distintos de clusterezación.
+
+707
+01:04:47,860 --> 01:04:54,060
+Uno tiene que elegir cuál es el método, el método que le acomoda y se basa en
+
+708
+01:04:54,060 --> 01:04:58,940
+este método. Hay gente que demuestra que para este caso particular el método
+
+709
+01:04:58,940 --> 01:05:02,380
+camisno va a funcionar bien. Entonces estamos proponiendo un método
+
+710
+01:05:02,380 --> 01:05:07,700
+basado en inferencia benigno paramétrica para hacer clusterezación.
+
+711
+01:05:07,700 --> 01:05:12,700
+y propone un método para desarrollar sus propios clústeres.
+
+712
+01:05:12,700 --> 01:05:13,700
+¿Sí?
+
+713
+01:05:13,700 --> 01:05:19,700
+Entonces, seguimos con eso.
+
+714
+01:05:19,700 --> 01:05:21,700
+Este es el nombre de las formas.
+
+715
+01:05:21,700 --> 01:05:22,700
+Déjame ver acá.
+
+716
+01:05:22,700 --> 01:05:26,700
+Yo creo que también acabé poniendo para hacer el cálculo de eso.
+
+717
+01:05:26,700 --> 01:05:27,700
+¿Por qué?
+
+718
+01:05:27,700 --> 01:05:32,700
+Acá no sé qué tenemos con los tres grupos, los centroides.
+
+719
+01:05:32,700 --> 01:05:33,700
+No.
+
+720
+01:05:33,700 --> 01:05:40,260
+pero no conseguí mostrar esto, dejame ir corriendo acá, no conseguí mostrar que
+
+721
+01:05:40,260 --> 01:05:44,420
+estos métodos funcionan bien
+
+722
+01:05:45,700 --> 01:05:54,020
+después volvemos y le explico en detalles lo que es cada uno de estos puntos
+
+723
+01:06:03,700 --> 01:06:16,420
+Bueno, estos métodos funcionan bien. Cuando intenté hacer un plot de los datos, las clases
+
+724
+01:06:16,420 --> 01:06:23,380
+reales acá de los vinos, los puntos, están con ese formato. Mira, este acá es un tipo
+
+725
+01:06:23,380 --> 01:06:31,820
+de vino conocido, no me recuerdo si es Merlot, no sé, bueno, hay un tipo de vino muy específico,
+
+726
+01:06:31,820 --> 01:06:36,820
+que era este grupo acá, un vino blanco y un otro tipo de vino, Camernet.
+
+727
+01:06:36,820 --> 01:06:44,820
+Entonces podemos tener ahí distintos vinos, existían de hecho tres vinos específicos, reales,
+
+728
+01:06:44,820 --> 01:06:50,820
+y cuando hacemos un biplote de estos vinos, tenemos esta estructura.
+
+729
+01:06:50,820 --> 01:06:55,820
+Uno va a ver que solamente tiene dos o tres vinos específicos que acabaron
+
+730
+01:06:55,820 --> 01:07:00,820
+y se parecía un poco con los otros grupos.
+
+731
+01:07:01,820 --> 01:07:02,820
+Y bueno,
+
+732
+01:07:03,820 --> 01:07:05,820
+eso fueron las clases reales de los guinos,
+
+733
+01:07:06,820 --> 01:07:09,820
+pero yo asumí que no existía cuando fui a intentar descubrir.
+
+734
+01:07:10,820 --> 01:07:13,820
+De hecho, existen grupos o existen clústeres.
+
+735
+01:07:14,820 --> 01:07:15,820
+Vamos a correr el Camins,
+
+736
+01:07:16,820 --> 01:07:17,820
+y corrí el Camins acá,
+
+737
+01:07:18,820 --> 01:07:21,820
+y el Camins me dio este tipo de clustereización.
+
+738
+01:07:22,820 --> 01:07:24,820
+Acá son los puntos que están mal clasificados.
+
+739
+01:07:25,820 --> 01:07:30,820
+Pero, professor, por que esta saliendo un verde acá? Porque yo estoy haciendo una proyección.
+
+740
+01:07:30,820 --> 01:07:35,820
+No acabe ser exactamente un biplot, un plot bivariado,
+
+741
+01:07:35,820 --> 01:07:37,820
+y después salí dibujando isso.
+
+742
+01:07:37,820 --> 01:07:44,820
+Este grupo, o este centroid, fue calculado con base en tres ecovariables.
+
+743
+01:07:44,820 --> 01:07:50,820
+Por supuesto, cuando hacemos una proyección para un gráfico bidimensional,
+
+744
+01:07:50,820 --> 01:07:58,820
+tenemos pérdida de información. Acá este gráfico tenemos basado en componentes principales,
+
+745
+01:07:58,820 --> 01:08:05,820
+yo tengo ahí casi 56% de la variabilidad explicada por estos componentes.
+
+746
+01:08:05,820 --> 01:08:11,820
+Entonces yo tuve alguna pérdida de información acá, por eso que hay algún punto acá que está azul.
+
+747
+01:08:11,820 --> 01:08:21,620
+y entonces cuando hacemos este tipo de proyección hacemos esta perda de información
+
+748
+01:08:21,620 --> 01:08:28,460
+por ahora creo que 7.45 paramos ahora volvemos a las 8 me parece Romina
+
+749
+01:08:31,020 --> 01:08:31,700
+super
+
+750
+01:08:34,860 --> 01:08:40,020
+gracias Romina
+
+751
+01:08:41,820 --> 01:08:46,300
+Bueno, seguimos con la forma que se hace el gráfico silueta.
+
+752
+01:08:48,940 --> 01:08:50,220
+Acá deje los codigos.
+
+753
+01:08:51,900 --> 01:08:54,500
+Nuevamente, uno va a tener que ajustar un camino,
+
+754
+01:08:54,580 --> 01:08:57,340
+que va a variar, por ejemplo, de uno hasta nueve clusters.
+
+755
+01:08:57,420 --> 01:09:00,420
+Va a ajustar los caminos, después va a ser...
+
+756
+01:09:02,100 --> 01:09:06,340
+Y su dentro nuestro modelo, va a poner modelos.append, modelo.
+
+757
+01:09:07,100 --> 01:09:10,780
+WSS.append, modelo Inertia.
+
+758
+01:09:11,820 --> 01:09:17,820
+y ahí va a salir este siluete punto append con los scores
+
+759
+01:09:17,820 --> 01:09:20,820
+acá
+
+760
+01:09:20,820 --> 01:09:23,820
+vean
+
+761
+01:09:23,820 --> 01:09:27,820
+tomemos exactamente
+
+762
+01:09:30,820 --> 01:09:33,820
+ajuste los modelos
+
+763
+01:09:33,820 --> 01:09:36,820
+la silueta
+
+764
+01:09:36,820 --> 01:09:48,820
+con este código podemos ajustar de una forma más sencilla de las cero entes
+
+765
+01:09:48,820 --> 01:09:52,820
+simplemente haciendo el punto para checar de las cero entes
+
+766
+01:09:52,820 --> 01:09:57,820
+o para no violar su repetición, pero acá hemos calculado
+
+767
+01:09:57,820 --> 01:10:09,820
+también de una forma similar. Entonces, uno puede salir por acá, acá ya calculamos los modelos,
+
+768
+01:10:09,820 --> 01:10:18,820
+después ya tenemos los resultados y esta funcionalidad acá va a salir exactamente similar a lo que ponemos acá.
+
+769
+01:10:18,820 --> 01:10:26,820
+Son dos formas de escribir, acá como el en siluente, yo calculo las siluentes y después calculo la mente y hago la cuenta yo mismo.
+
+770
+01:10:26,820 --> 01:10:46,820
+Son dos formas distintas de hacer esto en R.
+
+771
+01:10:46,820 --> 01:10:52,820
+Podemos hacer después en Python, aquel slide que estaba emocionado en Python.
+
+772
+01:10:52,820 --> 01:10:58,820
+Bueno, vamos a utilizar... Acá tenemos lo activo en Python para correr.
+
+773
+01:10:58,820 --> 01:11:01,820
+Tenemos que hacer el import de las funciones que ya conocen.
+
+774
+01:11:01,820 --> 01:11:05,820
+NumPy, estoy nomeando np, pandas, pd.
+
+775
+01:11:05,820 --> 01:11:14,820
+Vamos a utilizar skylearn.cluster. Acabe poniendo acá la función import camins.
+
+776
+01:11:14,820 --> 01:11:19,820
+Acabe haciendo lpca. No sé si estuvieron en la clase de componentes principales.
+
+777
+01:11:19,820 --> 01:11:26,320
+Es una forma de hacer reducción de dimensión. Creo que la próxima clase del profesor Eloy
+
+778
+01:11:26,320 --> 01:11:28,820
+estará hablando para ustedes sobre esto.
+
+779
+01:11:28,820 --> 01:11:35,820
+O si ya vieron durante el curso, es una de las formas de hacer reducción de dimensión.
+
+780
+01:11:35,820 --> 01:11:41,820
+Y después las métricas, acá escarnométricas, salimos con los siluentes SCORE.
+
+781
+01:11:41,820 --> 01:11:43,820
+Voy a importar la base de dados.
+
+782
+01:11:43,820 --> 01:11:50,220
+acá me salen las estadísticas descritivas relacionados a los dados con los prints VINUS
+
+783
+01:11:50,220 --> 01:12:00,100
+HEAD y VINUS SHAPE. Acá voy a hacer la estandarización de los dados, en seguida después
+
+784
+01:12:00,100 --> 01:12:06,780
+hacer la estandarización, ya corrí el modelo, acá ya tenemos el modelo corrido con camins
+
+785
+01:12:06,780 --> 01:12:11,540
+y acá está aquel gráfico que estaba emocionado, yo vi que pareció un poco raro pero exactamente
+
+786
+01:12:11,540 --> 01:12:17,840
+la la estaba en bando tenemos silueta punto apende me va a salir acá los
+
+787
+01:12:17,840 --> 01:12:24,480
+scores eso ya corrido y ahora el plot ya con
+
+788
+01:12:24,480 --> 01:12:28,960
+estos códigos acá me va a salir exactamente el plato de el codo y el
+
+789
+01:12:28,960 --> 01:12:32,400
+plato de la silueta
+
+790
+01:12:32,520 --> 01:12:38,840
+y bueno de forma similar ponemos tres acá o la silueta elegida igual a 3
+
+791
+01:12:41,540 --> 01:12:45,540
+después bueno, acá vamos a ver un poquito más adelante.
+
+792
+01:12:45,540 --> 01:12:50,540
+¿Cree que adelante? No sé si Claudia todavía tienes la duda que Claudia había levantado la mano.
+
+793
+01:12:50,540 --> 01:12:51,540
+Sí.
+
+794
+01:12:53,540 --> 01:12:55,540
+No sé si estará por ahí.
+
+795
+01:12:55,540 --> 01:13:10,540
+Sí, gracias Romina. La duda en general, profesores, en cuál rubro o en cuál tipo de industria uno generalmente puede encontrar más el método de selección del camín
+
+796
+01:13:10,540 --> 01:13:16,540
+o eso va a depender del tipo de datos sí o sí que tienen que ser no etiquetados?
+
+797
+01:13:16,540 --> 01:13:22,540
+Sí, básicamente así. Ahí el tema de exactamente cuándo va a aparecer
+
+798
+01:13:22,540 --> 01:13:29,540
+como pensar, realmente veo bastante en su segmentación de clientes
+
+799
+01:13:29,540 --> 01:13:34,540
+pero realmente situación donde tenemos dados no etiquetados
+
+800
+01:13:34,540 --> 01:13:42,400
+industria debe tener aplicación pero
+
+801
+01:13:42,400 --> 01:13:44,440
+generalmente muchos casos cuando estén
+
+802
+01:13:44,440 --> 01:13:46,360
+en la industria, tendrían la medición,
+
+803
+01:13:46,360 --> 01:13:47,800
+tendrían la variable de respuesta y quieren
+
+804
+01:13:47,800 --> 01:13:49,400
+evaluar cuál es el efecto de esa variable
+
+805
+01:13:49,400 --> 01:13:52,400
+de respuesta. Si tiene allí, acá no se utiliza.
+
+806
+01:13:52,400 --> 01:13:55,520
+Generalmente más en situaciones donde no
+
+807
+01:13:55,520 --> 01:13:58,360
+tenemos las etiquetas y queremos crear
+
+808
+01:13:58,360 --> 01:14:02,000
+clusters. Para ser un ejemplo específico
+
+809
+01:14:02,000 --> 01:14:10,600
+industria, no sé, control de calidad, no consigo pensar en nada que yo tenga visto.
+
+810
+01:14:10,600 --> 01:14:20,960
+Realmente cuando veo clasarización, por ejemplo, en salud, yo sé que muchas veces queremos
+
+811
+01:14:20,960 --> 01:14:29,440
+vamos a hablar de clústeres de individuos que tienen algunos efectos de enfermedad en
+
+812
+01:14:29,440 --> 01:14:36,440
+que no sabemos que pertenecen a un grupo o no. Entonces queremos hablar si estos individuos
+
+813
+01:14:36,440 --> 01:14:41,440
+están en ese grupo o están en ese grupo específico para una enfermedad específica,
+
+814
+01:14:41,440 --> 01:14:46,880
+tipo de reacción o para una...
+
+815
+01:14:46,880 --> 01:14:50,240
+¿Cómo explicar?
+
+816
+01:14:50,240 --> 01:14:55,680
+Por ejemplo, para un efecto de una enfermedad.
+
+817
+01:14:55,680 --> 01:15:00,120
+Por ejemplo, muchas veces tenemos algunas variables que no fueron observadas.
+
+818
+01:15:00,120 --> 01:15:05,480
+Muchas veces las variables que no fueron observadas crean grupos específicos.
+
+819
+01:15:05,480 --> 01:15:10,840
+Vamos a suponer que usted está haciendo un experimento y dejó de observar algunas co-variables.
+
+820
+01:15:10,840 --> 01:15:19,840
+y creemos que algunas variantes que no fueron observadas pueden tener un efecto en un grupo específico, por ejemplo tener o no tener diabetes.
+
+821
+01:15:19,840 --> 01:15:26,840
+Es una información que no fue observada, pero yo puedo intentar hacer un plot de estos individuos con base a algunas variantes
+
+822
+01:15:26,840 --> 01:15:35,840
+y al final crear dos grupos distintos. Un grupo tiene un comportamiento para las personas que no tienen diabetes y un grupo para las personas que tienen diabetes.
+
+823
+01:15:35,840 --> 01:15:39,840
+Entonces, sería un posible cluster, eso es más salvo.
+
+824
+01:15:39,840 --> 01:15:47,840
+Hace un poco de tiempo, estaba trabajando con el precio de departamentos en Chile.
+
+825
+01:15:47,840 --> 01:15:52,840
+Estaba evaluando la construcción, cuánto tiempo tomaba para cerrar la construcción,
+
+826
+01:15:52,840 --> 01:15:56,840
+y lo que eso influenciaba en el precio.
+
+827
+01:15:56,840 --> 01:16:03,840
+Encontramos clusters, lo que está influenciando el precio del departamento,
+
+828
+01:16:03,840 --> 01:16:09,360
+aumentar el precio del departamento al tiempo hasta cerrar una construcción en Chile.
+
+829
+01:16:09,360 --> 01:16:13,880
+Porque mucha gente tiene esa información del tiempo hasta acabar una construcción,
+
+830
+01:16:13,880 --> 01:16:16,640
+es muy importante para hacer inversión ahí.
+
+831
+01:16:16,640 --> 01:16:21,680
+Y nos damos cuenta que tenían edificios que tenían comportamientos muy distintos,
+
+832
+01:16:21,680 --> 01:16:26,400
+porque tenían un cluster específico, un cluster o una información que no era observada,
+
+833
+01:16:26,400 --> 01:16:30,600
+era por ejemplo, si los edificios están cerca del metro,
+
+834
+01:16:30,600 --> 01:16:37,600
+Entonces es probable que los edificios que están más cerca del metro terminan de hacer construcciones más temprano.
+
+835
+01:16:37,600 --> 01:16:43,600
+Entonces, esos son clústeres. Hay grupos que no están cerca del metro y hay grupos que están cerca del metro.
+
+836
+01:16:43,600 --> 01:16:50,600
+Pero inicialmente no habíamos observado esa información. Entonces fue un clúster que al final después nos demos cuenta.
+
+837
+01:16:50,600 --> 01:16:55,000
+Este tipo de clusterización viene ahí.
+
+838
+01:16:55,000 --> 01:16:58,860
+Muchas veces buscan algún efecto de una enfermedad,
+
+839
+01:16:58,860 --> 01:17:05,000
+así como un cluster, pero exactamente la industria no...
+
+840
+01:17:05,000 --> 01:17:09,000
+no tiene mucha idea de clusterización.
+
+841
+01:17:09,000 --> 01:17:14,160
+A veces componentes que pueden fallar,
+
+842
+01:17:14,160 --> 01:17:18,960
+un posible cluster podría ser algún componente que está veniendo de una empresa
+
+843
+01:17:18,960 --> 01:17:26,960
+Entonces tal vez no se tengamos componentes, tenemos productos que fueron construidos, autos por ejemplo.
+
+844
+01:17:26,960 --> 01:17:31,960
+Autos de la misma empresa, podrían tener tiempos de vida muy distintos.
+
+845
+01:17:31,960 --> 01:17:33,960
+¿Cuál podría ser una posibilidad?
+
+846
+01:17:33,960 --> 01:17:39,960
+Creemos que debe tener clusters, debe tener grupos que van a tener tiempos de vida distintos.
+
+847
+01:17:39,960 --> 01:17:45,960
+Esos grupos vienen porque tienen algunos componentes que no fueron informados,
+
+848
+01:17:45,960 --> 01:17:56,460
+estos componentes vienen de una empresa. Entonces tenemos dos clústeres, productos que fueron construidos por componentes que vienen de una empresa y componentes que vienen de otra empresa.
+
+849
+01:17:56,460 --> 01:18:06,960
+Entonces son informaciones que no fueron observadas, no tenemos este label, pero cuando uno va a dividir los grupos se ve que tienen grupos distintos, que no son grupos homogéneos.
+
+850
+01:18:06,960 --> 01:18:14,960
+generalmente cuando intentamos evaluar heterogeneidad en nuestros datos intentamos hacer claserización
+
+851
+01:18:14,960 --> 01:18:20,960
+entonces cualquier problema que pueda pensar que puede tener grupos heterogéneos, esto puede pasar
+
+852
+01:18:20,960 --> 01:18:26,960
+por ejemplo ahora estoy evaluando, estoy trabajando con un alumno de doctorado que trabaja en una empresa
+
+853
+01:18:26,960 --> 01:18:35,960
+que hace reparos en productos como tratores y nos vemos cuenta que hay tratores que fallan mucho más que otros tratores
+
+854
+01:18:35,960 --> 01:18:42,000
+otros tratores que no deberían tener el mismo tiempo de vida, pero hay algunos que
+
+855
+01:18:42,000 --> 01:18:47,000
+fallan cuatro o cinco veces más que los otros. Entonces dividimos en clusters específicos,
+
+856
+01:18:47,000 --> 01:18:51,720
+ellos están evaluando cuáles fueron los... porque estos tratores están fallando más
+
+857
+01:18:51,720 --> 01:18:56,400
+que otros. Si los productos que están, que ponieron en este trato venen de alguna empresa
+
+858
+01:18:56,400 --> 01:19:02,080
+específica, si fueron producidos, si están trabajando en condiciones distintas, pero
+
+859
+01:19:02,080 --> 01:19:10,360
+la cantidad de fallas es muy grande. Si son personas que están manejando esto de forma distinta,
+
+860
+01:19:10,360 --> 01:19:14,800
+por ejemplo un cluster puede ser un grupo de trabajadores con una buena formación,
+
+861
+01:19:14,800 --> 01:19:20,720
+y otro cluster puede ser grupo de trabajadores con mala formación. Está influenciando en el
+
+862
+01:19:20,720 --> 01:19:26,120
+tiempo de vida de estos productos. ¿Cómo dividimos? Inicialmente evaluamos que tienen dos grupos
+
+863
+01:19:26,120 --> 01:19:30,840
+distintos, creamos los clusters y después evaluamos por qué son distintos. Tentamos sacar esa
+
+864
+01:19:30,840 --> 01:19:35,640
+información adicional, lo que está cambiando en estos dos grupos que no fue agregado en el análisis.
+
+865
+01:19:35,640 --> 01:19:41,880
+Lo que no fue agregado fue por ejemplo las personas que están manejando
+
+866
+01:19:41,880 --> 01:19:47,400
+esos productos, entonces ese grupo está manejando muy mal o está diminuiendo el tiempo de vida.
+
+867
+01:19:47,400 --> 01:19:54,440
+Más o menos así pienso que podrían ser clusters, clusters son grupos heterogéneos pero que no
+
+868
+01:19:54,440 --> 01:19:59,720
+sabemos por qué está ocurriendo eso, entonces intentamos agruparlos y después evaluamos lo que
+
+869
+01:19:59,720 --> 01:20:01,720
+está pasando.
+
+870
+01:20:01,720 --> 01:20:04,720
+Perfecto, muchas gracias.
+
+871
+01:20:04,720 --> 01:20:05,720
+Clarísimo.
+
+872
+01:20:05,720 --> 01:20:11,720
+Bueno, entonces sería esa la posibilidad de hacer la clasarización.
+
+873
+01:20:11,720 --> 01:20:15,720
+Es muy interesante porque acá hay una forma de hacer clasarización.
+
+874
+01:20:15,720 --> 01:20:19,720
+Para los que tuvieron curso de anal de supervivencia, hay una otra forma,
+
+875
+01:20:19,720 --> 01:20:21,720
+avaliando tiempo de vida.
+
+876
+01:20:21,720 --> 01:20:24,720
+Hay grupos específicos que tienen comportamientos distintos.
+
+877
+01:20:24,720 --> 01:20:29,720
+Son grupos que tienen, por ejemplo, una enfermedad específica,
+
+878
+01:20:29,720 --> 01:20:31,220
+son clústeres distintos.
+
+879
+01:20:31,220 --> 01:20:36,720
+Como lo observamos, intentamos agruparlos, nos damos cuenta que son grupos distintos
+
+880
+01:20:36,720 --> 01:20:41,220
+y después evaluamos por qué se están comportando de forma distinta.
+
+881
+01:20:41,220 --> 01:20:45,720
+Mucha gente crea estos métodos de clústerización exactamente para eso.
+
+882
+01:20:45,720 --> 01:21:01,000
+Bueno, una cosa que... Dejemos ver acá, vamos hasta acá. Bueno, acá... Y hablar un poco
+
+883
+01:21:01,000 --> 01:21:07,880
+sobre la cantidad de clústeres. Los números de grupos son etiquetados, básicamente estimamos
+
+884
+01:21:07,880 --> 01:21:13,560
+los grupos en los números de clústeres. Tuvimos K igual a 3, pero sabemos que de hecho
+
+885
+01:21:13,560 --> 01:21:21,160
+En la base original tenían tres labels, tenían tres grupos.
+
+886
+01:21:21,160 --> 01:21:27,320
+Generalmente en la realidad no conocemos eso, pero mucha gente cuando va a proponer métodos de clasalización
+
+887
+01:21:27,320 --> 01:21:33,400
+hacen exactamente eso, crean un método de clasalización, saco una base de datos donde tengo los grupos,
+
+888
+01:21:33,400 --> 01:21:42,680
+voy a remover esa información, intento hacer la clasalización ahí, después comparo con los grupos que existían originalmente.
+
+889
+01:21:42,680 --> 01:21:51,780
+y alguna forma de evaluarse, fue posible encontrar estos grupos que no existían.
+
+890
+01:21:51,780 --> 01:21:59,740
+Porque se puede hacer este agrupamiento, se puede dividir, por ejemplo acá, igualicimos en R.
+
+891
+01:22:05,340 --> 01:22:09,460
+En un caso específico acá yo conocía los vinos.
+
+892
+01:22:09,460 --> 01:22:18,320
+Yo conocí a las clases reales de los vinos, ¿Cierto?
+
+893
+01:22:18,320 --> 01:22:22,340
+Quiero comentar eso, conocí a la clase real de los vinos.
+
+894
+01:22:22,340 --> 01:22:32,780
+Con las clases reales de los vinos, después acabé criando los grupos con camins.
+
+895
+01:22:32,780 --> 01:22:40,340
+nuestro objetivo es comparar ya el método de clasalización logró construir originalmente los grupos como debería
+
+896
+01:22:40,340 --> 01:22:45,700
+sí entonces después podemos evaluar y sólo vamos a ver que los errores son muy pocos
+
+897
+01:22:45,700 --> 01:22:52,860
+entonces camins de alguna manera puede ayudar a crear esos grupos nuevamente ya por supuesto va a tener
+
+898
+01:22:52,860 --> 01:22:59,420
+algún mejor acá o mejor allá pero de forma general él encuentra esos grupos de una forma muy particular
+
+899
+01:22:59,420 --> 01:23:05,420
+No sé si tuvieron clase, no me recuerdo, yo sé que van a ver peor las componentes principales,
+
+900
+01:23:05,420 --> 01:23:11,420
+si no vieron es posible que van a ver la próxima clase con Eloy, o dos, tres clases más adelante.
+
+901
+01:23:11,420 --> 01:23:18,420
+Pero la idea de componentes principales es exactamente resumir información en algunos componentes
+
+902
+01:23:18,420 --> 01:23:21,420
+para poder utilizar de algunas formas muy inteligentes.
+
+903
+01:23:21,420 --> 01:23:25,420
+Por ejemplo, una de las formas es hacer este tipo de proyección
+
+904
+01:23:25,420 --> 01:23:29,100
+para poder resumir la información de una otra dimensión.
+
+905
+01:23:29,100 --> 01:23:33,400
+Entonces puedo salir de una dimensión alta de tres de variables, por ejemplo,
+
+906
+01:23:33,400 --> 01:23:36,600
+acabe haciendo un plot para dos variables acá
+
+907
+01:23:36,600 --> 01:23:40,800
+y de alguna manera consigo mantener buena parte de la información, los grupos.
+
+908
+01:23:40,800 --> 01:23:44,640
+Entonces acá tengo un grupo, acá tengo otro grupo y acá tengo otro grupo.
+
+909
+01:23:44,640 --> 01:23:47,400
+¿Fue posible mantener toda la información? No.
+
+910
+01:23:47,400 --> 01:23:48,980
+Tuve una pesta de información.
+
+911
+01:23:48,980 --> 01:23:53,780
+Fue posible mantener casi como 56% de la variencia original de los dados.
+
+912
+01:23:53,780 --> 01:24:00,420
+Por eso que acá tenemos individuos que están muy raros, que están en este grupo acá.
+
+913
+01:24:00,420 --> 01:24:05,460
+¿Cierto? ¿Por qué? Porque salimos de una dimensión muy grande y proyectamos para una dimensión más tica.
+
+914
+01:24:05,460 --> 01:24:09,380
+Cuando hacemos este tipo de proyección, tenemos una pérdida de precisión.
+
+915
+01:24:09,380 --> 01:24:15,140
+Pero siempre es importante hacer el camino, no en estas componentes principales,
+
+916
+01:24:15,140 --> 01:24:21,780
+pero en el grupo original con todas las covariables, porque ahí ustedes pueden evaluar las distancias correctamente.
+
+917
+01:24:21,780 --> 01:24:25,780
+Entonces, esto es solo una forma de hacer la visualización de los datos.
+
+918
+01:24:25,780 --> 01:24:31,780
+Pero lo importante es que, con camins, fue posible etiquetar a estos individuos de esa forma.
+
+919
+01:24:31,780 --> 01:24:34,780
+Las clases reales funcionan de esa forma.
+
+920
+01:24:34,780 --> 01:24:38,780
+Y ahí podemos después hacerlo contigo a cada uno de los que fueron malo clasificados.
+
+921
+01:24:38,780 --> 01:24:39,780
+No fueron muchos puntos.
+
+922
+01:24:39,780 --> 01:24:53,280
+1, 2, 3, 4, 5, 6, debe tener alguna cosa como 8, 9 puntos en 177 mal clasificados.
+
+923
+01:24:53,280 --> 01:25:00,680
+Entonces tuvimos ahí una clasificación buena de no sé, más de 90%, 92% de la base original.
+
+924
+01:25:00,680 --> 01:25:06,120
+Entonces de alguna manera logramos construir nuevamente los labels.
+
+925
+01:25:06,120 --> 01:25:11,100
+estos libros no fueron conocidos y esa es una diferencia muy importante porque
+
+926
+01:25:11,100 --> 01:25:22,100
+apenas a supervisado, ustedes tienen ahí Y e intentan ajustar de alguna
+
+927
+01:25:22,100 --> 01:25:32,180
+manera con RDX, para usted está comparado Y con RDX, acá solamente tengo RDX, no
+
+928
+01:25:32,180 --> 01:25:34,420
+No tengo como comparar de ninguna manera con Yen
+
+929
+01:25:34,420 --> 01:25:42,740
+y de alguna manera construir este RDX que es muy cercano al posible Yen original acá,
+
+930
+01:25:42,740 --> 01:25:44,860
+si existía este Yen.
+
+931
+01:25:44,860 --> 01:25:49,980
+Por eso que este es un mensaje no supervisado, porque no estoy utilizando ningún label para
+
+932
+01:25:49,980 --> 01:25:52,740
+ajustar esta función RDX acá.
+
+933
+01:25:52,740 --> 01:25:58,380
+Entendemos esta función RDX, algunos labels, algunos clusters, pero no conozco esta información,
+
+934
+01:25:58,380 --> 01:25:59,700
+esto no me fue dado.
+
+935
+01:25:59,700 --> 01:26:04,180
+solamente ajusto esa función con eso.
+
+936
+01:26:06,340 --> 01:26:10,220
+Y lo impresionante es que con eso fue posible reconstruir de alguna manera bien
+
+937
+01:26:11,220 --> 01:26:12,220
+la base original.
+
+938
+01:26:17,500 --> 01:26:20,700
+Bueno, los clases pueden tener alguna información específica, por ejemplo, el
+
+939
+01:26:20,700 --> 01:26:21,700
+grupo 1.
+
+940
+01:26:22,220 --> 01:26:25,860
+Después uno empieza a evaluar cuáles fueron los efectos de ese grupo 1.
+
+941
+01:26:25,860 --> 01:26:31,060
+Por ejemplo, el grupo 1 muestra que tiene un menor alcohol y una color específica.
+
+942
+01:26:31,060 --> 01:26:35,540
+El grupo 2 tiene mayor color y menor matiz.
+
+943
+01:26:35,540 --> 01:26:39,940
+El grupo 3 tiene más flavonoides y prolina.
+
+944
+01:26:39,940 --> 01:26:43,540
+Entonces hay grupos distintos con informaciones distintas.
+
+945
+01:26:43,540 --> 01:26:47,380
+Bueno, tienen que bajar esas informaciones y después salir evaluando.
+
+946
+01:26:47,380 --> 01:26:55,380
+En la escala original, porque acá yo había hecho una transformación, o acá también
+
+947
+01:26:55,380 --> 01:26:59,400
+voy a estar haciendo esta transformación, pero en la escala original tengo acá los niveles
+
+948
+01:26:59,400 --> 01:27:02,380
+de alcohol para cada uno de los grupos.
+
+949
+01:27:02,380 --> 01:27:11,060
+Entonces el grupo 1 tiene 3.68 de alcohol, el grupo 2 13.14, el grupo 3 13.25.
+
+950
+01:27:11,060 --> 01:27:16,540
+Mira que los flavonoides cambian harto para un grupo y para otro, esos son los valores
+
+951
+01:27:16,540 --> 01:27:22,340
+promedios que tuvimos en esos grupos. Entonces para un valor promedio del grupo 1 tenía
+
+952
+01:27:22,340 --> 01:27:30,940
+3 de flavonoides, color 5.45, 7, 2. Entonces hay algunas componentes químicas que de
+
+953
+01:27:30,940 --> 01:27:35,780
+hecho hacen con que los vinos sean muy distintos. Ya no es solamente una percepción que la
+
+954
+01:27:35,780 --> 01:27:40,620
+persona fala, ah ese vino acá es muy distinto del otro. De hecho la parte química también
+
+955
+01:27:40,620 --> 01:27:53,460
+nos demuestra eso. Y uno puede saber exactamente cuál es la relación o la diferencia en términos
+
+956
+01:27:53,460 --> 01:27:59,460
+del promedio que tiene en cada uno de los puntos con una información específica. Por
+
+957
+01:27:59,460 --> 01:28:05,320
+ejemplo, en términos del promedio el grupo 1 tiene 0.8 más del col. El grupo 2 0.2
+
+958
+01:28:05,320 --> 01:28:08,320
+en cuanto al grupo 3 tienen menos 0.89.
+
+959
+01:28:08,320 --> 01:28:11,680
+Y eso es relacionar el promedio general.
+
+960
+01:28:11,680 --> 01:28:15,440
+Entonces sacamos el promedio y evaluamos la diferencia
+
+961
+01:28:15,440 --> 01:28:16,840
+en términos de los promedios.
+
+962
+01:28:16,840 --> 01:28:20,320
+Entonces acá uno puede evaluar y tener esta idea.
+
+963
+01:28:20,320 --> 01:28:22,320
+Sí, Matías?
+
+964
+01:28:22,320 --> 01:28:24,320
+Usted me dio una consulta.
+
+965
+01:28:24,320 --> 01:28:27,320
+Cuando usted intentó hacer la clasterización,
+
+966
+01:28:27,320 --> 01:28:31,320
+¿metió todas las variables o me refiero a las 13 ecovariables?
+
+967
+01:28:31,320 --> 01:28:33,320
+¿O la hizo ya pasando por el PCA?
+
+968
+01:28:33,320 --> 01:28:39,720
+No, meti las tres equivalentes ya porque bueno, este es un error que mucha gente lo hace a mí también me tocó hacer
+
+969
+01:28:39,720 --> 01:28:46,320
+un mule de vez pero bueno si usted va a correr con PCA y mantiene solamente las dos primeras componentes principales
+
+970
+01:28:46,880 --> 01:28:49,560
+va a tener presa de información, ¿Cierto?
+
+971
+01:28:50,000 --> 01:28:57,920
+Entonces su clasificación ahí, no la clasificación, pero la clasificación que va a estar haciendo la la consola el cluster va a tener menos precisión
+
+972
+01:28:57,920 --> 01:29:05,800
+Entonces lo que yo recomiendo es hacer la clasalización con la base original, sin tener
+
+973
+01:29:05,800 --> 01:29:06,800
+pena de información.
+
+974
+01:29:06,800 --> 01:29:13,280
+Profe, y qué pasaría si, porque claro en este caso son 13 variables, pero si fuesen,
+
+975
+01:29:13,280 --> 01:29:18,600
+no sé, 200 variables o 500 variables que intenten explicar las características de
+
+976
+01:29:18,600 --> 01:29:24,160
+tal cosa, ¿es factible meter esas 500 variables?
+
+977
+01:29:24,160 --> 01:29:26,760
+¿No se enreda el computador?
+
+978
+01:29:26,760 --> 01:29:32,400
+básicamente efectivo, no le va a costar mucho con la computadora. Porque yo sé
+
+979
+01:29:32,400 --> 01:29:38,760
+eso, bueno, Romina logró hacer conmigo el curso, siempre pedí para los alumnos de
+
+980
+01:29:38,760 --> 01:29:43,140
+métodos para grandes volúmenes de dados correr eso, entonces ellos tenían como
+
+981
+01:29:43,140 --> 01:29:49,040
+un millón de observaciones con 30, 40, 50 covariables, y correr un método no
+
+982
+01:29:49,040 --> 01:29:56,160
+tenía mucha dificultad. Una otra cosa que va a influenciar
+
+983
+01:29:56,160 --> 01:29:59,160
+¿Por qué no me gusta mucho hacer reducción de dimensión acá?
+
+984
+01:29:59,160 --> 01:30:08,160
+Porque por ahora está todo muy bonito, tenemos solamente variables categóricas acá, o variables reales.
+
+985
+01:30:08,160 --> 01:30:13,160
+Es decir, acá tengo alcohol que es un valor real, ácido que es un valor real,
+
+986
+01:30:13,160 --> 01:30:17,160
+pero si usted for sacar una base de un banco, de una empresa de avión, o cualquier cosa,
+
+987
+01:30:17,160 --> 01:30:22,160
+la gran mayoría de los datos que va a tener son binarios, ya?
+
+988
+01:30:22,160 --> 01:30:25,920
+y PCA, la forma en que se ajusta bien PCA,
+
+989
+01:30:25,920 --> 01:30:28,800
+PCA funciona solamente para variables reales.
+
+990
+01:30:28,800 --> 01:30:34,320
+Entonces, no sé, 70% de su base original no va a tener esta información.
+
+991
+01:30:34,320 --> 01:30:38,160
+Entonces, se va ajustar un CAD, después va a ser CAD Prototype,
+
+992
+01:30:38,160 --> 01:30:39,760
+debe hacer con la base...
+
+993
+01:30:39,760 --> 01:30:42,520
+Bueno, lo que yo entiendo y lo que siempre
+
+994
+01:30:42,520 --> 01:30:45,920
+yo vi es que debe se ajustar con la base original.
+
+995
+01:30:45,920 --> 01:30:49,600
+Si quiere ajustar con la base reducida,
+
+996
+01:30:49,600 --> 01:30:51,600
+es posible que va a tener pérdida de información.
+
+997
+01:30:51,600 --> 01:30:52,600
+Sí?
+
+998
+01:30:52,600 --> 01:30:54,600
+Bueno, gracias por la pregunta.
+
+999
+01:31:01,600 --> 01:31:02,600
+Sí.
+
+1000
+01:31:03,600 --> 01:31:08,600
+Entonces, este gráfico de perfiles estandarizados va a funcionar bien.
+
+1001
+01:31:08,600 --> 01:31:10,600
+Bueno, voy a ver una pregunta de Matías.
+
+1002
+01:31:10,600 --> 01:31:12,600
+Es una muy buena pregunta porque
+
+1003
+01:31:12,600 --> 01:31:15,600
+cuando yo empecé a enseñar este curso, yo hacía las dos formas.
+
+1004
+01:31:15,600 --> 01:31:16,600
+Enseñaba PCA,
+
+1005
+01:31:16,600 --> 01:31:20,840
+hacíamos reducción de dimensiones, después intentábamos hacer clasitarización con los dos,
+
+1006
+01:31:20,840 --> 01:31:28,840
+con la base original y con la base reducida vía PCA. Sacábamos como por ejemplo dos
+
+1007
+01:31:28,840 --> 01:31:37,000
+componentes principales. Y sí, se ve que la clasificación cuando comparábamos con el vino
+
+1008
+01:31:37,000 --> 01:31:43,240
+original se perdía información, entonces empezaba a clasificar malos vinos que con la base original
+
+1009
+01:31:43,240 --> 01:31:47,240
+se clasificaba bien, entonces vamos a ver cuánto.
+
+1010
+01:31:47,240 --> 01:31:51,240
+Para ser reducido en dimensiones acá uno va a mantener solamente
+
+1011
+01:31:51,240 --> 01:31:55,240
+acá no está en la figura de esta
+
+1012
+01:31:55,240 --> 01:31:59,240
+si hacemos PCA
+
+1013
+01:31:59,240 --> 01:32:03,240
+con esta base voy a mantener solamente estas variables
+
+1014
+01:32:03,240 --> 01:32:07,240
+uno y dos, y cuando fuera a ser un biplote
+
+1015
+01:32:07,240 --> 01:32:11,240
+usted va a ver acá, voy a estar clasificando los individuos de este grupo
+
+1016
+01:32:11,240 --> 01:32:15,080
+estos individuos acá estarán clasificados en otro grupo y ese
+
+1017
+01:32:15,080 --> 01:32:19,240
+estará clasificado en otro, entonces estos puntos acá estarán clasificados.
+
+1018
+01:32:19,240 --> 01:32:22,240
+Bien, acá me parece que no tiene problema porque de hecho,
+
+1019
+01:32:22,240 --> 01:32:26,240
+estos puntos, me parece que estoy con la conexión mala,
+
+1020
+01:32:26,240 --> 01:32:30,240
+estos puntos fueron mal clasificados, ya,
+
+1021
+01:32:30,240 --> 01:32:36,240
+pero acá, mira, estos puntos son los reales y
+
+1022
+01:32:36,240 --> 01:32:43,720
+con un PCA iría a clasificarlos como azules. No sé, bueno, con PCA tiene una pérdida de
+
+1023
+01:32:43,720 --> 01:32:49,000
+información cuando hace esa proyección. Entonces, cómo pasa tener esos problemas?
+
+1024
+01:32:54,320 --> 01:33:01,880
+Hay que tomar ese cuidado. Vamos a ver la clase. Y bueno, llegamos a esa pregunta interesante.
+
+1025
+01:33:01,880 --> 01:33:13,880
+La primera cosa es, si tenemos variables reales, tenemos grupos uno por evaluar el efecto de cada una de esas covariables en termos del grupo 1, 2 o 3.
+
+1026
+01:33:13,880 --> 01:33:18,880
+Entonces, por ejemplo, el Prolina en el grupo 1 está mucho más alto,
+
+1027
+01:33:18,880 --> 01:33:22,880
+los flavonoides están mucho más alto comparado con su promedio,
+
+1028
+01:33:22,880 --> 01:33:25,880
+y el alcohol también está mucho más alto.
+
+1029
+01:33:25,880 --> 01:33:34,880
+En cuanto al grupo 3, acá tiene una diferencia muy grande con menos alcohol, con menos color y con menos prolina.
+
+1030
+01:33:34,880 --> 01:33:48,880
+En cuanto al grupo 2 tiene una diferencia muy grande acá en matiz, en flavonoides y la color, también el ácido mágico.
+
+1031
+01:33:48,880 --> 01:33:54,880
+Entonces uno puede evaluar las principales diferencias químicas en cada uno de esos grupos.
+
+1032
+01:33:54,880 --> 01:34:01,880
+Entonces este gráfico, acá los perfiles estandarizados, es superinteresante para poder evaluar después cuál es el efecto.
+
+1033
+01:34:02,880 --> 01:34:09,880
+Bueno, estamos hablando de proyección, el PCA permite dibujar una aproximación en dos dimensiones.
+
+1034
+01:34:10,880 --> 01:34:17,880
+Es decir, estamos saliendo de 13 variables y estamos haciendo una proyección en solamente dos dimensiones.
+
+1035
+01:34:17,880 --> 01:34:23,640
+El PCA es muy bueno porque intenta mantener la variabilidad original de los dados y los
+
+1036
+01:34:23,640 --> 01:34:25,240
+primeros componentes.
+
+1037
+01:34:25,240 --> 01:34:30,880
+Entonces los dos primeros componentes son los que tienen la mayor variabilidad.
+
+1038
+01:34:30,880 --> 01:34:36,600
+Pero lo malo es que será empezando a perder información, de todas formas.
+
+1039
+01:34:36,600 --> 01:34:41,680
+Cuando necesitamos hacer visualización o a veces como tenemos muchas covariables, hacer
+
+1040
+01:34:41,680 --> 01:34:46,520
+un PCA es muy bueno para regresión o para hacer dibujos como éste, para hacer evaluación
+
+1041
+01:34:46,520 --> 01:34:54,000
+de Outliers, entonces voy a hablar con ustedes creo que en dos clases a más, vamos a ver
+
+1042
+01:34:54,000 --> 01:34:58,440
+una clase de detección de Outliers y vamos a ver que PCA es una de las formas de detectar
+
+1043
+01:34:58,440 --> 01:34:59,440
+Outliers.
+
+1044
+01:34:59,440 --> 01:35:06,360
+Entonces PCA funciona para un montón de cosas, pero son para cosas muy específicas,
+
+1045
+01:35:06,360 --> 01:35:12,400
+y en este caso nos ayuda a visualizar dados de alta dimensión y dimensión menores,
+
+1046
+01:35:12,400 --> 01:35:20,120
+y dentro nos ayuda muy bien. Mira acá tenemos grupo 1, el grupo 2, el grupo 3 y el grupo 1 acá,
+
+1047
+01:35:20,120 --> 01:35:25,960
+grupo 1, grupo 2 y el grupo 3. Entonces de alguna forma los grupos son distintos,
+
+1048
+01:35:25,960 --> 01:35:29,320
+cuando hacemos una proyección aún se mantienen en áreas muy específicas.
+
+1049
+01:35:29,320 --> 01:35:33,520
+Entonces el PCA que se llama Análisis de Componentes Principales,
+
+1050
+01:35:33,520 --> 01:35:36,280
+va a permitir dibujar una aproximación en 12 elementos.
+
+1051
+01:35:36,280 --> 01:35:43,200
+el agrupamiento se ajustó con las tres covariables no con las coordenadas específicas de los dados
+
+1052
+01:35:43,200 --> 01:35:48,160
+una pregunta para ustedes tu vieron clase de IPCA hasta ahora conocen el método
+
+1053
+01:35:52,160 --> 01:35:58,640
+todavía si ya perfecta así entonces perfecto se sabe cómo funciona el IPCA
+
+1054
+01:35:58,640 --> 01:36:02,360
+dos ideas de IPCA es hacer este tipo de reducción de dimensión ya
+
+1055
+01:36:02,360 --> 01:36:07,160
+PCI funciona muy bien para un montón de cosas, una de ellas es para detección de atilares,
+
+1056
+01:36:07,160 --> 01:36:10,120
+pero para Carlos va a ayudar principalmente la parte de visualización.
+
+1057
+01:36:10,120 --> 01:36:18,000
+Mira, algunas cosas que podemos tener de dificultad con el Camins, como le comenté, Camins es
+
+1058
+01:36:18,000 --> 01:36:24,360
+una forma muy buena para hacer clasarización, pero muchas veces no es la ideal.
+
+1059
+01:36:24,360 --> 01:36:33,740
+Por ejemplo, vamos a suponer que tenemos estructuras, curvas, donde tenemos grupos, en que la proyección
+
+1060
+01:36:33,740 --> 01:36:36,320
+me va a venir exactamente con esa forma.
+
+1061
+01:36:36,320 --> 01:36:39,740
+Es un otro grupo que tiene esa forma acá.
+
+1062
+01:36:39,740 --> 01:36:45,240
+En situaciones como esta, que algunas veces puede ocurrir en la práctica, cuando vamos
+
+1063
+01:36:45,240 --> 01:36:49,320
+a hacer la proyección de los dados, ustedes van a ver que grupos, ellos pueden se comportar
+
+1064
+01:36:49,320 --> 01:36:57,320
+de una manera como digo informado de signo, cosino, de alguna forma trigonométrica,
+
+1065
+01:36:57,320 --> 01:37:03,520
+puede tener alguna relación así en que hace con que los grupos no se distribúan como
+
+1066
+01:37:03,520 --> 01:37:10,440
+en un centro específico, ya? Y el camín no va a funcionar muy bien, por ejemplo el camín
+
+1067
+01:37:10,440 --> 01:37:16,720
+va a dibujar un centro acá, un otro centro acá y va a clasificar estos puntos acá como
+
+1068
+01:37:16,720 --> 01:37:46,480
+가� Obi fait si
+
+1069
+01:37:46,720 --> 01:37:49,160
+Entonces hay otros métodos de claserización.
+
+1070
+01:37:49,160 --> 01:37:50,720
+K-Mins no es el único.
+
+1071
+01:37:50,720 --> 01:37:53,760
+K-Mins, K-Mode, K-Prototype, no somos únicos.
+
+1072
+01:37:53,760 --> 01:37:56,560
+Hay métodos que no vamos a tener tiempo para discutir acá,
+
+1073
+01:37:56,560 --> 01:37:59,560
+que se ven en curso de Pesar Supervisado,
+
+1074
+01:37:59,560 --> 01:38:04,720
+por ejemplo DB-SCAN o una infinidad de otros métodos de claserización,
+
+1075
+01:38:04,720 --> 01:38:07,160
+que ahí pueden nos ayudar a claserizar
+
+1076
+01:38:07,160 --> 01:38:10,160
+individuos que tienen más cerca de una densidad específica.
+
+1077
+01:38:10,160 --> 01:38:13,960
+Por ejemplo, DB-SCAN va a evaluar los puntos que tienen una mayor densidad.
+
+1078
+01:38:13,960 --> 01:38:16,320
+Entonces todos los puntos que están más cerca acá
+
+1079
+01:38:16,320 --> 01:38:18,320
+debían ser clasificados en un grupo,
+
+1080
+01:38:18,320 --> 01:38:19,920
+individuos que tienen una alta densidad
+
+1081
+01:38:19,920 --> 01:38:21,920
+deberían ser clasificados como otro grupo.
+
+1082
+01:38:21,920 --> 01:38:24,920
+Entonces, él empieza a nos ayudar a tener
+
+1083
+01:38:24,920 --> 01:38:26,920
+esta idea de alta,
+
+1084
+01:38:26,920 --> 01:38:28,520
+una cantidad grande de densidad.
+
+1085
+01:38:28,520 --> 01:38:31,520
+Entonces, el DBSCAM podría ser una alternativa.
+
+1086
+01:38:31,520 --> 01:38:33,120
+Sólo para que sepan que camins
+
+1087
+01:38:33,120 --> 01:38:34,720
+pueden dividir estructuras curvas
+
+1088
+01:38:34,720 --> 01:38:37,320
+en grupos compactos que no siguen su forma.
+
+1089
+01:38:37,320 --> 01:38:39,520
+Esto sería un grupo, esto sería otro grupo,
+
+1090
+01:38:39,520 --> 01:38:41,520
+y camins no van a funcionar muy bien.
+
+1091
+01:38:41,520 --> 01:38:44,520
+Bueno, camins hasta el momento,
+
+1092
+01:38:44,520 --> 01:38:49,520
+y presenté varias formas de hacer clasificación,
+
+1093
+01:38:49,520 --> 01:38:55,520
+pero esta forma está basada en valores que son reales,
+
+1094
+01:38:55,520 --> 01:38:59,520
+por ejemplo, alcohol, ácido, ceniza y por ahí adelante.
+
+1095
+01:39:00,520 --> 01:39:04,520
+Por tener situaciones donde quiero encontrar información,
+
+1096
+01:39:04,520 --> 01:39:07,520
+por ejemplo, de individuos que son categóricos,
+
+1097
+01:39:07,520 --> 01:39:11,520
+por ejemplo, individuos que le gustan una cosa muy específica,
+
+1098
+01:39:11,520 --> 01:39:17,120
+cómo podemos crear clusters o encontrar clusters en un sitio como Netflix.
+
+1099
+01:39:17,120 --> 01:39:22,320
+Vamos a ver personas que les gustan algunas películas específicas, películas de terror,
+
+1100
+01:39:22,320 --> 01:39:25,720
+películas de acción, de suspense, entre otros.
+
+1101
+01:39:25,720 --> 01:39:33,320
+¿Cómo vamos a evaluar eso? ¿Tenemos un valor real? No, solamente conozco que la persona asistió o no asistió la película.
+
+1102
+01:39:33,320 --> 01:39:38,720
+Y ahí empezamos a medir ese nivel de similitud o disimilitud.
+
+1103
+01:39:38,720 --> 01:39:44,720
+Entonces, cuando tenemos variables categóricas, o variables binarias,
+
+1104
+01:39:44,720 --> 01:39:48,720
+que son binarias en este caso, o zero y uno, cuando tenemos variables binarias,
+
+1105
+01:39:48,720 --> 01:39:55,720
+tenemos que cambiar la forma que calculamos las cosas.
+
+1106
+01:39:55,720 --> 01:40:01,720
+Entonces, ven en una versión de camins que es conocida como k-modes.
+
+1107
+01:40:01,720 --> 01:40:06,720
+Entonces, si estoy sacando la media, vamos a suponer que ahora quiero evaluar
+
+1108
+01:40:06,720 --> 01:40:10,320
+que ocorre con frecuencia o que no ocorre con frecuencia. Malos son buenos pagadores.
+
+1109
+01:40:10,320 --> 01:40:16,720
+Va a tener valores cero o valores unos. ¿Tiene algún sentido sacar el promedio ahí? No,
+
+1110
+01:40:16,720 --> 01:40:22,240
+¿cierto? Entonces no tiene sentido promediar categorías como web, sucursal, entre otros.
+
+1111
+01:40:22,240 --> 01:40:30,240
+El centro contiene la categoría más frecuente en cada variable. Vamos a medir por medio
+
+1112
+01:40:30,240 --> 01:40:35,560
+de una otra métrica que es conocida como una métrica de dissimilitud. La dissimilitud
+
+1113
+01:40:35,560 --> 01:40:38,560
+cuenta cuántas variables tienen valores diferentes.
+
+1114
+01:40:38,560 --> 01:40:43,560
+Si alternan, se alternan asignación de observaciones y actualizaciones de modas.
+
+1115
+01:40:43,560 --> 01:40:49,560
+Básicamente lo que vamos a hacer acá es evaluar si los individuos son similares y si no son similares.
+
+1116
+01:40:49,560 --> 01:40:52,560
+Si son similares, vamos a querer agruparlos.
+
+1117
+01:40:52,560 --> 01:40:57,560
+Si son similares, vamos a querer que se quedan lo más lejos posible.
+
+1118
+01:40:57,560 --> 01:41:01,560
+Y eso funciona bien, funciona porque nuestro objetivo, por ejemplo,
+
+1119
+01:41:01,560 --> 01:41:04,560
+Tienen una clase que tendrá el sistema de recomendación.
+
+1120
+01:41:04,560 --> 01:41:08,560
+Verán que muchas cosas se basan en estas métricas de similitud.
+
+1121
+01:41:08,560 --> 01:41:12,560
+O sea, intentaremos evaluar los individuos que están más cerca
+
+1122
+01:41:12,560 --> 01:41:17,560
+uno de ellos al otro y después intentaremos hacer recomendaciones para estos individuos.
+
+1123
+01:41:17,560 --> 01:41:22,560
+Entonces verán que aquí está todo conectado.
+
+1124
+01:41:22,560 --> 01:41:28,560
+Queremos agrupar personas en clústeres específicos.
+
+1125
+01:41:28,560 --> 01:41:39,560
+La persona va a estar en un grupo o en una área muy específica y vamos a hacer una recomendación de una película, de un producto, de una música, entre otros.
+
+1126
+01:41:39,560 --> 01:41:45,560
+Estos tipos de cuentas están todos implementados en Netflix, Prime, YouTube, entre otros.
+
+1127
+01:41:45,560 --> 01:41:59,560
+Por ejemplo, vamos a suponer que acá queremos evaluar el nivel de desacuerdo o disimilitud entre un individuo estándar, un cliente, el punto central que tenemos ahí,
+
+1128
+01:41:59,560 --> 01:42:04,560
+un cliente acá con 200 que tenemos en cada uno de los grupos.
+
+1129
+01:42:04,560 --> 01:42:09,560
+Entonces tenemos dos grupos específicos, queremos dar cuenta que nuestro cliente está en un grupo o está en otro grupo.
+
+1130
+01:42:09,560 --> 01:42:15,560
+y ahí miramos cuál es su disimilitud. El cliente tiene un plan Gold,
+
+1131
+01:42:15,560 --> 01:42:20,560
+el canal que utiliza más es un aplicativo y está en la región sur.
+
+1132
+01:42:20,560 --> 01:42:25,560
+Y ahí tenemos dos grupos, el grupo que ocorre con más frecuencia tiene el plan Gold,
+
+1133
+01:42:25,560 --> 01:42:30,560
+el canal que utiliza más es el EPP y está en la región norte.
+
+1134
+01:42:30,560 --> 01:42:36,560
+Cuando miramos este cliente con este centro vemos que solamente tiene una disimilitud.
+
+1135
+01:42:36,560 --> 01:42:40,560
+es decir, él es un cliente Gold, sí, entonces ponemos 0.
+
+1136
+01:42:40,560 --> 01:42:43,560
+Un MEP, sí, entonces ponemos 0.
+
+1137
+01:42:43,560 --> 01:42:47,560
+Y lo que tiene de diferencia acá, ponemos 1.
+
+1138
+01:42:47,560 --> 01:42:52,560
+Indivíduos más cercanos, cliente más cercano al centro,
+
+1139
+01:42:52,560 --> 01:42:55,560
+debería tener valores más cerca de 0.
+
+1140
+01:42:55,560 --> 01:42:59,560
+Indivíduos más distintos deberían tener valores mucho grandes,
+
+1141
+01:42:59,560 --> 01:43:03,560
+principalmente la suma de todos los puntos que tenemos acá.
+
+1142
+01:43:03,560 --> 01:43:11,320
+Si tenemos 3, lo más distinto posible va a ser cuando tenemos el valor 3 acá.
+
+1143
+01:43:11,320 --> 01:43:15,080
+Lo más cerca posible va a ser cuando tenemos los valores por el service.
+
+1144
+01:43:15,080 --> 01:43:23,200
+Entonces el cliente se asigna un grupo A si tenemos un valor menor que el grupo B.
+
+1145
+01:43:23,200 --> 01:43:27,640
+Entonces por ejemplo, este individuo está más cerca del grupo A que del grupo B.
+
+1146
+01:43:27,640 --> 01:43:34,400
+Entonces el cliente se asigna el grupo A dado que el desacuerdo acá es el menor posible.
+
+1147
+01:43:34,400 --> 01:43:39,700
+Y bueno, lo que vamos a hacer allá va a ser una cosa similar, vamos a ir a los varios clientes,
+
+1148
+01:43:39,700 --> 01:43:48,600
+vamos a empezar con un valor estándar y después vamos a ir actualizando cada una de estos centroides acá
+
+1149
+01:43:48,600 --> 01:43:50,840
+para intentar encontrar lo que ocurre con mayor frecuencia.
+
+1150
+01:43:50,840 --> 01:43:58,100
+y después vamos a encontrar cuál es el grupo principal que nos dará el centro A,
+
+1151
+01:43:58,100 --> 01:44:01,940
+y las variables principales que nos dará el grupo B.
+
+1152
+01:44:01,940 --> 01:44:07,900
+Cada variable aporta un desacuerdo, como máximo en esta versión, no poderada,
+
+1153
+01:44:07,900 --> 01:44:11,100
+las categorías no necesitan una codificación ordinar.
+
+1154
+01:44:11,100 --> 01:44:13,740
+La actualización de una moda.
+
+1155
+01:44:13,740 --> 01:44:16,940
+Supongamos que un grupo contiene estos tres clientes,
+
+1156
+01:44:16,940 --> 01:44:21,940
+Uno que empezó con el Gold, Canal Up y está en el región norte.
+
+1157
+01:44:21,940 --> 01:44:27,940
+Un otro que está con el grupo Gold también, utiliza el aplicativo Web y está en el región norte.
+
+1158
+01:44:27,940 --> 01:44:32,940
+Y el último es un grupo Silver, utiliza el App y está en el región sur.
+
+1159
+01:44:32,940 --> 01:44:38,940
+Las modas por columnas son Gold, que fue lo que ocurrió con mayor frecuencia,
+
+1160
+01:44:38,940 --> 01:44:40,940
+y el Sambucón.
+
+1161
+01:44:40,940 --> 01:44:46,140
+que es lo que ocurre con más frecuencia acá, y el norte. Entonces empezamos con la moda con Gold, EPP y el norte.
+
+1162
+01:44:46,140 --> 01:44:54,340
+El curso del grupo puede ser 0, puede ser 1, puede ser 2, porque podemos tener hasta 3 desacuerdos.
+
+1163
+01:44:54,340 --> 01:45:05,140
+Bueno, una moda es la categoría más frecuente, incluso algunas situaciones pueden tener impartes que no siempre superan el 50%.
+
+1164
+01:45:05,140 --> 01:45:11,140
+Acá, de alguna manera, intenté sacar la base de datos que tenemos de los vinos
+
+1165
+01:45:11,140 --> 01:45:17,140
+e intenté categorizarlos para crear valores como 0, 1 y 2.
+
+1166
+01:45:17,140 --> 01:45:20,140
+Entonces, creé categorías para el ejemplo de vinos.
+
+1167
+01:45:20,140 --> 01:45:25,140
+El álcool, ser menor que 13, ponerlo en una categoría barra.
+
+1168
+01:45:25,140 --> 01:45:33,140
+Ser mayor o igual a 13, ponerlo en una categoría alta y no tener un valor medio acá.
+
+1169
+01:45:33,140 --> 01:45:38,140
+El flavinoides si tiene un valor medio, si es menor que 1.5, pongo en una categoría,
+
+1170
+01:45:38,140 --> 01:45:45,140
+si tengo valores entre 1.5 e 3, pongo en otra categoría medio y menor que 3 en otra categoría.
+
+1171
+01:45:45,140 --> 01:45:49,140
+Conservamos los cortes del material para ilustrar el método Camon,
+
+1172
+01:45:49,140 --> 01:45:53,140
+entonces fue solamente un to example para sacar la base que ya teníamos,
+
+1173
+01:45:53,140 --> 01:46:00,140
+criamos categorías acá y vamos a intentar de alguna manera hacer la clusterización,
+
+1174
+01:46:00,140 --> 01:46:06,420
+pero ahora con variables categóricas. Professor, cuál es la mejor forma? Por supuesto,
+
+1175
+01:46:06,420 --> 01:46:12,460
+si esto está en los reales, y hacer una categorización en eso, va a tener pérdida de información.
+
+1176
+01:46:12,460 --> 01:46:19,740
+Entonces, esto solamente como un ejemplo para que puedan evaluar cómo funciona la cosa. Pero,
+
+1177
+01:46:19,740 --> 01:46:25,100
+en la práctica, generalmente no debemos hacer esto si los valores están reales. Categorizar
+
+1178
+01:46:25,100 --> 01:46:27,680
+y se espera la información de las mediciones originales.
+
+1179
+01:46:27,680 --> 01:46:31,740
+Aquí las categorías se comparan por igualdad sin usar su orden.
+
+1180
+01:46:31,740 --> 01:46:36,100
+Entonces crean una función en R para hacer la categorización,
+
+1181
+01:46:36,100 --> 01:46:39,640
+entonces se va a evaluar cada un de ellos, se va a evaluar si está en un punto,
+
+1182
+01:46:39,640 --> 01:46:43,400
+y clasifica, acá va a ser 0 y 1 básicamente, barro y alto,
+
+1183
+01:46:43,400 --> 01:46:46,820
+acá tiene tres categorías, barro, medio y alto.
+
+1184
+01:46:46,820 --> 01:46:54,020
+Y ahí fue corregido el k-mode con una función R que se llama k-modes.
+
+1185
+01:46:54,020 --> 01:47:00,660
+De forma similar, necesito evaluar cuántos clústeres queremos ajustar.
+
+1186
+01:47:00,660 --> 01:47:04,060
+Entonces, voy a poner 1, 2, 3, 4, por ahí adelante.
+
+1187
+01:47:04,060 --> 01:47:10,340
+Y después de correr eso, voy a tener lo mismo los grupos específicos,
+
+1188
+01:47:10,340 --> 01:47:13,740
+pero ahora va a ser más difícil visualizar esos grupos porque no son reales,
+
+1189
+01:47:13,740 --> 01:47:19,780
+entonces no voy a poder hacer un plot como éste.
+
+1190
+01:47:19,780 --> 01:47:22,660
+No me va a ayudar mucho en esa parte.
+
+1191
+01:47:22,660 --> 01:47:32,260
+pero yo puedo al final encontrar la cantidad de clusters que debieron tener esta base de dados específica
+
+1192
+01:47:32,260 --> 01:47:38,740
+tenemos acá una tasa de desacuerdo entre 1, 2 y ahí exactamente el gráfico del código
+
+1193
+01:47:38,740 --> 01:47:44,020
+entre acá para acá tiene un cambio y de acá para acá tiene otro cambio
+
+1194
+01:47:44,020 --> 01:47:47,220
+entonces uno puede intentar informar ya o va a estar entre 2, 3 y 4
+
+1195
+01:47:47,220 --> 01:47:50,660
+no ayuda mucho porque no tiene un punto de corte acá
+
+1196
+01:47:50,660 --> 01:48:00,660
+El costo cuenta desacuerdos, no es una suma de cuadrados. Usaremos 4 para ilustrar los perfiles sin afirmar que es el mejor valor.
+
+1197
+01:48:00,660 --> 01:48:10,660
+Acá me parece que el método debería haber elegido en torno de 4, pero sabemos que son 3.
+
+1198
+01:48:10,660 --> 01:48:27,660
+la lectura de un perfil categórico, por ejemplo en Python tenemos la color alto, bajo y medio, números 40, corrió 40 veces, 1 y 7, y la proporción fue de 83, 2.1 y 14.
+
+1199
+01:48:27,660 --> 01:48:35,060
+Entonces su centro modal acá va a ser el alcohol, acá con flavinoides bajos y color alto.
+
+1200
+01:48:35,060 --> 01:48:39,500
+Entonces básicamente lo que he de demostrar acá fue que haciendo la clasitarización
+
+1201
+01:48:39,500 --> 01:48:45,620
+o la categorización de hecho tenemos algunas cosas, por ejemplo el alcohol se quedó con
+
+1202
+01:48:45,620 --> 01:48:51,020
+nivel alto, entonces va a ser una información en su centro modal va a ser exactamente ese
+
+1203
+01:48:51,020 --> 01:48:52,860
+punto alcohol alto.
+
+1204
+01:48:52,860 --> 01:48:56,100
+Después flavinoides bajos y un color alto.
+
+1205
+01:48:56,100 --> 01:49:04,100
+el perfil resumen las frecuencias, tenemos 15 minutos, pero no significa que todos los vinos tengan el mismo color
+
+1206
+01:49:07,100 --> 01:49:15,100
+acá es una de las formas de evaluar esto, k-modes, k-mins, pero muchas veces no veo exactamente a la persona
+
+1207
+01:49:15,100 --> 01:49:21,100
+que está cerrando exactamente solamente con k-modes, o sus dados vienen reales o muchas veces va a ser
+
+1208
+01:49:21,100 --> 01:49:28,340
+de valores reales con valores binarios, con categorías o con valores categóricos o
+
+1209
+01:49:28,340 --> 01:49:37,980
+principalmente categóricos pero binarios. Entonces, básicamente K-Modes moveo
+
+1210
+01:49:37,980 --> 01:49:43,420
+con una frecuencia muy grande, pero K-Mins es lo que más veo, pero conjuntamente con
+
+1211
+01:49:43,420 --> 01:49:49,260
+un poco de la parte de K-Modes. Entonces vamos a suponer, ustedes tienen una base donde la gran
+
+1212
+01:49:49,260 --> 01:49:57,620
+la mayoría son valores, tener varias variables reales, pero además de las variables reales
+
+1213
+01:49:57,620 --> 01:50:00,140
+voy a tener algunas variables categóricas acá.
+
+1214
+01:50:00,140 --> 01:50:02,900
+¿Cuál sería la mejor forma?
+
+1215
+01:50:02,900 --> 01:50:03,900
+Mezclar los dos.
+
+1216
+01:50:03,900 --> 01:50:10,100
+Si tengo una forma de evaluar el KAMMOD y tengo una forma de evaluar el KAMMOD, el nivel
+
+1217
+01:50:10,100 --> 01:50:17,220
+de similitud en KAMMOD y cansterizar un grupo específico, yo puedo juntar estas dos métricas,
+
+1218
+01:50:17,220 --> 01:50:28,700
+el Camus y juntar exactamente, un poquito más adelante, las dos métricas que tenemos en los métodos.
+
+1219
+01:50:28,700 --> 01:50:35,580
+Uno basado en el Camus, otro basado en el Camus y por supuesto acá después ellos agregan un gamma que va a ser
+
+1220
+01:50:35,580 --> 01:50:43,220
+lo peso que queremos dar para las variables categóricas. Muchas veces ayuda un poco principalmente
+
+1221
+01:50:43,220 --> 01:50:51,360
+que todo, eso después también tiene que seguir. Pero ahí vamos a tener ahí una mezcla entre el
+
+1222
+01:50:51,360 --> 01:50:57,840
+camins y una mezcla con camos. Ese método se llama k-prototypes. Entonces son variables
+
+1223
+01:50:57,840 --> 01:51:05,040
+mixtas, cuando tenemos variables categóricas y variables reales, uno puede ajustar exactamente
+
+1224
+01:51:05,040 --> 01:51:12,720
+con esta clase de modelos. Bueno, un costo mixto, una cuenta resultante aquí.
+
+1225
+01:51:12,720 --> 01:51:19,280
+Una observación tiene dos valores numéricos, 1 y 2 y categorías por ejemplo API y SURE.
+
+1226
+01:51:19,280 --> 01:51:24,680
+Entonces vamos a tener la parte numérica del prototipo acá, o para el grupo A y para el grupo B.
+
+1227
+01:51:24,680 --> 01:51:31,120
+La parte numérica, donde vamos a tener los centros y las categorías,
+
+1228
+01:51:31,120 --> 01:51:38,980
+más un costo asociado a esas informaciones. Por ejemplo, para el grupo A, en termos de distancia,
+
+1229
+01:51:38,980 --> 01:51:47,560
+si miramos uno con el centro, uno menos cero, ese individuo con ese, dos menos uno, entonces
+
+1230
+01:51:47,560 --> 01:51:54,880
+tenemos el valor uno para ese individuo A. Para el individuo B, uno menos dos, uno menos dos,
+
+1231
+01:51:54,880 --> 01:52:01,980
+para el individuo en la otra parte 1 menos 2 después 2 menos 3 entonces la
+
+1232
+01:52:01,980 --> 01:52:05,680
+misma forma que estamos haciendo anteriormente vamos a mirar los individuos en
+
+1233
+01:52:05,680 --> 01:52:11,980
+relación a su centro ya la diferencia acá por dos entonces tomemos dos acá y
+
+1234
+01:52:11,980 --> 01:52:17,500
+después tenemos la penalización de este individuo estar similar o distinto por
+
+1235
+01:52:17,500 --> 01:52:23,420
+ejemplo el protótipo a acá para este individuo cuando miramos las categorías
+
+1236
+01:52:23,420 --> 01:52:30,540
+vamos a ver que este individuo tiene la misma similitud entonces ponemos acá 0 pero para el sur
+
+1237
+01:52:30,540 --> 01:52:41,660
+son distintos, cuando los individuos son distintos lo que hago, voy a sumar 1, entonces somo 1 acá para
+
+1238
+01:52:41,660 --> 01:52:47,140
+los individuos distintos, entonces somo 1, 1 x gamma va a ser gamma, entonces va a ser el costo que
+
+1239
+01:52:47,140 --> 01:52:52,980
+vamos a tener acá va a ser 1 más gamma, en esta otra situación tengo una distancia un poco mayor
+
+1240
+01:52:52,980 --> 01:52:59,320
+pero las categorías son muy similares, entonces esta persona utiliza el AP y también está en la región sur,
+
+1241
+01:52:59,320 --> 01:53:07,360
+entonces no entró ninguna penalización acá por temas de desacuerdos, básicamente acá tenemos
+
+1242
+01:53:07,360 --> 01:53:15,460
+cero desacuerdos y acá tengo un desacuerdo, y ahí va a entrar exactamente la idea de los pesos,
+
+1243
+01:53:15,460 --> 01:53:22,940
+bueno, vamos a definir cuál es nuestro peso, si ponemos un peso de 0.5, clasificamos el individuo
+
+1244
+01:53:22,940 --> 01:53:27,900
+para el grupo A, si ponemos un peso gamma como 3, vamos a clasificar el
+
+1245
+01:53:27,900 --> 01:53:31,740
+nivel para el grupo B, entonces modificar el peso puede cambiar la
+
+1246
+01:53:31,740 --> 01:53:35,260
+asignación aunque los dados sean los mismos,
+
+1247
+01:53:35,260 --> 01:53:43,300
+entonces entramos en esta vela, en esta idea de cómo definimos gamma, cómo definimos,
+
+1248
+01:53:43,300 --> 01:53:48,580
+vamos a ver que hacer distintos cambios de valor como se quedan los grupos,
+
+1249
+01:53:48,580 --> 01:53:51,180
+de alguna manera intentar encontrar ese valor de lámina.
+
+1250
+01:53:53,420 --> 01:53:55,500
+Bueno, como ajustamos los datos,
+
+1251
+01:53:56,580 --> 01:54:01,380
+utilizamos esta función acá en R, conocida como K prototype.
+
+1252
+01:54:01,460 --> 01:54:04,340
+Entonces, va a ser nuestra base de datos que va a tener
+
+1253
+01:54:05,140 --> 01:54:07,300
+nuestro control de dados original.
+
+1254
+01:54:07,380 --> 01:54:11,220
+Y voy a cambiar algunas de estas variables acá como categóricas,
+
+1255
+01:54:11,380 --> 01:54:12,740
+ceniza y matiz.
+
+1256
+01:54:13,740 --> 01:54:16,980
+Entonces, ahora tengo variables numéricas,
+
+1257
+01:54:16,980 --> 01:54:20,540
+que no de hecho acá estoy salvando la base
+
+1258
+01:54:20,540 --> 01:54:25,380
+manteniendo Z padronizado con ceniza y matriz y después estoy agregando
+
+1259
+01:54:25,380 --> 01:54:29,860
+variables categóricas, es decir, la primera variable ceniza va a ser
+
+1260
+01:54:29,860 --> 01:54:34,340
+numérica, a ser real, la segunda variable va a ser real y las otras tres
+
+1261
+01:54:34,340 --> 01:54:39,460
+van a ser categóricas de la transformación, la categórica cada
+
+1262
+01:54:39,460 --> 01:54:43,860
+va a ser 2, 3 y 4 por ejemplo. Y ahí podemos ajustar la función con una
+
+1263
+01:54:43,860 --> 01:54:48,860
+una función conocida como k-proto, la base de datos y la cantidad de clusters.
+
+1264
+01:54:48,860 --> 01:54:53,860
+Bueno, yo puedo definir el peso acá, que vamos a poner lâmida igual a peso
+
+1265
+01:54:53,860 --> 01:54:58,860
+y corremos el modelo y vemos cómo nos va a salir.
+
+1266
+01:54:58,860 --> 01:55:04,860
+Aquí lâmida es el peso de las categorías, no es una penalización como por ejemplo,
+
+1267
+01:55:04,860 --> 01:55:10,860
+en Python hacemos básicamente lo mismo, pero vamos a correr acá con k-prototypes.
+
+1268
+01:55:10,860 --> 01:55:20,860
+El número de clúster, puntos iniciales, el peso también va a tener acá y bueno así
+
+1269
+01:55:20,860 --> 01:55:23,860
+ya se ha mostrado el modelo.
+
+1270
+01:55:23,860 --> 01:55:29,020
+Y ahí vamos a tener el gráfico del código nuevamente mostrando cuáles serían los posibles
+
+1271
+01:55:29,020 --> 01:55:30,020
+clústeres.
+
+1272
+01:55:30,020 --> 01:55:32,860
+Acá siempre me da la indicación posiblemente de cuando eso cambia.
+
+1273
+01:55:32,860 --> 01:55:36,620
+Me parece que hubo una gran ansia de información muy grande de acá para acá, pero de acá
+
+1274
+01:55:36,620 --> 01:55:38,260
+para acá ya es pequeño.
+
+1275
+01:55:38,260 --> 01:55:41,500
+Entonces yo me quedaría con tres posibles clusters acá, ¿cierto?
+
+1276
+01:55:41,900 --> 01:55:45,740
+Entonces cuando tenemos dados reales y dados catególicos,
+
+1277
+01:55:46,020 --> 01:55:50,340
+me da la indicación de que una buena solución sería K igual a 3, ¿sí?
+
+1278
+01:55:52,100 --> 01:55:58,780
+Bueno, el prototipo, o prototype, va a combinar medias y modas, ¿ya?
+
+1279
+01:55:59,060 --> 01:56:01,380
+Entonces tenemos tres posibles clusters
+
+1280
+01:56:01,700 --> 01:56:06,580
+y cada uno de esos clusters va a tener su grupo base,
+
+1281
+01:56:06,580 --> 01:56:10,420
+O sea, sus valores promedios, donde deberían estar cada una de las covariables,
+
+1282
+01:56:10,420 --> 01:56:12,940
+y las covariables que ocurren con mayor frecuencia.
+
+1283
+01:56:12,940 --> 01:56:16,980
+Entonces, por ejemplo, el grupo 1 se quedó con 69 observaciones.
+
+1284
+01:56:16,980 --> 01:56:21,980
+De esas 69 observaciones, el promedio de la ceniza es de 0.62.
+
+1285
+01:56:21,980 --> 01:56:25,460
+El promedio de la matiz es 0.50.
+
+1286
+01:56:25,460 --> 01:56:30,460
+Si recuerdo que esos valores están normalizados, están estandarizados.
+
+1287
+01:56:30,460 --> 01:56:35,460
+Después fue devolvida la variante original para ver cuál es la interpretación.
+
+1288
+01:56:35,460 --> 01:56:39,660
+Álcool alto, flavonides medio y la color medio.
+
+1289
+01:56:39,660 --> 01:56:47,340
+Entonces este grupo tiene algunas informaciones muy específicas, el nivel de alcohol alto y
+
+1290
+01:56:47,340 --> 01:56:52,060
+flavonoides medio, el color medio.
+
+1291
+01:56:52,060 --> 01:56:58,460
+El grupo 2 tiene una diferencia significativa en la ceniza, la matiz es muy distinta,
+
+1292
+01:56:58,460 --> 01:57:03,740
+está 0.5 positivo, esta está menos 0.22, el nivel de alcohol también es alto, pero
+
+1293
+01:57:03,740 --> 01:57:09,140
+flavonidos es barro y la color es alto. Entonces ellos tienen informaciones ahí me parece muy
+
+1294
+01:57:09,140 --> 01:57:15,020
+distintas. Entonces es un otro grupo que está siendo clasificado. Y por fin el último grupo 3
+
+1295
+01:57:15,020 --> 01:57:21,660
+que también tiene valores muy distintos para ceniza, menos 0.38, 0.3, el nivel de barro,
+
+1296
+01:57:21,660 --> 01:57:29,980
+medio y color barro. Entonces el grupo 2, Matisse está con 0.258 deviasiones bajo la media general.
+
+1297
+01:57:29,980 --> 01:57:38,620
+color alto es la moda. Pero sólo 30 de 47 tienen esta categoría. Un protótipo
+
+1298
+01:57:38,620 --> 01:57:43,300
+por él no corresponderá a ninguna observación real. Por eso es que ninguna de las observaciones
+
+1299
+01:57:43,300 --> 01:57:49,580
+reales ocurre exactamente con eso, pero cuando uno va a calcular la disimilitud y la distancia,
+
+1300
+01:57:49,580 --> 01:57:53,820
+va a acabar agrupando a estos individuos. Por el final, por él no tener ningún individuo
+
+1301
+01:57:53,820 --> 01:58:00,660
+que exactamente tiene esa información. Bueno, acabo de ser la sensibilidad, lo que,
+
+1302
+01:58:00,660 --> 01:58:07,740
+como funciona entonces conforme cambiamos los pesos? Y no puedo tener una idea cuando
+
+1303
+01:58:07,740 --> 01:58:12,780
+intenta hacer un plot cambiando la estructura de los pesos. Bueno, tenemos que definir ese
+
+1304
+01:58:12,780 --> 01:58:16,540
+peso, eso no es una cosa mala porque no tengo que después evaluar cuál será el clóset
+
+1305
+01:58:16,540 --> 01:58:23,380
+con base al peso, pero el peso, la matiz estandarizada en la seniza uno ve que con
+
+1306
+01:58:23,380 --> 01:58:29,340
+peso 0.25 logra hacer una buena clasificación para ese grupo. Conforme
+
+1307
+01:58:29,340 --> 01:58:35,860
+vamos cambiando el peso, la cosa empieza a se mezclar más y se queda más
+
+1308
+01:58:35,860 --> 01:58:42,280
+difícil hacer la clasificación de esos grupos. Entonces, conforme
+
+1309
+01:58:42,280 --> 01:58:45,660
+cambiamos el peso, vamos a cambiar esos grupos. Entonces, después tienen que hacer
+
+1310
+01:58:45,660 --> 01:58:52,980
+una una variación y por supuesto si tiene después un label ahí puede evaluarse como salió bien en
+
+1311
+01:58:52,980 --> 01:59:07,700
+términos de una clasificación real. Pero la gran mayoría de las veces no vamos a tener ese label entonces no podemos
+
+1312
+01:59:07,700 --> 01:59:13,580
+elegir eso es una información importante. Bueno una cosa que es mala es que no tenemos la
+
+1313
+01:59:13,580 --> 01:59:18,980
+variar respuesta. Entonces, una cosa que nunca vamos a poder elegir es el peso, por ejemplo, por una
+
+1314
+01:59:18,980 --> 01:59:24,700
+área de la curva rock o elegir el peso vía validación cruzada, porque no tenemos una variar
+
+1315
+01:59:24,700 --> 01:59:31,580
+respuesta acá. No calculamos la exatitud ni la área sobre la curva rock porque no hay una clase
+
+1316
+01:59:31,580 --> 01:59:38,020
+observada que pede ser. Usamos criterios internos a codis con las variables y la disimilitud. Revisamos
+
+1317
+01:59:38,020 --> 01:59:43,020
+los perfiles que aparecen al cambiar inicios o hacer un mostrío.
+
+1318
+01:59:43,020 --> 01:59:49,020
+Para eso utilizamos una exploración de las 157 observaciones,
+
+1319
+01:59:49,020 --> 01:59:53,020
+pero eso no va a requerir automáticamente una división de 70-30,
+
+1320
+01:59:53,020 --> 01:59:56,020
+porque acá no vamos a hacer entrenamiento en un modelo,
+
+1321
+01:59:56,020 --> 01:59:58,020
+después se califica en el otro.
+
+1322
+01:59:58,020 --> 02:00:02,020
+Cuando hacemos divisiones entre los tres métodos,
+
+1323
+02:00:02,020 --> 02:00:12,420
+métodos con camins, llegamos en tres clústeres y un costo acá del ejemplo, un VWSS de 1267,
+
+1324
+02:00:12,420 --> 02:00:18,580
+ya? Basado en la distancia al cuadrado. Cuando cambiamos para K-Modes, cambió el número de
+
+1325
+02:00:18,580 --> 02:00:24,100
+clústeres y tuvimos un cambio en el costo, o en la variancia, básicamente, aquella variancia que
+
+1326
+02:00:24,100 --> 02:00:29,660
+tenemos. O sea, estas métricas acá no son comparables para elegir cuál es el mejor método.
+
+1327
+02:00:29,660 --> 02:00:34,980
+porque le comento esto porque había mucha gente hacer esto, sale el costo y forma ya, esa es la
+
+1328
+02:00:34,980 --> 02:00:40,100
+variancia de uno, entonces eso también voy comparar, me salió mejor con k prototype.
+
+1329
+02:00:40,100 --> 02:00:46,180
+Entonces no elegimos kmods porque 75 ser el menor número de esa tabla. Los dados de entrada,
+
+1330
+02:00:46,180 --> 02:00:52,740
+las unidades, las funciones del costo son distintos. La comparación pertinente
+
+1331
+02:00:52,740 --> 02:00:58,300
+comienza por el tipo de variable y el propósito. Entonces, cuál de los tres vamos? Depende de cómo
+
+1332
+02:00:58,300 --> 02:00:59,780
+está su base de dados.
+
+1333
+02:00:59,780 --> 02:01:02,820
+Si tienes solamente valores reales, camins.
+
+1334
+02:01:02,820 --> 02:01:05,420
+Si tienes solamente valores categóricos, camotes.
+
+1335
+02:01:05,420 --> 02:01:08,140
+Si tienes una mezcla de los dos, capot types.
+
+1336
+02:01:08,140 --> 02:01:09,340
+De una forma muy sencilla.
+
+1337
+02:01:13,980 --> 02:01:17,140
+Bueno, antes de usar los grupos, revisamos las variables
+
+1338
+02:01:17,140 --> 02:01:20,900
+incluidas, escalas y posibles observaciones atípicas.
+
+1339
+02:01:20,900 --> 02:01:24,460
+Tamanos, perfiles y variaciones dentro de cada grupo.
+
+1340
+02:01:24,460 --> 02:01:28,060
+la sensibilidad del número de los clústeres,
+
+1341
+02:01:28,560 --> 02:01:31,160
+la inicialización y el peso de cada categoría.
+
+1342
+02:01:31,460 --> 02:01:33,160
+Les mostré que la inicialización
+
+1343
+02:01:33,460 --> 02:01:35,760
+va a influenciar alto
+
+1344
+02:01:36,260 --> 02:01:37,460
+o puede influenciar
+
+1345
+02:01:37,860 --> 02:01:39,760
+en la variancia final que tenemos.
+
+1346
+02:01:39,860 --> 02:01:42,160
+O sea, puede nos causar problemas
+
+1347
+02:01:42,460 --> 02:01:43,260
+cuando fuemos
+
+1348
+02:01:44,860 --> 02:01:45,760
+a hacer nuestro clúster.
+
+1349
+02:01:45,860 --> 02:01:48,660
+Entonces, tenemos que cambiar la inicialización.
+
+1350
+02:01:48,960 --> 02:01:51,360
+Tenemos que evaluar cuáles son los posibles clústeres.
+
+1351
+02:01:51,660 --> 02:01:53,160
+Utilice los tres métodos
+
+1352
+02:01:53,160 --> 02:01:58,960
+y una sugerencia es evaluar la cantidad de clústeres que ocurren con más frecuencia en esos métodos.
+
+1353
+02:01:58,960 --> 02:02:04,200
+Si dos métodos indican tres clústeres, bueno, yo me voy con los tres clústeres.
+
+1354
+02:02:04,200 --> 02:02:10,760
+Si las conclusiones describen las mediciones o exceden la evidencia,
+
+1355
+02:02:10,760 --> 02:02:14,200
+bueno, unos cuidados que no tienen que tener cuando va a ser una análisis estadística.
+
+1356
+02:02:14,200 --> 02:02:21,000
+Una cosa que es importante es recordar de hacer la estandarización de las observaciones
+
+1357
+02:02:21,000 --> 02:02:28,000
+y una cosa que no discutí acá pero que es muy importante es evaluar si tenemos puntos atípicos
+
+1358
+02:02:28,000 --> 02:02:30,000
+por que puntos atípicos?
+
+1359
+02:02:30,000 --> 02:02:33,000
+vamos a suponer que tengo varios puntos acá
+
+1360
+02:02:36,000 --> 02:02:38,000
+un otro grupo acá
+
+1361
+02:02:40,000 --> 02:02:46,000
+y uno no se da cuenta, tenemos cuando observaciones, no hace una análisis de puntos de outliers
+
+1362
+02:02:46,000 --> 02:02:52,320
+Bueno, hacemos acá una proyección 2x12, entonces facilita la vida, pero generalmente ustedes
+
+1363
+02:02:52,320 --> 02:02:58,600
+no van a tener este lujo porque van a estar trabajando con 10, 15, 20, 30 covariables.
+
+1364
+02:02:58,600 --> 02:03:03,040
+Pero si uno hace una proyección va a ver que tiene un punto acá que uno no utiliza.
+
+1365
+02:03:03,040 --> 02:03:04,040
+Ya?
+
+1366
+02:03:04,040 --> 02:03:11,200
+Bueno, si yo pongo K igual a 2, claramente, eso debería ser un cluster, y eso debería
+
+1367
+02:03:11,200 --> 02:03:12,200
+ser un cluster.
+
+1368
+02:03:12,200 --> 02:03:13,200
+Ya?
+
+1369
+02:03:13,200 --> 02:03:20,220
+Si no tomamos cuidado, el método indicará que esto es un cluster, un punto acá, y que
+
+1370
+02:03:20,220 --> 02:03:22,120
+esto es otro cluster.
+
+1371
+02:03:22,120 --> 02:03:26,940
+Entonces, los puntos, si tenemos outliers, tenemos que tomar mucho cuidado para que no
+
+1372
+02:03:26,940 --> 02:03:28,940
+se torne un cluster.
+
+1373
+02:03:28,940 --> 02:03:33,980
+Si no hay que tener cuidado, es la evaluación de clusters.
+
+1374
+02:03:33,980 --> 02:03:39,600
+De hecho, no camisa, pero PCA es una buena forma de hacer proyección, después de evaluar
+
+1375
+02:03:39,600 --> 02:03:41,860
+si tenemos puntos muy lejos.
+
+1376
+02:03:41,860 --> 02:03:45,860
+eliminamos posibles autilares y corremos la análisis de nuevo.
+
+1377
+02:03:45,860 --> 02:03:51,860
+Para los que vieron Random Forest, también es una forma de hacer evaluación de posibles autilares.
+
+1378
+02:03:51,860 --> 02:03:57,860
+Entonces vamos a ver una forma de hacer autilares para después no tener problemas con esto.
+
+1379
+02:03:57,860 --> 02:04:05,860
+Bueno, dejé algunas referencias acá, pero el artículo que no es pesado, me gustó mucho,
+
+1380
+02:04:05,860 --> 02:04:11,860
+que se publicaron en este artículo fue el artículo de Tibichirani, Alter y Rast.
+
+1381
+02:04:11,860 --> 02:04:15,860
+Se publicaron en una revista muy pesada de estadísticas, se llama Rolsocytes Serie B,
+
+1382
+02:04:15,860 --> 02:04:22,860
+de la Rolsocytes, pero el artículo es extremamente intuitivo, muy sencillo.
+
+1383
+02:04:22,860 --> 02:04:28,860
+Quien quiere dar una mirada mejor en la parte teórica, los invito a abajar este artículo para dar una mirada.
+
+1384
+02:04:28,860 --> 02:04:37,860
+utilizar las librerías que tenemos en R, en Python, tenemos ambos los códigos acá en R
+
+1385
+02:04:37,860 --> 02:04:42,860
+y para los que quieren correr en Python, van a ver que los cambios son pequeños,
+
+1386
+02:04:42,860 --> 02:04:47,860
+pero los resultados van a ser básicamente los mismos. Dejemos correr las cosas en Python
+
+1387
+02:04:47,860 --> 02:04:50,860
+para que veamos que vamos a llegar a los mismos resultados finales.
+
+1388
+02:04:50,860 --> 02:04:53,860
+5 6
+
+1389
+02:04:58,860 --> 02:04:59,860
+y
+
+1390
+02:05:01,860 --> 02:05:03,860
+esto fue con camins
+
+1391
+02:05:05,860 --> 02:05:08,860
+comparar los grupos con las clases reales acá
+
+1392
+02:05:08,860 --> 02:05:11,860
+pues yo había hecho una comparación de los grupos con las clases reales
+
+1393
+02:05:11,860 --> 02:05:16,860
+para ver que con camins me sale en python la misma cosa
+
+1394
+02:05:16,860 --> 02:05:18,860
+entonces voy a tener acá la comparación
+
+1395
+02:05:18,860 --> 02:05:22,780
+Esta es la clase real de un grupo, la clase real de otro grupo y la clase real.
+
+1396
+02:05:22,780 --> 02:05:26,860
+La única cosa que estaba allá es que creo que la orden estaba, el PCA estaba invertido.
+
+1397
+02:05:26,860 --> 02:05:28,860
+Estos puntos estaban más arriba.
+
+1398
+02:05:28,860 --> 02:05:34,860
+Pero la identificación es muy similar a donde estamos haciendo mal la clasificación.
+
+1399
+02:05:34,860 --> 02:05:40,860
+Entonces uno puede hacer este tipo de comparación.
+
+1400
+02:05:40,860 --> 02:05:46,860
+Acá, bajamos la base real, la original y tenemos las etiquetas.
+
+1401
+02:05:46,860 --> 02:05:51,860
+entonces podemos hacer la comparación, ¿cierto? con el PCA.
+
+1402
+02:05:51,860 --> 02:05:56,860
+Bueno, era eso lo que había planificado para hoy, para ustedes.
+
+1403
+02:05:56,860 --> 02:06:02,860
+Bueno, fue ahora que ya tenemos el contenido, simplemente voy a hacer un resumen
+
+1404
+02:06:02,860 --> 02:06:08,860
+y en la próxima clase revisamos tanto lo que vamos a tener con Eloy
+
+1405
+02:06:08,860 --> 02:06:11,860
+cuanto la idea de clasalización, ¿cierto?
+
+1406
+02:06:11,860 --> 02:06:17,460
+¿Dudas, preguntas, sugerencias? ¿Les gusta? ¿Sí Claudia?
+
+1407
+02:06:17,460 --> 02:06:26,860
+Profesor, una pequeña duda, como en regresión logística se penalizaba mediante reach o mediante lazo,
+
+1408
+02:06:26,860 --> 02:06:38,860
+acá en estos modelos que estamos revisando ahora, ¿existe algún tipo de penalización o simplemente va a existir la función de costo que usted mencionó?
+
+1409
+02:06:38,860 --> 02:06:43,860
+solamente la función de costo mira que acá no estamos por ejemplo en
+
+1410
+02:06:43,860 --> 02:06:47,900
+región o risca lo que tenemos es calculamos
+
+1411
+02:06:47,900 --> 02:06:54,140
+y la variable respuesta menos los betas a ser estimados más una función de
+
+1412
+02:06:54,140 --> 02:06:58,540
+penalización para eliminar los parámetros ya no se acuerda que esa
+
+1413
+02:06:58,540 --> 02:07:04,140
+función de penalización allá en rich laso y otros lo que intenta hacer es te
+
+1414
+02:07:04,140 --> 02:07:09,860
+ayuda a controlar la variancia, pero por supuesto usted está mirando para un label específico.
+
+1415
+02:07:09,860 --> 02:07:23,020
+Acá no tenemos ese label, por supuesto como suporte vector machinito vamos a tener un parámetro que
+
+1416
+02:07:23,020 --> 02:07:30,940
+tenemos problemas para poder encontrarlo, vamos a tener que evaluarlo. Pero no va a ser exactamente como hacemos
+
+1417
+02:07:30,940 --> 02:07:36,520
+con RID, porque RID nos facilita la cosa, minimizamos, encontramos el lambda o el gamma
+
+1418
+02:07:36,520 --> 02:07:41,260
+que minimiza una función, pero en este caso acá no tenemos como minimizar nada, nosotros
+
+1419
+02:07:41,260 --> 02:07:44,940
+tenemos que cambiar, evaluar cómo están saliendo las clasificaciones con base de Nc gamma,
+
+1420
+02:07:44,940 --> 02:07:47,940
+entonces tenemos que poner este valor, pero este gamma...
+

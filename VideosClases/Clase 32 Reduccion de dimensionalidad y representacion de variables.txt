@@ -1,0 +1,1576 @@
+¿Cuántos hay? ¿105? Normalmente son 130. ¿Queda todavía gente por entrar? ¿Hay gente en la sala de espera?
+Creo que no. No, no hay nadie por espera. Pues nada, pues empezamos entonces.
+Vale, entonces como os decía, el sábado recordad que tenemos sesión de dudas, no alcancé a subiros lo que tenía que subiros, os dije que os iba a subir de ejercicios y tal, pero como la de hoy va a resumir también, va a pasar otra vez por lo que vimos el otro día, pues hacemos una conjunta, ¿de acuerdo?
+Lo que no me acuerdo es cuál es la sesión que tenéis después de esta. Imagino que entraréis ya con todo lo que es Machine Learning, como más a los casos de supervisados, reinforcement learning, en fin.
+El asunto es que nosotros hoy nos vamos a enfocar en la reducción de dimensionalidad y representación de variables, ¿de acuerdo?
+En este caso, recordad que en las sesiones anteriores, pues bueno, estábamos enfocándonos en justamente preparar el terreno para esto de hoy, ¿de acuerdo?
+Entonces, primero hicimos la preparación para Machine Learning, donde hacíamos ese ciclo de preguntar, responder, refinar.
+Veíamos las cuatro dimensiones de calidad de los datos, que fueran exactos, completos, coherentes, frescos, actualizados.
+Veíamos en tal caso si faltaban datos, si se podía hacer una imputación con la media, la mediana, la moda, con regresión.
+Luego queríamos hacer una división del dataset en tres grupos, entrenamiento, validación y prueba o test.
+Y después habíamos dicho que teníamos que, claro, si queríamos mejorar el modelo, queríamos ponerle restricciones porque aprendía demasiado del ruido,
+entonces podíamos hacer métodos de regularización y ahí teníamos los modelos de Lasso y Ridge.
+Y recordábamos que las métricas que teníamos que usar eran además Recall, Precision, F1, no solo el Accuracy, porque ya vimos que con el Accuracy solo pues podíamos meter las patas, ¿de acuerdo?
+En la siguiente sesión ya pasamos este salto al Machine Learning y estuvimos hablando de cómo el Deep Learning era un conjunto, o sea, un caso particular dentro del Machine Learning, dentro de lo que se considera como IA.
+Hablamos de este ciclo, si os acordáis, de estas ruedas que decíamos que teníamos los datos, que con estos datos generábamos los modelos, evaluábamos los modelos y teníamos que mejorarlos
+y que este ciclo había que repetirlo hasta conseguir un modelo que realmente fuera válido para lo que buscábamos.
+Luego habíamos hablado de los tres tipos de familias, de modelos dentro del Machine Learning, como eran el Aprendizaje Supervisado, el Aprendizaje No Supervisado y el Aprendizaje por refuerzo.
+Además estuvimos viendo los casos de clasificación versus regresión con el caso Supervisado y en el No Supervisado estuvimos hablando del Clustering y del PCA, que era como resumir las variables, como reducir la dimensionalidad.
+Y hoy ya nos vamos a centrar en este PCA, que va a ser un modelo que va a ser lineal, pero además vamos a ver otro modelo no lineal, donde vamos a trabajar también este análisis No Supervisado.
+Entonces lo vamos a separar en cuatro bloques. ¿Qué es lo que vamos a hacer hoy? Vamos a seguir estos pasos.
+Vamos a hacer un diagnóstico, es decir, ¿por qué tenemos que reducir variables? ¿Por qué realmente demasiadas variables van a perjudicar al modelo?
+Vamos a ver las razones como la multicolinealidad, el ruido, el sobreajuste que ya habíamos hablado.
+La multicolinealidad yo imagino que ya lo visteis en los temas de regresión, no sé si visteis regresión múltiple, ¿lo visteis o no? ¿O solo en una variable?
+¿Visteis en varias variables o no? ¿Sí o no?
+Sí, lo vimos.
+Entonces, lo dicho que no es nada nuevo.
+Luego, una vez que hacemos el diagnóstico, queremos ver cómo vamos a representar justamente las dimensiones que vamos a usar.
+Como las escalamos, codificamos, si construimos variables, por ejemplo, si vamos a hacer combinación de las variables que nos de la base de datos, es lo que se llama Feature Engineering.
+Después vamos a hacer esta extracción de dimensiones y vamos a resumir variables que estén correlacionadas en componentes principales.
+Pero esto lo vamos a ver de una manera lo más sencillo posible.
+Yo me voy a saltar un poco todo lo que tiene que ver con fórmulas, porque si bien efectivamente en los libros vais a poder ver las fórmulas que tienen que ver con las matrices, etc.
+Pero no sé hasta qué punto, según los perfiles que tenéis, realmente nos interesan tanto las fórmulas matemáticas a quien quiera.
+Por supuesto que en los materiales complementarios, que sí que os voy a subir los capítulos, pues que tengo que seleccionar la parte que realmente interesa.
+Ahí vais a poder ver quién quiera profundizar un poquito más con el tema de las fórmulas y tal.
+Pero mi objetivo es que salgamos de aquí, por lo menos entendiendo el concepto de lo que se está haciendo y que quien quiera profundizar puede profundizar,
+pero no perdernos en temas de fórmulas y análisis de las mismas, porque a lo mejor nos distrae del foco principal.
+Aunque bueno, por ahí en el código en algún punto lo menciono, pero bueno, que no me voy a meter en el tema fórmular.
+Después vamos a ver entonces cómo se puede visualizar esta extracción con el método del t-SNE,
+que vamos a visualizar la estructura no lineal en 2D preservando las relaciones de vecindad.
+O sea, en realidad este es otro método que nos va a permitir justamente visualizar estas variables.
+Y luego vamos a comparar y vamos a ver cuando tenemos que usar selección versus extracción y cuando tenemos que usar un método PCA versus t-SNE.
+Y ahí vamos a hacer el caso aplicado. El otro día estuvimos hablando de la cancelación de planes, del abandono de clientes.
+La fuga de clientes, bueno, vamos a hacer un caso de churn.
+Vale, y en eso se va a basar. Entonces, dicho lo cual, vamos a partir con el primer bloque.
+Van a ser cuatro bloques, de acuerdo? Entonces el primer bloque va a ser el problema de la dimensionalidad.
+Entonces, ¿por qué demasiadas variables perjudican y no ayudan al modelo? Esa es la primera pregunta, de acuerdo?
+Entonces, ¿qué pasa cuando hay demasiadas variables? Bueno, esto imagino que ya lo habíais visto.
+¿Lo habíais visto ya o no en la parte de regresión, estos conceptos?
+A ver qué dicen por aquí. Sí, sí, algo sí, profe. Vale, entonces, ¿qué es lo que pasa cuando tenemos demasiadas variables?
+Fundamentalmente pasan estas cuatro cosas. El costo computacional que hemos hablado tantísimas veces.
+Cuando tenemos más columnas, recordad que en una planilla de datos, o sea, cuando está esta planilla,
+tenemos en el caso de personas, tenemos individuos por filas y por columnas las variables que medimos.
+Entonces, ¿qué pasa? Cuantas más variables tengamos, cuantas más columnas tengamos,
+hay mayor procesamiento de los datos y por lo tanto mayor coste en el entrenamiento, etcétera.
+Con lo cual el coste computacional es mayor, todo va más lento, se necesita más memoria, etcétera.
+Así que, mal ahí. Así que, una de las razones por las que queremos reducir las variables, las dimensiones,
+recordad que al final cada variable va a representar un vector. Entonces, aquí me meto en el álgebra lineal.
+En realidad, lo que estamos haciendo es que cada variable representa una dimensión, un vector,
+que es linealmente independiente con otros, o bueno, idealmente así.
+Es lo que va a pasar, que en la vida real vamos a tener muchos datos donde si nosotros pensamos,
+no sé si os acordáis de la época que veíais vectores y veías, por ejemplo, un espacio en R3,
+decís, bueno, pues tengo yo qué sé, si veis la esquina de una habitación, veis que tenéis las dos líneas del techo
+y luego la línea que baja, ¿cierto? Entonces, esos son tres vectores que nos dan las tres dimensiones,
+¿no? El alto, el largo y el ancho, ¿cierto? ¿Qué pasa? Si tenéis un vector entre medias,
+pues bueno, ese vector se combina con las dos dimensiones. O sea, si vosotros trazáis una línea en el techo,
+esa línea en el techo en realidad se puede combinar con las líneas que tenéis en la horizontal del techo, ¿cierto?
+Entonces, no necesitaríais una tercera línea, esa estaría siendo redundante, con lo cual,
+esto me estaría generando una tercera variable que sería, en este caso, dependiente de las otras,
+estaría correlacionada con ellas, con lo cual estaría generando una información que es redundante
+porque la puedo generar con la combinación de otras dos, ¿vale? Entonces, en realidad lo que queremos
+es que de todas las variables que tengamos, vamos a tratar de reducirlas de tal manera que con las que tengamos
+podamos representar las otras que eventualmente nos pueden venir también en esa base de datos,
+pero sin necesidad de tenerlas en la planilla, las otras que estoy generando, ¿se entiende?
+Luego, lo otro es la multicolinealidad, ¿de acuerdo? Que bueno, está relacionado con esto,
+o sea, el costo computacional tiene que ver con esta colinealidad, ¿de acuerdo?
+También, porque tenemos variables, como os he dicho, que están correlacionadas, entonces,
+¿qué pasa? Que al final esto nos genera inestabilidad, ¿de acuerdo? En los modelos que hagamos,
+¿por qué? Por lo que os estoy diciendo, hay una información ahí que está redundante, ¿ya?
+No hay número ideal, el número ideal, porque es que va a depender de cuántas variables tienes,
+el número ideal pues dos, pero es que dos depende del modelo, ¿me entiendes?
+O sea, si lo dejas a... No hay un número ideal, el número ideal lo que vas a hacer es que dentro de tu modelo
+vamos a ver cuándo decides que ya no necesitas más, ¿vale?
+Ahí vamos a ver, de hecho, unos parámetros que nos van a permitir decidir en qué momento yo puedo
+cortar y decir, mira, para este caso en concreto, con ocho variables estamos más que bien,
+pero a lo mejor para otro problema, con ocho variables, pues siguen siendo muchas, ¿me entiendes?
+O para otro problema, ocho variables son pocas, va a depender del problema, va a depender de,
+pues eso, del contexto, ¿de acuerdo? Entonces, no hay un número ideal.
+Siempre tenéis que tener en cuenta que en todas estas cosas que estamos viendo, no solo en las clases
+que estáis viendo conmigo, sino en todas las que tienen que ver con matemáticas en general, ¿vale?
+Pero en el diplomado, cuando os estén hablando de conceptos
+donde se dan parámetros como, bueno, pues esto es un valor
+que se asigna como valor de corte, tal, no sé qué, esos valores siempre son, digamos,
+que una referencia, pero siempre hay que ver en los contextos que es lo que es lo que es lo que es el valor,
+nosotros, por ejemplo, cuando hablamos del R cuadrado, claro, siempre hablamos que el R cuadrado
+se mueve entre cero y uno, que si lo pasamos a porcentaje entre cero y cien, y uno dice,
+bueno, pues cuanto más cerca de uno esté, más mejor es el modelo, pero en la vida real
+hay muchísimos modelos que es que con que tengan un 0.6 de R cuadrado es buenísimo
+y uno diría, pero a ver, 0.6 de R cuadrado, es muy bueno, pero en la vida real
+0.6 de R cuadrado es buenísimo y uno diría, pero a ver, 0.6 es casi 0.5, no es un R tan bueno
+por, sería mejor un 0.7, un 0.8, sí, pero es que en ese contexto
+un 0.6 es lo más que vas a encontrar, ¿me entendéis?
+Entonces hay que ver dentro de todo lo que nosotros expliquemos
+como parámetros o puntos de referencia, siempre hay que bajarlo al contexto
+y entender sabiendo cómo se interpretan esos valores
+dentro de ese contexto qué es lo que realmente es lo mejor
+que puedo conseguir, ¿de acuerdo? Entonces, a ver,
+por ejemplo,
+multicolinealidad, hay variables ruido, ya, en este caso
+es lo que vimos el otro día, que no todas las columnas aportan información real al modelo,
+¿de acuerdo? ¿Os acordáis que hay veces que
+metemos variables el otro día, por ejemplo, en la base de datos, yo metí variables para que hicieran ruido
+y justamente el Lasso lo que hacía era eliminarlas, ¿de acuerdo?
+Entonces, bueno, al final está como relacionado el costo computacional, la multicolinealidad,
+la variable ruido, o sea, que están correlacionadas no significa que están metiendo ruido,
+sino que las variables ruido a veces no son variables que están correlacionadas,
+sino que son variables que están ahí, pero que me da igual que no se representen por
+otras variables porque la verdad es que no aportan nada, no sé si estáis viendo, por ejemplo,
+el índice de masa corporal y decís, bueno, pues yo qué sé,
+la altura, el índice de, o sea, la altura, el peso,
+la ingesta de calorías, yo qué sé, estáis viendo todas esas variables y de repente decís,
+pues voy a poner también como variable,
+no sé, el tamaño del pie, por ejemplo, dices, bueno,
+pues será una variable ruido, o sea, realmente la puedo poner
+y a lo mejor me dice que aporta algo de información, pero vamos, si luego la analizo, seguramente
+es insignificante, entonces esa es una variable que me está generando ruido,
+no me interesa porque no está relacionada con ninguna, pero es que no me está aportando información real al modelo,
+de acuerdo, vale, entonces, sesgo, estamos con el costo
+computacional, la multicolinealidad, las variables ruido,
+y luego sesgo versus varianza,
+fijaros, con pocas observaciones, más variables
+aumentan la varianza de las predicciones sin compensar el sesgo, qué quiere decir esto,
+en resumen, si reducís el sesgo aumenta la varianza, si reducís la varianza
+aumenta el sesgo, básicamente el tema es que
+si tenemos pocas observaciones, más variables
+van, la varianza siempre es la,
+el promedio de distancias a la media, promedio de distancias al promedio,
+entonces, qué pasa, si tenemos una mayor varianza,
+obviamente va a haber, en ese caso, menos posibilidad,
+de que haya más varianza, voy a tener menos sesgo, pero si nosotros reducimos la varianza,
+hay mayor probabilidad de que haya sesgo, de que haya valores que estén generando
+una diferencia de la masa central, sí, entonces, bueno, al final,
+en este caso, cuando tenemos pocas observaciones, qué va a pasar,
+qué va a aumentar la varianza, de acuerdo, porque obviamente si tengo pocas, pues voy a tratar
+de que la masa central haga el promedio, la distancia de los valores al promedio, pues obviamente si tengo poquitos,
+digamos que esos van a determinar como toda la masa que voy a tener, entonces bueno,
+al final, o controlamos el sesgo, o controlamos la varianza, si aumenta una, disminuye la otra,
+básicamente, pero bueno, qué es lo que pasa, que cuando tenemos muchas variables
+puede darse cualquiera de estas circunstancias, y eso va a ser un problema, de acuerdo,
+entonces,
+no he visto la pregunta, bueno, pero ahí te he contestado Romina, si no, luego al final,
+igual miro más preguntas, vale,
+vale, siguiente,
+entonces, ya que sabemos que es importante, o sea que tenemos un problema con
+el tema de la, de hecho, aquí,
+vale, entonces, cuando hay demasiadas variables, ya hemos visto que tenemos estos cuatro posibles problemas,
+entonces, ¿por qué vale la pena reducir las dimensiones? ¿por qué vale la pena que
+reduzcamos el número de variables? Bueno, primero, porque va a ser más fácil de poner en producción,
+obviamente con menos variables, más fácil de ponernos manos a la obra,
+lo segundo, va a aumentar la performance, o la, en el fondo, el rendimiento del modelo,
+de acuerdo, lo siguiente es que va a remover variables que, pues, eso que me están generando ruido,
+que son, que están ya representadas por otras, en fin, eso va a hacer que el entrenamiento
+sea mucho más eficiente, a la vez, eso va a ser, si yo tengo menos variables, pues va a ser
+mucho más fácil que yo limpie la base de datos, y a la vez, va a ser más fácil de interpretar si tengo
+menos variables que si tengo más, porque luego, si no, los resultados, cuando tengo muchas variables,
+que es lo que pasa, si os acordáis de las regresiones múltiples, al final, claro,
+cuando estáis interpretando, tenéis que verlo en el conjunto, entonces, cuando decís,
+ah, pues pongo cero todas las demás, y pongo uno en esta, entonces, lo que hacéis es interpretar cada variable
+en ausencia de las otras, y luego, si hay, por ejemplo, combinación de variables,
+imaginaos que tenéis muchísimas variables, pues eso hace que el modelo sea más difícil de interpretar
+y de comprender, ¿de acuerdo? Insisto, no vamos a tener modelos con dos variables,
+en estos casos estamos hablando de bases de datos gigantescas, entonces, igual, vamos a tener bastantes
+variables, pero cuanto más las reduzcamos, pues más fácil de comprender va a ser el número,
+o sea, en el fondo, ¿vale la pena reducir dimensiones? Por supuesto, porque al final, lo que estamos
+haciendo es el mismo problema, simplificarlo sin perder la información esencial del modelo
+y el rigor de la información que trae él mismo, ¿de acuerdo?
+Entonces, yo lo que quiero es capturar la mayor información posible de los datos
+y hacerlo lo más rigurosa posible, pero facilitando la vida lo más que pueda,
+¿de acuerdo? Es que al final, todo esto también son matemáticas, y las matemáticas son flojas,
+o sea, las matemáticas no quieren complicar la existencia, aunque creéis que sí,
+las matemáticas siempre buscan el camino más eficiente, y reducir dimensiones es algo eficiente,
+¿vale? Pero no es reducir por reducir, igual que en las regresiones no es dejar y quitar
+outliers por quitar outliers, porque siempre podéis quitar el dato que está un poquito más alejado,
+pero tiene sentido o no tiene sentido, mejora considerablemente o no,
+pues esto es lo mismo con la reducción de dimensiones, ¿de acuerdo?
+Bueno, entonces, manifold y por qué reducimos,
+¿qué es un manifold? Y esto va a ser interesante luego cuando veamos el t-SNE.
+Fijaros, un manifold, nosotros tenemos el globo terráqueo, ¿de acuerdo?
+que en realidad el globo terráqueo es en tres dimensiones, ¿no?
+Pues eso, tenemos la esfera de la Tierra y son 3D, pero resulta que nosotros lo que hacemos
+es representarlo en un plano en dos dimensiones, y no por ello perdemos las relaciones
+esenciales entre países y continentes, bueno, aquí hay todo un tema de que en realidad las dimensiones
+que vemos en los mapas no tienen nada que ver con las dimensiones reales, ¿no? Como que en realidad
+hay países que se representan mucho más grandes y son más chiquititos, ¿no? Un tema de problema
+de representatividad, pero bueno, pero más o menos nosotros podemos entender que este globo terráqueo
+en 3D lo vemos proyectado en un plano 2D, ¿de acuerdo? Bueno, pues el manifold viene siendo
+esta estructura de menor dimensión, ¿de acuerdo? Que está doblada dentro de un espacio mayor
+y que sigue manteniendo en el fondo la forma real de los datos, o sea, lo que hacemos es que cuando
+reducimos la dimensionalidad, lo que estamos haciendo es desdoblar ese manifold, ¿ok?
+Entonces cuando hablemos de manifold, recordad que estamos hablando de un manifold
+que lo que hacemos es desdoblarlo o desplegarlo, ¿de acuerdo? Entonces bueno, ¿qué caminos hay?
+Pues tenemos dos caminos. Uno, que es la selección de variables, es decir, vamos a eliminar las columnas,
+vamos a quitar las variables redundantes o poco informativas y vamos a conservar las originales,
+¿de acuerdo? Que sean más interpretables. Y el camino 2 va a ser la creación o extracción
+de las variables que se presentan en el modelo 2D, ¿de acuerdo? Y el camino 3 va a ser la creación
+o extracción de variables, es decir, vamos a combinar columnas en nuevas variables,
+por ejemplo, que es cuando vamos a hacer el Feature Engineering, ¿de acuerdo? Y bueno,
+también vamos a poder extraer variables con métodos que nos permitan decidir cómo podemos extraer
+esas variables, ¿de acuerdo? Vale. Entonces, dicha esta parte de por qué es importante
+reducir la dimensionalidad que nos mejora el modelo, ¿de acuerdo? Ahora vamos a pasar a ver
+cómo representamos las variables, es decir, cómo las escalamos, cómo las codificamos,
+cómo las construimos y cómo vamos a entregar la información al modelo para que se ejecute,
+¿de acuerdo? Una cosa, yo aquí no tengo el Romina, no tengo el... A ver si me sale. No tengo el reloj,
+¿de acuerdo? Entonces, si... Yo le aviso como un cuarto para las ocho, le aviso unos diez minutitos antes.
+Vale, es que no tengo el móvil aquí y como tengo en grande la pantalla, no veo el reloj,
+entonces avísame, ¿vale? Normalmente está calculado y seguro que voy a llegar a la mitad,
+en la mitad, pero por si acaso, ¿ya? Vale, ¿alguna pregunta hasta aquí de la primera parte?
+No. No, pues ya está, vale. Entonces, representación de variables. Fijaros, ¿os acordáis que en la primera
+sesión, conmigo, o sea, la sesión 30, primero vimos que los datos tenían que ser exactos, completos,
+coherentes y frescos, ¿de acuerdo? Es decir, queremos ver si los datos son confiables. Bueno, pues ahora
+eso, en la primera, en la primera sesión decíamos, los datos son confiables, ahora imaginemos que ya son
+confiables, vale, pero entonces, ¿de qué manera se los vamos a entregar al modelo? ¿De acuerdo?
+Porque una cosa es que sean confiables y otra es que el modelo los pueda leer, o sea, yo primero me tengo
+que asegurar que esa base es buena y una vez que ya sé que la base está ok, ahora tengo que traducirla
+de tal manera que el modelo pueda ejecutar la base de datos que pueda ejecutar el modelo, tomar esta base
+de datos y entregar información decente, ¿de acuerdo? Entonces, ¿qué es lo que pasa? ¿Cómo tenemos que
+ver esto? Primero, si tienen escalas distintas, ¿de acuerdo? Lo que tenemos que hacer es pasarlo a una
+escala semejante, ¿de acuerdo? De segundos llega a miles y reclamos es 0,1, entonces, ¿qué pasa? Que si
+tenemos representación de escalas distintas, pues al final el modelo se va a volver loco, ¿de acuerdo?
+Por lo tanto, tenemos que rescalar las variables. Luego, si nosotros tenemos textos y categorías,
+tenemos que entender que los modelos computacionales no van a entender prepago o plan, sino que
+necesitan una representación numérica de las categorías 0 y 1, en fin, lo típico, ¿de acuerdo?
+Donde el 0 no representa que no exista o el 1 que exista, sino que en realidad estamos hablando de la
+categoría 0, de la categoría 1, de la categoría 1, de la categoría 2, si tiene 3, pues 3, ¿vale?
+Pero el tema es que recordad que necesitan que se lo codifiquemos a números, de hecho, bueno, también
+vamos a hablar muy por encima del one-hot encoding, que lo que hace es transformar todo a cadenas de
+ceros y unos, ¿de acuerdo? Bueno, el código binario. Y luego información implícitas, ¿qué pasa?
+Que a veces un dato, un dato útil resulta que no es una columna en sí misma, sino que es una
+combinación de varias columnas. ¿Cuántas veces habéis hecho sin meternos en cosas muy complejas?
+¿Estáis en Excel? ¿Tenéis una columna, otra columna?
+Y luego generáis otra columna, que es combinación de estas dos. Y resulta que llega un colega o
+una colega, entra al trabajo otro día, toca el dato que no debe y entonces se desconfigura todo lo
+siguiente. ¿Por qué? Porque ahí esa columna, lo que estaba pasando es que era un dato que estaba creado
+en función a otros. ¿De acuerdo? Entonces, ¿qué es lo que pasa? Pues que esa información tenemos que tener
+cuidado, cómo se la pasamos al modelo para que si se tocan las piezas de las que depende, pues que en el
+fondo no se nos vaya el traste, el modelo al traste. ¿De acuerdo? Entonces, bueno, si las variables no
+estuvieran bien representadas, o sea, si no tenemos en cuenta estos detalles a la hora de tradúcselo al
+modelo, pues lo que va a pasar es que el modelo nos va a traducir ruido y no nos va a traducir la
+información que necesitamos. ¿De acuerdo? Entonces, primero tenemos que tener la base de datos bien,
+pero después tenemos que traducirla correctamente para el modelo. ¿De acuerdo? Vale. Entonces,
+antes de aplicar ningún tipo de reducción de dimensionalidad, ¿de acuerdo? Tenemos que tener todas
+las variables en una escala comparable, es decir, estandarizarlas. ¿De acuerdo? Entonces, aquí tenemos
+el escalamiento y la estandarización. ¿De acuerdo? En lenguaje coloquial, en realidad, que es lo que
+estamos diciendo, la estandarización lo que dice es cuántas desviaciones típicas se aleja del promedio.
+¿De acuerdo? Entonces, todas las variables terminan centradas en el cero. ¿Ya? O sea, cuando os
+acordáis, cuando hacíais el valor menos la media dividido en la desviación estándar. ¿Qué es lo que
+estábais haciendo? Simplemente estábais reescalando, porque si os dais cuenta cuando... Bueno, ahora no,
+no. ¿Podré dibujar yo aquí? A ver si puedo dibujar. ¿Se puede dibujar aquí o no? Yo creo que sí,
+¿no? Anotar. Creo que sí, le aparece un lapicito. Ah, sí, me aparece un lapicito. Vale. Es que a mí me
+gusta mucho hacer siempre este ejemplo así. De hecho, a ver si lo hago aquí en chiquitito.
+Es que aquí está la mina. ¿Tengo aquí pizarra o no? A lo mejor también hay pizarra, ¿no? Sí, también
+hay en más. Si es que usted coloca pizarras. Nunca las ha usado, pero aparece la opción.
+En suave de grupos, deshabilitar rotación para otros. Es que no sé si hubiera una pizarra sería más
+guay, pero bueno, da igual. Lo pongo aquí en chiquitito. ¿Qué es lo que pasa? Nosotros, de hecho,
+sabéis que tengo otra idea, porque yo tengo un OneNote. Dame un segundito, si tardo medio segundo
+en hacer esto. Dame un segundo, dejar de compartir. Voy a abrir el OneNote. Es que quiero que entedáis
+por qué, cuando estandarizamos, por qué es un cambio de escala. Me acuerdo. Dame un segundito.
+Lo abro aquí en el OneNote. Abro una página nueva. A ver. Vale. Y agregar página. Voy a hacer aquí
+el dibujo más o menos rabio, chapucilla, pero se va a entender muy bien. A ver. Aquí el OneNote está aquí.
+Vale. Veis mi OneNote. No sé. Perfecto. Muy bien. ¿Qué es lo que pasa? Fijaos. Cuando nosotros estamos
+haciendo una estandarización, lo que estamos haciendo es lo siguiente. Nosotros tenemos la
+normal 0,1. A ver si me sale bien la curvita más o menos. Esto es una estandar 0,1. Aquí tenemos el 0,
+el 1, el 2, el 3. Esta es la media, ¿cierto? Y estas son las desviaciones estándar. Esto es la media más
+una desviación estándar. Esto es la media más dos desviaciones estándar. Y esto es la media más tres
+desviaciones estándar. Bueno, si estamos hablando de muestras serían X barra y el S. De acuerdo,
+que sería lo más correcto de poner aquí, pero bueno, ya está. Entonces, ¿qué tenemos? Tenemos esto
+y ahora fijaos. Esta es una normal que tiene de media 0 y de desviación estándar 1. De acuerdo. Esta es mi media
+y esta es mi desviación estándar. Vale. ¿Qué es lo que pasa? Cuando nosotros tenemos una variable en la
+vida real, ya va a tener otra media otra desviación estándar, que es muy raro que la media está en 0 y la
+desviación estándar esté en 1. Si hablamos yo que sé de pesos, de edades, decimos vale un grupo etario,
+pues la media está en los 15 años y tenemos en este grupo una desviación de más menos dos años. Entonces,
+¿qué pasa? Que tenéis un 15 y un 2. Vale. O no sé, pongamos ahora una ficticia donde aquí vamos a poner
+esta es nuestra recta real, o sea aquí seguimos teniendo el 0, 1, 2, 3 a la misma altura. Vale.
+4, 5, 6, déjame que ponga aquí 7, 8, 9, 10. Vale. Entonces, ¿qué pasa? Imaginaos que ahora lo que tenéis es
+una variable que está con media, es una normal que tiene la media, por ejemplo, en el 3 y la desviación
+estándar de 2. ¿Eso qué significa? Que el centro está en 3 y la desviación estándar está en 2, o sea que una
+desviación estándar equivaldría al 5. Dos desviaciones estándar equivaldría al 7 y así tres desviaciones
+estándar equivaldrían al 9. ¿De acuerdo? Con lo cual, ¿qué es lo que pasa? Si os acordáis, aquí sería
+una desviación estándar menos. Déjame que lo mueva aquí. Una desviación estándar menos y aquí una desviación
+estándar menos. O sea, aquí ya van 2 y aquí serían 3. ¿Cierto? Menos 3. ¿Qué es lo que está pasando?
+Que aquí nosotros vamos a dibujar nuestra distribución normal, que a ver si me sale o un poco mejor
+dibujada, pero va a ser un poquito más chatita. ¿De acuerdo? Más o menos. Va a ser un poco más chata.
+¿Por qué? Porque mi desviación estándar es más larga. Recuerda que entre una desviación estándar
+entre la media y una desviación estándar, la cantidad, el porcentaje de datos que voy a tener ahí es la misma
+que aquí, porque sigue siendo una distribución normal, sigue teniendo en el fondo la misma, el mismo reparto
+de datos. ¿De acuerdo? Lo que pasa es que claro, en la primera están más cerca y en la segunda están más
+dispersos porque tenéis una desviación estándar de longitud 2. Cuando nosotros hacemos el proceso de
+estandarización, ¿qué es lo que estamos haciendo? Lo primero que queremos es, como queremos igualar
+probabilidades, es decir, si yo lo que quiero es por ejemplo calcular la probabilidad de que X sea
+igual a 5, ¿qué es lo que va a pasar? Dices, bueno, es lo mismo, tendría que ser lo mismo que la
+probabilidad de que Z sea igual a 1, porque al final es una desviación estándar. ¿No? Entonces,
+¿cómo hago para calcular eso si yo no tengo la tabla de la normal, pero si tengo la tabla de la
+normal, 0,1? Pues bueno, decimos A. Pues es que entonces yo aquí lo que tengo es justamente que
+esta desviación que tengo aquí, ¿cierto? Lo que voy a hacer, lo primero que voy a hacer es tratar de
+escalar esto para que sea igual. Entonces, ¿qué es lo primero que voy a hacer? Lo primero que voy a hacer
+es trasladarlo. Entonces, el centro que está en el 3 lo voy a pasar al 0, ¿me acuerdo? Y qué pasa,
+una vez que yo lo tengo en el 0, ahora esta raya que corresponde a una desviación estándar no me está
+cayendo en el 0, sino que me está cayendo en el 2. Y yo lo que quiero es que me caiga en el 1,
+porque en el fondo tengo que hacer que hagan match las dos curvas. Entonces, ¿cómo hago para que ese 2
+se transforme en un 1? Bueno, pues lo único que tengo que hacer es dividir 2 entre 2. O sea, lo que
+voy a hacer es dividir entre la misma desviación estándar. ¿Lo veis? Lo hago un poquito así, obviamente
+como mi dibujo era un poco piñufla, no coinciden del todo, pero al final, si hubiera hecho bien la
+curva, esto no se habría coincidido y habría sido exactamente la misma curva normal. ¿Se entiende?
+Entonces, ¿qué es lo que he hecho? Lo que he hecho ha sido que al valor original le he restado la media,
+en este caso la media de X, y lo he dividido por la desviación estándar de X, convirtiéndolo así en la
+misma escala que el Z. ¿Se entiende? Entonces, ¿qué pasa? Que al final, por eso, hacíais que esto es una Z,
+que lo que hace es 5 menos 3 y lo divide entre 2. ¿Y esto qué es? Pues no es nada más que el 1. ¿Os dais
+cuenta? Entonces, ¿qué es lo que hacemos cuando estamos haciendo esta estandarización? Estamos
+reescalando la distribución. ¿De acuerdo? Vale, eso simplemente para... Sí, estoy dibujando la
+recta real, efectivamente. No necesariamente, ta ta ta. Vale, sí, ya os han contestado perfectamente. Vale,
+entonces, no estoy diciendo que tengan que ser normales, no. Lo que estoy diciendo es que cuando estamos
+estandarizando, este es el ejemplo típico que hacemos de estandarización dentro de la normal, pero lo que
+estamos haciendo es cambiar la escala. Es decir, estoy cambiando el centro y cambiando la dispersión.
+Vale, si eso no es normal, igual vais a tener un centro y vais a tener una dispersión, una varianza de los
+datos. Entonces, ¿qué es lo que vais a hacer? Vais a tratar de pasarlo a una escala comparable. ¿Me acuerdo?
+Es decir, que hablen el mismo idioma todas las variables. Entonces, lo que hacíamos el otro día, ¿os
+acordáis que teníamos que eran? Creo que era el precio de la vivienda y no me acuerdo que otro valor,
+que estaba el número de meses, ¿no? Entonces, el precio de la vivienda oscilla van miles, el número de
+meses de antigüedad, el número de años de antigüedad o meses de antigüedad, los meses de antigüedad
+eran por decenas. Entonces, si los metíamos en el mismo modelo de regreso linal iba a ser un poco
+lío, porque al final estás comparando miles con decenas. Entonces, teníamos que estandarizar esos
+datos, tenemos que escalarlos, ¿de acuerdo? Para que el modelo lo entendiera como dentro de las mismas
+dimensiones, ¿me acuerdo? Y se pudiera interpretar. Vale, entonces, esto es un ejemplo de lo que
+significa, ¿de acuerdo? No sé si os he liado más o va a quedar más claro. ¿Alguna duda de esto?
+¿No? Vale, pues vamos, yo cuando no hay dudas, no sé si es que lo he liado más o es que ha quedado clarísimo,
+no sé qué decir. Espero que, ah, vale, más claro, menos mal, menos mal. Si no me lo decís y lo
+replicamos de otra manera, pero bueno, yo creo que con esto más o menos se enciende la idea. Ya, entonces,
+volviendo a esto, entonces, cuando hablamos de la estandarización, ¿de acuerdo? Esto de cuántas desviaciones
+se aleja del promedio, a eso se refiere, ¿de acuerdo? Lo que queremos es pasar a un mismo centro y un
+mismo ancho, por así decirlo, ¿vale? Y la normalización lo que hace es que comprime todos los valores,
+¿de acuerdo? Pero además está poniendo justamente un mínimo y un máximo, ¿de acuerdo? Entonces, bueno,
+están como relacionados, pero al final lo que estamos haciendo es justamente pasar a una misma
+escala. Da igual el método, pero al final lo que estáis haciendo es reescalar las variables, ¿ya?
+Vale, ¿he pasado bien? Sí. Entonces, ¿cómo podemos codificar variables categóricas? Es decir,
+aquellas que tienen categorías, no las, no las, las, se me dio el nombre ahora, categóricas, bueno,
+las ordinales, no las numéricas, ¿cierto? No, o sea, estamos hablando de las categoricas, ¿de acuerdo? Bueno,
+pues en este caso, por ejemplo, podemos hacer el ordinal encoding, el one-hot encoding, que es el que
+os mencionaba antes, y el target/frequency encoding, ¿ya? El ordinal encoding es para las nominales,
+¿de acuerdo? Entonces, simplemente lo que hacemos es, por ejemplo, el monto, estamos diciendo, o sea,
+nominal entero cuando existe un orden real, perdón. Entonces, aquí, ¿qué es lo que hacéis?
+Decéis, por ejemplo, monto cero es bajo y nueve es alto, ¿cierto? Bueno, esto en realidad no se refiere,
+esto sería ordinal, aquí hay un error. Entonces, ¿qué pasa? Que en este caso, pues, tenéis una escala,
+¿de acuerdo? Entonces, lo pasamos a un ordinal encoding, ¿ya? Entonces, lo que hacéis es que no es lo mismo
+cuando os hacen encuestas, ¿no? Que os dicen, bueno, del uno al siete, donde uno es que está muy en
+desacuerdo y siete que está muy de acuerdo, ¿qué nota le daría? Pues esto es, ¿de acuerdo?
+El one-hot encoding, en este caso, lo que estamos haciendo es pasar a código binario, ¿de acuerdo?
+Por lo tanto, ¿qué es lo que tenemos que hacer? Pues uno va a ser verdadero y el contrario va a ser falso,
+¿de acuerdo? Y entonces vamos a ponerlo en función a ceros y unos, eso no voy a entrar al detalle,
+pero está también en el libro. De hecho, por ejemplo, cuando se hacen sistemas de recomendación,
+se suele usar mucho el one-hot encoding, ¿de acuerdo? Porque en el fondo, cuando se da like, no like,
+¿vale? Estamos haciéndoles, ¿ya? Y entonces, pues, se van poniendo ceros y unos a lo largo de, digamos,
+imaginaros que tenéis un cajón, es un array, ¿vale? Es como un cajón, ¿vale? Con distintos espacios
+y cada uno de esos espacios corresponde a una variable. Entonces, se pone ceros si es que está uno,
+o sea, uno si es que está, ceros si es que no está. Si estamos en sistemas de recomendación es como un uno
+si le gusta, un ceros si no le gusta, por ejemplo. Entonces, lo que vamos haciendo es que vamos poniendo
+en el fondo a cada variable si le gusta, si no le gusta, y eso permite hacer luego un modelo
+donde le estamos dando un peso al total de la suma, por así decirlo, de las variables que ha elegido
+dentro de lo que contiene la información que contiene el dar like a un tipo de contenido, ¿de acuerdo?
+Vale, es que eso es un tema muy entretenido, pero que no nos da tiempo a ver, así que para otra vez.
+Ya, pero bueno, en el libro os lo paso para que lo leáis y veáis el ejemplo este de Netflix, ¿vale?
+Y luego, target/frequency encoding, que lo que hace es que reemplaza la categoría por un estadístico, ¿vale?
+Tasa de fuga, frecuencia y esto, pues bueno, esto va a ser muy útil en muchas categorías, ¿de acuerdo?
+Entonces, por ejemplo, en vez de representar un Ñuñoa, pues lo que va a hacer es poner la tasa de fuga en Ñuñoa.
+Entonces lo reemplaza por una estadística, un valor estadístico numérico asignado a esa comuna, ¿de acuerdo?
+Entonces, bueno, luego vamos a ver en nuestro dataset cómo lo vamos a codificar, ¿no?
+Vale, ahora, ¿qué es esto de la creación de variables o Feature Engineering?
+Bueno, a veces, ¿qué es lo que pasa? Que la variable más informativa es la combinación de variables que están,
+pero esa variable en sí no está todavía, no existe, ¿de acuerdo?
+Entonces la tenemos que construir combinando columnas, ¿de acuerdo?
+Por ejemplo, imaginaos que queremos ver la duración promedio, que esto lo vamos a ver luego en el ejemplo, ¿de acuerdo?
+Imaginaos que vamos a necesitar la duración promedio de la llamada, el SMS por antigüedad,
+uy, antigüedad, faltan los dos puntitos, la intensidad del contacto.
+Entonces, ¿qué es lo que vamos a hacer? Vamos a generar esas variables como operaciones con otras variables.
+Por ejemplo, la duración promedio por llamada, pues un cliente con muchas llamadas cortas
+se va a comportar distinto que un cliente con pocas llamadas, pero largas, obviamente, porque apuntan a perfiles distintos.
+Entonces, ¿qué es lo que vamos a hacer para generar la duración promedio por llamada?
+Pues la duración en segundos entre la frecuencia de llamadas, ¿de acuerdo?
+Si queremos generar, por ejemplo, el SMS por antigüedad, ¿de acuerdo?
+¿Qué es lo que vamos a hacer? Pues vamos a normalizar el uso de SMS por el tiempo que lleva el cliente en la compañía,
+es decir, vamos a dividir la frecuencia de SMS entre la antigüedad y eso nos va a dar SMS por antigüedad, ¿vale?
+Una división normal y corriente, pero nosotros no vamos a tener el SMS por antigüedad, vamos a tener la base de datos,
+la frecuencia de SMS y vamos a tener la antigüedad en la compañía.
+Y luego, por ejemplo, la intensidad contactos.
+Entonces, ¿qué va a ser? Va a ser el número de contactos entre la frecuencia de llamadas,
+es decir, ¿qué tan concentrada está la actividad del cliente en pocos contactos?
+¿Llama mucho a esos pocos contactos que tiene o llama poco a esos contactos que tiene?
+¿Tiene muchos contactos pero realmente no los llama o tiene muchos contactos y los llama todos?
+En fin, y cuánto los llama.
+Entonces, la intensidad de los contactos.
+Entonces, ¿qué es lo que pasa? Que cuando nosotros estamos creando, estamos haciendo este Feature Engineering,
+nosotros lo que hacemos es añadir estas variables al conjunto antes de reducir la dimensionalidad.
+¿Por qué? Porque si reduces la dimensionalidad, eventualmente estas variables no las vas a poder crear.
+Entonces, ¿qué hacemos? Creamos estas variables que vemos que nos pueden aportar información
+y luego vemos cómo reducimos la dimensionalidad.
+Ahí vamos a ver porque obviamente estas variables van a depender de estas otras dos.
+Uno diría, bueno, pues entonces me estás generando una variable que se genera con combinación de las otras,
+pero es que aquí no es una combinación lineal, porque estamos dividiendo.
+Entonces, las combinaciones lineales en realidad lo que estamos haciendo es cuando las estamos sumando,
+estamos en el fondo pues eso, haciendo operaciones que son lineales.
+Entonces, aquí este tipo de relaciones generan variables que no existen y por lo tanto hay que crearlas
+antes de hacer la reducción de dimensionalidad.
+¿No? ¿Apordo? Vale. Entonces, después de esto, es que hacemos el PCA.
+Bueno, hay muchas preguntas. ¿Se están respondiendo?
+Si quiero redimensionar la edad, por ejemplo, necesito definir... Vale, ahí habéis contestado.
+Vale, veo que están contestando.
+Vale, si veo luego en el descanso que hay tal, hago algún matices que estoy viendo que se están contestando.
+Así que nada. Vale, entonces dicho lo igual. Feature Engineering before the... Va.
+Perdón. Antes de... Es que me metí en el inglés. Feature Engineering, o sea,
+la creación de variables lo vamos a hacer antes de reducir la dimensionalidad.
+¿Me acuerdo? Vale.
+Entonces, ya estamos. Hemos hecho los dos primeros pasos.
+Ya hemos traducido las variables para que el modelo las entienda.
+Ya sabemos la importancia de reducir variables.
+Ya sabemos cómo tenemos que traducirlas al modelo.
+Y ahora, ¿qué vamos a hacer? Vamos a extraer las variables. ¿De acuerdo?
+Entonces, vamos a hacer primero la reducción de dimensionalidad.
+Es decir, muchas variables correlacionadas o componentes...
+Las vamos a reducir a componentes que van a resumir lo esencial.
+Ya recordad. Después de haber hecho ya las variables que se generan con otras variables.
+Vale.
+En una frase, ¿qué sería?
+La PCA lo que hace es tomar un montón de variables y las resumen unas pocas,
+que van a ser las componentes,
+tratando de perder siempre la menor cantidad de información posible.
+O sea, esto es lo que no puede ser, es que yo reduzca porque digo,
+¡uy! es que tengo cien variables y tengo que reducirlas porque tengo muchas.
+Pues, chiquis, si las cien variables os dan toda la información
+y no hay manera de resumirlas, son cien variables.
+¿Qué le vamos a hacer? No es así como...
+Son cien. Yo quiero eliminar, quiero eliminar.
+No. Primero vamos a ver si se pueden eliminar.
+¿De acuerdo? Porque si perdemos información,
+pues es que a lo mejor... A ver, hay veces que se pierde información que no es relevante.
+Pues vale. Pero hay que ver eso.
+Vamos a ver cómo analizar que no estoy perdiendo información.
+¿De acuerdo?
+Entonces, ¿qué pasa? Que cada componente es como una mezcla o receta
+hecha con un poco de cada variable original.
+Vamos.
+Que esto es como si tú al pastel que vas a hacer,
+resulta que es un pastel que lleva harina, huevo, no sé qué,
+y le quitas la harina.
+Pues o le pones otro ingrediente que haga el efecto de la harina
+o esto, el pastel no sube.
+Ya, el bizcocho, lo que sea.
+Pues esto es lo mismo. ¿De acuerdo?
+Entonces lo que hacemos es tomar un poquito de cada variable original.
+¿De acuerdo?
+Entonces, ¿qué pasa?
+La primera componente o el primer componente es la mezcla
+que mejor captura el patrón principal de los datos.
+El segundo, ¿qué va a hacer?
+Ya no va a repetirse con el primero.
+O sea, el primero va a seleccionar lo más que puede.
+Pero es que luego el segundo lo que va a hacer es seleccionar
+de lo que queda aquello que realmente aporta información extra.
+Pero que no va a tener nada en común con el primer.
+Porque la idea es que sea este concepto de vectores que son ortogonales.
+¿De acuerdo?
+Son vectores que aportan dimensiones distintas.
+¿Acordamos de la pared?
+¿De acuerdo?
+Y de estos vectores que nos van generando la estructura en tres dimensiones.
+Es eso. ¿De acuerdo?
+Entonces, ¿qué tenemos que hacer?
+Extraer la mayor parte de la variabilidad de los datos
+usando muchas menos variables que el conjunto original.
+Si os dais cuenta, constantemente lo que queremos hacer
+desde las regresiones que veíais en la parte de estadística
+hasta ahora con los modelos de Machine Learning
+es capturar la mayor variabilidad posible
+con la menor cantidad de dimensiones posibles.
+La menor cantidad de datos posibles.
+¿De acuerdo?
+La menor cantidad de peso, por así decirlo.
+¿Ya?
+Entonces, ¿qué es lo que va a pasar?
+Fijaros, en el aprendizaje no supervisado
+no usa la variable objetivo para construir los componentes.
+Además requiere escala, se calcula sobre variables estandarizadas.
+Ahí lo vamos a ver después.
+Y luego es una receta.
+Cada componente combina un poco de cada variable original.
+Esto es simplemente un resumen.
+¿De acuerdo?
+Ya.
+Entonces, ¿qué es lo que pasa detrás del análisis de componentes principales?
+Ya.
+No necesitamos hablar de álgebra.
+Como os digo, aquí me olvidé de las fórmulas.
+No me olvide que no las puse.
+Porque en realidad yo lo que quiero que entendáis aquí es que
+si vosotros tenéis esta nube de puntos
+nosotros lo que queremos ver es
+de qué manera generamos vectores
+que capturen la variabilidad de todos estos datos
+en el espacio multidimensional en el que están.
+¿De acuerdo?
+Entonces, ¿qué es lo que vamos a hacer?
+Vamos a empezar a ver cómo podemos generar
+de reducir al máximo posible
+los vectores que nos van a permitir generar todos los puntos que están ahí.
+¿De acuerdo?
+Entonces, ¿qué hace PCA?
+Lo que hace es principal component analysis.
+¿OK?
+El análisis de componentes principales.
+Vale.
+Lo que hace es que busca la dirección donde todos los datos varían más.
+¿De acuerdo?
+Y ahí es donde hay más información para resumir.
+Entonces, fijaos.
+Dice, esa dirección se convierte en la primera componente,
+¿sabéis?
+Esto es como una nube de puntos.
+Si estuviéramos viendo una regresión lineal, ¿cierto?
+¿Qué es lo que haríais?
+La primera línea que trazaría y sería atravesando los puntos
+en función a esta línea que se ve por la tendencia de la nube.
+¿Cierto?
+Entonces, pensemos en esa línea.
+Esa va a ser mi primera componente.
+¿Vale?
+Sería como buscar esta recta de regresión, por así decirlo.
+¿De acuerdo?
+Entonces, la siguiente dirección más informativa
+que no repite lo que ya explicó la PCA 1,
+en este caso, la inclinación de la nube,
+que sería el ancho de la nube.
+¿Os dais cuenta?
+Entonces, ¿qué hacéis?
+La segunda componente va a ser esta línea azul PC2.
+¿De acuerdo?
+Y claro, si tenemos muchas variables,
+luego tendríamos que buscar otra dimensión, por ejemplo,
+en altura.
+Y bueno, ya visualizarlo en más dimensiones
+es un poco difícil porque la especie humana
+lo podemos ver en tres dimensiones.
+Pero para que se entienda lo que está haciendo.
+Aquí en dos dimensiones se ve muy claro.
+Tenéis esa nube de puntos.
+Si vosotros rodeáis esa nube de puntos,
+¿cuál es primero la dirección donde se vería más?
+Pues lo primero que nos salta a la vista
+no es el ancho de la nube, sino que la nube va inclinada así.
+O sea, dices, ah, tiene esta inclinación.
+Pues ahora, esta es la componente principal 1.
+Y después, la componente principal 2,
+que es la que me habla de esa segunda dimensión,
+que sería el ancho de la nube.
+¿De acuerdo?
+El tercer acto.
+Ya, entonces, pues sí, pues ahí va.
+Entonces, ¿queda claro?
+Esto sería como seguir la PC1, la primera componente,
+siempre sigue la máxima varianza.
+¿De acuerdo?
+O sea, la que va a capturar la mayor variabilidad inicial.
+Entonces, no sé si pasar ya...
+Yo creo que vamos a pasar ya al colab,
+porque ya esto tiene que ver con el colab.
+Y entonces ahí lo vamos a interpretar
+y luego pasamos al t-SNE.
+Vale, ¿qué es lo que vamos a hacer ahora?
+Quedan 10 minutos para el descanso.
+Perfecto. Entonces, voy a pasar al colab.
+Vamos a ver esto y voy a empezar con el colab
+para que entendamos este PCA.
+Y así luego a la vuelta retomamos con esto.
+Perfecto. Entonces, ¿qué vamos a ver?
+Ahora vamos a ir a nuestro dataset.
+Vamos a hacer todo lo que hay que hacer al principio.
+Y queremos ver si el cliente va a cancelar la suscripción.
+Vamos a hacer un caso de churn.
+En el fondo, suscripción.
+Queremos ver si el cliente se va o no se va.
+En este caso, en temas de telecomunicaciones.
+Vamos a ver esto de... ¿cómo se llama? Telefónica.
+Entonces, vamos a generar una base de datos.
+En este caso, sintética, pero que podría ser perfectamente real.
+Lo que pasa es que para no estar liándonos que sí,
+subo la base que sí sale, que sí la cargo y no la carga,
+que no la carga, que no la carga,
+pero se puede luego en el ejercicio que os voy a pasar,
+os voy a pasar la base de datos para que uséis una base de datos real
+y podáis manejarlo desde una base de datos real.
+Vale, entonces, ¿qué tenemos aquí?
+Vamos a tener estas variables.
+Vamos a tener las variables que vienen, de acuerdo,
+en las que no hemos creado.
+Tenemos número de fallas, que van a ser el número de...
+reclamos, que va a ser 0 si no hay reclamo,
+1 con reclamo, antigüedad, que van a ser los meses en la suscripción,
+el monto, que va a ser el nivel del plan,
+si el nivel del plan es alto o bajo, de acuerdo,
+según el monto de... o sea, lo que hacemos es clasificar
+esto en función a rangos.
+Segundos, si son los segundos totales de llamadas,
+frecuencia de llamadas, que es el total de llamadas,
+frecuencia de SMS, el total de mensaje de texto,
+número de contactos, número de distintos números,
+o sea, número de cantidad de números distintos contactados,
+tipo de plan, si es de prepago, 1, y si es plan, es 2,
+el estado, si está activo, es 1, si no está activo, es 2,
+luego la edad del cliente, que bueno, vamos a suponer que...
+que no hay niños que están mayores de edad, cierto,
+y CLV, que es el valor del cliente, de acuerdo,
+o Customer Lifetime Value, ¿ya?
+Entonces, esas son las variables que vamos a tener.
+¿Cuál es nuestro objetivo? Pues nuestro objetivo va a ser la fuga, ¿vale?
+Va a ser si abandona, va a ser un 1,
+y si está activo, va a ser un 0, ¿de acuerdo?
+Entonces...
+Bueno, aquí corregimos un par de cosas típicas ya.
+Esto vamos ahora al Colab, yo os lo explico, ¿de acuerdo?
+Y vamos a esto. Entonces, dejar de compartir,
+me voy a ir al Google Colab.
+Entonces, al Colab ya sabéis que os va a salir...
+Pestañas de navegados.
+Compartir... El Google Colab, recordad que tenéis que decir
+que lo habrá con el Google Colab porque no sé qué ha pasado.
+Reducción de dimensionalidad, aquí está,
+compartir...
+A ver, porque a mí aquí no me ha sacado del Excel,
+del...
+A ver, que no me ha sacado...
+Que no me está sacando la presentación esta.
+Que si no, yo no puedo ver el Colab.
+Y esto lo cierro.
+Volver a conectar.
+Hecho, aquí está.
+Vale, ok. Sí se ve, ¿no?
+Mi...
+Sí, sí se ve.
+Vale, entonces...
+Lo de siempre, aquí simplemente os explico un poquito,
+vamos a ver el problema... Vamos a verlo entre cuatro bloques.
+El problema de la alta dimensionalidad, la representación de variables.
+O sea, lo que hemos visto en los bloques que hemos visto
+en el PowerPoint. Ok?
+Entonces, vamos a hacer los puntos 1, 2, 3. Luego ya, después del descanso,
+vamos a hacer el punto 4. ¿De acuerdo? Voy a trabajar
+con un dataset sintético, pero después con una semilla fija,
+así que todos vamos a tener los mismos resultados.
+Pero, para la práctica,
+para que repaseis, os pondré una base de datos real.
+¿De acuerdo? Aquí hacemos lo de siempre.
+Vamos a hacer que corran todas las...
+Ahí se me olvidó poner la frasecita de que está activada.
+Entonces le ponemos esto. Entonces, acordaros,
+¿cuál es el problema de la alta dimensionalidad? El costo computacional,
+la multicolinealidad, las variables ruido
+y el sesgo versus varianza.
+¿De acuerdo? Obviamente, como es una
+base de datos sintética,
+pues no vamos a tener muchos problemas, pero
+en la base real sí que va a haber datos que vamos a tener
+que reemplazar, etcétera. Pero bueno, para hacer esto un poco más rápido
+pues lo hice así. ¿De acuerdo? Entonces, bueno,
+aquí generamos la base de datos sintética.
+Que luego, cuando os pondré las indicaciones,
+en vez de use real data, en vez de false,
+le vamos a poner true y tenéis que poner la ruta
+de acceso a la base de datos, cuando os pase
+para hacer la atilla de repaso.
+Bueno, pero ahí os lo voy a indicar, así que no os preocupéis.
+Entonces, esto, hemos corrido esto, nos hace el dataset
+sintético y aquí tenemos número de fallas,
+reclamos, antigüedad, montos, segundos, frecuencia de llamadas,
+etcétera. ¿De acuerdo? Y aquí fuga. Esto es un
+head de la dataset, así que simplemente nos saca
+las cinco primeras filas. ¿De acuerdo?
+Vale, entonces, ¿qué hacemos? Hacemos una limpieza rápida
+con exactitud, completitud, todo lo que vimos.
+Y en este caso, pues como os digo, no hay que corregir
+mucho porque es una dataset sintética. Así que nada,
+si no, pues bueno, aquí lo que haría sería ver
+cuáles son las que no son válidas, lo que vimos
+en la otra sesión. ¿De acuerdo? Entonces, aquí
+diría cuáles son los que son nulos,
+si es que faltan datos para que pudiéramos
+reemplazarlos. ¿De acuerdo? En este caso no hay,
+así que, chimpún. Vale, ahora, ¿cuántas variables
+tenemos y qué tan relacionadas están?
+Vamos a hacer, o sea, ya tenemos la base de datos
+preparada, ya hemos hecho la limpieza, si hay que hacer
+imputación, tal y tal, tal, lo de siempre. Y ahora
+vamos a ver cuántas variables tenemos
+y qué tan correlacionadas están. ¿De acuerdo?
+Entonces, bueno, le decimos que es un
+de las observaciones que tiene, o sea, cuántos datos
+hay, las variables sin contar, la tasa de fuga,
+tal, tal. Vamos a ver. Entonces,
+observaciones, pues tenemos 1500 datos, que son los que
+hemos generado, variables sin contar fuga,
+pues son 12. Vale, entonces aquí tenemos
+12 variables. ¿Qué es lo que nos está diciendo
+aquí? La tasa de fuga. Entonces, recordad que 0
+es que no se habían
+fugado y 1 era que se habían
+fugado. Entonces, tenemos un 84, 85% que
+no se han fugado
+y un 15% que se ha fugado. ¿Me acuerdo?
+De los usuarios que tenemos.
+¿Qué pasará aquí con el Accuracy, no?
+¿Qué tenemos que tener aquí de cuidado?
+O sea, esta voy a replantear de otra manera.
+Sabiendo que tenemos 12 variables y que tenemos 1500
+datos, pero que el 85% ya sabemos que no se han
+fugado. ¿Qué problema vamos a tener con este
+dataset? ¿Está balanceado o no está balanceado?
+A ver qué decís.
+Está desbalanceado. Vale, entonces, cuando esté
+desbalanceado, ¿qué es lo que teníamos que tener en cuenta a la hora
+de hacer luego un modelo de Machine Learning cuando
+tomamos el dataset?
+Cuando hagamos esto de los datasets separados en
+entrenamiento, validación, test.
+¿Cuál es el objetivo? Estratificar.
+O sea, tenemos que ver en este caso que cuando
+tomemos efectivamente esas bases de datos,
+estemos seguros que estamos tomando los estratos.
+O sea, si no corremos el riesgo, tenemos un 85%
+de personas que no se fugan. Si hacemos un muestreo
+mal hecho, podríamos estar tomando todos
+los elementos de este conjunto.
+Entonces hay que tener mucho cuidado y asegurarnos
+que en esa selección
+de muestreo vamos a tomar
+justamente los estratos.
+Entonces, dicho esto,
+vamos a ver también, entonces esto,
+ojito con esto. Siempre lo primero es ver
+cuántas variables tenemos y obviamente
+cómo están repartidas. De acuerdo,
+a ver si tenemos, si está desbalanceada o no.
+Antes de ponernos a hacer separación
+para entrenar el modelo.
+A ver aquí, entonces aquí vamos a ver
+la correlación y este es el cuadro que os tenía
+que se ve mejor en el PDF.
+Porque aquí puedo reducir la vista,
+sí, pero bueno, luego lo vemos.
+Entonces, ¿qué es lo que pasa aquí? Fijaros.
+Aquí lo que tenemos es la correlación
+entre las variables. Entonces, obviamente se repiten.
+Ya habéis visto este tipo de matrices de correlaciones,
+¿cierto? De varianza a correlación, ¿sí o no?
+Sí, imagino que sí. Las habéis tenido que ver ya en
+modelos de regresión. Sí, ¿no? Sí.
+Entonces, aquí.
+¿Cuáles diríais que son las variables?
+Voy a pasar al PDF
+porque se ve mejor.
+Aquí está.
+¿Cuáles diríais que son las variables?
+Bueno, lo tenéis también en vuestro, se me olvidó que podéis correr vosotros también
+el colab.
+¿Cuáles diríais que son,
+en este caso, las variables
+que están correlacionadas?
+Ay, bueno, es que ésta era con otra base de datos.
+Ésta la puse con la base de datos real.
+Ah, bueno, luego os la paso. Pero vale, entonces aquí no.
+Dejadme pasar de aquí a la base de datos que ésta no era.
+Ésta era la de base de datos real que es con la que hice el PDF.
+Vamos al colab entonces.
+Perdónas, me acabo de dar cuenta.
+Bueno, ahí lo veis en el colab vuestro,
+si es que no se ve bien en el mío.
+Pero vamos a ver aquí.
+Vale, ¿cuáles son las variables que están correlacionadas?
+Entonces, las más correlacionadas en este caso.
+Las que tienen que ver con intensidad de uso.
+Vamos a ver.
+Quedan cinco minutos. Vale.
+Ahora lo vemos a la vuelta. Pero claro, ¿qué pasa?
+Vosotros tenéis aquí 0,99 que son segundos, por ejemplo,
+con frecuencia de llamadas.
+Luego, por ejemplo, otra que está
+muy correlacionada es el número de contactos
+con segundos, frecuencias de llamadas.
+Esas son bastante altas.
+Y luego también, por ejemplo, el CLV
+con segundos, frecuencias de llamadas.
+Entonces, claro, ahí hay correlación entre ellas.
+¿Cierto? Con lo cual, ¿qué es lo que pasa?
+Tenemos segundos, las variables, varias variables de uso,
+por ejemplo, segundos, frecuencias de llamadas,
+número de contactos, frecuencias de SMS,
+pues están fuertemente correlacionadas. ¿De acuerdo?
+Por lo tanto, ¿qué me están diciendo? Que si están correlacionadas,
+acordaros, si hay multicolinealidad,
+hay todas las variables, o sea, todo lo que vimos antes.
+En este caso se ha cubrido multicolinealidad, etc.
+¿Qué pasa?
+Esos son señales de que hay redundancia y que,
+por lo tanto, tenemos que aplicar el principal
+componente análisis. ¿De acuerdo? Y tratar de reducir
+dimensiones porque estamos teniendo ahí
+exceso de información redundante. ¿De acuerdo?
+Efectivamente. Entonces, ¿podemos reducir
+esas? Vamos a ver cómo se van a reducir. ¿De acuerdo?
+Lo que sabemos es que no necesitamos las seis variables
+para decir cuánto usa el cliente del servicio.
+O sea, el uso del cliente del servicio
+se va a poder simplificar, pero vamos a ver cómo. O sea,
+no es así como, venga, pues voy a quitar esta. No. Vamos a ver
+cómo vamos a separar esas variables.
+Pero eso lo veremos después de la pausa. ¿Os parece?
+Porque ya me dijeron ahí que quedaban cinco minutos,
+así que creo que es el momento de la pausa.
+¿Os parece?
+¡Chimpún! ¡Gracias! Ahí sí.
+[Pausa: recreo hacia 1:03:29 del video aprox. El video no contiene el tramo del descanso (no hay silencio ni audio intermedio); la clase continúa directamente con el regreso del recreo.]
+Perfecto. Entonces,
+volvemos al Google Colab.
+Entonces, estábamos diciendo...
+Perdonad.
+Aquí vamos.
+No, ese no es...
+Es en...
+¿Dónde está? Es en este.
+Veis muy buen el Colab, ¿no?
+Está cargando.
+Ahí cargó. ¿Sí? Ya, perfecto.
+Vale, entonces, os estaba diciendo
+que en este de acá...
+Aquí. Entonces, estábamos viendo
+que teníamos correlación, ¿cierto? entre varias variables.
+Aquí. Por lo tanto,
+¿qué es lo que tenemos aquí?
+¿Qué es lo que tenemos?
+Por lo tanto, habíamos dicho,
+vamos a ver cuáles son las que están correlacionadas antes de ponernos a hacer nada.
+Entonces, antes de reducir dimensionalidad,
+vamos a ver cuáles son las que están correlacionadas,
+si es que realmente tiene sentido reducir las dimensiones.
+Y ahora, lo que queremos decir es
+vamos a ver, antes de reducir, recordad, vamos a hacer un feature engineering
+y vamos a ver si podemos crear variables nuevas
+antes de escalar. Y habíamos dicho que íbamos a crear tres variables
+que nos iban a importar en cuanto a lo que era
+el análisis de la fuga de clientes, ¿no?
+Que era, por ejemplo, sus patrones de consumo, ¿no?
+Entonces, habíamos dicho la duración promedio llamada,
+el SMS por antigüedad y la intensidad del contacto, ¿de acuerdo?
+Y habíamos dicho que íbamos a hacer con esta combinación de segundos
+sobre frecuencia de llamadas, frecuencia de mensajes
+sobre antigüedad y luego número de contactos
+sobre frecuencias de llamadas, ¿de acuerdo?
+Entonces, bueno, pues ahí está, creamos ahí las variables
+y por lo tanto las incluimos en nuestra base de datos, ¿ya?
+Entonces, ¿qué es lo que pasa? Que ahora,
+pues aquí nos hace simplemente una estadística
+de nuestras variables
+para asegurarnos que las ha creado bien, ¿sí?
+Entonces, tenemos 1500 datos, o sea, las ha creado
+en todos los datos, ahí está la media de la duración de llamadas,
+vamos a las estadísticas descriptivas básicas, el box plot, ¿ya?
+Vale, entonces nos ha creado esas nuevas variables
+y ahora lo que vamos a hacer es ver
+cómo traducir obviamente esas variables al modelo.
+Entonces, lo que vamos a hacer es codificar
+las variables categóricas. ¿Os acordáis que era otro de los pasos
+que teníamos que hacer antes de entrar a aplicar
+ningún modelo de Machine Learning, ¿ya?
+Entonces, hemos visto que los datos ya están completos,
+hemos visto que efectivamente hay variables que están correlacionadas,
+con lo cual hay que reducirlas,
+hemos visto que podíamos crear otras variables nuevas
+antes de hacer la reducción de dimensiones
+y ahora tenemos que codificar las variables que no están
+en el lenguaje que pueda entender el modelo, ¿de acuerdo?
+Como por ejemplo el tipo de plan y el estado, ¿sí?
+Que ya habíamos dicho que el tipo de plan pues era
+si era alto, bajo, etcétera, y luego el estado,
+si estaba activo o no estaba activo, ¿de acuerdo?
+Entonces, ¿qué pasa? Que los tenemos que pasar a enteros, ¿ya?
+Vale, los vamos a convertir a un one-hot, ¿ya?
+Ceros y unos.
+Entonces, aquí el one-hot encoder, ¿ya?
+Le decimos que sea binario,
+luego pues nada, simplemente le ponemos aquí las instrucciones
+para que me pase las categóricas a binarias, etcétera
+y luego el estado, ¿sí?
+Y luego, ¿qué es lo que hacemos? Decimos, vale,
+es que, bueno, ya da igual, es que como estuve en el descanso
+para poner los textos bien, ya he corrido todo,
+pero bueno, ya está.
+El asunto es que antes que teníamos, tenemos 15 columnas,
+ahora ¿qué pasa? Pues con el one-hot vamos a tener
+15 columnas también, ¿vale? Es decir, no estamos
+creando una variable nueva, sino que lo que hemos hecho
+ha sido simplemente recodificar las variables
+que teníamos, ¿de acuerdo? O sea, ojo con eso,
+para que no estemos creando una variable nueva, ¿ya?
+Vale, pues aquí está, entonces tenemos reclamos,
+antigüedad, monto, etcétera, ¿ya? Así que estamos bien con eso.
+Muy bien, ahora ¿qué va a pasar? Nosotros vamos a separarlo
+en los grupos para hacer la validación, el test,
+el entrenamiento, ¿de acuerdo?
+En este caso, el escalador fit
+se ajusta solo con el entrenamiento, igual que cualquier
+importación o transformación y después aplicamos transform
+a la validación o prueba, ¿de acuerdo?
+Entonces, bueno, aquí separamos simplemente, yo os explico
+las instrucciones que estamos usando y aquí nada,
+separamos el grupo, lo vamos a separar en el 75% y 25%
+y vamos a tener entrenamiento y test, ¿de acuerdo?
+En este caso, sí que he puesto entrenamiento y test,
+no he puesto el de la validación, porque en realidad como simplemente
+vamos a seleccionar las variables y luego reducirlas, o sea no es no voy a hacer un modelo
+como tal de ver la precisión del entrenamiento, luego la validación y el test paso directamente
+del entrenamiento al test, por eso lo he separado en dos, pero lo lógico es que lo hubiéramos
+separado en train, validation y test, lo que pasa es que para este PCA en realidad podemos separarlo
+simplemente en un train test, porque es que nos van a salir las mismas, la misma descomposición que
+si lo separamos en tres, entonces aquí lo que nos sale es simplemente cuántos son los
+elementos que tenemos en el grupo de entrenamiento y cuáles son los que tenemos en el grupo de test,
+entonces están en 75% y 25% y contienen 15 variables cada uno de ellos, obviamente hay
+que poner el scaler etcétera y que esté estratificado, acordaros que tiene que estar
+estratificado porque la base estaba desbalanceada, eso es lo mismo que hemos hecho en las sesiones
+anteriores, y ahora ya vamos, ya hemos visto cuáles eran las correlaciones, hemos
+estandarizado las variables, hemos creado, hemos hecho el Feature Engineering, hemos hecho
+la separación en los grupos de entrenamiento y test, o sea ya hemos preparado todo, ahora sí
+podemos ir al PCA, entonces vamos a extraer las variables, entonces bueno aquí simplemente vamos
+a trabajar con NumPy, porque vamos a trabajar con vectores y valores propios, no sé si sabéis y
+esa es la fórmula que me he bailado, pero básicamente aquí lo que estamos haciendo es que vamos a hacer
+matrices, vamos a calcular cuántas personas aquí han visto álgebra lineal, que levanten un poco la
+mano para saber cuántas personas han visto álgebra lineal, a ver cuántas, dos, a ver más o menos,
+más o menos, bueno por ahí hay gente que ha visto álgebra lineal, no tantos, pero bueno,
+algunos poquitos sí que han visto álgebra lineal, no muchos, bueno pues entonces voy a tener que
+explicarlo en lenguaje sencillo, por eso no quería poner la fórmula, porque sabía que esto podía
+aburrir, vale entonces vamos a ver, personas, poquitas personas, vale
+hace mucho tiempo, hace mucho tiempo, vale, hace mucho tiempo, vamos a traducirlo, cuando nosotros
+hablamos en álgebra lineal, a ver cómo lo traduzco a lenguaje colombiano, cuando hablamos en álgebra
+lineal, hablamos de bases de vectores, nosotros lo que tenemos son, en álgebra lineal tenemos
+estructuras, vale, que aquí estas estructuras de vectores y espacios lo que representan son
+nuestras variables y las dimensiones distintas que vamos a tener para responder a una pregunta de
+una variable concreta, de acuerdo, entonces digamos que cada variable va a representar una
+dimensión, cuando en álgebra lineal eso lo traducimos, lo traducimos a estructuras abstractas
+algebraicas que son vectores y estos vectores tienen unas características que me permiten ir
+construyendo espacios, entonces la forma más sencilla de ver es en un plano, nosotros tenemos
+la hoja, la hoja es bidimensional, porque tenemos un ancho y un alto, vale, o un ancho y un largo,
+como queréis decirlo, cuando pasamos a la tercera dimensión necesitamos un alto, si queremos pasar
+a una cuarta dimensión, entonces qué pasa, que necesitamos una cuarta dimensión, de acuerdo,
+y así vamos sumando dimensiones cuando queremos empezar a añadir, por así decirlo,
+características que no están en el espacio anterior, ya, vale, dentro de todas las cosas que se pueden
+hacer dentro de estos espacios, nosotros llamamos base al conjunto de esos vectores mínimos,
+el conjunto más pequeño de vectores que me generan el espacio que yo busco, si ese conjunto
+de vectores además resulta que no se pueden crear como combinación de los otros, es decir,
+lo que se decía, tenéis el techo y cualquier línea que dibujéis en el techo ya se puede
+combinar por, se puede generar combinando las dos líneas que tenemos en los bordes,
+porque podemos decir, ah, por recorro esta línea hasta aquí, esta línea hasta aquí y llego al punto
+que he dibujado ahí, uno al centro y llego a ese punto, bueno, pues las bases son justamente esos
+vectores que aportan información distinta, y el mínimo número de vectores que aportan información
+distinta se dice que son linealmente independientes, entonces cuando tenemos esa base ya podemos
+generar cualquier cosa que esté dentro de ese espacio, en este caso se traduce en que si yo
+tengo las variables mínimas que condensan toda la variabilidad de la información que tengo,
+yo voy a poder crear todo lo que yo quiera simplemente con esa información y va a estar
+dentro del conjunto, o sea, cualquier dato que yo tenga en el conjunto lo puedo encontrar combinando
+simplemente esas variables que yo selecciona, de acuerdo, vale, cuando empezamos a trabajar dentro
+de estos espacios vectoriales en álgebra lineal hacemos una serie de transformaciones,
+y estas transformaciones pues pueden ser de lo más variopintas, pero una de las transformaciones
+más básicas es generar vectores proporcionales a otros vectores, es decir, que si yo tengo un
+vector de este largo, pues puedo generar un vector exactamente, o sea, este es mi vector,
+y entonces esta es la dimensión que está generando, yo puedo generar un vector proporcional a este que
+va a ser otro que tenga la misma inclinación pero que sea más chiquito o que sea más largo o que
+esté igual pero dado la vuelta, es decir, que apunte a otro lado, entonces ¿qué pasa? esas
+transformaciones, lo que están haciendo es generarme las transformaciones del vector,
+lo que pueden hacer es, pues este vector me lo puede dejar así, lo puede dejar exactamente igual,
+lo puede reducir pero manteniendo el mismo, pero también lo que podría hacer es que este vector
+lo esté doblando y me esté generando una curva o que haga una cosa más estrambótica,
+bueno, nosotros nos vamos a quedar con ese tipo de transformaciones que lo que hacen es que
+simplemente me mantienen el mismo vector pero proporcional, entonces esto es lo que cuando
+en álgebra lineal hablamos de los eigenvalues y eigenvectors, es decir, los vectores propios y
+los valores propios, el valor propio es qué tanto varío ese vector, es decir, si lo hago más grande
+tres veces, más grande, más pequeño a la tercera parte, si le doy vuelta, entonces lo multiplico por
+un menos uno, entonces ese valor propio, ese valor lo que me dice es qué tanto estoy cambiando
+ese vector, pero nos vamos a fijar en las transformaciones en las que ese vector
+simplemente es el mismo pero con otro traje, me acuerdo, pero es el mismo vector, es decir,
+lo va chica, lo va larga o le da vuelta, porque digo todo esto, nosotros cuando estamos viendo
+justamente este proceso que está aquí la extracción de variables, lo que estamos buscando es de todos
+los vectores que tenemos, es decir, de todas las variables que tenemos en nuestra base de datos,
+queremos elegir aquellos vectores que a través de esta transformación, en este caso el modelo
+que voy a aplicar, me deja al vector tal cual está, es decir, aquellos que realmente aportan
+información esencial se van a mantener a través del modelo y los que no aportan información esencial
+entonces se van a transformar en algo que no son ellos, se entiende, entonces qué es lo que va a
+hacer este modelo, va a seleccionar esos vectores, en este caso esas componentes, esas variables,
+que cuando yo les aplico esta transformación se quedan en una réplica más grande, más pequeña
+o dada la vuelta de ella misma, y eso es lo que aparece aquí como este Av = λv, y que es lo que
+se llama el vector propio, es decir, A es la matriz de la transformación, V es el vector que
+va a representar la variable y λ sería ese valor propio, es decir, que tanto estoy agrandando o
+empequeñeciendo ese vector, entonces ¿en qué consiste este proceso? consiste justamente en
+seleccionar esos vectores que por sí solos representan a la mayor variabilidad posible en
+cada dimensión, ¿se entiende? ha quedado más o menos claro para la gente que sabía algebra y
+ideal como para la gente que no, es el momento de preguntar antes de que corra el código
+¿hay alguien ahí?
+yo no entendí pero quizá con el ejemplo me queda más claro, vale
+hay gente, hay alguien, vale, vale, vale, es que no sé, yo creo que aquí han muerto varios,
+hemos tenido varias, la última oración, ¿cuál es la última oración?
+quizás si lo dibuja, estamos aquí muy atentos, vale, ¿qué última oración? es que he hecho
+tantas cosas que no sé cuál es la última oración, pero vale, vamos a ver si hacemos la,
+quizás con un dibujo se haga más fácil, puede ser, voy a tratar de hacer un dibujo para que
+entendamos lo que estamos haciendo, vale, es que necesito que entendamos esto para entender el
+proceso, aunque no lo vayáis a hacer a mano, pero sí que necesito que esto se entienda un poquito,
+a ver, esto ahora dónde estaba aquí para que yo dibuje, pausar salas, ocultar controles,
+porque ahora no me deja dibujar, a ver, aquí está, he dejado de compartir, ¿no?
+no, se sigue viendo, vale, vale, vale, entonces lo que he hecho ha sido quitar simplemente esto de acá,
+a ver, vale, ¿veis mi pantalla? sí, ahí, ¿por qué no me he dejado? es que quiero dibujar y ahora no me
+he dejado, automatizar, permite que todos lo usen, no, comenzar a tomar notas, a ver, me deja ahí,
+my notes, no, no me deja, no me deja dibujar, no sé por qué no me deja dibujar esto ahora,
+bueno, os lo voy a hacer en el OneNote entonces, porque si no, no, no puedo dibujarlo aquí,
+dame un segundín,
+si me deja en el OneNote, compartir, ahora voy a dejar de compartir un segundo para compartir en el otro,
+vale, no os preocupéis, voy a compartir el OneNote,
+hay que que me sale en algún lado el OneNote,
+aquí el OneNote, vale, vale, entonces, ahora sí veis el OneNote, ¿cierto? lo de, vale,
+a ver, nosotros tenemos vectores, ya estos vectores pues nos están haciendo dimensiones,
+vale, entonces aquí tenemos un espacio tridimensional, por ejemplo, ya, simplemente tenemos un espacio
+tridimensional, madre mía que dibujo mal hecho esta vez, voy a hacerlo así, vale, esto se entiende
+que es un espacio tridimensional, ¿cierto? entonces estos tres vectores forman una base, ¿vale? ¿por qué?
+porque simplemente me está generando cada uno de ellos una dimensión, o sea yo aquí solo puedo ir
+hacia arriba hacia abajo, si yo añado eso y yo quiero este punto, ¿este punto que hago? me voy
+tantos pasos hacia la derecha y tantos pasos hacia arriba, o sea yo voy siguiendo los vectores,
+¿lo veis? o sea yo este punto, por ejemplo, lo puedo escribir haciendo esto y esto, o puedo subir
+hacia arriba y luego ir hacia la derecha, ¿me entendéis? entonces yo aquí cualquier punto que
+yo dibuje en el plano, pues bueno, me voy, este me voy para abajo, por ejemplo, y luego me voy,
+o sea hago el opuesto, aquí estaría multiplicando por un negativo que sería como la mitad pero en
+opuesto del sentido del que está en vertical y luego el opuesto del que está en horizontal pero
+de la misma longitud aproximadamente, y llegaría ese sentido, entonces yo con esos dos vectores
+podría generar cualquier punto en el plano, pero si yo quiero sacar un punto en la tercera dimensión,
+o sea este espacio, esto ya se viene hacia afuera, ¿vale? y entonces yo quiero un punto, por ejemplo,
+que esté aquí, que este punto, pues qué pasa, que está en el fondo, tengo que subir,
+luego tengo que ir hacia aquí y luego tengo que ir hacia la derecha, o sea voy hacia la derecha,
+hacia arriba y hacia acá y ahí encuentro el punto, ¿lo veis? entonces necesito las tres
+dimensiones y así podemos ir haciendo más dimensiones, entonces yo lo que quiero es que
+si yo quiero, por ejemplo, imaginaros que estáis en un cubo y yo quiero poder describir cualquier
+punto de este, ¿ya? este cubo tiene tres dimensiones, por lo tanto esto sería como que yo tuviera un
+problema donde mi base de datos tiene tres variables y yo cualquier respuesta la puedo obtener, cualquier
+punto de esa base de datos la voy a obtener combinando estas tres dimensiones, ¿vale? que son en el fondo
+estos tres vectores, este, este y este, que son los que forman mi base, ¿ya? cuando nosotros hacemos
+el análisis de componentes principales lo que estamos diciendo es que imaginaros que en este
+cubo resulta que todos los puntos, por ejemplo, estuvieran, imaginaros que resulta que todos
+los puntos estuvieran, pues aquí, ¿vale? estuvieran en esa pared, entonces yo, por ejemplo,
+esta dimensión no la necesitaría, ¿os dais cuenta? yo podría reducirlo simplemente a esta
+dimensión y esta dimensión, ¿ya? entonces ¿qué es lo que va a hacer el modelo? lo que va a hacer es
+decir, mira, yo me voy a quedar con estos tres vectores que tengo, yo me voy a quedar con aquellos
+que cuando yo le aplique esta transformación los puntos del espacio que yo tengo se van a poder
+generar con transformaciones proporcionales de estos vectores, ¿vale? entonces va a ser, por ejemplo,
+este vector más chiquitito y este vector más chiquitito, ¿vale? eso en que se traduce a va a
+ser la matriz de la transformación, ¿ya? esta va a ser la transformación, en este caso el modelo,
+lo que va a hacer el modelo, ¿vale? porque hay modelos que lo que hacen es que elevan al cuadrado
+el valor, otros modelos que toman la raíz, este lo que va a hacer es que esta transformación,
+cuando yo se la aplique al vector, lo que va a hacer es que va a generar ese mismo vector pero
+con un tamaño proporcional al suyo, ¿vale? puede ser que lo deje igual, puede ser que le de la vuelta,
+si le da la vuelta lo multiplica por un menos, ¿vale? entonces lo que va a hacer es va a observar
+todos los puntos que hay y va a tomar aquellos vectores que cuando yo les aplique este modelo,
+que es esta transformación, me deje el mismo vector pero achicado, dado la vuelta, agrandado,
+o sea el mismo vector, entonces va a mirar todos los puntos y se va a quedar con aquellos vectores
+que combinados en sus proporciones me van a poder representar todos los puntos que yo tenga,
+¿se entiende así mejor? más o menos, ahora lo vamos a ver pero ese es como lo que va a hacer,
+¿vale? sí, vale, entonces vamos ahora al Colab, de acuerdo, entonces cuando veamos esa matriz que
+pone Av = λv, que era con ese g mogollón, sí, es con g mogollón, mojollón es una vez
+tan muy rara porque mojón podéis buscar lo que es, pero está como raro, vale, entonces,
+entonces aquí qué es lo que pasa cuando vosotros veáis el Av = λv, esa era la fórmula que yo
+quería evitar en el fondo para no perdernos pero que necesitamos usar para poder aplicar este
+modelo, ¿de acuerdo? pero simplemente quedaros con eso, lo que vamos a hacer es aplicar un modelo
+que me va a tomar aquellos vectores que combinados con proporcionales a ellos me van a permitir
+ir combinando todos ellos generar todos los puntos que yo tenga o explicar en el fondo
+todos los datos que yo tenga en la base de datos, ¿de acuerdo? ahora sí, vamos al Colab,
+dejadme que deje de compartir, ¿se pueden resumir en mapas que preservan la estructura? sí, viene
+siendo lo mismo, vale, al final siguen siendo dimensiones que te están reduciendo el espacio,
+vale, en el fondo espacios que siguen explicando todos los datos, vale, déjame ver aquí, compartir
+y el Colab, ahora sí veis el Colab
+y sí, perfecto, entonces, ¿qué es lo que hemos hecho? entendido eso, vale, tenemos que hacer esta
+extracción de variables tenemos que hacer la base matemática de esto, entonces hacemos un array,
+en el fondo estamos generando estos vectores, vamos a hacer los valores propios y vectores propios,
+el valor propio es ese numerito que me va a dar la proporción del vector y el vector propio,
+o sea que me va a decir cuántas veces tengo ese vector y el vector propio es el vector que a través
+de esta transformación se mantiene como su proporcional, vale, que no se transforma en
+otra cosa más que el mismo proporcional, entonces, ¿qué vamos a hacer? vamos a imprimir los valores
+propios y los vectores propios, entonces, ¿qué va a pasar? vamos a hacer un conjunto de vectores
+propios y de valores propios y aquí nos van a salir si coinciden o no coinciden, ¿de acuerdo?
+entonces, ¿qué es lo que tenemos aquí? los valores propios, vale, los vectores propios son estos,
+estos son los valores propios y ¿qué pasa? me calcula la transformación por el vector v que me
+da justamente estos valores y luego me da el proporcional de esos vectores y resulta que
+efectivamente me está dando el mismo valor, por lo tanto se mantiene esa igualdad que os decía,
+es decir, la transformación por el vector se ha convertido en el vector por un escalar, por un
+número, por lo tanto, ¿coinciden? sí, entonces, ¿cómo están coincidiendo? yo ya puedo aplicar
+en la reducción de dimensiones, ¿de acuerdo? ya, entonces, ¿cómo las va a reducir? bueno, pues le decimos
+que aplique el PCA, que lo aplique al grupo de entrenamiento, cierto, y esto es lo que nos sale,
+bueno, aquí simplemente es para que nos haga el gráfico, etcétera, ¿de acuerdo? que haga el gráfico
+de barras, que haga en el fondo la línea, etcétera, que me combine, ¿de acuerdo? entonces, fijaros,
+¿qué es lo que va a hacer esto? aquí nos va a hacer una varianza explicada por componente, las barras
+nos van a hablar de la varianza individual de cada componente, es decir, cuánto de la varianza es
+explicado por la componente y luego la línea naranja nos va a hablar de la varianza acumulada,
+es decir, la primera componente explica solo por sí misma un 35% de la varianza, ¿de acuerdo? la
+segunda componente explica por sí misma la diferencia, es decir, de 35% a 44% un 9%,
+lo veis, aquí es que claro, con esta escala no se ve, pero esto equivale a un 9%, de 44% esto va a
+ser un 8%, esto va a ser un 7%, ¿lo veis? entonces, esto es el porcentaje que cada una de las
+componentes explica por sí misma, obviamente la primera componente, os acordáis que es la que
+tomaba la mayor varianza posible, luego la siguiente era la que tomaba la siguiente dimensión que se
+veía, que estaba marcando la varianza, si hay más dimensiones, pues claro, si con la primera ya tienes
+el 35%, con la segunda hemos pillado otro, hemos dicho otro 9%, o sea, hemos acumulado ya un 40%,
+pues ahora cada componente obviamente va a ir explicando cada vez un poquito menos, o sea,
+estas columnas, estas barras van a ir bajando, porque la primera componente es la que más
+tienen que explicar, es la que captura la mayor parte de información posible, la que no captura
+ahí, entonces ya trata de pillar la segunda componente, lo que no capturan entre la primera
+y la segunda, lo trata de pillar la tercera, y así consecutivamente, entonces si hacéis la diferencia
+entre la acumulada, o sea la acumulada en la componente siguiente menos la acumulada anterior,
+sabéis cuánto ha sido lo que ha tenido cada una, la segunda tiene un 9%, la tercera tiene un 8%,
+la cuarta un 7%, la quinta tiene un 7%, la sexta va a tener un 6%, la séptima va a tener un 7%,
+esta tiene un poquito más 7, un 6, bueno aquí tiene, aquí hay un pequeño descuadre, pero vamos,
+es porque debe ser en decimales, lo está redondeando, entonces posiblemente es un 6,9 y el otro es un 6,8,
+entonces ¿qué es lo que pasa? Aquí va haciendo cuál es la acumulada, de acuerdo,
+vale, fijaros, si nosotros vamos, entonces ¿dónde cortamos? ¿cuál va a ser la componente en la que
+vamos a decir que hemos explicado la mayor parte de la variabilidad? Pues fijaros, aquí ya empieza
+la curva, crece mucho, sale 85%, podríamos decir 90%, aquí ya baja 5%, 4%, 3%, 2%, o sea ya las
+siguientes componentes es que están explicando un porcentaje muy chiquitito, o sea podríamos quedarnos,
+por ejemplo, en este caso con las ocho primeras, con las ocho primeras ya estamos explicando un
+85% de la varianza, podríamos ir al 90%, si, esto es un poco de criterio, es lo de siempre,
+es un poco un arte, me quedo en el 85, el 90, pues hombre, la verdad es que si veis la pendiente de
+la curva es como que sí, yo me podría quedar quizá con el 85, el 90 me quedaría, o sea me
+quedaría con 8,9 componentes, la verdad es que no es tanta la diferencia entre la octava y la
+novena, ya un 85% de la varianza explicada es bastante alta y recordad que además teníamos
+un 85% de fuga, o sea ya con 8 componentes ya empezamos a, ya hemos cubierto por así decirlo
+todos los que se fugan, con lo cual quizá, quizá conviene irse al 90% por pillar los que no están
+fugándose, pero bueno, o sea perdón, los que no se fugan, pero esos los que se fugan, entonces por
+pillar un poquito más del 85% que habíamos visto que estaba desbalanceado, pero ya bueno el 85%
+estamos explicando casi todo, entonces aquí lo que estáis viendo es como la curva luego aquí
+prácticamente no sube, lo veis, entonces podríais quedaros con la componente 8 o con la componente
+9, me acuerdo, entonces eso os diría cuántas componentes tendréis que tomar, ya más o menos,
+me acuerdo, ahora, ¿qué variables arma cada componente?, porque aquí solo sabemos cuántas son y
+cuánto explican, me acuerdo, recordad la línea es la acumulada y las barras son las que explica
+cada una de ellas, me acuerdo, aquí tenéis el gráfico para ver cuáles son, aquí está el de barras
+y aquí está el de línea, me acuerdo, y entonces luego tenéis que combinarlos, y bueno ahí tenéis
+los títulos para los labels de las de los ejes, etcétera, me acuerdo, la leyenda, etcétera,
+simplemente es el script para la gráfica, entonces con 8 componentes cubrimos al menos el 85%
+la varianza total, o sea que ya está bastante bien, la verdad es que con 8 nos podríamos quedar
+perfectamente, pero por eso como tenemos la base que el 85% está desbalanceado, pues a lo mejor
+la novena, pero 85% ya está bastante bien, entonces de nuevo hay que fijarse en el contexto, hay que
+fijarse cómo va, luego con la base de datos que os voy a pasar para hacer la actividad de repaso
+van a salir otros números y ahí vais a poder ver un poco más la curva pronunciada de otra manera y
+vais a poder elegir de otra manera, pero la idea es la misma, entonces qué variables, aquí sabemos
+cuánto explica cada una, pero no sabemos qué contiene cada una, no sabemos cuáles son,
+justamente sabemos que estas son las componentes, pero no sabemos qué variables están en estas
+componentes, o sea porque esto no es una variable sola, sino que es una combinación de ellas,
+cierto, recordad, o sea estamos mirando con qué combinaciones estamos pillando la mayor cantidad
+de información posible y esa es una componente, es como que en ese cubo que os había puesto
+tuviéramos puntitos en una cara y luego en otra cara, pero no estuvieramos por aquí en medio,
+en el cubo, en el centro del cubo, entonces claro pues estaríamos diciendo pues me voy a quedar con
+la componente de esta cara y la componente que me genera esta cara, ahí estaríamos tomando los
+tres vectores, pero una componente sería por ejemplo los dos vectores que generan esta cara y
+la segunda componente tomaría solo este vector, si me explico, o si hay más puntos en esta cara
+de acá, tomaría como primera componente los dos vectores, o es decir la cara completa y luego tomaría
+como segunda componente el segundo vector, el tercer vector, si me explico, entonces en este caso
+tenemos que ver quiénes son los que están en cada una de estas componentes principales, en cada uno
+de estos mapas, de estos planos, entonces ahí qué vamos a hacer, vamos a hacer un círculo de
+correlaciones, y eso qué va a hacer, pues para las dos primeras componentes va a decir cuánto pesa
+cada variable original, entonces las flechas largas y cercanas al borde del círculo va a decir que
+esa variable está muy bien representada por la componente 1 y la componente 2, entonces vamos a
+ver, vamos a hacer el círculo de correlaciones, entonces vamos a poner acá la componente x, la
+componente y, eso te habla en el eje, te va a decir en el fondo cómo está representado, esto
+simplemente para poder hacer el círculo de correlaciones, entonces bueno ahí están los
+parámetros para poder hacer el círculo de correlaciones, como os dije ya no, ya la había
+corrido así que está aquí, entonces fijaros, no sé si puedo agrandar esto,
+no me deja, hay un espectro de gatos, a ver si me deja, no, pero no me deja, bueno da igual, la cuestión es en este caso qué va a pasar si os
+dais cuenta, aquí tenéis la primera componente, que es esta horizontal, entonces tenéis el monto,
+la frecuencia de mensajes, creo que está la frecuencia de llamadas, el clv, de acuerdo, la segunda,
+porque si os dais cuenta son las más largas y que están llegando casi, y que están todas juntas,
+entonces esta es la primera componente, la segunda componente vendría por el tipo de plan y la
+antigüedad, y luego ya pues se van poniendo las otras componentes, que están un poco aquí más
+mezcladas, la pc1 explicaba ya el 34,9% y la pc2 ha explicado el 8,9%, bueno era lo que veíamos por acá,
+sí, ya entonces, qué pasa, que vamos a tener por lo tanto las componentes explicadas en la componente 1 y
+la componente 2, pues ya hemos explicado el 44% y está representado por estas variables que aparecen en
+el círculo, ahora bien, vamos a ver cómo se ve esto en colores, de acuerdo, entonces cómo se ven los clientes
+proyectados en las dos primeras componentes, y bueno aquí si os dais cuenta los naranjas son la fuga y
+los ceros son los activos, y aquí qué tenemos, tenemos la pc1, se ven dos componentes, lo que pasa
+que aquí están muy mezcladas, porque en realidad claro, fijaros que aquí explica el 34,9% y aquí
+explica el 8,9%, entonces aquí se ve como un clúster aquí y otro clúster acá, esto es simplemente
+ver cómo están los clientes, aquí ya estamos viendo los puntitos, no estamos viendo las variables,
+sino que estamos viendo los puntos por separado en función a las dimensiones que están generando,
+la verdad que en este por ejemplo no se ve del todo claro, pero bueno se pueden distinguir los
+dos grupos, entonces, cómo se puede, ahora si queremos comparar una regresión logística simple,
+con los componentes principales, entonces vamos a ver qué costo tiene esto, entonces fijaros aquí
+tenemos el PCA, tenemos el train test y lo que vamos a hacer es ver las variables,
+entonces qué es lo que vamos a hacer, vamos a comparar respecto a tener el modelo con las 15
+variables versus haber aplicado el PCA, entonces que también va a ajustar el modelo, en este caso
+el modelo logístico, la regresión logística, que también va a ajustar en función a si usamos las
+15 variables originales o si usamos las 8 componentes principales que nos ha seleccionado el modelo,
+de acuerdo, esos gráficos se ven bonitos en 3D, es verdad, pero aquí estábamos en 2D porque ahora
+vamos a ver qué pasa con el t-SNE, entonces el t-SNE se va a ver además más bonito también lo de las
+componentes, o sea cómo quedan los clústeres, entonces fijaros lo que os decía, las variables
+originales y PCA, con 15 variables el F1, bueno aquí la verdad es que como es una base sintética
+pues no está tan seleccionada así como en la realidad, el modelo que os voy a pasar después
+para que practiquéis vosotros sí que está basado en datos reales y vais a ver que el F1 es un poco
+más grande, va a ser como un 50 y algo por ciento, el MCC también, de acuerdo, que el MCC es el
+Matthews correlation coefficient, que bueno es otro coeficiente que nos ayuda a medir también
+la combinación, lo que pasa que el F1 lo que está haciendo es contar las fugas y el MCC es el que
+está, es un coeficiente que nos cuenta tanto las fugas como las no fugas, es un poco más complejo,
+entonces nos permite medir un poquito mejor pues en el fondo la validez del modelo, o sea que tan
+bueno es el modelo, pero si os dais cuenta no varían mucho, en este caso los dos modelos
+nos aportan una información similar, entonces aquí estamos con las variables originales,
+o sea este MCC no os he hablado del, pero bueno que sepáis que es otro coeficiente que nos ayuda
+a ver qué tan bueno es el modelo, de acuerdo, solo que con la aparición de muchos componentes,
+ahora te contesto a esto, que digo, aquí el F1 score, recordad que estaba hacia la combinación
+del recall con el precision, entonces en ese caso estábamos viendo las combinaciones de las
+fugas y el MCC lo que hace es un coeficiente que nos permite ver en el fondo la veracidad del
+modelo o la precisión del modelo, pero en este caso cuando está considerando tanto la fuga como
+los que no se fugan, de acuerdo, y entonces insisto en el modelo logístico con las 15 variables,
+pues si os dais cuenta sale un 0.270, un 0.265, o sea que 0.270, 0.265, ambos coeficientes informan
+más o menos lo mismo, te dicen que ese es el coeficiente, pero cuando pasa al PCA de 8 componentes
+no empeora, realmente no empeora casi, es prácticamente igual, es 0.267 y 0.252,
+o sea que es que hemos reducido ocho componentes y estamos teniendo la misma calidad de modelo,
+entonces ¿para qué vamos a usar 15 componentes? Si ya vimos que había correlación entre ellas,
+si ya vimos que además la base estaba desbalanceada, ya vimos que todas las cosas estaban perfectas
+para molestar, entonces pues vamos a quitar cosas de medio y resulta que cuando hacemos todo
+lo que tenemos que hacer, resulta que corremos el modelo, quitamos variables y es que el modelo
+sigue explicando igual de bien, pues para qué voy a hacer todos el astre, para qué voy a andar cargando
+yo con todas estas variables, cierto, aquí recordad a simplificarse la vida, de paso están las
+matemáticas, aunque creéis lo contrario, ya entonces aquí nos ha simplificado la vida,
+tenemos ocho componentes y esto funciona perfectamente, ¿estamos hasta ahí? Sí,
+entonces ¿qué pasa? que con menos columnas, con menos variables, se mantienen prácticamente iguales,
+por lo tanto chapejado, aquí lo que sobra para la casa, ¿de acuerdo? Vale, sí a mí la verdad que
+este tema me gusta mucho porque es eso, es muy interesante porque te permite explicar con la misma
+veracidad, pero reduciendo cosas que son redundantes y que a simple vista nos puede ver, cuando estamos
+hablando de bases de datos, con muchísimos datos, millones de datos y variables, pero muchísimas
+variables, imaginaos porque claro, uno hay ciertos modelos que bueno más o menos pues la experiencia
+y tal y puede ver las cosas que funcionan y las que no dentro de un modelo con un número limitado
+de variables, cierto, pero cuando ya estamos manejando Big Data, pues es que esto es una
+maravilla, me acuerdo y luego es lo que decís, si lo veis hay muchísimos más gráficos que se pueden
+ver, pues en tres dimensiones, hoy en día con la inteligencia artificial se pueden hacer maravillas
+a nivel visual, vale, aquí vamos un poco a lo básico, que ya con lo básico, volvemos a lo mismo,
+ya con lo básico se puede tener información, para qué nos vamos a complicar la existencia,
+vale, y la pregunta de Ignacia, ¿tiene algo que ver una muestra desbalanceada con la aparición de
+muchos componentes para explicar mayor varianza?, ¿una muestra desbalanceada con que haya muchos
+componentes para explicar mayor varianza?, pues no creo que haya una correlación directa en eso,
+porque en el fondo, bueno claro tú dices que como está desbalanceada, entonces hay mayor variabilidad,
+ojo, es que, a ver aquí hay dos conceptos, que esté desbalanceada significa que tienes muchos
+datos de uno y pocos de otro, entonces estaríamos hablando de algo que tiene como un sesgo, pero
+que tenga un sesgo no significa necesariamente que haya una mayor dispersión, porque ese sesgo
+puedes no estar muy lejos de, no sé si me explico, sí, o sea tú puedes tener una concentración aquí
+y un sesgo, pero que está no tan separado, o sea no te hace una cola tan larga, entonces no
+necesariamente vas a necesitar muchas componentes, porque no necesariamente hay mucha dispersión,
+si me explico, o sea una cosa es sesgo y otra es varianza, volvemos a lo mismo, vale, recordad
+varianza y sesgo no es lo mismo, tú estás pensando, según me lo estás diciendo, muestra desbalanceada,
+estamos hablando de que, pues efectivamente hay un sesgo, pero no necesariamente va a haber más
+varianza, por eso, vale, y de hecho, recuerda, si controlamos la varianza no vamos a poder controlar
+el sesgo y viceversa, o sea, si hacemos, reducimos la varianza seguramente aumenta el sesgo, si
+reducimos el sesgo posiblemente aumenta la varianza, sí, entonces una muestra desbalanceada habla más
+del sesgo que de la varianza, entonces desbalanceada depende de cómo esté, si me explico, entonces no
+diría yo, yo te diría que los muchos componentes sí que tienen que ver con la variabilidad de los
+datos, obviamente, sí, cuando Lasso y cuando PCA veo que aquí se pierde la interpretación de los
+coeficientes, claro, ¿qué es lo que pasa? es que son cosas distintas, Lasso lo que te está haciendo
+es te está quitando variables que no aportan información, de acuerdo, en el sentido de que
+es un modelo de regresión, al final, el Lasso, el Ridge son modelos de regresión que lo que hacen es
+pues eso, o te reducen los coeficientes o te elimina variables, pero PCA es un clustering,
+al final es distinto, son cosas distintas, Lasso y Ridge lo que hacen es poner restricciones al
+modelo, PCA automáticamente te está quitando cosas de en medio, te está diciendo esto no me
+sirve, entonces ¿qué pasa? cuando te está diciendo que esto no te sirve, corres el riesgo porque claro
+tú estás diciendo me quedo con ocho componentes o me quedo con nueve, entonces claro hay una elección
+ahí, posiblemente si está explicando sólo un 5% más pues no es tanta la diferencia, para eso haces
+luego estos coeficientes y mires el f1, mires el mcc para ver si realmente la diferencia entre
+ocho componentes, nueve componentes, hay una diferencia significativa en eso, porque si no
+efectivamente lo que pasa es que como estás eliminando componentes puedes estar justamente
+perdiendo información y por lo tanto vas a perder información para interpretar luego los coeficientes
+que te salen del modelo, entonces si tú me dices cuando Lasso y cuando PCA es que son
+funcionalidades distintas, porque Lasso se usa para hacer, o sea cuando tú tienes un sobreajuste,
+lo que quieres es hacer que ese modelo no aprenda del ruido y por lo tanto lo que quieres es quitar
+variables, entonces ahí no estás reduciendo dimensiones porque hay una, ahí no estás reduciendo
+dimensiones porque el boon me perdí. Se me escapó, se me escapó y la tenía, yo la tenía escrita y
+y a brenten te dice escapó. Me dije bueno qué pena que sea Lasso, bueno me salto y dije que he dicho
+la he puesto triste, no pues eso que Lasso, volviendo al tema que son cosas distintas,
+de acuerdo, cuando estamos diciendo una es reducir dimensiones porque hay pues lo que
+habíamos dicho una multicolinalidad, porque hay ruido, porque pero no estamos hablando PCA,
+yo no la voy a usar porque hay un sobreajuste, si hay un sobreajuste yo lo primero que voy a hacer
+es ver si puedo meter alguna restricción al modelo para que en el fondo no me aprenda del ruido,
+entonces voy a ver qué pasa con eso. Si ya después de eso yo además veo y analizo que las variables
+efectivamente pues tienen estas características que dijimos, que están por así decirlo
+sobre representadas, están pues eso tienen correlaciones entre ellas y que realmente pues
+estoy haciendo redundancia de información, entonces ahí sí voy a meter el PCA, pero son
+funciones distintas, de acuerdo, entonces PCA lo que hace es quitar dimensiones, de acuerdo,
+es un clustering al fin y al cabo, Lasso no es un clustering, Lasso lo que hace es ajustar los
+coeficientes de un modelo, ya son cosas distintas, PCA no te va a ajustar los coeficientes, PCA lo
+que te va a decir es quédate con esto, entonces claro en PCA pues cuando tú quitas componentes y
+luego haces el modelo obviamente te cambian los coeficientes, por supuesto, pero el objetivo de
+PCA no es cambiar los coeficientes, no sé si me explico, vale, recordad que cuando estábamos con
+el sobreajuste, recordad que teníamos las nubes de puntos y decíamos pasa una línea y la línea me
+deja muchos puntos, qué tal, ah, es un subajuste, luego hacíamos una curva y dijimos ah pues sí mira,
+toma más o menos la forma de los puntos, hay algunos que no los toma, pero bien, y cuando
+hacía un sobreajuste lo que pasaba es que iba tomando cada puntito, entonces iba haciendo así,
+entonces decía sí se ve como una curva así, pero es que además como que la detalla demasiado,
+entonces es como demasiado, porque qué es lo que pasa cuando sobre ajusta, lo que va a pasar es que
+cuando metas un dato nuevo se va a volverlo con el modelo, o sea no te sirve que sobreajuste un
+modelo, y entonces ahí es donde metes la regularización, porque entonces lo que estás haciendo es que quieres
+que te de un modelo más simple, quieres que lo que haga coloque cada ruido que no lo considere,
+pero no te está eliminando los datos, simplemente te está ajustando ese polinomio para que pase
+tomando la información necesaria, pese a lo que te dices vamos a ver aquí quiénes son los que
+informan, quiénes son los que informan, tú estás informando de más porque esto ya lo tenía con este
+y con este, para casa, me explico, se entiende ahí Gastón? Vale perfecto, entonces pasemos al siguiente,
+entonces ahora dicho lo cual pasamos al
+a las reducción de dimensionalidad, vamos al PowerPoint,
+vale entonces bueno pues aquí estaba, si estáis viendo mis diapos,
+no, si, no, madre mía me huele el tiempo, ni me doy cuenta la hora que es, me pongo a hablar,
+y ahora todo en el tema, me apasiona y entonces pues se me pasa el tiempo, vale entonces estaba
+diciendo que no me había dado cuenta que ya son las nueve, vale pero ya nos queda poquito porque
+esto lo voy a pasar ya más rápido porque en realidad el objetivo de esta clase era más bien PCA,
+vale pero bueno aquí simplemente os estaba explicando lo que os he explicado antes y tal,
+el proyecto de los clientes en las dos dimensiones y entonces, que pasa, reducir dimensiones cuesta
+desempeño, pues lo que estábamos hablando aquí, que en el fondo el desempeño baja apenas un poco,
+por lo tanto en realidad que hacemos que sí, que nos quedamos con los ocho componentes,
+ahora bien, que es el t-SNE, vale, esto va a ser un mapa no lineal, vale, porque el PCA al fin de
+al cabo lo que hace es linealizar, porque recordad que lo que estamos tomando son proporcionales de
+esos vectores, o sea estamos haciendo combinaciones lineales de los vectores, o sea suma este vector
+con este vector, como sabemos al general, me creéis, que en el fondo estamos haciendo sumas y restas de
+vectores, vale, entonces esto es lineal, aunque estemos en cosas multidimensionales, pero es lineal,
+entonces t-SNE, t-SNE, lo que hace es que es un mapa no lineal, de acuerdo, para explorar la estructura
+de los datos, vale, fijaros, esta alternativa que se llama t distributed stochastic neighbor,
+neighbor embedding, de acuerdo, la s de stochastic, neighbor, vecinos, embedding, de acuerdo,
+embedding es como, la traducción en español de embedding, era, es que tiene un nombre así como,
+bueno, embedding es como un solapamiento, como un embebido, sí, embebido, pero no sé, hay otra
+palabra, de hecho en el libro lo pone, luego os lo digo porque me acuerdo que cuando lo pasamos a
+los editores pusieron la traducción, tuvimos ahí una discusión de autores de embebido, de no sé qué,
+y ahora no me acuerdo la palabra, perdonadme por las horas, pero bueno, me acuerdo que fue una
+discusión que tuvimos todos los autores con la traducción al español de embedding, vale,
+entonces, pero bueno, en el fondo embebido, vale, entonces, el t distributed stochastic neighbor
+embedding, t-SNE, de acuerdo, que lo pusieron estas personicas aquí, bueno, qué es lo que hace,
+va a buscar un mapa de dos o tres dimensiones que mantiene juntos los puntos que eran parecidos
+originalmente y separados a los que no, de acuerdo, es decir, si bien a PCA le importaba
+la varianza total, aquí no le importa cuánta sea la varianza que haya, aquí dice, tú eres vecino
+de fulanito, listo, entras al grupo, tú no, para otro lado, vete al otro barrio, vale, entonces,
+le da igual en el fondo cuánta varianza hay, lo que hace es buscar los vecinos, de acuerdo, vale,
+entonces, cuál es la idea fundamental, si dos clientes se parecen mucho en las variables originales,
+el t-SNE los va a dibujar cerca en el mapa 2d y si son distintos los alejo, de acuerdo,
+entonces ve dos clientes que se parecen juntos, que son distintos, chau, los separa, el embedding,
+esto simplemente es el mapa simplificado, vale, y es una representación más chica que lo que
+hace es conservar las relaciones fundamentales entre los datos, fijaros que aquí antes en las
+pcas estamos hablando de las componentes, es decir, de las variables, aquí nos estamos fijando en
+los datos, van a cosas distintas, obviamente, al final, si afectas a las componentes, estás realizando
+los datos igual, pero lo estás analizando desde las componentes principales, aquí lo que estamos
+haciendo es ver las relaciones entre los datos, no estamos hablando de las variables, sino de los
+datos, de acuerdo, y bueno, aquí qué es lo que hace, pues ya no está asumiendo que hay una relación
+lineal entre las variables, sino que captura patrones más retorcidos, porque no se está fijando,
+insisto, no se está fijando como PCA en las variables y en base a esas variables ver cómo
+representas los datos, sino que aquí lo que está diciendo es que si fulanito se parece a menganito,
+se parece pues porque hay una combinación estrambótica de cosas, entonces puede que en el PCA no aparezcan
+esas relaciones, porque PCA simplemente busca estas relaciones lineales, busca que ese punto yo
+lo pueda representar con las combinaciones más básicas posibles de esas variables, de esos vectores,
+aquí no, aquí me mira los puntos y dice es que este punto se parece a este y por qué se parece,
+ah, pues mira, es que tienen los ojos parecidos, el pelo, estoy diciendo una cosa muy básica,
+pero para que me entendáis, o sea que en el fondo está viendo la relación entre los datos,
+entonces cómo funciona, lo que hace es que mide vecindades originales,
+entonces qué es lo que mira, qué tan probable es que cada cliente sea vecino,
+o sea que cada cliente sea vecino de otro, y luego qué hace, dibuja un mapa en 2d que respete estas
+vecindades, ubica cada cliente como un punto en el plano y lo que hace es que va moviendo esos puntos
+de a poco hasta que las vecindades del mapa se parecen lo más posible a las vecindades originales,
+entonces es como que ya toma los datos, los va juntando y mira esto se parece al original,
+perfecto, ahí está el modelo hecho, entonces lo que hace es que va acomodando los puntitos en el
+mapa, ahora vamos a ver en el Colab que vamos a decir cuántas vueltas vamos a hacer,
+en fin, vamos a darle unos parámetros para saber cuando parar esto, en este caso no va a ser una
+fórmula que se aplica, sino que es algo que va iterando, por eso además el t-SNE es pesado,
+me acuerdo con lo cual no lo vamos a usar tanto, porque es pesado computacionalmente,
+pues obviamente puede tardar, entonces vamos al Colab porque nos va a salir esto, vamos al Colab
+incrustación, gracias, incrustación, este fue el término que usamos al final, ahora estoy viendo,
+incrustado, efectivamente, embebido, incrustado, esa fue la palabra que hicimos, incrustación,
+en el libro de hecho al final usamos incrustación, con los editores, fue un rollo traducir que si no,
+que si lo dejamos, cómo no, que no sé quién, lo dejamos en inglés, no lo ponemos, incrustado,
+incrustación, eso es, muchas gracias, quien ha sido, Rodrigo, ha sido el primero, muchas gracias Rodrigo,
+vale, vamos entonces al Colab,
+es que a veces no me salen las palabras,
+a veces no me sale ni mi nombre, vale, vamos aquí, entonces,
+estáis viendo, sí, el este, pero yo no lo estoy viendo porque no he salido de estátua,
+ahí está, ahí veis mi Colab, cierto, entonces, t-SNE,
+los vamos a buscar las relaciones de vecindad, quiénes son parecidos entre sí, esto está
+pensado justamente para visualizar, de acuerdo, no para producir variables reutilizables, ya,
+en una, en un pipeline, en una de producción, entonces, que vamos a probar aquí, perplexity,
+perplexity en el fondo viene siendo como la complejidad que le vais a dar al, al,
+al modelo, de acuerdo, entonces vamos a usar perplexities de 5, de 30 y de 80, ya, y bueno,
+esto simplemente nos está hablando de la complejidad, aquí es cómo se modifica el t-SNE,
+de acuerdo, estos son los parámetros que se usan, para ver si está activo, el 0 va a ser activo,
+el 1 va a ser fuga, usamos los valores del set de train, vale, ahí simplemente los parámetros
+para el modelo, y entonces fijaros, si hacemos un perplexity de 5, un perplexity de 30 y un
+perplexity de 80, cuanto más bajo, más clustercillos hace, lo veis, porque al final no está haciendo
+como, claro, diría eso, bueno, se ve aquí un grupo, se ve aquí otro, pero es que no, en realidad,
+si veis, hay uno por acá, hay uno por acá, hay otro por acá, como que no se ve tan, tan claro,
+cierto, si hacemos un perplexity de 30, ya se ven grupos más diferenciados, los veis, y además se
+ve como más reducido, aunque fijaros que la shape, la forma viene siendo más o menos igual, o sea,
+fijaros en esto, veis mi mouse, cierto, a lo mejor estoy aquí pensando que veis mi mouse y no veis
+mi mouse, y estáis como diciendo esta que está señalando, si veis mi mouse o no, sí, hola, hola,
+ah, vale, vale, es que digo, a ver si estoy aquí hablando como cuando uno está señalando y nadie ve
+dónde está señalando, entonces, esta figura, por ejemplo, lo veis, al final los clusters están más
+o menos igual, pero claro, es que aquí no se diferencian tanto, si vais a un perplexity de 80,
+está clarísimamente el grupo hecho, pero claro, se modifican, porque en el fondo lo que estás
+haciendo es que estás buscando relaciones más complejas, con lo cual, relaciones más complejas,
+pues te lleva a ver, pues esas relaciones que no se te ocurren, me acuerdo, esto me recuerda a un,
+sí, vendría siendo como la complejidad de las iteraciones, en el fondo como la complejidad que
+vais a tener, me acuerdo, a la hora de buscar las relaciones, esto me recuerda, dije es una
+comparación, es como una, no estoy yo con una metáfora, no sé, estoy yo hoy con las palabras mal,
+bueno, es que me recuerda que había un vídeo que vi el otro día de estas cosas que te salen en
+Instagram, y había un tío que empezaba y decía, no sé quién se ha muerto en tal día, los números
+suman no sé cuánto, esos números estaban en el Wikipedia de no sé dónde, que justo era lo que
+necesitaba, no sé quién, una teoría de la conspiración basada en la fecha en la que una persona se
+murió de un accidente, que me lo expliquen, pues eso es esto, entonces empiezan a ver relaciones
+donde no las hay, porque empieza a tirar del hilo, entonces el perplexity, que es lo que va a
+hacer, va a buscar la complejidad de esas relaciones, relaciones espurias, la numerología, exactamente,
+es que hay cada cosa, es que luego cuando empezáis a aprender de estas cosas, veis las locuras que hay
+por el mundo, entonces pues uno ya saca las palomitas, las cabritas y momentos de ocio,
+que se llaman, vale, entonces volviendo a esto, para experimentar en clase, qué pasa, pues que si
+bajamos el perplexity a 5, luego podéis jugar vosotros con el perplexity, ponéis otros
+perplexities y ver qué es lo que sale, para ver en el fondo qué es lo que sale, entonces qué pasa,
+si bajáis la perplexity a 5 se forman muchos grupos pequeños y locales, porque en el fondo
+está habiendo las vecindades, pues muy, o sea, en el fondo ver relaciones aquí, pero no las ve aquí,
+sabes, porque está tomando menos, está tomando una baja complejidad, por así decirlo, ahora si lo
+subes a 80 le estás metiendo ya una caña, diciendo oye, mira, en realidad quiero que busques, pues eso,
+de la numerología, buscame todos los líos que puedas ver y enredalos, entonces claro, qué pasa,
+que al final están todos relacionados casi, claro, si lo subís vais a ir viendo que cada vez se ve más
+continuo y más global, o sea, al final se ve más como una masa, es más difícil, y luego si cambiáis el
+random state ya y comparáis, entonces bueno, vais a ir viendo qué es lo que va pasando, vale, entonces
+recordad que esto no es determinístico, por lo tanto, pues bueno, ir jugando con los datos y vais
+a ir viendo qué es lo que va haciendo, vale, entonces, ¿cuál sería la síntesis del PCA versus el t-SNE?
+Fijaros, vamos a fijarnos en la naturaleza, qué conserva, si es determinístico, el costo que tiene,
+si sirve para nuevos datos, si el uso típico, etcétera, entonces PCA, la naturaleza es lineal,
+ya lo dijimos, mientras que el t-SNE no es lineal, ¿qué conserva? el PCA conserva la varianza global,
+porque sí se fija en la varianza, de acuerdo, recuerda que busca las variables que me permiten
+representar a los datos y el t-SNE conserva las relaciones de vecindades locales, le importa
+tres carajos la varianza global, de acuerdo, el PCA es determinístico, el t-SNE no, el costo en el PCA
+es bajo, es decir, computacionalmente no es tanto, pero si le dais un N alto, pues el t-SNE va a ser
+muy costoso a nivel computacional, vale, ¿sirve para nuevos datos? pues sí, el PCA, recordad que
+metíamos en el fondo nuevas, queríamos meter nuevas variables, teníamos que hacerlas antes de
+aplicar el PCA, de acuerdo, el t-SNE no, no porque en el fondo no está pensado para producción,
+simplemente está viendo las relaciones entre datos, entonces ahí que metéis nuevas variables le da
+un poco igual, de acuerdo, y ahora ¿cuál es el uso típico que le damos a uno u a otro? bueno, pues el
+PCA lo que queremos es reducir antes de modelar y el t-SNE nos sirve para visualizar la estructura de
+los datos, explorar un poco los clústeres que se pueden hacer, etcétera, de acuerdo, entonces bueno,
+para que sigáis practicando después os dejo aquí algunas cosillas que podéis cambiar en el código y
+ver qué es lo que va saliendo, que estas cosas pues bueno, las podemos ver luego el sábado, vale, el
+sábado yo lo que quiero es que de lo que os suba de luego con otra base de datos para que practiquéis
+esto y lo que habíamos visto ayer, el martes, más lo que os dejé de la otra tarea, pues que veamos
+un poco las dudas que hay, hacemos un resumen y un poco relajado en el sentido de no os voy a pasar
+nueva batería simplemente es como no es obligatorio además, es más que nada para que resolvamos dudas
+y veamos un poco ejercicios, cosas curiosas que hayáis observado, un poco de pues eso, de discutir
+resultados, jugar un poco con las cosas y cerrar un poco las ideas que hemos visto en estas tres
+clases, sí, entonces bueno aquí probad a agregar y quitar variables, por ejemplo en el Future
+Engineering, mirad si queréis crear nuevas variables, vale, y ver por ejemplo cómo cambia
+el gráfico, luego por ejemplo comparar el desempeño de un random forest que es otro
+tipo de modelo, vale, de clasificación, que bueno, como están diseñados ahí, eso lo vais a ver después
+pero no habéis visto todavía random forest, no, porque eso lo habéis visto en esta estética, no creo, no lo habéis visto en esta, la que anita en la RAE
+Rodrigo, lo de cuál sería el uso del t-SNE, lo he puesto aquí, te lo he contestado ahora, o sea, se ha contestado solo
+o se puede ver qué características comparte, ah esto es del random forest, vale, sí, vale, pues esto
+aquí el random forest igual lo podéis poner dentro del modelo, bueno luego si no el sábado
+jugamos un poquito con esto, os hago un poco de spoiler, vale, y bueno, luego la idea es que con el
+dataset, el que os voy a pasar o en este mismo, por ejemplo si seleccionaríais variables o las
+extraeríais, en el fondo un poco jugar con los conceptos que tenemos, pero bueno como os voy a
+pasar una nueva dataset ahí lo vais a jugar con eso, que digo, a ver quién fue que lo preguntó, Rodrigo,
+Rodrigo, esto de cuál sería el uso del t-SNE y cómo podríamos hacer un análisis, eso se ha respondido
+entonces aquí o no, porque en el fondo el uso del t-SNE es simplemente cuando lo que quieres es explorar
+o visualizar la estructura de los datos, no necesariamente son usos distintos, simplemente
+estamos haciendo modelos de machine learning que no son supervisados y que lo que hacemos es traer
+información sobre los datos, de acuerdo, en el PCA lo que hacemos es reducir variables antes de
+meternos luego en otros modelos más complejos y el t-SNE nos ayuda a visualizar la estructura de
+los datos antes de meternos en otros modelos, de acuerdo, vale, perfecto, y no sé si me queda
+algo más, dejadme que vaya al, que creo que ya en las diapos era un poco el resumen de esto,
+pero dejadme ver si me falta algo más, estáis viendo las diapos,
+vale, entonces eso la perplexity es cuántos vecinos le presto atención, de acuerdo, en el
+fondo la complejidad que le estáis dando al modelo, entonces si es baja vais a tener grupos
+chicos y muy locales y si es alta pues vais a tener una vista más panorámica con grupos más
+grandes, en práctica se prueba entre 5 y 50, pero bueno aquí probamos 80 pues ya está, vale, entonces
+no se se ha quedado claro lo que es la perplexity, en el fondo es esa complejidad, de acuerdo, entonces
+cuanto más complejo sea pues a menos vecinos le presto atención por así decir, o mejor dicho,
+más grupos voy a hacer, porque en el fondo es como no voy a tratar de hacer la quenita la
+rein con la numerología que dice, vale, este mayor perplexity es el tío ese que está tratando de ver
+la relación de la muerte de una persona con la reproducción de las tortugas de ecuador, yo que
+sé, sabéis, es como algo insólito, pues eso, eso es la perplexity 80, de acuerdo, entonces pues bueno,
+eso es lo que os decía aquí, entonces consideraciones prácticas, perplexity acotada, pues debe ser menor
+al número de observaciones, eso sí, no hagáis un perplexity igual al número de observaciones,
+porque entonces lo que vais a hacer es pues eso, un grupo por cada por cada dato, no tiene sentido,
+entonces la práctica se prueba entre 5 y 50, no determinístico, es decir, cada corrida puede
+variar levemente el resultado, de acuerdo, entonces si por ejemplo fijáis el random state, pues eso
+ayuda a hacer, a reproducir de acuerdo en cada estado que hacéis, en el fondo que iteráis,
+de acuerdo, por lo tanto no es determinístico, el PCA sí que es determinístico, luego no es un
+modelo de cluster, en este caso sí que estáis haciendo en cierto modo cluster, pero se refiere
+a que no es un modelo de cluster porque expande grupos de estos densos y compacta los dispersos,
+entonces no está hablando de una distancia, o sea no es un K-means, por si acaso ha quedado eso a
+entender, no es un K-means, cuando estábamos haciendo el K-means lo que buscábamos era ese centroid y
+veíamos los datos que eran en el fondo cercanos a ese centroid, mirábamos distancias entre los
+puntos, aquí yo no estoy mirando la distancia entre este vecino y este, sino que estoy diciendo,
+o sea, yo puedo tener este y este y este, los dos están igual de cerca, pero lo relaciono con este y
+no con este, en el K-means yo lo que hago es ver las distancias, tomo un centroid y lo que hago es
+tomar los datos que están cerca de ese centroid, mientras es una cosa de distancias, aquí es un
+cluster, pero no se entiende como cluster en el sentido de distancias, por eso se dice que no es
+un modelo de cluster, aunque al final estáis haciendo cluster, pero lo estáis haciendo a través
+de la semejante entre vecinos, es decir, si tenéis un vecino que está a la misma distancia que otro,
+no necesariamente va a aparecer en el mismo grupo, porque no se van a aparecer, o sea,
+pueden estar cerca, pero no ser parecidos, entonces no estamos hablando de un K-means,
+no confundamos el t-SNE con un K-means por si acaso, y el costo computacional, que ya hemos dicho que
+es un costo computacional alto, porque lo que va a hacer es que va a comparar parejas de observaciones,
+entonces si tenéis más datos lo que va a hacer es comparar más parejas, por lo tanto es lo que va
+a hacer, entonces dice, venga compárese con este, se parece, venga, pero es que este también se
+parece a este, pero es que este se parece a este, y este se parece a, pues ya me entendéis, o sea, va
+haciendo comparaciones de pares, entonces al final, obviamente, cuanto mayor sea la complejidad,
+pues obviamente más parejas va a ir comparando unas con otras, y eso pues va a ser una locura,
+entonces el costo computacional del t-SNE es alto, por lo tanto, que otras alternativas
+tenemos, recordad, si tenemos, el primero es lineal y el segundo no es lineal, de acuerdo, el PCA,
+¿qué características tiene? Combina variables de forma simple, es lineal, conserva la variabilidad
+global, da el mismo resultado cada vez, es rápido y sirve para producción, porque en el fondo,
+pues sí, me sirve, porque como en el fondo sí que es determinístico, pues como siempre me va a dar
+el mismo resultado, al final, pues eso me sirve como para tomar decisiones para producción,
+el t-SNE, sin embargo, combina variables de forma más compleja, por lo tanto, no va a ser lineal,
+va a conservar vecindades locales, el resultado varía cada vez un poquito, es más lento,
+más costoso que el PCA y está pensado para visualizar, pero no en un sentido de producir,
+¿de acuerdo? ¿Qué otros algoritmos son similares o están en la familia del PCA? Pues está el
+análisis factorial, que eso lo habréis visto, lo habréis visto en estadística, está el análisis
+discriminante y el single value decomposition, la descomposición en valores singulares, que esto
+también es otro de los procesos que se ven en Machine Learning y también tiene que ver mucho
+con la álgebra lineal, ¿de acuerdo? Que no sé si lo vais a ver después, creo que sí, no estoy
+segura, pero bueno, ahí están, el análisis factorial se ve en estadística y el análisis
+discriminante yo creo que también, usted le sube, yo creo que lo vais a ver después, no estoy segura,
+estoy segura si se ve ya después. Bueno y luego otros modelos más complejos que no son lineales,
+que son en el fondo de la familia del t-SNE, pues los autoencoders, que eso también es interesante,
+se usa bastante en Machine Learning y Isomap, Local Linear Embedding y UMAP, ¿de acuerdo? Bueno,
+esto yo no creo que los veáis, quizás vais a ver autoencoders, no sé si local linear embedding,
+no sé, pero bueno, yo creo que más vais a usar es el autoencoders, ya, entonces bueno,
+esto simplemente son modelos que son no lineales y modelos lineales como para que los tengáis ahí
+en el mapa de posibilidades para quien quiera investigar un poquito más, ¿de acuerdo? Y bueno,
+y con esto ya estamos listos porque en estas tres sesiones hemos hecho esto, hemos visto la calidad
+de los datos, es decir, diagnosticamos si nuestra base de datos es buena, recordad,
+vuestros modelos de inteligencia artificial serán tanto cuanto más inteligentes en tanto en cuanto
+mejor sea la calidad de vuestros datos, si entrenáis basura vais a obtener un modelo basura,
+si entrenáis con datos con muchos sesgos vais a tener conclusiones con muchos sesgos, al final
+la máquina es simplemente un reflejo de la mano que lo entrena, así que la calidad de los datos
+es fundamental, por lo tanto hay que diagnosticar, imputar y dividir honestamente el dataset,
+hacer bien la división en entrenamiento, validación y test, recordad que como es el proceso de
+aprendizaje, recordad la importancia del error, recordad que las máquinas aprenden pero no son
+inteligentes, por lo tanto según la calidad de los datos y según en tanto en cuanto tengamos
+controlado el error, no sólo la accuracy, entonces vamos a poder tener modelos mejores y recordad
+que para no siempre vamos a necesitar machine learning, muchas veces con estadísticas está resuelto
+pero dentro de machine learning recordad que tenemos familias de algoritmos de aprendizaje
+supervisado y no supervisado y con refuerzo y después una vez que ya tenemos la calidad de los
+datos y que sabemos cómo funcionan estas maquinitas que aprenden, entonces tenemos que pasar a
+representar y reducir las variables que vamos a meter en la máquina, ya sabemos que nuestros
+datos son buenos, sabemos cómo aprende la máquina, entonces ahora traduzcamos todo para que podamos
+hacer el trabajo fácil para la máquina, escalando, codificando y resumiendo variables y después de
+esto ya vais a poder pasar a utilizar otros algoritmos de inteligencia artificial con modelos
+que funcionen de manera óptima, entonces de datos confiables a un modelo que aprende a variables
+bien representadas y resumidas, en el fondo todas las sesiones lo que han hecho es en estas tres
+sesiones os he armado como el esquema para que podáis aplicar correctamente modelos de inteligencia
+artificial en la vida real y bueno para que penséis si tuvierais un proyecto en el trabajo
+en el problema que pensáis en un problema en vuestro trabajo y que tengáis ahí y que penséis que
+os haya dicho el jefe o la jefa es que quiero usar inteligencia artificial, bueno pues empezad a haceros
+estas preguntas, que por ejemplo de las variables que vais a trabajar cuáles creéis que están
+altamente correlacionadas entre sí, qué variables nuevas podríais construir combinando las que ya
+tenéis, qué feature engineering podríais hacer que a lo mejor no habéis hecho, si tuvierais que
+quedar con la mitad de las variables que haríais, las eliminaríais o es decir las seleccionaríais y
+dirías chao o las resumiríais, es decir extrairíais y cuando preferiríais el t-SNE para explorar los
+datos y cuando el PCA para reducir antes de modelar en vuestro escenario real, o sea son preguntas que
+bueno siempre es interesante hacerlas antes de meter las manos en un modelo de inteligencia
+artificial, de acuerdo, entonces bueno lo dicho tenéis subido esto tenéis subido el Colab, me
+faltaría subiros la actividad y lo que os había prometido también de los capítulos del enlace,
+bueno todo lo que os he prometido lo tengo anotado, juro que lo subo, y el sábado estaríamos viéndonos
+Romina a las 10 ¿cierto?
+Sí, hasta las 12 y media. De 10 a 12 y media con una pausita, de acuerdo, así que no sé si tenéis
+alguna otra duda y si no pues con esto y un bizcocho, gracias, gracias a todas y todos, calabaza.
+Me parece que dice con esto y un bizcocho hasta mañana a las 8 así que perfecto, muy bien hoy sí tengo
+hujeras, pues entonces estaríamos por ahí, vale juntad dudas y hasta la vista malabarista, nos veríamos
+el sábado de acuerdo, vale que descanse y una buena semana para todos, chau a ti también buenas noches,

@@ -1,0 +1,1391 @@
+Hoy empezamos nuestra clase, creo que la 39, ¿sí?, vamos a hablar un poco sobre clustering.
+Bueno, es una clase que me gusta bastante porque los métodos que vamos a ver acá son extremadamente sencillos pero muy poderosos para poder trabajar desde el punto de vista del aprendizaje no supervisado.
+Entonces hoy vamos a hablar un poco sobre K-means, K-modes y K-prototypes.
+Bueno, voy presentando el contenido, si ustedes tienen alguna duda, me comentan, que ahí paro
+y bueno, y ahí seguimos.
+Yo solamente...
+Vamos a hacer acá una pausa.
+Seguimos entonces.
+¿Cuál es la diferencia acá de la clase que vamos a empezar respecto de las clases que seguimos anteriormente?
+Bueno, yo hablé con ustedes sobre regresión logística, support vector machine,
+vieron la idea de árboles, y todo nuestro enfoque estaba básicamente centrado en modelos desde el punto de vista de aprendizaje supervisado.
+Entonces, lo que vamos a intentar hacer ahora acá es una otra mirada
+desde el punto de vista del aprendizaje no supervisado.
+Bueno, lo que vemos es que en la última clase o en las dos clases anteriores
+hablamos sobre la idea de aprendizaje supervisado.
+En esta clase vamos a tener una mirada un poco distinta.
+Nuestro objetivo acá es asumir que no tenemos la variable respuesta.
+Entonces anteriormente, no sé, yo conocía la información de si era un mal o un buen
+pagador, o sea, si quiero hacer una previsión de sueldo, si el valor estaba subiendo,
+si estaba bajando, siempre tenía esta información. Entonces de alguna manera yo tenía acá,
+tenemos nuestra variable respuesta e intentábamos ajustar el modelo f(x) y después nuestro objetivo
+Al final es intentar estimar acá f(x).
+Discutimos varias formas de hacer eso.
+Árboles, random forest, support vector machine.
+Vamos a ver un poco más adelante redes neuronales.
+Son formas de tener una mirada como esta.
+Intentar ajustar esta función f(x).
+Pero muchas veces no vamos a tener exactamente
+este label o nuestra Y.
+Entonces, generalmente lo dividimos,
+el curso de Machine Learning o Aprendizaje Supervisado,
+en algunas clases.
+Una clase de clasificación supervisada,
+una clasificación semisupervisada,
+que no vamos a hablar por ahora,
+y una clase que es clasificación, o bueno,
+un tipo de clusterización que va a tener
+una mirada de aprendizaje no supervisado. Básicamente acá vamos a llamar
+eso de clustering. Lo que vamos a intentar hacer es, de alguna manera, ver si ya tengo
+la figura acá delante, es hacer una proyección en nuestros datos e intentar encontrar un
+patrón, un grupo, intentar encontrar centros e informar: ya, estos individuos pertenecen
+a este grupo. Bueno, un ejemplo que siempre me gusta utilizar,
+un ejemplo que me gusta siempre utilizar es
+una cosa que siempre pasa conmigo cuando un banco intenta ofrecerme hacer algún tipo
+de inversión en una cartera o en un área muy específica. Vamos a suponer que ustedes
+tienen un poco de plata en su cuenta. El banco se va a dar cuenta y les va a informar:
+¿qué le parece si usted saca un millón de pesos, dos millones de pesos y los pone acá
+en esa cartera o en ese grupo específico y los deja ahí por más o menos
+un, dos años, que va a tener una ganancia de un porcentaje específico.
+Bueno, ustedes empiezan a tener un poco de plata, van a querer hacer inversión y el
+banco va a querer de alguna manera clasificar a ustedes como unas personas
+que les gusta la inversión de bajo riesgo, de medio riesgo o
+de alto riesgo. Por ejemplo, vamos a suponer, ellos empezaron a hacer un
+par de preguntas para ustedes y al final se dan cuenta de que, no sé, por ejemplo, yo después
+de hacer un par de preguntas me clasifico como una persona que no me gusta hacer inversión
+en áreas muy peligrosas, por ejemplo poner plata en una criptomoneda inestable o no sé
+un grupo que tiene una empresa con una clasificación muy baja.
+Sabemos que conforme ponemos plata en más riesgo, mayor va a ser posiblemente la ganancia, pero
+mucha gente le gusta una inversión más segura.
+Pero el banco no puede llegar a preguntarles
+de qué grupo es usted, si le gusta el bajo riesgo, el medio riesgo o el alto riesgo.
+Bueno, nuestro objetivo acá es
+de alguna manera discutir métodos en que podemos hacer
+una sugerencia de un tag para la persona o de un label. Se hace eso con varias,
+con una frecuencia muy grande, en clientes: con frecuencia de compra, con gasto, con canal
+preferido; en vinos, si queremos hacer clasificaciones de vinos; en documentos,
+varios métodos que se utilizan hoy tienen esta mirada de aprendizaje no
+supervisado. Por ejemplo, todo tipo de publicidad que van a hacer, los productos
+que están buscando; de alguna manera ellos no conocen muy bien lo que
+necesitan, pero vamos a sacar un par de informaciones, vamos a poner a ustedes en un grupo
+muy específico e informar: ya, para esa persona tenemos que hacer este tipo de
+publicidad o vamos a ofrecer este producto. El tema es que acá no conocemos el label,
+No conocemos la variable respuesta. No sé si la persona va a ser un mal o buen pagador.
+Eso no fue observado.
+Esta variable Y acá no va a venir junto con nuestros X.
+Generalmente una base de datos de un banco va a llegar con todas las covariables,
+pero al final ustedes van a saber si la persona es un mal o buen pagador.
+Llegan varias informaciones, ustedes saben si hubo una ganancia o una pérdida.
+o en términos de sueldo
+conocemos por ejemplo una variable real
+conocemos exactamente
+cuales fueron las covariables acá
+el x, después de pasar en esa función
+que nos devolvió la variable respuesta
+si? entonces
+eso es aprendizaje supervisado
+cuando tenemos esa información
+muchos de los problemas que vamos a tener ahora
+o en varias situaciones
+no conocemos el label pero podemos crear
+un label específico. Entonces un ejemplo sencillo, por ejemplo, sería tener acá dos variables,
+voy a hacer una proyección y voy a tener distintos puntos acá. Una figura como esta es muy sencilla,
+ustedes pueden tener una mirada. Ya, esta acá me parece que es un grupo, esta acá me parece que es
+otro grupo y acá me parece que es otro grupo. Pero muchas veces, o la gran mayoría de las veces,
+no vamos a tener solamente dos variables, vamos a tener un montón de variables, generalmente los
+grupos no se van a separar tan bonito como está acá. En una situación como esta, no necesito
+una computadora para informar: ya, posiblemente ese es un cluster, ese es otro
+cluster y ese es un otro cluster. Ese podrían ser personas que le gustan de bajo riesgo, de hacer
+inversión en bajo riesgo, ese es hacer inversión en medio riesgo y ese es hacer inversión en alto
+riesgo. Bueno, como ejemplo iniciaremos con una situación más o menos como
+esta. ¿Cuál es la dificultad? La dificultad acá en esta clase va a ser definir el número
+de clusters que es necesario proponer y cómo encontramos los centroides o los centros
+de estos clusters. Porque una imagen como esta ya puedo pensar, voy a pensar por acá,
+más o menos por acá y por acá, pero como le comenté, no van a tener solamente dos variables,
+si ustedes tienen tres, cuatro, cinco variables que básicamente es siempre ahora, hoy básicamente
+no trabajamos más con dos variables solamente, pasa a ser muy complejo mirar eso de un punto
+de vista geométrico, o hacer algún tipo de proyección ahí de tal forma que van a estar
+están bien separados. Entonces, si tenemos los datos un poco más mezclados, ¿cómo
+definimos el centro? ¿Cuántos, cuántos posibles?
+Entonces, vamos a suponer que por acá lo que quiero hacer es crear clústeres específicos.
+Inicialmente me parece un ejemplo muy sencillo, pero vamos a seguir un poco más adelante y vamos a ver que no es una tarea sencilla.
+Bueno, una misma base puede producir agrupamientos distintos según las variables.
+Hablamos de esto un poco.
+Una idea es que hay diferentes métodos de clusterización dependiendo de cómo son nuestras covariables.
+Entonces, tenemos covariables que son solamente numéricas, por ejemplo, sueldo, altura, peso,
+informaciones que están contenidas en valores reales o naturales,
+valores que van de 0 1 2 3 4 5 hasta infinito o valores reales ahí el sueldo es 1.324.000 pesos
+la altura 1.64, el peso 57 kilos con 20 gramos. Si trabajamos solamente con K-means, K-means es una forma
+de hacer clusterización para variables numéricas, ya. Otra forma puede ocurrir, o siempre es una
+situación que siempre pasa, de que vamos a tener variables categóricas, por ejemplo,
+una división entre hombres y mujeres, una variable categórica; un color muy específico
+de un grupo, situaciones no sé, incluso tener un grupo de malos y buenos pagadores, son variables
+categóricas. Uno puede aplicar una forma de clusterización basada en estos grupos, solamente
+mirando los individuos desde el punto de vista categórico. La forma de decisión es un poco
+distinta. Vamos a representar este grupo por la moda, o sea, lo que ocurre con
+mayor frecuencia. Y variables numéricas, vamos a intentar trabajar con la media y después
+podemos llegar a una estructura que generalmente es lo que ocurre en la gran mayoría de los casos,
+en que vamos a tener variables mixtas, ¿de acuerdo?
+Un grupo de variables numéricas,
+otro grupo de variables categóricas
+y vamos a intentar crear clusters,
+crear grupos o encontrar los grupos específicos
+con base en estas dos variables.
+Cada uno de ellas fue construido de una forma distinta
+y después se puede mezclar ellas de una forma muy particular.
+Bueno, como ejemplo, vamos a considerar una base muy sencilla,
+de vinos con 13 mediciones. Romina ya envió
+los archivos. Ustedes pueden bajar ahí, van a tener un archivo en R, uno en Python y las
+bases; estas bases contienen 177 vinos y dentro de esos 177 vinos sacamos algunas métricas
+relacionadas a estos vinos, por ejemplo, alcohol, ácido málico, ceniza, alcalinidad, magnesio,
+fenoles, flavonoides y otras mediciones. Entonces tenemos ahí varias métricas relacionadas a
+estos vinos. Nuestro objetivo es, ya con base en estas informaciones, yo puedo hacer una clasificación
+de un vino específico o no. Hay diferencias, bueno, acá en Chile, a mucha gente le gusta,
+están acostumbrados a tomar vinos, se sabe muy bien la diferencia, pero en otros países no hay
+una costumbre como esta. En Brasil, por ejemplo, es un país que no toma tanto vino, entonces mucha
+gente no sabe evaluar la diferencia. Bueno, hay algunos que tienen un poco menos de alcohol,
+algunos otros tienen un poco más de alcohol, tienen diferentes niveles de flavonoides, color,
+entonces sabemos que algunos tipos de vino son vinos blancos, entonces uno puede clasificar
+esos vinos con base en esas informaciones. Por supuesto, la idea acá es que los vinos,
+bueno, ya existe una clasificación para esos vinos, pero vamos a suponer que no existiese,
+Vamos a intentar evaluar para hacer una proyección y evaluar si de hecho esos vinos son o no son distintos
+con base en sus características químicas.
+Entonces vamos a utilizar las características químicas de los vinos, vamos a tener estas métricas y después vamos a hacer la clusterización.
+Una cosa que es importante cuando vamos a trabajar con métodos basados en K-means, por ejemplo, es hacer una estandarización de los datos.
+¿Por qué esto es importante?
+Porque cuando vamos a empezar a hablar de K-means, vamos a intentar evaluar distancias acá.
+Queremos evaluar puntos que están distantes, si no están distantes de un centroide específico.
+Y cuando vamos a calcular estas distancias, si esta base no está estandarizada,
+una información como un millón de pesos chilenos para dos millones de pesos chilenos
+puede básicamente dominar toda la métrica de la distancia.
+Entonces, es importante hacer una estandarización para que una variable solamente no domine todo el análisis
+y si eso pasa es posible que ustedes van a tener clústeres que no están bien representados.
+Entonces, hacer la estandarización es muy importante antes de hacer la clusterización.
+La estandarización va a igualar las escalas, pero no va a eliminar puntos atípicos ni correlaciones.
+Entonces, esto también es una cosa importante, solamente nos va a ayudar a no tener problemas cuando
+vayamos a calcular las métricas de distancia. Por ejemplo, el ejemplo sencillo acá es,
+voy a estandarizar la variable alcohol: tengo acá el valor 14, y su promedio era 13,
+entonces 14 menos 13, dividimos por su desviación estándar, me sale el valor 1.25.
+Y bueno, para iniciar, vamos a empezar la lectura de los datos con R; después vamos a correr en Python
+pero vamos a usar algunas librerías: cluster, klaR, clustMixType, para poder hacer el K-
+prototypes. Y bueno, yo acabé poniendo en mi computadora la base de datos dentro del disco D,
+una carpeta códigos, y ahí otra carpeta con el nombre clustering; ustedes pueden crear la que
+quieran en su computadora, simplemente tienen que poner todos los archivos ahí. Ya, inicialmente
+vamos a hacer la lectura de la base de los vinos
+Bueno, acá es como vamos a hacer también en Python, ya. Entonces, para hacer
+la lectura de los datos. Y bueno, antes de correr, es importante entender o empezar a hacer el
+análisis de cómo funciona la idea de K-means. La idea de K-means
+es, vamos a intentar mirar nuevamente los puntos
+que van a estar distribuidos con base en las variables X
+y necesitamos intentar crear algunos clústeres específicos
+basados en los centroides.
+Entonces, ustedes necesitan o necesitaríamos definir
+un valor específico que va a ser conocido como centroide
+y ese valor va a ser calculado con la distancia
+entre un punto específico y su centro.
+Inicialmente ponemos valores aleatorios ahí
+y lo vamos actualizando poco a poco.
+Antes de comentar cómo funciona acá, teniendo una iteración,
+voy a presentar la idea básica de cómo funciona, con un ejemplo,
+para que tengan una idea de cómo funciona, de una forma muy sencilla, la idea de clusters.
+Entonces acabé haciendo un dibujo separado,
+pero bueno, después tienen un material en la clase que demuestra las iteraciones
+intenté presentar un ejemplo con una información un poco menor porque facilita ver cómo funciona la idea
+en términos de actualización
+vamos a suponer que tengo diferentes puntos acá, ¿cierto?
+punto B, punto C
+D, E, F, A, G, H
+tenemos nuestra variable X1 que estaba acá, X2 que estaba acá
+Necesitamos, nuestros datos están acá, con la posibilidad de encontrar clusters acá.
+No sé cuáles son los posibles grupos, pero necesito definir un algoritmo que
+me va a ayudar a tener esta actualización para ir haciendo las cuentas y
+llegar a clusters específicos, ¿cierto? La idea parte de un punto muy sencillo.
+Tengo varios puntos, voy a elegir uno de los puntos para iniciar.
+Ustedes pueden definir el punto que quieran; acá decidí poner estos dos
+puntos como puntos iniciales del cluster, ¿cierto?
+Entonces, voy a asumir en este caso que tenemos dos clusters
+pero ¿por qué dos clusters? Después podemos evaluar si son tres, si son cuatro; en esta clase
+vamos a discutir también cuál es el número ideal de clusters
+Entonces, por ahora, solamente como ejemplo, vamos a mirar dos clústeres.
+Voy a asumir que tienen dos clústeres, no sé cuáles son los puntos específicos iniciales.
+Una computadora inicialmente va a elegir esos puntos de forma aleatoria; acá podemos poner cuáles son los puntos iniciales.
+Yo estoy asumiendo que el G y el H son los dos puntos iniciales.
+Entonces, éstos van a ser nuestros centroides iniciales, nuestros centros.
+Bueno, después de definir cuáles son nuestros centros, uno va a ser G y otro va a ser H,
+tengo que calcular las distancias entre cada uno de estos puntos,
+tanto estos puntos acá, en relación a este centroide,
+y todos estos puntos en relación a este centroide.
+Entonces tengo un centroide, tengo otro centroide, este va a ser C1, este va a ser C2,
+tengo varios puntos acá: 1, 2, 3, 4, 5, 6, 7, 8, 8 puntos. Voy a calcular la distancia de
+esos 8 puntos en relación a nuestros centroides ya
+bueno, el primer punto que voy a mirar va a ser la distancia entre C y G o C y H
+ya, entonces tengo que calcular esta distancia, tengo X1, tengo X2 y puedo
+calcular la distancia entre este punto con este punto y voy a tener un valor ahí
+fíjate, va a salir un valor específico. Después voy a calcular la
+distancia entre C y H acá; entonces calculo entre C y G y C y H. Vamos a
+suponer que me salió el valor 8 cuando calculo esta distancia y acá me salió 9
+voy a clasificar este individuo C en el cluster del centroide que está
+más cerca; entonces este C está más cerca de G, no está más cerca de H.
+Entonces voy a poner allá como, acá está como rojo, acá está rosado,
+entonces acá me parece que debería ser rojo pero está rosado.
+Vamos a poner un rosado acá en este valor.
+Lo mismo para B, voy a calcular la distancia entre este punto y este centroide,
+y este otro centroide, y al final lo clasifico en este clúster específico
+de hecho, si voy haciendo todos estos puntos, uno va a darse cuenta de que
+todos los puntos están más cerca de G y H se queda solo, ya
+y eso no es una cosa mala, porque ahora ya tengo la primera iteración del algoritmo
+Después de calcular la distancia entre todos los puntos y
+cada uno de los centroides, relacionar cada punto a un grupo u otro, actualizo el centroide calculando
+el promedio de los X de cada grupo, el promedio de acá y el promedio de acá
+voy a actualizar este valor. Inicialmente yo tengo un punto acá, X1 y X2, esta proyección me sale acá.
+Cuando saco un promedio entre todos estos posibles valores acá,
+debería moverse un poco para acá, o para acá o para acá,
+pero para algún lugar se va a mover.
+¿Por qué? Porque tengo puntos muy lejos, B y C,
+que están influenciando, entonces va a tener un punto promedio
+entre todos estos individuos.
+Si calculo el promedio que estaba acá,
+este valor, este punto central se movió para acá, ¿cierto? Entonces ahora este es mi centroide,
+este es el μ que voy a presentar un poquito más adelante, pero este es el punto central acá,
+el punto que va a ser utilizado para calcular la distancia con los otros puntos.
+Bueno, el H estaba solo, continuó lo mismo, pero ahora tengo un centroide acá y otro centroide acá.
+Necesito nuevamente calcular las distancias.
+Entonces tengo este centroide,
+voy a evaluar.
+Este B está más cerca de este punto
+o este B está más cerca de este punto.
+Está más cerca de este punto acá.
+De este punto acá, de este clúster, de este grupo.
+C también está más cerca de este grupo.
+A también está más cerca de este grupo
+y F también está más cerca de este grupo.
+Pero mira que ahora
+Algunos individuos, algunas personas como C, D y H ya no están tan cerca de este centroide acá, ahora están cerca de este centroide.
+Entonces antes este punto estaba solo, ahora ya tiene tres puntos. Bueno, el E aún está perteneciendo a este grupo.
+Después de hacer la clasificación para todos ellos, tengo que nuevamente actualizar el punto medio,
+el centroide de este grupo acá, ¿cierto? Mira que ahora no tengo más estos dos elementos,
+no tengo más estas dos personas, entonces cuando vaya a calcular este centroide,
+él se va más para acá, se movió para acá, ¿cierto?
+Ahora, como tengo dos puntos cercanos, este centroide se movió hacia el punto medio entre ellos.
+Ahora, cuando vaya a calcular la distancia, yo creo que este E va a estar más cerca de este centroide
+que este E va a estar cerca de este grupo. De hecho, eso se va a hacer en la iteración 3.
+Ahora el E, este otro punto D, también todos pertenecen a este cluster acá, este grupo 2.
+En cuanto al grupo 1 o al cluster, nuestro centro de acá se movió un poco más y ahora
+estos individuos aún estaban cerca de ese, pero ahora yo creo que ese A y F van a estar más cerca del grupo 2.
+Entonces cuando vaya nuevamente a calcular la distancia y evaluar esos puntos, uno al final,
+después de calcular la distancia, va a ver que esos puntos están más cerca de ese individuo.
+Esos dos puntos están cerca de ese, actualizo nuevamente el centroide y el centroide acá
+se va a mover para ese punto y ese se va a mover para ese punto.
+Uno se va a dar cuenta que después de la iteración 4, yo puedo recalcular esto
+tantas veces como quiera, no va a cambiar más. Entonces tuve una convergencia para dos clusters muy
+específicos. Un cluster que va a ser dado por estos individuos y otro cluster que va a
+contener a esos individuos. Entonces yo estoy saliendo de una situación en que no tengo
+ninguna información, con centros aleatorios, y voy a llegar a dos clusters específicos.
+La idea es intentar crear clusters con esta estructura. Bueno, varias preguntas pueden
+venir acá; les dejo una imagen para tenerla adelante. Una de las preguntas es,
+iniciamos con un punto inicial acá y un punto inicial acá. Si cambiamos esos puntos iniciales,
+¿llegamos a clústeres distintos? Sí, eso puede ocurrir. Un ejemplo muy sencillo acá es
+yo tengo esos individuos 1, 2, 3 y 4, dependiendo del punto inicial que ponemos, eso puede ser un
+clúster, eso puede ser otro, eso puede ser otro y ese puede ser otro, o dependiendo del punto inicial
+que vamos a coger, eso puede ser un clúster, ese puede ser otro, ese puede ser otro y ese puede ser
+Pero generalmente cuando intentamos esto con varios puntos iniciales, tenemos una buena
+convergencia para los clústeres que necesitamos.
+Y también los algoritmos son actualizados para... bueno, Romina, hay varias preguntas
+que usted está contestando, ¿cierto?
+Sí.
+Bueno, por ejemplo, Gustavo dejó una buena pregunta.
+¿Cómo definimos cuántos clústeres, cuántos centroides se deben definir inicialmente?
+Es una excelente pregunta, ya vamos a discutir eso ahora durante la clase.
+Inicialmente lo que vamos a intentar hacer es hacer un testeo, asumiendo que no hay ningún
+clúster, que tenemos solamente una estructura general, una estructura con dos clústeres,
+una estructura con tres clústeres, con cuatro clústeres, y después vamos a hacer un punto
+de corte ahí y definir ya: este es el número de clusters ideal. Solamente para avanzar un poco,
+para que vean una imagen: por ejemplo, este sería el número de grupos o de clusters, voy a empezar
+con un cluster, o sea, no hay ningún grupo específico, todos están juntos; después dos grupos,
+tres grupos, y ahí tengo una métrica, ya. Con base en esta información yo creo que tenemos
+tenemos tres clústeres, y uno puede estimar el número de clústeres.
+Entonces, esa es una idea muy sencilla pero muy poderosa.
+¿Cómo calculamos esta distancia entre estos puntos y nuestros centroides?
+Vamos a basarnos en una métrica conocida como la distancia euclidiana.
+Utilizamos básicamente la distancia entre x y su centroide;
+este x inicialmente es solamente un punto, pero si tenemos 20 covariables vamos a
+calcular la distancia de cada uno de estos x en relación a su
+centro; entonces podemos tener las 20 covariables ahí y
+no vamos a tener problemas. Por ejemplo, acá tengo este punto con este,
+este punto con este, cada punto tiene un centroide específico, por ejemplo 2, 3 y 1, sería más o menos una visión acá
+sería por ejemplo algo como 3 y 1 acá, entonces acá sería el valor 3 y acá sería el valor 1, entonces el centroide empezaría por ejemplo acá
+Bueno, para esta base de datos muy sencilla, un valor inicial de x igual a (1, 2) y un
+centroide igual a (3, 1), voy a calcular la distancia euclidiana: saco el 5, o sea,
+la distancia al cuadrado entre éste y éste, después saco la raíz cuadrada de esta cosa acá.
+Con esto, tenemos la distancia euclidiana: individuos que están más cerca, esta distancia
+va a estar más cerca de cero, es decir, si tengo un punto que está muy cerca de donde
+debería estar el centro, este otro punto también está muy cerca de ese acá, va a ser 1 menos
+un centro, por ejemplo 1: 1 menos 1, cero, y 2 menos 2, cero. Entonces la distancia euclidiana
+va a ser exactamente cero. Cuanto más cerca de cero, más cercanos ellos están, deberían
+estar en un cluster específico. Individuos que están muy lejos se espera que estén en
+clusters distintos. Entonces la idea de K-means es minimizar la suma de distancias euclidianas al
+cuadrado. Además de eso vamos a evaluar eso en relación a grupos específicos. Para eso vamos a
+hacer una métrica muy específica. Vamos a buscar minimizar una cosa que se llama WSS. Vamos a
+buscar grupos acá, que son nuestros clusters; puede ser un grupo, dos grupos,
+como aquel ejemplo que yo estaba utilizando dos grupos específicos
+tenemos entonces K igual a 2: acá 1 y 2. Entonces, grupos igual a 2; además de tener
+dos grupos vamos a tener los centros de estos grupos, ya. Entonces cada uno de
+estos grupos deben tener un centro específico
+Y bueno, vamos a calcular algunas métricas en relación a estos grupos.
+Vamos a tener los z_i que fueron estandarizados.
+Pero, ¿qué son estos z_i?
+Recuerden que los z_i son estos puntos acá que ya estandarizamos.
+Y vamos a restar la media del grupo específico.
+¿Cuál es la media?
+Bueno, vamos a poner un punto inicial ahí, un valor inicial, o calcular, no sé.
+Hay distintas formas de definir valores iniciales,
+el algoritmo ya lo hace,
+ya tiene formas de intentar obtener buenos valores iniciales para eso,
+pero la idea es poder intentar también con distintos puntos iniciales.
+Este μ_g va a empezar como si fuesen puntos iniciales.
+Y después vamos haciendo exactamente lo que fui intentando hacer en la imagen,
+La imagen que había mostrado,
+vamos actualizando, a cada paso, este μ1 y μ2
+Entonces empiezo con μ1 igual a un punto específico
+Déjame ver acá de nuevo
+el μ1 acá será exactamente este punto
+después voy a actualizar este μ1 para otro valor
+que se va actualizando, que se va actualizando hasta que no tenga más actualizaciones
+entonces el μ1 va a ser exactamente este punto acá
+μ2 será exactamente este punto
+¿Cuál será el valor que empezamos?
+Podemos poner un valor aleatorio
+que empezó con G y H
+y lo vamos actualizando
+Para un grupo dado, el centro
+al final vamos actualizando
+como si fuera el centro que va a minimizar
+un valor específico
+podemos empezar con valor inicial
+y después vamos actualizando con base
+los promedios relacionados a los individuos que están más cerca.
+Entonces vamos calculando estas distancias y vamos agrupando
+y calculamos el promedio de estos individuos.
+Bueno, un WSS menor significa mayor compacidad
+bajo esta escala y este criterio.
+Bueno, no demuestra por sí solo que encontramos grupos reales o útiles.
+Es decir, con K-means uno va a poder elegir
+y elegir varios: 1, 2, 3, 4, 5 grupos; pero bueno, tenemos formas de
+intentar estimar eso, pero no puedo garantizar que son exactamente los
+grupos reales, porque no tenemos cómo evaluar esos grupos reales.
+Eso es desconocido, no existe, es una información que no tenemos.
+No sé si a las personas les gusta el bajo riesgo o el alto riesgo. De hecho, esas personas
+tampoco conocen esa información; pueden pensar que les gusta hacer
+inversión de bajo riesgo, cuando en realidad
+están más cerca de un grupo que hace inversiones de medio riesgo.
+Ya entonces la variable Y no es conocida,
+nunca va a ser conocida, es imposible tener esa información.
+No podemos poner esa información de ninguna manera.
+Lo que intentamos hacer es estimarla, o intentamos crear
+esos grupos, esos clústeres, y evaluar si tiene sentido. Bueno, varias empresas
+lo utilizan, es muy conocido exactamente para hacer publicidad. Entonces vamos a intentar
+poner ustedes en determinados grupos específicos. Este grupo acá que le gusta esas cosas, vamos a
+hacer una publicidad de computadores. O este grupo acá le gusta, no sé, celulares. Entonces vamos a
+hacer otro tipo de publicidad. Entonces ellos intentan sacar información, agregarlo a un grupo
+específico e informar que a ese individuo le gusta este tipo de publicidad. O si se va a hacer inversión,
+bueno con base en las informaciones que la persona me contestó, tiene pertenencia a un grupo
+específico 2 y al final comprendemos que este grupo 2 son personas que le gustan hacer inversión
+de medio riesgo. Por ejemplo acá dejo algunos ejemplos muy específicos, tengo datos 1, 2, 3, 8, 9 y 10.
+Vamos a empezar asumiendo que para estos individuos X acá tengo dos grupos, tengo dos clusters
+y vamos a poner algunos centros iniciales, vamos a asumir que el centro inicial está en 1 y que
+el otro centro inicial está en 8. Entonces voy a calcular acá para los individuos 1, 2, 3, 8, 9, 10.
+La distancia al centro 1 y la distancia al centro 2. Para el individuo 1, la distancia al centro 1 va a ser 0,
+y al centro 2, 49. El individuo 2 está más cerca de este punto acá. La distancia va a ser 2 menos 1,
+1; 2 menos 1 al cuadrado, 1; 3 menos 1, 2, 2 al cuadrado, 4.
+Cuando comparo 3 con 8 va a ser 5, 5 al cuadrado, 25.
+Por otro lado, estos puntos acá pasan a estar más lejos de este centro,
+más cercanos a este punto.
+Entonces, estos individuos pertenecen al grupo 1,
+y estos individuos pertenecen al grupo 2.
+Bueno, como ahora sé que estos individuos son 1, 2 y 3,
+yo empecé con el centro inicial 1 y terminé poniendo este individuo acá, pero ahora voy a hacer una actualización, entonces voy a calcular nuevos centros.
+Entonces, en la iteración 1 empecé con el valor 1,
+y en la iteración 2 ahora vamos a actualizarlo.
+Como actualizamos, estos individuos están más cerca de ese centro 1, calculo su promedio, ¿ya?
+el promedio de uno, dos y tres va a ser exactamente dos, el promedio de estos individuos acá
+va a ser exactamente nueve, y ahora puedo hacer lo que quiera: no voy a lograr más
+actualizar estos individuos; ellos siempre van a estar en el grupo uno, y ellos siempre en el grupo dos,
+por temas de la distancia, no tenemos más qué hacer. Bueno, en la práctica va a
+Vamos a poner puntos aleatorios o algún punto relacionado a un dato.
+Y vamos a empezar a hacer iteraciones, o sea, vamos a evaluar
+Estos individuos están cerca de este centro o de este centro, están cerca de este grupo acá.
+En cuanto a algunos puntos en verde, cerca de este punto acá.
+El azul, casi todos están cerca, pero hay un individuo que está más cerca de acá.
+Bueno, después de evaluar eso voy a recalcular el centro. Si antes estaba acá, ahora el centro
+debería moverse al tiro hacia algún punto más o menos acá, ¿cierto? Y es lo que pasa mismo,
+antes estaba acá, cuando acabé recalculando me salió este punto, sí, el X estaba acá, ya estaba
+muy cerca de los puntos, cuando recalcule solamente subió un poquito más, ya. Y acá no cambió casi
+porque básicamente solo tiene un punto que está mal clasificado. Ahora, nuevamente,
+¿este individuo está más cerca de este clúster o está más cerca de este? Ahora está más cerca
+de este, entonces clasifico con azul. Aún tenemos algunos verdes que están más cerca,
+algunos puntos acá que están más cerca del verde que de acá, pero después de algunas
+iteraciones, acá 20 iteraciones, llegamos exactamente a los clústeres específicos,
+más o menos como la estructura que les presenté.
+Entonces la idea es empezar en puntos aleatorios
+y vamos calculando seguido su promedio hasta llegar
+a los centros de cada uno de los clústeres.
+Una cosa que les comenté es que los mismos datos
+con tres clústeres pueden tener valores distintos.
+Es una situación acá: varía aquella distancia,
+la distancia entre los puntos de los clusters; uno va a ver que ella cambia un poquito
+dependiendo del punto inicial que ponemos
+pero llegó una situación muy específica acá,
+no sé qué pasó, creo que
+acabó clasificando muy mal los clusters; es posible que se
+definió un cluster como un punto acá,
+un otro cluster, dos puntos acá y un cluster puede ser definido como esos puntos acá,
+¿Cierto? Entonces es posible que uno de los valores iniciales acabara haciendo que
+esos clusters fuesen clasificados como un solo cluster específico, o esos, o no sé, alguno
+de esos. Esto les va a tocar algunas veces cuando vayan a poner algún valor inicial,
+Entonces, en esos puntos iniciales uno puede tener esos problemas.
+Y bien, vamos a correr esto varias veces con valores de inicialización distintos.
+No vamos a tener problemas, porque se espera que, conforme corremos esto varias veces,
+el algoritmo va a converger, la mayoría de las veces, al verdadero clúster.
+Y después evaluamos cuáles fueron los clústeres que más aparecieron, que más ocurrieron,
+y definimos esos como nuestros clústeres finales.
+Conservamos el ajuste del menor WSS entre varias inicializaciones.
+Una de ellas me sale super mal.
+Esto solamente muestra que en algunas situaciones la inicialización influye.
+Y hay que tener cuidado.
+No basta con correr K-means una sola vez;
+hay que correr nuevamente varias veces,
+y ver que sale el mismo clúster.
+Bueno, para eso vamos a mirar...
+A ver si tienen preguntas.
+Hay una buena pregunta, de Antonio.
+Antonio dejó una pregunta.
+¿El número de iteraciones lo definimos nosotros?
+En general vamos actualizando hasta que no haya más ningún cambio, por ejemplo acá
+tengo estos valores promedios
+Corrió una iteración
+bueno
+fue posible actualizar el centro hasta la iteración 12
+en la iteración 20; de 20 en adelante no me importa lo que haga, voy a calcular la distancia,
+voy a intentar actualizar el centroide, pero no va a ocurrir más nada. Entonces la
+iteración 20, 21, 22, 23, 24, 25, 26, hasta 1 millón, va a ser siempre el mismo cluster; es decir, llegamos
+a que nuestro algoritmo convergió, tuvo una convergencia; llegamos a la convergencia, nada más
+hacer; es importante que vayan haciendo la iteración hasta que haya una convergencia en algún
+momento. Principalmente si ustedes tienen muchas observaciones, van a tener que tener varias
+iteraciones; ya conforme aumente el número de observaciones va a aumentar el número de
+iteraciones. Si tengo muchas observaciones es posible que tenga muchas iteraciones, pero
+en algún momento, así como acá en la iteración 4, no me importa lo que haga acá,
+si fuera una iteración 5, no tiene más cómo actualizar, porque ese ya está en el centro
+de 6 puntos; si lo recalculo nuevamente, no va a cambiar nada.
+Entonces, ¿cuántas iteraciones debemos seguir? Hasta llegar a la convergencia. Entonces,
+varios algoritmos van a correr ahí 50 mil veces, 60 mil veces, 70,
+si hay muchas observaciones va a haber un montón de iteraciones, entonces solo se debe parar
+cuando se tiene la convergencia. Y bueno, vamos a describir entonces algunas métricas que realmente
+utilizamos, va a ser nuestro WSS, que es una métrica que va a medir la variabilidad dentro de un grupo,
+dentro de los grupos, es decir, cuánto estos valores están variando dentro de este grupo.
+Si tenemos centroides muy malos, esta distancia va a ser muy grande, este WSS va a ser muy grande.
+Entonces la idea es actualizarlos hasta que este valor sea lo menor posible.
+Pero vamos a tener una varianza dentro de nuestros grupos, es decir,
+en este punto acá, va a tener una varianza entre los centros y sus puntos,
+además de eso va a tener una varianza entre el centro y los otros centros específicos,
+que es exactamente lo que va a mostrar acá.
+La media general relaciona cada uno de los centroides o de la media de los grupos.
+Entonces la varianza total se puede descomponer por medio de la varianza dentro
+y la varianza entre grupos, considerando un centro promedio final acá.
+Si calculo un valor promedio, debería ser algo como un puntito acá.
+Voy a ponerlo.
+Voy a tener un valor acá.
+Este va a ser nuestro z barra.
+este es el punto promedio entre ellos
+y evalúo la distancia; está en el centro, debe ser algo así
+voy a calcular la diferencia entre este y este, este y este, este y este, más los pesos que tienen en relación a estos puntos
+entonces, de alguna manera, evalúo la variabilidad total.
+Entonces es una forma muy sencilla de hacer la descomposición.
+La varianza dentro de este grupo que tenemos
+y después el punto medio en relación a
+cuánto está distinto del valor general.
+Y la varianza total es la suma de los dos.
+Entonces para esas medidas y las mismas observaciones
+uno puede descomponer ese TSS como si fuese la suma de esas dos partes.
+BSS compara cada centro con la media global y pondera por el tamaño del grupo.
+BSS no es el promedio de las distancias entre todos los pares.
+Va a haber un valor z promedio general ahí,
+y vamos a evaluar cada μ en relación a ese promedio final.
+Pero bueno, tenemos también ese BSS.
+Un ejemplo específico acá de los datos que había representado anteriormente
+Tenemos valores 1, 2, 3, 8, 9, 10 y centros 2 y 9
+Si calculamos la media global acá vamos a tener el valor 5.5
+Mira que el WSS va a ser la distancia entre este y este
+1 menos 2 al cuadrado,
+después sacamos la raíz, va a ser 1. 2 menos 2, 0 al cuadrado, y sacamos la raíz, 0.
+3 menos 2, 1 al cuadrado, y sacamos la raíz, 1. Entonces tenemos acá la distancia entre este punto y
+este centro; lo mismo acá, 8 con 9 va a ser uno, 9 con 9 cero, y 10 con 9 uno,
+entonces el WSS es la distancia entre esos tres puntos y su centro
+lo mismo para estos, entonces el WSS es 4, ya. Pero cuando yo voy a calcular el BSS
+voy a tener 2 que es el centro que tengo acá ya menos la media global entonces 2 menos la media
+global que la media de esos puntos 5.5 o sea 2 menos 5.5 al cuadrado multiplicamos por 3 tenemos
+acá un valor específico lo mismo tenemos tres puntos acá el centro es 9 ya menos la media global
+Entonces 9 menos 5.5, veces 3 que son 3 puntos que tengo acá.
+Entonces voy a tener estos dos elementos, calculo la suma, ese va a ser 73.5.
+Nuestro TSS, o la varianza global, va a ser la suma de este punto con ese, 77.5.
+Una buena pregunta que me hicieron es cómo elegimos el número de clústeres.
+Hay algunos métodos muy conocidos para hacer la elección de los clústeres.
+Uno de ellos es por el método del codo.
+El método del codo busca una disminución cada vez menor dentro de nuestro WSS.
+Hay otro método conocido como silueta, que va a comparar la cercanía al propio grupo y al grupo vecino.
+Y hay otro método conocido como Gap, que va a contrastar la compacidad con una referencia simulada.
+El Gap va a generar grupos distintos de forma aleatoria.
+Yo tengo los clústeres, voy a generar valores aleatorios y voy a hacer una comparación de cómo deberían ser
+esos puntos con valores aleatorios y conseguir al final llegar a un número de clústeres específicos.
+El menor WSS favorece más grupos.
+En el extremo, un grupo por fila de WSS va a ser cero.
+Es decir, en una situación muy rara o muy extrema, ustedes podrían decir:
+profesor, yo tengo 50 observaciones.
+Voy a asumir que,
+de estas 50 observaciones cada uno de ellos es un cluster
+entonces cada uno de estos puntos acá va a ser un grupo específico
+¿eso puede ocurrir?
+sí, puede ocurrir, no es razonable pero puede ocurrir
+de hecho no está haciendo clusterización, está simplemente informando
+tenemos 50 observaciones cada uno de ellos es un individuo específico
+en esta situación muy extrema su WSS va a ser 0
+es decir, el punto acá menos su centro que va a ser el mismo punto
+punto va a ser igual a cero. Entonces nuestro objetivo no es tener 50 clústeres,
+sino encontrar grupos que están más cerca y que de hecho comparten
+alguna similitud, datos, información en común, para exactamente poder agruparlos.
+Una de las formas es por el método del codo; entonces vamos a cargar ahora inicialmente
+la base de los vinos, acá tengo RStudio; bueno, los que vayan a correr la clase van
+a tener ahí la librería cluster, cargar los datos, dar una mirada en cómo están los
+datos. Vamos a ver la imagen acá, vamos a ver varias informaciones que he comentado: alcohol, ácido,
+ceniza, alcalinidad, entre otros. Sí, bueno, en esa base por ahora no conozco cuáles son las clases de los vinos;
+después esa información existe, después vamos a agregar esa información y hacer una comparación,
+de hecho si se pueden encontrar los grupos específicos, ya. Pero bueno, cargamos la base, voy a hacer
+la estandarización; entonces ahora tengo acá los datos estandarizados, ya, como había comentado,
+es decir, estoy sacando su promedio y dividiendo por la desviación estándar, estoy calculando la Z,
+esto se hace con la escala Z. Y voy a intentar ahora, bueno, estoy definiendo algunas cosas acá,
+definiendo cuántos posibles clústeres vamos a tener, de uno a ocho, y vamos a calcular los K-means,
+los WSS, y después hacer el gráfico del codo, igual como tiene en la imagen, va a ser el
+codo y la silueta. La idea del gráfico del codo es, voy a tener la información del
+WSS, la idea más esencial, conforme voy agregando más clusters, cuánto
+esto está cambiando la variabilidad dentro de los grupos. Si no tengo ningún clúster, tengo una alta variabilidad.
+Si tengo dos clústeres, ahora dos grupos, aún tengo una alta variabilidad. Pero la ganancia de información
+acá fue muy grande, me bajó desde ese punto. Ahora con tres clústeres, me parece que también tuve una muy buena ganancia de información.
+Ya? Ustedes van a ver que después de un punto específico,
+esta ganancia pasa a ser muy pequeña.
+O sea, la idea acá es que se parezca con un codo.
+Si vamos a poner el codo para abajo,
+y la idea es cuando tenemos un cambio acá.
+Esta es la parte inicial del codo.
+Y acá es cuando tenemos el cambio.
+Entonces, en este punto acá,
+uno puede ver que hay un cambio muy significativo.
+y acá también, uno puede ver cambios significativos, ¿sí? Entonces,
+una cosa que es importante ver es, ¿cómo definimos acá? Cuando tenemos la mayor diferencia entre
+nuestros WSS; de acá para acá no me parece tener una buena ganancia de información,
+Entonces definimos este punto como el posible número de clústeres. Pero, profesor, ¿tengo que
+ajustar todo esto? Sí, ajustamos el modelo con un clúster, asumiendo que no tenemos ningún clúster,
+después ajustamos, asumiendo que tenemos dos clústeres, con tres clústeres, cuatro, cinco,
+hasta ocho. Una cosa buena es que los algoritmos ya son muy bien optimizados, entonces calcular
+eso no me tomó nada. De hecho, corremos acá con ocho posibles clusters y vamos a correr de nuevo,
+ahora voy a correr todos los clusters: 3 segundos más o menos me tomó para correr con
+1, 2, 3, 4, 5, 6, 7, 8 clusters; logró hacer todas esas cuentas para los 8 posibles clusters
+en tres segundos. Entonces este método es muy utilizado, pero uno tiene que calcular
+exactamente para 8; profesor, quería evaluar para más, no hay problema, ponemos acá
+20, y entonces podemos evaluar para 20,
+y no va a demorar mucho el gráfico,
+y nuevamente con 20, el gráfico, lo mismo va a pasar: esto después tiene un cambio acá,
+cuanto más clusters ponemos menor va a ser la varianza dentro de los grupos, pero la
+ganancia de información es muy pequeña, ¿sí? Y vamos a ver otro acá para que ustedes vean.
+O sea, volviendo a 8 clusters, lo que tenemos con el método del codo,
+sale con eso: posiblemente tenemos 3 clusters.
+Hay un otro método que es conocido como la silueta.
+La regla de decisión acá es que debemos elegir el k que tiene el mayor punto acá,
+lo que maximizó esta métrica.
+Les voy a presentar las cuentas un poquito más adelante, pero acá también me da la sensación,
+o bueno, el valor acá nos indica que posiblemente tenemos tres clústeres.
+Entonces inicialmente con esos dos métodos tenemos eso,
+y después vamos a ver el gap.
+¿Cómo calculamos la silueta?
+La silueta, la interpretación, con un ejemplo.
+La silueta va a calcular la distancia media a los otros puntos de su grupo.
+Entonces vamos a tener a(i), que es la distancia media a los otros puntos de su grupo
+y b(i) va a ser la menor distancia media a los puntos de otro grupo.
+Entonces él hace estas cuentas. Por ejemplo, si tenemos acá 2 y 6,
+va a calcular 6 menos 2, partido del máximo entre estos puntos, 6.
+Y tiene el valor 0.66 acá.
+La idea es que cerca de 1 mayor la separación respecto a su grupo vecino,
+o sea, si estos puntos están muy cerca, la diferencia entre este y este será cerca de 0.
+Si tengo aquí 2 y 2, la distancia será 2 menos 2, 0 partido 2, 0 partido 2 será exactamente 0.
+Cerca de 0 las observaciones en una zona de superposición,
+es decir, ellos están muy cerca o básicamente ahí está muy mezclada la cosa.
+Entonces la idea acá es que cuanto más cerca de uno, mayor la separación, más cerca de
+cero está una zona de superposición. Bueno, negativo, en promedio, está más cerca del
+otro grupo. Entonces, quiere decir que ese punto acá fue mal clasificado y debería
+estar en el otro grupo. Vamos a calcular cada uno de esos individuos y después saco su promedio.
+¿Por qué sacamos el promedio? Porque vamos a evaluar básicamente las distancias, no exactamente una distancia, pero las distancias acá
+con un punto específico; cada uno de esos valores va a ser distinto para los a(i) y los b(i)
+vamos a tener varios valores, sacamos el promedio y acá es exactamente la silueta media
+Entonces saco la silueta media acá, este valor fue de 0, casi 0.28
+Entonces, con dos grupos tenemos una silueta media de 0.26, con cuatro grupos y por ahí adelante.
+Elegimos la que maximiza eso.
+Entonces la silueta media en los vinos.
+Acá, el valor sale un poco distinto, ¿o no? Sale lo mismo que en la imagen.
+Entonces tenemos posiblemente ahí tres grupos;
+es el mejor de esos candidatos, aunque exista una superposición entre los grupos.
+Y el último es conocido como Gap, o una referencia sin estructura de grupos. Vamos a comparar los
+WSS observados con datos simulados de una región de referencia. Básicamente acá vamos a mirar
+comparar el WSS y comparar con valores que deberían venir al azar. Acá tenemos la forma
+en que se calcula el gap, pero básicamente lo que hacemos es: ajustamos K-means a los datos
+reales para cada k, simulamos B bases y calculamos el WSS para los mismos valores de k; entonces
+comparamos aquí: la idea es comparar el WSS con B bases que fueron generadas de forma aleatoria,
+y comparamos el costo observado con el promedio, en la escala logarítmica.
+En forma matemática se demuestra que esto funciona bien,
+y aquí usamos una referencia uniforme en el rango de cada columna estandarizada.
+Entonces, esta es una forma que no es tan sencilla de interpretar en la ecuación,
+pero básicamente es una comparación sencilla:
+un grupo con un grupo que fue generado de una forma aleatoria.
+Es muy interesante; bueno, tienen un artículo de Tibshirani, Walther y Hastie acá, que los muestran,
+discuten varias formas de clusterización, fue publicado en una excelente revista,
+no es un site, es un artículo muy bueno, y discuten cada uno de estos métodos,
+con muchos detalles, y su derivación matemática, para los que quieran dar una mirada.
+¿Cómo debemos seguir con el gap? El gap va a ser,
+vamos a evaluar cuánto tuvimos de cambio en cada uno de esos saltos que tenemos específicos,
+él va a mirar exactamente el próximo gap menos un s_k, que es el error estándar de la simulación.
+Elegimos el primer k que cumple la siguiente desigualdad.
+Un ejemplo hipotético: tenemos para cada uno de estos clústeres el gap que fue calculado
+de cada uno, ya, y s_k, que es un valor específico acá para cada uno, y vamos poniendo ese valor
+comparando ese valor con el siguiente gap menos su s, ya, y por ahí adelante. Por
+ejemplo, para k igual a 1 vamos a mirar: ¿0.4 es menor que 0.62 menos 0.05, o sea, 0.4 es
+menor que 0.57? Sí, eso no cumple, seguimos para el punto 2.
+Ahora vamos para el gap 2, 0.62. ¿0.62 es mayor que 0.64 menos 0.04?
+Sí, entonces elegimos, o bueno, seguimos acá y definimos, vamos corriendo este
+algoritmo hasta que aquella situación para exactamente en una regla acá
+donde k es igual a 4. Entonces para esta métrica específica, el gráfico nos indicó que deberíamos
+tener cuatro clústeres. Bueno, vimos en los otros métodos anteriores que teníamos una indicación de
+tres clústeres; este es un método que nos muestra que son cuatro clústeres, podemos tener una
+indicación entonces de que se puede trabajar con o tres o cuatro clústeres. Uno puede ver que la
+distancia del gap de 3 para 4 no cambia tanto. Entonces fue una situación
+un poco rara, pasó eso. Generalmente define exactamente el 3,
+pero para esta regla, una regla automática, me salió ese número 4.
+Entonces con la silueta salimos con tres grupos. Con gap, con esta referencia
+30 simulaciones, tuvimos un k igual a 4, tanto en R como en Python.
+Trabajamos con tres grupos porque fue lo que nos indicaron los otros métodos;
+vamos por la mayoría, y también se puede ver que alguna cosa acá puede haber pasado, o la ganancia
+de información es muy pequeña. Nosotros también podríamos definir tres. Por ahora voy a definir tres
+asumiendo exactamente estos dos formatos. Pero profesor, usted me presentó tres métodos, no
+No, es la misma forma de clusterización.
+Una cosa que es importante que sepan es que este algoritmo
+es un algoritmo específico para hacer clusterización.
+Hay una infinidad de algoritmos para hacer clusterización.
+De hecho, como la mitad del departamento de la Facultad de Matemática, de mi departamento
+de estadística, trabaja proponiendo métodos de clusterización. Yo fui a una infinidad
+de charlas en que ellos proponen: «estoy proponiendo un nuevo método de clusterización para esta
+estructura de datos». K-means es el más sencillo y el más conocido, pero hay un montón de
+variaciones. Otro que siempre se ve también es conocido como DBSCAN. Acá no vamos a verlo,
+es un método que tiene una mirada un poco distinta y intenta no evaluar los puntos medios
+sino los que tienen mayor densidad. Entonces acá no va a evaluar exactamente por ese tipo de métrica,
+por distancia en términos del centro, pero va a mirar los puntos o clústeres que tienen una mayor
+densidad. O tener un montón de puntos ahí es un clúster. Puede ser que al final tenga dos clústeres
+acá, si tengo muchas observaciones en ese grupo. Sí, entonces DBSCAN mira por medio de la
+idea de densidad. Hay otros métodos distintos de clusterización.
+Uno tiene que elegir cuál es el método que le acomoda y se basa en
+este método. Hay gente que demuestra que para este caso particular el método
+K-means va a funcionar bien. Entonces, estamos proponiendo un método
+basado en inferencia bayesiana no paramétrica para hacer clusterización,
+y propone un método para desarrollar sus propios clústeres.
+¿Sí?
+Entonces, seguimos con eso.
+Déjame ver acá.
+No conseguí mostrar esto, déjame ir corriendo acá.
+Después volvemos y les explico en detalle lo que es cada uno de estos puntos
+Bueno, estos métodos funcionan bien. Cuando intenté hacer un plot de los datos, las clases
+reales acá de los vinos, los puntos, están con ese formato. Mira, este acá es un tipo
+de vino conocido; no me acuerdo si es Merlot, no sé; bueno, hay un tipo de vino muy específico,
+que era este grupo acá, un vino blanco y otro tipo de vino, Cabernet.
+Entonces podemos tener ahí distintos vinos, existían de hecho tres vinos específicos, reales,
+y cuando hacemos un biplot de estos vinos, tenemos esta estructura.
+Uno va a ver que solamente hay dos o tres vinos específicos que acabaron
+pareciéndose un poco a los otros grupos.
+Y bueno,
+eso fueron las clases reales de los vinos,
+pero yo asumí que no existían cuando fui a intentar descubrir los grupos.
+De hecho, ¿existen grupos o existen clústeres?
+Vamos a correr el K-means,
+y corrí el K-means acá,
+y el K-means me dio este tipo de clusterización.
+Acá son los puntos que están mal clasificados.
+Pero, profesor, ¿por qué está saliendo un verde acá? Porque yo estoy haciendo una proyección.
+No es exactamente un biplot, un plot bivariado,
+y después salí dibujando eso.
+Este grupo, o este centroide, fue calculado con base en 13 covariables.
+Por supuesto, cuando hacemos una proyección para un gráfico bidimensional,
+tenemos pérdida de información. Acá este gráfico tenemos basado en componentes principales,
+yo tengo ahí casi 56% de la variabilidad explicada por estos componentes.
+Entonces yo tuve alguna pérdida de información acá, por eso que hay algún punto acá que está azul.
+y entonces cuando hacemos este tipo de proyección hacemos esta pérdida de información.
+Por ahora creo que son las 7:45, paramos ahora y volvemos a las 8, me parece, Romina.
+Súper.
+Gracias, Romina.
+[Pausa: recreo hacia 1:08:40 del video aprox. El video no contiene el tramo del descanso (no hay silencio ni audio intermedio); la clase continúa directamente con el regreso del recreo.]
+Bueno, seguimos con la forma en que se hace el gráfico de silueta.
+Acá dejé los códigos.
+Nuevamente, uno va a tener que ajustar un K-means,
+que va a variar, por ejemplo, de uno hasta nueve clusters.
+Va a ajustar los K-means, después va a...
+Y dentro de nuestro modelo va a poner modelos.append(modelo),
+wss.append(modelo.inertia_),
+y ahí va a salir silueta.append con los scores
+Acá, vean:
+ajustamos los modelos,
+calculamos la silueta,
+con este código podemos ajustar de una forma más sencilla
+Es también de una forma similar. Entonces, uno puede seguir por acá; acá ya calculamos los modelos,
+después ya tenemos los resultados y esta función va a dar exactamente algo similar a lo que ponemos acá.
+Son dos formas de escribir: acá, con silhouette, yo calculo las siluetas y después calculo la media y hago la cuenta yo mismo.
+Son dos formas distintas de hacer esto en R.
+Podemos hacerlo después en Python, aquel slide que estaba mencionando, en Python.
+Bueno, vamos a utilizar... Acá tenemos el archivo en Python para correr.
+Tenemos que hacer el import de las funciones que ya conocen.
+NumPy, lo nombro np; pandas, pd.
+Vamos a utilizar sklearn.cluster. Acabé poniendo acá la función import KMeans.
+Acabé importando PCA. No sé si estuvieron en la clase de componentes principales.
+Es una forma de hacer reducción de dimensión. Creo que la próxima clase del profesor Eloy
+estará hablando para ustedes sobre esto.
+O si ya vieron durante el curso, es una de las formas de hacer reducción de dimensión.
+Y después las métricas: acá, sklearn.metrics, silhouette_score.
+Voy a importar la base de datos.
+Acá me salen las estadísticas descriptivas relacionadas a los datos con los prints vinos.head()
+y vinos.shape. Acá voy a hacer la estandarización de los datos; en seguida, después de
+hacer la estandarización, ya corrí el modelo, acá ya tenemos el modelo corrido con K-means
+y acá está aquel gráfico que había mencionado; yo vi que pareció un poco raro, pero exactamente
+lo que estábamos haciendo: tenemos silueta.append, me va a salir acá los
+scores. Eso ya corrido, y ahora el plot ya con
+estos códigos acá me va a salir exactamente el plot del codo y el
+plot de la silueta,
+y bueno, de forma similar ponemos tres acá, la silueta elegida igual a 3,
+después bueno, acá vamos a ver un poquito más adelante.
+¿Seguimos adelante? No sé si Claudia todavía tiene la duda; Claudia había levantado la mano.
+Sí.
+No sé si estará por ahí.
+Sí, gracias, Romina. La duda en general, profesor: ¿en cuál rubro o en cuál tipo de industria uno generalmente puede encontrar más el método K-means,
+o eso va a depender del tipo de datos, sí o sí, que tienen que ser no etiquetados?
+Sí, básicamente así. Ahí el tema es exactamente cuándo va a aparecer;
+como pensar, realmente veo bastante en segmentación de clientes,
+pero realmente en situaciones donde tenemos datos no etiquetados,
+en cualquier industria debe tener aplicación, pero
+generalmente en muchos casos, cuando están
+en la industria, tendrían la medición,
+tendrían la variable de respuesta y quieren
+evaluar cuál es el efecto de esa variable
+de respuesta. Si la tiene, acá no se utiliza.
+Generalmente más en situaciones donde no
+tenemos las etiquetas y queremos crear
+clusters. Para dar un ejemplo específico de
+industria, no sé, control de calidad, no consigo pensar en nada que yo haya visto.
+Realmente cuando veo clusterización, por ejemplo, en salud, yo sé que muchas veces queremos
+hablar de clústeres de individuos que tienen algunos efectos de enfermedad en
+que no sabemos si pertenecen a un grupo o no. Entonces queremos saber si estos individuos
+están en ese grupo o están en ese grupo específico para una enfermedad específica,
+tipo de reacción o para una...
+¿Cómo explicar?
+Por ejemplo, para un efecto de una enfermedad.
+Por ejemplo, muchas veces tenemos algunas variables que no fueron observadas.
+Muchas veces las variables que no fueron observadas crean grupos específicos.
+Vamos a suponer que usted está haciendo un experimento y dejó de observar algunas covariables.
+y creemos que algunas variables que no fueron observadas pueden tener un efecto en un grupo específico, por ejemplo tener o no tener diabetes.
+Es una información que no fue observada, pero yo puedo intentar hacer un plot de estos individuos con base a algunas variables
+y al final crear dos grupos distintos. Un grupo tiene un comportamiento para las personas que no tienen diabetes y un grupo para las personas que tienen diabetes.
+Entonces, sería un posible cluster.
+Hace un poco de tiempo, estaba trabajando con el precio de departamentos en Chile.
+Estaba evaluando la construcción, cuánto tiempo tomaba para cerrar la construcción,
+y lo que eso influenciaba en el precio.
+Encontramos clusters en lo que está influenciando el precio del departamento,
+cómo aumenta el precio del departamento con el tiempo hasta cerrar una construcción en Chile.
+Porque mucha gente tiene esa información del tiempo hasta acabar una construcción,
+es muy importante para hacer inversión ahí.
+Y nos damos cuenta que tenían edificios que tenían comportamientos muy distintos,
+porque tenían un cluster específico, un cluster o una información que no era observada,
+era, por ejemplo, si los edificios están cerca del metro.
+Entonces es probable que los edificios que están más cerca del metro terminen las construcciones más temprano.
+Entonces, esos son clústeres. Hay grupos que no están cerca del metro y hay grupos que están cerca del metro.
+Pero inicialmente no habíamos observado esa información. Entonces fue un clúster que al final después nos dimos cuenta.
+Este tipo de clusterización viene ahí.
+Muchas veces buscan algún efecto de una enfermedad,
+así como un cluster, pero exactamente la industria no...
+no tiene mucha idea de clusterización.
+A veces componentes que pueden fallar,
+un posible cluster podría ser algún componente que está viniendo de una empresa
+Entonces tal vez no tengamos componentes; tenemos productos que fueron construidos, autos, por ejemplo.
+Autos de la misma empresa, podrían tener tiempos de vida muy distintos.
+¿Cuál podría ser una posibilidad?
+Creemos que debe haber clusters, grupos que van a tener tiempos de vida distintos.
+Esos grupos vienen porque tienen algunos componentes que no fueron informados,
+estos componentes vienen de una empresa. Entonces tenemos dos clústeres, productos que fueron construidos por componentes que vienen de una empresa y componentes que vienen de otra empresa.
+Entonces son informaciones que no fueron observadas, no tenemos este label, pero cuando uno va a dividir los grupos se ve que tienen grupos distintos, que no son grupos homogéneos.
+generalmente cuando intentamos evaluar heterogeneidad en nuestros datos intentamos hacer clusterización
+entonces cualquier problema que pueda pensar que puede tener grupos heterogéneos, esto puede pasar
+por ejemplo ahora estoy evaluando, estoy trabajando con un alumno de doctorado que trabaja en una empresa
+que hace reparaciones en productos como tractores, y nos damos cuenta de que hay tractores que fallan mucho más que otros tractores
+que deberían tener el mismo tiempo de vida, pero hay algunos que
+fallan cuatro o cinco veces más que los otros. Entonces dividimos en clusters específicos,
+ellos están evaluando por qué estos tractores están fallando más
+que otros. Si los productos que pusieron en este tractor vienen de alguna empresa
+específica, si fueron producidos, si están trabajando en condiciones distintas, pero
+la cantidad de fallas es muy grande. Si son personas que están manejando esto de forma distinta,
+por ejemplo un cluster puede ser un grupo de trabajadores con una buena formación,
+y otro cluster puede ser grupo de trabajadores con mala formación. Está influenciando en el
+tiempo de vida de estos productos. ¿Cómo dividimos? Inicialmente evaluamos que tienen dos grupos
+distintos, creamos los clusters y después evaluamos por qué son distintos. Tratamos de sacar esa
+información adicional, lo que está cambiando en estos dos grupos que no fue agregado en el análisis.
+Lo que no fue agregado fue por ejemplo las personas que están manejando
+esos productos, entonces ese grupo está manejando muy mal o está disminuyendo el tiempo de vida.
+Más o menos así pienso que podrían ser clusters, clusters son grupos heterogéneos pero que no
+sabemos por qué está ocurriendo eso, entonces intentamos agruparlos y después evaluamos lo que
+está pasando.
+Perfecto, muchas gracias.
+Clarísimo.
+Bueno, entonces sería esa la posibilidad de hacer la clusterización.
+Es muy interesante porque acá hay una forma de hacer clusterización.
+Para los que tuvieron curso de análisis de supervivencia, hay otra forma,
+evaluando tiempo de vida.
+Hay grupos específicos que tienen comportamientos distintos.
+Son grupos que tienen, por ejemplo, una enfermedad específica,
+son clústeres distintos.
+Como lo observamos, intentamos agruparlos, nos damos cuenta que son grupos distintos
+y después evaluamos por qué se están comportando de forma distinta.
+Mucha gente crea estos métodos de clusterización exactamente para eso.
+Bueno, una cosa que... déjenme ver acá, vamos hasta acá. Bueno, acá... y hablar un poco
+sobre la cantidad de clústeres. Los números de grupos son etiquetas; básicamente estimamos
+los grupos y el número de clústeres. Tuvimos k igual a 3, pero sabemos que, de hecho,
+en la base original había tres labels, tres grupos.
+Generalmente en la realidad no conocemos eso, pero mucha gente cuando va a proponer métodos de clusterización
+hace exactamente eso: crea un método de clusterización, toma una base de datos donde tiene los grupos,
+remueve esa información, intenta hacer la clusterización ahí y después compara con los grupos que existían originalmente,
+y de alguna forma evalúa si fue posible encontrar estos grupos que no existían.
+Porque se puede hacer este agrupamiento, se puede dividir; por ejemplo, acá lo hicimos en R.
+En un caso específico acá yo conocía los vinos.
+Yo conocía las clases reales de los vinos, ¿cierto?
+Quiero comentar eso: conocía la clase real de los vinos.
+Con las clases reales de los vinos, después acabé creando los grupos con K-means.
+nuestro objetivo es comparar si el método de clusterización logró construir originalmente los grupos como debería
+Sí, entonces después podemos evaluar y vamos a ver que los errores son muy pocos
+entonces K-means de alguna manera puede ayudar a crear esos grupos nuevamente, ya, por supuesto va a tener
+algún mejor acá o mejor allá, pero en forma general encuentra esos grupos de una forma muy particular
+No sé si tuvieron clase, no me acuerdo; yo sé que van a ver pronto las componentes principales,
+si no las vieron, es posible que las vean la próxima clase con Eloy, o dos o tres clases más adelante.
+Pero la idea de componentes principales es exactamente resumir información en algunos componentes
+para poder utilizar de algunas formas muy inteligentes.
+Por ejemplo, una de las formas es hacer este tipo de proyección
+para poder resumir la información de una dimensión alta en otra menor.
+Entonces puedo salir de una dimensión alta, de 13 variables, por ejemplo,
+y acabé haciendo un plot para dos variables acá
+y de alguna manera consigo mantener buena parte de la información, los grupos.
+Entonces acá tengo un grupo, acá tengo otro grupo y acá tengo otro grupo.
+¿Fue posible mantener toda la información? No.
+Tuve una pérdida de información.
+Fue posible mantener casi como 56% de la varianza original de los datos.
+Por eso que acá tenemos individuos que están muy raros, que están en este grupo acá.
+¿Cierto? ¿Por qué? Porque salimos de una dimensión muy grande y proyectamos para una dimensión más chica.
+Cuando hacemos este tipo de proyección, tenemos una pérdida de precisión.
+Pero siempre es importante hacer el K-means, no en estas componentes principales,
+sino en el conjunto original con todas las covariables, porque ahí ustedes pueden evaluar las distancias correctamente.
+Entonces, esto es solo una forma de hacer la visualización de los datos.
+Pero lo importante es que, con K-means, fue posible etiquetar a estos individuos de esa forma.
+Las clases reales se ven de esa forma.
+Y ahí podemos después ver cada uno de los que fueron mal clasificados.
+No fueron muchos puntos.
+1, 2, 3, 4, 5, 6; debe tener alguna cosa como 8, 9 puntos de 177 mal clasificados.
+Entonces tuvimos ahí una clasificación buena de no sé, más de 90%, 92% de la base original.
+Entonces de alguna manera logramos construir nuevamente los labels.
+estos labels no fueron conocidos, y esa es una diferencia muy importante, porque
+en el aprendizaje supervisado ustedes tienen ahí Y e intentan ajustar de alguna
+manera f(x), de modo que se compara Y con f(x); acá solamente tengo f(x), no
+tengo cómo comparar de ninguna manera con Y
+y de alguna manera construir este f(x) que es muy cercano al posible Y original acá,
+si existía este Y.
+Por eso es que este es un método no supervisado, porque no estoy utilizando ningún label para
+ajustar esta función f(x) acá.
+Entendemos esta función f(x) como algunos labels, algunos clusters, pero no conozco esta información,
+esto no me fue dado.
+solamente ajusto esa función con eso.
+Y lo impresionante es que con eso fue posible reconstruir de alguna manera bien
+la base original.
+Bueno, las clases pueden tener alguna información específica, por ejemplo, el
+grupo 1.
+Después uno empieza a evaluar cuáles fueron los efectos de ese grupo 1.
+Por ejemplo, el grupo 1 muestra que tiene un menor alcohol y un color específico.
+El grupo 2 tiene mayor color y menor matiz.
+El grupo 3 tiene más flavonoides y prolina.
+Entonces hay grupos distintos con informaciones distintas.
+Bueno, tienen que bajar esas informaciones y después salir evaluando.
+En la escala original, porque acá yo había hecho una transformación, o acá también
+voy a estar haciendo esta transformación, pero en la escala original tengo acá los niveles
+de alcohol para cada uno de los grupos.
+Entonces el grupo 1 tiene 13.68 de alcohol, el grupo 2 13.14, el grupo 3 12.25.
+Mira que los flavonoides cambian harto para un grupo y para otro, esos son los valores
+promedios que tuvimos en esos grupos. Entonces el valor promedio del grupo 1 tenía
+3 de flavonoides, color 5.45, 7.2, 2.97. Entonces hay algunas componentes químicas que de
+hecho hacen con que los vinos sean muy distintos. Ya no es solamente una percepción que la
+persona dice: «ah, este vino es muy distinto del otro». De hecho la parte química también
+nos demuestra eso. Y uno puede saber exactamente cuál es la relación o la diferencia en términos
+del promedio que tiene cada uno de los grupos con una información específica. Por
+ejemplo, en términos del promedio el grupo 1 tiene 0.8 más de alcohol. El grupo 2, 0.2;
+en cuanto al grupo 3, tiene menos 0.89.
+Y eso es en relación al promedio general.
+Entonces sacamos el promedio y evaluamos la diferencia
+en términos de los promedios.
+Entonces acá uno puede evaluar y tener esta idea.
+¿Sí, Matías?
+Tiene una consulta.
+Cuando usted intentó hacer la clusterización,
+¿metió todas las variables, me refiero a las 13 covariables?
+¿O la hizo ya pasando por el PCA?
+No, metí las 13 covariables, ya, porque bueno, este es un error que mucha gente comete; a mí también me tocó hacerlo
+un montón de veces. Pero bueno, si usted va a correr con PCA y mantiene solamente las dos primeras componentes principales
+va a tener pérdida de información, ¿cierto?
+Entonces su clasificación ahí, no la clasificación, pero la clusterización que va a estar haciendo, el cluster va a tener menos precisión
+Entonces lo que yo recomiendo es hacer la clusterización con la base original, sin tener
+pérdida de información.
+Profe, y qué pasaría si, porque claro en este caso son 13 variables, pero si fuesen,
+no sé, 200 variables o 500 variables que intenten explicar las características de
+tal cosa, ¿es factible meter esas 500 variables?
+¿No se enreda el computador?
+Básicamente sí, no le va a costar mucho a la computadora. Porque yo sé
+eso: bueno, Romina hizo conmigo el curso, siempre les pedí a los alumnos de
+métodos para grandes volúmenes de datos correr eso; entonces ellos tenían como
+un millón de observaciones con 30, 40, 50 covariables, y correr un método no
+tenía mucha dificultad. Otra cosa que va a influenciar:
+¿Por qué no me gusta mucho hacer reducción de dimensión acá?
+Porque por ahora está todo muy bonito, tenemos solamente variables reales acá.
+Es decir, acá tengo alcohol que es un valor real, ácido que es un valor real,
+pero si usted va a sacar una base de un banco, de una empresa de aviación, o cualquier cosa,
+la gran mayoría de los datos que va a tener son binarios, ¿ya?
+y PCA, la forma en que se ajusta, PCA
+PCA funciona solamente para variables reales.
+Entonces, no sé, 70% de su base original no va a entrar en esta información.
+Entonces se va a ajustar un K-modes, después un K-prototypes,
+debe hacerse con la base...
+Bueno, lo que yo entiendo y lo que siempre
+yo vi es que se debe ajustar con la base original.
+Si quiere ajustar con la base reducida,
+es posible que va a tener pérdida de información.
+¿Sí?
+Bueno, gracias por la pregunta.
+Sí.
+Entonces, este gráfico de perfiles estandarizados va a funcionar bien.
+Bueno, voy a ver una pregunta de Matías.
+Es una muy buena pregunta, porque
+cuando yo empecé a enseñar este curso, yo hacía las dos formas.
+Enseñaba PCA,
+hacíamos reducción de dimensiones, después intentábamos hacer clusterización con los dos,
+con la base original y con la base reducida vía PCA. Sacábamos como por ejemplo dos
+componentes principales. Y sí, se ve que la clasificación cuando comparábamos con el vino
+original se perdía información, entonces empezaba a clasificar malos vinos que con la base original
+se clasificaban bien. Entonces vamos a ver cuánto.
+Para reducir las dimensiones, acá uno va a mantener solamente
+acá no está en la figura de esta
+si hacemos PCA
+con esta base voy a mantener solamente estas variables
+uno y dos, y cuando fuera a hacer un biplot
+usted va a ver acá, voy a estar clasificando los individuos de este grupo
+estos individuos acá estarán clasificados en otro grupo y ese
+estará clasificado en otro, entonces estos puntos acá estarán clasificados.
+Bien, acá me parece que no tiene problema porque de hecho,
+estos puntos, me parece que estoy con la conexión mala,
+estos puntos fueron mal clasificados, ya,
+pero acá, mira, estos puntos son los reales y
+con un PCA iría a clasificarlos como azules. No sé, bueno, con PCA hay una pérdida de
+información cuando se hace esa proyección. Entonces, ¿cómo puede pasar que tengamos esos problemas?
+Hay que tener ese cuidado. Vamos a ver la clase. Y bueno, llegamos a esa pregunta interesante.
+La primera cosa es que, si tenemos variables reales, podemos evaluar el efecto de cada una de esas covariables en términos del grupo 1, 2 o 3.
+Entonces, por ejemplo, la prolina en el grupo 1 está mucho más alta,
+los flavonoides están mucho más altos comparado con su promedio,
+y el alcohol también está mucho más alto.
+En cuanto al grupo 3, acá tiene una diferencia muy grande con menos alcohol, con menos color y con menos prolina.
+En cuanto al grupo 2 tiene una diferencia muy grande acá en matiz, en flavonoides y el color, también el ácido málico.
+Entonces uno puede evaluar las principales diferencias químicas en cada uno de esos grupos.
+Entonces este gráfico, acá los perfiles estandarizados, es superinteresante para poder evaluar después cuál es el efecto.
+Bueno, estamos hablando de proyección, el PCA permite dibujar una aproximación en dos dimensiones.
+Es decir, estamos saliendo de 13 variables y estamos haciendo una proyección en solamente dos dimensiones.
+El PCA es muy bueno porque intenta mantener la variabilidad original de los datos en los
+primeros componentes.
+Entonces los dos primeros componentes son los que tienen la mayor variabilidad.
+Pero lo malo es que vamos a ir perdiendo información, de todas formas.
+Cuando necesitamos hacer visualización, o a veces como tenemos muchas covariables, hacer
+un PCA es muy bueno para regresión o para hacer dibujos como éste, para hacer evaluación
+de outliers, entonces voy a hablar con ustedes creo que en dos clases más, vamos a ver
+una clase de detección de outliers y vamos a ver que PCA es una de las formas de detectar
+outliers.
+Entonces PCA funciona para un montón de cosas, pero son para cosas muy específicas,
+y en este caso nos ayuda a visualizar datos de alta dimensión en dimensiones menores,
+y nos ayuda muy bien. Mira, acá tenemos el grupo 1, el grupo 2, el grupo 3, y el grupo 1 acá,
+grupo 1, grupo 2 y el grupo 3. Entonces de alguna forma los grupos son distintos,
+cuando hacemos una proyección aún se mantienen en áreas muy específicas.
+Entonces el PCA, que se llama Análisis de Componentes Principales,
+va a permitir dibujar una aproximación en 2 dimensiones.
+El agrupamiento se ajustó con las 13 covariables, no con las coordenadas específicas de los datos.
+Una pregunta para ustedes: ¿tuvieron clase de PCA hasta ahora? ¿Conocen el método?
+Todavía no, ¿sí? Si ya, perfecto; se sabe cómo funciona el PCA.
+La idea del PCA es hacer este tipo de reducción de dimensión, ¿ya?
+PCA funciona muy bien para un montón de cosas, una de ellas es para detección de outliers,
+pero para K-means va a ayudar principalmente en la parte de visualización.
+Mira, algunas cosas que podemos tener de dificultad con el K-means, como les comenté, K-means es
+una forma muy buena para hacer clusterización, pero muchas veces no es la ideal.
+Por ejemplo, vamos a suponer que tenemos estructuras, curvas, donde tenemos grupos, en que la proyección
+me va a venir exactamente con esa forma.
+Es un otro grupo que tiene esa forma acá.
+En situaciones como esta, que algunas veces puede ocurrir en la práctica, cuando vamos
+a hacer la proyección de los datos, ustedes van a ver que grupos, ellos pueden comportarse
+de una manera como, digamos, una función seno, coseno, de alguna forma trigonométrica,
+puede tener alguna relación así, lo que hace que los grupos no se distribuyan
+alrededor de un centro específico, ¿ya? Y K-means no va a funcionar muy bien; por ejemplo, K-means
+va a dibujar un centro acá, otro centro acá y va a clasificar estos puntos acá como
+Entonces hay otros métodos de clusterización.
+K-means no es el único.
+K-means, K-modes, K-prototypes no son los únicos.
+Hay métodos que no vamos a tener tiempo para discutir acá,
+que se ven en el curso de aprendizaje no supervisado,
+por ejemplo DBSCAN o una infinidad de otros métodos de clusterización,
+que pueden ayudarnos a clusterizar
+individuos que están más cerca, en una densidad específica.
+Por ejemplo, DBSCAN va a evaluar los puntos que tienen una mayor densidad.
+Entonces todos los puntos que están más cerca acá
+debían ser clasificados en un grupo,
+individuos que tienen una alta densidad
+deberían ser clasificados como otro grupo.
+Entonces, empieza a ayudarnos a tener
+esta idea de alta,
+una cantidad grande de densidad.
+Entonces, DBSCAN podría ser una alternativa.
+Solo para que sepan que K-means
+puede dividir estructuras curvas
+en grupos compactos que no siguen su forma.
+Esto sería un grupo, esto sería otro grupo,
+y K-means no va a funcionar muy bien.
+Bueno, K-means hasta el momento,
+presenté varias formas de hacer clusterización,
+pero esta forma está basada en valores que son reales,
+por ejemplo, alcohol, ácido, ceniza y por ahí adelante.
+Pero tenemos situaciones donde quiero encontrar información,
+por ejemplo, de individuos que son categóricos,
+por ejemplo, individuos a los que les gusta una cosa muy específica,
+¿cómo podemos crear clusters o encontrar clusters en un sitio como Netflix?
+Vamos a ver personas que les gustan algunas películas específicas, películas de terror,
+películas de acción, de suspense, entre otros.
+¿Cómo vamos a evaluar eso? ¿Tenemos un valor real? No, solamente conozco que la persona vio o no vio la película.
+Y ahí empezamos a medir ese nivel de similitud o disimilitud.
+Entonces, cuando tenemos variables categóricas, o variables binarias,
+que son binarias en este caso, o zero y uno, cuando tenemos variables binarias,
+tenemos que cambiar la forma que calculamos las cosas.
+Entonces, viene una versión de K-means que es conocida como K-modes.
+Entonces, si estoy sacando la media, vamos a suponer que ahora quiero evaluar
+lo que ocurre con frecuencia o lo que no ocurre con frecuencia: malos o buenos pagadores.
+Va a tener valores cero o valores unos. ¿Tiene algún sentido sacar el promedio ahí? No,
+¿cierto? Entonces no tiene sentido promediar categorías como web, sucursal, entre otros.
+El centro contiene la categoría más frecuente en cada variable. Vamos a medir por medio
+de otra métrica que es conocida como una métrica de disimilitud. La disimilitud
+cuenta cuántas variables tienen valores diferentes.
+Se alternan asignación de observaciones y actualizaciones de modas.
+Básicamente lo que vamos a hacer acá es evaluar si los individuos son similares y si no son similares.
+Si son similares, vamos a querer agruparlos.
+Si no son similares, vamos a querer que se queden lo más lejos posible.
+Y eso funciona bien; funciona porque nuestro objetivo, por ejemplo,
+Tendrán una clase sobre sistemas de recomendación.
+Verán que muchas cosas se basan en estas métricas de similitud.
+O sea, intentaremos evaluar los individuos que están más cerca
+uno de ellos al otro y después intentaremos hacer recomendaciones para estos individuos.
+Entonces verán que aquí está todo conectado.
+Queremos agrupar personas en clústeres específicos.
+La persona va a estar en un grupo o en una área muy específica y vamos a hacer una recomendación de una película, de un producto, de una música, entre otros.
+Este tipo de cuentas están todas implementadas en Netflix, Prime, YouTube, entre otros.
+Por ejemplo, vamos a suponer que acá queremos evaluar el nivel de desacuerdo o disimilitud entre un cliente y el punto central que tenemos ahí,
+un cliente acá, con los centros que tenemos en cada uno de los grupos.
+Entonces tenemos dos grupos específicos; queremos ver si nuestro cliente está en un grupo o en el otro grupo.
+y ahí miramos cuál es su disimilitud. El cliente tiene un plan Gold,
+el canal que más utiliza es la app y está en la región sur.
+Y ahí tenemos dos grupos; el centro del grupo A tiene el plan Gold,
+el canal que más utiliza es la app y está en la región norte.
+Cuando miramos este cliente con este centro vemos que solamente tiene una disimilitud.
+es decir, él es un cliente Gold, sí, entonces ponemos 0.
+Una app, sí, entonces ponemos 0.
+Y lo que tiene de diferencia acá, ponemos 1.
+Individuos más cercanos, un cliente más cercano al centro,
+debería tener valores más cerca de 0.
+Individuos más distintos deberían tener valores mucho más grandes,
+principalmente la suma de todas las variables que tenemos acá.
+Si tenemos 3 variables, lo más distinto posible va a ser cuando tenemos el valor 3 acá.
+Lo más cerca posible va a ser cuando tenemos el valor cero.
+Entonces el cliente se asigna al grupo A si tiene un valor menor que el del grupo B.
+Entonces, por ejemplo, este individuo está más cerca del grupo A que del grupo B.
+Entonces el cliente se asigna al grupo A dado que el desacuerdo acá es el menor posible.
+Y bueno, lo que vamos a hacer allá va a ser una cosa similar, vamos a ir a los varios clientes,
+vamos a empezar con un valor estándar y después vamos a ir actualizando cada uno de estos centroides acá
+para intentar encontrar lo que ocurre con mayor frecuencia.
+y después vamos a encontrar cuál es el grupo principal que nos dará el centro A,
+y las variables principales que nos dará el grupo B.
+Cada variable aporta un desacuerdo como máximo, en esta versión no ponderada;
+las categorías no necesitan una codificación ordinal.
+La actualización de una moda:
+Supongamos que un grupo contiene estos tres clientes,
+Uno que es Gold, canal App y está en la región norte.
+Otro que es Gold también, utiliza el canal Web y está en la región norte.
+Y el último es Silver, utiliza la App y está en la región sur.
+Las modas por columnas son Gold, que fue lo que ocurrió con mayor frecuencia,
+y la App,
+que es lo que ocurre con más frecuencia acá, y el Norte. Entonces empezamos con la moda: Gold, App y Norte.
+El costo de cada cliente puede ser 0, puede ser 1, puede ser 2, porque podemos tener hasta 3 desacuerdos.
+Bueno, una moda es la categoría más frecuente, incluso algunas situaciones pueden tener empates, y no siempre supera el 50%.
+Acá, de alguna manera, intenté sacar la base de datos que tenemos de los vinos
+e intenté categorizarlos para crear valores como 0, 1 y 2.
+Entonces, creé categorías para el ejemplo de vinos.
+El alcohol, ser menor que 13, ponerlo en una categoría baja.
+Ser mayor o igual a 13, ponerlo en una categoría alta y no tener un valor medio acá.
+Los flavonoides sí tienen un valor medio: si es menor que 1.5, pongo en una categoría,
+si tengo valores entre 1.5 y 3, pongo en otra categoría, medio, y mayor o igual que 3 en otra categoría.
+Conservamos los cortes del material para ilustrar el método K-modes,
+entonces fue solamente un ejemplo para sacar de la base que ya teníamos,
+creamos categorías acá y vamos a intentar de alguna manera hacer la clusterización,
+pero ahora con variables categóricas. Profesor, ¿cuál es la mejor forma? Por supuesto,
+si esto está en reales y hacemos una categorización, va a haber pérdida de información.
+Entonces, esto solamente como un ejemplo para que puedan evaluar cómo funciona la cosa. Pero,
+en la práctica, generalmente no debemos hacer esto si los valores son reales. Categorizar
+pierde información de las mediciones originales.
+Aquí las categorías se comparan por igualdad sin usar su orden.
+Entonces creamos una función en R para hacer la categorización,
+entonces se va a evaluar cada uno de ellos, se va a evaluar si está sobre o bajo un punto,
+y clasifica; acá va a ser 0 y 1 básicamente, bajo y alto,
+acá tiene tres categorías: bajo, medio y alto.
+Y ahí fue corrido el K-modes, con una función de R que se llama kmodes.
+De forma similar, necesito evaluar cuántos clústeres queremos ajustar.
+Entonces, voy a poner 1, 2, 3, 4, por ahí adelante.
+Y después de correr eso, voy a tener lo mismo los grupos específicos,
+pero ahora va a ser más difícil visualizar esos grupos porque no son reales,
+entonces no voy a poder hacer un plot como éste.
+No me va a ayudar mucho en esa parte.
+pero yo puedo al final encontrar la cantidad de clusters que debería tener esta base de datos específica
+tenemos acá la tasa de desacuerdo para 1, 2, y ahí exactamente el gráfico del codo
+de acá para acá tiene un cambio y de acá para acá tiene otro cambio
+entonces uno puede intentar informar: ya, va a estar entre 2, 3 y 4
+no ayuda mucho porque no tiene un punto de corte claro acá
+El costo cuenta desacuerdos, no es una suma de cuadrados. Usaremos 4 para ilustrar los perfiles sin afirmar que es el mejor valor.
+Acá me parece que el método debería haber elegido en torno de 4, pero sabemos que son 3.
+La lectura de un perfil categórico: por ejemplo, en Python tenemos el color alto, bajo y medio, con números 40, 1 y 7, y la proporción fue de 83, 2.1 y 14.
+Entonces su centro modal acá va a ser alcohol alto, flavonoides bajos y color alto.
+Entonces básicamente lo que quería demostrar acá fue que, haciendo la clusterización
+o la categorización de hecho tenemos algunas cosas, por ejemplo el alcohol se quedó con
+nivel alto, entonces va a ser una información en su centro modal va a ser exactamente ese
+punto alcohol alto.
+Después flavonoides bajos y un color alto.
+el perfil resume las frecuencias, pero no significa que todos los vinos tengan el mismo color
+Acá es una de las formas de evaluar esto: K-modes, K-means. Pero muchas veces no veo a la persona
+trabajando solamente con K-modes; o sus datos vienen reales, o muchas veces van a ser
+valores reales con valores binarios, con categorías, o con valores categóricos, o
+principalmente categóricos pero binarios. Entonces, básicamente K-modes lo veo
+con una frecuencia muy grande, pero K-means es lo que más veo, conjuntamente con
+un poco de la parte de K-modes. Entonces vamos a suponer, ustedes tienen una base donde la gran
+la mayoría son valores, tener varias variables reales, pero además de las variables reales
+voy a tener algunas variables categóricas acá.
+¿Cuál sería la mejor forma?
+Mezclar los dos.
+Si tengo una forma de evaluar con K-means y tengo una forma de evaluar con K-modes, el nivel
+de similitud en K-modes, y clusterizar un grupo específico, yo puedo juntar estas dos métricas,
+la de K-means y la de K-modes, juntar exactamente, un poquito más adelante, las dos métricas que tenemos en los métodos.
+Una basada en K-means, otra basada en K-modes, y por supuesto acá después ellos agregan un gamma que va a ser
+el peso que queremos dar a las variables categóricas. Muchas veces ayuda un poco, principalmente
+que todo, eso después también tiene que seguir. Pero ahí vamos a tener una mezcla entre el
+K-means y una mezcla con K-modes. Ese método se llama K-prototypes. Entonces son variables
+mixtas, cuando tenemos variables categóricas y variables reales, uno puede ajustar exactamente
+con esta clase de modelos. Bueno, un costo mixto, una cuenta resultante aquí.
+Una observación tiene dos valores numéricos, 1 y 2 y categorías por ejemplo App y Sur.
+Entonces vamos a tener la parte numérica del prototipo acá, o para el grupo A y para el grupo B.
+La parte numérica, donde vamos a tener los centros y las categorías,
+más un costo asociado a esas informaciones. Por ejemplo, para el grupo A, en termos de distancia,
+si miramos uno con el centro, uno menos cero, ese individuo con ese, dos menos dos, entonces
+tenemos el valor uno para el prototipo A. Para el prototipo B, uno menos dos,
+y en la otra variable, dos menos tres; entonces la
+misma forma que estamos haciendo anteriormente vamos a mirar los individuos en
+relación a su centro ya la diferencia acá por dos entonces tomemos dos acá y
+después tenemos la penalización por estar similar o distinto: por
+ejemplo, el prototipo A acá, para este individuo, cuando miramos las categorías
+vamos a ver que este individuo tiene la misma categoría en App, entonces ponemos acá 0, pero para el Sur
+son distintos; cuando los individuos son distintos, lo que hago es sumar 1, entonces sumo 1 acá para
+los individuos distintos, entonces sumo 1, 1 por gamma va a ser gamma, entonces el costo que
+vamos a tener acá va a ser 1 más gamma, en esta otra situación tengo una distancia un poco mayor
+pero las categorías son muy similares, entonces esta persona utiliza la App y también está en la región sur,
+entonces no entró ninguna penalización acá por temas de desacuerdos; básicamente acá tenemos
+cero desacuerdos y acá tengo un desacuerdo, y ahí va a entrar exactamente la idea de los pesos,
+bueno, vamos a definir cuál es nuestro peso, si ponemos un peso de 0.5, clasificamos el individuo
+para el grupo A, si ponemos un peso gamma como 3, vamos a clasificar el
+nivel para el grupo B, entonces modificar el peso puede cambiar la
+asignación aunque los datos sean los mismos,
+entonces entramos en esta idea de cómo definimos gamma, cómo definimos,
+vamos a ver, haciendo distintos cambios de valor, cómo quedan los grupos,
+de alguna manera intentar encontrar ese valor de gamma.
+Bueno, como ajustamos los datos,
+utilizamos esta función acá en R, conocida como kproto.
+Entonces, va a ser nuestra base de datos que va a tener
+nuestro conjunto de datos original.
+Y voy a dejar algunas de estas variables acá como numéricas:
+ceniza y matiz.
+Entonces, ahora tengo variables numéricas,
+que no, de hecho, acá estoy salvando la base
+manteniendo z estandarizado con ceniza y matiz, y después estoy agregando
+variables categóricas, es decir, la primera variable ceniza va a ser
+numérica, a ser real, la segunda variable va a ser real y las otras tres
+van a ser categóricas, de la transformación; las categóricas van a ser
+2, 3 y 4, por ejemplo. Y ahí podemos ajustar la función con una
+función conocida como kproto, la base de datos y la cantidad de clusters.
+Bueno, yo puedo definir el peso acá, vamos a poner lambda igual a peso
+y corremos el modelo y vemos cómo nos va a salir.
+Aquí lambda es el peso de las categorías, no es una penalización como, por ejemplo, la de Ridge.
+En Python hacemos básicamente lo mismo, pero vamos a correr acá con KPrototypes.
+El número de clusters, puntos iniciales, el peso también lo vamos a tener acá, y bueno, así
+ya se ha mostrado el modelo.
+Y ahí vamos a tener el gráfico del codo nuevamente mostrando cuáles serían los posibles
+clústeres.
+Acá siempre me da la indicación posiblemente de cuando eso cambia.
+Me parece que hubo una ganancia de información muy grande de acá para acá, pero de acá
+para acá ya es pequeño.
+Entonces yo me quedaría con tres posibles clusters acá, ¿cierto?
+Entonces cuando tenemos datos reales y datos categóricos,
+me da la indicación de que una buena solución sería K igual a 3, ¿sí?
+Bueno, el prototipo, o prototype, va a combinar medias y modas, ¿ya?
+Entonces tenemos tres posibles clusters
+y cada uno de esos clusters va a tener su grupo base,
+O sea, sus valores promedios, donde deberían estar cada una de las covariables,
+y las covariables que ocurren con mayor frecuencia.
+Entonces, por ejemplo, el grupo 1 se quedó con 69 observaciones.
+De esas 69 observaciones, el promedio de la ceniza es de 0.62.
+El promedio del matiz es 0.50.
+Recuerden que esos valores están normalizados, están estandarizados.
+Después se devolvió la variable a la escala original para ver cuál es la interpretación.
+Alcohol alto, flavonoides medio y color medio.
+Entonces este grupo tiene algunas informaciones muy específicas, el nivel de alcohol alto y
+flavonoides medio, el color medio.
+El grupo 2 tiene una diferencia significativa en la ceniza, el matiz es muy distinto,
+está 0.22 positivo, esta está menos 1.26, el nivel de alcohol también es alto, pero
+flavonoides es bajo y el color es alto. Entonces ellos tienen informaciones ahí me parece muy
+distintas. Entonces es un otro grupo que está siendo clasificado. Y por fin el último grupo 3
+que también tiene valores muy distintos para ceniza, menos 0.88, 0.40, el nivel de alcohol bajo,
+flavonoides medio y color bajo. Entonces en el grupo 2, el matiz está a 1.258 desviaciones bajo la media general.
+color alto es la moda. Pero sólo 30 de 47 tienen esta categoría.
+Un prototipo puede no corresponder a ninguna observación real. Por eso
+ninguna de las observaciones reales ocurre exactamente con eso, pero cuando uno va a calcular la disimilitud y la distancia,
+va a acabar agrupando a estos individuos, aun
+sin que haya ningún individuo que tenga exactamente esa información. Bueno, ahora la sensibilidad, lo que,
+cómo funciona entonces conforme cambiamos los pesos. Uno puede tener una idea cuando
+intenta hacer un plot cambiando la estructura de los pesos. Bueno, tenemos que definir ese
+peso; eso no es una cosa mala, porque tengo que después evaluar cuál será el cluster
+con base en el peso. En la ceniza y el matiz estandarizados uno ve que con
+peso 0.25 logra hacer una buena clasificación para ese grupo. Conforme
+vamos cambiando el peso, la cosa empieza a se mezclar más y se queda más
+difícil hacer la clasificación de esos grupos. Entonces, conforme
+cambiamos el peso, vamos a cambiar esos grupos. Entonces, después tienen que hacer
+una variación, y por supuesto, si tienen después un label, ahí puede evaluarse cómo salió en
+términos de una clasificación real. Pero la gran mayoría de las veces no vamos a tener ese label, entonces no podemos
+elegir; eso es una información importante. Bueno, una cosa que es mala es que no tenemos la
+variable respuesta. Entonces, una cosa que nunca vamos a poder hacer es elegir el peso, por ejemplo, por una
+área bajo la curva ROC, o elegir el peso vía validación cruzada, porque no tenemos una variable
+respuesta acá. No calculamos la exactitud ni el área bajo la curva ROC porque no hay una clase
+observada que predecir. Usamos criterios internos acordes con las variables y la disimilitud. Revisamos
+los perfiles que aparecen al cambiar inicios o remuestrear.
+Para eso utilizamos una exploración de las 177 observaciones,
+pero eso no va a requerir automáticamente una división de 70-30,
+porque acá no vamos a hacer entrenamiento en un modelo,
+después se califica en el otro.
+Cuando comparamos los tres métodos,
+con K-means llegamos a tres clústeres y un costo acá del ejemplo, un WSS de 1267,
+¿ya? Basado en la distancia al cuadrado. Cuando cambiamos a K-modes, cambió el número de
+clústeres y tuvimos un cambio en el costo, o en la varianza, básicamente, aquella varianza que
+tenemos. O sea, estas métricas acá no son comparables para elegir cuál es el mejor método.
+Les comento esto porque hay mucha gente que hace esto: sale el costo y dicen «ya, esa es la
+varianza de uno, entonces eso también voy a comparar, me salió mejor con K-prototypes».
+Entonces no elegimos K-modes porque 75 sea el menor número de esa tabla. Los datos de entrada,
+las unidades, las funciones de costo son distintos. La comparación pertinente
+comienza por el tipo de variable y el propósito. Entonces, ¿cuál de los tres vamos a usar? Depende de cómo
+esté su base de datos.
+Si tienen solamente valores reales, K-means.
+Si tienen solamente valores categóricos, K-modes.
+Si tienen una mezcla de los dos, K-prototypes.
+De una forma muy sencilla.
+Bueno, antes de usar los grupos, revisamos las variables
+incluidas, escalas y posibles observaciones atípicas.
+Tamaños, perfiles y variación dentro de cada grupo;
+la sensibilidad al número de clústeres,
+la inicialización y el peso de cada categoría.
+Les mostré que la inicialización
+va a influenciar mucho
+o puede influenciar
+en la varianza final que tenemos.
+O sea, puede causarnos problemas
+cuando vayamos
+a hacer nuestro clúster.
+Entonces, tenemos que cambiar la inicialización.
+Tenemos que evaluar cuáles son los posibles clústeres.
+Utilicen los tres métodos
+y una sugerencia es evaluar la cantidad de clústeres que ocurren con más frecuencia en esos métodos.
+Si dos métodos indican tres clústeres, bueno, yo me voy con los tres clústeres.
+Revisamos si las conclusiones describen las mediciones o exceden la evidencia;
+bueno, unos cuidados que tienen que tener cuando van a hacer un análisis estadístico.
+Una cosa que es importante es recordar hacer la estandarización de las observaciones
+y una cosa que no discutí acá pero que es muy importante es evaluar si tenemos puntos atípicos
+¿Por qué puntos atípicos?
+vamos a suponer que tengo varios puntos acá
+un otro grupo acá
+y uno no se da cuenta; si tenemos observaciones y no hace un análisis de outliers.
+Bueno, hacemos acá una proyección 2D, entonces facilita la vida, pero generalmente ustedes
+no van a tener este lujo porque van a estar trabajando con 10, 15, 20, 30 covariables.
+Pero si uno hace una proyección va a ver que tiene un punto acá que uno no utiliza.
+Ya?
+Bueno, si yo pongo K igual a 2, claramente, eso debería ser un cluster, y eso debería
+ser un cluster.
+Ya?
+Si no tomamos cuidado, el método indicará que esto es un cluster, un punto acá, y que
+esto es otro cluster.
+Entonces, si tenemos outliers, tenemos que tomar mucho cuidado para que no
+se torne un cluster.
+Hay que tener cuidado en la evaluación de clusters.
+De hecho, no es K-means, pero PCA es una buena forma de hacer proyección y evaluar
+si tenemos puntos muy lejos.
+eliminamos posibles outliers y corremos el análisis de nuevo.
+Para los que vieron Random Forest, también es una forma de hacer evaluación de posibles outliers.
+Entonces vamos a ver una forma de detectar outliers para después no tener problemas con esto.
+Bueno, dejé algunas referencias acá, pero el artículo que me gustó mucho, que no es pesado,
+es el artículo de Tibshirani, Walther y Hastie.
+Se publicó en una revista muy importante de estadística, se llama Journal of the Royal Statistical Society, Serie B,
+de la Royal Statistical Society, pero el artículo es extremadamente intuitivo, muy sencillo.
+Quien quiera dar una mirada mejor a la parte teórica, los invito a bajar este artículo.
+Pueden utilizar las librerías que tenemos en R, en Python; tenemos ambos códigos, acá en R
+y para los que quieran correr en Python, van a ver que los cambios son pequeños,
+pero los resultados van a ser básicamente los mismos. Dejemos correr las cosas en Python
+para que veamos que vamos a llegar a los mismos resultados finales.
+esto fue con K-means
+comparar los grupos con las clases reales acá
+pues yo había hecho una comparación de los grupos con las clases reales
+para ver que con K-means me sale en python la misma cosa
+entonces voy a tener acá la comparación
+Esta es la clase real de un grupo, la clase real de otro grupo y la clase real.
+La única cosa que cambió es que creo que el orden, el PCA, estaba invertido.
+Estos puntos estaban más arriba.
+Pero la identificación es muy similar en dónde estamos clasificando mal.
+Entonces uno puede hacer este tipo de comparación.
+Acá bajamos la base real, la original, y tenemos las etiquetas,
+entonces podemos hacer la comparación, ¿cierto? con el PCA.
+Bueno, era eso lo que había planificado para hoy, para ustedes.
+Bueno, ahora que ya tenemos el contenido, simplemente voy a hacer un resumen
+y en la próxima clase revisamos tanto lo que vamos a tener con Eloy
+cuanto la idea de clusterización, ¿cierto?
+¿Dudas, preguntas, sugerencias? ¿Les gusta? ¿Sí Claudia?
+Profesor, una pequeña duda: como en regresión logística se penalizaba mediante Ridge o mediante Lasso,
+acá en estos modelos que estamos revisando ahora, ¿existe algún tipo de penalización o simplemente va a existir la función de costo que usted mencionó?
+Solamente la función de costo. Mira que acá no estamos, por ejemplo, en
+regresión Ridge o Lasso, en que lo que calculamos es
+la variable respuesta menos los betas a ser estimados, más una función de
+penalización para encoger los parámetros. ¿Se acuerdan de esa
+función de penalización allá en Ridge, Lasso y otros? Lo que intenta hacer es
+ayudarte a controlar la varianza, pero por supuesto usted está mirando un label específico.
+Acá no tenemos ese label. Por supuesto, como en support vector machine, vamos a tener un parámetro que
+tenemos problemas para poder encontrarlo, vamos a tener que evaluarlo. Pero no va a ser exactamente como hacemos
+con Ridge, porque Ridge nos facilita la cosa: minimizamos, encontramos el lambda o el gamma
+que minimiza una función; pero en este caso acá no tenemos cómo minimizar nada, nosotros
+tenemos que cambiar, evaluar cómo están saliendo las clusterizaciones en base a este gamma,
+entonces tenemos que poner este valor, pero este gamma...

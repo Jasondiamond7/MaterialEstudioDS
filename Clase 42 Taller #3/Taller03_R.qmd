@@ -1,0 +1,249 @@
+---
+title: "Taller #3 · Respuesta a una campaña bancaria"
+subtitle: "Aprendizaje Automático · Diplomado en Data Science UC 2026"
+lang: es
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    embed-resources: true
+    code-fold: false
+execute:
+  echo: true
+  warning: true
+  error: false
+engine: knitr
+---
+
+> Completen una sola plantilla. Generen su versión `.html` con Render y entreguen el `.html`, este `.qmd` y los dos archivos `.csv` dentro del `.zip` del grupo.
+
+Publicación: Jueves 8 de octubre de 2026, 18:30. Entrega: Miércoles 21 de octubre de 2026, 23:59.
+
+**Grupo:**
+
+**Integrantes (3 a 5):**
+
+**Lenguaje:** R
+
+**Puntaje máximo: 60. Nota = 1 + P/10.**
+
+## El caso
+
+Un banco portugués realiza campañas telefónicas para ofrecer depósitos a plazo. Contactar a toda la cartera tiene un costo y muchos clientes no contratan el producto. El equipo comercial quiere anticipar qué registros tienen mayor probabilidad de contratación y comprender los perfiles de la campaña. Una predicción favorable que no se concreta implica un contacto poco productivo; una predicción desfavorable puede dejar fuera una oportunidad.
+
+Como equipo de Data Science, deberán preparar los datos, comparar modelos y recomendar a qué clientes contactar. La predicción se realiza antes de la llamada registrada. El análisis de grupos y de registros inusuales complementará su recomendación.
+
+Se utiliza la muestra pública `bank.csv` de Bank Marketing, con 4521 registros. Cada fila contiene información de un cliente y sus contactos, junto con el resultado de contratación.
+
+## Entrega
+
+Elijan R o Python y resuelvan todo el taller en ese mismo lenguaje. Entreguen un archivo `.zip` por grupo, llamado `Grupo_XX_Taller3.zip`, con un notebook ejecutado y los dos archivos `.csv`. Identifiquen a todos los integrantes e incluyan código, resultados e interpretación en cada respuesta. Si entregan una versión `.html`, adjunten también su fuente (`.ipynb`, `.Rmd` o `.qmd`). Usen rutas relativas e indiquen las versiones de los paquetes.
+
+## Indicaciones de trabajo
+
+Trabajen con `clientes_entrenamiento.csv` y reserven `clientes_prueba.csv` para 3(b). Conserven las filas, fijen semilla 2026 y consideren `contrata` = 1 como clase positiva.
+
+Usen los cinco pliegues entregados para la validación cruzada. Aprendan las transformaciones y la selección de variables solo con las filas de ajuste de cada pliegue. Reúnan predicciones fuera de pliegue (OOF): probabilidades para los modelos probabilísticos y puntajes de decisión para SVM.
+
+El modelo de referencia predice la proporción positiva de las filas de ajuste. Para la evaluación final, calculen esa proporción con todo el conjunto de entrenamiento.
+
+## Datos
+
+Entrenamiento: 3617 registros. Prueba: 904 registros.
+
+| Columna | Descripción |
+|---|---|
+| `edad` / `saldo` | Edad en años / saldo medio anual en euros. |
+| `ocupacion` / `estado_civil` / `educacion` | Categorías de ocupación, estado civil y educación. |
+| `mora` / `hipoteca` / `prestamo` | Indicadores yes/no de mora, crédito hipotecario y préstamo personal. |
+| `canal` / `dia` / `mes` | Medio de contacto y día del mes / mes de la llamada registrada. |
+| `duracion` | Duración de la llamada registrada, en segundos. |
+| `contactos_campana` | Número de contactos de la campaña, incluida la llamada registrada. |
+| `dias_previos` | Días desde el contacto de una campaña anterior; -1 indica que no lo hubo. |
+| `contactos_previos` / `resultado_previo` | Número de contactos y resultado de campañas anteriores. |
+| `contrata` | Respuesta: 1 = contrata el depósito; 0 = no contrata. |
+| `id_cliente` / `pliegue` | Identificador del registro / pliegue de validación (solo en entrenamiento). |
+
+En las preguntas 4 y 5 usen solo `edad`, `saldo`, `contactos_campana` y `contactos_previos` del conjunto de entrenamiento, estandarizadas con media y desviación muestral.
+
+Fuente: [Bank Marketing (UCI)](https://doi.org/10.24432/C5K306). Moro, Rita y Cortez (2014). Licencia CC BY 4.0. Muestra completa, con nombres traducidos y particiones preparadas para el taller.
+
+## Preparación
+
+Funciones de apoyo: model.matrix, scale, lm/aov para el estadístico F, glm, rpart, ranger o randomForest, gbm, e1071::svm y predict con decision.values=TRUE, naivebayes::gaussian_naive_bayes y predict con type="prob", prcomp, kmeans y mahalanobis. Verifiquen los paquetes de su implementación; orienten el puntaje SVM hacia la clase 1 y seleccionen esa columna en las salidas de probabilidad de los demás modelos.
+
+```{r}
+set.seed(2026)
+carpeta <- '.'
+entrenamiento <- read.csv(file.path(carpeta, 'clientes_entrenamiento.csv'), check.names=FALSE)
+print(R.version.string)
+# El conjunto de prueba se abre en 3(b).
+```
+
+## Pregunta 1. Problema, preparación y representación (12 puntos)
+
+### 1(a) (3 puntos)
+
+Identifiquen la tarea de aprendizaje, la unidad de observación y la respuesta. ¿Por qué `duracion` no puede usarse para predecir antes de la llamada? Exclúyanla de los predictores, junto con `id_cliente`, `pliegue` y `contrata`.
+
+```{r}
+# Código y resultados de este apartado.
+```
+
+**Respuesta e interpretación del grupo:**
+
+
+
+### 1(b) (4 puntos)
+
+Revisen tipos de variables, faltantes, categorías unknown, duplicados y balance de clases. Interpreten los valores negativos de `saldo` y el código -1 de `dias_previos`. ¿Sería suficiente la exactitud de predecir siempre la clase mayoritaria? Fundamenten.
+
+```{r}
+# Código y resultados de este apartado.
+```
+
+**Respuesta e interpretación del grupo:**
+
+
+
+### 1(c) (5 puntos)
+
+Construyan dos variables: `contactado_antes` = 1 si `dias_previos` es distinto de -1, y `log_contactos_previos` = log(1 + `contactos_previos`). Expliquen su sentido. Reemplacen -1 por 0 en `dias_previos` conservando el indicador, mantengan unknown como categoría y codifiquen las variables categóricas mediante one-hot. Describan y apliquen el escalamiento necesario para cada método.
+
+```{r}
+# Código y resultados de este apartado.
+```
+
+**Respuesta e interpretación del grupo:**
+
+
+
+## Pregunta 2. Selección de variables y modelos supervisados (24 puntos)
+
+| Modelo | Configuraciones |
+|---|---|
+| Regresión logística | Sin penalización: todas las columnas preparadas y una versión con selección de 10 columnas. |
+| Árbol de decisión | Profundidades máximas 3 y 6; mínimo 20 observaciones por hoja. |
+| Random Forest | 200 árboles; raíz cuadrada del número de columnas como candidatas por división; mínimo 10 por hoja. |
+| Boosting | Una variante vista en clases; hasta 200 árboles y profundidad máxima 3. Informen variante y tasa de aprendizaje. |
+| SVM radial | C = 1 y gamma = 1/p, donde p es el número de columnas preparadas; usen el puntaje de decisión. |
+| Naive Bayes | Variante gaussiana sobre las columnas numéricas y binarias preparadas. |
+
+### 2(a) (5 puntos)
+
+Comparen regresión logística con todas las columnas preparadas y con las 10 de mayor estadístico F de ANOVA respecto de `contrata`. Informen las columnas seleccionadas en cada pliegue y comparen sus métricas OOF. ¿En qué se diferencia esta selección de PCA? ¿Qué limitación tiene el filtro univariado?
+
+```{r}
+# Código y resultados de este apartado.
+```
+
+**Respuesta e interpretación del grupo:**
+
+
+
+### 2(b) (11 puntos)
+
+Comparen las configuraciones de la tabla, incluidas las dos regresiones de 2(a), mediante sus predicciones OOF. Presenten log loss, Brier y AUC; para SVM, solo AUC. Incluyan el modelo de referencia y, para ambos árboles, el log loss medio de entrenamiento de los cinco ajustes. Seleccionen el modelo probabilístico con menor log loss OOF.
+
+```{r}
+# Código y resultados de este apartado.
+```
+
+**Respuesta e interpretación del grupo:**
+
+
+
+### 2(c) (8 puntos)
+
+Interpreten los resultados considerando: profundidad y sobreajuste de los árboles; diferencias entre bagging, Random Forest y boosting; independencia condicional de Naive Bayes y limitaciones de la variante gaussiana para columnas binarias; efecto de C, gamma y el escalamiento en SVM. ¿Un mejor ordenamiento de las observaciones implica mejores probabilidades? Fundamenten.
+
+```{r}
+# Código y resultados de este apartado.
+```
+
+**Respuesta e interpretación del grupo:**
+
+
+
+## Pregunta 3. Evaluación y decisión (10 puntos)
+
+### 3(a) (4 puntos)
+
+Con las probabilidades OOF del modelo elegido, evalúen los umbrales 0.05; 0.10; ...; 0.95. Predigan contratación si p es mayor o igual al umbral. Elijan el que minimiza el costo hipotético C(t) = FP(t) + 5 FN(t), donde FP es una alerta de contratación que no ocurre y FN una contratación no detectada. Presenten una tabla o curva e interpreten ambos errores.
+
+```{r}
+# Código y resultados de este apartado.
+```
+
+**Respuesta e interpretación del grupo:**
+
+
+
+### 3(b) (6 puntos)
+
+Reajusten el modelo elegido con todo el entrenamiento y evalúen en `clientes_prueba.csv`. Informen log loss, Brier, AUC y curva ROC. Comparen el umbral elegido con 0.50 mediante matriz de confusión, sensibilidad, especificidad y C/n; incluyan el modelo de referencia. ¿Qué recomendarían al banco? ¿Qué permiten concluir los resultados y qué falta verificar para una campaña futura?
+
+```{r}
+# Registre primero el modelo y el umbral elegidos con OOF.
+prueba <- read.csv(file.path(carpeta, 'clientes_prueba.csv'), check.names=FALSE)
+```
+
+**Respuesta e interpretación del grupo:**
+
+
+
+## Pregunta 4. Componentes principales y agrupamiento (8 puntos)
+
+### 4(a) (3 puntos)
+
+Realicen PCA. Informen la varianza explicada por PC1 y PC2, su suma y las cargas; grafiquen las observaciones en ese plano. ¿Qué información resume la proyección y cuál omite?
+
+```{r}
+# Código y resultados de este apartado.
+```
+
+**Respuesta e interpretación del grupo:**
+
+
+
+### 4(b) (5 puntos)
+
+Ajusten K-means sobre las cuatro variables estandarizadas con k = 2, 3 y 4 y al menos 30 inicializaciones. Comparen WSS y silueta media y elijan el k de mayor silueta. Informen tamaños, describan perfiles y representen los grupos en el plano PCA. Calculen la proporción de contratación dentro de cada grupo y expliquen por qué los grupos no equivalen a clases predichas.
+
+```{r}
+# Código y resultados de este apartado.
+```
+
+**Respuesta e interpretación del grupo:**
+
+
+
+## Pregunta 5. Detección de anomalías (6 puntos)
+
+### 5(a) (3 puntos)
+
+Calculen la distancia de Mahalanobis al cuadrado y usen como corte el cuantil 0.99 de una chi-cuadrado con 4 grados de libertad. Informen el corte, la cantidad y el porcentaje de registros marcados. Identifiquen los dos de mayor distancia y presenten sus valores originales.
+
+```{r}
+# Código y resultados de este apartado.
+```
+
+**Respuesta e interpretación del grupo:**
+
+
+
+### 5(b) (3 puntos)
+
+¿Por qué son inusuales los dos registros identificados? ¿Esto demuestra que contienen errores? ¿El corte utilizado garantiza marcar al 1% de la muestra? Fundamenten e indiquen qué revisarían antes de eliminar un registro.
+
+```{r}
+# Código y resultados de este apartado.
+```
+
+**Respuesta e interpretación del grupo:**
+
+
+
+## Criterios de evaluación
+
+Se evaluarán procedimiento, resultados e interpretación. Se asignará crédito parcial sin descontar dos veces un mismo error arrastrado. Se aceptan diferencias numéricas y ganadores distintos cuando la implementación y la regla de selección estén justificadas.

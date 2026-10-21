@@ -1,0 +1,6784 @@
+1
+00:00:00,000 --> 00:00:06,000
+Perfecto, ahí empecé a grabar también para que quede...
+
+2
+00:00:06,000 --> 00:00:11,000
+Perfecto, déjame compartir la pantalla.
+
+3
+00:00:11,000 --> 00:00:14,000
+Acabamos.
+
+4
+00:00:30,000 --> 00:00:39,000
+Bueno, ¿se ve bien? ¿Se escucha bien? ¿Todo bien?
+
+5
+00:00:39,000 --> 00:00:46,000
+Perfecto, bueno, es un gusto estar acá de nuevo. Bueno, agradezco al profesor Ricardo por la introducción.
+
+6
+00:00:46,000 --> 00:00:53,000
+Para los alumnos que se recuerdan, tuvimos una clase en julio, creo que fue en julio, de repaso.
+
+7
+00:00:53,000 --> 00:00:59,000
+Bueno, en ese momento había hecho un repaso de probabilidad y había comentado que en algún momento
+
+8
+00:00:59,000 --> 00:01:08,000
+yo iría a ser exactamente las clases de una parte al menos de la parte de Machine Learning.
+
+9
+00:01:08,000 --> 00:01:15,000
+Como el profesor Ricardo le comentó, me gusta el carácter con la parte de la inferencia, principalmente
+
+10
+00:01:15,000 --> 00:01:19,000
+los métodos de Machine Learning, Romina, creo que fue mi alumna,
+
+11
+00:01:19,000 --> 00:01:23,000
+del curso de métodos para grandes volúmenes de datos.
+
+12
+00:01:23,000 --> 00:01:25,000
+Entonces, ya está.
+
+13
+00:01:25,000 --> 00:01:30,000
+Bueno, va a revisar nuevamente los contenidos que discutimos en clase.
+
+14
+00:01:30,000 --> 00:01:35,000
+Bueno, hoy lo objetivo es hablar un poco sobre una metodología que me gusta bastante,
+
+15
+00:01:35,000 --> 00:01:37,000
+Support Vector Machine, ya?
+
+16
+00:01:37,000 --> 00:01:41,000
+Y algunos clasificadores, acá se llaman clásicos,
+
+17
+00:01:41,000 --> 00:01:43,000
+en el sentido que son los más conocidos,
+
+18
+00:01:43,000 --> 00:01:46,000
+pero no básicamente en términos de inferencia.
+
+19
+00:01:46,000 --> 00:01:49,280
+Aquí tenemos dos cuidados: tenemos la inferencia clásica y la inferencia
+
+20
+00:01:49,280 --> 00:01:50,280
+bayesiana.
+
+21
+00:01:53,280 --> 00:01:54,280
+Sí.
+
+22
+00:02:02,280 --> 00:02:03,280
+Ya, sigamos.
+
+23
+00:02:03,280 --> 00:02:11,200
+Entonces, la idea es que tenemos acá el nombre clásico, pero no vamos a discutir ese punto
+
+24
+00:02:11,200 --> 00:02:15,720
+desde el punto de vista bayesiano o clásico, pero se puede agregar este tipo de discusión
+
+25
+00:02:15,720 --> 00:02:22,720
+en el largo de una clase en el futuro, por el lado de Eloy, el profesor Alvarado.
+
+26
+00:02:22,720 --> 00:02:30,920
+Lo que creo que es casi interesante, porque es importante que repasemos, bueno, nuestro
+
+27
+00:02:30,920 --> 00:02:34,240
+objetivo va a ser trabajar desde un punto de vista de aprendizaje supervisado.
+
+28
+00:02:34,240 --> 00:02:43,240
+Entonces, desde el punto de vista de aprendizaje supervisado, lo que queremos hacer es hacer básicamente un entrenamiento de un modelo, hacer una supervisión.
+
+29
+00:02:43,240 --> 00:02:55,240
+En ese sentido tenemos nuestra variable, nuestro label, acá y ahí. Creo que ya vieron eso en la introducción de modelos de aprendizaje supervisado, introducción de Machine Learning.
+
+30
+00:02:55,240 --> 00:02:58,240
+Ya tenéis una idea de lo que se espera en ese momento.
+
+31
+00:02:58,240 --> 00:03:00,800
+El subjetivo tiene una variable de respuesta, ¿bien?
+
+32
+00:03:01,480 --> 00:03:04,880
+Y esa variable de respuesta puede tomar alguna categoría que yo quiero poner acá.
+
+33
+00:03:04,880 --> 00:03:07,280
+Puedo poner cualquier valor que me gustaría.
+
+34
+00:03:07,800 --> 00:03:10,760
+Menos uno, uno, menos dos, dos.
+
+35
+00:03:11,080 --> 00:03:14,720
+No me importa. 0 y 1 va a ser exactamente la clasificación
+
+36
+00:03:15,280 --> 00:03:19,480
+de un punto específico que esto es, de una persona o una área.
+
+37
+00:03:22,400 --> 00:03:25,960
+Lo que generalmente utilizamos más es si la persona es malo o un bueno pagador,
+
+38
+00:03:25,960 --> 00:03:30,880
+por ejemplo, entonces voy a clasificar las personas como quiero, 0 puede ser malo, 1 como
+
+39
+00:03:30,880 --> 00:03:37,240
+bueno pagador o puede ser 0 como bueno pagador y 1 como malo, no importa solamente va a cambiar
+
+40
+00:03:37,240 --> 00:03:46,360
+la forma de la probabilidad pero al final vamos a tener los mismos resultados, junto con nuestro
+
+41
+00:03:46,360 --> 00:03:54,800
+clasificador acá nuestra variable de respuesta 0,1 que puede ser una variable binaria, vamos a tener
+
+42
+00:03:54,800 --> 00:03:58,440
+nuestras covariables entonces la idea que por ejemplo ustedes van a solicitar
+
+43
+00:03:58,440 --> 00:04:03,800
+plata al banco el banco le va a sacar un montón de información en relación a
+
+44
+00:04:03,800 --> 00:04:10,240
+ese X, va a preguntar su sueldo, va a preguntar su historia laboral, va a
+
+45
+00:04:10,240 --> 00:04:14,760
+pedir los últimos comprobantes de la AFP que tienen
+
+46
+00:04:14,760 --> 00:04:18,680
+ellos van a tener varias informaciones un montón de ex acá
+
+47
+00:04:18,680 --> 00:04:26,020
+¿Cierto? Y la idea es exactamente intentar crear una función que con base en estos X
+
+48
+00:04:26,020 --> 00:04:30,680
+le va a poder clasificar a ustedes o a otras personas como 0 y 1.
+
+49
+00:04:30,680 --> 00:04:37,220
+Entonces, nuestro objetivo es crear una función f, acá, de X muy específica,
+
+50
+00:04:37,220 --> 00:04:40,980
+donde cuando ponemos nuestros X acá,
+
+51
+00:04:40,980 --> 00:04:44,620
+él nos va a informar y le va a retornar alguna regla de decisión
+
+52
+00:04:44,620 --> 00:04:47,220
+que va a clasificar ese individuo como 0 o 1.
+
+53
+00:04:47,220 --> 00:04:54,500
+Sí, eso es muy importante, tiene una importancia muy grande porque con base a
+
+54
+00:04:54,500 --> 00:04:58,940
+eso podemos tomar buenas decisiones. Banco por ejemplo no va a emprestar plata
+
+55
+00:04:58,940 --> 00:05:03,100
+si tiene una alta probabilidad que no va a volver, no va a pagar el precio que va a
+
+56
+00:05:03,100 --> 00:05:08,460
+nacer con ellos. Una cosa que olvide acá de comentar con ustedes, tenemos
+
+57
+00:05:08,460 --> 00:05:13,100
+95 alumnos, mucho más de los que
+
+58
+00:05:17,220 --> 00:05:28,420
+de la cantidad de alumnos que tenemos durante el repaso. Una cosa que es importante que se recuerda
+
+59
+00:05:28,420 --> 00:05:35,780
+es que soy brasilien, ya llegue a Chile, he mejorado el tema del español pero muchas veces me cuesta
+
+60
+00:05:35,780 --> 00:05:40,260
+un poco, entonces si tienen alguna duda pueden preguntarme que intento explicarlo en una forma distinta.
+
+61
+00:05:40,260 --> 00:05:48,260
+También si estoy yendo muy rápido, me comenten que intento describirlo en una forma distinta o cambiar el ejemplo.
+
+62
+00:05:48,260 --> 00:05:52,260
+Bueno, vamos por otro camino acá.
+
+63
+00:05:52,260 --> 00:05:58,260
+Entonces, lo que intentamos hacer, básicamente va a ser crear una función f, acá.
+
+64
+00:05:58,260 --> 00:06:01,260
+Esta función f puede venir por varios tipos de funciones.
+
+65
+00:06:01,260 --> 00:06:05,260
+En este curso, ustedes van a ver regresión logística, como vamos a ver ahora,
+
+66
+00:06:05,260 --> 00:06:11,260
+Support Vector Machine, árboles, random forest, redes neuronales, boosting.
+
+67
+00:06:11,260 --> 00:06:15,260
+Hay un montón de métodos que nos van a ayudar a hacer clasificación, ¿cierto?
+
+68
+00:06:15,260 --> 00:06:19,260
+Cada método va a tener una predicción de forma distinta,
+
+69
+00:06:19,260 --> 00:06:24,260
+ojalá no sea tan distinto así, pero ellos van a tener,
+
+70
+00:06:24,260 --> 00:06:28,260
+es posible que nos va a retornar valores distintos, ¿cierto?
+
+71
+00:06:28,260 --> 00:06:33,260
+un método puede clasificar una persona como malo y otro método va a clasificar a persona como bueno pagador.
+
+72
+00:06:33,260 --> 00:06:37,260
+Entonces la idea es hacer comparaciones entre estos métodos.
+
+73
+00:06:39,260 --> 00:06:43,260
+Bueno, es importante que se recuerden un poco de esto porque vamos siguiendo.
+
+74
+00:06:43,260 --> 00:06:47,260
+Bueno, después voy a empezar a describir cómo construimos esta función f
+
+75
+00:06:47,260 --> 00:06:50,260
+y es importante que no se clave con ninguna duda.
+
+76
+00:06:50,260 --> 00:06:58,260
+Nuestro objetivo acá es clasificar bien casos no utilizados en el entrenamiento.
+
+77
+00:06:58,260 --> 00:07:04,260
+Acá básicamente nos objetivo es clasificar bien estos individuos como cero o clasificar individuos como uno.
+
+78
+00:07:04,260 --> 00:07:11,260
+Perfecto.
+
+79
+00:07:11,260 --> 00:07:18,260
+Vamos allá. Una cosa que también es importante es cómo hacemos el entrenamiento del modelo.
+
+80
+00:07:18,260 --> 00:07:25,260
+Ya vamos a entrar un poco en la discusión, pero el entrenamiento acá se va a utilizar exactamente nuestra variable de respuesta,
+
+81
+00:07:25,260 --> 00:07:27,260
+que va a ser 0 y 1.
+
+82
+00:07:27,260 --> 00:07:32,340
+nuestro objetivo es sacamos las covariables evaluamos ya una persona que tiene un sueldo
+
+83
+00:07:32,340 --> 00:07:40,300
+de 2 millones y medio que vive en determinada comuna que no tiene deudas que no tiene 30% de su
+
+84
+00:07:40,300 --> 00:07:46,700
+de su rienda comprometida con con deudas por ejemplo cuál es la probabilidad de ser un bueno
+
+85
+00:07:46,700 --> 00:07:52,780
+pagador lo que el banco lo que un banco va a hacer cualquier otro modelo que vamos a intentar
+
+86
+00:07:52,780 --> 00:07:58,620
+ajustar, él va a mirar en los dados que ya tenemos almacenado, entonces ya hizo el banco
+
+87
+00:07:58,620 --> 00:08:03,860
+ya tiene mucha desinformación, con mucha información podemos crear buenos modelos para hacer la
+
+88
+00:08:03,860 --> 00:08:10,300
+clasificación, entonces el banco va a mirar y pensar ya, esas personas tienen, esas personas que
+
+89
+00:08:10,300 --> 00:08:16,140
+tienen un sueldo de 2 millones de medio, no tener 30% de su sueldo comprometido con delas,
+
+90
+00:08:16,140 --> 00:08:23,840
+es muy probable que nos va a pagar. De hecho, casi 100% de esas personas que tenían esta información
+
+91
+00:08:23,840 --> 00:08:31,960
+lograron hacer el pago. Ellos impulsaron hacer este tipo de comparación. Pero directamente acá vamos
+
+92
+00:08:31,960 --> 00:08:37,600
+a tener ventas o una función muy similar a lo que hacemos con regresión logística o con regresión
+
+93
+00:08:37,600 --> 00:08:42,280
+lineal. Vamos a ajustar una función en que vamos a tener algunos pesos que nos van a aumentar o
+
+94
+00:08:42,280 --> 00:08:46,280
+puede aumentar o disminuir la probabilidad de que la persona va a pagar esa deuda.
+
+95
+00:08:46,280 --> 00:08:50,280
+Entonces tenemos que ajustar estos parámetros con base en los dados que tenemos
+
+96
+00:08:50,280 --> 00:08:54,280
+y esperamos que este modelo sea un buen clasificador.
+
+97
+00:08:54,280 --> 00:08:56,280
+Yo vi que leí algunos comentarios acá,
+
+98
+00:09:08,280 --> 00:09:15,680
+Romina va contestando. Bueno, si ustedes tienen alguna duda muy grande levanten la mano y
+
+99
+00:09:15,680 --> 00:09:22,760
+ahí paramos. Entonces inicialmente vamos a escuchar formas de obtener esta función
+
+100
+00:09:22,760 --> 00:09:28,240
+RE. En este curso, con esta clase inicialmente, después también en repaso, vamos a hablar
+
+101
+00:09:28,240 --> 00:09:34,920
+exactamente sobre dos formas muy importantes y muy poderosas de hacer clasificación. La
+
+102
+00:09:34,920 --> 00:09:40,120
+La primera, Regresión Logística, no sé si tú vieron una clase de Regresión Logística, creo que sí,
+
+103
+00:09:40,120 --> 00:09:43,120
+en algún momento anterior, vamos a acordar eso a la hora del punto de vista de pensar
+
+104
+00:09:43,120 --> 00:09:48,920
+supervisado, y un modelo que tiene un nombre muy mágico que se llama Support Vector Machine,
+
+105
+00:09:48,920 --> 00:09:54,320
+esta máquina de vectores de soporte, vamos a pensar eso del punto de vista de Regresión
+
+106
+00:09:54,320 --> 00:09:59,620
+un poco más adelante, Support Vector Regression Machine, ellos son construidos de formas
+
+107
+00:09:59,620 --> 00:10:04,120
+completamente distintas, una persona construyó una forma, otra persona
+
+108
+00:10:04,120 --> 00:10:09,120
+construyen de otra forma métodos distintos que toman decisiones de formas distintas.
+
+109
+00:10:09,120 --> 00:10:13,120
+Como son métodos distintos se espera que van a tener desempeños también distintos.
+
+110
+00:10:13,120 --> 00:10:20,120
+¿Cuáles es mejor? No sé, va a tener que evaluar dependiendo del contexto y de la base de dados que tiene.
+
+111
+00:10:23,120 --> 00:10:26,120
+El soporte vector machine siempre va a ser mejor que regresión logística.
+
+112
+00:10:26,120 --> 00:10:30,120
+Si algún profesor le comenta eso está dando una mala información.
+
+113
+00:10:30,120 --> 00:10:34,120
+siempre va a salir mejor que Support Vector Machine o no sé,
+
+114
+00:10:34,120 --> 00:10:36,120
+Random Forest o alguna variación.
+
+115
+00:10:36,120 --> 00:10:42,120
+No podemos elegir el mejor modelo solamente por la forma que fue construido
+
+116
+00:10:42,120 --> 00:10:47,120
+sin evaluar eso en un punto de entrenamiento, en un punto de validación, ¿cierto?
+
+117
+00:10:47,120 --> 00:10:50,120
+Por eso que la idea acá es, le presentar un conjunto de modelos,
+
+118
+00:10:50,120 --> 00:10:54,120
+varios modelos, ustedes van a ajustar todos esos modelos
+
+119
+00:10:54,120 --> 00:10:57,120
+y van a empezar a hacer comparaciones entre ellos.
+
+120
+00:10:57,120 --> 00:11:03,120
+Y ahí se elegirá el mejor modelo para esta base de datos específica.
+
+121
+00:11:05,120 --> 00:11:11,120
+Por ejemplo, un ejemplo muy sencillo es...
+
+122
+00:11:16,120 --> 00:11:21,120
+Siempre hago clases con Romina, con todos los alumnos de métodos para grandes volúmenes de dados.
+
+123
+00:11:21,120 --> 00:11:27,120
+Ellos siempre tienen proyectos para presentar y cada uno de ellos elige una base distinta.
+
+124
+00:11:27,120 --> 00:11:33,120
+Bueno, cada uno con una base distinta, vamos a hacer una comparación entre 15 métodos
+
+125
+00:11:33,120 --> 00:11:38,720
+de clasificación, 10 a 15 métodos, y al final se dan cuenta que para esta base nos
+
+126
+00:11:38,720 --> 00:11:44,000
+salió mejor Regresión Logística, para esta otra base me salió mejor KNN, una otra base
+
+127
+00:11:44,000 --> 00:11:48,120
+me salió mejor Support Vector Machine, y conforme cambiamos la base...
+
+128
+00:11:48,120 --> 00:11:49,120
+Sí, Claudia.
+
+129
+00:11:49,120 --> 00:11:56,120
+Hola, buenas tardes. ¿Ambos modelos son válidos solamente para variables continuas?
+
+130
+00:11:56,120 --> 00:12:05,120
+En este caso, ambos los modelos que voy a discutir ahora, la estructura que está acá, son válidos solamente para variables binarias.
+
+131
+00:12:05,120 --> 00:12:13,120
+O sea, se va a describir variables con variables de respuesta como ser uno, hombre o mujer, malo o bueno.
+
+132
+00:12:13,120 --> 00:12:18,320
+Por ejemplo, no puedo ajustar la regresión logística si tengo como variable de respuesta el sueldo.
+
+133
+00:12:18,320 --> 00:12:21,980
+O por ejemplo el precio del bitcoin.
+
+134
+00:12:21,980 --> 00:12:27,180
+Entonces en una situación como esta, tenemos que ir para otros modelos, como regresión linear,
+
+135
+00:12:27,180 --> 00:12:32,780
+modelos aditivos generalizados, bueno, random forest.
+
+136
+00:12:32,780 --> 00:12:40,780
+El único nombre que de hecho, creo que uno de los únicos modelos que tiene un nombre distinto va a ser la regresión logística.
+
+137
+00:12:40,780 --> 00:12:47,780
+Porque el Support Vector Machine que voy a presentar ahora es un Support Vector Machine para clasificación, ¿cierto?
+
+138
+00:12:47,780 --> 00:12:50,780
+Acá estamos enfocados en un problema de clasificación.
+
+139
+00:12:50,780 --> 00:12:55,780
+Entonces, usted puede me preguntar, pero no existe un Support Vector Machine para regresión?
+
+140
+00:12:55,780 --> 00:13:02,780
+Si, cuando ustedes fueran a utilizar la función solamente tiene que cambiar reg que va a cambiar para regresión.
+
+141
+00:13:02,780 --> 00:13:06,780
+Entonces, un modelo como este, Support Vector Machine, tiene dos versiones.
+
+142
+00:13:06,780 --> 00:13:09,780
+Una para regresión y una versión para clasificación, ¿cierto?
+
+143
+00:13:09,780 --> 00:13:13,780
+La regresión logística no, la regresión logística es para clasificación.
+
+144
+00:13:13,780 --> 00:13:17,780
+Si queremos ir para la regresión, tenemos que utilizar una regresión linear
+
+145
+00:13:17,780 --> 00:13:20,780
+o alguna otra versión de un modelo linear generalizado
+
+146
+00:13:20,780 --> 00:13:22,780
+o incluso modelos no lineales.
+
+147
+00:13:22,780 --> 00:13:26,780
+Vamos a empezar a hablar acá sobre algunas estructuras de modelos no lineales.
+
+148
+00:13:26,780 --> 00:13:28,780
+Pero ambos son para clasificación.
+
+149
+00:13:28,780 --> 00:13:31,780
+Quiero clasificar a la persona como malo o bueno pagador.
+
+150
+00:13:31,780 --> 00:13:34,780
+Aquella variada de respuesta va a ser una variable binaria.
+
+151
+00:13:34,780 --> 00:13:37,780
+Perfecto, gracias.
+
+152
+00:13:37,780 --> 00:13:42,780
+Entonces, muchas gracias Claudia por la pregunta, una excelente pregunta.
+
+153
+00:13:42,780 --> 00:13:45,780
+Entonces, los modelos para que utilizamos para clasificación.
+
+154
+00:13:45,780 --> 00:13:50,780
+Profesor, pero no sé, yo estoy preocupado en hacer predicciones de bitcoin,
+
+155
+00:13:50,780 --> 00:13:56,780
+quiero saber si el bitcoin está subiendo o bajando, mi trabajo necesita hacer la
+
+156
+00:13:56,780 --> 00:14:01,780
+predicción de la venda de un producto específico, la cantidad de un producto que
+
+157
+00:14:01,780 --> 00:14:04,780
+vamos a hacer la venda. No se preocupe, después de estos modelos, un poquito más
+
+158
+00:14:04,780 --> 00:14:10,420
+adelante lo vamos a adaptar para regresión y ahí se van a poder ver cómo funciona. Pero por ahora
+
+159
+00:14:10,420 --> 00:14:16,060
+vamos a ver sobre clasificación. ¿Esto cambia alguna cosa? Sí, cambia todo porque si vamos para
+
+160
+00:14:16,060 --> 00:14:23,220
+clasificación miramos eso de un punto de vista de función de pérdida. Si vamos para regresión es
+
+161
+00:14:23,220 --> 00:14:27,780
+una otra forma de hacer la estimación. Entonces un support vector machine para regresión o para
+
+162
+00:14:27,780 --> 00:14:33,180
+clasificación es muy distinto. Un random forest para regresión o para clasificación también es muy
+
+163
+00:14:33,180 --> 00:14:38,820
+de cinto, ya? Entonces hay que tomar lo inter... por eso que es importante que tomen
+
+164
+00:14:38,820 --> 00:14:43,180
+este curso para entender. Ya, estoy utilizando Support Vector Machine, ya, pero el Support
+
+165
+00:14:43,180 --> 00:14:46,660
+Vector Machine es para clasificación o regresión. Me recuerdo que el profesor me comentó que
+
+166
+00:14:46,660 --> 00:14:53,180
+era distinto. Si ustedes van a arrear, ajustan una función, ponen 0 y 1 en un Support Vector
+
+167
+00:14:53,180 --> 00:14:58,300
+Machine y ajusta eso como una regresión, le va a salir alguna cosa en el software.
+
+168
+00:14:58,300 --> 00:14:59,800
+El R lo va a computar.
+
+169
+00:15:00,800 --> 00:15:03,300
+Python también lo va a hacer las cuentas,
+
+170
+00:15:03,300 --> 00:15:05,300
+pero las cuentas van a estar malas.
+
+171
+00:15:05,800 --> 00:15:10,300
+Entonces, la idea es que acá ustedes aprendan exactamente la diferencia,
+
+172
+00:15:10,300 --> 00:15:12,300
+simplemente de que de apretar un botón ahí,
+
+173
+00:15:12,300 --> 00:15:14,300
+y ya estoy haciendo este ajuste,
+
+174
+00:15:14,300 --> 00:15:15,800
+pero no sé lo que está saliendo,
+
+175
+00:15:15,800 --> 00:15:17,300
+y tampoco sé
+
+176
+00:15:17,800 --> 00:15:20,300
+cuáles son las oposiciones que tenemos en nuestro modelo.
+
+177
+00:15:22,800 --> 00:15:26,300
+Entonces, nuestro objetivo acá va a ser hablar sobre regresión logística,
+
+178
+00:15:26,300 --> 00:15:30,460
+En la regresión logística, en nuestra salida o cuando hacemos las cuentas,
+
+179
+00:15:30,460 --> 00:15:33,180
+vamos a calcular una probabilidad.
+
+180
+00:15:33,180 --> 00:15:35,180
+Para ser la probabilidad estimada,
+
+181
+00:15:35,180 --> 00:15:38,380
+la probabilidad de este individuo ser un mal pagador.
+
+182
+00:15:38,380 --> 00:15:41,900
+La probabilidad de este individuo ser un mal pagador.
+
+183
+00:15:41,900 --> 00:15:45,420
+Y con base en un valor específico que podemos definir,
+
+184
+00:15:45,420 --> 00:15:50,220
+un umbral, por ejemplo, o un punto de corte de 0.5,
+
+185
+00:15:50,220 --> 00:15:53,180
+los que están arriba de 0.5, clasifico como 1,
+
+186
+00:15:53,180 --> 00:15:55,900
+y los que están abajo, clasifico como 0.
+
+187
+00:15:55,900 --> 00:15:59,900
+Los que están abajo son malos pagadores, los que están arriba son buenos pagadores.
+
+188
+00:15:59,900 --> 00:16:00,900
+¿Verdad?
+
+189
+00:16:00,900 --> 00:16:03,900
+Entonces, es una posible forma de hacer eso.
+
+190
+00:16:03,900 --> 00:16:09,900
+Entonces, clasifico uno si esta probabilidad que fue estimada está mayor que un valor T que puede ser un umbral.
+
+191
+00:16:09,900 --> 00:16:15,900
+Profesor, tiene que ser 0.5? No. Podemos evaluar otros puntos de corte.
+
+192
+00:16:15,900 --> 00:16:21,900
+Generalmente se define 0.5, pero muchos modelos, o sea, ustedes van a tener tiempo para eso.
+
+193
+00:16:21,900 --> 00:16:27,900
+y después cambiar los umbrales y evaluar cuál es el umbral que está dando la mejor clasificación.
+
+194
+00:16:27,900 --> 00:16:33,900
+En cuanto al soporte vector machine, va a tomar una otra decisión.
+
+195
+00:16:33,900 --> 00:16:38,900
+Clasificamos como 1 si la función de x for mayor que un valor, mayor o igual a un valor 0 acá,
+
+196
+00:16:38,900 --> 00:16:40,900
+después recalculamos esta función.
+
+197
+00:16:40,900 --> 00:16:47,900
+El umbral, T = 0.5, es una referencia habitual, pero puede modificarse con un criterio definido previamente.
+
+198
+00:16:47,900 --> 00:16:52,340
+Y el puntaje de un suporte vector machine no es por si solo una probabilidad.
+
+199
+00:16:52,340 --> 00:16:56,300
+¿Por qué estoy cambiando acá el nombre P por F?
+
+200
+00:16:56,300 --> 00:17:01,380
+Porque lo que me va a salir en suporte vector machine no es una probabilidad.
+
+201
+00:17:01,380 --> 00:17:07,180
+Algunos métodos que comparamos en términos de clasificación,
+
+202
+00:17:07,180 --> 00:17:08,940
+no me sale probabilidades.
+
+203
+00:17:08,940 --> 00:17:13,580
+Por ejemplo, en los vecinos más cercanos, cuando voy a tomar la decisión,
+
+204
+00:17:13,580 --> 00:17:15,900
+lo que me va a salir allá no es una probabilidad.
+
+205
+00:17:15,900 --> 00:17:23,400
+Entonces, exactamente tenemos que tomar un poco de este cuidado, evaluar con frecuencia.
+
+206
+00:17:23,400 --> 00:17:27,900
+Sólo para que sepa que es muy distinto lo que me va a salir en la probabilidad,
+
+207
+00:17:27,900 --> 00:17:32,400
+yo no funciono. Por eso que dependiendo del modelo tomamos reglas distintas.
+
+208
+00:17:32,400 --> 00:17:39,900
+Como caso de trabajo acá, para empezarmos a hacer esta clase, vamos a evaluar una situación
+
+209
+00:17:39,900 --> 00:17:48,300
+donde tenemos 569 muestras, en que estoy evaluando un caso de cáncer en un hospital de
+
+210
+00:17:48,300 --> 00:17:56,500
+Wisconsin. En ese caso tenemos 357 resultados que fueron benignos, que no tenían el valor
+
+211
+00:17:56,500 --> 00:18:04,020
+específico, que no tenían una muestra maligna. Por otro lado tenemos 212 respuestas que fueron
+
+212
+00:18:04,020 --> 00:18:09,820
+malignas. Entonces tenemos una persona, me llamo esta persona, yo sé que esta persona
+
+213
+00:18:09,820 --> 00:18:14,620
+tiene una respuesta donde indica que la muestra es maligna y tengo varias
+
+214
+00:18:14,620 --> 00:18:21,300
+covariables informando cuáles fueron estas informaciones para llevar a esta
+
+215
+00:18:21,300 --> 00:18:25,860
+persona a ser una persona que tiene un diagnóstico maligno o no.
+
+216
+00:18:25,860 --> 00:18:28,820
+Y básicamente lo que ocurre cuando vamos al hospital, sacamos un montón de
+
+217
+00:18:28,820 --> 00:18:32,780
+muestras de sangre, si tiene alguna cosa muy mala nos piden para después hacer un
+
+218
+00:18:32,780 --> 00:18:36,540
+un examen mucho más específico y clasificado, clasificado en que tenemos una enfermedad,
+
+219
+00:18:36,540 --> 00:18:41,660
+¿Cierto? Pero acá, ¿Cuál es nuestra variable respuesta? Nuestra variable respuesta es una
+
+220
+00:18:41,660 --> 00:18:49,860
+variable binaria, binaria, ya, entonces tenemos cero, si la muestra no es maligna, uno si la muestra es
+
+221
+00:18:49,860 --> 00:18:55,820
+maligna, o sea, uno si la persona tiene un cáncer muy complicado, cero si la persona no tiene cáncer,
+
+222
+00:18:55,820 --> 00:19:02,540
+el cáncer no es complicado, ya. Entonces usaremos acá, podemos poner todas las covariables que
+
+223
+00:19:02,540 --> 00:19:08,980
+queremos, o sea, persona va a hacer un montón de exames de sangre, podemos poner todo ahí o podemos,
+
+224
+00:19:08,980 --> 00:19:13,660
+en este caso acá, para facilitar la interpretación de ustedes, voy a elegir solamente cuatro
+
+225
+00:19:13,660 --> 00:19:19,820
+covariables, ¿cierto? ¿Por qué elegimos las esas cuatro covariables? Solamente para que facilite
+
+226
+00:19:19,820 --> 00:19:25,820
+la interpretación o cómo vamos a presentar los resultados. Pero,
+
+227
+00:19:25,820 --> 00:19:31,460
+en un ejemplo real hay que evaluar las 30 covariables y elegir algunas reglas formales
+
+228
+00:19:31,460 --> 00:19:39,320
+para eliminar estas covariables. Por ejemplo, regularización, Lasso, versiones de Lasso para
+
+229
+00:19:39,320 --> 00:19:43,820
+regresión logística, regularización para eliminar estas covariables. O alguno de los
+
+230
+00:19:43,820 --> 00:19:47,860
+métodos que vamos a presentar acá, creo que no se si va a servir o no va a ser la clase,
+
+231
+00:19:47,860 --> 00:19:52,780
+pero en Random Forest por ejemplo, ya va a hacer la selección de variables, ya va a eliminar
+
+232
+00:19:52,780 --> 00:19:59,820
+un par de variables acá, eso pasa que da las variables que son importantes. Bueno, voy al final
+
+233
+00:19:59,820 --> 00:20:04,000
+de la clase tengo todo el material, aún no he compartido con Romina, voy a compartir
+
+234
+00:20:04,000 --> 00:20:08,680
+con ella y ella va a subir para ustedes al final de la clase para que puedan correr.
+
+235
+00:20:08,680 --> 00:20:13,260
+O también hago esto durante el intervalo y ahí van a tener acceso.
+
+236
+00:20:13,260 --> 00:20:16,820
+Desarrollo un código tanto para R como para Python, para los que les gusten de ambas las
+
+237
+00:20:16,820 --> 00:20:19,820
+versiones pueden correr sin ningún problema.
+
+238
+00:20:19,820 --> 00:20:24,740
+Es simplemente una base solamente para que compren cómo funciona la cosa.
+
+239
+00:20:24,740 --> 00:20:29,940
+La cosa que es importante es que no es solamente porque yo tengo esta base de datos acá que
+
+240
+00:20:29,940 --> 00:20:35,860
+tiene esta información de que la muestra es benigna o maligna y un par de covariables
+
+241
+00:20:35,860 --> 00:20:40,020
+que yo puedo utilizar para una población, ¿cierto?
+
+242
+00:20:40,020 --> 00:20:46,340
+Ni siempre las muestras que tenemos o la información que tenemos se puede extender para una población
+
+243
+00:20:46,340 --> 00:20:47,340
+general.
+
+244
+00:20:47,340 --> 00:20:51,980
+O sea, esta es una muestra muy específica de una región de Wisconsin.
+
+245
+00:20:51,980 --> 00:20:54,540
+Puedo utilizar estos resultados acá en Chile?
+
+246
+00:20:54,540 --> 00:21:00,500
+No. ¿Puedo construir una muestra o una herramienta para hacer una validación clínica o para desarrollar
+
+247
+00:21:00,500 --> 00:21:05,180
+un aplicativo, por ejemplo, para que las personas puedan utilizarlo? No. Porque tiene una muestra
+
+248
+00:21:05,180 --> 00:21:11,620
+pequeña, es una muestra muy específica de una ciudad, de un estado de Estados Unidos,
+
+249
+00:21:11,620 --> 00:21:17,400
+y estas informaciones pueden no ser significativas para la práctica clínica en Chile. Si queremos evaluar
+
+250
+00:21:17,400 --> 00:21:24,400
+como un todo, hay que hacer un estudio global donde tener todos los países donde se haga
+
+251
+00:21:24,400 --> 00:21:31,040
+un buen desenho de experimento. Como no vamos a discutir esto ahora en nuestro curso, nuestro objetivo
+
+252
+00:21:31,040 --> 00:21:39,680
+solamente es hacer esto desde un punto de vista de ejemplo. Bueno, una cosa que empezaron a escuchar
+
+253
+00:21:39,680 --> 00:21:48,880
+harto acá y que cambia demasiado cuando uno empieza a trabajar con aprendizaje supervisado es,
+
+254
+00:21:48,880 --> 00:21:56,880
+Pero en cuanto a regresión, cuando ustedes estaban trabajando con regresión linear, cuando empezaron a hacer ajustes, ustedes sacaron toda la base,
+
+255
+00:21:56,880 --> 00:22:05,880
+hacían un ajuste e intentaban describir el pasado. Entonces la estadística acá era más relacionada a ajustar un buen modelo,
+
+256
+00:22:05,880 --> 00:22:14,880
+hacer buenas inferencias y describir bien nuestro pasado. Sin embargo, la idea de Machine Learning,
+
+257
+00:22:14,880 --> 00:22:15,880
+Ya?
+
+258
+00:22:18,880 --> 00:22:24,880
+Sin embargo, Machine Learning cambió un poco la estructura de cómo hacemos nuestra...
+
+259
+00:22:24,880 --> 00:22:26,880
+¿Cuál es nuestro objetivo acá?
+
+260
+00:22:26,880 --> 00:22:29,880
+Nuestro objetivo pasa a ser un objetivo inferencial.
+
+261
+00:22:29,880 --> 00:22:32,880
+Entonces, dejamos de tener interés en describir el pasado,
+
+262
+00:22:32,880 --> 00:22:36,880
+y nuestro objetivo pasa a ser intentar predecir de alguna manera.
+
+263
+00:22:36,880 --> 00:22:39,880
+Sé que no es bueno hablar de esto, pero predecir el futuro.
+
+264
+00:22:39,880 --> 00:22:41,880
+Ya queremos hacer predicciones.
+
+265
+00:22:41,880 --> 00:22:45,880
+Entonces, nuestra idea es evaluar si el modelo está haciendo buenas predicciones.
+
+266
+00:22:45,880 --> 00:22:48,880
+Y eso es muy importante que tengan en cuenta.
+
+267
+00:22:48,880 --> 00:22:52,880
+Muchas veces, un modelo puede describir muy bien el pasado,
+
+268
+00:22:52,880 --> 00:22:56,880
+pero ser muy malo para describir o para hacer predicciones.
+
+269
+00:22:56,880 --> 00:23:02,880
+Entonces, Breiman, cuando empezó a trabajar con esa idea de machine learning, de aprendizado máquina,
+
+270
+00:23:02,880 --> 00:23:07,880
+de hacer entrenamiento, evaluar esto desde un punto de vista de entrenamiento y validación,
+
+271
+00:23:07,880 --> 00:23:14,380
+el entrenamiento de prueba, se dio cuenta de que la universidad se dio de una forma y la industria se dio de otra forma.
+
+272
+00:23:14,380 --> 00:23:17,880
+La universidad estaba enfocada en describir el pasado.
+
+273
+00:23:17,880 --> 00:23:25,880
+Sacamos toda la base de un experimento de clasificación entre benigno y maligno
+
+274
+00:23:25,880 --> 00:23:30,880
+y creamos un modelo que va a describir muy bien eso pero con toda la base.
+
+275
+00:23:30,880 --> 00:23:35,380
+Este modelo es un buen modelo para hacer predicciones al futuro, no sé, no tengo cómo evaluar eso.
+
+276
+00:23:35,380 --> 00:23:41,740
+Entonces no era el objetivo que tenían, ellos necesitaban crear modelos que fuesen buenos para hacer predicción.
+
+277
+00:23:41,740 --> 00:23:45,140
+Porque ahí uno estaba seguro de dónde estaba poniendo la plata.
+
+278
+00:23:45,140 --> 00:23:50,740
+Voy a poner una plata acá porque esto es una buena, creo que ese modelo está prediciendo, está prediciendo muy bien.
+
+279
+00:23:50,740 --> 00:23:58,420
+Esto es extremamente importante porque en ese caso hacemos un entrenamiento en nuestro modelo.
+
+280
+00:23:58,420 --> 00:24:01,820
+Entonces dividimos el culto entre entrenamiento y prueba.
+
+281
+00:24:01,820 --> 00:24:08,820
+ajustamos los parámetros y los hiperparámetros de nuestro modelo dentro de nuestro entrenamiento,
+
+282
+00:24:08,820 --> 00:24:12,820
+después hacemos una división en k-folds que ya voy a hablar para ustedes,
+
+283
+00:24:12,820 --> 00:24:14,820
+pero ajustamos nuestro modelo con una base,
+
+284
+00:24:14,820 --> 00:24:19,820
+este modelo es bueno, vamos a evaluar, evaluamos en un conjunto que no fue utilizado,
+
+285
+00:24:19,820 --> 00:24:24,820
+si el modelo es bueno, debería funcionar muy bien para este punto de prueba.
+
+286
+00:24:24,820 --> 00:24:35,820
+Entonces hacemos una división ahí, esa división va a ser estratificada, podemos poner los valores que queremos,
+
+287
+00:24:35,820 --> 00:24:41,820
+pero lo importante es que tenga una parsimonia en cómo hace la división entre entrenamiento y validación.
+
+288
+00:24:41,820 --> 00:24:49,820
+Por ejemplo, si tenemos una base muy chica, es razonable hacer una división, por ejemplo, estratificada entre 70 y 30%.
+
+289
+00:24:49,820 --> 00:24:55,820
+Si tenemos solamente 100 observaciones, creo que no. Entrenar un modelo con 70 y 30 es super malo.
+
+290
+00:24:55,820 --> 00:25:03,820
+Entonces podemos, hay mejores formas de hacer validación cruzada para intentar sacar lo máximo de información de nuestra muestra.
+
+291
+00:25:03,820 --> 00:25:06,820
+Por ejemplo, el Leave-One-Out Cross Validation.
+
+292
+00:25:08,820 --> 00:25:15,820
+Por otro lado, si tenemos una base muy grande, si tengo no sé igual los alumnos, como Romina trabajó en el conjunto de datos de su curso,
+
+293
+00:25:15,820 --> 00:25:21,180
+si tenemos un millón de observaciones es razonable hacer el entrenamiento con 700 mil
+
+294
+00:25:21,180 --> 00:25:26,900
+y después evaluar en 300 mil observaciones. No, no necesito evaluar en tantas observaciones como
+
+295
+00:25:26,900 --> 00:25:33,540
+300 mil observaciones. Yo puedo hacer una división entre 90 y 10 por ciento si tengo una base muy
+
+296
+00:25:33,540 --> 00:25:40,660
+grande. Entonces esa división uno puede elegir. ¿Cómo elegimos? Bueno, con base en los conocimientos
+
+297
+00:25:40,660 --> 00:25:44,700
+que van desarrollando se dan cuenta si están haciendo una buena división entre entrenamiento
+
+298
+00:25:44,700 --> 00:25:57,700
+y ahora con la base de 357 vamos a dividir en 70 y 30 y tenemos el modelo con 70% y después evaluamos
+
+299
+00:25:57,700 --> 00:26:00,400
+si el modelo está funcionando bien y los otros 30%
+
+300
+00:26:02,400 --> 00:26:08,800
+Bueno, acá yo acabé haciendo un plot donde pongo los valores que la persona sacó en una de las
+
+301
+00:26:08,800 --> 00:26:13,920
+con variables el radio y la textura. Esa textura es la cantidad de información
+
+302
+00:26:13,920 --> 00:26:20,200
+gris que tenemos en la imagen, entonces ellos evaluan esa cantidad de
+
+303
+00:26:20,200 --> 00:26:24,360
+información gris que tienen la imagen. Radio es otra información sobre
+
+304
+00:26:24,360 --> 00:26:30,040
+un tamaño muy específico de alguna métrica que tienen allá y con base en
+
+305
+00:26:30,040 --> 00:26:36,000
+esas dos informaciones evaluamos. Cuáles fueron las personas que tenían una
+
+306
+00:26:36,000 --> 00:26:42,880
+una clasificación como benigno, si tuvieron un cáncer benigno o las personas que tuvieron un maligno
+
+307
+00:26:43,440 --> 00:26:48,300
+se puede notar una cosa interesante acá, la gran mayoría de las personas que tuvieron cáncer maligno
+
+308
+00:26:48,680 --> 00:26:50,680
+había un radio
+
+309
+00:26:50,760 --> 00:26:52,600
+un poco mayor
+
+310
+00:26:52,600 --> 00:26:54,240
+conjuntamente con la textura
+
+311
+00:26:54,240 --> 00:27:00,860
+ahí también un poquito mayor pero no tanto, acá no tiene tanta diferencia, hay un valor por ejemplo para 15
+
+312
+00:27:01,200 --> 00:27:03,200
+ellos están bien distribuidos acá pero
+
+313
+00:27:03,200 --> 00:27:09,360
+el radio nos mostrará que era una posible variable que tiene una relación grande.
+
+314
+00:27:09,360 --> 00:27:15,240
+Entonces con base a eso podemos ver que tenemos dos grupos que creemos que se puede hacer una
+
+315
+00:27:15,240 --> 00:27:21,520
+división buena para clasificar. Es decir, me parece que la información que las covariables
+
+316
+00:27:21,520 --> 00:27:26,960
+están trayendo para nosotros son buenas y esas informaciones van a ayudar a hacer una buena
+
+317
+00:27:26,960 --> 00:27:33,540
+clasificación. Si estos puntos estuviesen todos distribuidos de forma aleatoria, la clasificación
+
+318
+00:27:33,540 --> 00:27:38,460
+que queríamos tener era lo mismo que hacer un lanzamiento de una moneda. Ya clasificamos
+
+319
+00:27:38,460 --> 00:27:45,920
+como benigno o maligno. No sé, hago un lanzamiento de una moneda y pongo cara para maligno y
+
+320
+00:27:45,920 --> 00:27:52,460
+ahí cruz para benigno. Entonces en una situación al azar, un modelo de clasificación debería
+
+321
+00:27:52,460 --> 00:27:57,460
+traer ahí una clasificación de 0.5 ya, y eso es una información importante porque
+
+322
+00:27:57,460 --> 00:28:02,660
+había alumnos que sacan valores como 0.5 y creen que es una buena clasificación,
+
+323
+00:28:02,660 --> 00:28:10,300
+ah, el valor está mucho arriba de 0, 0.5 está entre la mitad de 0 y 1, 0.5 es la
+
+324
+00:28:10,300 --> 00:28:16,100
+peor situación, ¿cierto? Profesores, cuando tenemos 0, 0 es una situación que está
+
+325
+00:28:16,100 --> 00:28:20,180
+haciendo clasificación perfecta pero al revés, está clasificando todos los
+
+326
+00:28:20,180 --> 00:28:24,620
+individuos que son benignos como malignos y todos que son malignos como benignos.
+
+327
+00:28:24,620 --> 00:28:29,220
+Se solamente invierte en esta clasificación y tiene una clasificación perfecta.
+
+328
+00:28:29,220 --> 00:28:34,500
+Entonces acá nos da la posible información de que vamos a tener una clasificación razonable,
+
+329
+00:28:34,500 --> 00:28:38,780
+voy a poder intentar hacer alguna división acá, pero si hay algunas personas que tuvieron
+
+330
+00:28:38,780 --> 00:28:44,620
+cáncer maligno que se mezclan con la información de los individuos que tuvieron cáncer benigno.
+
+331
+00:28:44,620 --> 00:28:48,620
+es muy poco probable que voy a tener una clasificación perfecta.
+
+332
+00:28:48,620 --> 00:28:54,620
+Y bueno, ¿cómo podría ser el primer clasificador que vamos a evaluar acá?
+
+333
+00:28:54,620 --> 00:29:01,620
+Romina, una duda. El break va a las 8, vamos hasta las 8, ¿cierto?
+
+334
+00:29:01,620 --> 00:29:05,620
+Sí, y ahí tomamos 20 minutos.
+
+335
+00:29:05,620 --> 00:29:07,620
+¿Será el tiempo?
+
+336
+00:29:07,620 --> 00:29:14,620
+Bueno, una rea que tenemos acá es, por ejemplo, cómo creamos un clasificador.
+
+337
+00:29:14,620 --> 00:29:18,620
+Esa es una pregunta que podemos definir.
+
+338
+00:29:18,620 --> 00:29:32,620
+Usted puede crear el clasificador que quiere, ¿cierto? Usted puede, no sé, crear cinco lanzamientos de monedas, hacer alguna combinación ahí, informar, ya, si hago ese lanzamiento de monedas, sale cara, cruz, cara, cruz, voy a clasificar a la persona como benigno.
+
+339
+00:29:32,620 --> 00:29:34,620
+¿Está haciendo una buena clasificación? No sé.
+
+340
+00:29:34,860 --> 00:29:36,860
+Pero usted puede crear lo clasificador que quiere.
+
+341
+00:29:37,660 --> 00:29:42,380
+Nuestro objetivo en aprendizaje supervisado es evaluar si ese clasificador funciona bien.
+
+342
+00:29:42,580 --> 00:29:44,580
+No se hace sentido, ¿cierto?
+
+343
+00:29:44,820 --> 00:29:46,820
+Por supuesto, después es interesante que
+
+344
+00:29:47,380 --> 00:29:52,700
+uno puede evaluar cómo fue construido el modelo, el modelo y si tiene alguna interpretación.
+
+345
+00:29:53,420 --> 00:29:59,180
+Pero una cosa importante en aprendizaje supervisado es que nuestro objetivo es crear un clasificador que haga
+
+346
+00:29:59,620 --> 00:30:00,900
+buenas predicciones.
+
+347
+00:30:00,900 --> 00:30:08,220
+No necesita exactamente tener una interpretabilidad, ¿cierto? Redes neuronales, modelos que son
+
+348
+00:30:08,220 --> 00:30:15,220
+random forest, boosting, varios modelos que vamos a discutir acá que son muy poderosos, ellos
+
+349
+00:30:15,220 --> 00:30:19,700
+no tienen interpretabilidad, son conocidos como cajas negras, ¿ya? ¿Por qué este
+
+350
+00:30:19,700 --> 00:30:25,420
+modelo está siendo una buena clasificación? No tengo idea, pero está funcionando, ¿si?
+
+351
+00:30:25,420 --> 00:30:31,420
+Es muy difícil abrir esta caja negra y descubrir exactamente cuáles fueron los riesgos
+
+352
+00:30:31,420 --> 00:30:38,920
+y las informaciones que llevaron a clasificar a este individuo como un individuo que va a tener un cáncer maligno o benigno.
+
+353
+00:30:38,920 --> 00:30:42,920
+Pero si las covaliables de alguna manera estamos informando,
+
+354
+00:30:42,920 --> 00:30:47,420
+alguna cosa que puede nos llevar a clasificar a este individuo como benigno o maligno.
+
+355
+00:30:48,920 --> 00:30:54,420
+Entonces, debemos tener eso en consideración.
+
+356
+00:30:54,420 --> 00:31:01,420
+Pero profesor, en mi trabajo necesito tener la interpretación, la interpretabilidad de las covariables.
+
+357
+00:31:01,420 --> 00:31:06,420
+Vamos a tener modelos acá, como regresión logística es un modelo que tiene interpretación.
+
+358
+00:31:06,420 --> 00:31:10,420
+Árboles es un otro modelo muy poderoso que tiene interpretación.
+
+359
+00:31:10,420 --> 00:31:18,420
+Pero se puede perder un poco en términos de sensibilidad o exactitud o el área sobre la curva ROC.
+
+360
+00:31:18,420 --> 00:31:27,180
+Entonces, muchas veces el ganho de precisión, accuracy, exactitud, sensibilidad o cualquier
+
+361
+00:31:27,180 --> 00:31:31,060
+métrica que vamos a tener, va a estar un poco relacionado con la interpretabilidad.
+
+362
+00:31:31,060 --> 00:31:37,180
+Modelos con muy buen poder predictivo pueden tener una mala interpretabilidad.
+
+363
+00:31:37,180 --> 00:31:43,860
+Hay una comunidad muy grande en aprendizaje supervisado desarrollando modelos interpretables.
+
+364
+00:31:43,860 --> 00:31:50,220
+Entonces hay gente que hoy lo que más se hace en los últimos años es intentar proponer esos modelos.
+
+365
+00:31:50,220 --> 00:31:58,580
+Entonces acá voy a explicar dos modelos que son muy conocidos, pero no sé, el último año debe tener una infinidad,
+
+366
+00:31:58,580 --> 00:32:02,800
+más 300, 400 nuevos modelos ahí, ¿cierto? Parece trabajar.
+
+367
+00:32:02,800 --> 00:32:06,660
+Entonces ustedes van a conocer los más conocidos y los que funcionan mejor,
+
+368
+00:32:06,660 --> 00:32:13,660
+y lo que están bien implementados es tener una buena tradición.
+
+369
+00:32:13,660 --> 00:32:17,660
+Entonces, cuando uno utiliza, se sabe que no va a tener problemas.
+
+370
+00:32:17,660 --> 00:32:24,660
+Un ejemplo sencillo podría ser crear una regla que siempre predice el cáncer como benigno.
+
+371
+00:32:24,660 --> 00:32:28,660
+Entonces, esta función simplemente es una función acá,
+
+372
+00:32:28,660 --> 00:32:31,660
+y de x
+
+373
+00:32:32,660 --> 00:32:37,660
+igual a 1 no importa
+
+374
+00:32:37,660 --> 00:32:43,660
+la covariable que voy a poner acá esa idea que será igual a 1
+
+375
+00:32:43,660 --> 00:32:49,660
+y es un buen modelo podemos evaluar si clasificamos todos como uno
+
+376
+00:32:49,660 --> 00:32:53,660
+¿Cuál fue la exactitud que tengo acá? La exactitud.
+
+377
+00:32:53,660 --> 00:32:57,660
+Voy a clasificar 107 personas correctamente.
+
+378
+00:32:57,660 --> 00:33:02,660
+¿Es un buen modelo? No, porque los individuos que tienen un cáncer maligno
+
+379
+00:33:02,660 --> 00:33:06,660
+no fue ninguno de ellos clasificado bien.
+
+380
+00:33:06,660 --> 00:33:10,660
+Bueno, esta información es importante porque cuando ustedes van a emprestar
+
+381
+00:33:10,660 --> 00:33:13,660
+con datos, por ejemplo, datos de bancos, la información de un banco,
+
+382
+00:33:13,660 --> 00:33:18,660
+ellos van a tener una exactitud. Generalmente ellos emprestaron plata
+
+383
+00:33:18,660 --> 00:33:26,660
+los individuos que son malos pagadores son muy pocos, generalmente 1%, 0.5 por ahí.
+
+384
+00:33:26,660 --> 00:33:31,660
+Si un banco empresta plata y 5% de las personas que imprestan plata no están pagando,
+
+385
+00:33:31,660 --> 00:33:35,660
+este banco va a tener muchos problemas, no va a estar funcionando ahora.
+
+386
+00:33:35,660 --> 00:33:45,660
+Entonces, el banco va a emprestar una plata para varias personas, 99% de esas personas va a volver la plata.
+
+387
+00:33:45,660 --> 00:33:55,140
+Si creas un modelo, donde? Nuevamente el modelo tiene solamente esta forma, no me importan las
+
+388
+00:33:55,140 --> 00:34:01,500
+comariables, voy a clasificar todos como un buen pagador, la exactitud acá va a ser de 0.99.
+
+389
+00:34:01,500 --> 00:34:07,740
+Si uno mira eso, piensa, oh, creé un buen modelo, ya, tiene una exactitud de 99%.
+
+390
+00:34:07,740 --> 00:34:12,220
+Sí, pero el banco está preocupado exactamente con que las personas que no están pagando,
+
+391
+00:34:12,220 --> 00:34:18,700
+o que no van a pagar. Entonces no podemos emprestar plata para que no van a volver la plata,
+
+392
+00:34:18,700 --> 00:34:27,040
+entonces es importante tener eso en cuenta. Hay modelos, hay métricas que toman ambos en cuenta,
+
+393
+00:34:27,040 --> 00:34:33,740
+vamos a hablar acá sobre la área under the curve, la sobre la curva ROC, pero bueno, son métricas
+
+394
+00:34:33,740 --> 00:34:41,480
+distintas que pasan a ser interesantes para nosotros. Por ejemplo, muchos métodos de
+
+395
+00:34:41,480 --> 00:34:46,120
+clasificación que son basados en regresión logística, ustedes tienen que tener mucho cuidado
+
+396
+00:34:46,120 --> 00:34:52,440
+cuando van desarrollarlos para conocer de hecho cuántas personas que tienen la enfermedad y él
+
+397
+00:34:52,440 --> 00:35:00,160
+está clasificando correctamente. A veces una enfermedad es muy pesada, es una enfermedad como que
+
+398
+00:35:00,160 --> 00:35:09,720
+solamente tener la información puede causar un estrés, una carga de estrés en la persona muy
+
+399
+00:35:09,720 --> 00:35:15,240
+grande, entonces no se, informar que la persona tiene un cáncer terminal, voy a llamar a usted
+
+400
+00:35:15,240 --> 00:35:20,940
+a los 100 pero usted está con cáncer y va a vivir dos semanas y después llega dos semanas la
+
+401
+00:35:20,940 --> 00:35:28,200
+persona no se va y se da cuenta de que el tercer se había clasificado malo o había hecho una mala
+
+402
+00:35:28,200 --> 00:35:34,160
+clasificación, entonces es importante crear buenos modelos que hagan una buena clasificación.
+
+403
+00:35:34,160 --> 00:35:43,600
+Para ello debemos tener en cuenta nuestra matriz, una matriz que vamos a basar para calcular o con base
+
+404
+00:35:43,600 --> 00:35:50,200
+en nuestro clasificador, que va a ser nuestra matriz de confusión. Entonces, si nuestra matriz es confusión,
+
+405
+00:35:50,200 --> 00:35:54,800
+no tener valores distintos acá, es una matriz muy interesante, con base en esta matriz
+
+406
+00:35:57,200 --> 00:36:03,360
+calculamos alguna métrica de interés o podemos tener las dos métricas de los verdaderos negativos
+
+407
+00:36:03,360 --> 00:36:09,960
+de los verdaderos positivos como nuestra métrica de interés y evaluar ahí cuál de ellos debemos tener más peso.
+
+408
+00:36:09,960 --> 00:36:18,760
+La matriz de confusión básicamente construida con los valores mirando exactamente los individuos que tuvieron la clasificación 0
+
+409
+00:36:18,760 --> 00:36:22,560
+y que fueron predictos como 0 y ahí tengo verdaderos negativos.
+
+410
+00:36:22,560 --> 00:36:31,760
+Por otro lado puedo tener un real donde me salió valor 1 y el modelo predició 1, tengo los verdaderos positivos.
+
+411
+00:36:31,760 --> 00:36:37,760
+Muchas veces puede ocurrir que la persona tenía un valor 1 y el modelo predice un 0.
+
+412
+00:36:37,760 --> 00:36:44,760
+O sea, la persona sería un buen pagador e informamos que no debería emprestar plata para esa persona que sería un mal pagador.
+
+413
+00:36:44,760 --> 00:36:47,760
+Y el banco al final no le empresta la plata.
+
+414
+00:36:47,760 --> 00:36:56,760
+Entonces tenemos falsos negativos o que la persona va a ser un mal pagador y predicimos que va a ser un buen pagador y el banco le presta esta plata.
+
+415
+00:36:56,760 --> 00:37:13,760
+Entonces es un otro problema que podemos tener, ahí debemos tomar cuidado. Al final no va a salir una matriz y esa matriz idealmente debería tener valores muy grandes en ese punto, en ese punto y debería ser 0 acá o 0 acá.
+
+416
+00:37:13,760 --> 00:37:20,760
+Bueno, con base en estas métricas que tenemos acá, podemos calcular también algunas métricas de interés.
+
+417
+00:37:20,760 --> 00:37:31,760
+Por ejemplo, la accuracy o la exactitud, en español, donde tenemos los verdaderos positivos más los verdaderos negativos,
+
+418
+00:37:31,760 --> 00:37:38,760
+dividido por el total. Vamos a suponer que un ejemplo ilustrativo tuvimos verdaderos negativos, 56.
+
+419
+00:37:38,760 --> 00:37:45,160
+clasificamos bien las personas con valor negativo de 56, clasificamos los verdaderos positivos 24,
+
+420
+00:37:45,160 --> 00:37:52,960
+tuvimos falsos valores en torno de 20, 20 acá clasificamos 14 como falsos positivos,
+
+421
+00:37:52,960 --> 00:38:01,160
+6 como falsos negativos. Entonces la exactitud acá fue de 80. Además de la exactitud podemos evaluar
+
+422
+00:38:01,160 --> 00:38:08,160
+cuál es la sensibilidad que tenemos de nuestro clasificador. Esa sensibilidad se constró
+
+423
+00:38:08,160 --> 00:38:14,520
+entre los verdaderos positivos, partido la suma entre los verdaderos positivos y los falsos negativos.
+
+424
+00:38:14,520 --> 00:38:23,120
+También me fue de 80. Entonces los verdaderos positivos y los falsos negativos. 24 partido 30.
+
+425
+00:38:23,120 --> 00:38:29,760
+La especificidad sería los verdaderos negativos partido los verdaderos negativos más los falsos positivos.
+
+426
+00:38:29,760 --> 00:38:35,920
+Este es el caso de una métrica que mucha gente utiliza exactamente cuando están mirando los puntos negativos.
+
+427
+00:38:35,920 --> 00:38:42,280
+estamos clasificando bien o mal los negativos. Entonces, si hacemos un modelo super malo,
+
+428
+00:38:42,280 --> 00:38:49,920
+esta sensibilidad acá, la especificidad debería ser pequeña. Por ejemplo acá, sensibilidad,
+
+429
+00:38:49,920 --> 00:39:00,200
+como tú viste, no detectamos ninguna persona mal. Bueno, una otra métrica como la precisión. Estas son,
+
+430
+00:39:00,200 --> 00:39:04,880
+por ejemplo, cuatro métricas que les presento, pero existen solamente estas? No, si ustedes
+
+431
+00:39:04,880 --> 00:39:11,280
+cuando calcula un clasificador, una matriz de confusión en R, va a ver que le va a salir un montón de
+
+432
+00:39:11,280 --> 00:39:19,760
+métricas ahí, F1, una media armónica ponderada, entre otros, hay un montón de métricas específicas basadas
+
+433
+00:39:19,760 --> 00:39:28,800
+en estos valores específicos. Un otro que no va a valer mucho que me va a calcular acá, que va a ser de una gran utilidad,
+
+434
+00:39:28,800 --> 00:39:32,800
+va a ser una otra métrica que va a estar en la área sobre la curva ROC.
+
+435
+00:39:33,800 --> 00:39:37,800
+Acá es una métrica también que es interesante, por ejemplo, el F1,
+
+436
+00:39:37,800 --> 00:39:43,800
+que va a dar un peso de 2 para los verdadeiros positivos, dividido para 2 para los verdaderos positivos.
+
+437
+00:39:43,800 --> 00:39:50,800
+En fin, hay métricas como F1, que va a tener un peso para los verdaderos positivos,
+
+438
+00:39:50,800 --> 00:39:54,800
+o la exactitud balanceada, donde miramos la sensibilidad, la especificidad.
+
+439
+00:39:54,800 --> 00:40:00,740
+y bueno cada una de ellas va a resumir una información distinta, por ejemplo la F1 resume
+
+440
+00:40:00,740 --> 00:40:05,920
+precisión y sensibilidad pero no incorpora directamente los verdaderos negativos
+
+441
+00:40:05,920 --> 00:40:10,280
+la exactitud balanceada da el mismo peso a ambas clases
+
+442
+00:40:10,280 --> 00:40:14,200
+pero la área sobre la curva ROC evalúa el ordenamiento de los puntajes
+
+443
+00:40:14,200 --> 00:40:16,160
+a través de distintos umbrales
+
+444
+00:40:16,160 --> 00:40:18,500
+porque habló de la área sobre la curva ROC acá?
+
+445
+00:40:18,500 --> 00:40:21,200
+AUC o la área under the curve?
+
+446
+00:40:21,200 --> 00:40:24,000
+porque mucha gente utiliza esta métrica
+
+447
+00:40:24,000 --> 00:40:27,280
+como una buena métrica para poder evaluar los clasificadores.
+
+448
+00:40:27,280 --> 00:40:31,520
+Ya? Bueno, a mí me gusta utilizar bastante ella.
+
+449
+00:40:31,520 --> 00:40:36,000
+Vamos a seguir con esa clasificación acá.
+
+450
+00:40:36,000 --> 00:40:42,400
+Bueno, algunas cosas que son muy importantes tenemos en cuenta.
+
+451
+00:40:42,400 --> 00:40:46,480
+¿Cierto? Tres funciones distintas de los datos.
+
+452
+00:40:46,480 --> 00:40:52,560
+Vamos a tener una etapa de entrenamiento donde vamos a estimar los coeficientes, las escalas,
+
+453
+00:40:52,560 --> 00:40:58,920
+los coeficientes del modelo de regresión logística, algunas escalas y los vectores de soporte.
+
+454
+00:40:58,920 --> 00:41:07,240
+Vamos a hacer un proceso de validación donde vamos a comparar o vamos a hacer tune de diferentes parámetros
+
+455
+00:41:07,240 --> 00:41:16,480
+de los modelos o reglas de decisión, y después de hacer este tune, acá evaluamos cómo sale el modelo en el conjunto de prueba.
+
+456
+00:41:16,480 --> 00:41:23,200
+Acá es muy importante tener mucho cuidado cuando hacen esto.
+
+457
+00:41:23,200 --> 00:41:28,140
+Cuando trabajamos con la pensada supervisada es un costumbre muy grande
+
+458
+00:41:28,140 --> 00:41:34,940
+o uno puede tener harto la tentación de hacer un vazamento de los datos,
+
+459
+00:41:34,940 --> 00:41:40,400
+un conjunto de prueba de alguna manera, o la información de la prueba de alguna manera
+
+460
+00:41:40,400 --> 00:41:42,960
+acabar entrando en el conjunto de entrenamiento.
+
+461
+00:41:42,960 --> 00:41:48,400
+O de alguna manera utilizar la prueba para hacer la estimación de los hiperparámetros.
+
+462
+00:41:48,400 --> 00:41:55,520
+Lo que sería un hiperparámetro acá, por ejemplo, un parámetro de suavidad que vamos a utilizar en su port vector machine.
+
+463
+00:41:55,520 --> 00:42:01,840
+O por ejemplo, regresión logística, el Lasso, un parámetro de penalización.
+
+464
+00:42:01,840 --> 00:42:06,000
+El parámetro que hace regularización, un lambda.
+
+465
+00:42:06,000 --> 00:42:16,000
+Entonces este lambda de ninguna manera debe ser estimado exactamente solamente con el conjunto de entrenamiento.
+
+466
+00:42:16,000 --> 00:42:21,000
+Por eso que realmente cuando vamos a hacer el entrenamiento, y eso es una información importante,
+
+467
+00:42:21,000 --> 00:42:26,000
+vamos a tener 100% de nuestra base de datos.
+
+468
+00:42:26,000 --> 00:42:31,000
+Vamos a suponer que acabé haciendo la división entre 70% y 30%.
+
+469
+00:42:31,000 --> 00:42:38,500
+Este 30% de ninguna manera lo puedo utilizar para nada.
+
+470
+00:42:38,500 --> 00:42:42,000
+Es un conjunto de datos que se va a quedar ahí separado
+
+471
+00:42:42,000 --> 00:42:45,000
+y me va a venir solamente el último paso para elegir
+
+472
+00:42:45,000 --> 00:42:48,000
+o hacer una comparación entre distintos modelos.
+
+473
+00:42:48,000 --> 00:42:54,000
+Entonces este 30% de prueba se va a quedar ahí al lado.
+
+474
+00:42:54,000 --> 00:42:56,500
+Pero dentro de esta base acá,
+
+475
+00:42:56,500 --> 00:43:00,000
+yo necesito hacer una división específica,
+
+476
+00:43:00,000 --> 00:43:10,600
+Por ejemplo, podría ser 50 y 20 para estimar el modelo acá dentro y encontrar los preparantes
+
+477
+00:43:10,600 --> 00:43:13,600
+con ese valor.
+
+478
+00:43:13,600 --> 00:43:20,360
+Entonces un buen curso que le enseña cómo hacer ajustes en los modelos le enseña hacer
+
+479
+00:43:20,360 --> 00:43:23,000
+la división en tres partes.
+
+480
+00:43:23,000 --> 00:43:28,760
+Una parte entre entrenamiento, validación, que dentro de ese entrenamiento hacemos una
+
+481
+00:43:28,760 --> 00:43:34,100
+validación cruzada. Si ustedes no hacen validación cruzada, no
+
+482
+00:43:34,100 --> 00:43:37,160
+van a encontrar los hiperparámetros, pero esta validación cruzada tiene que venir
+
+483
+00:43:37,160 --> 00:43:42,000
+con una parte de la base que está acá adentro. Entonces hacemos el entrenamiento,
+
+484
+00:43:42,000 --> 00:43:46,720
+hacemos la validación para encontrar los hiperparámetros y al final evaluamos
+
+485
+00:43:46,720 --> 00:43:50,480
+como empezaron el modelo que fue elegido.
+
+486
+00:43:50,480 --> 00:43:55,680
+Esto no es un concepto sencillo de pensar. Muchos alumnos tienen
+
+487
+00:43:55,680 --> 00:43:59,640
+difícil, cuando yo empecé a estudiar a pensar en supervisado tenía un poco de
+
+488
+00:43:59,640 --> 00:44:05,440
+dificultad de entender por qué hacemos una división dentro de nuestro conjunto
+
+489
+00:44:05,440 --> 00:44:10,840
+de entrenamiento y no simplemente porque utilizó toda esa base para estimar los
+
+490
+00:44:10,840 --> 00:44:14,880
+coeficientes para encontrar los hiperparámetros.
+
+491
+00:44:14,880 --> 00:44:19,880
+Bueno, ya me mencioné que hay preguntas acá.
+
+492
+00:44:19,880 --> 00:44:28,240
+hay una pregunta que preguntaban cuando usted dijo como tuning hacer tuning
+
+493
+00:44:28,240 --> 00:44:38,200
+lo siento bueno ustedes van a ver el concepto bueno escucho alto en portugués en inglés es
+
+494
+00:44:38,200 --> 00:44:45,000
+como tunar los hiperparamentos o sea un tuning, el tuning sería encontrar o elegir
+
+495
+00:44:45,000 --> 00:44:53,640
+los hiperparámetros específicos de un modelo. No sé, Tomina, si tenés una definición distinta.
+
+496
+00:44:53,640 --> 00:44:56,280
+Bueno, yo conozco cómo oponernos los hiperparámetros.
+
+497
+00:44:56,280 --> 00:45:01,240
+Es que a Brenda y a yo no se. Entonces, no tengo tres.
+
+498
+00:45:01,240 --> 00:45:04,640
+A Brenda y a yo también. Entonces, tenés exactamente la misma referencia.
+
+499
+00:45:04,640 --> 00:45:14,320
+Entonces, esa idea de encontrar esos hiperparámetros es muy importante y hay que tomar mucho cuidado
+
+500
+00:45:14,320 --> 00:45:17,560
+porque mucha gente acaba haciendo una fuga,
+
+501
+00:45:18,240 --> 00:45:21,320
+teniendo una fuga de información, haciendo un vasamento
+
+502
+00:45:21,680 --> 00:45:23,920
+para estimar ese hiperparámetro.
+
+503
+00:45:25,240 --> 00:45:28,840
+Y bueno, todos los buenos libros informan que tenemos que dividir
+
+504
+00:45:28,840 --> 00:45:33,040
+eso en tres partes y hay una demostración formal de por qué eso es importante.
+
+505
+00:45:33,560 --> 00:45:35,840
+Entonces, ustedes tienen que tomar mucho cuidado cuando lo hacen.
+
+506
+00:45:36,360 --> 00:45:40,160
+Pero profesor, yo estoy acostumado entre hacer la división entre entrenamiento
+
+507
+00:45:40,160 --> 00:45:48,620
+y después ajustamos el modelo acá, yo ajusté el modelo en el entrenamiento y después tengo
+
+508
+00:45:48,620 --> 00:45:55,960
+una parte del control de dados y pongo ahí la validación. Está mal, no, no está mal, de hecho,
+
+509
+00:45:55,960 --> 00:46:01,960
+la gran mayoría de los paquetes incluso lo que vamos a hacer acá hacemos eso, ya volvemos a
+
+510
+00:46:01,960 --> 00:46:10,360
+la escuela base pero acá hacemos una división de entrenamiento y prueba, ¿cierto? Pero
+
+511
+00:46:10,360 --> 00:46:15,960
+estos hiperparámetros ya pasan a ser estimados dentro de nuestro entrenamiento. Entonces,
+
+512
+00:46:15,960 --> 00:46:19,360
+la gran mayoría de los... Sí, Claudia.
+
+513
+00:46:19,360 --> 00:46:27,100
+Profesor, ¿cuál podrían ser unos hiperparámetros en el modelo previamente mencionado por usted
+
+514
+00:46:27,100 --> 00:46:32,100
+la detección de cáncer, si tiene cáncer o no tiene cáncer.
+
+515
+00:46:32,100 --> 00:46:36,100
+Por ejemplo acá, cuando fuimos a hablar de
+
+516
+00:46:36,100 --> 00:46:38,100
+como fuimos a hablar de Support Vector Machine,
+
+517
+00:46:38,100 --> 00:46:41,100
+uno de los hiperparámetros va a ser, déjame ver,
+
+518
+00:46:41,100 --> 00:46:46,100
+ese es un parámetro que es un valor escrito como C, ya.
+
+519
+00:46:46,100 --> 00:46:50,100
+Por ejemplo, un valor gamma dentro de un Support Vector Machine.
+
+520
+00:46:50,100 --> 00:46:53,100
+Entonces, dependiendo del valor que ponemos acá,
+
+521
+00:46:53,100 --> 00:46:56,100
+vamos a tener diferentes suavidades, ya.
+
+522
+00:46:56,100 --> 00:46:59,940
+Esto es un hiperparámetro que encontramos dentro de nuestro...
+
+523
+00:47:01,100 --> 00:47:03,300
+cuando vamos a hacer el entrenamiento del modelo.
+
+524
+00:47:03,540 --> 00:47:06,340
+Pero esto es un hiperparámetro que se encuentra
+
+525
+00:47:06,540 --> 00:47:09,900
+durante este proceso de hacer la estimación de los parámetros
+
+526
+00:47:10,100 --> 00:47:15,820
+y elegir ese hiperparámetro en el conjunto de validación.
+
+527
+00:47:16,980 --> 00:47:19,500
+No sé si ustedes tuvieron un curso de Lasso.
+
+528
+00:47:19,660 --> 00:47:20,660
+Gracias.
+
+529
+00:47:21,100 --> 00:47:22,260
+¿Conoce Lasso?
+
+530
+00:47:22,260 --> 00:47:26,260
+Sí, sí lo vimos, creo que la preste Laura.
+
+531
+00:47:26,260 --> 00:47:28,260
+Vieron Lasso, ¿cierto?
+
+532
+00:47:28,260 --> 00:47:30,260
+Sí.
+
+533
+00:47:30,260 --> 00:47:32,260
+Pero no lo vieron tan matema...
+
+534
+00:47:32,260 --> 00:47:35,260
+por ejemplo, cuando dije que justo estudié en esa clase,
+
+535
+00:47:35,260 --> 00:47:37,260
+por ejemplo, no vieron las fórmulas de matemática,
+
+536
+00:47:37,260 --> 00:47:40,260
+pero tienen súper clara la idea.
+
+537
+00:47:40,260 --> 00:47:41,260
+Para decir...
+
+538
+00:47:41,260 --> 00:47:43,260
+Porque es importante, a mí me gusta mucho el Lasso,
+
+539
+00:47:43,260 --> 00:47:45,260
+es triste que no fui el profesor,
+
+540
+00:47:45,260 --> 00:47:47,260
+pero debe haberse tenido un espacio acá
+
+541
+00:47:47,260 --> 00:47:49,260
+para hacer un dibujo.
+
+542
+00:47:49,260 --> 00:47:51,260
+a una página blanca
+
+543
+00:47:58,260 --> 00:48:01,260
+voy a intentar encontrar una acá que tiene un poquito más de espacio
+
+544
+00:48:02,260 --> 00:48:04,260
+por ejemplo acá mismo
+
+545
+00:48:05,260 --> 00:48:07,260
+bueno, en Lasso tenemos que estimar
+
+546
+00:48:08,260 --> 00:48:11,260
+los betas de una regresión, entonces nuestro objetivo va a ser un G
+
+547
+00:48:12,260 --> 00:48:14,260
+de X, voy a tener ahí beta cero
+
+548
+00:48:15,260 --> 00:48:16,260
+más beta uno
+
+549
+00:48:16,260 --> 00:48:24,260
+x1, y por ahí de allá, ¿cierto? beta de xd.
+
+550
+00:48:24,260 --> 00:48:31,260
+En Lasso, no sé si se les recuerda, pero Lasso hace una regularización
+
+551
+00:48:31,260 --> 00:48:34,260
+en que durante el proceso de estimación ya se elimina
+
+552
+00:48:34,260 --> 00:48:40,260
+varios deces hiperparámetros, por eliminar no sé, por empezar con 100 parámetros
+
+553
+00:48:40,260 --> 00:48:44,260
+y al final me quedara solamente con 5 para ser precisión.
+
+554
+00:48:44,260 --> 00:48:49,900
+En Lasso tenemos un parámetro de penalización que era un λ,
+
+555
+00:48:49,900 --> 00:48:53,260
+este λ entraba,
+
+556
+00:48:53,260 --> 00:48:56,260
+ver acá,
+
+557
+00:48:56,260 --> 00:48:58,260
+como?
+
+558
+00:48:58,260 --> 00:49:06,260
+el argumento que minimiza los mínimos cuadrados,
+
+559
+00:49:06,260 --> 00:49:10,260
+más una penalización acá, λ,
+
+560
+00:49:10,260 --> 00:49:15,180
+suma de los betas, con módulo.
+
+561
+00:49:17,180 --> 00:49:20,980
+Entonces, este λ es fundamental para nosotros
+
+562
+00:49:20,980 --> 00:49:23,820
+y este λ pasa a ser un hiperparámetro.
+
+563
+00:49:23,820 --> 00:49:26,340
+¿Por qué estoy comentando esto? Porque este λ
+
+564
+00:49:26,340 --> 00:49:29,260
+creo que es la mejor forma de entender lo que es un hiperparámetro.
+
+565
+00:49:29,260 --> 00:49:33,820
+Este λ no es estimado a lo largo de
+
+566
+00:49:33,820 --> 00:49:35,300
+la estimación de los mínimos cuadrados.
+
+567
+00:49:35,300 --> 00:49:37,940
+Entonces, primero, estimo los betas.
+
+568
+00:49:37,940 --> 00:49:41,060
+Ya, el vector beta de una regresión.
+
+569
+00:49:41,060 --> 00:49:44,060
+Después de estimar una regresión,
+
+570
+00:49:44,060 --> 00:49:47,060
+estos betas, de una regresión,
+
+571
+00:49:47,060 --> 00:49:49,060
+evaluo cómo está saliendo este beta
+
+572
+00:49:49,060 --> 00:49:53,060
+cuando fijo λ igual a 0.1.
+
+573
+00:49:53,060 --> 00:49:56,060
+Entonces fijo λ igual a 0.1,
+
+574
+00:49:56,060 --> 00:49:58,060
+estimo los betas y evaluo
+
+575
+00:49:58,060 --> 00:50:00,060
+esto con aquel conjunto
+
+576
+00:50:00,060 --> 00:50:03,060
+que había comentado, el de validación.
+
+577
+00:50:03,060 --> 00:50:06,060
+Después cambio λ igual a 0.2
+
+578
+00:50:06,060 --> 00:50:13,420
+y estimamos nuevamente los betas. Cambio λ igual a 3 y por ahí adelante.
+
+579
+00:50:13,420 --> 00:50:18,900
+Lambdas muy grandes, van a ser con que varios de los betas sean iguales a 0,
+
+580
+00:50:18,900 --> 00:50:22,060
+o sea, está me ayudando a eliminar los parámetros.
+
+581
+00:50:22,060 --> 00:50:28,060
+Entonces, este λ acá es un hiperparámetro que es estimado por medio de validação cruzada.
+
+582
+00:50:28,060 --> 00:50:32,380
+Entonces al final elegimos
+
+583
+00:50:33,740 --> 00:50:37,740
+cuál fue el lambda que tiene el menor error cuadrático medio.
+
+584
+00:50:37,740 --> 00:50:41,140
+El lambda que tiene el menor error cuadrático medio fue lo que
+
+585
+00:50:41,140 --> 00:50:49,580
+tiene solamente beta 1, beta 40, beta 41,
+
+586
+00:50:49,580 --> 00:50:53,100
+por ejemplo beta 50.
+
+587
+00:50:53,380 --> 00:50:57,420
+Yo salí de 50 con variables y llegué solamente a 4.
+
+588
+00:50:57,420 --> 00:51:01,420
+Estos acabaron haciendo que este valor sea lo menor posible.
+
+589
+00:51:01,420 --> 00:51:05,420
+¿Cómo encontramos esta función a cabo de esta curva?
+
+590
+00:51:05,420 --> 00:51:17,420
+Exactamente poniendo, donde está, este conjunto de validación.
+
+591
+00:51:17,420 --> 00:51:26,420
+Entonces, bueno, el profesor está un poco complicado, me perdí, está un poco difícil.
+
+592
+00:51:26,420 --> 00:51:30,220
+solamente voy a entender porque es importante entender que varias de las funciones
+
+593
+00:51:30,220 --> 00:51:34,100
+van a tener una cosa que se llama cross validation, ¿sí?
+
+594
+00:51:34,100 --> 00:51:37,100
+¿Por qué estoy explicando todo esto? Porque en algún momento cuando ustedes
+
+595
+00:51:37,100 --> 00:51:41,140
+pueden ajustar un Lasso, dentro del Lasso va a tener una cosa que se llama
+
+596
+00:51:41,140 --> 00:51:46,980
+cv.glmnet, que es la función que ajusta Lasso.
+
+597
+00:51:46,980 --> 00:51:50,580
+Y ustedes tienen una validación cruzada acá.
+
+598
+00:51:50,580 --> 00:51:54,740
+Varios de los métodos hacen o logran una cierta validación cruzada
+
+599
+00:51:54,740 --> 00:51:58,660
+de alguna manera que ustedes no conocen.
+
+600
+00:51:58,660 --> 00:52:02,300
+Entonces el método, varios de los métodos ya tienen esa implementación,
+
+601
+00:52:02,300 --> 00:52:04,300
+pero es importante que comprendan que
+
+602
+00:52:04,300 --> 00:52:07,300
+esta validación o
+
+603
+00:52:07,300 --> 00:52:09,900
+esta estimación de los hiperparámetros uno hace
+
+604
+00:52:09,900 --> 00:52:13,700
+durante esta división acá que hacemos entre entrenamiento
+
+605
+00:52:13,700 --> 00:52:17,780
+y prueba dentro del entrenamiento lo dividen en dos partes.
+
+606
+00:52:17,780 --> 00:52:22,420
+Ya? Y estimamos los coeficientes con el entrenamiento,
+
+607
+00:52:22,420 --> 00:52:25,740
+Estimamos los hiperparámetros con la validación.
+
+608
+00:52:25,740 --> 00:52:30,780
+Después de encontrar cuáles son los hiperparámetros finales basados en esos hiperparámetros,
+
+609
+00:52:30,780 --> 00:52:33,180
+ahí sí vamos para la prueba.
+
+610
+00:52:33,180 --> 00:52:39,340
+Pero la prueba es el último paso, acá es solamente el paso después que ya tenemos el modelo que fue elegido.
+
+611
+00:52:39,340 --> 00:52:40,340
+¿Sí?
+
+612
+00:52:47,780 --> 00:52:49,180
+Ya, perfecto.
+
+613
+00:52:52,420 --> 00:53:06,220
+Entonces, básicamente es esto. La idea es que cuando evaluamos los hiperparámetros miramos
+
+614
+00:53:06,220 --> 00:53:12,280
+exactamente esto durante esta división acá. Una forma de hacer la validación cruzada para
+
+615
+00:53:12,280 --> 00:53:17,620
+elegir estos hiperparámetros. Bueno, dentro de nuestro conjunto de entrenamiento lo vamos
+
+616
+00:53:17,620 --> 00:53:22,420
+dividir en folds, ya ustedes van a conocer este nombre que es conocido como k-folds,
+
+617
+00:53:22,420 --> 00:53:29,860
+entonces la validación cruzada puede ser mirada en una cosa que se llama folds, podemos poner
+
+618
+00:53:29,860 --> 00:53:36,380
+diferentes números de folds, esos folds en español serían carpetas, vamos a dividir en distintas
+
+619
+00:53:36,380 --> 00:53:45,380
+carpetas. Y cómo hacemos eso? cómo hacemos esos k-folds? Esos k-folds pueden ser dentro de distintas
+
+620
+00:53:45,380 --> 00:53:50,600
+formas, una de las formas o la forma que vamos a definir acá es utilizando 5
+
+621
+00:53:50,600 --> 00:53:59,000
+folds, ya? Es decir, lo que vamos a hacer es, si tengo 100 observaciones, voy a poner
+
+622
+00:53:59,000 --> 00:54:02,800
+vamos a suponer que tengo 100 observaciones para hacer el entrenamiento
+
+623
+00:54:02,800 --> 00:54:11,240
+entonces en el entrenamiento tengo 100 observaciones, ya?
+
+624
+00:54:11,240 --> 00:54:22,240
+Estas 100 observaciones, voy a poner 20 observaciones acá, 20 observaciones acá, 20 acá, 20 acá y 20 acá.
+
+625
+00:54:22,240 --> 00:54:31,240
+Y eso todo para nuestro conjunto de entrenamiento. El conjunto de prueba está separado, no se usa para nada.
+
+626
+00:54:31,240 --> 00:54:39,880
+Ya, juntamos estas 80 observaciones acá y ajustamos el beta.
+
+627
+00:54:39,880 --> 00:54:47,920
+Ya, y evaluamos el modelo ajustado dentro de 20 observaciones.
+
+628
+00:54:47,920 --> 00:54:50,880
+Evaluamos, es decir, calculamos un error cuadrático medio.
+
+629
+00:54:50,880 --> 00:54:59,400
+Ya, bueno, después de hacer esto vamos a hacer un error cuadrático medio acá.
+
+630
+00:54:59,400 --> 00:55:08,400
+Ahora lo que vamos a hacer es juntar estas 20 observaciones acá con las otras 60 que tenemos acá.
+
+631
+00:55:08,400 --> 00:55:26,400
+Nuevamente, tenemos 80 observaciones para ajustar los betas y calcular el error cuadrático medio o el efecto de la clasificación entre malos y buenos pagadores en este conjunto acá.
+
+632
+00:55:26,400 --> 00:55:34,400
+Los betas que estoy calculando acá son distintos, voy a poner el paso 1,
+
+633
+00:55:34,400 --> 00:55:43,400
+van a ser distintos de los betas que yo calculé en este paso acá.
+
+634
+00:55:43,400 --> 00:55:47,400
+O sea, cuando yo ajusto con estas 80 observaciones voy a tener algunos betas.
+
+635
+00:55:47,400 --> 00:55:54,400
+Cuando ajusto con estas otras 80 observaciones tengo otros betas.
+
+636
+00:55:54,400 --> 00:55:57,200
+y por supuesto tengo otros errores cuadrados.
+
+637
+00:55:57,200 --> 00:56:02,800
+Voy haciendo lo mismo, después junto a acá 40 más 40, voy a tener 80,
+
+638
+00:56:02,800 --> 00:56:06,000
+ajusto las betas y evaluo en ese grupo.
+
+639
+00:56:06,000 --> 00:56:11,600
+Voy haciendo esto hasta llegar al final, ajusté 80 acá y evalué acá.
+
+640
+00:56:11,600 --> 00:56:16,400
+¿Por qué es esto importante? Porque es muy importante de que los parámetros que fueron ajustados
+
+641
+00:56:16,400 --> 00:56:20,200
+no sean los mismos que fueron utilizados en la validación.
+
+642
+00:56:20,200 --> 00:56:31,200
+Entonces, esta es una forma de lograr evaluar si estamos haciendo buenas predicciones dentro de nuestro conjunto de entrenamiento.
+
+643
+00:56:31,200 --> 00:56:40,200
+En este paso encontramos o podemos encontrar exactamente aquellos hiperparámetros que habíamos comentado.
+
+644
+00:56:40,200 --> 00:56:45,200
+Pero bueno, yo creo que si entramos mucho en esta discusión, ahí va a complicar un poco más.
+
+645
+00:56:45,200 --> 00:56:52,480
+solamente sepan que una información que importante es que utilizamos estos kfolds
+
+646
+00:56:52,480 --> 00:57:03,480
+específicos, kfolds puede ser cuántos queremos acá 1 2 3 4 5, 5 folds pueden ser 10 folds, 20 folds,
+
+647
+00:57:03,480 --> 00:57:12,160
+50 folds o por ejemplo supongamos que tenemos 100 observaciones yo voy a hacer la division en 100
+
+648
+00:57:12,160 --> 00:57:16,160
+y tiene 100 folds acá
+
+649
+00:57:19,160 --> 00:57:22,160
+y ajusto simplemente con 99 observaciones
+
+650
+00:57:22,160 --> 00:57:24,160
+y evalúo solamente con una
+
+651
+00:57:25,160 --> 00:57:28,160
+Después, voy variando estas observaciones
+
+652
+00:57:28,160 --> 00:57:30,160
+y voy ajustando esto siempre
+
+653
+00:57:30,160 --> 00:57:32,160
+Selecciono 99 observaciones
+
+654
+00:57:32,160 --> 00:57:35,160
+ajusto el modelo y después evalúo en uno
+
+655
+00:57:35,160 --> 00:57:38,160
+Esos 100 folds se extienden de esta forma
+
+656
+00:57:38,160 --> 00:57:40,160
+tienen un nombre muy específico que se llama
+
+657
+00:57:40,160 --> 00:57:44,160
+y se llama Leave-One-Out Cross Validation.
+
+658
+00:57:44,160 --> 00:57:49,160
+Entonces, sí, hay varias variaciones de folds que son importantes
+
+659
+00:57:49,160 --> 00:57:54,160
+o formas que el paquete ya hace para hacer esa estimación.
+
+660
+00:57:57,160 --> 00:58:01,160
+Por eso que debemos tener mucho cuidado cuando vamos a hacer ese tipo de división
+
+661
+00:58:01,160 --> 00:58:05,160
+de entrenamiento y validación, porque estoy teniendo
+
+662
+00:58:05,160 --> 00:58:11,260
+poniendo mucha energía en eso y creo que estoy complicando un poco la cosa, después
+
+663
+00:58:11,260 --> 00:58:17,040
+va a facilitar un poco, pero ¿por qué estamos demasiado en ese punto? Porque es muy importante
+
+664
+00:58:17,040 --> 00:58:22,440
+tener mucho cuidado cuando van a hacer los ajustes y no tener fuga de información. Entonces,
+
+665
+00:58:22,440 --> 00:58:30,060
+por ejemplo, una cosa que puede pasar demasiado, que muchos alumnos míos hacen de error es,
+
+666
+00:58:30,060 --> 00:58:34,940
+muchas veces cuando vamos a ajustar un modelo, necesitamos hacer una estandarización entre
+
+667
+00:58:34,940 --> 00:58:41,060
+los datos, ¿cierto? Entonces, si se recuerda, pero si va a ajustar una regresión lineal,
+
+668
+00:58:41,060 --> 00:58:49,420
+usted hace una estandarización de las covariables, ¿verdad? Entonces, saca los valores, subtrae
+
+669
+00:58:49,420 --> 00:58:54,860
+por la media y divide por la división estándar, ¿sí?
+
+670
+00:58:54,860 --> 00:59:00,560
+Cuál es un cuidado que la persona puede dejar pasar sin tener información, o sin tener
+
+671
+00:59:00,560 --> 00:59:09,320
+este cuidado. Yo puedo simplemente hacer la estandarización o puedo padronizar el sueldo.
+
+672
+00:59:09,320 --> 00:59:14,560
+Vamos sumir que una de las variables es el sueldo. Ex Puno es ex sueldo. El sueldo tiene
+
+673
+00:59:14,560 --> 00:59:22,480
+valores como acá en Chile, un millón de pesos. Son valores que tienen una escala muy grande.
+
+674
+00:59:22,480 --> 00:59:27,840
+Muchos de los métodos con una variable como esta nos va a complicar la vida. Entonces
+
+675
+00:59:27,840 --> 00:59:31,120
+Nuestro objetivo es estandarizar eso, ¿cierto?
+
+676
+00:59:32,640 --> 00:59:37,840
+Pero muchas veces cuando vamos a soltar X1 por la media,
+
+677
+00:59:38,840 --> 00:59:42,440
+sacamos la media de todas nuestras observaciones.
+
+678
+00:59:43,600 --> 00:59:47,640
+Si hacemos este tipo de transformación X1 menos X barra,
+
+679
+00:59:48,720 --> 00:59:50,080
+tomando en cuenta la media,
+
+680
+00:59:50,240 --> 00:59:53,520
+sin hacer la división entre entrenamiento y validación,
+
+681
+00:59:54,040 --> 00:59:56,280
+ahí tenemos fuga de información.
+
+682
+00:59:56,280 --> 01:00:02,080
+y el modelo de predicciones se influencia exactamente por esa transformación.
+
+683
+01:00:02,080 --> 01:00:06,640
+Es un ejemplo sencillo donde existe fuga de información.
+
+684
+01:00:06,640 --> 01:00:12,280
+En varios casos, o muchas veces, cuando hago revisiones de varios artículos,
+
+685
+01:00:12,280 --> 01:00:16,680
+siempre hay muchos problemas, o varias situaciones en las que la persona no toma cuidado
+
+686
+01:00:16,680 --> 01:00:18,680
+y tiene fuga de información.
+
+687
+01:00:18,680 --> 01:00:23,760
+Por ejemplo, calcular medios de división estándar con toda la base y después dividirla.
+
+688
+01:00:23,760 --> 01:00:25,760
+Entonces, esto es un problema muy grande.
+
+689
+01:00:25,760 --> 01:00:33,760
+Un procedimiento correcto en cada fold, estimar la transformación con los 4 folds usados para ajustar.
+
+690
+01:00:33,760 --> 01:00:40,760
+Entonces, hacemos acá, sacamos estas 80 observaciones, hacemos la estandarización,
+
+691
+01:00:40,760 --> 01:00:48,760
+y cuando fuimos a hacer la validación utilizamos la estandarización que me salió acá, también en este conto de validación.
+
+692
+01:00:48,760 --> 01:00:50,760
+Entonces, esta es la forma correcta de hacer.
+
+693
+01:00:50,760 --> 01:00:54,760
+La gran mayoría de los paquetes ya lo hacen de forma automática.
+
+694
+01:00:54,760 --> 01:00:57,240
+Entonces ajustamos el clasificador y evaluamos.
+
+695
+01:00:57,240 --> 01:01:01,480
+Es decir, estimamos la transformación con los cuatro folds usados para ajustar,
+
+696
+01:01:01,480 --> 01:01:05,040
+aplicamos esta misma transformación en el fold de validación
+
+697
+01:01:05,040 --> 01:01:07,920
+y ajustamos el clasificador y evaluamos.
+
+698
+01:01:07,920 --> 01:01:13,240
+Entonces la misma regla se aplica en imputación, selección de variables y submuestreo.
+
+699
+01:01:13,240 --> 01:01:17,600
+O sea, si ustedes van a hacer acá en imputación de datos, selección de variables,
+
+700
+01:01:17,600 --> 01:01:20,240
+hay que tener mucho cuidado para no tener fuga de información.
+
+701
+01:01:20,240 --> 01:01:21,240
+¿Cierto?
+
+702
+01:01:21,240 --> 01:01:29,680
+Bueno, varios de los métodos hacen este tipo de estandarización de forma automática,
+
+703
+01:01:29,680 --> 01:01:35,000
+por ejemplo, el soporte vector machine, en R, tendrá una función muy sencilla, SVM,
+
+704
+01:01:35,000 --> 01:01:39,720
+y hace la escala de la forma correcta, ya, haciendo exactamente esta división.
+
+705
+01:01:39,720 --> 01:01:42,680
+En Python utilizamos la función StandardScaler.
+
+706
+01:01:42,680 --> 01:01:49,200
+Y bueno, finalmente llegamos en nuestro primer modelo de clasificación, ya, pensábamos
+
+707
+01:01:49,200 --> 01:01:53,980
+que no llegue, pero bueno, vamos a la hora de regresión logística, cómo hacemos el ajuste,
+
+708
+01:01:53,980 --> 01:01:57,860
+después la idea de support vector machine y cerramos estos dos modelos.
+
+709
+01:01:57,860 --> 01:02:05,220
+Professor, hasta acá fue un poco pesado, sí, porque es una información muy importante y la
+
+710
+01:02:05,220 --> 01:02:11,980
+idea es que ustedes acá aprendan no solamente poner los datos y aguardar que salgan los resultados.
+
+711
+01:02:11,980 --> 01:02:18,340
+Esta idea de fuga de información o hacer malo la división entre entrenamiento y validación es un
+
+712
+01:02:18,340 --> 01:02:23,580
+un problema que mucha gente que está empezando a se meter con ciencia de dados acaba pasando
+
+713
+01:02:23,580 --> 01:02:29,120
+y después eso toma una escala muy grande cuando se implementa un modelo y tuve una
+
+714
+01:02:29,120 --> 01:02:33,600
+fuga de información en la host. Entonces es muy importante que tomen mucho cuidado para
+
+715
+01:02:33,600 --> 01:02:39,360
+no tener ese problema durante la división entre entrenamiento y validación. Es importante
+
+716
+01:02:39,360 --> 01:02:43,500
+hacer la división de forma aleatoria y tomar cuidado para que esa información no tenga
+
+717
+01:02:43,500 --> 01:02:51,260
+con un avanzamiento. Bueno, el primer modelo de clasificación que vamos a mirar es el
+
+718
+01:02:51,260 --> 01:02:56,340
+modelo de regresión logística. Lo que queremos modelar acá directamente, queremos modelar
+
+719
+01:02:56,340 --> 01:03:06,680
+la probabilidad de Y ser igual a 1 conocido o dado nuestras covariables. Es decir, conociendo
+
+720
+01:03:06,680 --> 01:03:12,980
+la información de que la persona tiene buen sueldo, que vive en determinado local, que
+
+721
+01:03:12,980 --> 01:03:17,540
+está con una deuda muy grande, cuál es la probabilidad de ese individuo ser un
+
+722
+01:03:17,540 --> 01:03:22,580
+bueno pagador. Ya? Esa información acá, esa probabilidad va a cambiar a alto
+
+723
+01:03:22,580 --> 01:03:27,800
+dependiendo de las covariables que tenemos. Entonces, conocido, esas
+
+724
+01:03:27,800 --> 01:03:32,820
+covariables, la persona va a ser un buen pagador o no va a ser un buen pagador.
+
+725
+01:03:32,820 --> 01:03:36,500
+Y dependiendo de esa probabilidad, tomamos la decisión de clasificarlo como
+
+726
+01:03:36,500 --> 01:03:45,440
+un bueno o un malo pagador. Bueno, podemos hacer una transformación acá para nos llevar
+
+727
+01:03:45,440 --> 01:03:52,380
+exactamente a una estructura lineal para poder estimar estos parámetros igual lo hacemos en,
+
+728
+01:03:52,380 --> 01:03:59,180
+por ejemplo, una regresión lineal. Podemos hacer esta transformación que es una transformación
+
+729
+01:03:59,180 --> 01:04:04,500
+muy conocida regresión logística y después de hacer algunos cambios,
+
+730
+01:04:04,500 --> 01:04:09,420
+asumiendo esta estructura acá y agregando las covariables que tenemos
+
+731
+01:04:09,420 --> 01:04:14,220
+en nuestro modelo, ya? Entonces tenemos esta probabilidad, queremos
+
+732
+01:04:14,220 --> 01:04:17,180
+calcular una probabilidad acá, pero inicialmente quiero hacer una
+
+733
+01:04:17,180 --> 01:04:21,940
+transformación de esta probabilidad para que ella esté entre menos
+
+734
+01:04:21,940 --> 01:04:31,980
+infinito e infinito. Utilizamos una transformación basada en esta probabilidad
+
+735
+01:04:31,980 --> 01:04:40,040
+e igualamos con base en nuestras covariadas, más o menos como hacemos con nuestra regresión
+
+736
+01:04:40,040 --> 01:04:47,180
+linear como si tuvieramos nuestro y y igualamos x beta. Pero acá debemos tener cuidado que
+
+737
+01:04:47,180 --> 01:04:49,580
+Estos valores estarán entre 0 y 1.
+
+738
+01:04:49,580 --> 01:04:51,380
+Estas probabilidades.
+
+739
+01:04:51,380 --> 01:04:54,980
+Pero bueno, si hago esta función de ligación acá,
+
+740
+01:04:54,980 --> 01:04:59,380
+igual a estos dos valores, los parámetros, por ejemplo, beta 0,
+
+741
+01:04:59,380 --> 01:05:04,580
+y las covariables y los efectos de las covariables beta,
+
+742
+01:05:04,580 --> 01:05:08,780
+puedo hacer algunas manipulaciones al réplicas de acá para acá
+
+743
+01:05:08,780 --> 01:05:12,980
+y despejar exactamente o encontrar una forma
+
+744
+01:05:12,980 --> 01:05:16,280
+para estimar exactamente esta probabilidad.
+
+745
+01:05:16,280 --> 01:05:20,760
+Entonces, regresó la logística por encontrar esta probabilidad de que
+
+746
+01:05:20,760 --> 01:05:24,280
+y es igual a 1, exactamente por medio de esta expresión.
+
+747
+01:05:25,120 --> 01:05:28,960
+x va a ser nuestras covariables, entonces voy a poner las covariables acá.
+
+748
+01:05:28,960 --> 01:05:31,760
+El sueldo, la edad y todo más.
+
+749
+01:05:31,760 --> 01:05:34,120
+Voy a encontrar algunos valores de betas.
+
+750
+01:05:34,120 --> 01:05:37,000
+Y estos valores de betas van a informar que dado
+
+751
+01:05:37,600 --> 01:05:39,680
+este histórico de estas personas,
+
+752
+01:05:39,680 --> 01:05:42,640
+esta probabilidad de ser un buen pagador,
+
+753
+01:05:42,640 --> 01:05:48,780
+Siempre recuerden que esta probabilidad está relacionada a los individuos que están clasificados como 1.
+
+754
+01:05:48,780 --> 01:05:52,640
+Entonces, si esta probabilidad es alta, clasificamos como 1.
+
+755
+01:05:52,640 --> 01:05:55,920
+Si esta probabilidad es baja, clasificamos como 0.
+
+756
+01:05:58,340 --> 01:06:05,040
+Entonces, el predictor es lineal, el predictor es lineal,
+
+757
+01:06:05,040 --> 01:06:08,320
+y los coeficientes y la probabilidad se van a quedar entre 0 y 1.
+
+758
+01:06:08,320 --> 01:06:13,320
+Esto es muy importante porque por ejemplo si yo hago una cosa como esta
+
+759
+01:06:13,320 --> 01:06:29,320
+y el valor es beta transpuesta x y pongo acá que puede ser 0 y 1 entre malos y buenos pagadores
+
+760
+01:06:29,320 --> 01:06:35,320
+yo incluso puedo ajustar esta función, si ustedes intentan hacer esto en R o en Python
+
+761
+01:06:35,320 --> 01:06:41,040
+te va a salir, pero acá este valor no va a ser una probabilidad, puede ser valores
+
+762
+01:06:41,040 --> 01:06:47,320
+menos uno, valores 1.2, entonces acá no voy a tener una probabilidad,
+
+763
+01:06:47,320 --> 01:06:53,320
+por eso que no es una buena idea ajustar un modelo de regresión lineal
+
+764
+01:06:53,320 --> 01:06:57,840
+para clasificación, o incluso yo puedo cambiarlo, la variante de respuesta podría ser
+
+765
+01:06:57,840 --> 01:07:06,100
+menos uno y uno. De ahí los betas que tenemos acá se cambian. Si pongo menos dos y dos,
+
+766
+01:07:06,100 --> 01:07:13,000
+esos valores también se cambian. Ya? Entonces lo ideal es no ajustar una regresión lineal
+
+767
+01:07:13,000 --> 01:07:19,800
+para hacer clasificación. Vamos exactamente con un modelo logístico y ese modelo logístico
+
+768
+01:07:19,800 --> 01:07:25,300
+nos va a salir de la información que viene de los datos, nos va a atribuir una probabilidad
+
+769
+01:07:25,300 --> 01:07:31,220
+Y después, con esta probabilidad, clasifico al individuo como malo o bueno pagador, por cero o uno.
+
+770
+01:07:32,100 --> 01:07:35,300
+Esta probabilidad se calcula exactamente con base en esta expresión.
+
+771
+01:07:36,380 --> 01:07:44,820
+Por eso, por demostrar un ejemplo, ya, aquí, evaluamos cómo va a ser la probabilidad, basada en un eta que voy a mostrar un poquito más adelante.
+
+772
+01:07:45,300 --> 01:07:51,060
+Pero esta probabilidad va cambiando conforme vamos mudando las covariables.
+
+773
+01:07:51,060 --> 01:07:56,860
+Dependiendo de algunas covariables vamos a tener un valor muy negativo,
+
+774
+01:07:56,860 --> 01:08:00,660
+y ese valor muy negativo, cuando calculamos esta probabilidad,
+
+775
+01:08:00,660 --> 01:08:02,660
+va a ser una probabilidad muy pequeña.
+
+776
+01:08:02,660 --> 01:08:05,460
+Entonces depende de las covariables que ponga,
+
+777
+01:08:05,460 --> 01:08:09,060
+o sea, la persona tiene un sueldo de 500 mil pesos,
+
+778
+01:08:09,060 --> 01:08:14,660
+y la persona va a solicitar un precio de 100 millones de pesos
+
+779
+01:08:14,660 --> 01:08:17,060
+para pagar en cinco años.
+
+780
+01:08:17,060 --> 01:08:23,060
+solamente esta información debería dar un peso muy grande de que es poco probable que esta persona
+
+781
+01:08:23,060 --> 01:08:30,060
+va a alcanzar de pagar los dividendos. Entonces, esto va a ser con que un eta específico que vamos
+
+782
+01:08:30,060 --> 01:08:37,060
+calcular va a ser muy pequeño y cuando ponemos ese valor dentro de la que la funciona, dentro de esta
+
+783
+01:08:37,060 --> 01:08:43,060
+expresión acá, ese valor va a ser muy pequeño, esa probabilidad va a ser muy pequeña. Entonces, la probabilidad
+
+784
+01:08:43,060 --> 01:08:48,620
+la probabilidad de la persona ser igual a uno o un buen pagador va a ser muy baja.
+
+785
+01:08:48,620 --> 01:08:56,100
+Esta probabilidad es específica y bueno, podemos poner un umbral o umbral específico
+
+786
+01:08:56,100 --> 01:09:02,900
+acá para clasificar como uno. Por ejemplo, un ejemplo didáctico acá donde tenemos un
+
+787
+01:09:02,900 --> 01:09:09,180
+beta cero, un beta uno y un beta dos y tenemos un eta. Porque ese eta? Porque después voy
+
+788
+01:09:09,180 --> 01:09:20,940
+cambiar ese ETA exactamente acá, entonces es 1 partido 1 más exponencial de menos ETA, menos ETA
+
+789
+01:09:20,940 --> 01:09:25,420
+que va a ser ese valor acá, entonces el ETA es exactamente esa funcionzita acá.
+
+790
+01:09:27,420 --> 01:09:33,780
+Vamos a suponer que inicialmente yo pongo, yo voy a estimar los parámetros, necesitamos estimar
+
+791
+01:09:33,780 --> 01:09:39,580
+estos parámetros entonces el modelo en el conjunto de entrenamiento me va a encontrar beta cero y
+
+792
+01:09:39,580 --> 01:09:46,980
+beta 1 beta 2 beta 3 por adelante cuando fuimos a hacer este entrenamiento me va a salir exactamente
+
+793
+01:09:46,980 --> 01:09:54,780
+este valores acá menos uno 0.8 y 0.4 cuando puede preguntar profesor donde venía esta información
+
+794
+01:09:54,780 --> 01:10:01,500
+menos uno 0.8 0.4 eso venía durante el conjunto de entrenamiento cuando fuimos a entrenar el
+
+795
+01:10:01,500 --> 01:10:08,740
+modelo me salió que las estimativas de los parámetros deberían ser menos 1 más 0.8
+
+796
+01:10:08,740 --> 01:10:16,300
+y 0.4. Y ahora quiero saber cuál es la probabilidad de la persona ser un bueno pagador si ella
+
+797
+01:10:16,300 --> 01:10:25,980
+tiene esas covariables como Z1 acá que podría ser o X1 si queremos o Z1 igual a 1.5 y la
+
+798
+01:10:25,980 --> 01:10:31,700
+la segunda covariable igual a 2. Ponemos estas dos informaciones acá y acá, calculo
+
+799
+01:10:31,700 --> 01:10:38,940
+este ETA, una situación como esta va a ser exactamente 1. Si ponemos entonces ETA igual
+
+800
+01:10:38,940 --> 01:10:46,060
+a 1 y calculamos la probabilidad, va a ser esta probabilidad de 1 partido 1 más exponencial
+
+801
+01:10:46,060 --> 01:10:55,900
+de menos 1 que entró acá, o sea entró exactamente acá. Y me salió que el valor era de 0.73.
+
+802
+01:10:55,900 --> 01:11:06,900
+Entonces, la persona tiene estas informaciones, la probabilidad de participar del grupo 1,
+
+803
+01:11:06,900 --> 01:11:21,900
+ahí debería ser de 0.73.
+
+804
+01:11:21,900 --> 01:11:29,900
+Si un individuo está arriba, por ejemplo, de 0.5, podríamos considerar entonces esta persona acá,
+
+805
+01:11:29,900 --> 01:11:33,900
+cuando ven esa información, como un posible bueno pagador.
+
+806
+01:11:33,900 --> 01:11:44,900
+O sea, si ponemos un umbral o un punto de corte de 0.5, lo clasificamos como un bueno pagador.
+
+807
+01:11:44,900 --> 01:11:54,200
+Yo puedo cambiar el umbral, vamos a suponer que el banco está siendo muy restrito con crédito,
+
+808
+01:11:54,200 --> 01:12:00,260
+él me va a informar, no voy a querer un punto de corte de 0.5, vamos a aumentar un poco
+
+809
+01:12:00,260 --> 01:12:04,680
+este punto de corte para que no empreste plata a tanta gente.
+
+810
+01:12:04,680 --> 01:12:07,820
+Y ahí definimos un umbral, por ejemplo, de 0.8.
+
+811
+01:12:07,820 --> 01:12:13,820
+En este caso, como esta probabilidad de 0.73 es menor que 0.8,
+
+812
+01:12:13,820 --> 01:12:17,820
+clasifico al individuo como una persona que no va a recibir crédito.
+
+813
+01:12:17,820 --> 01:12:20,820
+Este umbral podemos definir nosotros.
+
+814
+01:12:20,820 --> 01:12:25,820
+El banco puede definir o podemos hacer esto via validación cruzada.
+
+815
+01:12:25,820 --> 01:12:30,820
+Uno puede definir cuál es el umbral que está le dando la mejor clasificación.
+
+816
+01:12:30,820 --> 01:12:34,820
+Una convención es asumir que este valor es 0.5.
+
+817
+01:12:34,820 --> 01:12:41,820
+Pero una cosa importante es que, si cambiamos el umbral, no va a cambiar la probabilidad de ninguna manera.
+
+818
+01:12:41,820 --> 01:12:45,820
+Y esta probabilidad siempre va a ser la misma porque la probabilidad vio de esta cuenta.
+
+819
+01:12:45,820 --> 01:12:52,820
+Entonces la probabilidad no cambia al modificar el umbral, solo va a cambiar la decisión.
+
+820
+01:12:52,820 --> 01:12:57,820
+Entonces tomamos la decisión de clasificar como mal o bueno pagador con base en umbral.
+
+821
+01:12:57,820 --> 01:13:04,280
+¿Por qué es importante para nosotros? Porque ustedes van a llegar con una base de datos
+
+822
+01:13:04,280 --> 01:13:11,300
+para hacer el entrenamiento. El entrenamiento le va a retornar esta función, ¿Cierto?
+
+823
+01:13:11,300 --> 01:13:15,240
+Después van a llegar nuevas personas, entonces vamos a suponer que me llegó una nueva persona
+
+824
+01:13:15,240 --> 01:13:21,540
+con ese valor y con ese valor. El banco ya tiene esa información acá, ahora me llegó
+
+825
+01:13:21,540 --> 01:13:27,400
+un nuevo cliente, ese nuevo cliente tiene esas dos informaciones. Pongo esas dos informaciones
+
+826
+01:13:27,400 --> 01:13:29,400
+en el modelo que ya fue entrenado.
+
+827
+01:13:31,120 --> 01:13:33,820
+Después de poner esa información en el modelo que ya fue entrenado,
+
+828
+01:13:33,820 --> 01:13:35,820
+me va a salir una probabilidad.
+
+829
+01:13:35,820 --> 01:13:39,480
+Y ahí decido si voy a emprestar plata o si no voy a emprestar plata a esa persona.
+
+830
+01:13:39,480 --> 01:13:41,480
+Ya? O en ese caso del cáncer,
+
+831
+01:13:41,480 --> 01:13:45,160
+si la persona va, tiene o no tiene un cáncer maligno.
+
+832
+01:13:46,680 --> 01:13:48,680
+Entonces, mira que la idea es muy sencilla.
+
+833
+01:13:48,680 --> 01:13:50,680
+Hacemos un entrenamiento.
+
+834
+01:13:52,400 --> 01:13:53,400
+Acá.
+
+835
+01:13:53,400 --> 01:14:02,220
+Hacemos la división de conto de entrenamiento, estimamos los parámetros con ese conto de
+
+836
+01:14:02,220 --> 01:14:07,920
+entrenamiento y después cuando viene nuevas informaciones tomamos la decisión si emprestamos
+
+837
+01:14:07,920 --> 01:14:15,180
+o no. Pero antes de tomar la decisión necesitamos nos dar cuenta si este modelo fue bien entrenado,
+
+838
+01:14:15,180 --> 01:14:22,920
+por eso que tomamos un conto de dados de prueba. Entonces acá voy a empezar a poner los individuos
+
+839
+01:14:22,920 --> 01:14:29,220
+de prueba porque poner los individuos de prueba porque yo conozco o cuál fue la
+
+840
+01:14:29,220 --> 01:14:34,260
+respuesta de estos individuos entonces vamos a poner ya el individuo que tiene
+
+841
+01:14:34,260 --> 01:14:38,900
+esta información acá fue clasificado como un buen pagador
+
+842
+01:14:40,620 --> 01:14:48,020
+estimado, certo? y mira, el verdadero Yé era un buen pagador, o sea, tuve una buena
+
+843
+01:14:48,020 --> 01:14:54,420
+decisión ahí me evo nuevo con una otra observación de uno es igual a uno con todo
+
+844
+01:14:54,420 --> 01:14:58,540
+todo va a ser igual a la de veracán
+
+845
+01:14:58,540 --> 01:15:09,500
+y cero y a hacer cuando fuera a ser eso la estimación me va a salir una probabilidad
+
+846
+01:15:09,500 --> 01:15:15,060
+acá muy pequeña tenemos que cambiar los valores pero debería ser alguna cosa como no sé 0.4
+
+847
+01:15:15,060 --> 01:15:25,980
+0.3 0.4 voy a tomar la decisión de clasificar el individuo como 0 y ahí miro porque yo conozco
+
+848
+01:15:25,980 --> 01:15:31,060
+cuál fue la respuesta de los individuos y comparo exactamente con el individuo que observe la muestra
+
+849
+01:15:31,060 --> 01:15:37,060
+y voy haciendo eso con todo nuestro conto de prueba y al final después voy a tener una buena
+
+850
+01:15:37,060 --> 01:15:43,580
+idea de que el modelo tiene los parámetros ajustados con el conto de entrenamiento pero
+
+851
+01:15:43,580 --> 01:15:49,580
+está siendo muy bueno para hacer predicciones en un conjunto que no fue utilizado.
+
+852
+01:15:49,580 --> 01:15:54,580
+Es decir, si me llegan nuevas observaciones, el modelo va a predecir bien.
+
+853
+01:15:58,580 --> 01:16:03,580
+La cosa interesante de la Regresión Logística es, además de, bueno, acá vamos a usar para
+
+854
+01:16:03,580 --> 01:16:09,580
+predicción, es que los betas pasan a tener una buena interpretación, ¿cierto?
+
+855
+01:16:09,580 --> 01:16:13,500
+Por eso que por ejemplo los bancos le encantan utilizar la regresión logística,
+
+856
+01:16:13,500 --> 01:16:18,540
+por estar en modelos de regresión, modelos de redes neuronales, random forest y varias versiones,
+
+857
+01:16:18,540 --> 01:16:23,380
+pero a ellos les gusta la regresión logística porque estos parámetros que fueron estimados,
+
+858
+01:16:23,380 --> 01:16:29,780
+este valor acá, este valor acá y este valor acá, tiene una buena interpretación
+
+859
+01:16:29,780 --> 01:16:33,300
+y muchas veces ellos necesitan esa interpretación, ¿cierto?
+
+860
+01:16:33,300 --> 01:16:35,100
+¿Cuál es la interpretación?
+
+861
+01:16:35,100 --> 01:16:44,600
+Al aumentar X_j en una unidad y manteniendo los demás, los demás predictores constantes,
+
+862
+01:16:45,800 --> 01:16:50,100
+vamos a tener que la interpretación se va a dar en términos de odds,
+
+863
+01:16:50,100 --> 01:16:56,100
+o sea, se va a observar exactamente en términos de esta exponencial, veces el valor que fue estimado,
+
+864
+01:16:56,400 --> 01:17:03,300
+y este valor acá nos informa exactamente lo cuanto está cambiando conforme agregamos una unidad.
+
+865
+01:17:03,300 --> 01:17:09,940
+Por ejemplo, si aumentamos un año las personas que están solicitando plata,
+
+866
+01:17:09,940 --> 01:17:21,320
+ella va a tener 2.23 veces más la chance de retornar un buen pagador,
+
+867
+01:17:21,320 --> 01:17:25,220
+comparado con los individuos que tienen un año a menos.
+
+868
+01:17:25,220 --> 01:17:32,220
+Es decir, si la persona tiene 18 años y cambió para 19,
+
+869
+01:17:32,220 --> 01:17:38,220
+eso aumentó en 2.23 veces más la chance de pagar el precio.
+
+870
+01:17:38,220 --> 01:17:43,220
+Y eso es genial. O por ejemplo, si la persona tiene una, no sé,
+
+871
+01:17:43,220 --> 01:17:49,220
+si pertenece a un grupo específico, si la persona tiene una enfermedad grave,
+
+872
+01:17:49,220 --> 01:17:56,060
+Esto hará que ella tenga cinco o seis veces menos chance de venir a pagar un empréstimo
+
+873
+01:17:56,060 --> 01:18:01,140
+comparado con una persona que no tiene una enfermedad terminal.
+
+874
+01:18:01,140 --> 01:18:06,500
+Por eso que muchas veces cuando ustedes van a solicitar plata durante mucho tiempo al banco,
+
+875
+01:18:06,500 --> 01:18:12,980
+yo le preguntar varias preguntas en términos de salud, porque quieren saber si tiene alguna enfermedad
+
+876
+01:18:12,980 --> 01:18:15,060
+que pueda influenciar en su tiempo de vida.
+
+877
+01:18:15,060 --> 01:18:22,320
+porque saben que aumenta en tantas veces la chance de venir o no venir pagar este valor.
+
+878
+01:18:22,320 --> 01:18:27,060
+¿Dónde viene esta interpretación? Exactamente de los betas que fueron estimados.
+
+879
+01:18:27,060 --> 01:18:38,420
+Bueno, la interpretación es una asociación condicional, pero no un efecto causal.
+
+880
+01:18:38,420 --> 01:18:43,800
+Bueno, esto no significa una probabilidad, es una chance de venir a pagar.
+
+881
+01:18:43,800 --> 01:18:50,520
+Entonces, una cosa es que está aumentando cinco veces, pero no es una probabilidad de 2.23 veces más.
+
+882
+01:18:51,000 --> 01:18:53,200
+Mesmo porque la probabilidad está entre 0 y 1.
+
+883
+01:18:53,200 --> 01:18:57,400
+Entonces, es odds, aumenta la chance de venir a ocurrir este evento.
+
+884
+01:19:01,240 --> 01:19:02,840
+¿Cómo hacemos la estimación?
+
+885
+01:19:02,840 --> 01:19:03,440
+Listo.
+
+886
+01:19:03,440 --> 01:19:05,480
+Bueno, utilizamos una función.
+
+887
+01:19:05,480 --> 01:19:10,720
+Hay varias funciones en R distintas para hacer la estimación en Python también.
+
+888
+01:19:10,720 --> 01:19:15,720
+Una que utilizamos harto, que ustedes creen que deben conocer, es la función GLM.
+
+889
+01:19:15,720 --> 01:19:18,720
+Utilizamos la familia binomial.
+
+890
+01:19:18,720 --> 01:19:21,720
+Entonces utilizamos la función GLM y la familia binomial,
+
+891
+01:19:21,720 --> 01:19:31,720
+ellos van a estimar exactamente estas betas utilizando un método que se llama estimador de máxima verosimilitud.
+
+892
+01:19:31,720 --> 01:19:33,720
+O de una forma equivalente,
+
+893
+01:19:33,720 --> 01:19:38,720
+los coeficientes se estiman minimizando una función de pérdida logística.
+
+894
+01:19:38,720 --> 01:19:43,960
+podemos calcular minimizando esta función de pérdida lórisica o de una forma equivalente
+
+895
+01:19:43,960 --> 01:19:48,200
+de punto de vista de inferencia calculando una cosa que se llama estimador de máxima
+
+896
+01:19:48,200 --> 01:19:55,640
+verosimilitud. El estimador de máxima verosimilitud es genial porque tiene excelentes propiedades,
+
+897
+01:19:55,640 --> 01:20:01,960
+tiene garantizado que tiene una solución única, que se puede calcular bien, se puede
+
+898
+01:20:01,960 --> 01:20:07,560
+calcular los intervalos de confianza y los estimadores son muy estables. Entonces, si
+
+899
+01:20:07,560 --> 01:20:10,840
+si usted intenta calcular con esta función no va a tener problemas.
+
+900
+01:20:10,840 --> 01:20:18,720
+Entonces, una predicción muy segura y equivocada, acá no vamos a hablar mucho de penalización,
+
+901
+01:20:18,720 --> 01:20:27,260
+pero una cosa que no podría hacer es, después agregar también un término acá de penalización
+
+902
+01:20:27,260 --> 01:20:31,920
+en términos de los betas.
+
+903
+01:20:31,920 --> 01:20:36,720
+queremos agregar acá, podríamos hacer regularización,
+
+904
+01:20:36,720 --> 01:20:43,520
+esto es considerado como regularización, y minimizamos una función como esa,
+
+905
+01:20:43,520 --> 01:20:47,280
+con una función de penalización, ya para eliminar las covariables que no son
+
+906
+01:20:47,280 --> 01:20:50,320
+importantes. Entonces vamos a suponer que ustedes
+
+907
+01:20:50,320 --> 01:20:54,880
+tienen cinco variables ahí, cien variables que sacaron de una encuesta,
+
+908
+01:20:54,880 --> 01:20:59,120
+durante la minimización se pone una penalización como Lasso, por ejemplo,
+
+909
+01:20:59,120 --> 01:21:02,120
+y eliminará varios de los parámetros.
+
+910
+01:21:03,620 --> 01:21:07,620
+Esta penalización no se puede sacar con la función glm.
+
+911
+01:21:07,880 --> 01:21:11,620
+Hay una función que se llama glmnet
+
+912
+01:21:12,160 --> 01:21:13,920
+que fue propuesta por Tibshirani.
+
+913
+01:21:15,380 --> 01:21:16,380
+glmnet.
+
+914
+01:21:17,040 --> 01:21:19,280
+Y dentro de esta función glmnet
+
+915
+01:21:19,320 --> 01:21:23,460
+uno puede utilizar la penalización Lasso o la penalización Ridge
+
+916
+01:21:23,720 --> 01:21:26,520
+para eliminar varios de los parámetros.
+
+917
+01:21:26,520 --> 01:21:30,520
+profesor está hablando de eliminar parámetros ustedes conocen el método
+
+918
+01:21:30,520 --> 01:21:35,760
+stepwise, ¿certo? sí creo que sí, ¿certo Lumina?
+
+919
+01:21:35,760 --> 01:21:40,880
+¿ellos vieron en algún momento? ¿conocen ustedes de stepwise? creo que sí porque
+
+920
+01:21:40,880 --> 01:21:47,280
+vieron regresión y vieron regresión múltiple también, creo que alguien pongo un
+
+921
+01:21:47,280 --> 01:21:55,160
+dedito para arriba o para abajo, bueno, este es uno de las formas de hacer selección de
+
+922
+01:21:55,160 --> 01:22:01,360
+variables, ya o sea, estoy empezando con cinco variables, utilizo stepwise, de la inversión,
+
+923
+01:22:01,360 --> 01:22:06,080
+si lo mencionaron, si me sueña, vamos a poner stepwise, vamos a ver que ustedes empiezan
+
+924
+01:22:06,080 --> 01:22:12,640
+con cinco variables, pero no voy a utilizar todas ellas, porque trabajar con cinco variables
+
+925
+01:22:12,640 --> 01:22:17,560
+acá le va a aumentar demasiado, pero va a aumentar mucho la variancia del estimador.
+
+926
+01:22:17,560 --> 01:22:24,200
+No sé si la clase recuerda o no, pero tiene una ganancia entre trabajar con todas las
+
+927
+01:22:24,200 --> 01:22:29,980
+con variables y trabajar sin ninguna variable. Si ustedes tienen 100 variables y al final
+
+928
+01:22:29,980 --> 01:22:34,040
+van a trabajar con esas 100 variables, la variancia de su estimador va a ser muy grande.
+
+929
+01:22:34,040 --> 01:22:42,120
+Ustedes no van a tener un buen estimador. Pero Dios, ustedes tienen 100 variables ahí.
+
+930
+01:22:42,120 --> 01:22:47,460
+Vamos a suponer que ustedes quieren construir todas las combinaciones con 100 variables.
+
+931
+01:22:47,460 --> 01:22:53,820
+van a tener 2 elevado a 100. Ponen ahí en R intentando hacer esta cuenta con
+
+932
+01:22:53,820 --> 01:23:00,260
+eso. Ustedes van a tener más modelos que granos de arena en el universo.
+
+933
+01:23:00,260 --> 01:23:05,100
+Con 100, este modelo acá ya va a tener más modelos que granos de arena en todo el
+
+934
+01:23:05,100 --> 01:23:12,340
+universo que tenemos. Entonces con 100, 200, la cosa ya se complica demasiado,
+
+935
+01:23:12,340 --> 01:23:17,680
+imposible hacer esa cuenta. Entonces, una de las formas es, en vez de
+
+936
+01:23:17,680 --> 01:23:22,160
+evaluar todos los modelos, utilizamos una idea que se llama stepwise, que de alguna
+
+937
+01:23:22,160 --> 01:23:29,100
+manera ayuda a seleccionar las covariables. Stepwise funciona bien, más o menos la
+
+938
+01:23:29,100 --> 01:23:32,960
+mejor forma, o la forma que me gusta mucho más, que he visto en todos los
+
+939
+01:23:32,960 --> 01:23:38,200
+cursos que funciona muy bien, es por base de regularización, ¿cierto?
+
+940
+01:23:38,200 --> 01:23:42,520
+Esta regularización ya la estima al tiro durante...
+
+941
+01:23:45,280 --> 01:23:51,320
+Ya va a ser selección de variables conforme se estima o se va a estimar los parámetros.
+
+942
+01:23:51,640 --> 01:23:55,040
+Entonces, cuando voy a encontrar los betas de la regresión logística,
+
+943
+01:23:55,400 --> 01:23:58,240
+ya hago con que varios de los betas sean igualizados.
+
+944
+01:23:59,600 --> 01:24:01,000
+Porque realmente, ¿qué ustedes hacen?
+
+945
+01:24:01,000 --> 01:24:04,360
+Ustedes intentan estimar un beta, no sé, 50.
+
+946
+01:24:04,360 --> 01:24:12,800
+y este valor me va a salir 0.01 y ahí ustedes construyen un intervalo de confianza y a
+
+947
+01:24:12,800 --> 01:24:24,440
+mi no se tiene menos 0.5 0.8 ya acá está la estimativa me parece 0 o intervalo contiene
+
+948
+01:24:24,440 --> 01:24:32,760
+0 no es significativo por eliminar el problema es que si ustedes eliminan B50
+
+949
+01:24:32,760 --> 01:24:40,880
+puede ser con que haga con que B49 pase a ser significativo ya ustedes
+
+950
+01:24:40,880 --> 01:24:45,240
+tienen una relación de que eliminando uno otro pasa a ser significativo
+
+951
+01:24:45,240 --> 01:24:51,040
+puede ser que algo eliminar el B49 el B50 pasa a ser significativo entonces
+
+952
+01:24:51,040 --> 01:24:57,160
+ustedes no pueden eliminar los parámetros solamente porque tienen una estrella ahí a la
+
+953
+01:24:57,160 --> 01:25:02,400
+frente. Demuestra que para aquel modelo con todas esas com variables aquel parámetro no era
+
+954
+01:25:02,400 --> 01:25:09,040
+significativo, pero si elimina un otro parámetro puede ser que sea significativo. Pero
+
+955
+01:25:09,040 --> 01:25:14,440
+ahí el profesor complicó la vida porque yo estaba acostumbrado a eliminar los parámetros de esa forma.
+
+956
+01:25:14,440 --> 01:25:20,920
+Tenemos que hacer alguna evaluación mejor. Una de las formas es hacer selección de variables
+
+957
+01:25:20,920 --> 01:25:24,920
+eliminar los betas vía regularización.
+
+958
+01:25:30,920 --> 01:25:35,920
+Bueno Felipe nos mostró acá las variaciones de stepwise.
+
+959
+01:25:35,920 --> 01:25:41,920
+Stepwise tiene algunas versiones, forward stepwise, backward stepwise,
+
+960
+01:25:41,920 --> 01:25:43,920
+forward y backward stepwise.
+
+961
+01:25:43,920 --> 01:25:45,920
+Él puede hacer esta selección de formas distintas.
+
+962
+01:25:45,920 --> 01:25:48,920
+Si no lo conocen, es una buena forma.
+
+963
+01:25:48,920 --> 01:25:53,920
+¿Y si utilizo stepwise? Casi nunca. Cuando voy a hacer la inferencia, siempre me voy con regularización.
+
+964
+01:25:53,920 --> 01:25:56,920
+Y elimino los parâmetros con regularización.
+
+965
+01:25:57,920 --> 01:26:03,920
+Bueno, paramos ahora, Romina. Movemos en, ¿cuánto tiempo? ¿15 a 20 minutos?
+
+966
+01:26:04,920 --> 01:26:07,920
+Sí, a 20 minutos, a las 8.20.
+
+967
+01:26:07,920 --> 01:26:09,920
+Perfecto, 20 minutos.
+
+968
+01:26:09,920 --> 01:26:14,920
+Bueno, fomos solamente hasta lámina 20, pero varias de ellas son códigos en R más adelante.
+
+969
+01:26:14,920 --> 01:26:18,520
+se va más rápido entonces paramos por ahora volvimos en 20 minutos
+
+970
+01:26:18,520 --> 01:26:18,521
+[Pausa: recreo hacia 1:26:14 del video aprox. El video no contiene el tramo del descanso (no hay silencio ni audio intermedio); la clase continúa directamente con el regreso del recreo.]
+
+971
+01:26:19,720 --> 01:26:23,720
+super ahí estamos de vuelta perfecto
+
+972
+01:26:25,480 --> 01:26:31,120
+bueno estaba comentando que después de ajustar estas probabilidades de regresión logística debemos
+
+973
+01:26:31,120 --> 01:26:37,400
+definir un umbral ya este umbral o este punto que vamos a clasificar como uno y cero los dos grupos
+
+974
+01:26:37,400 --> 01:26:44,760
+generalmente se asume un valor de 0.5 se no se pone nada el software va a definir de 0.5 ya
+
+975
+01:26:44,920 --> 01:26:48,280
+pero ustedes después pueden definir este valor distinto si quieren.
+
+976
+01:26:48,280 --> 01:26:57,000
+Y también incluir, evaluar cómo esto va a funcionar cuando cambiamos este umbral.
+
+977
+01:26:57,000 --> 01:27:02,920
+Lo interesante es que la área de la curva ROC ya considera estos diferentes puntos
+
+978
+01:27:02,920 --> 01:27:06,520
+de umbral cuando cambiamos.
+
+979
+01:27:06,520 --> 01:27:11,000
+Entonces, es una de las características que me gusta bastante esta área de la curva ROC.
+
+980
+01:27:11,000 --> 01:27:15,000
+Bueno, en este curso por ahora vamos a sumar 0.5.
+
+981
+01:27:15,000 --> 01:27:20,000
+Les invito después a cambiar estos valores y evaluar si esto está mejorando o peorando su clasificación.
+
+982
+01:27:20,000 --> 01:27:27,000
+Siempre pido para los alumnos hacer lo mismo, bueno, siempre veo que de una forma natural se va a cambiar
+
+983
+01:27:27,000 --> 01:27:33,000
+y usted va a encontrar algún umbral específico que le va a mejorar la clasificación.
+
+984
+01:27:33,000 --> 01:27:43,000
+Bueno, como lo hacemos, voy a subir los códigos para Romina. No sé si sería bueno enviar
+
+985
+01:27:43,000 --> 01:27:46,000
+ahora, mejor después de la clase, ¿cierto Romina?
+
+986
+01:27:46,000 --> 01:27:53,000
+No, yo creo que después, porque pueden verlos ahí.
+
+987
+01:27:53,000 --> 01:27:58,500
+Sí, por ahora, y después pueden correr. Y bueno, voy a estar haciendo el repaso con
+
+988
+01:27:58,500 --> 01:28:04,060
+ustedes el sábado y si alguien tiene alguna duda volvemos el sábado y vemos si tiene algún problema
+
+989
+01:28:06,060 --> 01:28:12,820
+Bueno la idea es ustedes tienen que cambiar la carpeta donde van poner los códigos va a crear una carpeta
+
+990
+01:28:12,820 --> 01:28:20,780
+y acabo poniendo acá la carpeta barra códigos, hay que utilizar la librería e1071 para
+
+991
+01:28:20,780 --> 01:28:26,620
+que la librería e1071 para correr la función Support Vector Machine, ya ustedes van a cargar
+
+992
+01:28:26,620 --> 01:28:31,620
+esta base de datos que está con ese nombre, wisconsin_clase.csv
+
+993
+01:28:31,620 --> 01:28:36,620
+Entonces va a ser un wisconsin_clase.csv acá y va a cargar esta base de dados
+
+994
+01:28:41,620 --> 01:28:45,620
+Después de cargar la base de dados, puede dar una mirada como está la base de dados
+
+995
+01:28:45,620 --> 01:28:49,620
+Una cosa interesante, bueno, que inicialmente yo había dado cuenta
+
+996
+01:28:49,620 --> 01:28:54,620
+era que, bueno, yo saque esta base de dados de la clase del año pasado
+
+997
+01:28:54,620 --> 01:29:02,620
+y en la clase de año pasado ellos ya habían hecho la división entre entrenamiento y validación dentro de nuestro archivo CSV.
+
+998
+01:29:03,620 --> 01:29:12,620
+¿Por qué es importante? Porque, bueno, dando una mirada uno va a ver acá que hacemos una división entre entrenamiento, entre nuestra base y...
+
+999
+01:29:15,620 --> 01:29:17,620
+una otra base de prueba, ¿cierto?
+
+1000
+01:29:17,620 --> 01:29:22,900
+Cierto? Professor, pero donde sé que estoy haciendo la división entre 70 y 30?
+
+1001
+01:29:22,900 --> 01:29:28,100
+Bueno, no sabe por qué y había hecho eso dentro del conjunto de datos.
+
+1002
+01:29:28,100 --> 01:29:32,580
+Pero hay funciones sencillas acá que se puede cambiar el punto.
+
+1003
+01:29:32,580 --> 01:29:35,700
+Si queremos sacar 80% a 70% por ahí adelante.
+
+1004
+01:29:35,700 --> 01:29:39,380
+Pero el código como está acá no va a ser eso ahora.
+
+1005
+01:29:39,380 --> 01:29:44,100
+Yo puedo después adaptarlo y corremos con diferentes contos de entrenamiento
+
+1006
+01:29:44,100 --> 01:29:48,100
+durante el repaso de la clase que vamos a hacer el sábado.
+
+1007
+01:29:49,740 --> 01:29:51,100
+Bueno, tenemos acá
+
+1008
+01:29:52,180 --> 01:29:56,180
+la información de los individuos que fueron clasificados como benignos y malignos.
+
+1009
+01:29:58,020 --> 01:30:00,620
+Voy a hacer un plot de cómo están los dados,
+
+1010
+01:30:00,620 --> 01:30:03,540
+exactamente el plot que tenemos en nuestra clase.
+
+1011
+01:30:04,540 --> 01:30:07,500
+Y la leyenda acá informando si eres benigno o maligno.
+
+1012
+01:30:09,060 --> 01:30:10,660
+Entrenamiento y prueba,
+
+1013
+01:30:10,660 --> 01:30:14,660
+vamos a hacer la división entre entrenamiento y prueba.
+
+1014
+01:30:14,660 --> 01:30:18,660
+Exactamente la estructura que también está en las diapositivas.
+
+1015
+01:30:18,660 --> 01:30:20,660
+Entonces acá hacemos la lectura de los dados,
+
+1016
+01:30:20,660 --> 01:30:24,660
+sacamos un poco de estadísticas,
+
+1017
+01:30:24,660 --> 01:30:27,660
+la librería para cargar la función SVM,
+
+1018
+01:30:27,660 --> 01:30:31,660
+dividimos el conjunto entre entrenamiento y prueba,
+
+1019
+01:30:31,660 --> 01:30:36,660
+voy a definir cuáles son las variables que van para el conjunto de entrenamiento
+
+1020
+01:30:36,660 --> 01:30:44,620
+en x y después cuál es la variable respuesta ya porque es importante porque estamos haciendo
+
+1021
+01:30:44,620 --> 01:30:52,620
+eso acá estamos haciendo eso acá porque no tener que tener en cuenta lo que somos x de entrenamiento
+
+1022
+01:30:52,620 --> 01:30:58,860
+que tiene que entrar dentro de la función y cuál es no y de entrenamiento ser la variable respuesta
+
+1023
+01:30:58,860 --> 01:31:07,620
+para entrenamiento, después lo ex y lo ye para la validación, para la prueba, ya, entonces
+
+1024
+01:31:07,620 --> 01:31:19,580
+dividimos el conjunto, acá, puedo poner en código, acá, dividimos nuestras variables,
+
+1025
+01:31:19,580 --> 01:31:26,020
+nuestro conjunto de entrenamiento y nuestro conjunto de prueba, ya, y bueno, vamos a ajustar
+
+1026
+01:31:26,020 --> 01:31:32,100
+el modelo por ahora no estoy ajustando nada con regularización voy a agregar
+
+1027
+01:31:32,100 --> 01:31:35,980
+glmnet, después, en esta clase de repaso entonces los que vienen a
+
+1028
+01:31:35,980 --> 01:31:41,300
+assistir el sábado van a ver esto de una otra mirada con glmnet, ya
+
+1029
+01:31:41,300 --> 01:31:45,540
+entonces voy a ajustar la regresión logística como ajustamos un modelo de
+
+1030
+01:31:45,540 --> 01:31:50,300
+regresión logística ajustamos vía una función que se llama glmnet
+
+1031
+01:31:50,300 --> 01:31:57,900
+GLM, perdón. GLM es Generalized Linear Model. Es un modelo linear generalizado.
+
+1032
+01:31:57,900 --> 01:32:03,240
+Es un curso, hay un curso que se habla sobre modelos lineales generalizados y
+
+1033
+01:32:03,240 --> 01:32:08,340
+este curso le va a mostrar que se puede elegir diferentes distribuciones dentro
+
+1034
+01:32:08,340 --> 01:32:14,020
+de esta familia, de la familia exponencial. Una de ellas es la familia
+
+1035
+01:32:14,020 --> 01:32:22,060
+binomial. Si no elegimos la familia binomial dentro del modelo glm, va a llegar exactamente
+
+1036
+01:32:22,060 --> 01:32:28,260
+en la regresión logística. Acá tenemos nuestra variable de respuesta que es el tipo de cáncer.
+
+1037
+01:32:28,260 --> 01:32:44,260
+no, déjame subir este código a Romina y después subir para ellos, déjame un ratito.
+
+1038
+01:32:44,260 --> 01:32:46,260
+Romina, ¿podrías compartir tu correo?
+
+1039
+01:32:46,260 --> 01:32:49,260
+Ah, sí, lo voy a poner en el chat.
+
+1040
+01:33:08,260 --> 01:33:10,260
+perfecto
+
+1041
+01:33:19,260 --> 01:33:27,260
+No sé por qué el Python acá no me deja subir Python, no sé si me deja me compactar.
+
+1042
+01:33:27,260 --> 01:33:35,260
+Bueno, si no te llegaron archivos de Python, no sé por qué el Outlook no me deje enviar,
+
+1043
+01:33:35,260 --> 01:33:37,260
+entonces envié dentro de un archivo comprimido.
+
+1044
+01:33:37,260 --> 01:33:43,260
+Tenía un archivo en PDF de la clase, un archivo en R, y un archivo en Python.
+
+1045
+01:33:43,260 --> 01:33:48,260
+Y ahí voy a compartir con ellos, y ellos van corriendo juntos.
+
+1046
+01:33:48,260 --> 01:33:55,260
+Mientras siga hablando, las voy a subir ahí a la plataforma.
+
+1047
+01:33:55,260 --> 01:34:00,260
+Perfecto. En la próxima clase, antes de empezar, ya comparto también porque ahí,
+
+1048
+01:34:00,260 --> 01:34:06,260
+Romina, pueden ir, eh, ustedes pueden ir siguiendo y corriendo junto a los códigos, ¿sí, bien?
+
+1049
+01:34:06,260 --> 01:34:11,260
+De hecho, para el sábado también me la pueden mandar porque también me anoté para el sábado.
+
+1050
+01:34:11,260 --> 01:34:17,260
+Sí, les envío el viernes, el viernes los códigos actualizados, entonces, en la clase de repaso.
+
+1051
+01:34:17,260 --> 01:34:24,100
+Bueno, lo que hicimos acá fue dividimos este entrenamiento y prueba, ya?
+
+1052
+01:34:24,100 --> 01:34:28,020
+Lo mismo pasa acá, entrenamiento y prueba.
+
+1053
+01:34:28,020 --> 01:34:31,020
+Después ajustamos un modelo GLM.
+
+1054
+01:34:31,020 --> 01:34:38,300
+Yo podría cambiar la familia para Gaussian para tener una regresión lineal, cambiar
+
+1055
+01:34:38,300 --> 01:34:42,380
+para la regresión de Poisson, hay varias estructuras de regresión.
+
+1056
+01:34:42,380 --> 01:34:49,180
+Lo interesante es que este GLM funciona muy similar a lo que tenemos solamente con la función LM.
+
+1057
+01:34:49,180 --> 01:34:57,980
+Es decir, la variable respuesta que es maligno, o si el cáncer es maligno o benigno, acá en el estudiante,
+
+1058
+01:34:57,980 --> 01:35:03,580
+acá está como maligno, y acá las otras cuatro covariables.
+
+1059
+01:35:03,580 --> 01:35:06,380
+Radio, textura, suavidad y concavidad.
+
+1060
+01:35:06,380 --> 01:35:08,380
+Un punto muy importante.
+
+1061
+01:35:08,380 --> 01:35:15,020
+¿Con qué datos estoy ajustando? Con el conjunto de datos de entrenamiento.
+
+1062
+01:35:15,020 --> 01:35:19,100
+Y al profesor, ¿hay algún hiperparámetro para estimar acá?
+
+1063
+01:35:19,100 --> 01:35:24,640
+¿En ese punto? No. Entonces, aquel hiperparámetro que le comenté anteriormente,
+
+1064
+01:35:24,640 --> 01:35:28,020
+al menos para esta regresión logística, no existe.
+
+1065
+01:35:28,020 --> 01:35:32,100
+No tiene un lambda, no tiene un parámetro de suavidad, no tiene nada.
+
+1066
+01:35:32,100 --> 01:35:35,340
+Entonces yo puedo correr GLM acá sin problema.
+
+1067
+01:35:35,340 --> 01:35:41,340
+Si quieres aplicar regularización, ahí tienes un parámetro, o un parámetro, digo, a ser estimado.
+
+1068
+01:35:41,340 --> 01:35:43,340
+Vamos a hacer esto en la clase de repaso.
+
+1069
+01:35:43,340 --> 01:35:47,340
+Y ahí sí tenemos que estimarlo con aquella división que había comentado.
+
+1070
+01:35:47,340 --> 01:35:52,340
+Pero por ahora, como no tenemos, simplemente pongo el conjunto de entrenamiento acá.
+
+1071
+01:35:54,340 --> 01:35:55,340
+Voy a correr.
+
+1072
+01:35:56,340 --> 01:35:58,340
+Y voy a tener los parámetros ajustados.
+
+1073
+01:36:01,340 --> 01:36:02,340
+Los betas.
+
+1074
+01:36:03,340 --> 01:36:04,340
+Estimados.
+
+1075
+01:36:05,340 --> 01:36:07,940
+si son significativos o no.
+
+1076
+01:36:09,140 --> 01:36:11,940
+Después podemos empezar a interpretarlos.
+
+1077
+01:36:11,940 --> 01:36:14,140
+El objetivo acá no es interpretar las betas.
+
+1078
+01:36:14,140 --> 01:36:15,940
+Nuestro objetivo inicialmente es evaluar
+
+1079
+01:36:15,940 --> 01:36:18,140
+si el modelo está haciendo buenas predicciones o no.
+
+1080
+01:36:18,140 --> 01:36:20,540
+Entonces, dentro de esta función,
+
+1081
+01:36:20,540 --> 01:36:24,540
+lojistic, acá lojística,
+
+1082
+01:36:25,340 --> 01:36:28,140
+yo acabé poniendo el modelo que fue ajustado.
+
+1083
+01:36:28,140 --> 01:36:31,140
+Entonces, recibió el modelo GLM.
+
+1084
+01:36:31,740 --> 01:36:35,140
+Ahora con este modelo voy a hacer predicciones.
+
+1085
+01:36:35,140 --> 01:36:37,580
+¿Cómo hacemos predicciones en este modelo?
+
+1086
+01:36:37,580 --> 01:36:40,780
+Utilizamos esta función Predict.
+
+1087
+01:36:40,780 --> 01:36:45,140
+Voy a utilizar Predict, el modelo que fue ajustado,
+
+1088
+01:36:45,140 --> 01:36:50,460
+que fue ajustado acá, está acá, el modelo ajustado.
+
+1089
+01:36:50,460 --> 01:36:54,700
+Pero se recuerden, ahora voy a predecir en nuevas observaciones,
+
+1090
+01:36:54,700 --> 01:37:00,620
+en nuevos X, voy a predecir en nuestro X que está acá,
+
+1091
+01:37:00,620 --> 01:37:03,780
+X de prueba.
+
+1092
+01:37:03,780 --> 01:37:07,780
+Entonces uso un Predict, vean dónde está.
+
+1093
+01:37:11,280 --> 01:37:16,280
+Y el Data prueba, porque está solamente con el nombre prueba, ¿cierto?
+
+1094
+01:37:16,780 --> 01:37:18,780
+Entonces acabo poniendo acá prueba.
+
+1095
+01:37:20,280 --> 01:37:26,280
+Entonces este prueba va a ser nuestro conjunto de prueba.
+
+1096
+01:37:27,780 --> 01:37:32,780
+Entonces acá es exactamente este conjunto de prueba.
+
+1097
+01:37:32,780 --> 01:37:39,500
+Yo creo que el X prueba después para aplicar en el SVM, pero esta funciona que el prueba o el X prueba es lo mismo.
+
+1098
+01:37:39,500 --> 01:37:41,820
+Incluso debería correr la misma cosa.
+
+1099
+01:37:41,820 --> 01:37:44,300
+Yo puedo cambiar después.
+
+1100
+01:37:44,300 --> 01:37:47,260
+Lo que me va a retornar?
+
+1101
+01:37:47,260 --> 01:37:50,220
+Las probabilidades que había comentado.
+
+1102
+01:37:50,220 --> 01:37:55,580
+Mira, el individuo 5 me salió la probabilidad de 0.99.
+
+1103
+01:37:55,580 --> 01:37:57,820
+El individuo 7 0.99.
+
+1104
+01:37:57,820 --> 01:38:01,100
+El individuo 8 0.89.
+
+1105
+01:38:01,100 --> 01:38:06,100
+Podríamos tener individuos con valores altos. Podríamos dar una mirada,
+
+1106
+01:38:06,100 --> 01:38:10,100
+y tener esta probabilidad que vamos a ver que hay individuos con valores bajos.
+
+1107
+01:38:14,100 --> 01:38:18,100
+Está todo en valores como exponencial, ahí nos complica la visión.
+
+1108
+01:38:19,100 --> 01:38:23,100
+Podríamos dar una cosa distinta, vamos a ver probabilidad.
+
+1109
+01:38:31,100 --> 01:38:35,100
+El individuo 10 tiene una probabilidad extremamente baja.
+
+1110
+01:38:35,100 --> 01:38:51,100
+El individuo 13, 14, 15, 17, 20, 21, 50, valor 0.004.
+
+1111
+01:38:51,100 --> 01:38:56,100
+Ahora tenemos esas probabilidades, debemos cambiar por la regla de decisión que le comenté,
+
+1112
+01:38:56,100 --> 01:39:00,100
+específico si vamos a clasificar estos individuos como 1 o 0.
+
+1113
+01:39:00,100 --> 01:39:05,100
+Clasifico los individuos como 1, los que son mayores que 0.5 acá.
+
+1114
+01:39:05,100 --> 01:39:11,100
+Entonces, si la probabilidad formada es 0.5, clasifico como 1.
+
+1115
+01:39:11,100 --> 01:39:13,100
+Caso contrario, clasifico como 0.
+
+1116
+01:39:13,100 --> 01:39:22,100
+Entonces, vengo acá, esta clase logística, y ahora tengo los individuos que fueron clasificados.
+
+1117
+01:39:22,100 --> 01:39:26,100
+0 1 0 1 por ahí adelante.
+
+1118
+01:39:26,100 --> 01:39:31,100
+Ahora ya tengo los individuos que fueron clasificados, pero recuerden que yo tengo
+
+1119
+01:39:31,100 --> 01:39:36,100
+la verdadera respuesta, porque yo había separado a ya este individuo para prueba.
+
+1120
+01:39:36,100 --> 01:39:42,100
+Entonces yo puedo comparar lo que fue estimado con lo que dentro fue observado.
+
+1121
+01:39:42,100 --> 01:39:48,100
+Entonces voy a hacerlo en la tabla, con el Y que fue observado,
+
+1122
+01:39:48,100 --> 01:39:58,100
+y prueba con el Y que fue estimado. El Y que fue observado, el Y que fue estimado.
+
+1123
+01:39:58,100 --> 01:40:04,900
+Si son buenos modelos, debería salir una matriz de confusión ahí más o menos con
+
+1124
+01:40:04,900 --> 01:40:11,020
+muchos valores muy grandes acá, valores muy grandes acá, valores pequeños acá y
+
+1125
+01:40:11,020 --> 01:40:15,700
+valores pequeños acá, ¿certo? Entonces, esta es la matriz de confusión.
+
+1126
+01:40:15,700 --> 01:40:20,060
+profesor usted me comentó que había varias métricas, si, voy a presentar una
+
+1127
+01:40:20,060 --> 01:40:25,340
+otra forma de hacer clasificación que se llama SVM y después hacemos la
+
+1128
+01:40:25,340 --> 01:40:31,180
+comparación con todos, ya? entramos entonces en la idea de SVM, profesor
+
+1129
+01:40:31,180 --> 01:40:35,340
+también tiene los códigos de Python acá, podría correr un poco de Python porque
+
+1130
+01:40:35,340 --> 01:40:40,700
+me gusta más Python, no hay problema, miramos acá como hacemos la cosa,
+
+1131
+01:40:40,700 --> 01:40:45,800
+La idea de Python va a ser una estructura muy similar. Tenemos varias
+
+1132
+01:40:45,800 --> 01:40:49,760
+librerías que tienen que ser utilizadas, una de regresión logística y una de
+
+1133
+01:40:49,760 --> 01:40:53,640
+Support Vector Machine.
+
+1134
+01:40:53,640 --> 01:40:58,120
+Acá hacemos una pequeña lista descriptiva, acá voy a hacer la división entre
+
+1135
+01:40:58,120 --> 01:41:03,600
+entrenamiento y prueba, más o menos similar a lo que había hecho anteriormente.
+
+1136
+01:41:03,600 --> 01:41:06,280
+Certo?
+
+1137
+01:41:06,280 --> 01:41:14,860
+Voy a ajustar después, voy a hacer la estandarización entre los dados que vamos a ajustar en el
+
+1138
+01:41:14,860 --> 01:41:19,680
+conjunto de enteramiento, entonces hacemos la estandarización en cada uno de estos conjuntos,
+
+1139
+01:41:19,680 --> 01:41:23,520
+tomando el cuidado que había comentado, hay que tomar cuidado si vamos a hacer validación
+
+1140
+01:41:23,520 --> 01:41:29,280
+cruzada, regresión logística no vamos a hacer validación cruzada para estimar ningún
+
+1141
+01:41:29,280 --> 01:41:33,480
+lambda, entonces no hay problema en hacer la estandarización acá.
+
+1142
+01:41:33,480 --> 01:41:35,780
+Y después ajusto Regresión Logística
+
+1143
+01:41:35,780 --> 01:41:37,640
+exactamente con una función que se llama
+
+1144
+01:41:37,980 --> 01:41:40,280
+Logistic Regression.
+
+1145
+01:41:41,100 --> 01:41:43,080
+Esta va a ser la función de Regresión Logística.
+
+1146
+01:41:43,180 --> 01:41:43,980
+Ajusto
+
+1147
+01:41:44,540 --> 01:41:46,080
+logística.fit
+
+1148
+01:41:46,800 --> 01:41:48,480
+con el conjunto de entrenamiento.
+
+1149
+01:41:49,040 --> 01:41:50,380
+Ya dejé como escalado.
+
+1150
+01:41:50,680 --> 01:41:52,080
+Ya que fue escalado acá arriba.
+
+1151
+01:41:52,540 --> 01:41:52,840
+Y
+
+1152
+01:41:53,340 --> 01:41:55,280
+nuestro Y de entrenamiento.
+
+1153
+01:41:55,640 --> 01:41:57,900
+Entonces acá ajusto la Regresión Logística
+
+1154
+01:41:57,900 --> 01:41:59,300
+con el conjunto de entrenamiento.
+
+1155
+01:41:59,340 --> 01:42:01,780
+Los X, las con variables, escaladas
+
+1156
+01:42:01,780 --> 01:42:03,080
+y la variable respuesta.
+
+1157
+01:42:03,080 --> 01:42:07,680
+Bueno, recuerda que después tengo que hacer la predicción, ¿cierto?
+
+1158
+01:42:07,680 --> 01:42:14,000
+Entonces, logística.predict_proba en el conjunto de prueba.
+
+1159
+01:42:14,000 --> 01:42:26,300
+Ya lo que haces antes, ajuste con el conjunto de entrenamiento, ahora estoy haciendo el Predict con el conjunto de prueba.
+
+1160
+01:42:26,300 --> 01:42:30,000
+En el entrenamiento y se valida con el conjunto de prueba.
+
+1161
+01:42:30,000 --> 01:42:38,440
+Yo calculé acá probabilidades exactamente como estamos haciendo con los casos anteriores.
+
+1162
+01:42:38,440 --> 01:42:44,000
+Salen probabilidades 0.99, 0.99, 0.90, por ahí adelante.
+
+1163
+01:42:44,000 --> 01:42:56,400
+Tenemos que convertir estas probabilidades en valores enteros.
+
+1164
+01:42:56,400 --> 01:43:03,440
+Entonces utilizo esta función, evaluar la probabilidad si fue mayor que 0.5, cambió entero.
+
+1165
+01:43:03,680 --> 01:43:11,120
+Entonces, al correr de acá esta función, había corrido ella, pero tengo la matriz de confusión acá.
+
+1166
+01:43:11,200 --> 01:43:14,240
+Me salió 103, 58, 64.
+
+1167
+01:43:15,000 --> 01:43:18,320
+Vamos a ver si sale la misma clasificación que salió acá.
+
+1168
+01:43:19,160 --> 01:43:19,680
+Lo mismo.
+
+1169
+01:43:19,680 --> 01:43:22,480
+profesor, ¿puedes cambiar el umbral?
+
+1170
+01:43:22,480 --> 01:43:28,680
+Si podemos, cambió el umbral de 0.5 para 0.8
+
+1171
+01:43:28,680 --> 01:43:30,680
+vamos a ver si cambia alguna cosa
+
+1172
+01:43:30,680 --> 01:43:38,680
+probabilidades, calculadas, calculo el umbral y verifico
+
+1173
+01:43:38,680 --> 01:43:43,680
+mira, cuando yo cambié el umbral de 0.5 para 0.8, antes yo tenía
+
+1174
+01:43:43,680 --> 01:43:53,680
+tenía 10 malas clasificaciones, ahora tengo 14.
+
+1175
+01:43:53,680 --> 01:43:58,480
+Entonces, uno puede informar, cambiando el numeral para 0.8 no me
+
+1176
+01:43:58,480 --> 01:44:04,480
+Mejoró mucho la cosa. Vamos a evaluar para ese valor.
+
+1177
+01:44:10,480 --> 01:44:16,480
+Valor de 0.01 hasta 1.00. ¿Me escucha?
+
+1178
+01:44:17,480 --> 01:44:20,480
+Me parece que está estable mi conexión. ¿Me escucha?
+
+1179
+01:44:20,480 --> 01:44:21,480
+Sí, sí.
+
+1180
+01:44:21,480 --> 01:44:23,480
+¿Sí?
+
+1181
+01:44:23,480 --> 01:44:27,480
+Pero es una pregunta, ¿el archivo de datos?
+
+1182
+01:44:27,480 --> 01:44:29,480
+¿No lo escucha?
+
+1183
+01:44:29,480 --> 01:44:32,480
+Sí, lo escucho, ¿ustedes lo escuchan?
+
+1184
+01:44:32,480 --> 01:44:34,480
+Ah sí, perfecto.
+
+1185
+01:44:34,480 --> 01:44:39,480
+Pero es el archivo de datos Wisconsin, ¿sí?
+
+1186
+01:44:39,480 --> 01:44:41,480
+Ehh, eso no me lo mando.
+
+1187
+01:44:41,480 --> 01:44:43,480
+Déjame ir a ver acá.
+
+1188
+01:45:13,480 --> 01:45:15,480
+Puedo compartir la pantalla.
+
+1189
+01:45:24,480 --> 01:45:26,480
+Máquinas de vectores de soporte.
+
+1190
+01:45:26,480 --> 01:45:28,480
+Support Vector Machine.
+
+1191
+01:45:28,480 --> 01:45:30,480
+No sé si ese nombre siempre me parecía algo muy mágico.
+
+1192
+01:45:30,480 --> 01:45:35,480
+Parecía como las máquinas estuviesen tomando venta del mundo.
+
+1193
+01:45:35,480 --> 01:45:41,480
+Personalmente, cuando lo hice, no pensaba que support Vector Machine era algo muy raro.
+
+1194
+01:45:41,480 --> 01:45:50,480
+¿Por qué se llama eso? Porque vamos a crear algunas líneas de vector suporte para tomar una decisión específica.
+
+1195
+01:45:50,480 --> 01:46:05,480
+Lo que vamos a intentar hacer acá es dibujar algunas líneas de alguna manera muy inteligente para separar los individuos que deben ser clasificados como 0 y los individuos que deben ser clasificados como 1.
+
+1196
+01:46:05,480 --> 01:46:09,680
+La idea o la idea genial que ellos tuvieron era que,
+
+1197
+01:46:09,680 --> 01:46:15,440
+esa estructura, ella puede ser hecha de una forma que se permite tener
+
+1198
+01:46:15,440 --> 01:46:18,600
+algunos errores específicos y además de eso,
+
+1199
+01:46:18,600 --> 01:46:24,920
+depender de algunos kernels o algunas proyecciones que permite
+
+1200
+01:46:24,920 --> 01:46:27,520
+considerar una estructura no lineal.
+
+1201
+01:46:27,520 --> 01:46:32,760
+Entonces, profesor, me perdí, usted está hablando sobre estructuras no lineales.
+
+1202
+01:46:32,760 --> 01:46:37,760
+Voy a pasar una imagen solamente para que tenga una idea de lo que vamos a intentar hacer.
+
+1203
+01:46:41,760 --> 01:46:44,760
+Una regresión logística va a intentar dibujar una línea,
+
+1204
+01:46:44,760 --> 01:46:49,760
+clasificar los individuos de arriba como uno, los que están abajo como cero.
+
+1205
+01:46:49,760 --> 01:46:52,760
+Podemos hacer esto también con el soporte vector machine,
+
+1206
+01:46:52,760 --> 01:46:57,760
+va a hacer este dibujo de una forma distinta y intentando maximizar el margen.
+
+1207
+01:46:57,760 --> 01:47:06,400
+La gran ganancia o una ganancia muy buena de Support Vector Machine es que puede permitir que esta línea tenga curvas no lineales.
+
+1208
+01:47:06,400 --> 01:47:10,640
+Estas curvas vienen dependiendo del kernel que asumimos.
+
+1209
+01:47:10,640 --> 01:47:16,640
+Y ahí viene porque ahora pensamos a alcanzar individuos que antes no tenían en esa estructura.
+
+1210
+01:47:16,640 --> 01:47:23,040
+El Support Vector Machine es una herramienta muy poderosa para hacer clasificación.
+
+1211
+01:47:23,040 --> 01:47:26,880
+Lo que cambia de Support Vector Machine para Regresión.
+
+1212
+01:47:26,880 --> 01:47:32,920
+utilizaremos vamos a utilizar etiquetas específicas para ésta este método
+
+1213
+01:47:32,920 --> 01:47:38,560
+profesor usted me comentó que acá yo puedo poner 0 y 1 puedo poner menos 1 y 1
+
+1214
+01:47:38,560 --> 01:47:46,240
+puedo poner menos 100 y 1 puedo poner 0 y 1000 la gran mayoría de los otros métodos
+
+1215
+01:47:46,240 --> 01:47:51,960
+pueden poner lo que quieren acá 0 0.1 no me importa no valor que estuviera acá es
+
+1216
+01:47:51,960 --> 01:47:56,580
+solamente una categorización cierto pero para su parte vector machine si lo
+
+1217
+01:47:56,580 --> 01:48:01,080
+clasificamos como menos uno y uno. Hay que ser menos uno y uno.
+
+1218
+01:48:01,080 --> 01:48:07,000
+Entonces utilizaremos esta idea de menos uno y uno para crear la geometría de
+
+1219
+01:48:07,000 --> 01:48:12,300
+clasificación que queremos. Este modelo va a depender de algunas cosas importantes
+
+1220
+01:48:12,300 --> 01:48:17,440
+que se llaman kernels. Profesor, por qué depende de kernels? Porque una persona
+
+1221
+01:48:17,440 --> 01:48:23,540
+logró demostrar que si usted tiene un kernel específico, un kernel radial,
+
+1222
+01:48:23,540 --> 01:48:30,740
+kernel lineal, en algunas estructuras de kernel, esta solución es no lineal, ustedes pueden tener
+
+1223
+01:48:30,740 --> 01:48:38,940
+estas curvas bonitas que tenemos, muy flexibles, y lo más importante que la solución de esta
+
+1224
+01:48:38,940 --> 01:48:48,420
+curva es única, entonces a cada kernel que tenemos, fijado en algunos valores de hiperparámetros,
+
+1225
+01:48:48,420 --> 01:48:51,420
+esta curva será única.
+
+1226
+01:48:52,420 --> 01:48:55,420
+Y esto para nosotros en estimación,
+
+1227
+01:48:55,420 --> 01:48:57,420
+cuando se les ajuste a un paquete,
+
+1228
+01:48:57,420 --> 01:48:58,420
+es fundamental.
+
+1229
+01:48:58,420 --> 01:49:00,420
+En el caso contrario,
+
+1230
+01:49:00,420 --> 01:49:02,420
+se dejará correndo en su computadora
+
+1231
+01:49:02,420 --> 01:49:05,420
+varios años y no volverá la respuesta.
+
+1232
+01:49:05,420 --> 01:49:08,420
+Se dejará correndo cinco meses, un año,
+
+1233
+01:49:08,420 --> 01:49:10,420
+y no llegará una solución.
+
+1234
+01:49:10,420 --> 01:49:12,420
+Pero con este esquema específico
+
+1235
+01:49:12,420 --> 01:49:15,420
+nos garantizan que tenga una solución única.
+
+1236
+01:49:15,420 --> 01:49:24,920
+Entonces lo que hace es suporte vector machine, nos va a buscar una frontera que equilibre la separación entre clases y las violaciones del margen.
+
+1237
+01:49:24,920 --> 01:49:32,420
+Vamos a intentar dibujar una margen, vamos a intentar encontrar un equilibrio entre eso y permitir que algunas de ellas tengan una violación.
+
+1238
+01:49:32,420 --> 01:49:41,420
+Y va a depender de algunas fronteras, una frontera lineal, o también una frontera flexible, acá el espacio original,
+
+1239
+01:49:41,420 --> 01:49:45,420
+por lo que va a ser una frontera no lineal ahí.
+
+1240
+01:49:45,420 --> 01:49:50,420
+La solución depende de los vectores de soporte y de los hiperparámetros.
+
+1241
+01:49:50,420 --> 01:49:52,420
+Vamos a definir algunos hiperparámetros.
+
+1242
+01:49:52,420 --> 01:49:57,420
+Y aquí viene aquella situación donde yo estaba confundiendo a ustedes antes.
+
+1243
+01:49:57,420 --> 01:50:03,620
+Bueno, hay que dividir entre entrenamiento, prueba, pero dentro del entrenamiento hay validación.
+
+1244
+01:50:03,620 --> 01:50:07,820
+¿Por qué? Porque esa validación nos va a encontrar ese hiperparámetro.
+
+1245
+01:50:09,500 --> 01:50:15,340
+Bueno, me comento entonces lo que hacemos acá para ajustar ese modelo de suporte vector machine.
+
+1246
+01:50:15,340 --> 01:50:19,420
+Lo que va a hacer es una cosa muy sencilla. Tenemos un vector w
+
+1247
+01:50:19,420 --> 01:50:22,940
+que va a determinar la orientación donde vamos a tener
+
+1248
+01:50:22,940 --> 01:50:25,740
+nuestra
+
+1249
+01:50:25,740 --> 01:50:32,740
+Voy a estar dividiendo. Acá esta orientación se va a estar así, va a estar inclinada.
+
+1250
+01:50:32,740 --> 01:50:38,740
+Y un desplazamiento de la frontera, donde ya va a estar empezando este valor específico.
+
+1251
+01:50:38,740 --> 01:50:42,740
+Bueno, son parámetros a ser estimados en nuestro modelo.
+
+1252
+01:50:42,740 --> 01:50:46,740
+La clasificación va a ser menos uno y más uno.
+
+1253
+01:50:54,260 --> 01:50:57,940
+Voy a presentar solamente dos kernels para ustedes, pero tienen varios.
+
+1254
+01:51:03,460 --> 01:51:06,660
+Entonces uno puede cambiar varios kernels específicos.
+
+1255
+01:51:06,660 --> 01:51:14,860
+Bueno, lo que vamos a hacer es clasificamos el individuo como menos 1, o un grupo específico,
+
+1256
+01:51:14,860 --> 01:51:22,980
+valor es menor que 0 más 1 si el valor es mayor o igual a 0. Lo que yo intento hacer inicialmente
+
+1257
+01:51:22,980 --> 01:51:28,300
+voy a intentar hacer un vector suporte una división acá muy específica donde voy a intentar
+
+1258
+01:51:28,300 --> 01:51:34,940
+clasificar los individuos de un punto a otro. Voy a tener algunas margen, esas margen son muy
+
+1259
+01:51:34,940 --> 01:51:44,580
+importantes y lo cuanto estoy dispuesto a errar durante la clasificación de estas margen.
+
+1260
+01:51:44,580 --> 01:51:53,580
+Si ustedes tienen un vector acá, voy a intentar encontrar esta línea que va a clasificar los individuos como menos uno, los individuos como uno y lo cuento por el hardware ahí.
+
+1261
+01:51:53,580 --> 01:51:57,580
+Profesor, esto acá es una imagen muy bonita, muy sencilla.
+
+1262
+01:51:57,580 --> 01:52:05,580
+Por supuesto, tener un individuo con este tipo de situación no necesita ajustar un modelo muy completo.
+
+1263
+01:52:05,580 --> 01:52:10,580
+Eso ya vamos a tener listo. Pero realmente, eso es la forma más sencilla.
+
+1264
+01:52:10,580 --> 01:52:17,340
+Lo que nos va a ocurrir exactamente es, vamos a intentar estimar esta margen, este w,
+
+1265
+01:52:17,340 --> 01:52:25,040
+sujeto a una restricción específica, que va a complicar un poco, entonces la idea no es nos fijar
+
+1266
+01:52:25,040 --> 01:52:30,740
+exactamente como estimamos este parámetro b y este w, simplemente de alguna manera
+
+1267
+01:52:30,740 --> 01:52:35,780
+voy a utilizar un proceso de minimización donde me va a encontrar esta reta,
+
+1268
+01:52:35,780 --> 01:52:40,500
+entonces tengo un proceso de minimización que encuentra exactamente esta reta acá.
+
+1269
+01:52:40,500 --> 01:52:43,780
+Encuentra exactamente el B que necesito.
+
+1270
+01:52:44,460 --> 01:52:46,460
+Y me ayudará a hacer esta división.
+
+1271
+01:52:46,460 --> 01:52:50,240
+Esta división no será exactamente la misma que tenemos para
+
+1272
+01:52:50,240 --> 01:52:52,500
+como por ejemplo en la regresión lineal
+
+1273
+01:52:52,500 --> 01:52:54,860
+o en la análisis discriminante lineal.
+
+1274
+01:52:54,860 --> 01:52:57,980
+Esto crea un soporte distinto porque va a intentar encontrar
+
+1275
+01:52:57,980 --> 01:52:59,820
+una diferencia entre
+
+1276
+01:52:59,820 --> 01:53:01,620
+los puntos específicos acá.
+
+1277
+01:53:01,620 --> 01:53:04,180
+Va a mirar este punto, va a mirar este otro punto
+
+1278
+01:53:04,180 --> 01:53:06,180
+y va a intentar encontrar algún valor
+
+1279
+01:53:06,180 --> 01:53:08,500
+que maximiza bien al medio
+
+1280
+01:53:08,500 --> 01:53:10,420
+entre estos dos puntos.
+
+1281
+01:53:10,500 --> 01:53:24,500
+El problema empieza cuando empezamos a tener puntos acá o acá.
+
+1282
+01:53:24,500 --> 01:53:29,500
+Tenemos que aceptar que va a tener algunos valores,
+
+1283
+01:53:29,500 --> 01:53:32,500
+algunos posibles errores que se van a poder pasar.
+
+1284
+01:53:32,500 --> 01:53:37,500
+¿Cuánto estamos dispuestos a dejar que se va a tener esa margen de error?
+
+1285
+01:53:37,500 --> 01:53:44,380
+para que aún si que encuentre esta línea específica.
+
+1286
+01:53:44,380 --> 01:53:57,540
+Bueno acá dejo un ejemplo después de dar la misma pregunta, pero yo imagino que estas cuentas
+
+1287
+01:53:57,540 --> 01:54:04,140
+van a complicar un poco más la idea. Lo que quería comentar es que dibujamos esta
+
+1288
+01:54:04,140 --> 01:54:09,060
+la línea minimizando esta función acá. Esto es super intuitivo, dibujamos minimizando
+
+1289
+01:54:09,060 --> 01:54:16,540
+esto. Pero mira que ahora yo estoy agregando, minimizando esto. Pero ahora voy a agregar
+
+1290
+01:54:16,540 --> 01:54:24,860
+un épsilon específico acá o una cantidad de valores que yo puedo permitir de error.
+
+1291
+01:54:24,860 --> 01:54:31,020
+Entonces ahora estoy permitido que algunos puntos van arriba y algunos puntos van allá.
+
+1292
+01:54:31,020 --> 01:54:40,380
+es decir, voy a clasificar con 1 específico acá, el valor 1, si él for mayor o igual a 1 menos
+
+1293
+01:54:40,380 --> 01:54:46,620
+1 épsilon específico. Es exactamente lo que hacíamos acá, clasificamos como 1, si tenemos la
+
+1294
+01:54:46,620 --> 01:54:58,460
+variable respuesta, a veces esta línea que dibujamos. Me parece complicado pero la idea es sencilla,
+
+1295
+01:54:58,460 --> 01:55:04,460
+Vamos a empujar esta línea y vamos a permitir que algunos valores puedan pasar de esta margen.
+
+1296
+01:55:04,460 --> 01:55:14,460
+Esta cantidad de errores que estamos aceptando va a venir exactamente de esta penalización de acá.
+
+1297
+01:55:14,460 --> 01:55:19,460
+Vamos a tener ahora un valor, un parámetro que hay que ser definido.
+
+1298
+01:55:19,460 --> 01:55:26,300
+y ahí evaluamos lo que ocurre cuando tenemos algunos errores específicos.
+
+1299
+01:55:26,300 --> 01:55:31,020
+Por ejemplo, vamos a suponer que conforme fomos calcular la variable respuesta
+
+1300
+01:55:31,020 --> 01:55:36,060
+a veces el valor de esta recta, me salió un valor 1.4.
+
+1301
+01:55:36,060 --> 01:55:42,740
+Vamos a sacar el valor 1.4 e clasificamos como 1, si él for mayor o igual a 1 acá.
+
+1302
+01:55:42,740 --> 01:55:53,280
+En el ejemplo específico, si colocamos el valor acá, mensalido 1.4, y es igual a 1,
+
+1303
+01:55:53,280 --> 01:55:57,040
+este valor será 1.4, mayor o igual a 1.
+
+1304
+01:55:57,040 --> 01:55:59,960
+Si esto ocurre, clasifico al individuo como 1.
+
+1305
+01:55:59,960 --> 01:56:07,280
+Si el valor es menor, lo clasifico como menos 1.
+
+1306
+01:56:07,280 --> 01:56:12,720
+Acá es una mirada que ocurre cuando permitimos a hora tener un error específico, este error
+
+1307
+01:56:12,720 --> 01:56:21,220
+va a ser la cantidad de veces que estamos dispuestos a permitir que el individuo pase en una margen donde no debería.
+
+1308
+01:56:21,220 --> 01:56:29,720
+Por ejemplo acá, una situación muy específica, tenemos varios individuos que son del grupo azul,
+
+1309
+01:56:29,720 --> 01:56:32,720
+pero que están en la otra margen.
+
+1310
+01:56:32,720 --> 01:56:36,720
+Entonces, dependiendo de cómo ponemos la cosa, vamos a dibujar una línea,
+
+1311
+01:56:36,720 --> 01:56:40,720
+pero siempre vamos a tener individuos que están pasando para acá y pasando para acá.
+
+1312
+01:56:40,720 --> 01:56:47,920
+Entonces, lo objetivo o lo interesante es, dependiendo del valor que ponemos de C acá,
+
+1313
+01:56:47,920 --> 01:56:51,080
+el o cuanto permitimos que ocurra eso.
+
+1314
+01:56:51,080 --> 01:56:55,720
+No solamente C, después vamos a tener otro hiperparámetro que también nos va a dar esa suavidad.
+
+1315
+01:56:55,720 --> 01:56:58,480
+Acá creo que nos ayuda mejor la idea.
+
+1316
+01:56:58,480 --> 01:57:02,320
+Por ejemplo, un soporte vector machine lineal, que es lo que estamos discutiendo.
+
+1317
+01:57:02,320 --> 01:57:07,920
+Él va a dibujar una línea, él va a intentar con base en esa línea evaluar cuánto estamos permitiendo de error.
+
+1318
+01:57:07,920 --> 01:57:25,920
+Dependiendo del valor que ponemos, esta línea va cambiando, va manteniendo curvas que van naciendo, por ejemplo, o que van invertiendo así.
+
+1319
+01:57:25,920 --> 01:57:30,920
+Entonces acá tengo una curva específica. Depende del valor que pongo,
+
+1320
+01:57:30,920 --> 01:57:34,920
+esta curva pasa a ser un poquito más diferente.
+
+1321
+01:57:34,920 --> 01:57:37,920
+O puede ser alguna cosa como así.
+
+1322
+01:57:37,920 --> 01:57:42,920
+Entonces este valor nos va a ayudar a definir lo cuanto estamos dispuestos a errar.
+
+1323
+01:57:42,920 --> 01:57:49,920
+Esto acá, o estos puntos, es un error. Ellos deberían ser clasificados como naranja.
+
+1324
+01:57:49,920 --> 01:57:52,920
+Estos individuos deberían ser clasificados como azules.
+
+1325
+01:57:52,920 --> 01:57:58,640
+pero de hecho yo soy naranja, entonces hay una error acá no estoy logrando ser una buena división,
+
+1326
+01:57:58,640 --> 01:58:02,800
+¿Cierto? Entonces estas fronteras que tenemos,
+
+1327
+01:58:04,800 --> 01:58:12,280
+en lo cuanto estoy dispuesto a errar, ¿Cierto? Bueno, voy a tener algunos errores acá específicos,
+
+1328
+01:58:12,280 --> 01:58:18,440
+¿Cierto? Entonces cuando calculo ese valor, va a salir por ejemplo un valor en ese producto 0.5,
+
+1329
+01:58:18,440 --> 01:58:24,900
+se define un error acá comparo el valor que me salió con un menos este valor de error que
+
+1330
+01:58:24,900 --> 01:58:30,360
+estamos aceptando ese épsilon que estamos aceptando se me sale 0.5 inicialmente lo
+
+1331
+01:58:30,360 --> 01:58:38,440
+clasificaría como menos uno o fuera de la margen como malo pagador ya pero ahora como estoy aceptando
+
+1332
+01:58:38,440 --> 01:58:44,120
+que él va a estar dentro de un rango específico lo voy a clasificar como bueno estoy estoy aceptando
+
+1333
+01:58:44,120 --> 01:58:48,120
+que él podría estar en la otra región, ¿cierto?
+
+1334
+01:58:48,120 --> 01:58:51,120
+Profesor, ¿cómo lo definimos eso?
+
+1335
+01:58:51,120 --> 01:58:58,120
+Va a tener una situación de ganancia e pérdida conforme cambiamos ese valor de C.
+
+1336
+01:58:58,120 --> 01:59:05,120
+C pequeño va a dar menos peso a violaciones, entonces tiene una regularización más fuerte.
+
+1337
+01:59:05,120 --> 01:59:08,120
+Profesor, pero me parece que lo mejor es siempre poner C pequeño,
+
+1338
+01:59:08,120 --> 01:59:14,120
+porque no va a dejar que él acepte mal los valores.
+
+1339
+01:59:14,120 --> 01:59:17,120
+Vamos a llegar a este punto.
+
+1340
+01:59:17,120 --> 01:59:20,120
+Voy a comentar por qué no puedo tener C muy pequeño
+
+1341
+01:59:20,120 --> 01:59:23,120
+y tampoco puedo tener C muy grande.
+
+1342
+01:59:23,120 --> 01:59:27,120
+Si pongo C muy pequeño, vamos a dar pesos muy pequeños
+
+1343
+01:59:27,120 --> 01:59:31,120
+a violaciones y vamos a tener una regularización muy fuerte.
+
+1344
+01:59:31,120 --> 01:59:37,120
+Si tenemos C muy grande, vamos a penalizar más
+
+1345
+01:59:37,120 --> 01:59:44,420
+las violaciones del entrenamiento. El tema es que si el C es pequeño, vamos a tener
+
+1346
+01:59:44,420 --> 01:59:50,420
+curvas que van a estar aceptando más errores. Si tenemos C muy grande, vamos a empezar a
+
+1347
+01:59:50,420 --> 01:59:56,960
+tener curvas que no son muy suaves. Voy a dar algún ejemplo específico acá. Vamos
+
+1348
+01:59:56,960 --> 02:00:07,020
+a poner un C igual a 0.1. Lo que nos implica tener un C igual a 0.1. Con C de 0.1
+
+1349
+02:00:07,020 --> 02:00:17,780
+estoy permitiendo que tenga algunas violaciones, tiene 1, 2, 3 y varios acá abajo, 4, 5, 6, 7, un montón de errores
+
+1350
+02:00:17,780 --> 02:00:25,500
+y los estoy permitiendo acá que tenga varios errores pero lo bueno es que esta curva acá es mucho más suave
+
+1351
+02:00:25,500 --> 02:00:33,180
+y eso fue ajustado con nuestro conjunto de entrenamiento, es decir, cuando fue evaluar
+
+1352
+02:00:33,180 --> 02:00:40,740
+que tenga un conjunto de validación, yo espero que un conjunto como este no sea un modelo super
+
+1353
+02:00:40,740 --> 02:00:49,980
+parametrizado. Yo espero que con curvas suaves así, yo no tenga un super ajuste. En la pesado máquina
+
+1354
+02:00:49,980 --> 02:00:55,980
+siempre tendríamos un super ajuste, es super malo. Se dio a intentar hacer un dibujo, exactamente como
+
+1355
+02:00:55,980 --> 02:01:03,580
+así, por mirando y haciendo esta división exactamente acá, así, para poner cada uno de
+
+1356
+02:01:03,580 --> 02:01:11,620
+estos puntos en una región específica, hacer esta división acá, llegué a un sobreajuste.
+
+1357
+02:01:11,620 --> 02:01:20,020
+Entendí dibujar una frontera tan complicada donde pongo todos los individuos azules en una
+
+1358
+02:01:20,020 --> 02:01:26,380
+región y todos los naranjos en otra. Inicialmente parece bueno, es bueno para el conjunto de
+
+1359
+02:01:26,380 --> 02:01:31,620
+entrenamiento, pero es un súper ajuste, él va a ser muy malo para el conjunto de validación.
+
+1360
+02:01:31,620 --> 02:01:37,820
+Cuando yo fui a intentar hacer predicciones, este modelo acá va a ser un modelo súper malo por
+
+1361
+02:01:37,820 --> 02:01:46,380
+causa de las fronteras o las bordes que estoy haciendo. Entonces, un modelo como ese, me parece
+
+1362
+02:01:46,380 --> 02:01:52,940
+más un poco más flexible es lo mejor no sé tenemos que evaluar esto en durante
+
+1363
+02:01:52,940 --> 02:01:56,740
+nuestro ajuste entonces tenemos que de alguna manera e intentar encontrar el
+
+1364
+02:01:56,740 --> 02:02:04,340
+mejor se vean algunos ejemplos con c igual a 0.1 tenemos esa división se
+
+1365
+02:02:04,340 --> 02:02:09,340
+igual a uno tenemos una división como ésa mira que
+
+1366
+02:02:09,340 --> 02:02:14,540
+intentó agregar algunos puntos azules a más acá intentó errar un poco menos en
+
+1367
+02:02:14,540 --> 02:02:20,580
+en ese naranja mira cuando pongo c igual a 100 casi no estoy permitiendo
+
+1368
+02:02:20,580 --> 02:02:27,060
+errores ya estoy eliminando casi todos ahora que los errores están mucho menores
+
+1369
+02:02:27,060 --> 02:02:32,980
+entonces vamos observando como esta frontera cambia conforme cambiamos el
+
+1370
+02:02:32,980 --> 02:02:40,420
+valor de c en esta penalización acá
+
+1371
+02:02:40,420 --> 02:02:47,420
+Además de tener el C, tenemos el kernel que he comentado.
+
+1372
+02:02:47,420 --> 02:02:57,420
+El kernel nos va a dar esa suavidad lineal, puede ser una curva no lineal, nos va a dar diferentes posibilidades de ajustar la cosa.
+
+1373
+02:02:57,420 --> 02:03:05,420
+Puede tener una estructura trigonométrica, entonces va a depender demasiado del kernel que asumimos.
+
+1374
+02:03:05,420 --> 02:03:10,660
+Profesor, cuál es el mejor? Hay que evaluar y hacer test con todos los kernels o,
+
+1375
+02:03:10,660 --> 02:03:16,340
+si usted ya sabe, esto me parece con una división lineal, me parece con una estructura lineal.
+
+1376
+02:03:16,340 --> 02:03:20,940
+Si yo pienso que es más polinomial, yo puedo intentar ajustar, o no lineal,
+
+1377
+02:03:20,940 --> 02:03:23,620
+pueden intentar ajustar con un radial o un polinomial.
+
+1378
+02:03:23,620 --> 02:03:26,580
+Va a depender de cómo están sus datos.
+
+1379
+02:03:28,580 --> 02:03:34,100
+Acá muestro un poco de la penalización como funciona, porque me gusta más mirar la idea de la imagen.
+
+1380
+02:03:34,100 --> 02:03:42,100
+Este tipo de penalización va a depender por ejemplo el radial, ese kernel.
+
+1381
+02:03:42,100 --> 02:03:51,100
+El kernel tiene un hiperparámetro, por eso voy allá, yo había hablado para ustedes de hiperparámetros que tienen que ser estimados.
+
+1382
+02:03:51,100 --> 02:03:57,100
+Cuando entra este hiperparámetro, cuando asumimos un kernel radial, entra un gamma acá.
+
+1383
+02:03:57,100 --> 02:04:03,100
+Ahora tengo un gamma que tiene que ser elegido.
+
+1384
+02:04:03,100 --> 02:04:05,100
+Cómo lo hacemos?
+
+1385
+02:04:05,100 --> 02:04:09,100
+Bueno, tengo que cambiar este valor de gamma para diferentes valores
+
+1386
+02:04:09,100 --> 02:04:12,100
+y elegir algún gamma específico.
+
+1387
+02:04:15,100 --> 02:04:17,100
+Cuando tengamos diferentes valores de gamma,
+
+1388
+02:04:17,100 --> 02:04:21,100
+vamos a tener diferentes comportamientos en nuestro clasificador.
+
+1389
+02:04:21,100 --> 02:04:32,100
+Para un kernel radial, por ejemplo, un gamma muy pequeño, es decir, una función con una separación más linear.
+
+1390
+02:04:32,100 --> 02:04:40,100
+Un kernel radial, conforme va llegando a cerca de uno, va teniendo una estructura más no lineal, ¿cierto?
+
+1391
+02:04:40,100 --> 02:04:48,100
+Y conforme vamos teniendo un gamma muy grande, vamos teniendo un super ajuste, ¿ya?
+
+1392
+02:04:48,100 --> 02:04:56,740
+Entonces acá básicamente logré tener todos los individuos divididos en un punto específico.
+
+1393
+02:04:56,740 --> 02:05:03,460
+Y ahí vamos a tener el problema. Vamos con un super ajuste, nos quedamos con un sob ajuste,
+
+1394
+02:05:03,460 --> 02:05:10,340
+un sub ajuste o un ajuste malo, o intentamos encontrar un valor entre 0.1 e 0.50
+
+1395
+02:05:10,340 --> 02:05:14,420
+donde va a tener la mejor curva y va a ser mejores predicciones.
+
+1396
+02:05:14,420 --> 02:05:26,420
+Y ahí viene este truco, ajustamos el modelo SVM con entrenamiento.
+
+1397
+02:05:29,420 --> 02:05:34,420
+Volvemos a la lámina anterior.
+
+1398
+02:05:34,420 --> 02:05:49,620
+y ahí llegamos exactamente en ese punto acá. Ajustamos aquí el w y el b con ese conjunto
+
+1399
+02:05:49,620 --> 02:05:57,500
+de entrenamiento, por ejemplo 50%. Después de ajustar esto, intentamos encontrar el gamma
+
+1400
+02:05:57,500 --> 02:06:04,180
+con este 20% acá. Entonces encontramos los hiperparámetros con este conjunto acá.
+
+1401
+02:06:04,180 --> 02:06:10,780
+Con base en eso ya sabemos cuál es el mejor gamma y cuál debería ser el modelo final.
+
+1402
+02:06:10,780 --> 02:06:18,540
+Entonces tenemos el w ajustado con el mejor gamma posible. Y ahora sí evaluo en un conjunto
+
+1403
+02:06:18,540 --> 02:06:22,900
+que nunca fue utilizado en forma de este modelo está haciendo buenas predicciones.
+
+1404
+02:06:22,900 --> 02:06:28,100
+estimamos el gamma exactamente durante este paso acá.
+
+1405
+02:06:28,100 --> 02:06:30,900
+Entonces, este gamma,
+
+1406
+02:06:34,900 --> 02:06:39,700
+perdón, acá, este gamma, por ejemplo, de un kernel radial,
+
+1407
+02:06:39,700 --> 02:06:44,100
+se va a estimar con base en este conjunto,
+
+1408
+02:06:44,100 --> 02:06:47,100
+en esta división que hacemos entre el entrenamiento y validación.
+
+1409
+02:06:47,100 --> 02:06:51,100
+Profesor, necesito me preocupar, no se preocupe,
+
+1410
+02:06:51,100 --> 02:06:55,660
+En su suporte Vector Machine sí podemos elegir el gamma, ya, entonces ustedes
+
+1411
+02:06:55,660 --> 02:07:02,220
+van a tener que hacer algunos cambios ahí, pero algunos modelos se estima
+
+1412
+02:07:02,220 --> 02:07:06,940
+ese gamma de una forma automática. El polinomial tiene un hiperparámetro
+
+1413
+02:07:06,940 --> 02:07:11,740
+acá que necesita ser estimado, el radial tiene un gamma, solamente si ajustamos
+
+1414
+02:07:11,740 --> 02:07:17,380
+un lineal no tiene este gamma. Y acá el efecto del gamma.
+
+1415
+02:07:17,380 --> 02:07:23,560
+Bueno, cuando queremos mirar ahora la comparación entre diferentes clasificadores.
+
+1416
+02:07:23,560 --> 02:07:28,240
+Ya profesor usted me explicó que tenemos un modelo de regresión logística,
+
+1417
+02:07:28,240 --> 02:07:33,080
+un modelo de Support Vector Machine, pero cómo él hace la división específica.
+
+1418
+02:07:33,080 --> 02:07:38,240
+Bueno, dependiendo, bueno acá un umbral específico que definimos,
+
+1419
+02:07:38,240 --> 02:07:42,160
+pero para la regresión logística él va a ser este tipo de división.
+
+1420
+02:07:42,160 --> 02:07:45,240
+Los puntos que están acá clasifico como uno,
+
+1421
+02:07:45,240 --> 02:07:47,840
+los puntos que están acá, clasifico como cero.
+
+1422
+02:07:48,160 --> 02:07:50,400
+Malos pagadores que buenos pagadores.
+
+1423
+02:07:51,120 --> 02:07:52,120
+Cuando utilizo
+
+1424
+02:07:52,520 --> 02:07:53,800
+el soporte Vector Machine
+
+1425
+02:07:54,000 --> 02:07:56,360
+va a ser lo justo, pero mira que la curva
+
+1426
+02:07:56,920 --> 02:07:58,560
+está distinta.
+
+1427
+02:07:58,960 --> 02:08:01,080
+Está un poco más inclinada
+
+1428
+02:08:01,400 --> 02:08:02,960
+y está considerando
+
+1429
+02:08:03,400 --> 02:08:05,080
+o clasificando puntos distintos.
+
+1430
+02:08:05,160 --> 02:08:06,240
+Yo creo que este azul
+
+1431
+02:08:06,800 --> 02:08:09,120
+acá está clasificado para una región,
+
+1432
+02:08:09,200 --> 02:08:10,680
+acá está clasificado para otra.
+
+1433
+02:08:11,040 --> 02:08:13,960
+Entonces, la inclinación de esta reta está distinta.
+
+1434
+02:08:13,960 --> 02:08:18,400
+Mira que la recta pasa entre estos dos puntos.
+
+1435
+02:08:18,400 --> 02:08:21,600
+Acá ella no pasa entre estos dos puntos.
+
+1436
+02:08:21,600 --> 02:08:26,120
+En la regresión logística, clasificamos malo estos dos puntos.
+
+1437
+02:08:26,120 --> 02:08:30,760
+En suporte vector machine clasificamos malo solamente este punto.
+
+1438
+02:08:30,760 --> 02:08:35,000
+En cuanto, por ejemplo, observamos para una estructura más no lineal,
+
+1439
+02:08:35,000 --> 02:08:38,960
+con modelo un poco más flexible, por ejemplo, un suporte vector machine
+
+1440
+02:08:38,960 --> 02:08:41,360
+con un kernel radial,
+
+1441
+02:08:41,360 --> 02:08:48,200
+Ahora va a tener una frontera no lineal y debe mejorar la clasificación.
+
+1442
+02:08:52,080 --> 02:08:57,200
+Bueno, podemos ajustar este soporte vector machine lineal con diferentes valores de C,
+
+1443
+02:08:57,400 --> 02:08:59,640
+con diferentes valores de C y gamma.
+
+1444
+02:09:00,040 --> 02:09:05,240
+Generalmente es una dificultad muy grande encontrar estos hiperparámetros
+
+1445
+02:09:05,240 --> 02:09:07,640
+y el ajuste toma tiempo.
+
+1446
+02:09:07,640 --> 02:09:15,640
+Voy a hacer los ajustes, pero antes es una cosa que es importante comentar.
+
+1447
+02:09:15,640 --> 02:09:19,640
+Support Vector Machine es una información muy importante.
+
+1448
+02:09:19,640 --> 02:09:21,640
+Hay que tener en cuenta eso.
+
+1449
+02:09:21,640 --> 02:09:27,640
+Support Vector Machine es un modelo que funciona muy bien para dados, pero no para Big Data.
+
+1450
+02:09:27,640 --> 02:09:32,640
+Entonces, ustedes tienen 1 milión de observaciones, 2 millones de observaciones.
+
+1451
+02:09:32,640 --> 02:09:37,360
+el soporte vector machine tendrá muchos parámetros a ser estimados, no funcionará bien.
+
+1452
+02:09:38,080 --> 02:09:40,480
+Entonces, si van a utilizar el soporte vector machine,
+
+1453
+02:09:41,240 --> 02:09:43,920
+utilicen una base de datos un poco más chica.
+
+1454
+02:09:45,640 --> 02:09:49,120
+Los alumnos que intentan correr el soporte vector machine en un curso de Big Data,
+
+1455
+02:09:49,320 --> 02:09:50,240
+nunca logran.
+
+1456
+02:09:51,720 --> 02:09:55,720
+Yo me recuerdo que siempre intentan correr, pero hay muchos parámetros a ser estimados.
+
+1457
+02:09:56,040 --> 02:10:01,000
+Entonces, este método funciona bien para un control de datos no muy grande.
+
+1458
+02:10:02,640 --> 02:10:11,640
+¿Cómo ajustamos esto en R? Es muy sencillo tener una función que se llama SVM, Support Vector Machine, que hace el ajuste.
+
+1459
+02:10:11,640 --> 02:10:25,640
+El modelo se ajusta con el conjunto de entrenamiento, X, nuestro Y de entrenamiento, el kernel, uno tiene que definir cuál es el tipo del kernel, y el costo, o C, que tenemos.
+
+1460
+02:10:25,640 --> 02:10:30,640
+Y bueno, tengo que hacer un escalamiento de los dados acá con esta realización.
+
+1461
+02:10:30,640 --> 02:10:34,640
+Como estamos utilizando un kernel lineal, solamente pongo el C acá.
+
+1462
+02:10:34,640 --> 02:10:41,640
+Pero si voy a ajustar un kernel con un kernel radial, también tiene que definir el gamma.
+
+1463
+02:10:41,640 --> 02:10:45,640
+Entonces el SVM con el kernel lineal hacemos el ajuste.
+
+1464
+02:10:45,640 --> 02:10:49,640
+Después de hacer el ajuste, necesito hacer la predicción.
+
+1465
+02:10:49,640 --> 02:10:54,640
+Bueno, acá estoy recibiendo el modelo que fue ajustado.
+
+1466
+02:10:54,640 --> 02:10:56,640
+Voy a poner acá el modelo ajustado.
+
+1467
+02:10:56,640 --> 02:11:03,240
+voy a hacer un Predict para ahora un nuevo conjunto de prueba. En el conjunto de prueba
+
+1468
+02:11:03,240 --> 02:11:08,560
+voy a poner el modelo que fue ajustado. De ahí ahora tengo la predicción de lo que debería.
+
+1469
+02:11:08,560 --> 02:11:15,600
+Voy a crear una matriz de confusión y evaluo si estoy haciendo bien o mal la clasificación.
+
+1470
+02:11:18,720 --> 02:11:23,920
+También puedo ajustar un kernel radial. Kernel radial lo que va a cambiar es casi nada,
+
+1471
+02:11:23,920 --> 02:11:30,940
+va a ser la función SVM, conjunto de entrenamiento, X de entrenamiento y el entrenamiento,
+
+1472
+02:11:30,940 --> 02:11:36,780
+el kernel, radial, el custo, acá estoy poniendo el custo de 10 y estoy poniendo un gamma de
+
+1473
+02:11:36,780 --> 02:11:37,780
+0.1.
+
+1474
+02:11:37,780 --> 02:11:44,620
+Profesor, pero yo quiero poner gamma igual a 1, se puede ajustar cuanto quiera ir, entonces
+
+1475
+02:11:44,620 --> 02:11:49,260
+muchos alumnos que tengo en el curso empiezan a ajustar eso como 100 veces,
+
+1476
+02:11:49,260 --> 02:11:57,500
+0.1 0.2 0.3 eligen cuál es el mejor si ajustado el modelo
+
+1477
+02:11:57,500 --> 02:12:01,380
+tenemos el modelo ajustado ahora tenemos que evaluar un conjunto de prueba
+
+1478
+02:12:01,380 --> 02:12:05,380
+pongo el modelo que fue ajustado en el conjunto de prueba me van a salir
+
+1479
+02:12:05,380 --> 02:12:11,740
+estimativas de clasificación y evaluó lo que fue estimado con lo que fue
+
+1480
+02:12:11,740 --> 02:12:18,380
+observado podemos ajustar acá si lo ajustamos
+
+1481
+02:12:18,380 --> 02:12:25,540
+la regresión logística, ahora vamos para el SVM, SVM como había demostrado con el
+
+1482
+02:12:25,540 --> 02:12:32,740
+kernel lineal ya ajuste acá el modelo ahora vamos a hacer la predicción
+
+1483
+02:12:32,740 --> 02:12:37,220
+ahora predicción ahora quiero hacer la matriz de confusión para comparar ambos
+
+1484
+02:12:37,220 --> 02:12:43,980
+y en este modelo estoy teniendo una mala clasificación por ejemplo en
+
+1485
+02:12:43,980 --> 02:12:47,380
+términos de acuracia o sensibilidad
+
+1486
+02:12:47,380 --> 02:12:54,140
+de acuracia de 14, estoy errando acá 14.
+
+1487
+02:12:54,140 --> 02:12:58,420
+Profesor, vamos a considerar un kernel radial
+
+1488
+02:12:58,420 --> 02:13:08,420
+Kernel radial, costo 10, gamma 0.1. Voy a ajustar este modelo, ya no tengo ajustado acá,
+
+1489
+02:13:08,420 --> 02:13:14,420
+voy a hacer un predict y voy a evaluar cuánto me salió la matriz de confusión.
+
+1490
+02:13:14,420 --> 02:13:18,420
+Mira que interesante, el kernel radial solamente tiene cinco errores,
+
+1491
+02:13:18,420 --> 02:13:23,420
+en cuanto regresión logística tenía casi 10, el kernel linear tenía 14.
+
+1492
+02:13:23,420 --> 02:13:29,180
+Entonces me muestra que este modelo acá está teniendo una precisión, una acuracia muy grande.
+
+1493
+02:13:29,180 --> 02:13:36,180
+Bueno, llegó el momento de comparar ambos o todos los modelos. Hago una comparación.
+
+1494
+02:13:36,180 --> 02:13:39,420
+Perdón acá.
+
+1495
+02:13:42,260 --> 02:13:47,060
+Voy a correr para tener la área sobre la curva ROC.
+
+1496
+02:13:47,060 --> 02:13:54,780
+Y bueno, llegamos ahora en la hora de comparar nuestros modelos. Vamos a tener el modelo de
+
+1497
+02:13:54,780 --> 02:13:59,260
+regresión logística, el suporte vector machine linear y el suporte vector machine
+
+1498
+02:13:59,260 --> 02:14:05,000
+radial. Cada uno de ellos va a tener una exactitud o acuracia distinta, uno tendrá una
+
+1499
+02:14:05,000 --> 02:14:12,220
+acuracia muy buena, otro un poco mejor, pero menos no tan buena como esta y este acá el
+
+1500
+02:14:12,220 --> 02:14:23,220
+Uno va a tener sensibilidad distinta, pero una forma de mirar ellos de una forma global es por medio de una cosa que se llama AUC, Area Under the Curve.
+
+1501
+02:14:23,220 --> 02:14:38,220
+La situación más mala en una situación como esa es el valor de 0.5. No sé si vieron eso en el curso, si no vieron, vean lo que Eloy debe mostrar en la próxima clase.
+
+1502
+02:14:38,220 --> 02:14:39,220
+¿Ya?
+
+1503
+02:14:39,220 --> 02:14:47,980
+A ver, sí, área under the curve, creo que deben conocer entonces área under the curve,
+
+1504
+02:14:47,980 --> 02:14:51,220
+estoy eligiendo por la área sobre la curva ROC ¿Ya?
+
+1505
+02:14:51,220 --> 02:14:59,700
+Ella tiene una buena interpretación, es una forma de elegir el mejor modelo ¿Ya?
+
+1506
+02:14:59,700 --> 02:15:04,900
+Acá en este curso defino como el mejor en esta situación la área sobre la curva ROC,
+
+1507
+02:15:04,900 --> 02:15:09,300
+hay variaciones, no podréis alear profesor, yo creo que la área sobre la curva ROC,
+
+1508
+02:15:09,300 --> 02:15:15,780
+basareo en otra métrica es mejor, ya entonces hay variaciones ahí. Pero bueno, para no complicar la
+
+1509
+02:15:15,780 --> 02:15:24,700
+vida y para facilitar la forma de selección me gusta utilizar esta métrica. Y esta métrica me
+
+1510
+02:15:24,700 --> 02:15:32,260
+da un valor de 0.98. 0.98 era una probabilidad de describir la variabilidad de nota. Esto no tiene
+
+1511
+02:15:32,260 --> 02:15:37,540
+ninguna relación con el poder preditivo de describir el modelo 98% de la
+
+1512
+02:15:37,540 --> 02:15:42,220
+variabilidad está siendo descrita por el modelo acá. No, esto es simplemente la área
+
+1513
+02:15:42,220 --> 02:15:48,140
+de una curva que nos muestra cuánto está, cuando integramos eso, lo
+
+1514
+02:15:48,140 --> 02:15:52,620
+cuánto estamos eligiendo el mejor modelo. El mejor modelo es cerca de 1, el
+
+1515
+02:15:52,620 --> 02:15:58,460
+peor modelo 0.5, pero este valor no es una interpretación de probabilidad o nada
+
+1516
+02:15:58,460 --> 02:16:06,420
+tipo si un valor de 0.98 es un valor muy bueno casi no tiene ningún error ahí ya entonces
+
+1517
+02:16:06,420 --> 02:16:14,220
+una situación como esta seguimos con un support vector machine radial ya bueno en resumen
+
+1518
+02:16:17,060 --> 02:16:23,220
+resumir la cosa pero acá ustedes también pueden correr Support Vector Machine con Python
+
+1519
+02:16:23,220 --> 02:16:28,260
+La única cosa que cambia es la función que va a entrar acá, una función que se llama SVC.
+
+1520
+02:16:28,260 --> 02:16:29,260
+Ya?
+
+1521
+02:16:29,260 --> 02:16:34,260
+Definimos cuál es el kernel, un kernel linear y el custo.
+
+1522
+02:16:34,260 --> 02:16:36,860
+Y después va a entrar de la misma forma.
+
+1523
+02:16:36,860 --> 02:16:42,300
+El conjunto de entrenamiento se ajusta, crea una matriz de confusión y por ahí adelante.
+
+1524
+02:16:42,300 --> 02:16:50,140
+Ahora voy a cambiar el Support Vector Classification acá, o modelo de Support Vector Machine,
+
+1525
+02:16:50,140 --> 02:16:57,660
+clasificación pero con el kernel Radial, acá se llama RBF, con costo de 10 y una
+
+1526
+02:16:57,660 --> 02:17:03,820
+gamma de 0.1, ustedes pueden cambiar el gamma que quieran, lo corremos, déjenme ver si
+
+1527
+02:17:03,820 --> 02:17:11,520
+corre también el otro, mira que la clasificación acá del Radial sale lo
+
+1528
+02:17:11,520 --> 02:17:16,940
+mismo que teníamos anteriormente, después de correreos,
+
+1529
+02:17:16,940 --> 02:17:18,940
+Yo creo que olvidé de correr alguna cosa.
+
+1530
+02:17:18,940 --> 02:17:19,440
+Espera.
+
+1531
+02:17:19,940 --> 02:17:21,940
+Ese, ese...
+
+1532
+02:17:23,440 --> 02:17:25,440
+Me pasó alguna cosa arriba que no corrí.
+
+1533
+02:17:25,940 --> 02:17:27,940
+Tengo que ver que no pasó.
+
+1534
+02:17:28,940 --> 02:17:30,940
+Ese, ese...
+
+1535
+02:17:32,940 --> 02:17:33,940
+Ese...
+
+1536
+02:17:37,440 --> 02:17:38,440
+Recorrí.
+
+1537
+02:17:38,940 --> 02:17:40,440
+Ese corrí, corrí.
+
+1538
+02:17:46,940 --> 02:17:54,940
+Ahora sí, después de correr todos, ahí me va a salir exactamente la área sobre la curva, ya?
+
+1539
+02:17:54,940 --> 02:18:01,940
+La área sobre la curva para cada uno de los modelos, exactamente como tenemos en R, ¿Cierto?
+
+1540
+02:18:01,940 --> 02:18:06,940
+La función también se calcula acá por roc_auc_score.
+
+1541
+02:18:06,940 --> 02:18:12,940
+Y ahí con base en eso elegimos al menos para esta situación específica entre estos tres modelos,
+
+1542
+02:18:12,940 --> 02:18:14,940
+el support vector machine radial.
+
+1543
+02:18:14,940 --> 02:18:20,940
+¿Es el mejor modelo? No, tenemos que comparar con random forest, con árboles, boosting,
+
+1544
+02:18:20,940 --> 02:18:25,540
+redes neuronales, hay varias variaciones de modelos que vamos a ver un poco más adelante
+
+1545
+02:18:25,540 --> 02:18:33,460
+en el curso. Pero bueno, acá están solamente los códigos que había demostrado y al final
+
+1546
+02:18:33,460 --> 02:18:40,620
+la tabla para un conjunto de prueba, un conjunto de validación de los valores que tenemos.
+
+1547
+02:18:40,620 --> 02:18:47,260
+no acabo poniendo la área sobre la curva ROC acá, pero bueno, no puedo calcular exactamente por ese punto.
+
+1548
+02:18:47,260 --> 02:18:58,020
+Hay algunos puntos acá solamente para cerrar la cosa, pero básicamente hay varias funciones que se pueden utilizar en Python
+
+1549
+02:18:58,020 --> 02:19:09,180
+en R para calcular eso, yo les apresente una de ellas, acá cómo acelerar la validación cruzada, en fin, básicamente lo que acabamos comentando
+
+1550
+02:19:09,180 --> 02:19:16,220
+y un poco sobre la área sobre la curva ROC. En fin, resumir esto de alguna forma que podemos
+
+1551
+02:19:16,220 --> 02:19:24,140
+mirar durante la aplicación de estos códigos. Lo que debería comentar a lo largo de todo este texto,
+
+1552
+02:19:24,140 --> 02:19:29,380
+cuando miramos por la área sobre la curva ROC, es una buena métrica, podemos utilizar
+
+1553
+02:19:29,380 --> 02:19:34,380
+estos diferentes kernels, uno puede considerar un kernel lineal, un kernel radial, o puede cambiar
+
+1554
+02:19:34,380 --> 02:19:36,740
+para otras estructuras de kernels.
+
+1555
+02:19:36,740 --> 02:19:42,060
+Y ahora ustedes conocen al menos dos métodos de clasificación.
+
+1556
+02:19:42,060 --> 02:19:45,340
+Regresión logística y support vector machine.
+
+1557
+02:19:45,340 --> 02:19:48,780
+Son dos herramientas muy poderosas para hacer previsión.
+
+1558
+02:19:48,780 --> 02:19:53,180
+Bueno, en el curso el sábado hacemos un repaso de eso.
+
+1559
+02:19:53,180 --> 02:19:56,180
+No vamos a tener que adentrar tanto en la parte de división
+
+1560
+02:19:56,180 --> 02:19:57,900
+y de entrenamiento y validación.
+
+1561
+02:19:57,900 --> 02:20:02,460
+Entonces, voy a poner un enfoque mayor en correr eso con regularización.
+
+1562
+02:20:02,460 --> 02:20:06,380
+Entonces vamos a ver eso en regresión logística con glmnet.
+
+1563
+02:20:06,820 --> 02:20:10,060
+Corremos el suporte Vector Machine en Python en R.
+
+1564
+02:20:10,460 --> 02:20:12,700
+Y bueno, vamos a hacer esto con un poco más de calma.
+
+1565
+02:20:12,780 --> 02:20:15,420
+Y ahí ustedes pueden sacar las dudas que tienen.
+
+1566
+02:20:17,060 --> 02:20:18,140
+Pasamos un poco.
+
+1567
+02:20:18,140 --> 02:20:20,820
+Hasta qué horas? ¿Eras hasta las 9? ¿O hasta las 20?
+
+1568
+02:20:22,980 --> 02:20:26,100
+Hasta las 20, ¿no? ¿Hace media?
+
+1569
+02:20:27,620 --> 02:20:29,100
+Entonces estamos al tiempo.
+
+1570
+02:20:29,100 --> 02:20:30,620
+Yo pensé que era hasta las 9.
+
+1571
+02:20:30,620 --> 02:20:35,940
+Entonces, una cosa que es importante es solamente poner la área sobre la curva ROC,
+
+1572
+02:20:35,940 --> 02:20:41,300
+cuál es la definición, pero básicamente la área tiene esta interpretación.
+
+1573
+02:20:41,300 --> 02:20:46,620
+Cuanto más cerca de uno, mejor el ordenamiento que estamos haciendo.
+
+1574
+02:20:46,620 --> 02:20:52,580
+Entonces, un AUC cercano a uno indica un buen ordenamiento entre las clases.
+
+1575
+02:20:52,580 --> 02:20:56,220
+No es una probabilidad de que cada clasificación sea correcta,
+
+1576
+02:20:56,220 --> 02:21:00,660
+no define el lugar operativo ni mide la calibración de probabilidades.
+
+1577
+02:21:01,560 --> 02:21:04,460
+Una cosa importante es que dos modelos pueden tener la misma área
+
+1578
+02:21:04,460 --> 02:21:08,060
+sobre la curva ROC por distintas sensibilidades en su corte habitual.
+
+1579
+02:21:08,860 --> 02:21:11,260
+Es una métrica complementar
+
+1580
+02:21:11,260 --> 02:21:13,360
+pero una buena métrica que realmente utilizamos.
+
+1581
+02:21:17,100 --> 02:21:20,620
+En Python utilicé para
+
+1582
+02:21:21,920 --> 02:21:25,260
+ajustar el suporte vector machine el C igual a 1
+
+1583
+02:21:26,220 --> 02:21:29,920
+y el gamma igual a 0.1 tanto en R como en Python,
+
+1584
+02:21:29,920 --> 02:21:32,320
+acabamos poniendo los dos valores iguales a 10 acá,
+
+1585
+02:21:32,320 --> 02:21:34,720
+podemos hacer la comparación.
+
+1586
+02:21:37,420 --> 02:21:39,320
+Uno puede de alguna manera también,
+
+1587
+02:21:39,320 --> 02:21:42,520
+si quiere estimar estos valores,
+
+1588
+02:21:42,520 --> 02:21:46,320
+viene una búsqueda con una función que se llama
+
+1589
+02:21:46,320 --> 02:21:48,720
+grid search cross validation.
+
+1590
+02:21:48,720 --> 02:21:51,820
+Entonces, cuando esta función grid search cross validation,
+
+1591
+02:21:51,820 --> 02:21:55,660
+Él va a intentar encontrar los valores de C,
+
+1592
+02:21:55,980 --> 02:22:00,220
+esa penalización que tenemos, y también el valor de gamma.
+
+1593
+02:22:01,620 --> 02:22:04,740
+Correr esto acá va a tomar bastante tiempo.
+
+1594
+02:22:04,980 --> 02:22:08,460
+Corremos esto el sábado, pero uno puede hacer esto
+
+1595
+02:22:08,620 --> 02:22:09,940
+tanto en R como en Python,
+
+1596
+02:22:10,020 --> 02:22:13,020
+y encontrar el mejor valor de C,
+
+1597
+02:22:13,220 --> 02:22:15,420
+el mejor valor de gamma.
+
+1598
+02:22:15,900 --> 02:22:19,340
+Es una cosa que siempre surgió cuando nació el Support Vector Machine.
+
+1599
+02:22:19,340 --> 02:22:24,340
+hacer validación cruzada y encontrar los mejores hiperparámetros.
+
+1600
+02:22:24,340 --> 02:22:25,340
+Sí?
+
+1601
+02:22:25,340 --> 02:22:27,340
+Sería básicamente eso.
+
+1602
+02:22:27,340 --> 02:22:31,340
+Cuando estaba hablando de tunar, es porque, exactamente, tener acá un tune.
+
+1603
+02:22:31,340 --> 02:22:35,340
+Cuando vamos a hacer una búsqueda de los hiperparámetros, por ejemplo, en R,
+
+1604
+02:22:35,340 --> 02:22:37,340
+tener la función de tune.
+
+1605
+02:22:37,340 --> 02:22:41,340
+Entonces, intentamos encontrar el mejor hiperparámetro haciendo un tune.
+
+1606
+02:22:41,340 --> 02:22:43,340
+Tune Support Vector Machine.
+
+1607
+02:22:43,340 --> 02:22:45,340
+En R también se puede hacer eso.
+
+1608
+02:22:45,340 --> 02:22:47,340
+Tune Support Vector Machine.
+
+1609
+02:22:47,340 --> 02:22:52,940
+cambia el costo y cambia la penalización gamma.
+
+1610
+02:22:52,940 --> 02:23:00,260
+Profesor me perdí acá, bueno, solamente para revisar.
+
+1611
+02:23:05,500 --> 02:23:15,740
+Se recuerda, acá tenemos un C de costo que va a permitir ese error para abajo o para arriba.
+
+1612
+02:23:17,340 --> 02:23:22,660
+este costo va a entrar, perdón
+
+1613
+02:23:30,700 --> 02:23:39,340
+este costo entra acá, y recuerda que algún de los modelos el radial y
+
+1614
+02:23:39,340 --> 02:23:44,260
+el radial y el polinomial tiene una función gamma, esta función gamma puede
+
+1615
+02:23:44,260 --> 02:23:53,420
+0.1 0.0 0.0 10 y por allá delante entonces acá yo puedo poner todos los valores que quiero hacer
+
+1616
+02:23:53,420 --> 02:24:00,780
+en el testero ya y va a ser esas combinaciones entonces va a evaluar ese con ese ese con ese
+
+1617
+02:24:00,780 --> 02:24:07,540
+ese con ese después va a evaluar ese con ese ese con ese y ese con ese por último ese con ese
+
+1618
+02:24:07,540 --> 02:24:13,500
+ese con ese y ese con ese entonces va a evaluar todos los posibles valores que tenemos acá con
+
+1619
+02:24:13,500 --> 02:24:17,100
+de esos valores y va a encontrar lo que va a tener el mejor ajuste.
+
+1620
+02:24:18,060 --> 02:24:20,860
+Eso es hacer un túnel de los hiperparámetros.
+
+1621
+02:24:21,220 --> 02:24:25,180
+Con base a eso encontramos el mejor gamma, el mejor custo y ajustamos bien
+
+1622
+02:24:26,740 --> 02:24:27,740
+esta frontera.
+
+1623
+02:24:30,260 --> 02:24:33,300
+De decisión acá, tratamos de encontrar lo mejor
+
+1624
+02:24:34,140 --> 02:24:36,740
+para no tener un súper ajuste.
+
+1625
+02:24:37,580 --> 02:24:40,460
+Profesor, pero usted está haciendo eso con el conto de entrenamiento.
+
+1626
+02:24:40,460 --> 02:24:46,660
+se recuerdan dentro del conto de entrenamiento estamos dividido en dos partes ya entonces es
+
+1627
+02:24:46,660 --> 02:24:51,380
+imposible tener un super ajuste ahí estoy ajustando acá en una parte y estoy mirando
+
+1628
+02:24:51,380 --> 02:24:58,660
+en otra parte entonces este modelo acá con super ajuste como este va a ser altamente penalizado
+
+1629
+02:24:58,660 --> 02:25:04,500
+de ninguna manera voy a encontrar un modelo por ejemplo con gamma igual a 50 ya yo también
+
+1630
+02:25:04,500 --> 02:25:09,660
+es posible que gamma igual a 0.01 ser demasiado simples y ahí él va a intentar encontrar
+
+1631
+02:25:09,660 --> 02:25:15,980
+entre ellos. Con base a eso entonces tenemos esta estructura de support vector machine.
+
+1632
+02:25:18,420 --> 02:25:26,260
+Era básicamente eso que quería hablar con ustedes. Bueno, tenemos algunos minutos, preguntas, dudas,
+
+1633
+02:25:36,100 --> 02:25:37,100
+sugerencias.
+
+1634
+02:26:09,660 --> 02:26:16,220
+cliente o un nuevo grupo de clientes ingresaba una nueva data set
+
+1635
+02:26:16,220 --> 02:26:25,740
+vamos a usted una cosa es usted llegó en ese punto es una muy buena pregunta ya
+
+1636
+02:26:32,860 --> 02:26:38,660
+déjame mover la tabla bueno una cosa va a ser llegó la base original entonces su
+
+1637
+02:26:38,660 --> 02:26:45,900
+el empleador llegó y informó, acá está la base. En esa base que llegó ahora, usted va a hacer un entrenamiento,
+
+1638
+02:26:45,900 --> 02:26:53,220
+va a ser una división 70 y 30. Con 70% usted va a dividir entre 50 para hacer el entrenamiento,
+
+1639
+02:26:53,220 --> 02:26:58,580
+20 para encontrar los hiperparámetros. Después de encontrar estos hiperparámetros,
+
+1640
+02:26:58,580 --> 02:27:06,980
+usted tiene un SVM radial, un SVM linear, una regresión logística, un random forest, KNN,
+
+1641
+02:27:06,980 --> 02:27:10,460
+redes neuronales y todo más. Tenemos un montón de modelos ahí, 15 modelos.
+
+1642
+02:27:11,620 --> 02:27:14,740
+Usted va a evaluar estos 15 modelos en ese conjunto de prueba.
+
+1643
+02:27:15,380 --> 02:27:20,340
+Y ahí va a elegir un modelo específico. Vamos a suponer que usted elige un modelo que sea el que es Random Forest.
+
+1644
+02:27:21,220 --> 02:27:26,700
+Llegó un nuevo cliente, usted va a simplemente poner ese nuevo cliente en ese modelo que ya está entrenado.
+
+1645
+02:27:27,860 --> 02:27:29,060
+Y va a salir un resultado.
+
+1646
+02:27:29,060 --> 02:27:35,900
+Ahora vamos a suponer que bueno, llegó un cliente, tenemos la predicción, llegó un
+
+1647
+02:27:35,900 --> 02:27:39,780
+nuevo cliente, usted hizo la predicción y informó para su empleador, ya, no empréstese
+
+1648
+02:27:39,780 --> 02:27:43,620
+plata para esa persona, listo, no empréstese plata.
+
+1649
+02:27:43,620 --> 02:27:49,380
+Y bueno, usted no va a tener la información si esta persona es un malo o un bueno pagador.
+
+1650
+02:27:49,380 --> 02:27:54,820
+Vamos a suponer que usted sugirió a su empleador para emprestar la plata para esa persona.
+
+1651
+02:27:54,820 --> 02:27:59,740
+Entonces, se le prestó la plata a esa persona, ya va a quedar ahí y después de un tiempo
+
+1652
+02:27:59,740 --> 02:28:03,180
+esa persona pasa a componer su base de datos.
+
+1653
+02:28:03,180 --> 02:28:07,980
+Esa persona va a ser una persona que fue, que pagó, que no pagó, ya va a llegar nuevas
+
+1654
+02:28:07,980 --> 02:28:11,780
+personas y usted va acumulando nuevas observaciones.
+
+1655
+02:28:11,780 --> 02:28:15,900
+Después de un momento que usted tiene no sé, 10, 15 nuevas observaciones, usted puede
+
+1656
+02:28:15,900 --> 02:28:23,020
+poner esas 10 nuevas observaciones, juntar en su base original y hacer nuevamente todo
+
+1657
+02:28:23,020 --> 02:28:28,460
+el entrenamiento, validación y prueba. Puede ser que después cuando tenga más observaciones,
+
+1658
+02:28:28,460 --> 02:28:32,900
+otro modelo sea mejor. Ese cambia, antes usted estaba trabajando con Random Forest,
+
+1659
+02:28:32,900 --> 02:28:37,060
+pero ahora tiene información suficiente y una red neuronal está súper buena.
+
+1660
+02:28:37,060 --> 02:28:44,340
+Si? Profesor, tengo que entrenar todo de nuevo? Bueno, eso que el ChatGPT lo hace,
+
+1661
+02:28:44,340 --> 02:28:50,060
+certo? Saca sus datos, hace el entrenamiento, sale la versión 4.1. Después de un tiempo a más,
+
+1662
+02:28:50,060 --> 02:28:56,620
+más observas, más información, hace nuevamente el entrenamiento 4.3. Usted va teniendo más información,
+
+1663
+02:28:56,620 --> 02:29:02,380
+va ajustando el modelo de nuevo, va teniendo un modelo más preciso. Profesor, tengo que gastar plata
+
+1664
+02:29:02,380 --> 02:29:10,780
+para entrenar todo el modelo nuevamente, dependiendo del modelo específico, sí. Hay
+
+1665
+02:29:10,780 --> 02:29:15,580
+algunos modelos como, no sé, el suporte vector machine, yo creo que tiene que entrenar todo de nuevo.
+
+1666
+02:29:15,580 --> 02:29:22,580
+Hay otros modelos que uno puede utilizar y a lo que fue entrenado y solamente hacer una actualización.
+
+1667
+02:29:22,580 --> 02:29:27,580
+Por ejemplo, una regresión lineal se puede hacer una actualización sin tener que entrenar todo de nuevo.
+
+1668
+02:29:27,580 --> 02:29:30,580
+Entonces va a hacer ese paso.
+
+1669
+02:29:30,580 --> 02:29:35,580
+Entonces llega una nueva persona, que va a predecir para esa nueva persona y va a informar a su empleador si va a emprestar o no.
+
+1670
+02:29:35,580 --> 02:29:42,580
+Pero si va llegando a nuevas observaciones, que usted tiene tanto la covariable y la variable de respuesta,
+
+1671
+02:29:42,580 --> 02:29:45,400
+respuesta usted va a juntar esa información y después va a tener que
+
+1672
+02:29:45,400 --> 02:29:50,160
+hacer un entrenamiento de nuevo. Ese entrenamiento va a influenciar en los
+
+1673
+02:29:50,160 --> 02:29:55,400
+coeficientes estimados e incluso puede cambiar el modelo que usted está
+
+1674
+02:29:55,400 --> 02:29:58,400
+trabajando.
+
+1675
+02:29:58,560 --> 02:30:03,080
+Entonces, César, se entendió bien?
+
+1676
+02:30:03,080 --> 02:30:11,920
+Sí, pero sería posible que cambiara por ejemplo la clasificación de un cliente de que con el
+
+1677
+02:30:11,920 --> 02:30:21,920
+modelo original fuera apto para un crédito y con la versión más actual no lo sea?
+
+1678
+02:30:21,920 --> 02:30:29,920
+Puede ser, por ejemplo, pero usted siempre tiene que tener la idea de que el nuevo modelo tiene más datos
+
+1679
+02:30:29,920 --> 02:30:34,920
+y si tiene más datos, tiene una mejor información y te va a ayudar a mejorar la clasificación.
+
+1680
+02:30:34,920 --> 02:30:40,920
+Por supuesto, no sé si usted entra en un modelo con que las observaciones está emprestando plata
+
+1681
+02:30:40,920 --> 02:30:45,560
+para una persona, si tiene un nuevo modelo con 3.000 observaciones, puede ser que ahora
+
+1682
+02:30:45,560 --> 02:30:50,440
+va a clasificar ese individuo como malo pagador, porque llegó información suficiente de esa
+
+1683
+02:30:50,440 --> 02:30:53,880
+persona, de un grupo específico que contiene esa persona, que acabó siendo con que el
+
+1684
+02:30:53,880 --> 02:30:58,640
+modelo clasificase como malo pagador. Entonces tiene más información, tiene mejores parámetros,
+
+1685
+02:30:58,640 --> 02:31:02,320
+tiene mejor decisión para hacer la clasificación. Es posible que con el nuevo modelo, antes
+
+1686
+02:31:02,320 --> 02:31:05,440
+usted había prestado plata para esa persona, pero si esa persona llega ahora y va a correr
+
+1687
+02:31:05,440 --> 02:31:09,400
+de nuevo, se va a formar nuevo centro, no puede prestar la plata, el modelo le va a rechazar.
+
+1688
+02:31:09,400 --> 02:31:11,400
+entonces sí, sobrepasamos.
+
+1689
+02:31:11,400 --> 02:31:13,400
+Perfecto, muchas gracias profesor.
+
+1690
+02:31:13,400 --> 02:31:15,400
+Más preguntas?
+
+1691
+02:31:17,400 --> 02:31:19,400
+No?
+
+1692
+02:31:19,400 --> 02:31:21,400
+Todo claro?
+
+1693
+02:31:21,400 --> 02:31:23,400
+Perfecto, bueno.
+
+1694
+02:31:23,400 --> 02:31:29,400
+La próxima, el sábado, va a ser un repaso, como le comenté, de lo que yo acabé de hablar hoy, lo que Eloy va a conseguir con él.
+
+1695
+02:31:29,400 --> 02:31:35,400
+Entonces, voy a intentar hacer un resumen, pero de todas formas, voy a intentar traer una cosa también que puede ser una regresión logística con Lasso, o una regresión logística con Elastic Net.
+
+1696
+02:31:35,400 --> 02:31:37,400
+Ya?
+

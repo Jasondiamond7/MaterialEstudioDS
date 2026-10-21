@@ -1,0 +1,6180 @@
+1
+00:00:00,000 --> 00:00:09,240
+Hoy lo que veremos es Naive Bayes y clasificación probabilística. Va a estar muy relacionado
+
+2
+00:00:09,240 --> 00:00:14,340
+con las métricas que nosotros hemos visto y vamos a hacer una pequeña diferencia con
+
+3
+00:00:14,340 --> 00:00:19,200
+lo que trabajaron el martes pasado con Pedro.
+
+4
+00:00:19,200 --> 00:00:25,200
+y creo que estoy compartiendo bien, sí
+
+5
+00:00:25,200 --> 00:00:28,200
+perfecto
+
+6
+00:00:38,200 --> 00:00:41,960
+creo que se ve mejor, ya
+
+7
+00:00:41,960 --> 00:00:48,200
+bueno en la sesión pasada ustedes vieron la forma de encontrar grupos
+
+8
+00:00:48,200 --> 00:00:59,320
+clasificar de cierta manera las observaciones conforme quedan similares eran entre sí ya si
+
+9
+00:00:59,320 --> 00:01:06,320
+se fijan en esa en ese tipo de problemáticas que son de clasificación no tenían una variable
+
+10
+00:01:06,320 --> 00:01:13,520
+respuesta y de cierta manera lo que hacían era buscar alguna métrica de similitud y juntarlos
+
+11
+00:01:13,520 --> 00:01:19,440
+y a priori digamos decir cuántos grupos quieren, en el ejemplo específico que
+
+12
+00:01:19,440 --> 00:01:26,440
+vieron con Pedro, que era con los conjuntos de datos de los vinos, intentaban ver los
+
+13
+00:01:26,440 --> 00:01:32,000
+perfiles químicos de los vinos y tratar de agruparlos de alguna manera.
+
+14
+00:01:32,000 --> 00:01:38,400
+Eso es súper útil para los aplicaciones reales, pero qué pasa si yo
+
+15
+00:01:38,400 --> 00:01:42,280
+tengo información adicional yo ya los tengo clasificado
+
+16
+00:01:42,280 --> 00:01:48,800
+pensemos en el ejemplo de los correos que lo vimos cuando vimos las métricas
+
+17
+00:01:48,800 --> 00:01:53,840
+de la matriz de confusión y demás el jueves pasado
+
+18
+00:01:53,840 --> 00:01:59,400
+pensamos que tenemos un conjunto de datos de correo y en esencia lo que hace todos
+
+19
+00:01:59,400 --> 00:02:07,080
+los proveedores de correo electrónico y ya tengo correos que están
+
+20
+00:02:07,080 --> 00:02:14,740
+marcados o etiquetados como correo no deseado, spam o correo legítimo. Yo ya
+
+21
+00:02:14,740 --> 00:02:21,040
+tengo una clasificación, entonces adicional o a la información propia
+
+22
+00:02:21,040 --> 00:02:25,720
+en este caso el correo, ya que uno lo puede caracterizar de distintas maneras,
+
+23
+00:02:25,720 --> 00:02:31,120
+tengo ya una clasificación, entonces tengo una variable
+
+24
+00:02:31,120 --> 00:02:37,000
+que ya no es una propiedad per se, en el sentido del mensaje en sí mismo, si no
+
+25
+00:02:37,000 --> 00:02:43,660
+que es una etiqueta. Entonces, yo ya no voy a ver las características de este
+
+26
+00:02:43,660 --> 00:02:49,820
+correo o los perfiles químicos solo como mi conjunto completo, sino que voy a
+
+27
+00:02:49,820 --> 00:02:54,900
+tener un conjunto de variables, características, predictoras,
+
+28
+00:02:54,900 --> 00:02:59,260
+covariables, puede serlo si uno quiere hacerlo, que vendría haciendo las
+
+29
+00:02:59,260 --> 00:03:05,020
+características del perfil químico o las características de los mensajes de
+
+30
+00:03:05,020 --> 00:03:10,900
+correo porque no además de tener toda esa información que cuando tenemos
+
+31
+00:03:10,900 --> 00:03:15,700
+toda la información sólo podemos buscar cosas similares y tratar de ver qué
+
+32
+00:03:15,700 --> 00:03:21,100
+observaciones se parecen entre sí lo que yo voy a querer hacer en este
+
+33
+00:03:21,100 --> 00:03:25,340
+contexto es cuando qué pasa o preguntarme qué pasa cuando ya tengo
+
+34
+00:03:25,340 --> 00:03:30,060
+clasificadas información cómo puedo ocupar esa información para por
+
+35
+00:03:30,060 --> 00:03:36,420
+ejemplo, clasificar nuevos correos como correos de spam, como correo no decía.
+
+36
+00:03:36,420 --> 00:03:40,620
+Entonces lo que nosotros vamos a tratar es buscar señales
+
+37
+00:03:40,620 --> 00:03:46,340
+que me permitan predecir de mejor manera los correos futuros. A todo nos ha
+
+38
+00:03:46,340 --> 00:03:52,340
+pasado que nos llega un correo y en realidad de vez en vez de haber sido spam.
+
+39
+00:03:52,340 --> 00:03:56,780
+Hoy en día estos modelos son bastante sofisticados y es raro que pase, pero
+
+40
+00:03:56,780 --> 00:04:03,060
+hace muchos años atrás era algo bastante común. Entonces, en el contexto que vamos a trabajar hoy,
+
+41
+00:04:03,060 --> 00:04:11,740
+nos vamos a poner una variable de respuesta o una etiqueta que le vamos a llamar y le vamos a definir
+
+42
+00:04:11,740 --> 00:04:19,340
+como 1 si efectivamente era spam y está etiquetada como spam o 0 si no era spam o era un correo
+
+43
+00:04:19,340 --> 00:04:25,940
+el heating. ¿Cuáles van a ser nuestras características que sean, que es
+
+44
+00:04:25,940 --> 00:04:30,340
+equivalente, digamos, a los perfiles químicos de los vinos? Acá vamos a hablar de,
+
+45
+00:04:30,340 --> 00:04:36,140
+por ejemplo, si contiene palabras o no, creemos qué proporción de palabras
+
+46
+00:04:36,140 --> 00:04:41,300
+utiliza, digamos, o qué proporción de palabras pertenecen o son una
+
+47
+00:04:41,300 --> 00:04:45,420
+palabra en particular, y lo podemos clasificar de muchas, de varias maneras
+
+48
+00:04:45,420 --> 00:04:50,420
+lo vamos a ver un poquito más adelante. Lo que queremos hacer hoy es
+
+49
+00:04:50,420 --> 00:04:57,500
+definir o construir, ya vamos a modelar de alguna manera, una probabilidad de spam a
+
+50
+00:04:57,500 --> 00:05:01,700
+partir de mis datos que yo ya tengo etiquetados, es decir, yo tengo un conjunto
+
+51
+00:05:01,700 --> 00:05:07,540
+de datos que sé sus características, por ejemplo, la frecuencia, ciertas
+
+52
+00:05:07,540 --> 00:05:11,900
+palabras, y sé que es spam o no.
+
+53
+00:05:11,900 --> 00:05:19,820
+Entonces, vamos a querer crear un filtro, como lo hacen Gmail o Outlook, etcétera,
+
+54
+00:05:19,820 --> 00:05:23,820
+para definir cuándo esa spam abre el ring o forma las características.
+
+55
+00:05:23,820 --> 00:05:31,020
+Entonces, vamos a pensar que un correo va, vamos a poner esta problemática, nos va a
+
+56
+00:05:31,020 --> 00:05:36,500
+preguntar si es que tiene la palabra oferta, ¿ya?
+
+57
+00:05:36,500 --> 00:05:46,200
+Y nuestro objetivo va a ser definir o modelar la probabilidad de spam,
+
+58
+00:05:46,200 --> 00:05:52,580
+o qué probabilidad asignarle a spam y si conviene bloquearlo.
+
+59
+00:05:52,580 --> 00:05:57,200
+Entonces, vamos a considerar por consecuencia las frecuencias de estas
+
+60
+00:05:57,200 --> 00:06:02,080
+características o de estas clases de correo en nuestro conjunto de datos y
+
+61
+00:06:02,080 --> 00:06:05,900
+vamos a ver cómo eso afecta y cómo podemos efectivamente estimar la
+
+62
+00:06:05,900 --> 00:06:09,460
+probabilidad y vamos a hablar de probabilidades condicionales conforme
+
+63
+00:06:09,460 --> 00:06:13,540
+los datos que tenemos. Entonces vamos a tener
+
+64
+00:06:13,540 --> 00:06:23,500
+tres, digamos, aristas que tenemos que, digamos, definir. Entonces, primero vamos a
+
+65
+00:06:23,500 --> 00:06:26,020
+tener que aprender de nuestro conjunto de datos.
+
+66
+00:06:26,020 --> 00:06:30,540
+Entonces vamos a tener clases. Nosotros ya nos definimos las clases. Las clases son
+
+67
+00:06:30,540 --> 00:06:34,220
+dos. Estamos haciendo una clasificación binaria y en principio no podría ser
+
+68
+00:06:34,220 --> 00:06:38,180
+reglación logística, es decir, se estima. Pero nosotros tenemos que aprender estos
+
+69
+00:06:38,180 --> 00:06:44,000
+correos y tenemos en este ejercicio, en este ejemplo, dos clases. El correo es spam o
+
+70
+00:06:44,000 --> 00:06:48,260
+no lo es, o es un correo legítimo. Entonces, veremos de cierta manera
+
+71
+00:06:48,260 --> 00:06:56,740
+caracterizar cómo se comportan los datos dentro de cada una de esas categorías.
+
+72
+00:06:56,740 --> 00:07:00,220
+Entonces vamos a preguntarnos qué señales aparecen dentro de spam, qué
+
+73
+00:07:00,220 --> 00:07:05,540
+señales aparecen dentro de correo legítimos. Entonces tenemos que preguntarnos
+
+74
+00:07:05,540 --> 00:07:10,520
+cómo vamos a combinar esas frecuencias, esas características y qué tan
+
+75
+00:07:10,520 --> 00:07:16,060
+fiables van a ser esas probabilidades. Y finalmente vamos a definir, vamos a hacer
+
+76
+00:07:16,060 --> 00:07:22,420
+una diferencia. Nosotros queremos predecir, pero el acto de predecir y el
+
+77
+00:07:22,420 --> 00:07:27,860
+acto de tomar una decisión son cosas distintas. Por ejemplo, yo puedo predecir
+
+78
+00:07:27,860 --> 00:07:36,800
+de antemano, llevo un correo, yo no sé efectivamente si es spam o no, leo sus características,
+
+79
+00:07:36,800 --> 00:07:41,900
+con esta metodología que vamos a desarrollar en la catedral de hoy, voy a llegar a una
+
+80
+00:07:41,900 --> 00:07:47,980
+probabilidad de que sea spam o no lo sea, o sea un correo legítimo, y yo, ese es el
+
+81
+00:07:47,980 --> 00:07:55,100
+proceso de predecir, y luego voy a tomar una decisión que va a estar definida como una
+
+82
+00:07:55,100 --> 00:08:00,980
+regla. Por ejemplo, tal como se hace en regresión logística, si la probabilidad
+
+83
+00:08:00,980 --> 00:08:06,100
+de que sea spam es mayor al 80%, entonces lo voy a clasificar como spam.
+
+84
+00:08:06,100 --> 00:08:12,500
+Si es que no, va a ser un correo logístico. Entonces, vamos a definir
+
+85
+00:08:12,500 --> 00:08:17,420
+una función de costos, ya en términos de los falsos positivos y los falsos
+
+86
+00:08:17,420 --> 00:08:21,660
+negativos, que puede cambiar esa decisión. Tenemos que hacer una
+
+87
+00:08:21,660 --> 00:08:26,700
+diferencia entre lo que es el predecir la probabilidad o predecir nuevas
+
+88
+00:08:26,700 --> 00:08:32,340
+observaciones con su probabilidad de que sea spam o no y la decisión que se toma
+
+89
+00:08:32,340 --> 00:08:41,660
+primero vamos a considerar 100 correos 100 correos esto digamos un ejemplo
+
+90
+00:08:41,660 --> 00:08:48,340
+y vamos a analizar cómo calculamos estas probabilidades como las utilizamos que
+
+91
+00:08:48,340 --> 00:08:52,700
+estamos utilizando por debajo y luego de eso una vez que lo tenemos definido lo
+
+92
+00:08:52,700 --> 00:08:56,740
+vamos a ampliar una base un poco más real digamos que son el conjunto de datos
+
+93
+00:08:56,740 --> 00:08:59,900
+que está disponible en
+
+94
+00:08:59,900 --> 00:09:03,700
+en el mood
+
+95
+00:09:03,700 --> 00:09:08,300
+entonces vamos a preguntar tres cosas para definir estas probabilidades
+
+96
+00:09:08,300 --> 00:09:14,280
+primero la prior o la previa digamos que nos va a preguntar qué fracción de
+
+97
+00:09:14,280 --> 00:09:18,220
+correos es spam y hacemos la referencia como spam porque estamos interesados en
+
+98
+00:09:18,220 --> 00:09:22,360
+esa clase, ya por eso le pusimos igual a uno que sea spam. Si nosotros queremos
+
+99
+00:09:22,360 --> 00:09:27,400
+justificar al revés, es decir, la probabilidad de que sea legítimo, que
+
+100
+00:09:27,400 --> 00:09:31,680
+también podemos hacerlo en la clasificación minaria sobre todo,
+
+101
+00:09:31,680 --> 00:09:36,960
+tenemos que observar cuantas observaciones son spam, cuantas observaciones no lo son.
+
+102
+00:09:36,960 --> 00:09:41,600
+Entonces esta primera pregunta, antes de ver la clase, ya antes de ver las
+
+103
+00:09:41,600 --> 00:09:45,800
+características que tienen los mensajes de spam y que tienen los
+
+104
+00:09:45,800 --> 00:09:51,020
+mensajes legítimos nos vamos a preguntar qué tanto ocurre, cuál es su
+
+105
+00:09:51,020 --> 00:09:55,460
+frecuencia, es decir, qué fracción de los correos y yo tengo disposición de estos
+
+106
+00:09:55,460 --> 00:10:01,740
+100 que estoy planteando es SPAM. Ahí vamos a observar efectivamente la
+
+107
+00:10:01,740 --> 00:10:06,380
+frecuencia de la clase, clase igual a 1, clase igual a 0.
+
+108
+00:10:06,380 --> 00:10:12,640
+Segundo, vamos a considerar dentro de la clase, entonces entre la clase de
+
+109
+00:10:12,640 --> 00:10:18,280
+interés, que en particular es spam, qué fracción contiene la palabra oferta.
+
+110
+00:10:18,280 --> 00:10:23,440
+Nosotros estamos conjunturando cada que sí tiene la palabra oferta puede
+
+111
+00:10:23,440 --> 00:10:29,360
+incidir en la probabilidad de que sea spam o no.
+
+112
+00:10:29,360 --> 00:10:36,640
+Entonces, primero vemos la frecuencia de los corredores spam y los no spam y luego
+
+113
+00:10:36,640 --> 00:10:42,140
+nos vamos a la clase de interés de dentro de spam. ¿Cuántas de esas contienen la
+
+114
+00:10:42,140 --> 00:10:48,020
+palabra oferta. ¿Qué va a observar ahí? La característica de interés que nosotros
+
+115
+00:10:48,020 --> 00:10:52,180
+estamos conciurturando que afecta esta probabilidad, que es si es que la palabra
+
+116
+00:10:52,180 --> 00:10:57,220
+oferta está dentro o no del mensaje. Y a eso estamos haciendo una probabilidad
+
+117
+00:10:57,220 --> 00:11:01,740
+condicional, es decir, ¿cuál es la probabilidad de que saca la palabra oferta
+
+118
+00:11:01,740 --> 00:11:09,700
+dado que es spam? Y finalmente la tercera pregunta es la probabilidad posterior.
+
+119
+00:11:09,700 --> 00:11:16,260
+Entonces, entre los correos con oferta, o la palabra oferta dentro de esos mensajes,
+
+120
+00:11:16,260 --> 00:11:17,540
+¿qué fracción es spam?
+
+121
+00:11:17,540 --> 00:11:20,060
+Si se fijan, la pregunta es al revés.
+
+122
+00:11:20,060 --> 00:11:24,220
+Primero nos preguntábamos, dentro de los que son spam, ¿cuántos son oferta?
+
+123
+00:11:24,220 --> 00:11:25,940
+¿Cuántos tiene la palabra oferta?
+
+124
+00:11:25,940 --> 00:11:32,740
+Y ahora nos preguntamos, entre los correos que son oferta, ¿qué fracción es de spam?
+
+125
+00:11:32,740 --> 00:11:38,340
+Son preguntas que parecen similares, digamos, en vocabulario, pero son totalmente distintas.
+
+126
+00:11:38,340 --> 00:11:44,860
+vamos a formalizar. Entonces aquí quedó observar la clase al conocer la palabra
+
+127
+00:11:44,860 --> 00:11:49,380
+oferta, por una observación. Entonces el teorema Bayes, y probabilidad
+
+128
+00:11:49,380 --> 00:11:54,840
+condicional por consecuencia, nos va a permitir hacer esto. El naíf va a
+
+129
+00:11:54,840 --> 00:12:00,180
+salir por un supuesto que vamos a hacer. Entonces vamos a ocupar esta
+
+130
+00:12:00,180 --> 00:12:09,900
+metodología para definir esa probabilidad. Entonces, vemos el ejemplo de los 100 correos.
+
+131
+00:12:09,900 --> 00:12:18,740
+En los 100 correos tengo las dos clases spam o no spam, y al no spam le estamos llamando legítimo.
+
+132
+00:12:18,740 --> 00:12:27,220
+Entonces, si se fijan acá, tengo 80 correos legítimos y 20 correos spam, que suman los 100
+
+133
+00:12:27,220 --> 00:12:34,720
+correos del ejemplo dentro de spam que son los 20 yo voy a encontrar donde
+
+134
+00:12:34,720 --> 00:12:42,300
+conjunto de datos tengo 16 con la palabra oferta si se fijan acá estoy
+
+135
+00:12:42,300 --> 00:12:47,260
+hablando de si contiene o no la palabra oferta y no cuántas veces aparece la
+
+136
+00:12:47,260 --> 00:12:52,060
+palabra oferta que lo vamos también a considerar, aquí estamos considerando
+
+137
+00:12:52,060 --> 00:12:57,060
+simplemente la presencia o no, tiene la palabra oferta si o no, entonces dentro de
+
+138
+00:12:57,060 --> 00:13:02,960
+spam que son 20 observaciones de las 100, 16 tienen la palabra oferta y por
+
+139
+00:13:02,960 --> 00:13:08,700
+consecuencia 4 no la tiene porque es una categoría, digo Tony, o tiene la
+
+140
+00:13:08,700 --> 00:13:15,220
+palabra o no la tiene, no pueden ser ambas ala vez, entonces necesariamente tiene que ser un 4.
+
+141
+00:13:15,220 --> 00:13:23,540
+Y también en el caso de la clase no spam o legítimo 8 tiene la palabra oferta y
+
+142
+00:13:23,540 --> 00:13:28,460
+72 no tienen la palabra oferta entonces si se fijan acá
+
+143
+00:13:28,460 --> 00:13:35,620
+80 legítimos 20 con spam 24 con la palabra oferta y sabemos cómo
+
+144
+00:13:35,620 --> 00:13:38,900
+se distribuye entonces a priori uno podría decir bueno si contiene la
+
+145
+00:13:38,900 --> 00:13:43,260
+palabra oferta que es nuestra conjectura si tiene la palabra oferta
+
+146
+00:13:43,260 --> 00:13:49,220
+entonces pareciera ser más probable que va a ser spam y si tiene la palabra si
+
+147
+00:13:49,220 --> 00:13:53,380
+no tiene la palabra oferta pareciera ser que es más probable que sea legítimo
+
+148
+00:13:53,380 --> 00:13:58,660
+pero tenemos que llegar a la probabilidad probablemente tal, cómo hacemos eso, cómo lo formalizamos
+
+149
+00:14:01,620 --> 00:14:10,040
+entonces pensemos cómo calculamos estas cosas, preguntemos, cuál es la probabilidad según en
+
+150
+00:14:10,040 --> 00:14:17,060
+términos frecuentistas esto, cuál es la probabilidad de que el mensaje o un correo contenga la palabra
+
+151
+00:14:17,060 --> 00:14:24,940
+oferta dado que el correo está categorizado, está etiquetado como spam
+
+152
+00:14:24,940 --> 00:14:30,660
+entonces si nos fijamos esto es simplemente el cociente entre 16 y 20
+
+153
+00:14:30,660 --> 00:14:37,900
+porque 16 son con oferta de los 20 que son spam entonces aquí me estoy
+
+154
+00:14:37,900 --> 00:14:44,220
+preguntando dado que el dado que el correo es spam entonces ya voy a estar
+
+155
+00:14:44,220 --> 00:14:52,740
+trabajando en esta fila, cuántos son ofertas y por consecuencia esos son 16
+
+156
+00:14:52,740 --> 00:15:00,660
+ya al ser 16 entonces me queda 16 sobre 20 que me da punto 8 de probabilidad
+
+157
+00:15:00,660 --> 00:15:05,180
+hago el mismo ejemplo o el mismo ejercicio con la probabilidad de que sea
+
+158
+00:15:05,180 --> 00:15:10,740
+oferta dado que es un correo legítimo y se teje en acá
+
+159
+00:15:10,740 --> 00:15:19,140
+que tenga en esa es la palabra oferta son 8 sobre los 80 entonces me queda 8 sobre 80
+
+160
+00:15:19,140 --> 00:15:24,020
+que es un 0 1 si se fijan acá esto no suma 1 porque estamos trabajando dentro
+
+161
+00:15:24,020 --> 00:15:27,100
+de dos clases distintas
+
+162
+00:15:27,500 --> 00:15:31,820
+si trabajásemos como la probabilidad de que no se oferta dado que es legítimo
+
+163
+00:15:31,820 --> 00:15:39,260
+ahí sería 72 sobre 80 que me daría el 0,9 restante
+
+164
+00:15:39,260 --> 00:15:42,260
+lo mismo acá con no oferta dado que es spam
+
+165
+00:15:42,260 --> 00:15:43,260
+entonces
+
+166
+00:15:43,720 --> 00:15:46,860
+en la primera cantidad nosotros consideramos
+
+167
+00:15:47,040 --> 00:15:50,160
+todos los spams y en la segunda cantidad consideramos
+
+168
+00:15:50,160 --> 00:15:52,080
+todos los legítimos
+
+169
+00:15:52,940 --> 00:15:53,940
+entonces
+
+170
+00:15:54,440 --> 00:15:57,280
+ahora nosotros estamos tratando de invertir la pregunta
+
+171
+00:15:57,280 --> 00:15:58,820
+aquí nos preguntamos
+
+172
+00:15:59,580 --> 00:16:01,860
+cual es la probabilidad de que sea oferta
+
+173
+00:16:01,860 --> 00:16:05,200
+dado que es spam, o sea yo ya conozco que es spam
+
+174
+00:16:05,300 --> 00:16:08,420
+y acá abajo me estoy pensándolo
+
+175
+00:16:08,420 --> 00:16:15,100
+en al revés, estoy preguntando cuál es la probabilidad que sea spam dado que
+
+176
+00:16:15,100 --> 00:16:21,660
+contiene la palabra oferta y el dado es lo que en la predicción será nuestra
+
+177
+00:16:21,660 --> 00:16:27,620
+información ya cuando tengo nuevos nuevas observaciones nuevos correos yo voy
+
+178
+00:16:27,620 --> 00:16:31,660
+a conocer el mensaje y en el mensaje voy a saber si contiene la palabra oferta o no
+
+179
+00:16:31,660 --> 00:16:35,060
+pero no voy a saber a priori si es spam o no porque quiero definir esa
+
+180
+00:16:35,060 --> 00:16:39,380
+probabilidad. Entonces, ¿cómo calculamos éste? La probabilidad de que sea spam
+
+181
+00:16:39,380 --> 00:16:46,940
+dado que es oferta, si se fijan es 16 sobre 16 más 8. Entonces, dado que es oferta
+
+182
+00:16:46,940 --> 00:16:51,700
+¿cuántos son spam? Dado que es oferta, entonces estamos viendo ahora la columna,
+
+183
+00:16:51,700 --> 00:17:02,060
+¿cuántos son spam? 16. ¿De cuántos? De los 24. Y los 24 son el 16 más 8.
+
+184
+00:17:02,060 --> 00:17:07,480
+16 más 8. Entonces se entiende que es la proporción de correos spam dentro de la
+
+185
+00:17:07,480 --> 00:17:13,520
+categoría oferta, que en esencia es que el mensaje de correo contiene la palabra
+
+186
+00:17:13,520 --> 00:17:19,240
+oferta. Calculamos esto y nos da 2 tercios. Entonces, como concluimos decimos que el 80%
+
+187
+00:17:19,240 --> 00:17:25,960
+de los spams contiene la palabra oferta, que lo podemos ver dentro de esta matriz, 16 de 20 es el 80%,
+
+188
+00:17:25,960 --> 00:17:33,400
+por ciento pero son los dos tercios de los correos con oferta es spam porque
+
+189
+00:17:33,400 --> 00:17:37,120
+aquí nos estamos preguntando las cosas al revés es decir qué información estoy
+
+190
+00:17:37,120 --> 00:17:41,200
+preguntando es información en la que estoy dando por hecho entonces para la
+
+191
+00:17:41,200 --> 00:17:46,520
+primera pregunta veo los valores horizontales y cual para la segunda
+
+192
+00:17:46,520 --> 00:17:50,960
+pregunta veo los valores verticales porque va a depender mucho estoy viendo
+
+193
+00:17:50,960 --> 00:17:57,800
+dentro de la clase o dentro de la señal. Dentro de la clase todos son spam o no
+
+194
+00:17:57,800 --> 00:18:03,960
+spam y dentro de la señal todos son con oferta o sin oferta, que
+
+195
+00:18:03,960 --> 00:18:10,960
+son ambas categorías dicotónicas, no pueden pasar a la vez.
+
+196
+00:18:10,960 --> 00:18:16,960
+¿Cómo utilizamos esta cosa? Con estas probabilidades podemos calcular
+
+197
+00:18:16,960 --> 00:18:24,520
+nuestra probabilidad de interés, si fijan que es la probabilidad, o sea dado que voy a clasificar
+
+198
+00:18:24,520 --> 00:18:34,080
+primero el i que es mi etiqueta de que sea spam o no, voy a aplicar el teorema de Bayes, el teorema
+
+199
+00:18:34,080 --> 00:18:39,880
+Bayes me va a decir en este caso particular que la probabilidad de que sea spam dada oferta la puedo
+
+200
+00:18:39,880 --> 00:18:46,520
+obtener como y me demuele un poco de sentido esto como la probabilidad de spam por la probabilidad
+
+201
+00:18:46,520 --> 00:18:53,760
+de que sea oferta dado spam sobre la misma probabilidad más
+
+202
+00:18:53,760 --> 00:19:00,400
+la probabilidad que sea legítimo o no spam a su vez por la probabilidad de
+
+203
+00:19:00,400 --> 00:19:04,320
+oferta dado que es legítimo. Si se fijan,
+
+204
+00:19:04,320 --> 00:19:08,820
+esas son las cosas que calculamos. Entonces, la probabilidad de spam dado
+
+205
+00:19:08,820 --> 00:19:17,300
+será 20 sobre 100 porque es la frecuencia de los de cuántos de los
+
+206
+00:19:17,300 --> 00:19:22,580
+correos de los 100 que tengo disponibles son spam, entonces 20 de los 100
+
+207
+00:19:22,580 --> 00:19:28,460
+se me da 0.2 y dentro de lo que son spam cuántos son oferta, entonces dentro de los
+
+208
+00:19:28,460 --> 00:19:34,300
+que son spam cuántos son oferta 16, entonces esa proporción será 16 sobre 8
+
+209
+00:19:34,300 --> 00:19:40,380
+Si se fijan, este número 02 por 08 es el mismo que está abajo. Entonces, esto está
+
+210
+00:19:40,380 --> 00:19:45,860
+incluido arriba. Un número menor que 1 está definido bien la probabilidad. Y acá va a
+
+211
+00:19:45,860 --> 00:19:51,300
+ser la probabilidad de que sea legítimo. 80 correos son legítimos, 20 correos son
+
+212
+00:19:51,300 --> 00:19:56,060
+spam. Entonces, la proporción o probabilidad en este caso, que estamos haciendo esta equivalencia,
+
+213
+00:19:56,060 --> 00:20:02,740
+es 80% o 08 de que sea legítimo. Y ahora, dentro de la clase legítimo, ¿cuántos son
+
+214
+00:20:02,740 --> 00:20:09,220
+ofertas dentro de los que son legítimos, cuántos son ofertas? 8. Entonces 8 sobre 80
+
+215
+00:20:09,220 --> 00:20:18,260
+me da el 0,1. Calculando esto voy a tener 0,16 sobre 0,24 que me da el
+
+216
+00:20:18,260 --> 00:20:23,220
+2 tercios, que es este mismo 2 tercios.
+
+217
+00:20:24,220 --> 00:20:28,940
+Ahora, esta es la forma general, esta es una forma un poco más intuitiva. Ahora, yo
+
+218
+00:20:28,940 --> 00:20:32,820
+quiero ocupar esta y la vamos a generalizar un poco más adelante para, por
+
+219
+00:20:32,820 --> 00:20:38,000
+ejemplo, qué pasa si tengo más de una clase o más de dos clases. Ya no es solo
+
+220
+00:20:38,000 --> 00:20:45,180
+spam y correo legítimo, sino que sea spam, correo financiero y correo legítimo.
+
+221
+00:20:45,180 --> 00:20:52,060
+Entonces, ya ahí no va a ser tan sencillo hacerlo con esta matriz, digamos, de las
+
+222
+00:20:52,060 --> 00:20:58,700
+categorías, sino que tendremos que utilizar la definición.
+
+223
+00:20:58,700 --> 00:21:04,980
+Entonces, vamos a seguir observando si los correos contienen la palabra oferta,
+
+224
+00:21:04,980 --> 00:21:10,720
+porque en todo esto yo estoy asumiendo de que tiene alguna incidencia dentro de
+
+225
+00:21:10,720 --> 00:21:14,700
+la probabilidad de que sea spam o no. Entonces, yo de alguna manera tengo una
+
+226
+00:21:14,700 --> 00:21:23,320
+creencia que si tiene la palabra oferta probablemente es un spam, aunque podría
+
+227
+00:21:23,320 --> 00:21:26,880
+ser, uno podría tener distinta creencia o podría estar interesado en
+
+228
+00:21:26,880 --> 00:21:32,160
+identificar lo legítimo en vez de los correos que son spam.
+
+229
+00:21:32,160 --> 00:21:38,560
+Entonces, si se fijan acá, para cuando hago el producto entre la clase y oferta
+
+230
+00:21:38,560 --> 00:21:44,920
+estoy haciendo 80 dividido 100 porque son 80 correos legítimos de los 100 y
+
+231
+00:21:44,920 --> 00:21:51,280
+dentro de los 80 correos legítimos 8 tienen oferta entonces eso me da 0.08
+
+232
+00:21:51,280 --> 00:21:59,620
+hago el mismo ejemplo con spam 20 de los 100 son spam y dentro de los 20 16 son
+
+233
+00:21:59,620 --> 00:22:04,780
+oferta entonces me da 0.806 y los dividos del total que es la suma y me da en
+
+234
+00:22:04,780 --> 00:22:12,600
+esencia las probabilidades que yo estoy separando. Entonces, si se fijan 0,24 es la probabilidad con
+
+235
+00:22:12,600 --> 00:22:19,000
+que tengo oferta y la estoy separando entre la probabilidad de que sea legítimo con oferta o
+
+236
+00:22:19,000 --> 00:22:25,680
+spam con oferta. Entonces ya tengo una noción de para dónde van a haber más oferta o correos con
+
+237
+00:22:25,680 --> 00:22:31,640
+la palabra oferta y vemos que cuando contiene la palabra oferta, entonces tiene esa señal,
+
+238
+00:22:31,640 --> 00:22:40,540
+hay una mayor probabilidad de que sea spam. Entonces nos vamos a tomar de eso y lo vamos
+
+239
+00:22:40,540 --> 00:22:48,440
+a utilizar para predecir probabilidades de nuevos mensajes. Pero podemos en un caso hipotético,
+
+240
+00:22:48,440 --> 00:22:55,940
+pensemos que en el ejemplo que nosotros teníamos, teníamos 100 correos. De los 100 correos 20 eran
+
+241
+00:22:55,940 --> 00:23:05,900
+spam y 80 eran legitim. 20 es una proporción baja conforme del 80% pero no
+
+242
+00:23:05,900 --> 00:23:13,060
+ridículamente baja, entonces puedo aprender de esa probabilidad de esas
+
+243
+00:23:13,060 --> 00:23:18,580
+frecuencias que tengo disponible en mis dados. Pensemos ahora que esos correos
+
+244
+00:23:18,580 --> 00:23:25,360
+spam son mucho más anómalos en el sentido de que son raros que pasen.
+
+245
+00:23:25,360 --> 00:23:30,600
+Entonces, si yo tengo 100 observaciones que son 100 correos, yo voy a definir qué
+
+246
+00:23:30,600 --> 00:23:38,360
+pasa si el 2% de esos 100, es decir, 2 correos solamente, son spam.
+
+247
+00:23:38,360 --> 00:23:43,240
+Entonces, inicialmente tenía 20 sobre 100.
+
+248
+00:23:43,240 --> 00:23:48,680
+en el nuevo escenario voy a tener 2 sobre 100 o 0.02
+
+249
+00:23:48,680 --> 00:23:53,020
+entonces la probabilidad de que sea legítimo va a ser el recíproco, o sea va a ser
+
+250
+00:23:53,020 --> 00:24:00,960
+el complemento 1 menos 0.2 0.8 y en otro caso 1 menos 0.02 0.98
+
+251
+00:24:00,960 --> 00:24:06,560
+y hago el mismo ejercicio de antes, la probabilidad de que sea spam por la
+
+252
+00:24:06,560 --> 00:24:10,880
+probabilidad de que sea oferta dentro de spam
+
+253
+00:24:10,880 --> 00:24:14,120
+Recuerden acá, la probabilidad de que sea oferta dentro de spam.
+
+254
+00:24:14,120 --> 00:24:18,640
+La probabilidad de que sea oferta dentro de spam 16 sobre 20, 08.
+
+255
+00:24:21,120 --> 00:24:22,840
+Y me da 0,16.
+
+256
+00:24:22,840 --> 00:24:26,040
+En el caso hipotético que le estoy planteando,
+
+257
+00:24:26,040 --> 00:24:30,600
+de que la proporción de correo de spam es solo el 2%,
+
+258
+00:24:30,600 --> 00:24:35,520
+que vendría a significar dos observaciones de las 100 con spam,
+
+259
+00:24:35,520 --> 00:24:39,800
+voy a tener entonces la proporción de spam dentro de mi conjunto de datos,
+
+260
+00:24:39,800 --> 00:24:48,520
+que mis son mis 100 observaciones, entonces va a ser 2 sobre 100, 0.02 por
+
+261
+00:24:48,640 --> 00:24:53,000
+la proporción de que sea oferta dado que
+
+262
+00:24:53,000 --> 00:24:58,680
+dado que sea de que tenga la palabra oferta dado que es SPAM, ya, y aquí estoy
+
+263
+00:24:58,680 --> 00:25:02,040
+asumiendo que esa proporción se mantiene, ya, tu y son implementa haciendo este
+
+264
+00:25:02,040 --> 00:25:06,080
+canc. Ahora, hago el mismo ejercicio con lo
+
+265
+00:25:06,080 --> 00:25:10,280
+legítimo y oferta, recuerden que aquí yo estoy interesado en la señal que
+
+266
+00:25:10,280 --> 00:25:14,360
+tenga la palabra oferta, luego la vamos a extender a dos señales, entonces
+
+267
+00:25:14,360 --> 00:25:19,600
+cuál es la probabilidad que sea legítimo? 0.8 porque son 80 de los 100
+
+268
+00:25:19,600 --> 00:25:24,560
+y dentro de los legítimos sólo el 10% tiene la palabra oferta entonces 0.08
+
+269
+00:25:24,560 --> 00:25:29,480
+hago el mismo ejercicio acá dado que 2% simplemente es spam
+
+270
+00:25:29,480 --> 00:25:34,000
+necesariamente el 98% restante tiene que ser legítimo porque nuevamente es una
+
+271
+00:25:34,000 --> 00:25:39,560
+categoría dicotómica no pueden ser no pueden pasar las cosas a la vez pues una
+
+272
+00:25:39,560 --> 00:25:46,240
+o la otra y dentro de esta clase vamos a seguir asumiendo que hay un 10% de las
+
+273
+00:25:46,240 --> 00:25:52,120
+palabras de las mensajes que tienen la palabra oferta y ahora hacemos el mismo
+
+274
+00:25:52,120 --> 00:26:00,040
+cálculo que acabamos de hacer acá 0.16 sobre 0.08 más 0.16
+
+275
+00:26:00,040 --> 00:26:06,440
+lo calculamos con los valores iniciados y no entregado en el módulo, 2 tercios, pero ahora lo
+
+276
+00:26:06,440 --> 00:26:15,360
+calculo con el nuevo supuesto, es decir que la frecuencia de spam dentro de mi conjunto de datos
+
+277
+00:26:15,360 --> 00:26:24,360
+es sólo el 2% y si se fijan arriba no me va a cambiar, no me va a cambiar sustancialmente en el sentido de que
+
+278
+00:26:24,360 --> 00:26:28,080
+salió un 16 pero hay un orden de magnitud distinto porque pasé de 2 a 20
+
+279
+00:26:28,080 --> 00:26:34,600
+entonces me sale 0.016 y abajo tengo que reemplazarlo con el 0.098
+
+280
+00:26:34,600 --> 00:26:44,020
+más el 0.016 y al calcular esa probabilidad me da que es 0.14
+
+281
+00:26:44,020 --> 00:26:50,480
+entonces pasamos de tener casi 67% de probabilidad de que
+
+282
+00:26:50,480 --> 00:26:55,720
+si es que el mensaje contiene la palabra oferta
+
+283
+00:26:55,720 --> 00:27:02,400
+entonces la probabilidad va a ser dos tercios de que sea spam
+
+284
+00:27:02,400 --> 00:27:08,520
+casi un 14% de que sea spam dado que contiene la palabra oferta y si se fijan
+
+285
+00:27:08,520 --> 00:27:16,040
+yo deje todo constante exceptuando la proporción de spam
+
+286
+00:27:16,040 --> 00:27:22,060
+probabilidad de que sea spam dentro de mi conjunto de datos, lo cual tiene todo el
+
+287
+00:27:22,060 --> 00:27:30,040
+sentido si se fijan, pensemos acá, el ejemplo inicial, si el 20% de los mensajes
+
+288
+00:27:30,040 --> 00:27:38,840
+es spam y yo veo que hay la señal de que tenga la palabra oferta,
+
+289
+00:27:38,840 --> 00:27:43,360
+digamos, me indica de cierta manera una mayor probabilidad de que sea
+
+290
+00:27:43,360 --> 00:27:49,400
+efectivamente spam, entonces es razonable de que si un mensaje contiene la palabra
+
+291
+00:27:49,400 --> 00:27:56,040
+oferta, entonces es muy probable, aunque puede no serlo, que sea spam. Pero eso
+
+292
+00:27:56,040 --> 00:28:02,280
+debido a que hay 20 observaciones de las 100 que eran spam. En el nuevo caso,
+
+293
+00:28:02,280 --> 00:28:08,720
+sólo dos observaciones. Entonces, aquí ya la pregunta no es, si bien estamos
+
+294
+00:28:08,720 --> 00:28:11,840
+haciendo la misma pregunta, la probabilidad de que sea spam dado que era
+
+295
+00:28:11,840 --> 00:28:18,760
+oferta, de que contiene el mensaje oferta, ahora spam es un caso muy anómalo, solo
+
+296
+00:28:18,760 --> 00:28:24,280
+dos de cien, entonces tenga o no la palabra, el mensaje la palabra oferta, no?
+
+297
+00:28:24,280 --> 00:28:30,520
+Igual es difícil que pase porque con un correo sea spam es raro en este contexto
+
+298
+00:28:30,520 --> 00:28:35,720
+entonces si se fijan baja sustancialmente la probabilidad de yo
+
+299
+00:28:35,720 --> 00:28:42,080
+predecir un mensaje con oferta, con la palabra oferta, como es PAM,
+
+300
+00:28:42,080 --> 00:28:47,680
+categorizarlo de esa manera. Entonces, importa mucho la frecuencia del conjunto
+
+301
+00:28:47,680 --> 00:28:51,680
+de datos con el cual estoy trabajando, de la clase en interés en principio.
+
+302
+00:28:51,680 --> 00:28:58,880
+Entonces, a mayor frecuencia voy a tratar de, o con Modelova, asignarle una mayor
+
+303
+00:28:58,880 --> 00:29:04,760
+probabilidad porque el caso no es tan difícil que pase. En cambio, si en este
+
+304
+00:29:04,760 --> 00:29:11,400
+caso utópico, diga si pasa porque hay mucho spam, es un caso muy anómalo, entonces
+
+305
+00:29:11,400 --> 00:29:16,920
+tenga o no la palabra oferta es difícil que pase porque dado mi conjunto de datos
+
+306
+00:29:16,920 --> 00:29:22,040
+tengo muy poca frecuencia, entonces, al bajar sustancialmente eso, entonces la
+
+307
+00:29:22,040 --> 00:29:25,720
+frecuencia de la clase de interés que en nuestro caso es si un mensaje está
+
+308
+00:29:25,720 --> 00:29:30,680
+etiquetado como spam o no, me va a cambiar esa probabilidad, ya, a pesar de que
+
+309
+00:29:30,680 --> 00:29:35,960
+mantenga todas las probabilidades dentro de la misma clase.
+
+310
+00:29:36,240 --> 00:29:43,440
+Y puedo graficar eso, si yo cambio la probabilidad de que sea spam, la
+
+311
+00:29:43,440 --> 00:29:50,120
+frecuencia de los mensajes etiquetados como spam dentro de mi conjunto de datos,
+
+312
+00:29:50,120 --> 00:29:56,360
+recuerden que acá yo lo hice como 2 de 100 y 20 de 100, si se fijan esa
+
+313
+00:29:56,360 --> 00:30:05,140
+curva no es lineal y conforme va bajando la probabilidad previa, digamos la
+
+314
+00:30:05,140 --> 00:30:11,260
+frecuencia de que sea spam, la probabilidad de que yo clasifique un
+
+315
+00:30:11,260 --> 00:30:19,180
+mensaje como spam dado que contiene la palabra oferta baja sustancialmente
+
+316
+00:30:19,180 --> 00:30:33,060
+de igual manera, vengamos al otro caso, ¿qué pasa si 98% de los correos son spam? estaríamos
+
+317
+00:30:33,060 --> 00:30:41,060
+por acá, en ese caso, tenga o no la palabra oferta, es muy probable que sea spam, porque
+
+318
+00:30:41,060 --> 00:30:48,100
+el 98% de los mensajes es spam, entonces la frecuencia en que ocurren, o la frecuencia
+
+319
+00:30:48,100 --> 00:30:58,060
+de ocurrencia que ocurre cada clase, en este caso spam o no spam o spam ilegítimo, influye
+
+320
+00:30:58,060 --> 00:31:03,340
+sustancialmente en cómo voy a definir yo la probabilidad de predicción que va a ser
+
+321
+00:31:03,340 --> 00:31:08,380
+esta la probabilidad de spam dado que contiene la palabra oferta. Nosotros estamos poniendo
+
+322
+00:31:08,380 --> 00:31:14,660
+de esta manera en términos de la señal de que contenga el mensaje, que el mensaje tenga
+
+323
+00:31:14,660 --> 00:31:18,160
+la palabra oferta pero en principio yo podría hacerlo con otras cosas y de hecho con el
+
+324
+00:31:18,160 --> 00:31:27,860
+conjunto de datos lo vamos a hacer con más variables. Entonces, la palabra ayuda, que
+
+325
+00:31:27,860 --> 00:31:33,180
+es la palabra oferta, pero no decide por sí sola porque va a depender mucho de la frecuencia
+
+326
+00:31:33,180 --> 00:31:40,860
+de la clase en la que yo estoy interesado. Entonces, eso es para una señal binaria,
+
+327
+00:31:40,860 --> 00:31:49,620
+decir es spam o no es spam y dentro de spam veo si tiene la palabra oferta no y dentro
+
+328
+00:31:49,620 --> 00:31:56,980
+de legítimo veo la palabra sin oferta no pero qué pasa si ahora agregó una nueva señal entonces
+
+329
+00:31:57,980 --> 00:32:07,300
+voy a tener los correos que son spam y legítimos voy a preguntarme digamos dentro de legítimos
+
+330
+00:32:07,300 --> 00:32:14,500
+8 tienen la palabra oferta dentro de spam 16 tienen la palabra oferta tal como antes pero ahora voy a
+
+331
+00:32:14,500 --> 00:32:22,740
+agregar otra característica más si es que tiene un link o no un enlace entonces dentro de la clase
+
+332
+00:32:22,740 --> 00:32:31,500
+legítima o la clase legítima digamos de no spam 16 correos tienen enlace y dentro de spam 14 no
+
+333
+00:32:31,500 --> 00:32:37,100
+tienen enlace. ¿Qué es lo que nosotros queremos clasificar?
+
+334
+00:32:37,100 --> 00:32:42,180
+Para ponerlo un poco más interesante, digamos, es
+
+335
+00:32:42,180 --> 00:32:47,100
+que hay oferta presente pero que no tiene link.
+
+336
+00:32:47,100 --> 00:32:53,820
+Queremos clasificar ese tipo de correos. Entonces necesitamos saber
+
+337
+00:32:53,820 --> 00:32:58,440
+cómo ocurre cada señal con el mensaje oferta y si es que tiene el
+
+338
+00:32:58,440 --> 00:33:04,920
+íncono por separado y necesitamos de alguna manera combinarlo porque yo no
+
+339
+00:33:04,920 --> 00:33:11,640
+sé de esta tabla descriptiva si es que estos ocho de oferta
+
+340
+00:33:11,640 --> 00:33:19,160
+pertenecen a los ocho con el láser porque puede ser que estos ocho
+
+341
+00:33:19,160 --> 00:33:24,920
+que tienen oferta no tengan el láser yo no lo sé, solo sé la
+
+342
+00:33:24,920 --> 00:33:33,960
+frecuencia. Entonces, vamos en esta noción de que esa
+
+343
+00:33:33,960 --> 00:33:39,080
+señal está presente o no lo está, ya porque como les comentaba antes, yo estoy
+
+344
+00:33:39,080 --> 00:33:44,520
+preguntándome aquí si es que tiene en algún lado la palabra oferta. No estoy
+
+345
+00:33:44,520 --> 00:33:48,960
+preguntándome o no estoy analizando cuántas veces tiene la palabra oferta, que
+
+346
+00:33:48,960 --> 00:33:53,800
+es una pregunta distinta. Entonces cuando yo me pregunto como variable, digamos, como
+
+347
+00:33:53,800 --> 00:33:57,960
+características si es que contiene la palabra, el mensaje contiene la palabra
+
+348
+00:33:57,960 --> 00:34:02,800
+oferta o no, o si es que tiene enlace o no, que a su vez tampoco me estoy
+
+349
+00:34:02,800 --> 00:34:06,440
+preguntando cuántos enlaces o hiperlínculos tiene.
+
+350
+00:34:06,440 --> 00:34:14,680
+Nace naturalmente una variable aleatoria, digas en el paso, ver no hi. Es decir, aparece o no aparece.
+
+351
+00:34:14,680 --> 00:34:21,400
+O pasa o no pasa. No es cuántas veces pasa. Pasa o no pasa, es decir, contiene la
+
+352
+00:34:21,400 --> 00:34:27,480
+palabra oferta o no la contiene, tiene hipervínculo o no, no tiene, no tiene enlace.
+
+353
+00:34:27,480 --> 00:34:32,480
+Entonces todas las variables de la literaturidad per nuí, en el senso de son dicotómicas,
+
+354
+00:34:32,480 --> 00:34:42,160
+si no 0 1, en ese sentido. Vamos a clasificar 1 para la presencia de esa señal,
+
+355
+00:34:42,160 --> 00:34:44,000
+decir
+
+356
+00:34:44,000 --> 00:34:50,920
+presencia de la palabra oferta o presencia de un enlace
+
+357
+00:34:50,920 --> 00:34:55,480
+y ser el caso contrario, es decir, que no lo contenga, que no contenga enlace y que no
+
+358
+00:34:55,480 --> 00:35:00,800
+te queda la palabra oferta.
+
+359
+00:35:00,800 --> 00:35:09,560
+Entonces, en los 20 spond del ejemplo, recuerden que tenemos un conjunto de datos de 100,
+
+360
+00:35:09,560 --> 00:35:11,400
+la categoría
+
+361
+00:35:11,400 --> 00:35:18,400
+que yo clasifique como uno, que es cuando tiene un enlace presente, son 14.
+
+362
+00:35:18,400 --> 00:35:19,960
+Estoy partiando aquí.
+
+363
+00:35:19,960 --> 00:35:23,080
+Por consecuencia, la probabilidad
+
+364
+00:35:23,080 --> 00:35:26,880
+asociada a esto, es decir, la probabilidad que
+
+365
+00:35:26,880 --> 00:35:31,880
+la probabilidad de que hay un enlace dado que es de spam,
+
+366
+00:35:31,880 --> 00:35:33,640
+es los casos positivos
+
+367
+00:35:33,640 --> 00:35:38,960
+sobre los casos totales, es decir, 14, porque 14 tiene un enlace, de los 20
+
+368
+00:35:38,960 --> 00:35:40,040
+del ejemplo
+
+369
+00:35:40,040 --> 00:35:47,080
+que estamos trabajando, entonces me da un 07 y puedo hacer al revés lo mismo, si no tiene enlace entonces
+
+370
+00:35:47,880 --> 00:35:49,880
+o si digo si hay 14
+
+371
+00:35:50,480 --> 00:35:52,480
+que tienen enlace
+
+372
+00:35:53,040 --> 00:35:55,560
+dentro de los 20 con spam, necesariamente
+
+373
+00:35:56,200 --> 00:36:02,480
+6 no tienen que tener enlace porque es el complemento, porque tienen que haber y yo sé que hay 20
+
+374
+00:36:02,840 --> 00:36:06,560
+mensajes que son spam, por consecuencia estas probabilidades suman 1
+
+375
+00:36:06,560 --> 00:36:18,180
+ahora vamos a empezar a definir que es entonces este naive bias, porque recuerden acá yo no sé y no
+
+376
+00:36:18,180 --> 00:36:23,560
+tengo información de cómo se relacionan los mensajes con oferta con los mensajes con enlace
+
+377
+00:36:23,560 --> 00:36:31,640
+yo no sé si de cuántos de estos 8 tienen enlace y no sé cuántos de estos 16 tienen oferta,
+
+378
+00:36:31,640 --> 00:36:37,640
+la estamos viendo por separado. Entonces, queremos combinar estas probabilidades que podemos sacar,
+
+379
+00:36:37,640 --> 00:36:45,200
+ya, que son en esencia, contiene una señal o no la contiene, y en este caso son más de una
+
+380
+00:36:45,200 --> 00:36:51,120
+señal, porque estamos hablando de con palabras vertas, y sí que contiene el lazo, ¿no? Y voy a
+
+381
+00:36:51,120 --> 00:36:57,280
+definir un clasificador, un clasificador probabilístico, que va a decir que es simplemente
+
+382
+00:36:57,280 --> 00:37:01,120
+una forma un poco más bonita de decir en términos de la frecuencia de mis datos
+
+383
+00:37:01,120 --> 00:37:04,800
+voy a definir probabilidades y esas probabilidades
+
+384
+00:37:04,800 --> 00:37:11,200
+en esencia utilizando el tema de Bias para clasificar nuevas
+
+385
+00:37:11,200 --> 00:37:15,600
+observaciones entonces vamos a poder definir probabilidades
+
+386
+00:37:15,600 --> 00:37:23,360
+para que en un futuro mensaje yo pueda definir si es spam o no
+
+387
+00:37:23,360 --> 00:37:30,240
+y en el caso que está muy interesado que es si es que tiene oferta pero no tiene enlace
+
+388
+00:37:30,240 --> 00:37:33,520
+es la clase que nosotros vamos a tener que usar
+
+389
+00:37:33,520 --> 00:37:37,520
+entonces si se fijan acá tengo dos señales
+
+390
+00:37:37,520 --> 00:37:42,480
+aparece oferta aparece enlace entonces tengo cuatro combinaciones
+
+391
+00:37:42,480 --> 00:37:48,560
+no hay enlace no hay oferta no hay oferta pero si hay enlace
+
+392
+00:37:48,560 --> 00:37:52,800
+si hay oferta pero no hay enlace que es la clase que yo estoy interesado
+
+393
+00:37:52,800 --> 00:37:54,800
+y hay oferta y hay enlace
+
+394
+00:37:56,080 --> 00:37:59,360
+y yo no sé cómo se comporta en esta dentro del conjunto de dos que tengo
+
+395
+00:37:59,840 --> 00:38:01,840
+disponible, digamos, las tablas tabuladas
+
+396
+00:38:03,600 --> 00:38:05,920
+cuántos de esos son legítimos, cuántos de esos son spam
+
+397
+00:38:06,800 --> 00:38:08,800
+y si fijan, sólo tengo dos señales
+
+398
+00:38:11,360 --> 00:38:13,360
+que en principio está calculado
+
+399
+00:38:13,600 --> 00:38:16,360
+cómo llegaste 4 con 2 a la 2
+
+400
+00:38:16,560 --> 00:38:20,320
+si tuviese más señales, por ejemplo 10
+
+401
+00:38:20,560 --> 00:38:21,520
+voy a tener
+
+402
+00:38:21,520 --> 00:38:30,960
+1024 patrones posibles, ya, y ahí me va a ser super difícil clasificar porque voy a tener 1024
+
+403
+00:38:30,960 --> 00:38:40,600
+formas de clasificar los mensajes, entonces tengo que tratar de caracterizar esto en términos,
+
+404
+00:38:40,600 --> 00:38:47,560
+con esta metodología, en términos de categoría de manera redundancia o de grupos grandes, ya,
+
+405
+00:38:47,560 --> 00:38:59,840
+no de muchos subgrupos porque si no son demasiadas opciones de clasificar que puede que mi conjunto
+
+406
+00:38:59,840 --> 00:39:07,360
+de datos ni siquiera las tenga en términos de combinación, puede que no esté una combinación
+
+407
+00:39:07,360 --> 00:39:11,280
+en particular, no esté presente en mi datos, entonces no voy a tener ninguna frecuencia
+
+408
+00:39:11,280 --> 00:39:14,700
+con la cual yo saque la probabilidad porque nunca paso, entonces si no pasó en mi datos
+
+409
+00:39:14,700 --> 00:39:20,420
+entonces la frecuencia es cero, y por consecuencia la probabilidad es cero, porque si se fija en acá,
+
+410
+00:39:20,420 --> 00:39:27,820
+aquí estamos haciendo una equivalencia de una filosofía frecuentista, es decir, estamos pasando
+
+411
+00:39:27,820 --> 00:39:35,260
+la frecuencia, es decir, cuántas veces pasa el evento con las distintas combinaciones de las
+
+412
+00:39:35,260 --> 00:39:41,420
+señales en mi conjunto de datos, y digo, bueno, entonces esa es la probabilidad, que es en esencia
+
+413
+00:39:41,420 --> 00:39:50,420
+el argumento frecuentista de la probabilidad estadística. Entonces, si yo tengo pocos correos,
+
+414
+00:39:50,420 --> 00:39:57,500
+pueden haber patrones características, combinaciones de estos que no aparezcan en mis datos y por
+
+415
+00:39:57,500 --> 00:40:02,420
+consecuencia no hay señal. Entonces, le voy a asignar una probabilidad cero. Y no queremos
+
+416
+00:40:02,420 --> 00:40:09,140
+que pase eso porque pensemos si yo quiero poner un enlace que diga
+
+417
+00:40:09,140 --> 00:40:16,140
+cuenta y entro en mi conjunto de datos ningún mensaje tiene cuenta si yo le
+
+418
+00:40:16,140 --> 00:40:21,420
+asigno una probabilidad 0 si estoy aseverando que no puede pasar que
+
+419
+00:40:21,420 --> 00:40:25,140
+algún mensaje tenga la palabra cuenta no obstante nosotros sabemos que puede
+
+420
+00:40:25,140 --> 00:40:28,580
+haber eso ya solamente no va a ser tan común digamos porque tiene las cuentas
+
+421
+00:40:28,580 --> 00:40:39,580
+sí, por fin de mes. Entonces, no podemos asegurar que es imposible, pero cuando le asignamos una probabilidad 0, eso es lo que estamos haciendo, si no queremos hacer esa cosa.
+
+422
+00:40:39,580 --> 00:40:44,580
+Por eso, tenemos que tener cuidado con definir muchas clases.
+
+423
+00:40:44,580 --> 00:40:46,580
+entonces
+
+424
+00:40:46,580 --> 00:40:54,580
+esta señal que yo tengo de en este caso dos señales
+
+425
+00:40:54,580 --> 00:41:01,580
+es decir, tenga la palabra oferta y tenga el lazo, son dos señales distintas
+
+426
+00:41:01,580 --> 00:41:05,580
+esta técnica de Nahid Valles va a tratar de combinar
+
+427
+00:41:05,580 --> 00:41:09,580
+y hace un supuesto para eso, porque recuerden
+
+428
+00:41:09,580 --> 00:41:11,580
+nosotros dentro de nuestros datos
+
+429
+00:41:11,580 --> 00:41:19,900
+yo sé que dentro del legítimo hay 8 con oferta, con la palabra oferta, y dentro de los correos
+
+430
+00:41:19,900 --> 00:41:26,460
+legítimos hay 16 con enlace. Yo no sé cómo se combina y no sé en estricto rigor formalmente
+
+431
+00:41:26,460 --> 00:41:31,660
+esto es decir, no sé la distribución conjunta de estas cosas, sólo sé las distribuciones
+
+432
+00:41:31,660 --> 00:41:36,540
+marginales separadas, es decir, sólo con oferta dentro de los legítimos, sólo con enlace dentro
+
+433
+00:41:36,540 --> 00:41:41,300
+dentro de lo legítimo y lo mismo para spam. Tengo que mezclarla de alguna manera.
+
+434
+00:41:41,300 --> 00:41:47,940
+Entonces yo quiero saber la distribución conjunta que es la probabilidad
+
+435
+00:41:47,940 --> 00:41:53,660
+de que tenga el mensaje oferta y a su vez tenga no tenga enlace que es la
+
+436
+00:41:53,660 --> 00:42:01,260
+clase de interés. Es esta, oferta presente y enlace ausente. Entonces esto es la
+
+437
+00:42:01,260 --> 00:42:05,940
+probabilidad de que sí tenga el mensaje oferta pero no tenga enlace dado que es
+
+438
+00:42:05,940 --> 00:42:12,840
+spam. El supuesto que hacen ahí valles y ahí vienen higienos porque hacen un
+
+439
+00:42:12,840 --> 00:42:17,360
+supuesto que usualmente no pasa, que es decir
+
+440
+00:42:17,360 --> 00:42:23,120
+que esta probabilidad es separable en el sentido de que esta probabilidad
+
+441
+00:42:23,120 --> 00:42:28,760
+conjunta es exactamente la multiplicación de las probabilidades por
+
+442
+00:42:28,760 --> 00:42:33,560
+separado, es decir, la probabilidad de que sea
+
+443
+00:42:33,560 --> 00:42:38,780
+que tenga el mensaje tenga la palabra oferta dado que es spam
+
+444
+00:42:41,200 --> 00:42:46,920
+multiplicado por la probabilidad de que no tenga el láser dado que es spam al multiplicar
+
+445
+00:42:46,920 --> 00:42:54,880
+o obtener ese producto me da la probabilidad de que el mensaje tenga la palabra oferta y a su vez
+
+446
+00:42:54,880 --> 00:43:01,200
+no tenga el láser. Si se fijan son dos cosas distintas porque esta probabilidad de que tenga
+
+447
+00:43:01,200 --> 00:43:05,580
+oferta desde que tenga el mensaje y tenga la palabra oferta dado que es spam no
+
+448
+00:43:05,580 --> 00:43:08,080
+considera
+
+449
+00:43:08,360 --> 00:43:15,080
+si es que tiene el lazo no y a su vez esta probabilidad no considera si es que
+
+450
+00:43:15,080 --> 00:43:19,840
+es tiene la palabra oferta no pero de alguna manera estoy combinando y naipayas
+
+451
+00:43:19,840 --> 00:43:24,240
+ingenuamente define estas cosas se pueden separar es decir esta probabilidad
+
+452
+00:43:24,240 --> 00:43:28,840
+conjunta la puedo separar como la multiplicación de las probabilidades y
+
+453
+00:43:28,840 --> 00:43:34,500
+nada más segura eso, nada más segura eso, por eso es una metodología que es, digamos,
+
+454
+00:43:34,500 --> 00:43:37,780
+ingena, por eso naïve.
+
+455
+00:43:39,340 --> 00:43:42,020
+Entonces,
+
+456
+00:43:42,660 --> 00:43:47,140
+es un primer acercamiento a esta
+
+457
+00:43:47,140 --> 00:43:51,820
+problemática, a este tipo de problema, funciona relativamente bien, pero
+
+458
+00:43:51,820 --> 00:43:56,340
+podemos sofisticar nomás. Ahora, qué es lo bueno de esto?
+
+459
+00:43:56,340 --> 00:44:00,780
+esta probabilidad yo no puedo calcular y las puedo obtener fácilmente
+
+460
+00:44:00,780 --> 00:44:04,420
+esta probabilidad es bastante más difícil
+
+461
+00:44:04,420 --> 00:44:10,460
+entonces cada señal por separado me va a aportar a la probabilidad que yo estoy
+
+462
+00:44:10,460 --> 00:44:15,700
+interesado o al tipo de correos que estoy interesado que son con oferta
+
+463
+00:44:15,700 --> 00:44:18,980
+presente y enlace ausente
+
+464
+00:44:18,980 --> 00:44:21,780
+entonces
+
+465
+00:44:21,780 --> 00:44:32,780
+¿Qué pasa si tengo más variables? Por ejemplo, que tenga la palabra oferta, no tenga enlace y contenga la palabra cuenta, voy a hacer lo mismo.
+
+466
+00:44:32,780 --> 00:44:40,780
+La probabilidad de oferta dado que es spam, la probabilidad de no enlace dado que es spam, por la probabilidad de que contenga la palabra cuenta dado que es spam.
+
+467
+00:44:40,780 --> 00:44:44,460
+estoy asumiendo una noción de independencia estoy separando las cosas
+
+468
+00:44:44,460 --> 00:44:51,300
+que en principio nada me asegura esto es un supuesto que estoy haciendo
+
+469
+00:44:53,500 --> 00:44:56,140
+ahora
+
+470
+00:44:58,540 --> 00:45:03,500
+estos supuestos es algo que yo no puedo demostrar que es lo que no estoy
+
+471
+00:45:03,500 --> 00:45:07,540
+suponiendo y en esencia es el supuesto de independencia
+
+472
+00:45:07,540 --> 00:45:11,260
+y en general en estadística la independencia es una de las cosas más
+
+473
+00:45:11,260 --> 00:45:15,540
+fuertes que uno puede tener. Si las cosas son independientes entonces puedo hacer
+
+474
+00:45:15,540 --> 00:45:20,980
+muchas cosas en términos de observaciones. Si observaciones no son
+
+475
+00:45:20,980 --> 00:45:26,060
+independientes entonces tengo un sinfín de trancas que me inhabilitan un sinfín
+
+476
+00:45:26,060 --> 00:45:30,340
+de metodologías en estadística. Entonces la independencia uno de los supuestos más
+
+477
+00:45:30,340 --> 00:45:34,300
+fuertes que tiene estadística porque tenemos mucho, digamos, metodología para
+
+478
+00:45:34,300 --> 00:45:42,100
+Entonces, volviendo a Neib Bayes, hacemos este supuesto de que la probabilidad conjunta es la
+
+479
+00:45:42,100 --> 00:45:47,580
+multiplicación de las probabilidades por separado y ahora si hago este supuesto ¿cómo puedo
+
+480
+00:45:47,580 --> 00:45:54,040
+calcularlo? Pensemos, quiero calcular la probabilidad de que sea oferta, o sea que tenga el mensaje,
+
+481
+00:45:54,040 --> 00:46:01,500
+tenga la palabra oferta y no tenga enlace, que si se fijan es lo que yo quiero clasificar,
+
+482
+00:46:01,500 --> 00:46:08,580
+pero dentro de spam. Ahora, acabamos de decir que esto es,
+
+483
+00:46:08,580 --> 00:46:11,940
+esta probabilidad que quiero calcular es la multiplicación de las probabilidades
+
+484
+00:46:11,940 --> 00:46:17,180
+por separado. Entonces, primero esta probabilidad de que sea oferta,
+
+485
+00:46:17,180 --> 00:46:23,580
+dado que tenga el mensaje tenga la palabra oferta dado que es spam, no volvemos,
+
+486
+00:46:24,020 --> 00:46:29,780
+pero volvemos acá, dentro de las que son spam son 20 y cuántos son con oferta? 16
+
+487
+00:46:29,780 --> 00:46:37,640
+por consecuencia 16 sobre 20 y ahora que debo calcular la probabilidad de que no
+
+488
+00:46:37,640 --> 00:46:43,880
+hay enlace dado que es spam entonces que no hay enlace
+
+489
+00:46:43,880 --> 00:46:50,080
+es 20 menos 14 porque aquí estoy definiendo 14 son con enlace dentro de spam
+
+490
+00:46:50,080 --> 00:46:54,360
+entonces que no hay enlace necesariamente tiene que ser 6 y eso es
+
+491
+00:46:54,360 --> 00:46:59,120
+lo que estoy haciendo acá 20 menos 14 sobre todo los que son de spam
+
+492
+00:46:59,120 --> 00:47:07,800
+entonces me queda 0,8 por 0.3 que me da 0,24 y hago el mismo ejercicio pero
+
+493
+00:47:07,800 --> 00:47:14,040
+dentro de la clase no-spam que es la clase legítima
+
+494
+00:47:14,040 --> 00:47:21,220
+dentro de las 80 observaciones que son legítimas cuántos son con
+
+495
+00:47:21,220 --> 00:47:30,180
+oferta o tiene la palabra oferta, perdón, 8 y dentro del legítimo cuántos no tienen enlace?
+
+496
+00:47:30,180 --> 00:47:39,620
+Acá me definen que 16 tienen enlace de los 80, por consecuencia 80 menos 16
+
+497
+00:47:39,620 --> 00:47:45,140
+son los que no tienen enlace dentro de los 80, que son los legítimos.
+
+498
+00:47:45,140 --> 00:47:53,340
+va a ser 0.1 por 0.8 me da 0.08. Ahora, esto, estas probabilidades que
+
+499
+00:47:53,340 --> 00:47:58,500
+calculo son las probabilidades o patrones conjuntos bajo el supuesto de
+
+500
+00:47:58,500 --> 00:48:03,420
+independencia de naive biases dentro de cada clase, la clase spam y la clase
+
+501
+00:48:03,420 --> 00:48:11,220
+legítimo o no spam. Ahora necesitamos incorporar las frecuencias, que nosotros
+
+502
+00:48:11,220 --> 00:48:16,860
+dijimos anteriormente, la frecuencia de spam o las clases en general va a
+
+503
+00:48:16,860 --> 00:48:23,440
+cambiar la respuesta porque aquí estamos trabajando dentro de las clases, ahora
+
+504
+00:48:23,440 --> 00:48:29,060
+tenemos que subir un nivel, subir a cuántas veces pasa spam, cuántas
+
+505
+00:48:29,060 --> 00:48:35,020
+veces pasa legítimo porque si no, no vamos a ver en qué parte de esta línea,
+
+506
+00:48:35,020 --> 00:48:41,020
+en el parte de este eje estamos. Entonces,
+
+507
+00:48:41,300 --> 00:48:47,300
+vamos a preparar estos factores. Nuevamente, queremos clasificar que
+
+508
+00:48:47,300 --> 00:48:54,020
+el mensaje tiene una palabra que se llama oferta, solo tiene la presencia de esa
+
+509
+00:48:54,020 --> 00:49:01,300
+palabra de ya se pasó, y que no hay enlace. Entonces, ¿cuánto es la frecuencia de la
+
+510
+00:49:01,300 --> 00:49:07,820
+clase legítimo 80 sobre 100 porque son 80 mensajes etiquetados como legítimo
+
+511
+00:49:07,820 --> 00:49:17,740
+0 dentro de spam 20 de 100 0 2 oferta presente dentro de legítimo 8 sobre 80
+
+512
+00:49:17,740 --> 00:49:23,380
+oferta presente sobre legítimo 8 sobre 80
+
+513
+00:49:24,220 --> 00:49:29,860
+la misma idea pero dentro de la clase spam es decir cuántos
+
+514
+00:49:29,860 --> 00:49:38,100
+mensajes tienen la palabra oferta de los 20 que son spam 16 sobre 20 y en el enlace
+
+515
+00:49:38,100 --> 00:49:44,180
+ausente que lo acabamos de calcular si fijan hace referencia a estos
+
+516
+00:49:44,180 --> 00:49:54,380
+a estos números digamos entonces hay 80 menos 16 correos sin enlace dentro de
+
+517
+00:49:54,380 --> 00:50:00,740
+los 80 que son legítimos y 6 correos que no tienen enlace dentro de los 20 que son
+
+518
+00:50:00,740 --> 00:50:06,260
+legítimos. Ahora, este supuesto, estas probabilidades las podemos calcular porque
+
+519
+00:50:06,260 --> 00:50:11,500
+asumimos independencia, porque estamos calculando esta cantidad. Ahora tenemos
+
+520
+00:50:11,500 --> 00:50:17,100
+que mezclarlo junto con ese supuesto en una gran probabilidad. Recuerden que yo
+
+521
+00:50:17,100 --> 00:50:26,040
+quiero clasificar cuando es, el mensaje tiene la palabra oferta y no tiene enlace
+
+522
+00:50:26,040 --> 00:50:32,100
+entonces, si fijan acá la ausencia de enlace es más frecuente entre legítimos
+
+523
+00:50:32,100 --> 00:50:37,060
+usualmente los correos legítimos no tienen enlace
+
+524
+00:50:37,980 --> 00:50:44,380
+sobre digamos el 03, esto no suma a 1 porque estoy trabajando dentro de distintas
+
+525
+00:50:44,380 --> 00:50:51,220
+clases. Siguiendo entonces, oferta presente en las ausentes, recuerden, ese es lo que
+
+526
+00:50:51,220 --> 00:50:56,940
+está muy interesado. Primero vamos a definir el producto S sub 0 y el S sub 1, el
+
+527
+00:50:56,940 --> 00:51:02,140
+producto para legítimo o no spam y el producto para spam. Vamos al primer caso.
+
+528
+00:51:02,140 --> 00:51:09,220
+Recuerden que yo quiero hacer esto. Ya, este es el nivel de clase y ahora
+
+529
+00:51:09,220 --> 00:51:15,380
+estoy elevando un nivel al nivel total. Entonces, tal como hacíamos antes, si fijan
+
+530
+00:51:15,380 --> 00:51:22,780
+acá, esto era la frecuencia que lo equiparábamos con la probabilidad de que
+
+531
+00:51:22,780 --> 00:51:28,700
+sea spam, por la probabilidad de que tenga la palabra oferta dado que es spam.
+
+532
+00:51:28,700 --> 00:51:36,300
+Y acá la frecuencia de que sea legítimo, por la probabilidad de que
+
+533
+00:51:36,300 --> 00:51:40,760
+tenga la palabra oferta dado que es legítimo, ahora lo estoy extendiendo y
+
+534
+00:51:40,760 --> 00:51:45,960
+cómo lo estiendo? lo estiendo de manera en términos de un producto, entonces
+
+535
+00:51:45,960 --> 00:51:51,680
+primero cuánto es la probabilidad de que un mensaje sea clasificado como
+
+536
+00:51:51,680 --> 00:51:57,440
+legítimo? 80 de 100 porque son 80 de mis 100 datos
+
+537
+00:51:57,440 --> 00:52:02,560
+dentro de los mensajes que son legítimos cuántos tienen la oferta?
+
+538
+00:52:02,560 --> 00:52:09,320
+la mensaje oferta, la palabra oferta dentro del mensaje, os digo 8 sobre 80 y
+
+539
+00:52:09,320 --> 00:52:16,440
+dentro de esos 80 cuántos no tienen enlace 64 sobre 80 si se fijan estoy
+
+540
+00:52:16,440 --> 00:52:22,440
+haciendo exactamente esto pero le multipliqué un peso
+
+541
+00:52:22,440 --> 00:52:26,920
+esa expresión que está abajo es esta cantidad
+
+542
+00:52:26,920 --> 00:52:34,840
+multiplicada por el peso de que sea legítimo o spam, ya en este caso empezamos
+
+543
+00:52:34,840 --> 00:52:42,760
+por legítimo, estamos aquí, entonces primero probabilidad de que sea legítimo, probabilidad de que
+
+544
+00:52:42,760 --> 00:52:47,240
+tenga el mensaje tenga la palabra oferta dentro de los legítimos, probabilidad de que no tenga
+
+545
+00:52:47,240 --> 00:52:53,520
+enlace dentro de los legítimos y de igual manera hago lo mismo, cuánto es la probabilidad de que
+
+546
+00:52:53,520 --> 00:53:01,080
+sea spam, 0.2 porque son 20 de 100, dentro de los que son spam, cuántos tienen la palabra oferta?
+
+547
+00:53:01,080 --> 00:53:10,200
+0.8 porque son 16 de 20 y dentro de los 20 mensajes de spam, cuántos no tienen enlace?
+
+548
+00:53:10,200 --> 00:53:21,400
+Que son 6 de 20. Multiplicando eso me da 0.64 para el producto de la categoría legítimo y 0.048
+
+549
+00:53:21,400 --> 00:53:27,400
+para el producto para la clase spam
+
+550
+00:53:28,320 --> 00:53:33,520
+ahora voy a volver a lo que al objetivo que yo quiero
+
+551
+00:53:33,520 --> 00:53:41,120
+acuerdo yo estoy tratando tratar mi objetivo es clasificar las observaciones
+
+552
+00:53:41,120 --> 00:53:47,920
+o nuevos correos que contienen la palabra oferta pero no tienen enlace
+
+553
+00:53:47,920 --> 00:53:53,520
+entonces lo que yo tengo interés de hacer es obtener una probabilidad o
+
+554
+00:53:53,520 --> 00:53:58,600
+predecir la probabilidad de que un correo sea spam
+
+555
+00:53:58,600 --> 00:54:04,800
+dado que el mensaje tiene la palabra oferta y además no tiene el laser
+
+556
+00:54:04,800 --> 00:54:10,780
+porque si se fijan eso es algo que tiene utilidad el
+
+557
+00:54:10,780 --> 00:54:15,920
+clasificar o no que un mensaje sea spam o no
+
+558
+00:54:15,920 --> 00:54:20,880
+Así entonces, por eso esto lo sabemos.
+
+559
+00:54:20,880 --> 00:54:25,280
+A ti te llega el mensaje y tú sabes y puedes decir, bueno,
+
+560
+00:54:25,280 --> 00:54:30,960
+¿tienen la palabra oferta? Sí o no. Y ¿tienen enlace? Sí o no.
+
+561
+00:54:30,960 --> 00:54:34,640
+Esto lo vas a saber, entonces lo estamos dando por dado, por hecho,
+
+562
+00:54:34,640 --> 00:54:38,960
+por consecuencia está condicionado a eso. Es decir, la probabilidad, ahora entonces
+
+563
+00:54:38,960 --> 00:54:43,040
+que estamos interesados en calcular, es la probabilidad de que sea spam,
+
+564
+00:54:43,040 --> 00:54:49,400
+pero condicionado, aquí un mensaje tiene la palabra oferta y no tiene el last.
+
+565
+00:54:49,400 --> 00:54:51,680
+¿Cómo calculamos eso?
+
+566
+00:54:51,680 --> 00:54:59,040
+Dividimos el producto de spam, porque eso es lo que queremos calcular,
+
+567
+00:54:59,040 --> 00:55:05,680
+sobre la suma de ambos productos que son todos los casos posibles.
+
+568
+00:55:05,680 --> 00:55:14,680
+y esto nos va entonces .048 sobre la misma cantidad más .064
+
+569
+00:55:14,680 --> 00:55:25,680
+y eso nos da un 42.86% de que clasifiquemos un correo que tiene la palabra oferta
+
+570
+00:55:25,680 --> 00:55:35,580
+y no tiene enlace como spam. Ahora, esto es el predecir, estamos definiendo una probabilidad
+
+571
+00:55:35,580 --> 00:55:42,420
+pero no hemos tomado una decisión porque yo voy a definir, bueno esta es una
+
+572
+00:55:42,420 --> 00:55:48,100
+probabilidad alta o no, y eso va a depender del contexto del problema
+
+573
+00:55:48,100 --> 00:55:50,780
+entonces
+
+574
+00:55:50,980 --> 00:55:58,060
+vamos a considerar otros escenarios, pensemos que sólo es oferta, sólo oferta
+
+575
+00:55:58,060 --> 00:56:08,560
+0.16 sobre 0.08 más 0.16 que fue el primer caso que vimos ya que sea spam
+
+576
+00:56:08,560 --> 00:56:13,400
+dado que es que contiene la palabra oferta
+
+577
+00:56:13,400 --> 00:56:16,000
+ahora
+
+578
+00:56:18,400 --> 00:56:23,400
+si en un mensaje veo que
+
+579
+00:56:23,400 --> 00:56:30,220
+tiene la palabra oferta pero no tiene enlace, hago el cálculo y voy a pasar a
+
+580
+00:56:30,220 --> 00:56:36,580
+42%, 43 casi, de probabilidad de clasificarlo como spam.
+
+581
+00:56:36,580 --> 00:56:43,340
+Ahora vamos al tercer caso, si es que observo un mensaje, tiene la palabra
+
+582
+00:56:43,340 --> 00:56:49,700
+oferta y tiene enlace, entonces la probabilidad de ser clasificado como spam
+
+583
+00:56:49,700 --> 00:56:54,260
+es de un 87.5%
+
+584
+00:56:54,540 --> 00:57:03,020
+entonces es que tijan observar si es que hay enlazo o no me detalló aún más las
+
+585
+00:57:03,020 --> 00:57:06,060
+probabilidades
+
+586
+00:57:07,660 --> 00:57:16,500
+entonces mientras claramente ese no siempre el caso ya porque
+
+587
+00:57:16,500 --> 00:57:22,900
+puede que yo observe algo que no me afecte en nada
+
+588
+00:57:22,900 --> 00:57:27,780
+la clasificación que yo estoy interesado en hacer.
+
+589
+00:57:27,780 --> 00:57:34,180
+Entonces, si se fijan estos valores que están aquí, el punto medio es relativamente
+
+590
+00:57:34,180 --> 00:57:39,140
+similar a este que está acá. No es exactamente lo mismo,
+
+591
+00:57:39,140 --> 00:57:43,580
+exactamente, pero tienden a ser más menos en ese orden.
+
+592
+00:57:43,580 --> 00:57:52,340
+entonces me está aportando preguntarme si el mensaje tiene hipervínculo o no
+
+593
+00:57:52,340 --> 00:57:58,460
+como calculo la última de abajo ya que no la habíamos visto y se fijan acá es
+
+594
+00:57:58,460 --> 00:58:04,700
+que primero ese 20 sobre 100 es la frecuencia y por
+
+595
+00:58:04,700 --> 00:58:07,340
+consecuencia la probabilidad de que sea spam
+
+596
+00:58:07,340 --> 00:58:16,980
+sobre la 16 sobre 20 que hace referencia a la oferta y 14 sobre 20 que son los que
+
+597
+00:58:16,980 --> 00:58:23,100
+tienen enlace dentro de lo que son spam y el caso legítimo 80 sobre 100 porque
+
+598
+00:58:23,100 --> 00:58:29,900
+es la frecuencia de que sea legítimo y que además tenga oferta la palabra oferta 8
+
+599
+00:58:29,900 --> 00:58:35,700
+sobre 80 y 16 sobre 80 que ese 16 es la referencia a cuántas observaciones tiene
+
+600
+00:58:35,700 --> 00:58:42,060
+mi enlace, hago la misma idea de arriba y voy a llegar al valor.
+
+601
+00:58:42,060 --> 00:58:50,100
+Ahora, si se fijan, ¿qué es lo que tenemos? Podemos concluir acá. Si yo no observo y no,
+
+602
+00:58:50,100 --> 00:58:58,020
+digamos, utilizo la información de si es que es enlace, hay enlace o no, por
+
+603
+00:58:58,020 --> 00:59:05,300
+consecuencia, desconozco si es que el mensaje tiene un enlace o no. No es lo
+
+604
+00:59:05,300 --> 00:59:18,060
+mismo que, digamos, no observar si es que tiene el láser o no, porque aquí ni siquiera lo registro,
+
+605
+00:59:18,060 --> 00:59:24,540
+aquí lo registro y digo no tiene el láser o si tiene el láser, entonces en este sentido esto me
+
+606
+00:59:24,540 --> 00:59:29,620
+está dando unas probabilidades que son distintas en principio, no puedo decir cuál es mejor porque
+
+607
+00:59:29,620 --> 00:59:36,140
+eso para vender de las observaciones futuras. Ahora, estas probabilidades
+
+608
+00:59:36,140 --> 00:59:40,460
+claramente son distintas y todas responden a lo mismo, la probabilidad de
+
+609
+00:59:40,460 --> 00:59:45,980
+que un mensaje sea clasificado como spam, condicionado a ciertas cosas, el primero
+
+610
+00:59:45,980 --> 00:59:49,700
+con que está la palabra oferta, el segundo con que está la palabra oferta y no hay enlace
+
+611
+00:59:49,700 --> 00:59:54,780
+y el tercero con la palabra que está oferta y sí tiene enlace.
+
+612
+00:59:54,780 --> 00:59:58,460
+Todas son probabilidades distintas pero son la forma en que yo lo estoy
+
+613
+00:59:58,460 --> 01:00:02,500
+prediciendo aún no tomo esta decisión porque por ejemplo yo puedo decir si es
+
+614
+01:00:02,500 --> 01:00:05,260
+que la probabilidad
+
+615
+01:00:05,260 --> 01:00:10,780
+de el término de mi preexample la probabilidad de que sea spam dado que el
+
+616
+01:00:10,780 --> 01:00:16,860
+mensaje tiene la palabra oferta es mayor que 0 5 mayor que el 50% entonces
+
+617
+01:00:16,860 --> 01:00:21,580
+efectivamente lo voy a clasificar como spam
+
+618
+01:00:21,580 --> 01:00:28,020
+pero lo podría clasificar como spam en el caso en donde sólo veo y estoy
+
+619
+01:00:28,020 --> 01:00:33,300
+interesado y de registro si que tiene la palabra oferta y si que tiene la palabra
+
+620
+01:00:33,300 --> 01:00:40,940
+oferta y además que en el ACET. En este caso no lo clasificaría como un spam.
+
+621
+01:00:40,940 --> 01:00:45,860
+Entonces va a depender mucho de su umbral la decisión, la predicción y la decisión
+
+622
+01:00:45,860 --> 01:00:49,820
+son cosas distintas, una alimenta a la otra, eso sí.
+
+623
+01:00:49,820 --> 01:00:56,100
+ahora algo que les comentaba antes qué pasa si
+
+624
+01:00:57,020 --> 01:01:01,340
+una de las señales no están mi conjunto de datos
+
+625
+01:01:01,340 --> 01:01:07,180
+pongamos el caso hipotético palabra premio que no podría decir bueno
+
+626
+01:01:07,180 --> 01:01:11,740
+si sale la palabra premio es más probable que sea spam que un corredor
+
+627
+01:01:11,740 --> 01:01:17,300
+hitting porque uno no se gana premios todos los días pero en spam siempre te
+
+628
+01:01:17,300 --> 01:01:22,300
+tres en premios. Uno podría congitular eso. Entonces,
+
+629
+01:01:22,300 --> 01:01:29,140
+pensemos que la palabra premio no salió en ninguna, en ninguno de los mensajes o
+
+630
+01:01:29,140 --> 01:01:33,780
+de los 20 mensajes que están definidos como spam.
+
+631
+01:01:33,780 --> 01:01:39,780
+Entonces, la probabilidad de que sea premio dado que es spam es 0 sobre 20
+
+632
+01:01:39,780 --> 01:01:46,180
+porque nunca pasó. Entonces esto es 0. Ahora, si hay un correo futuro que no está
+
+633
+01:01:46,180 --> 01:01:51,280
+mi conjunto de datos que sí contiene la palabra premio, cuando yo hago el cálculo
+
+634
+01:01:51,280 --> 01:01:57,080
+que está acá, porque si se fijan es multiplicar cosas y una de estas en este
+
+635
+01:01:57,080 --> 01:02:01,540
+nuevo caso que es la probabilidad de que sea que tenga premio dado que es spam
+
+636
+01:02:01,540 --> 01:02:07,960
+va a ser 0, entonces me va a anular toda esa probabilidad
+
+637
+01:02:07,960 --> 01:02:12,640
+y eso es un problema porque el ponerle el 0 significa que yo estoy acelerando que
+
+638
+01:02:12,640 --> 01:02:17,200
+no puede pasar, siendo que en realidad simplemente no está en mi conjunto de
+
+639
+01:02:17,200 --> 01:02:23,040
+arco. Entonces necesitamos evitar que pase eso y lo vamos a hacer con una metodología
+
+640
+01:02:23,040 --> 01:02:29,240
+que se llama el suavizamiento de la plaza. Entonces, ¿qué es lo que voy a hacer?
+
+641
+01:02:29,240 --> 01:02:32,600
+No voy a tirar las cosas a cero, sino que voy a darle un pequeño peso, pero voy a
+
+642
+01:02:32,600 --> 01:02:38,680
+compensar todas las clases. Entonces, este suavizamiento de la plaza, voy a
+
+643
+01:02:38,680 --> 01:02:47,560
+agregar 1 a presente de la señal y a 1 a ausente de la señal. Entonces, para el
+
+644
+01:02:47,560 --> 01:02:52,820
+caso de premio, en el caso hipotético, nosotros sabemos que no en nuestro
+
+645
+01:02:52,820 --> 01:02:58,920
+conjunto de datos no está la palabra premio. Por consecuencia, observe 0
+
+646
+01:02:58,920 --> 01:03:02,880
+presencia de esa señal, este 0 que está aquí.
+
+647
+01:03:02,880 --> 01:03:06,400
+Recuerden que estamos calculando la probabilidad de premio de 2 pasos.
+
+648
+01:03:06,400 --> 01:03:12,280
+entonces que en esencia es contar cuántas mensajes tiene la palabra
+
+649
+01:03:12,280 --> 01:03:17,640
+premio dentro de los 20 que son spam y lo que habíamos hecho era sacar 0 sobre 20
+
+650
+01:03:17,640 --> 01:03:22,200
+porque son 0 mensajes con la palabra premio dentro de los 20 que son spam
+
+651
+01:03:22,200 --> 01:03:26,720
+pero ahora quiero hacer este suavizamiento entonces a este 0 presencia yo
+
+652
+01:03:26,720 --> 01:03:32,520
+le voy a sumar 1, entonces voy a decir que no le he observé nada pero voy a hacer como que
+
+653
+01:03:32,520 --> 01:03:45,020
+observé uno, un mensaje con la palabra premio dentro de los 20 más 2 porque
+
+654
+01:03:45,020 --> 01:03:52,120
+alegué uno a la presencia de señal y uno a la ausencia de señal
+
+655
+01:03:52,800 --> 01:03:57,060
+entonces que estoy haciendo acá? estoy como inventándome un dato, pero no un dato
+
+656
+01:03:57,060 --> 01:04:03,980
+porque esta es la probabilidad de que observe premio y no observe premio
+
+657
+01:04:03,980 --> 01:04:07,780
+dentro de spam, eso es lo que estoy definiendo. ¿Qué me permite hacer eso?
+
+658
+01:04:07,780 --> 01:04:13,220
+¿Cuál es la consecuencia? Es que no voy a tener una probabilidad 0 y por
+
+659
+01:04:13,220 --> 01:04:16,700
+consecuencia no se me va a ganar toda la probabilidad
+
+660
+01:04:16,700 --> 01:04:25,740
+pero igual esa probabilidad va a ser chica, si se fijan acá me entrega 0.0455
+
+661
+01:04:25,740 --> 01:04:29,420
+y después cuando la multiplique por otra cosa va a ser más chico a 1.
+
+662
+01:04:29,420 --> 01:04:35,020
+Entonces, pasé de una probabilidad cero, que no sirve de nada porque al final voy a predecir
+
+663
+01:04:35,020 --> 01:04:42,260
+puras probabilidades ceros, a una probabilidad más chica, pero que no
+
+664
+01:04:42,260 --> 01:04:48,100
+simplemente hace vera que es imposible que pase, sino que solamente le da o le asigna
+
+665
+01:04:48,100 --> 01:04:55,100
+una probabilidad muy pequeña. Ahora, este 1 que le sumamos al peso del
+
+666
+01:04:55,100 --> 01:04:59,720
+caso de la presencia de señal y la ausencia de señal, se fijan estoy
+
+667
+01:04:59,720 --> 01:05:06,580
+sumando 2 por eso porque es 1 y 1, es un parámetro, un parámetro que yo le
+
+668
+01:05:06,580 --> 01:05:12,060
+definí como lo voy a definir con alfa y aquí este alfa es 1, yo podría hacerlo
+
+669
+01:05:12,060 --> 01:05:19,020
+con 2, con 3, con 4, cualquier otro número en este caso ni siquiera tiene que ser
+
+670
+01:05:19,020 --> 01:05:23,580
+entero podría ser 0.5
+
+671
+01:05:23,580 --> 01:05:27,900
+entonces esto es lo que nosotros llamamos el suavizado suavizamiento de
+
+672
+01:05:27,900 --> 01:05:32,580
+la plaza, entonces ahora voy a reconstruir
+
+673
+01:05:32,580 --> 01:05:37,380
+el ejemplo que habíamos visto con dos señales que habíamos calculado acá con
+
+674
+01:05:37,380 --> 01:05:42,020
+oferta y enlace pero con el suavizamiento entonces
+
+675
+01:05:42,020 --> 01:05:49,700
+habíamos visto que dentro de los mensajes legítimos no spam que eran
+
+676
+01:05:49,700 --> 01:05:56,060
+80 de los 100 8 tenían la palabra oferta presente
+
+677
+01:05:56,060 --> 01:06:01,140
+vamos a volver acá 8 tenían la palabra oferta dentro de los
+
+678
+01:06:01,140 --> 01:06:05,220
+dentro de los 80 legítimos
+
+679
+01:06:05,300 --> 01:06:09,580
+y así lo calculamos antes 8 sobre 80
+
+680
+01:06:09,580 --> 01:06:14,620
+está aquí 8 sobre 80
+
+681
+01:06:14,620 --> 01:06:20,340
+pero ahora quiero hacer este suavicimiento entonces 8 sobre 80 va a pasar con un
+
+682
+01:06:20,340 --> 01:06:27,500
+lambda y con una alfa igual a 1 8 más 1 sobre 80 más 2
+
+683
+01:06:27,500 --> 01:06:32,980
+y no es que tenga 82 observaciones legítimas pero uno podría decir bueno
+
+684
+01:06:32,980 --> 01:06:36,860
+estoy como agregando dos observaciones pero lo que estoy cambiando es la
+
+685
+01:06:36,860 --> 01:06:39,420
+porción
+
+686
+01:06:39,820 --> 01:06:46,700
+así entonces ahora de pasar de 80 sobre 8 sobre 80 que me da 0 1 pase a un 9
+
+687
+01:06:46,700 --> 01:06:51,460
+sobre 82 hago la misma idea la misma metodología con
+
+688
+01:06:51,460 --> 01:06:59,220
+el lazo ausente le sumo 1 arriba le sumo 2 abajo le sumo 1 una unidad en el
+
+689
+01:06:59,220 --> 01:07:05,500
+numerador y 2 en el denominador y así para todas estas cuatro valores
+
+690
+01:07:05,500 --> 01:07:15,500
+y ahora entonces este 722 aos que el valor que está acá son spam sin enlace
+
+691
+01:07:15,500 --> 01:07:22,500
+7 ya es spam sin enlace 6 perdón 6 que 20 menos 14
+
+692
+01:07:22,500 --> 01:07:29,100
+más uno del suavizado 20 de los spam que son observados son 80 de los 100 y el 2
+
+693
+01:07:29,100 --> 01:07:33,620
+que viene del suavizamiento, si se fijan esto me cambia las probabilidades que
+
+694
+01:07:33,620 --> 01:07:37,940
+voy a estar asignando. ¿Qué es lo que va a hacer?
+
+695
+01:07:37,940 --> 01:07:44,240
+Va a hacer que los eventos que son muy atámbalos no queden con
+
+696
+01:07:44,240 --> 01:07:50,260
+probabilidad 0 y los eventos que son muy frecuentes sean considerados un poco
+
+697
+01:07:50,260 --> 01:07:55,580
+menos frecuentes. Ahora, hago la misma idea, calculo el producto para
+
+698
+01:07:55,580 --> 01:08:03,380
+legítimo, el producto para spam, si se fijan esto es el 0, que es el equivalente
+
+699
+01:08:03,380 --> 01:08:08,660
+que hicimos acá, voy a calcularlo pero con estos nuevos valores, si se fijan es
+
+700
+01:08:08,660 --> 01:08:15,940
+0.8 por 9 sobre 82 por 65 sobre 82 y antes que lo que hice
+
+701
+01:08:15,940 --> 01:08:24,860
+0.8 por 8 sobre 80 ya que en la nueva versión suavizada es 9 sobre 82 y en el
+
+702
+01:08:24,860 --> 01:08:32,740
+enlace 64 sobre 80 y acá en la nueva versión perdón es 65 sobre 82
+
+703
+01:08:32,740 --> 01:08:42,300
+Si se fijan acá llegué a un 0.069 y antes llegué a un 0.064.
+
+704
+01:08:42,300 --> 01:08:48,420
+Calculo, hago la misma metodología, el mismo cálculo para el producto de spam,
+
+705
+01:08:48,420 --> 01:08:55,220
+probabilidad de que sea spam, por cuántos son ofertas dentro de los que son spam
+
+706
+01:08:55,220 --> 01:09:01,300
+y aplicando el suavizamiento, es decir, sumo 1 arriba, sumo 2 abajo, lo mismo para
+
+707
+01:09:01,300 --> 01:09:07,500
+enlace y me llega a 0.049, realizo el mismo caso, el mismo ejemplo, el mismo
+
+708
+01:09:07,500 --> 01:09:13,940
+cálculo que lo que hace es clasificar, digamos, la prueba o definir, establecer
+
+709
+01:09:13,940 --> 01:09:17,800
+la probabilidad de que sea spam dado que yo observe la señal de que hay un
+
+710
+01:09:17,800 --> 01:09:22,700
+mensaje o el mensaje contiene la palabra oferta y además no tiene enlace, va a ser
+
+711
+01:09:22,700 --> 01:09:32,900
+este cociente me va a dar 0,414, entonces pasé de un 0,4286 a un 0,414
+
+712
+01:09:32,900 --> 01:09:37,540
+este es un avisamiento para evitar 0, no va a haber probabilidades 0, pero me va a corregir
+
+713
+01:09:37,540 --> 01:09:43,780
+estas probabilidades, en ningún caso va a arreglar la dependencia entre las
+
+714
+01:09:43,780 --> 01:09:47,820
+señales porque nosotros estamos dentro del contexto de Naive Bias, estamos bajo
+
+715
+01:09:47,820 --> 01:09:54,240
+supuesto de independencia, por lo que este eso avisamiento lo
+
+716
+01:09:54,240 --> 01:09:58,980
+utilizamos cuando tengo alguna señal que es muy anómala, muy poco frecuente
+
+717
+01:09:58,980 --> 01:10:05,300
+pero que sí pasa, porque así no hace veros que no puede pasar nunca.
+
+718
+01:10:05,300 --> 01:10:08,140
+Entonces,
+
+719
+01:10:08,340 --> 01:10:13,620
+ahora tenemos que hacer esta separación de
+
+720
+01:10:13,620 --> 01:10:19,420
+predecidido y decidido. Entonces, ¿cómo voy a hacer eso? Yo voy a tener un conjunto de datos
+
+721
+01:10:19,420 --> 01:10:29,860
+de correos, de correos que yo voy a clasificar y en principio voy a clasificar manualmente,
+
+722
+01:10:29,860 --> 01:10:35,600
+que es lo que se hacía antiguamente. Voy a clasificar un correo y yo lo voy a definir como
+
+723
+01:10:35,600 --> 01:10:40,980
+spam y de hecho por eso ustedes tienen, cuando ustedes ven su correo y tienen la opción botón
+
+724
+01:10:40,980 --> 01:10:45,540
+derecho y poner marcar como es lo que están haciendo y es marcar un correo y
+
+725
+01:10:45,540 --> 01:10:51,260
+clasificarlo probablemente tan etiquetaje ya manualmente porque a priori
+
+726
+01:10:51,260 --> 01:10:57,300
+estos modelos se basan en datos y estos datos me van a definir alguna probabilidad
+
+727
+01:10:57,300 --> 01:11:01,380
+y yo tengo una decisión pero necesito esos datos entonces tengo que tener las
+
+728
+01:11:01,380 --> 01:11:06,460
+características del mensaje o el mensaje mismo que lo puedo resubir en
+
+729
+01:11:06,460 --> 01:11:13,860
+distintas características para definir si es que definir las probabilidades de
+
+730
+01:11:13,860 --> 01:11:18,360
+que sea spam o no. Entonces cuando usted aprieta en esto marcar como spam lo que
+
+731
+01:11:18,360 --> 01:11:21,740
+están haciendo es clasificar una observación más de esta cosa.
+
+732
+01:11:21,740 --> 01:11:26,540
+Entonces primero hay que contar cuántos correos hay en cada clase. Ya nosotros
+
+733
+01:11:26,540 --> 01:11:34,060
+hicimos la dicotomía spam y no spam o spam ilegítimo y dentro de cada
+
+734
+01:11:34,060 --> 01:11:39,100
+una de estas clases, tengo que definir las distintas señales. En el ejemplo que
+
+735
+01:11:39,100 --> 01:11:45,660
+nosotros vimos, vimos dos señales. Presencia de la palabra oferta y
+
+736
+01:11:45,660 --> 01:11:51,340
+presencia de el láser o no. Yo puedo contar esas cosas, obtener probabilidades,
+
+737
+01:11:51,340 --> 01:11:56,700
+puedo hacer el suavizamiento de la plaza, que va a tener el modelo y con eso puedo
+
+738
+01:11:56,700 --> 01:12:00,860
+estimar la probabilidad del clasificador de lo que yo quiero hacer.
+
+739
+01:12:00,860 --> 01:12:05,600
+recuerden que estamos haciendo la probabilidad de que sea spam dado que
+
+740
+01:12:05,600 --> 01:12:13,400
+estas tiene el mensaje tiene la palabra oferta y no tienen las. Ahora, eso me
+
+741
+01:12:13,400 --> 01:12:18,840
+entrega una probabilidad, me entrega una probabilidad como esto 0.41
+
+742
+01:12:19,440 --> 01:12:25,280
+y si fijan cómo lo voy a aplicar en un nuevo correo, imaginemos que esto que está acá
+
+743
+01:12:25,280 --> 01:12:29,800
+para esta probabilidad entonces si yo hago un correo nuevo primero voy a ver
+
+744
+01:12:29,800 --> 01:12:35,240
+tiene la palabra oferta? si y si no tiene y si no tiene enlace entonces
+
+745
+01:12:35,240 --> 01:12:39,560
+voy a decir automáticamente entonces la probabilidad que sea spam es 41.4
+
+746
+01:12:39,560 --> 01:12:44,000
+esa es la forma de utilizar esta metodología
+
+747
+01:12:47,400 --> 01:12:53,800
+ahora con nuevos datos yo puedo recalcular estas cosas y con la cantidad
+
+748
+01:12:53,800 --> 01:12:57,320
+de información que se tiene hasta el día de hoy bueno hay nuevas formas de
+
+749
+01:12:57,320 --> 01:13:01,400
+de ver pasear el spam
+
+750
+01:13:01,400 --> 01:13:05,160
+se ha, digamos, sofisticado bastante esto, pero yo lo hace con
+
+751
+01:13:05,160 --> 01:13:10,040
+muchos datos, son bastante certeros, digamos, en el sentido de que tiene una precisión
+
+752
+01:13:10,040 --> 01:13:12,280
+super alta.
+
+753
+01:13:12,280 --> 01:13:16,960
+Así lo clasifico, dado que yo puedo analizar estas características de
+
+754
+01:13:16,960 --> 01:13:23,040
+presencia o no, un nuevo correo puedo decir, puedo ver, tiene la señal 1, sí o
+
+755
+01:13:23,040 --> 01:13:27,760
+tienen la señal 2 si o no, tienen la señal 3 si o no y con esta metodología
+
+756
+01:13:27,760 --> 01:13:32,040
+yo puedo calcular todas esas posibles combinaciones
+
+757
+01:13:32,040 --> 01:13:36,720
+y en base a eso definir una probabilidad, una vez que defino esa probabilidad yo
+
+758
+01:13:36,720 --> 01:13:41,520
+me defino un umbral para clasificarlo efectivamente como
+
+759
+01:13:41,520 --> 01:13:46,960
+spam o no. Ahora, yo puedo entrar ahí a lo que vamos a ver un poquito más adelante que es la
+
+760
+01:13:46,960 --> 01:13:52,880
+función de costos. ¿Qué tan seguro quiero estar para clasificar un correo
+
+761
+01:13:52,880 --> 01:14:01,040
+como spam. Y si os fijan acá en este en mri en python lo puedo escribir
+
+762
+01:14:01,040 --> 01:14:07,160
+fácilmente digamos en este ejemplo porque en esencia son cocientes ya son
+
+763
+01:14:07,160 --> 01:14:13,320
+divisiones que las puedo calcular rápidamente sin entrar en ningún uso
+
+764
+01:14:13,320 --> 01:14:16,160
+de un paquete si bien al final vamos a ver paquetes particulares que lo
+
+765
+01:14:16,160 --> 01:14:18,160
+con esta de manera automática
+
+766
+01:14:21,160 --> 01:14:24,160
+es simplemente divisiones y multiplicaciones de cosas
+
+767
+01:14:24,160 --> 01:14:26,160
+entonces no tenía ningún problema
+
+768
+01:14:26,160 --> 01:14:29,160
+en ambos lenguajes nos entrega el mismo valor
+
+769
+01:14:29,160 --> 01:14:33,160
+porque son unos cálculos complicados
+
+770
+01:14:35,160 --> 01:14:39,160
+ahora, esta pequeña discrepancia que yo tengo
+
+771
+01:14:39,160 --> 01:14:43,160
+si lo hago sin suavizado o sin suavizamiento
+
+772
+01:14:43,160 --> 01:14:45,160
+y con un suavizamiento con un lambda igual a 1
+
+773
+01:14:45,160 --> 01:14:51,880
+igual a 1 si se fijan sin suavizado la probabilidad de que sea oferta entre los
+
+774
+01:14:51,880 --> 01:14:58,120
+datos que tiene un spam es de 0.8 y con el suavizamiento pasó 0.77 y este 0.7
+
+775
+01:14:58,120 --> 01:15:04,960
+que el caso del enlace me lo pasó 0.7 y 0.68 y a modo global me cambió casi en 1%
+
+776
+01:15:04,960 --> 01:15:11,560
+el porcentaje de interés
+
+777
+01:15:15,160 --> 01:15:22,360
+cuál es mejor, ya, en general un suavizamiento, sobre todo el suavizamiento de la plaza, lo ocupamos
+
+778
+01:15:22,360 --> 01:15:31,680
+cuando estamos interesados en saber esa, en no, en considerar una señal que es anómala, porque si
+
+779
+01:15:31,680 --> 01:15:38,320
+esa señal es muy indicadora de que por ejemplo sea spam, no se me ocurra algo en el momento de,
+
+780
+01:15:38,320 --> 01:15:49,720
+de, por ejemplo, piensen en una página web que te sabe que es, digamos, estafa de alguna
+
+781
+01:15:49,720 --> 01:15:56,560
+manera y yo pongo como señal el nombre de esa empresa si es que está presento o no en el mensaje
+
+782
+01:15:57,680 --> 01:16:03,320
+puede que no pase mucho porque puede que no manden muchos mensajes pero cuando pasa yo sé y estoy
+
+783
+01:16:03,320 --> 01:16:09,160
+muy seguro, por algo que él incorpora en el modelo, de que va a ser un spam.
+
+784
+01:16:09,160 --> 01:16:16,440
+Entonces, si tengo muy pocas observaciones, voy a tener una probabilidad
+
+785
+01:16:16,440 --> 01:16:21,240
+cero de que obtenga, de que tenga esa palabra que va a ser el nombre de la
+
+786
+01:16:21,240 --> 01:16:26,560
+empresa que estafa, digamos, y por consecuencia no quiero que se vaya cero
+
+787
+01:16:26,560 --> 01:16:32,440
+porque es un indicador, es una señal muy fuerte de que es spam, solo que esa
+
+788
+01:16:32,440 --> 01:16:37,760
+señal pasa poco y cuando no quiero tirar esas señales que son fuertes de
+
+789
+01:16:37,760 --> 01:16:44,000
+mi identificación y la predicción de mi clase de interés
+
+790
+01:16:45,640 --> 01:16:49,400
+no la quiero tirar a ser y quiero mantenerla en el estudio entonces un
+
+791
+01:16:49,400 --> 01:16:55,960
+savisamiento es justificable si no estoy en ese caso las y sobre todo con un lambda
+
+792
+01:16:55,960 --> 01:17:03,760
+pequeño, las probabilidades estimadas ya no difieren tanto. Entonces, en la mayoría
+
+793
+01:17:03,760 --> 01:17:10,880
+de los casos un suavizamiento no es imperativo, solo es relevante cuando
+
+794
+01:17:10,880 --> 01:17:16,680
+tengo clases que son muy anómalas y las quiero incorporar dentro del estudio.
+
+795
+01:17:16,680 --> 01:17:19,680
+Entonces
+
+796
+01:17:19,680 --> 01:17:28,940
+Si se fijan acá, yo puedo calcularlo de ambas maneras, ya puedo calcularlo con su avisamiento
+
+797
+01:17:28,940 --> 01:17:34,900
+y sin su avisamiento y al final de esta sesión vamos a hablar de cuáles son los paquetes
+
+798
+01:17:34,900 --> 01:17:44,140
+que tenemos de manera, o que tenemos disponibles en Python y Unreal que realizan esto de manera
+
+799
+01:17:44,140 --> 01:17:49,580
+un poquito más automatizada con funciones particulares.
+
+800
+01:17:50,020 --> 01:17:52,780
+Entonces
+
+801
+01:17:53,340 --> 01:17:59,140
+¿Cómo lo hacemos? Resumen de este naïve bias.
+
+802
+01:17:59,180 --> 01:18:06,100
+Si ocupo, pensemos en el correo. Estamos interesados en clasificar mensajes
+
+803
+01:18:06,100 --> 01:18:10,220
+que tienen la palabra oferta y nos tienen enlace y con un suavizamiento
+
+804
+01:18:10,220 --> 01:18:16,880
+lambda igual a 1, o sea un alpha igual a 1. Entonces, ¿cuáles van a ser las cantidades de entradas?
+
+805
+01:18:16,880 --> 01:18:25,400
+Primero, lo que observamos en los nuevos mensajes, es decir, para un nuevo mensaje
+
+806
+01:18:25,400 --> 01:18:31,080
+voy a ver si es que tiene la palabra oferta y si es que tiene enlace. Si es que tiene la palabra oferta
+
+807
+01:18:31,080 --> 01:18:35,000
+y no tiene enlace, entonces cae dentro de la probabilidad que yo estoy definiendo.
+
+808
+01:18:35,000 --> 01:18:41,360
+antes de eso yo voy a tener que calcular las probabilidades de que sea spam y vimos que afectaba
+
+809
+01:18:41,360 --> 01:18:48,480
+ya afectaba la probabilidad que sea spam no condicionada ya no condicionada que es 0.2
+
+810
+01:18:48,480 --> 01:18:55,600
+porque si esa frecuencia es muy anómala también también me cambia la probabilidad y voy a ver
+
+811
+01:18:55,600 --> 01:19:03,800
+dentro dentro de esa clase las distintas señales en este caso oferta en spam y voy a convidarlas
+
+812
+01:19:03,800 --> 01:19:09,560
+de la manera que lo hicimos para estimar esa probabilidad de interés.
+
+813
+01:19:09,560 --> 01:19:15,160
+Si se fijan lo que estoy haciendo en esto es una forma un poquito más
+
+814
+01:19:15,160 --> 01:19:23,120
+sofisticada de esta pregunta. Utilizando oferta dado spam, oferta dado
+
+815
+01:19:23,120 --> 01:19:27,280
+legítimo, quiero preguntar al revés. La probabilidad que sea spam dado que es
+
+816
+01:19:27,280 --> 01:19:35,640
+dado que tiene oferta. Pero acá en el último ejemplo lo hice con más clases.
+
+817
+01:19:35,640 --> 01:19:42,460
+Eso es lo que hacemos en general, en realidad para el
+
+818
+01:19:42,460 --> 01:19:49,440
+ejemplo en particular. En general, pensemos que en nuestro ejemplo nosotros
+
+819
+01:19:49,440 --> 01:19:55,200
+definimos dos clases, spam y no spam, porque lo que estábamos haciendo es un
+
+820
+01:19:55,200 --> 01:20:07,360
+una if-vice-verno-y, que pasa o no pasa y lo que estamos haciendo es definir dos clases
+
+821
+01:20:07,360 --> 01:20:16,120
+igual a 1 y igual a 0, es decir, if es spam o if o el mensaje no es spam
+
+822
+01:20:16,120 --> 01:20:20,920
+qué pasa si ahora tengo varias clases ya como yo les comentaba al principio
+
+823
+01:20:20,920 --> 01:20:27,880
+spam, no spam o tipos de clase por ejemplo cuenta financiera, mensaje
+
+824
+01:20:27,880 --> 01:20:32,720
+personal, correo académico
+
+825
+01:20:32,720 --> 01:20:39,900
+ahí ya no tengo dos categorías, simplemente tengo tres clases y cómo lo hago para K
+
+826
+01:20:39,900 --> 01:20:47,040
+clases ya entonces voy a tener K, voy a tener clase 1, clase 2 hasta la clase K
+
+827
+01:20:47,040 --> 01:20:54,060
+por ejemplo spam, personal y trabajo y voy a tener entradas de correo, entonces
+
+828
+01:20:54,060 --> 01:20:58,300
+qué es lo que voy a hacer yo voy a definir la probabilidad de que pertenezca
+
+829
+01:20:58,300 --> 01:21:05,240
+a la clase K que va a ser que el I sea C sub K que es el equivalente de
+
+830
+01:21:05,240 --> 01:21:11,820
+estas probabilidades que hemos definido 0 2 y 0 8, es decir cuánta es la
+
+831
+01:21:11,820 --> 01:21:15,860
+frecuencia de esa clase dentro de mis datos
+
+832
+01:21:15,860 --> 01:21:24,860
+y voy a definir f sub k que es la probabilidad de las entradas x dentro de esa clase que hace referencia
+
+833
+01:21:24,860 --> 01:21:31,860
+el equivalente a esta cantidad, la multiplicación de estas cantidades que en esencia bajo Naive-Bayes
+
+834
+01:21:31,860 --> 01:21:35,860
+la multiplico porque estoy en su puesto de independencia
+
+835
+01:21:35,860 --> 01:21:40,860
+y después la sumo, todas las posibles cantidades
+
+836
+01:21:40,860 --> 01:21:48,820
+esto es la forma general de naivayes pero para k clases
+
+837
+01:21:48,820 --> 01:21:54,220
+antes el ejemplo que nosotros lo hicimos es para dos clases y lo único que va a
+
+838
+01:21:54,220 --> 01:21:58,940
+cambiar ahí va a que va a tener que ser por ejemplo si tuviésemos acá una
+
+839
+01:21:58,940 --> 01:22:05,900
+tercera clase sería s1 sobre s0 más s1 más s2
+
+840
+01:22:05,900 --> 01:22:10,700
+tal como lo hacemos acá porque esto es para un k particular y esto sumado en
+
+841
+01:22:10,700 --> 01:22:14,960
+todos los K, entonces si tengo tres, caigo en la tres, abajo voy a tener tres
+
+842
+01:22:14,960 --> 01:22:19,180
+elementos, tres productos y arriba va a tener sólo uno.
+
+843
+01:22:19,180 --> 01:22:24,820
+Es la generalización, acá clases es bastante natural, simplemente divido de
+
+844
+01:22:24,820 --> 01:22:33,660
+una clase adicional y se fijan tiene sentido, si yo tengo
+
+845
+01:22:34,940 --> 01:22:40,420
+señales de un mensaje por ejemplo
+
+846
+01:22:40,700 --> 01:22:47,360
+de un correo y yo antes estaba en el ejemplo spam y no spam, entonces las probabilidades
+
+847
+01:22:47,360 --> 01:22:55,220
+eran pensemos fijas, la definí como el 0.41, pero si ahora esta probabilidad que definí
+
+848
+01:22:55,220 --> 01:23:08,940
+yo acá, oferta y no enlace dado que sea spam, spam en este ejemplo era una de dos clases,
+
+849
+01:23:08,940 --> 01:23:17,340
+spam es 1, una sobre k clases, entonces tengo más opciones en las cuales clasificar y por
+
+850
+01:23:17,340 --> 01:23:22,660
+consecuencia más opciones en las cuales equivocarnos, entonces como estas cantidades de abajo son
+
+851
+01:23:22,660 --> 01:23:29,860
+positivas, este número va a tender a ser más chico porque hay más formas en las cuales me puedo
+
+852
+01:23:29,860 --> 01:23:36,660
+equivocar, hay más formas en las cuales yo puedo clasificar un mensaje con una cierta configuración
+
+853
+01:23:36,660 --> 01:23:41,020
+de señales. Entonces tiende a ser más
+
+854
+01:23:41,020 --> 01:23:43,380
+chico cuando tengo más clases y por eso
+
+855
+01:23:43,380 --> 01:23:47,860
+también quiero clasificar
+
+856
+01:23:47,860 --> 01:23:50,420
+en general en pocas clases y de
+
+857
+01:23:50,420 --> 01:23:53,520
+obviamente en una clase binaria. Es decir,
+
+858
+01:23:53,520 --> 01:23:55,580
+paso no pasa. Entonces yo me tengo que
+
+859
+01:23:55,580 --> 01:23:56,860
+preguntar bien qué es lo que quiero
+
+860
+01:23:56,860 --> 01:23:59,100
+clasificar. Si bien lo puedo implementar
+
+861
+01:23:59,100 --> 01:24:02,540
+para acá clases, tengo que definir
+
+862
+01:24:02,540 --> 01:24:08,340
+claramente las probabilidades dentro de cada clase y las clases.
+
+863
+01:24:08,340 --> 01:24:13,660
+Entonces, general es recomendable tener menos clases
+
+864
+01:24:13,660 --> 01:24:19,060
+dentro de mi conjunto de datos que yo pueda estudiar. No obstante, en el ejemplo
+
+865
+01:24:19,060 --> 01:24:27,740
+que vamos a ver, más adelante, es con muchas, o sea, con varias señales,
+
+866
+01:24:27,740 --> 01:24:33,740
+a bastantes señales dentro. Entonces, ¿cómo lo formalizamos? En naive-bias, porque esto,
+
+867
+01:24:33,740 --> 01:24:41,360
+si se fijan acá, está definido como la distribución conjunta, entonces es sin el
+
+868
+01:24:41,360 --> 01:24:49,660
+supuesto, es decir, esto es el equivalente de esta cantidad. Cuando lo hacemos en naive-bias,
+
+869
+01:24:49,660 --> 01:24:56,700
+que es lo que voy a hacer, ese f sub k es la multiplicación de estas distribuciones
+
+870
+01:24:56,700 --> 01:25:02,740
+marginales, que es lo mismo que hicimos antes, solo que con d igual a 2, aquí es
+
+871
+01:25:02,740 --> 01:25:10,020
+de modo general, entonces este f de k ahora va a ser reemplazado por una
+
+872
+01:25:10,020 --> 01:25:14,340
+multiplicación de probabilidades, y sigue siendo la inmediata porque también lo
+
+873
+01:25:14,340 --> 01:25:22,220
+reemplaza abajo. Si pongo de igual a 2 me encuentro en la expresión que tenía antes.
+
+874
+01:25:22,860 --> 01:25:29,700
+Ahora tengo que poner a prueba esto, poner a prueba lo que hice, estas probabilidades.
+
+875
+01:25:29,700 --> 01:25:35,340
+Nosotros dijimos que la probabilidad de que sea spam dado que tenga una cierta
+
+876
+01:25:35,340 --> 01:25:41,820
+configuración es 0.414 con el subvisamiento y para un correo con
+
+877
+01:25:41,820 --> 01:25:44,820
+oferta y sin enlace
+
+878
+01:25:45,580 --> 01:25:51,320
+y ahora quiero volver a algo real ya entonces voy a ocupar el conjunto de datos
+
+879
+01:25:51,320 --> 01:26:01,920
+que está disponible en el múdulo son 4.601 correos
+
+880
+01:26:04,540 --> 01:26:09,140
+que vamos a hacer esta metodología y la vamos a implementar entonces ahora vamos a ir un
+
+881
+01:26:09,140 --> 01:26:18,640
+pequeño break de unos 15 minutos más o menos, podemos volver a las 12.15 y a las
+
+882
+01:26:18,640 --> 01:26:23,760
+12.15 implementamos esta metodología pero a nivel más mágico, ya no son no
+
+883
+01:26:23,760 --> 01:26:29,300
+sólo 100 datos sino muchos más datos y tanto.
+
+884
+01:26:29,300 --> 01:26:32,860
+Volvemos a unos 15 minutos.
+
+885
+01:26:32,860 --> 01:26:46,260
+Entonces, ya construimos, digamos, este clasificador, esta predicción en términos de las frecuencias
+
+886
+01:26:46,260 --> 01:26:50,980
+observadas dentro de las distintas clases con sus distintas señales en un conjunto
+
+887
+01:26:50,980 --> 01:26:51,980
+de datos.
+
+888
+01:26:51,980 --> 01:26:56,300
+Ahora, tenemos que evaluar a los datos reales, ¿sí?
+
+889
+01:26:56,300 --> 01:26:59,820
+No vamos a tener 100 datos, vamos a tener 6.000 datos.
+
+890
+01:26:59,820 --> 01:27:06,900
+esta receta digamos que tenemos va a contener lo que acabamos de hacer, la misma metodología,
+
+891
+01:27:06,900 --> 01:27:12,980
+pero ajustando obviamente las clases y las señales a lo que observemos en el conjunto
+
+892
+01:27:12,980 --> 01:27:19,340
+de datos y este conjunto de datos va a tener 54 señales, ya, contiene bastante más señales que antes,
+
+893
+01:27:19,340 --> 01:27:26,780
+tenemos sin fin 2 a las 54 observadas de distintas categorías por lo cual tenemos que tener cuidado,
+
+894
+01:27:26,780 --> 01:27:35,980
+Ahora tenemos que implementar esto, lo vamos a implementar y le está el código disponible
+
+895
+01:27:35,980 --> 01:27:42,300
+en el mood. Entonces, ¿qué tenemos en nuestra base de datos? Que en las bases de spam tenemos
+
+896
+01:27:42,300 --> 01:27:53,800
+48 frecuencias de palabras. Es decir, ahora no estoy considerando la presencia o no de
+
+897
+01:27:53,800 --> 01:28:00,600
+una o dos señales o una o dos palabras o si tiene un enlace o no, sino que estoy definiendo
+
+898
+01:28:00,600 --> 01:28:08,420
+frecuencias, que también la puedo poner, o sea, si yo sé que pasó una palabra hasta
+
+899
+01:28:08,420 --> 01:28:14,620
+diez veces, igual la puedo considerar que está presente, pero estamos de cierta manera
+
+900
+01:28:14,620 --> 01:28:20,800
+no utilizando toda la información. Entonces, ¿qué vamos a utilizar? Las 48 columnas que
+
+901
+01:28:20,800 --> 01:28:25,160
+son las frecuencias de las palabras que tenemos disponible.
+
+902
+01:28:25,160 --> 01:28:29,640
+Entonces, vamos a ocupar esas frecuencias con distintas palabras dentro de los
+
+903
+01:28:29,640 --> 01:28:33,200
+mensajes de los correos para describir su contenido.
+
+904
+01:28:33,200 --> 01:28:37,800
+Vamos a tener seguido frecuencias de caracteres, por consecuencia sumando los
+
+905
+01:28:37,800 --> 01:28:44,640
+54 señales y vamos a tener epiquetado los correos.
+
+906
+01:28:44,640 --> 01:28:49,000
+Entonces vamos a ver cuáles son spam y cuáles no lo son de antemano.
+
+907
+01:28:49,000 --> 01:28:53,920
+Y esa es la diferencia de la clasificación que teníamos antes.
+
+908
+01:28:53,920 --> 01:28:58,880
+Ya aquí tenemos una etiqueta antes cuando hacíamos camins que lo hicieron con Pedro
+
+909
+01:28:58,880 --> 01:29:06,240
+o otro tipo de clasificadores que no supervisaban al principio.
+
+910
+01:29:06,240 --> 01:29:10,400
+No teníamos esa clasificación y esto es lo que nos permite hacer este tipo de metodologías.
+
+911
+01:29:10,400 --> 01:29:11,400
+¿Qué vamos a utilizar?
+
+912
+01:29:11,400 --> 01:29:17,800
+Vamos a estar en el mismo contexto del problema, clasificar las mensajes como spam o no.
+
+913
+01:29:17,800 --> 01:29:28,400
+entonces, si ustedes ven la base de datos, que la tenemos por acá, ustedes la pueden
+
+914
+01:29:28,400 --> 01:29:36,600
+ver, si se fijan acá tengo señal, tres tipos de señales, o tres señales de las 54, por
+
+915
+01:29:36,600 --> 01:29:45,640
+ejemplo la palabra free, tengo la frecuencia, el 0.32% de las palabras, en el primer mensaje
+
+916
+01:29:45,640 --> 01:29:53,160
+0.32% de las palabras es free y ahí estaría ocupando la
+
+917
+01:29:53,160 --> 01:29:58,680
+frecuencia pero con la metodología que nosotros hicimos nosotros necesitamos
+
+918
+01:29:58,680 --> 01:30:03,960
+saber si es que la señal está presente o no ya no saber cuántas veces está la
+
+919
+01:30:03,960 --> 01:30:08,400
+palabra free sino que si está presente la palabra free o no lo mismo para la
+
+920
+01:30:08,400 --> 01:30:12,880
+palabra money significa no hay una frecuencia registrada y por consecuencia
+
+921
+01:30:12,880 --> 01:30:24,000
+está ausente y el carácter de exclamación está presente el 0,77, 8% de los caracteres y
+
+922
+01:30:24,000 --> 01:30:31,720
+si lo defino con una indicadora, pasa o no pasa, caso Bernoulli, esto sería un 1.
+
+923
+01:30:34,280 --> 01:30:42,280
+Ahora, vamos a ocuparlo con la presencia o no de las observaciones, para utilizar la
+
+924
+01:30:42,280 --> 01:30:46,240
+metodología que hicimos antes. Entonces, si se fijan, ustedes lo pueden ir
+
+925
+01:30:46,240 --> 01:30:52,040
+ejecutando, a la vez están los códigos disponibles.
+
+926
+01:30:52,040 --> 01:31:00,740
+¿Y qué tenemos acá? Tengo un X que tiene 3.680
+
+927
+01:31:00,740 --> 01:31:08,840
+córregos y 54 frecuencias y el Y que son su etiqueta
+
+928
+01:31:08,840 --> 01:31:16,060
+spam o legitim, vamos a ocupar estas 54 frecuencias
+
+929
+01:31:16,060 --> 01:31:24,060
+fíjense acá, porque es 3680? porque quiero probar qué tan bueno este
+
+930
+01:31:24,060 --> 01:31:31,980
+clasificador, entonces voy a dejar un resto de 921 correos
+
+931
+01:31:31,980 --> 01:31:38,880
+que no voy a utilizar para probar si lo que estoy haciendo
+
+932
+01:31:38,880 --> 01:31:43,760
+está dando buenos resultados. Y aquí voy a ocupar la metodología de validación
+
+933
+01:31:43,760 --> 01:31:49,480
+cruzada, por consecuencia voy a tener que, luego, voy a hacer y calcular, digamos,
+
+934
+01:31:49,480 --> 01:31:54,560
+las predicciones fuera de pliegues. En este caso voy a hacer cinco pliegues y
+
+935
+01:31:54,560 --> 01:31:59,640
+después lo voy a evaluar en estos cinco pliegues, voy a calcular el
+
+936
+01:31:59,640 --> 01:32:06,280
+clasificador comillas y luego lo voy a evaluar en el conjunto de prueba de 921
+
+937
+01:32:06,280 --> 01:32:09,400
+observaciones
+
+938
+01:32:09,480 --> 01:32:12,040
+entonces
+
+939
+01:32:12,040 --> 01:32:16,000
+cómo calculo la probabilidad voy a ocupar esta función que se llama
+
+940
+01:32:16,000 --> 01:32:22,480
+ajustar predecir que la programada está en el código digamos y lo que hace es
+
+941
+01:32:22,480 --> 01:32:27,720
+calcular que no tanto detalle porque ya describimos la metodología
+
+942
+01:32:27,720 --> 01:32:34,720
+con la probabilidad de que sea spam dado las características que tiene el mensaje
+
+943
+01:32:34,720 --> 01:32:44,720
+entonces para el ID1 por ejemplo vuelve con una probabilidad de 0.9954 de que sea spam
+
+944
+01:32:44,720 --> 01:32:49,720
+y se fijan acá
+
+945
+01:32:49,720 --> 01:32:56,720
+uno podría decir, bueno, con las otras señales en conjunto se puede llegar a un consenso
+
+946
+01:32:56,720 --> 01:33:02,000
+eso digamos de que lo más probable es que sea spam y esta metodología de Naive-Beyes
+
+947
+01:33:02,000 --> 01:33:07,920
+no lo hace vera. Entonces,
+
+948
+01:33:07,920 --> 01:33:10,600
+si se fijan,
+
+949
+01:33:11,960 --> 01:33:17,180
+en esta metodología puedo hacerlo para cada observación, pero me voy a hacer una
+
+950
+01:33:17,180 --> 01:33:22,800
+pregunta distinta. En toda la metodología de Naive-Beyes nosotros definimos si es
+
+951
+01:33:22,800 --> 01:33:26,640
+que está o no está la presencia, porque estamos siendo como, estábamos modelándolo
+
+952
+01:33:26,640 --> 01:33:34,440
+como una variable de free. Y la frecuencia de la palabra free, en el primer id es 0.32.
+
+953
+01:33:34,440 --> 01:33:43,560
+Ahora, ¿qué es mejor? ¿Utilizar el que sucede o no, es decir, la presencia o su frecuencia,
+
+954
+01:33:43,560 --> 01:33:54,200
+que es 0.32%? 0.32%. Entonces, en la presencia voy a ver si es que está o no la palabra
+
+955
+01:33:54,200 --> 01:34:00,600
+y en la frecuencia voy a ver la proporción que representa esa palabra dentro de todas
+
+956
+01:34:00,600 --> 01:34:06,480
+las palabras posibles. Entonces para el caso de en un G, si aparece una o cinco veces o
+
+957
+01:34:06,480 --> 01:34:10,800
+diez veces es lo mismo, es la misma observación porque solo está viendo si es presente o
+
+958
+01:34:10,800 --> 01:34:20,080
+no. En cambio la frecuencia me conserva, digamos, la proporción propiamente de la que yo voy
+
+959
+01:34:20,080 --> 01:34:24,100
+tener a disposición cuando leo un correo y lo tabule en términos de las
+
+960
+01:34:24,100 --> 01:34:30,460
+características y señales que yo define. Entonces, aquí hay un detalle, en la
+
+961
+01:34:30,460 --> 01:34:37,580
+frecuencia que está viendo en la esencia 0.32 es
+
+962
+01:34:37,580 --> 01:34:42,080
+más detalle porque si yo sé que pasó un 30% una vez, si yo sé que lo menos pasó
+
+963
+01:34:42,080 --> 01:34:45,800
+una vez y por consecuencia está presente, entonces me está entregando una mayor
+
+964
+01:34:45,800 --> 01:34:50,920
+información, pero para yo analizarlo voy a tener que hacer supuestos
+
+965
+01:34:50,920 --> 01:34:56,320
+adicionales sobre los datos. Tenemos que ver empíricamente si es que
+
+966
+01:34:56,320 --> 01:35:00,520
+efectivamente mejoran las probabilidades y yo estoy calculando.
+
+967
+01:35:00,520 --> 01:35:07,120
+Entonces, antes estábamos viéndolo como sucede o no sucede, ahora
+
+968
+01:35:07,120 --> 01:35:11,640
+voy a hacer que en lo que estábamos haciendo una I-vice-e-verg-1-y porque estaba
+
+969
+01:35:11,640 --> 01:35:16,600
+pensando lo que en presencia y no presencia en una variable dicotómica
+
+970
+01:35:16,600 --> 01:35:19,840
+ahora lo voy a ver cómo
+
+971
+01:35:19,840 --> 01:35:26,360
+una... voy a utilizar la distribución gaussiana para describir ese pasar del
+
+972
+01:35:26,360 --> 01:35:30,840
+pasa no pasa al cuántas veces, cuántas veces pasa en términos de una proporción
+
+973
+01:35:30,840 --> 01:35:36,160
+eso le vamos a llamar el nid bais gaussiana
+
+974
+01:35:36,160 --> 01:35:41,840
+los valores que toma esa variable la voy a describir como una curva normal
+
+975
+01:35:41,840 --> 01:35:47,200
+dentro de todas las clases que yo estoy definiendo en este caso es tan ilegítimo
+
+976
+01:35:47,200 --> 01:35:52,200
+que va a aprender que todo esto aprenden de las probabilidades o las frecuencias
+
+977
+01:35:52,200 --> 01:35:57,840
+probablemente tal y en este caso de la de la frecuencia en términos relativos
+
+978
+01:35:57,840 --> 01:36:03,240
+va a definir una media una dispersión en qué es lo que va a evaluar cómo lo va
+
+979
+01:36:03,240 --> 01:36:07,960
+predecir, él es midiendo digamos las alturas o evaluando las alturas en cada
+
+980
+01:36:07,960 --> 01:36:11,520
+uno de los córrecos, ya, de la densidad en principio.
+
+981
+01:36:11,520 --> 01:36:16,140
+Esta altura es la densidad digamos que yo voy a haber observada, ya, y no
+
+982
+01:36:16,140 --> 01:36:22,320
+necesariamente va a ser una, la probabilidad de un valor exacto, ya, por el punto de que
+
+983
+01:36:22,320 --> 01:36:27,920
+lo vamos a considerar continuo, ya. Entonces, ¿cómo lo definimos esto? Ahora, estas
+
+984
+01:36:27,920 --> 01:36:35,820
+frecuencias, por definición son no negativas porque a lo más pueden ser 0 y a lo más pueden ser 1.
+
+985
+01:36:35,820 --> 01:36:41,880
+0 significando que nunca no está la palabra y 1 que todo el mensaje en su totalidad es la misma palabra.
+
+986
+01:36:44,080 --> 01:36:48,680
+Y estas frecuencias pueden ser de distinta magnitud porque va a depender de la longitud del mensaje,
+
+987
+01:36:48,680 --> 01:36:54,840
+ya, entonces pueden ser muy grandes. Entonces en este caso gausiano, que lo vamos a utilizar,
+
+988
+01:36:54,840 --> 01:37:01,520
+vamos a hacer una transformación. Esta frecuencia la vamos a incorporar dentro
+
+989
+01:37:01,520 --> 01:37:10,800
+un logaritmo. El logaritmo de 1 más la frecuencia fundamental, 1 más X.
+
+990
+01:37:10,800 --> 01:37:19,960
+Y ahora, tras esa transformación, si te fijan acá, en la palabra o la señal de
+
+991
+01:37:19,960 --> 01:37:29,500
+la palabra free en el conjunto atos tengo una frecuencia de 0.32 y ahora yo lo
+
+992
+01:37:29,500 --> 01:37:38,080
+voy a transformar a 1 más 0.32 que va a ser logaritmo de 1.32 que me da 0.277
+
+993
+01:37:38,080 --> 01:37:45,020
+y luego lo mismo con el con el con la palabra money que es 0 y si se fijan
+
+994
+01:37:45,020 --> 01:37:51,060
+aquí sale el 1 porque si no haría el logaritmo de 0 ya que no puedo sacarlo
+
+995
+01:37:51,060 --> 01:37:54,940
+entonces logaritmo de 1 por eso estoy sumando 1 para que la transformación
+
+996
+01:37:54,940 --> 01:37:59,720
+tenga sentido entonces esta transformación que lo que hace los valores
+
+997
+01:37:59,720 --> 01:38:04,660
+muy grandes lo va a chica conserva los ceros lo que era 0 antes sigue siendo 0
+
+998
+01:38:04,660 --> 01:38:09,300
+después y se fijan acá estos 0 sigue siendo 0 si algo no pasa no va a pasar
+
+999
+01:38:09,300 --> 01:38:14,940
+después o no hay una sino no una no hay una tiene frecuencia 0 va a tener una
+
+1000
+01:38:14,940 --> 01:38:18,540
+nueva frecuencia 0 en esta nueva
+
+1001
+01:38:18,540 --> 01:38:21,540
+valor transformado z
+
+1002
+01:38:21,700 --> 01:38:25,620
+y vamos a aprender todas las cosas en
+
+1003
+01:38:25,620 --> 01:38:27,580
+términos de esa escala, esa va a ser la
+
+1004
+01:38:27,580 --> 01:38:29,540
+nueva nuestra nueva frecuencia con
+
+1005
+01:38:29,540 --> 01:38:32,580
+Illa's. Transformar no me no me va a
+
+1006
+01:38:32,580 --> 01:38:33,900
+asegurar que voy a estar trabajando
+
+1007
+01:38:33,900 --> 01:38:35,620
+efectivamente con distribuciones
+
+1008
+01:38:35,620 --> 01:38:37,420
+normales, yo voy a utilizarlo de manera
+
+1009
+01:38:37,420 --> 01:38:41,420
+utilitaria para hacer 9-pais.
+
+1010
+01:38:41,420 --> 01:38:44,020
+Ahora
+
+1011
+01:38:44,940 --> 01:38:53,260
+Veamos, pensemos que tengo un mensaje que dice oferta hoy y otro mensaje que
+
+1012
+01:38:53,260 --> 01:38:59,260
+dice oferta oferta hoy, entonces ¿cómo lo voy clasificando?
+
+1013
+01:39:00,300 --> 01:39:05,700
+si el mensaje es oferta hoy, la frecuencia de oferta es 1, la frecuencia de
+
+1014
+01:39:05,700 --> 01:39:09,900
+reunión es 0, la frecuencia de hoy es 1, entonces 1 0 1
+
+1015
+01:39:09,900 --> 01:39:15,020
+para el mensaje oferta oferta hoy va a ser 201
+
+1016
+01:39:15,020 --> 01:39:22,620
+entonces si lo trabajase como en el caso naiv y es ver no y estas dos estos dos
+
+1017
+01:39:22,620 --> 01:39:28,060
+mensajes tendrían la misma codificación sería 101 y 101 porque
+
+1018
+01:39:28,060 --> 01:39:36,420
+estoy viendo la presencia y en el caso multinomial ya es cada una de esas o
+
+1019
+01:39:36,420 --> 01:39:41,940
+cada aparición va a presentar o aportar un factor adicional.
+
+1020
+01:39:41,940 --> 01:39:51,500
+Entonces, en el caso multinomial voy a ir contando las palabras dentro de cada
+
+1021
+01:39:51,500 --> 01:39:58,740
+clase y voy a en esencia conservar esas repeticiones y en el caso Bernoulli
+
+1022
+01:39:58,740 --> 01:40:02,860
+no los voy a considerar igual, que parezca una o más veces para hacer la
+
+1023
+01:40:02,860 --> 01:40:15,620
+misma variable. Entonces, resumiendo, si tengo 54 frecuencias, o sea 54 señales
+
+1024
+01:40:15,620 --> 01:40:19,020
+perdón, allí dicen señales
+
+1025
+01:40:19,620 --> 01:40:24,100
+en la variante de Naís Valles que es Bernoulli, voy a considerar si está
+
+1026
+01:40:24,100 --> 01:40:30,100
+presente o no las distintas señales, y la decisión en ese caso va a ser usar
+
+1027
+01:40:30,100 --> 01:40:32,460
+las frecuencias positivas o en
+
+1028
+01:40:32,460 --> 01:40:35,320
+equivalente a ser un suavizamiento en
+
+1029
+01:40:35,320 --> 01:40:38,620
+la variante gaussiana voy a tener
+
+1030
+01:40:38,620 --> 01:40:40,920
+mediciones numéricas que yo voy a
+
+1031
+01:40:40,920 --> 01:40:45,820
+transformar para hacer naipayas y con
+
+1032
+01:40:45,820 --> 01:40:47,740
+eso calcula las probabilidades. Y en la
+
+1033
+01:40:47,740 --> 01:40:50,260
+variante multinomial voy a contar el
+
+1034
+01:40:50,260 --> 01:40:52,620
+número de veces que pasa en vez de
+
+1035
+01:40:52,620 --> 01:40:54,660
+considerar la frecuencia. Entonces aquí es
+
+1036
+01:40:54,660 --> 01:40:56,300
+uno o cero, aquí va a ser la
+
+1037
+01:40:56,300 --> 01:40:59,620
+transformación logaritmo uno más x, en
+
+1038
+01:40:59,620 --> 01:41:04,960
+donde X es la frecuencia y en la última miel voy a considerar la frecuencia de
+
+1039
+01:41:04,960 --> 01:41:08,420
+las palabras y eso va a requerir información adicional. Entonces en general
+
+1040
+01:41:08,420 --> 01:41:13,940
+nos vamos a trabajar con oberno y o con gaussian, porque si se fijan acá si
+
+1041
+01:41:13,940 --> 01:41:19,540
+trabajo directamente con un porcentaje ya
+
+1042
+01:41:19,540 --> 01:41:27,220
+no voy a saber si yo le digo el 50% del mensaje es
+
+1043
+01:41:27,220 --> 01:41:33,100
+la palabra hola. Ustedes no saben cuántas veces ocurrió hola, solo saben que la mitad
+
+1044
+01:41:33,100 --> 01:41:38,580
+del mensaje es hola. Entonces yo para la multinomial necesito saber cuántas veces
+
+1045
+01:41:38,580 --> 01:41:45,340
+ocurrió la palabra en términos absolutos y no relativos. Ya, entonces no son un
+
+1046
+01:41:45,340 --> 01:41:49,500
+conteo probablemente tal cuando digo la frecuencia, en el sentido en términos
+
+1047
+01:41:49,500 --> 01:41:53,740
+proporcionales o términos de porcentaje. Tengo que saber la longitud del
+
+1048
+01:41:53,740 --> 01:41:56,140
+intervalo.
+
+1049
+01:41:56,140 --> 01:42:00,860
+entonces si aplicamos la misma receta que hemos hecho antes con night bias
+
+1050
+01:42:00,860 --> 01:42:06,100
+porque la misma idea aplica para las dos metodologías lo único que voy a estar
+
+1051
+01:42:06,100 --> 01:42:11,180
+cambiando porque lo que vamos a estar haciendo en este caso va a ser esta
+
+1052
+01:42:11,180 --> 01:42:19,740
+misma, se me ha perdido la fórmula, vamos a estar haciendo esto ya solo que
+
+1053
+01:42:19,740 --> 01:42:24,900
+para los distintos casos estas probabilidades van a ser circuladas de
+
+1054
+01:42:24,900 --> 01:42:31,260
+de manera distinta, pero el esquema general es el mismo.
+
+1055
+01:42:31,260 --> 01:42:42,800
+Entonces, si veo la frecuencia de spam, voy a obtener una probabilidad sin usar señales,
+
+1056
+01:42:42,800 --> 01:42:48,860
+que sería el caso más, digamos, ingenuo de todos, es decir, no voy a considerar si
+
+1057
+01:42:48,860 --> 01:42:56,900
+tiene la palabra oferta o free o nada ni es que si tiene el lazo. No, simplemente voy a decir
+
+1058
+01:42:56,900 --> 01:43:06,540
+bueno si tengo 100 mensajes y 20 de los 100 son spam entonces la probabilidad que sea spam es 0.
+
+1059
+01:43:06,540 --> 01:43:14,180
+Ese es lo más fácil que podemos hacer porque ni siquiera necesitamos saber cuáles son las señales,
+
+1060
+01:43:14,180 --> 01:43:21,320
+que es el caso de clasificación sin no condicionada. Y eso lo vamos a ver como referencia.
+
+1061
+01:43:21,320 --> 01:43:28,500
+Porque, y aquí tiene todo el sentido práctico, porque si todas mis probabilidades me dan mal
+
+1062
+01:43:28,500 --> 01:43:34,380
+cuando lo evaluo en el conjunto de pruebas, en términos de simplemente sacar la frecuencia
+
+1063
+01:43:34,380 --> 01:43:39,460
+de la clase y simplemente jugarla con probabilidad y no hacer todo este enrollo, digamos, que estamos
+
+1064
+01:43:39,460 --> 01:43:43,980
+haciendo con Naive Bias y vemos que la prueba no funciona entonces bueno
+
+1065
+01:43:43,980 --> 01:43:48,740
+por qué me voy a complicar la vida si simplemente puedo sacar hacer dos divisiones
+
+1066
+01:43:48,740 --> 01:43:53,780
+y me quede mejor ya como utilizado lo que he utilizado como clasificado no
+
+1067
+01:43:53,780 --> 01:43:58,020
+quiero complejizar las cosas porque si ahora Naive Bias tiende a ser bastante
+
+1068
+01:43:58,020 --> 01:44:04,820
+mejor que esto porque es una referencia claramente no algo muy muy analítico
+
+1069
+01:44:04,820 --> 01:44:10,260
+se bastante putivo. En el caso de la receta de Benoyi, la inváis Benoyi, voy a
+
+1070
+01:44:10,260 --> 01:44:15,300
+aprender las presencias y ausencias o presencias y no presencias y voy a
+
+1071
+01:44:15,300 --> 01:44:21,540
+ocupar opciones de suavizamiento. Si se fijan acá, tengo un alfa 0,5, yo puedo
+
+1072
+01:44:21,540 --> 01:44:25,660
+sumar, no necesariamente tengo que hacerlo en términos discreto, puedo sumarlo en
+
+1073
+01:44:25,660 --> 01:44:31,540
+términos de algún valor continuo. Y la receta gaussiana, lo que voy a aprender son
+
+1074
+01:44:31,540 --> 01:44:36,100
+las medias y las dispersiones de este logaritmo de 1 más x, que es donde x es la frecuencia.
+
+1075
+01:44:36,100 --> 01:44:41,540
+Entonces voy a hacer cinco candidatos y voy a ocupar una métrica para el término de la prueba
+
+1076
+01:44:41,540 --> 01:44:49,180
+y de la pérdida logarítmica, que la habíamos mencionado antes. Y voy a que lo que hace es
+
+1077
+01:44:49,180 --> 01:44:57,500
+penalizar cuando se asigna poca probabilidad a la clase que realmente ocurra. Esto lo voy a
+
+1078
+01:44:57,500 --> 01:45:03,540
+evaluar en el conjunto de prueba y vamos a volver a esta decisión
+
+1079
+01:45:03,540 --> 01:45:09,340
+porque recuerden todas estas metodologías, todo lo que me predicen ya en términos de
+
+1080
+01:45:09,340 --> 01:45:14,920
+que me van a dar una probabilidad para una nueva observación futura pero eso no
+
+1081
+01:45:14,920 --> 01:45:21,180
+necesariamente se ve traducido uno a uno con una decisión puesto que la decisión
+
+1082
+01:45:21,180 --> 01:45:25,620
+implica que tengo que definir un umbral y ese umbral puede cambiar en términos de
+
+1083
+01:45:25,620 --> 01:45:33,140
+los costos que yo define. Entonces, ¿cómo lo hacemos?
+
+1084
+01:45:33,140 --> 01:45:39,380
+Si os dije acá, tengo los 3680 córregos ya en nuestro entrenamiento y lo voy a
+
+1085
+01:45:39,380 --> 01:45:44,100
+repartir en cinco pliegues y voy a ajustar en cuatro pliegues y voy a
+
+1086
+01:45:44,100 --> 01:45:49,060
+predecir en el pliegue restante para tener predicciones fuera de pliegue y lo
+
+1087
+01:45:49,060 --> 01:45:55,500
+voy a repetir cinco veces para que cada tenga cinco pliegues o cinco
+
+1088
+01:45:55,500 --> 01:46:01,260
+predicciones fuera de ApliA. Luego de eso,
+
+1089
+01:46:01,260 --> 01:46:05,460
+voy a tener entonces las cinco recetas que son las cinco metodologías que voy a
+
+1090
+01:46:05,460 --> 01:46:11,820
+probar que están acá. La referencia, el NUGI con tres alfas y la receta de
+
+1091
+01:46:11,820 --> 01:46:17,980
+la Oceana. Y por consecuencia voy a tener 25 ajustes,
+
+1092
+01:46:17,980 --> 01:46:21,980
+que son el cálculo de las probabilidades.
+
+1093
+01:46:21,980 --> 01:46:30,580
+Entonces, implemento esto, simplemente puedo hacerlo de manera iterativa, para el caso
+
+1094
+01:46:30,580 --> 01:46:35,780
+del NUGI yo simplemente voy a ir evaluando y cambiando el alfa que es la penalización
+
+1095
+01:46:35,780 --> 01:46:43,100
+o el suavizamiento, el parámetro de suavizamiento y voy a obtener en esencia las predicciones
+
+1096
+01:46:43,100 --> 01:46:45,380
+fuera de pliegue.
+
+1097
+01:46:45,380 --> 01:46:53,300
+estas predicciones fuera de pliegue las vamos a repetir para los distintos tipos de recetas,
+
+1098
+01:46:53,300 --> 01:46:59,940
+ya sea Bernoulli con los distintos parámetros, la referencia y además el caso de Ney-Bahy es
+
+1099
+01:46:59,940 --> 01:47:09,940
+Gaussian. Entonces, cuando yo resumo eso, porque si se fijan, nuevamente son cálculos relativamente
+
+1100
+01:47:09,940 --> 01:47:13,900
+sencillos porque son cálculos de probabilidades multiplicadas y
+
+1101
+01:47:13,900 --> 01:47:18,780
+divididas, que lo vamos a ver al final como se calcula de manera un poco
+
+1102
+01:47:18,780 --> 01:47:25,580
+más automatizada. Y vamos a mencionar librerías que se tienen a disposición.
+
+1103
+01:47:25,580 --> 01:47:32,980
+Entonces, las predicciones fuera de pliegue, cuando las resumo en las cinco
+
+1104
+01:47:32,980 --> 01:47:39,820
+pliegues y las junto, para la frecuencia simplemente que el caso de referencia
+
+1105
+01:47:39,820 --> 01:47:46,960
+la verde a la logarítmica es 0,61, el brier es 0,239 y el área abajo de la curva es casi 0,5
+
+1106
+01:47:46,960 --> 01:47:52,840
+y si fijan tiene que ser malo porque no estamos haciendo mucho
+
+1107
+01:47:52,840 --> 01:47:57,660
+simplemente veo la frecuencia y eso lo asumo como la probabilidad de previsión
+
+1108
+01:47:57,660 --> 01:48:00,540
+sin considerar señales
+
+1109
+01:48:00,540 --> 01:48:06,700
+y cuando hago Bernoulli, que es el caso que andamos más hoy, con un parámetro
+
+1110
+01:48:06,700 --> 01:48:12,860
+del suavizamiento de la plaza 05, 0, 1 y 2 me entregan valores bastante similares,
+
+1111
+01:48:12,860 --> 01:48:17,980
+bastante similares, entonces pareciera que el suavizamiento no es tan
+
+1112
+01:48:17,980 --> 01:48:23,100
+importante porque si se fijan el suavizamiento me suma en este caso a
+
+1113
+01:48:23,100 --> 01:48:26,340
+lo más 2 en el numerador
+
+1114
+01:48:26,340 --> 01:48:28,340
+y
+
+1115
+01:48:28,340 --> 01:48:38,660
+y 2 en el denominador, o sea 1 en el numerador y 2 en el denominador.
+
+1116
+01:48:38,660 --> 01:48:46,860
+Entonces el valor de esa fracción, de ese cociente, no va a cambiar mucho, por
+
+1117
+01:48:46,860 --> 01:48:51,420
+consecuencia las métricas de ajuste tampoco van a cambiar mucho porque las
+
+1118
+01:48:51,420 --> 01:48:57,380
+probabilidades de selección no van a cambiar mucho. Entonces, cuando lo
+
+1119
+01:48:57,380 --> 01:49:02,700
+evalúe estas metodologías en prueba, no hay mucha discrepancia entre ellas.
+
+1120
+01:49:02,700 --> 01:49:06,420
+Entonces, aquí cuando tengo muchos datos y las clases y las señales
+
+1121
+01:49:06,420 --> 01:49:12,580
+son más o menos balanceadas, el subavisamiento no es de mayor importancia.
+
+1122
+01:49:12,580 --> 01:49:15,620
+Por eso les comentaba que el subavisamiento lo utilizamos principalmente
+
+1123
+01:49:15,620 --> 01:49:19,100
+cuando tengo clases que son muy anómalas.
+
+1124
+01:49:19,100 --> 01:49:23,340
+Y en el caso gaussiano calcula el logaritmo de 1 más x y si se fijan me
+
+1125
+01:49:23,340 --> 01:49:28,020
+entrega bastante mal en términos de la
+
+1126
+01:49:28,020 --> 01:49:34,340
+Vrayer cosas más o menos similares y el
+
+1127
+01:49:45,040 --> 01:49:50,820
+bastante similares, tienen discrepancia en
+
+1128
+01:49:50,820 --> 01:49:54,780
+muy muy pequeñas por lo cual puede ser
+
+1129
+01:49:54,780 --> 01:50:01,020
+eso puede ser debido a la selección de entrenamiento y prueba, por lo que
+
+1130
+01:50:01,020 --> 01:50:06,020
+pero en principio, si nos guiamos por esta métrica en particular, con un
+
+1131
+01:50:06,020 --> 01:50:13,780
+alfa 05 tenemos mejores, muy levemente resultados, en términos de la comparativa
+
+1132
+01:50:13,780 --> 01:50:19,860
+con otros Neibayes-Bernoulli. Ahora, son muy cercanos estos
+
+1133
+01:50:19,860 --> 01:50:23,600
+su avicamiento pues podemos pensar que quizás el su avicamiento no es tan
+
+1134
+01:50:23,600 --> 01:50:28,620
+necesario. Ahora, fíjense acá, si lo vemos
+
+1135
+01:50:28,620 --> 01:50:34,560
+gráficamente, los naipayes.png son muy iguales, nos quedamos con el
+
+1136
+01:50:34,560 --> 01:50:39,600
+alfa 0.5, la frecuencia del spam es que nosotros dijimos que era
+
+1137
+01:50:39,600 --> 01:50:42,720
+incensiva hacerlo, simplemente contar cuántos correos están etiquetados como
+
+1138
+01:50:42,720 --> 01:50:47,640
+spam y esa va a ser mi probabilidad. Eso nos entrega resultados mucho peores que
+
+1139
+01:50:47,640 --> 01:50:51,960
+hacer algo más complicado que
+
+1140
+01:50:51,960 --> 01:50:57,160
+general tenemos que tener cuidado de ahí
+
+1141
+01:50:57,160 --> 01:50:58,920
+estamos sobrecomplicizando el problema
+
+1142
+01:50:58,920 --> 01:51:00,300
+y no nos está entregando ni siquiera uno
+
+1143
+01:51:00,300 --> 01:51:02,960
+de errores buenos
+
+1144
+01:51:03,440 --> 01:51:04,880
+que va a depender mucho también del
+
+1145
+01:51:04,880 --> 01:51:07,080
+umbral pero no nos está entregando muy
+
+1146
+01:51:07,080 --> 01:51:11,120
+buenos resultados en el bias gausiano
+
+1147
+01:51:11,120 --> 01:51:13,600
+entonces
+
+1148
+01:51:13,600 --> 01:51:17,200
+si se fijan acá les planteo que el
+
+1149
+01:51:17,200 --> 01:51:20,460
+verano y con alfa 05 es el mejor la
+
+1150
+01:51:20,460 --> 01:51:26,700
+mejor metodología y en general Bernoulli-Vayas-Venoujee tiende a ser la, al menos en
+
+1151
+01:51:26,700 --> 01:51:33,780
+esta, en este ejemplo, independiente, el mejor independiente del ALF. Ahora, yo les
+
+1152
+01:51:33,780 --> 01:51:41,300
+planteo un problema. ¿Qué pasa si yo una señal la copio? Es decir,
+
+1153
+01:51:41,300 --> 01:51:46,180
+para todas las observaciones, una de las señales era
+
+1154
+01:51:46,180 --> 01:51:48,180
+que
+
+1155
+01:51:49,360 --> 01:51:52,840
+era la proporción o presencia de la palabra
+
+1156
+01:51:54,320 --> 01:51:55,320
+free
+
+1157
+01:51:55,320 --> 01:51:58,720
+¿Qué pasa? si yo esa columna la copio y le pongo otro nombre
+
+1158
+01:52:00,000 --> 01:52:05,720
+¿Qué pasa? entonces voy a estar agregando una señal que me están entregando la misma información
+
+1159
+01:52:06,160 --> 01:52:11,380
+entonces, vamos a hacer un ejemplo controlado, tenemos 100 datos que son spam
+
+1160
+01:52:11,380 --> 01:52:16,380
+100 datos que son legítimos, por consecuencia tengo 200 correos en mi
+
+1161
+01:52:16,380 --> 01:52:21,180
+conjunto de datos, de los cuales 80 son spam
+
+1162
+01:52:21,180 --> 01:52:29,100
+una señal aparece en 80 spam y 20 legítimos
+
+1163
+01:52:29,100 --> 01:52:33,120
+cualquiera sea esa señal, entonces si se fijan yo hago el mismo calculo que de
+
+1164
+01:52:33,120 --> 01:52:38,440
+antes, la probabilidad que sea spam dado que esa señal está presente va a ser
+
+1165
+01:52:38,440 --> 01:52:46,240
+primero la presencia de que sea spam 100 sobre la frecuencia probablemente
+
+1166
+01:52:46,240 --> 01:52:54,580
+tal 100 sobre 200 05 por la presencia de ese señal en spam 80 sobre 100 y abajo
+
+1167
+01:52:54,580 --> 01:53:00,160
+repito la misma cantidad más ahora la presencia de esa señal dentro de la
+
+1168
+01:53:00,160 --> 01:53:05,560
+otra clase que es legítimo 05 por 0 2 que es 20 sobre 100 eso me da un 08
+
+1169
+01:53:05,560 --> 01:53:11,600
+ahora yo voy a copiar esa señal es decir, señal 1 y señal 2 son exactamente lo mismo
+
+1170
+01:53:11,600 --> 01:53:16,400
+pero los voy a considerar distintos, si se fijan cuando hago eso y lo hacemos de la
+
+1171
+01:53:16,400 --> 01:53:22,240
+misma manera que lo hicimos anteriormente, como le hicimos acá, hago toda esta metodología
+
+1172
+01:53:22,240 --> 01:53:26,320
+de igual manera sin su avistamiento en este caso
+
+1173
+01:53:26,320 --> 01:53:36,480
+tendría que hacer esta cantidad 05 por 08 porque es la probabilidad de la primera clase
+
+1174
+01:53:36,480 --> 01:53:40,200
+recuerden que aquí estoy diciendo en e-byte entonces estoy asumiendo independencia
+
+1175
+01:53:40,200 --> 01:53:45,160
+por la misma probabilidad de la señal 2 pero sabemos que es la misma que la primera porque
+
+1176
+01:53:45,160 --> 01:53:50,240
+la copia entonces estoy multiplicando 08 y abajo si se fijan multiplique en todos lados
+
+1177
+01:53:50,240 --> 01:53:57,140
+por 08 y acá por el 02 porque estoy simplemente duplicando esa presencia de la señal dentro
+
+1178
+01:53:57,140 --> 01:54:04,880
+de distintas clases y si fijan me subió la probabilidad de clasificar un correo spam
+
+1179
+01:54:04,880 --> 01:54:10,520
+ya con dos señales pero las dos señales son iguales si entonces aquí es un poco distinto
+
+1180
+01:54:10,520 --> 01:54:16,040
+porque antes usualmente cuando hacemos regresión y tenemos por ejemplo otro modelo y tengo
+
+1181
+01:54:16,040 --> 01:54:19,760
+dos predictores y son lo mismo porque me entregan la misma información, no me
+
+1182
+01:54:19,760 --> 01:54:24,600
+agrega mucho más en términos de la ajuste y la predicción. En cambio, en esta
+
+1183
+01:54:24,600 --> 01:54:28,160
+clasificación con AI Bias,
+
+1184
+01:54:28,360 --> 01:54:32,440
+la probabilidad aumenta.
+
+1185
+01:54:32,600 --> 01:54:38,020
+Entonces, contar dos veces una misma señal aumentó su certeza porque estoy
+
+1186
+01:54:38,020 --> 01:54:43,280
+dando el DOC, no el doble de peso per se, pero estoy considerando
+
+1187
+01:54:43,280 --> 01:54:48,280
+que esas dos señales me están entregando información de identificar un
+
+1188
+01:54:48,280 --> 01:54:52,840
+correo como spam. Hay que tener cuidado con la representación.
+
+1189
+01:54:52,840 --> 01:54:59,360
+Entonces la clase la voy a mantener pero esa certeza con la que yo estoy
+
+1190
+01:54:59,360 --> 01:55:03,840
+predicciendo la probabilidad va a aumentar.
+
+1191
+01:55:03,840 --> 01:55:09,720
+Con cuatro copias de la misma clase este número aumenta
+
+1192
+01:55:09,720 --> 01:55:16,580
+sustancialmente entonces si yo identifico señales
+
+1193
+01:55:16,580 --> 01:55:22,800
+que el aprendizaje está comentario
+
+1194
+01:55:22,800 --> 01:55:32,120
+si yo sé de señales claras de identificación de spam entonces mi
+
+1195
+01:55:32,120 --> 01:55:37,620
+certeza de la probabilidad de que sea spam un mensaje en particular va a
+
+1196
+01:55:37,620 --> 01:55:42,300
+aumentar sustancialmente. Por eso yo quiero hacer
+
+1197
+01:55:42,420 --> 01:55:49,140
+naive bias con muchas señales porque en el conjunto, ya con muchas señales
+
+1198
+01:55:49,140 --> 01:55:54,540
+sin entrar a un problema que no tenga datos que lo puedan sostener, pero a lo
+
+1199
+01:55:54,540 --> 01:55:59,180
+menos unas tres o cuatro señales para ejemplo digamos mediano o de bajo
+
+1200
+01:55:59,180 --> 01:56:06,840
+problemática digamos real, porque en esa conjunción de señales yo voy a estar
+
+1201
+01:56:06,840 --> 01:56:12,360
+aprendiendo. Si bien una señal me puede identificar o me puede hacer que el
+
+1202
+01:56:12,360 --> 01:56:17,680
+porcentaje de clasificación de spam suba lo suficiente como para considerarlo,
+
+1203
+01:56:17,680 --> 01:56:22,840
+cuando agrego otras señales que me entregan información similar, que en
+
+1204
+01:56:22,840 --> 01:56:28,600
+esencia es otros comillas predictores, que le llamamos señales acá, para identificar
+
+1205
+01:56:28,600 --> 01:56:34,080
+la señal, la probabilidad no sube linealmente. Entonces por eso queremos
+
+1206
+01:56:34,080 --> 01:56:40,920
+ocupar distintas señales. Ahora, nuevamente eso es la predicción, no la
+
+1207
+01:56:40,920 --> 01:56:47,280
+decisión, porque yo si me pongo un umbral 0.5, 0.5 es menor que 0.99 por
+
+1208
+01:56:47,280 --> 01:56:50,920
+consecuencia lo clasifico como spam, porque esto me está entregando un
+
+1209
+01:56:50,920 --> 01:56:56,120
+número, un número de probabilidad de que sea spam. Entonces mi pregunta ahora es, ¿qué
+
+1210
+01:56:56,120 --> 01:57:01,200
+tan grande tiene que ser la probabilidad para que yo lo considere y lo
+
+1211
+01:57:01,200 --> 01:57:10,120
+racifique como spam. Eso es el proceso de decisión y eso umbral puede cambiar.
+
+1212
+01:57:10,280 --> 01:57:14,900
+Si yo quiero contrastar la probabilidad que yo la asigné con lo que
+
+1213
+01:57:14,900 --> 01:57:18,880
+efectivamente ocurrió, si se fija acá, se fijan acá en el Bernoulli con un
+
+1214
+01:57:18,880 --> 01:57:24,520
+alfa 1, que era muy similar al alfa 0 5, esta línea que está en el centro es lo
+
+1215
+01:57:24,520 --> 01:57:26,520
+que efectivamente
+
+1216
+01:57:26,520 --> 01:57:28,520
+eeeh
+
+1217
+01:57:28,520 --> 01:57:37,400
+es cuando la probabilidad predicha y la frecuencia observada son iguales
+
+1218
+01:57:37,400 --> 01:57:44,680
+entonces si se fijan ahí valles está bastante más cercano que el caso
+
+1219
+01:57:44,680 --> 01:57:54,500
+gausiano y si fijan siempre o está muy seguro de que es spam o está muy poco
+
+1220
+01:57:54,500 --> 01:57:59,580
+seguro que es el de Spant, en cambio el NUJI es un poco más mesurado de ese aspecto.
+
+1221
+01:57:59,580 --> 01:58:06,620
+Y el LockLoss lo que hace es penalizar esa sobreconfianza de tu
+
+1222
+01:58:06,620 --> 01:58:09,340
+clasificación.
+
+1223
+01:58:10,860 --> 01:58:17,620
+Siguiendo entonces, yo puedo reconstruir digamos en el conjunto de datos que
+
+1224
+01:58:17,620 --> 01:58:24,020
+estamos trabajando lo que hemos hecho antes. Voy a ocupar un alpha igual a 1 y
+
+1225
+01:58:24,020 --> 01:58:32,900
+estoy si se fijan acá estoy calculando las probabilidades de interés con
+
+1226
+01:58:32,900 --> 01:58:40,820
+el suavizamiento de la plaza y se fijan si yo tengo una señal que es la
+
+1227
+01:58:40,820 --> 01:58:47,140
+presencia o no de la palabra address favorece o pareciera favorecer el spam
+
+1228
+01:58:47,140 --> 01:58:56,840
+¿por qué 498 de 1450? si fijan vean en la probabilidad dentro de la clase 03 y la
+
+1229
+01:58:56,840 --> 01:59:03,020
+probabilidad dentro del legítimo 01 porque si dicen la dirección probablemente
+
+1230
+01:59:03,020 --> 01:59:07,740
+es un correo no deseado, un correo SPAM
+
+1231
+01:59:07,740 --> 01:59:16,260
+pero ahora eso solo de una clase yo tengo que considerar el 50 de las 53
+
+1232
+01:59:17,140 --> 01:59:21,140
+otras clases. Romina.
+
+1233
+01:59:21,140 --> 01:59:26,640
+Es que le preguntaban en chat si es que no hay que hacer corrección de los datos
+
+1234
+01:59:26,640 --> 01:59:29,140
+dado que están desbalanceados.
+
+1235
+01:59:29,140 --> 01:59:34,140
+En general, si tengo clases que son muy desbalanceadas,
+
+1236
+01:59:34,140 --> 01:59:38,640
+voy a tener bastantes problemas porque es súper en general en estadísticas,
+
+1237
+01:59:38,640 --> 01:59:43,140
+si tengo observaciones que pasan
+
+1238
+01:59:43,140 --> 01:59:48,480
+muy anomalamente, son muy anomalas, no hay nada de lo que aprender porque recuerden
+
+1239
+01:59:48,480 --> 01:59:53,280
+que la estadística es de lo que yo tengo de mis datos, trato de caracterizarlo y
+
+1240
+01:59:53,280 --> 01:59:59,080
+predecir y todas estas metodologías son en funciones de la frecuencia
+
+1241
+01:59:59,080 --> 02:00:06,320
+y la única forma que tenemos de que la frecuencia o compensar las
+
+1242
+02:00:06,320 --> 02:00:11,320
+frecuencias que son muy anómalas son el suavizamiento y la otra forma, la única
+
+1243
+02:00:11,320 --> 02:00:16,780
+forma de terminar dentro del contexto de
+
+1244
+02:00:16,780 --> 02:00:22,460
+de datos y el mucurum, modificar el conjunto de datos, pondrá en metodologías de balanceo,
+
+1245
+02:00:22,460 --> 02:00:33,020
+que quiere decir que por ejemplo si tengo 20% que es spam y 80% que son no spam, yo
+
+1246
+02:00:33,020 --> 02:00:39,140
+voy a hacer un conjunto de datos que tengan la misma proporción, 50-50% por ejemplo,
+
+1247
+02:00:39,140 --> 02:00:44,340
+o subirle un poco digamos, y ahí puedo hacer, voy a escoger las 20% del spam y voy a escoger
+
+1248
+02:00:44,340 --> 02:00:47,620
+20 balanceos o puedo hacer un
+
+1249
+02:00:47,620 --> 02:00:52,060
+unas cosas un poquito más sofisticadas que voy a tratar de caracterizar esos 20
+
+1250
+02:00:52,060 --> 02:00:57,660
+esas 20 observaciones que son el spam y generar 39 para dejar 50 y 50 cosas de
+
+1251
+02:00:57,660 --> 02:01:01,780
+ese estilo ya pero luego de eso puedo ocuparlo pero después tengo que
+
+1252
+02:01:01,780 --> 02:01:06,540
+compensar ese balanceo que yo hice ya porque si no voy a sobreestimar cosas
+
+1253
+02:01:06,540 --> 02:01:10,580
+que son en realidad anómalas Claudia
+
+1254
+02:01:10,580 --> 02:01:15,740
+Hola, buenas noches. Volviendo dos o tres minutos atrás, cuando usted dice, cuando
+
+1255
+02:01:15,740 --> 02:01:23,300
+duplicó los datos, que se copió una columna sobre la otra, ¿eso no es una
+
+1256
+02:01:23,300 --> 02:01:28,220
+especie o lo puedo correlacionar con un sobre aprendizaje, un sobre ajuste del
+
+1257
+02:01:28,220 --> 02:01:31,740
+modelo? Bueno, nada que ver.
+
+1258
+02:01:31,740 --> 02:01:41,540
+estoy repitiendo una señal, ya, eso es lo que estoy haciendo, estoy diciendo que es como que
+
+1259
+02:01:41,540 --> 02:01:47,100
+observé dos cosas que en principio son iguales pero las estoy considerando distintas, ahora dado
+
+1260
+02:01:47,100 --> 02:01:51,980
+que yo sé que son la misma, sí es un sobre ajuste porque estoy contando dos veces lo mismo,
+
+1261
+02:01:51,980 --> 02:01:57,620
+que es el ejemplo que lo que quería mencionar ahí, es que si yo tengo señales que me están
+
+1262
+02:01:57,620 --> 02:02:01,580
+entregando, vale la redundancia, la misma señal de identificación de la clase de
+
+1263
+02:02:01,580 --> 02:02:06,140
+interés que en este caso es spam o no, la probabilidad no va a subir linealmente y
+
+1264
+02:02:06,140 --> 02:02:11,940
+va a mejorar sustancialmente. ¿Cómo lo ejemplificábamos acá?
+
+1265
+02:02:11,940 --> 02:02:20,660
+simplemente copiando una columna para ver o replicar el caso idóneo de que me
+
+1266
+02:02:20,660 --> 02:02:24,460
+entrega la misma información. Cuando tengo señales que me están entregando
+
+1267
+02:02:24,460 --> 02:02:28,540
+la misma información de identificación de spam, la probabilidad sube sustancialmente.
+
+1268
+02:02:28,540 --> 02:02:33,300
+Ahora, es sobre ajuste porque en principio porque yo sé que son iguales.
+
+1269
+02:02:36,700 --> 02:02:38,820
+¿Alguna otra pregunta? ¿Dudas? Ok, gracias.
+
+1270
+02:02:42,700 --> 02:02:52,740
+Ya, síguelo entonces. Lo de los balanceados, sí, cuando tengo de balanceamiento y hago técnicas,
+
+1271
+02:02:52,740 --> 02:02:56,340
+digamos, de balanceo de clases por parte de cosas muy anómalas, igual después
+
+1272
+02:02:56,340 --> 02:03:02,700
+tengo que considerar ese arreglo que hice, digamos, porque estoy...
+
+1273
+02:03:02,700 --> 02:03:06,380
+Lo que usualmente pasa cuando doplico esa metodología es que voy a
+
+1274
+02:03:06,380 --> 02:03:11,900
+sobreestimar las probabilidades. Después tengo que tener una forma de llevarlas al
+
+1275
+02:03:11,900 --> 02:03:17,660
+plano real de la frecuencia que efectivamente ocurre en esos eventos.
+
+1276
+02:03:17,660 --> 02:03:32,540
+Siguiendo entonces, aquí hay un pequeño gráfico de cómo se ven las distintas señales dentro de las distintas clases, es decir, la palabra free está presente en
+
+1277
+02:03:32,540 --> 02:03:46,820
+cincuenta y tanto por ciento de dentro de spam y casi 0,1 dentro de legítimo y así para el resto, ya estas son ocho señales dentro de las cincuenta y tres, de las cincuenta y cuatro para formar señales.
+
+1278
+02:03:46,820 --> 02:03:52,700
+Entonces nosotros tenemos que combinar todas esas cosas y lo hacemos de la metodología que vimos, que estamos uniendo independencia, entonces
+
+1279
+02:03:52,900 --> 02:03:56,140
+multiplicamos estas probabilidades que como lo vimos anteriormente
+
+1280
+02:03:59,060 --> 02:04:01,060
+Entonces
+
+1281
+02:04:01,740 --> 02:04:05,820
+para ese caso lo podemos calcular y simplemente basta
+
+1282
+02:04:06,860 --> 02:04:08,860
+realizar esta metodología
+
+1283
+02:04:09,740 --> 02:04:12,080
+Ahora hay una pregunta que es más interesante
+
+1284
+02:04:12,080 --> 02:04:16,860
+porque toda esta metodología independiente si ocupo en IPS,
+
+1285
+02:04:16,860 --> 02:04:25,160
+Bernoulli, Gaussiano, o ocupo un Bernoulli con distinto suavizamiento o la referencia misma
+
+1286
+02:04:25,160 --> 02:04:30,000
+van a entregar una probabilidad, van a tener una probabilidad de identificar la
+
+1287
+02:04:30,000 --> 02:04:36,920
+clase que yo estoy de interés, que es spam o no. Pero ahora, la pregunta más práctica
+
+1288
+02:04:36,920 --> 02:04:42,340
+cuando conviene evitar el correo antes de que entra tu versión de correo y pase
+
+1289
+02:04:42,340 --> 02:04:47,620
+directamente a spam? porque ahora yo voy a definir si se fijan, esta era una
+
+1290
+02:04:47,620 --> 02:04:52,300
+clasificación binaria, por consecuencia hay dos formas de equivocar y entra una
+
+1291
+02:04:52,300 --> 02:04:57,380
+matriz de confusión, decir que era correo o predecir que era correo y que era
+
+1292
+02:04:57,380 --> 02:05:03,700
+correo spam y efectivamente lo era, que eso es acertarle, decir que no era
+
+1293
+02:05:03,700 --> 02:05:08,940
+correo a spam y no efectivamente no lo era nuevamente otra cierto y tengo la
+
+1294
+02:05:08,940 --> 02:05:12,460
+otra forma de que querés decir que era spam y cuando no lo era y decir que no
+
+1295
+02:05:12,460 --> 02:05:16,380
+era spam cuando si lo era entonces ahí estoy en los casos de
+
+1296
+02:05:16,380 --> 02:05:21,700
+falsos positivos y los falsos negativos que es peor en este caso porque no
+
+1297
+02:05:21,700 --> 02:05:27,500
+tienen la misma el mismo peso claramente es mucho peor bloquear un correo que si
+
+1298
+02:05:27,500 --> 02:05:33,440
+efectivamente era legítimo en cambio dejar pasar un spam a tu buzón de
+
+1299
+02:05:33,440 --> 02:05:42,000
+entrada, es tedioso si hay un coste que yo le estoy definiendo como un costo 1, pero que un
+
+1300
+02:05:42,000 --> 02:05:46,720
+correo legítimo pasa el spam tiene un costo bastante cinco veces mayor que lo estoy cuantificando.
+
+1301
+02:05:46,720 --> 02:05:51,720
+Ahora esas cuantificaciones son de ejemplo, yo la podría cuantificar en términos monetarios o
+
+1302
+02:05:51,720 --> 02:05:59,720
+importancia o alguna otra forma. Entonces, si la probabilidad, por ejemplo, yo voy a definir que
+
+1303
+02:05:59,720 --> 02:06:04,180
+los falsos positivos que son bloquear un correo legítimo tiene un costo 5 y los
+
+1304
+02:06:04,180 --> 02:06:12,340
+falsos negativos van a tener un costo 1 entonces yo ahora puedo definir con las
+
+1305
+02:06:12,340 --> 02:06:16,680
+probabilidades de predicción que calculé con algunas de las
+
+1306
+02:06:16,680 --> 02:06:25,480
+meteorologías de Naipayas, el costo de bloquear, si se fijan acá es
+
+1307
+02:06:25,480 --> 02:06:34,600
+5 por la probabilidad ya 1 menos 0 9 ya que vendría siendo el complemento de
+
+1308
+02:06:34,600 --> 02:06:41,600
+esta probabilidad de no de que no sea spam que va a ser 0 5 que en esencia es
+
+1309
+02:06:41,600 --> 02:06:47,560
+bloquear el costo de bloquear y el costo de dejar pasar que tiene menor costo
+
+1310
+02:06:47,560 --> 02:06:53,440
+bloquear porque es 5 por 1 menos 0 9 me da 0 5
+
+1311
+02:06:53,440 --> 02:06:58,120
+y para el caso por ejemplo una probabilidad 0.7 que predigo entonces
+
+1312
+02:06:58,120 --> 02:07:04,400
+hago el mismo ejercicio 5 por 1 menos 0.7 me da un costo de 1.5 y para dejar
+
+1313
+02:07:04,400 --> 02:07:10,200
+pasar 1.07 me da un 0.7
+
+1314
+02:07:10,200 --> 02:07:15,040
+el menor costo el caso de dejar pasar el correo
+
+1315
+02:07:15,040 --> 02:07:21,280
+entonces esta probabilidad P es la probabilidad de que sea spam ya sea spam
+
+1316
+02:07:21,280 --> 02:07:29,320
+condicionado o no condicionado y yo le estoy definiendo, digamos, costos
+
+1317
+02:07:29,320 --> 02:07:33,920
+asociados a las distintas decisiones porque todas las metodologías anteriores
+
+1318
+02:07:33,920 --> 02:07:41,800
+meten una probabilidad pero la decisión no es sólo cuantitativa en el sentido de
+
+1319
+02:07:41,800 --> 02:07:45,800
+si la probabilidad es mayor que un número entonces ah y si es que no lo es
+
+1320
+02:07:45,800 --> 02:07:49,720
+entonces no. Los problemas son más
+
+1321
+02:07:49,720 --> 02:07:52,480
+complicados y en ese sentido no es, no
+
+1322
+02:07:52,480 --> 02:07:54,280
+entramos en la misma métrica que habíamos dicho
+
+1323
+02:07:54,280 --> 02:07:55,800
+antes de la matriz de confusión y las
+
+1324
+02:07:55,800 --> 02:07:57,080
+formas distintas de equivocarse en
+
+1325
+02:07:57,080 --> 02:07:59,680
+clasificación binaria
+
+1326
+02:07:59,680 --> 02:08:04,280
+de que no, equivocarse de distinta
+
+1327
+02:08:04,280 --> 02:08:08,320
+manera no es lo mismo siempre.
+
+1328
+02:08:08,320 --> 02:08:10,200
+Hay distintas formas de equivocarse y
+
+1329
+02:08:10,200 --> 02:08:11,960
+hay equivocaciones que son peores que
+
+1330
+02:08:11,960 --> 02:08:14,080
+otras. Aquí lo estamos cuantificando en
+
+1331
+02:08:14,080 --> 02:08:19,320
+términos de un costo. Entonces yo podría calibrar, digamos, estos costos, pero
+
+1332
+02:08:19,320 --> 02:08:25,960
+usualmente vienen dentro de algún contexto económico financiero, digamos, o
+
+1333
+02:08:25,960 --> 02:08:32,240
+también lo podría definir en términos de tiempo. Un fin de cosa que va a
+
+1334
+02:08:32,240 --> 02:08:40,040
+depender mucho del contexto. Entonces, ese es el proceso de decisión. Yo, con la
+
+1335
+02:08:40,040 --> 02:08:47,440
+metodología en I-bias predigo estas probabilidades y la decisión la tomo a
+
+1336
+02:08:47,440 --> 02:08:53,760
+nivel un poco más global, inmerso, digamos, dentro del contexto del problema.
+
+1337
+02:08:54,000 --> 02:09:02,720
+Entonces, yo puedo programar esto y definir el umbral. Yo puedo definir
+
+1338
+02:09:02,720 --> 02:09:09,120
+esto, cuál va a ser el umbral de decisión, que me voy a definirlo como
+
+1339
+02:09:09,120 --> 02:09:18,420
+si bloquear o no bloquear. Yo voy a clasificar esto, que aquí está el video claramente
+
+1340
+02:09:18,420 --> 02:09:25,860
+programado de manera un poco más manual, los distintos umbrales, que es en esencia
+
+1341
+02:09:25,860 --> 02:09:30,240
+el umbral es la pregunta de qué tan seguro en términos de la probabilidad tengo que
+
+1342
+02:09:30,240 --> 02:09:36,160
+estar yo para clasificar algo como spam o no.
+
+1343
+02:09:36,160 --> 02:09:43,040
+y se fijan acá, dado que yo me definí los costos para bloquear y no bloquear, o para
+
+1344
+02:09:43,040 --> 02:09:50,840
+los falsos positivos y los falsos negativos, yo voy a probar los distintos umbrales. Si
+
+1345
+02:09:50,840 --> 02:09:57,180
+elijo un umbral muy bajo, ¿qué es lo que voy a estar haciendo? Voy a estar bloqueando
+
+1346
+02:09:57,180 --> 02:10:02,920
+o voy a estar prediciendo muchos, que hay muchos mensajes para hacer spam. Entonces
+
+1347
+02:10:02,920 --> 02:10:07,480
+voy a ser un poco más laxo para decir que un mensaje es spam, ya?
+
+1348
+02:10:07,480 --> 02:10:13,960
+Y como un decir, si yo tengo la preferencia de decir,
+
+1349
+02:10:13,960 --> 02:10:16,480
+o tengo una mayor probabilidad de decir, no, este mensaje es spam,
+
+1350
+02:10:16,480 --> 02:10:20,600
+este mensaje es spam, dado que yo le puse un costo de 5
+
+1351
+02:10:20,600 --> 02:10:23,800
+a bloquear un legítimo, cuando digo que muchas cosas son spam,
+
+1352
+02:10:23,800 --> 02:10:28,040
+es muy fácil que yo me equivoque y diga que un legítimo era,
+
+1353
+02:10:28,040 --> 02:10:31,520
+lo clasifique como spam y efectivamente no lo era, porque es legítimo.
+
+1354
+02:10:31,520 --> 02:10:39,760
+entonces el costo va a tender a subir mucho pero conforme voy subiendo el
+
+1355
+02:10:39,760 --> 02:10:42,240
+umbral
+
+1356
+02:10:42,240 --> 02:10:47,440
+el costo va a ir bajando ¿por qué? porque ahora tengo que estar muy seguro en
+
+1357
+02:10:47,440 --> 02:10:52,040
+términos de la probabilidad de definir que es spam para clasificar un mensaje
+
+1358
+02:10:52,040 --> 02:10:56,800
+como spam. Ahora tampoco puedo irme tan a la
+
+1359
+02:10:56,800 --> 02:11:00,840
+derecha porque si me voy muy a la derecha entonces en la práctica no voy a
+
+1360
+02:11:00,840 --> 02:11:07,120
+clasificar nada como spam, ya, y voy a tener un costo base que va a ser el número de
+
+1361
+02:11:07,120 --> 02:11:14,280
+mensajes por uno, ya, por la cantidad de los costos, digamos, pero tengo un costo uno
+
+1362
+02:11:14,280 --> 02:11:19,560
+por cada mensaje que no clasifico mal. Entonces, tampoco me puedo ir tan arriba, ya.
+
+1363
+02:11:19,560 --> 02:11:24,480
+Quiero disminuir el costo, pero también quiero decir de vez en cuando y jugarme
+
+1364
+02:11:24,480 --> 02:11:29,920
+la, digamos, el modelo tiene que decir que clasifique que sea spam, ya, porque si no
+
+1365
+02:11:29,920 --> 02:11:34,120
+entraba otro problema, que no estamos clasificando nada. Si digo que todo no es spam,
+
+1366
+02:11:34,120 --> 02:11:42,320
+la verdad es que no estoy clasificando nada. Entonces puedo obtener el valor
+
+1367
+02:11:42,320 --> 02:11:50,780
+del costo por cada mil, digamos, observaciones. Va a ser 5 por los falsos positivos más 1 por 4
+
+1368
+02:11:50,780 --> 02:11:56,320
+16. Recuerden que 1 era el costo de los falsos negativos y voy a tener un 2 16 y este 2 16 es el
+
+1369
+02:11:56,320 --> 02:12:00,620
+umbral que está acá abajo, este número que hace el 095 donde está esta línea
+
+1370
+02:12:00,620 --> 02:12:09,640
+punteada. Yo podría plantearme otros umbrares un poco más finos, pero
+
+1371
+02:12:09,640 --> 02:12:15,000
+eso simplemente en términos de costo, no necesariamente el mejor umbral, y aparte
+
+1372
+02:12:15,000 --> 02:12:20,560
+podrían calibrar los costos asociados para cada falso positivo y para cada
+
+1373
+02:12:20,560 --> 02:12:27,880
+falso negativo. Ahora, lo que hicimos ahora lo queremos probar en el conjunto de prueba
+
+1374
+02:12:27,880 --> 02:12:37,960
+para la redundancia. Entonces, tenemos estos 921 correos históricos y aquí está la matriz de
+
+1375
+02:12:37,960 --> 02:12:48,520
+confusión. Para abajo, cuando es real, cuando era legítimo en el conjunto de datos y cuando era
+
+1376
+02:12:48,520 --> 02:12:52,560
+spam en el conjunto de datos y aquí estoy la predicción, estoy haciendo una predicción
+
+1377
+02:12:52,560 --> 02:12:57,720
+que me entregó mi modelo que hice entonces vemos que
+
+1378
+02:12:57,720 --> 02:13:03,880
+si 500 de las 921 veces, 541 veces dije que predije que era legítimo y
+
+1379
+02:13:03,880 --> 02:13:08,960
+efectivamente era legítimo y 274 predije que era spam y efectivamente era spam
+
+1380
+02:13:08,960 --> 02:13:12,360
+pero ahora tengo
+
+1381
+02:13:13,120 --> 02:13:18,080
+las dos formas de el video Carmen dice tijan si yo predigo que era spam
+
+1382
+02:13:18,080 --> 02:13:25,680
+y efectivamente el legítimo son 17 veces, que era el caso más costoso. Y el caso al revés,
+
+1383
+02:13:25,680 --> 02:13:31,040
+quiere decir que era legítimo y efectivamente era spam, es 89, que tiene un costo menor de 1.
+
+1384
+02:13:31,040 --> 02:13:40,880
+Entonces, en el conjunto de prueba, yo puedo calcular cuánto es el costo de esta clasificación,
+
+1385
+02:13:40,880 --> 02:13:47,520
+que va a ser 5 por los falsos positivos que en el caso del conjunto de prueba son 17
+
+1386
+02:13:47,520 --> 02:13:53,920
+más 1 por los falsos negativos que en el caso del conjunto de prueba son 89
+
+1387
+02:13:53,920 --> 02:13:59,880
+dividido en 921 correos por 1000 para estandarizarlo y hacerlo comparable y me
+
+1388
+02:13:59,880 --> 02:14:05,920
+queda 188 ahora vemos el caso que no nos sirve mucho
+
+1389
+02:14:05,920 --> 02:14:10,600
+si dejo pasar todos los correos y en principio no clasifico nada como
+
+1390
+02:14:10,600 --> 02:14:15,720
+el costo, cuando hago este mismo ejercicio, va a ser 394. Entonces tengo que
+
+1391
+02:14:15,720 --> 02:14:22,040
+clasificar para reducir el costo. Por eso, esta función de clasificación en
+
+1392
+02:14:22,040 --> 02:14:26,520
+términos de los costos y la calibración de cuántos el costo por cada falso
+
+1393
+02:14:26,520 --> 02:14:33,320
+positivo y por cada falso negativo es súper importante, tan importante como la
+
+1394
+02:14:33,320 --> 02:14:38,680
+estimación de las probabilidades, la predicción de las probabilidades.
+
+1395
+02:14:38,680 --> 02:14:43,880
+cuento que yo puedo tener probabilidades muy bajas pero si tengo un costo muy alto
+
+1396
+02:14:43,880 --> 02:14:49,120
+entonces en el costo global me va a cambiar mi decisión y usualmente esos
+
+1397
+02:14:49,120 --> 02:14:54,280
+costos vienen del contexto del problema. Entonces hay que separar la predicción
+
+1398
+02:14:54,280 --> 02:15:00,080
+de la decisión propiamente. En este caso es clasifico como spam o no lo clasifico
+
+1399
+02:15:00,080 --> 02:15:02,320
+como spam.
+
+1400
+02:15:02,320 --> 02:15:11,680
+ahora, ¿qué tengo que revisar, digamos, antes de usar este filtro que nosotros hicimos con naive-pies?
+
+1401
+02:15:11,680 --> 02:15:16,960
+en otro conjunto de datos que yo lo especifico como otra bandeja
+
+1402
+02:15:16,960 --> 02:15:21,480
+¿qué aprendimos, digamos?
+
+1403
+02:15:21,480 --> 02:15:26,240
+si la frecuencia importa, entonces si la frecuencia es muy baja
+
+1404
+02:15:26,240 --> 02:15:33,600
+entonces también va a bajar la probabilidad de predicción de esa clase
+
+1405
+02:15:33,600 --> 02:15:37,840
+entonces tiene que estar relativamente representado y eso está conectado con lo que preguntaba
+
+1406
+02:15:37,840 --> 02:15:42,280
+Antonio con clases desbalanceadas
+
+1407
+02:15:42,280 --> 02:15:44,320
+si copio una señal que vendría haciendo
+
+1408
+02:15:44,320 --> 02:15:50,000
+no es sobre ajuste per se pero si la copio un momento y tal o tengo dos señales que me entregan la misma información
+
+1409
+02:15:50,000 --> 02:15:51,720
+e...
+
+1410
+02:15:51,720 --> 02:15:57,240
+me va a subir sustancialmente las probabilidades de clasificación de spam
+
+1411
+02:15:57,240 --> 02:16:02,320
+y todas estas cosas lo tengo que hacer siempre cuando genera esta metodología
+
+1412
+02:16:02,320 --> 02:16:06,280
+dejando el conjunto de pruebas afuera para
+
+1413
+02:16:06,280 --> 02:16:07,960
+digamos
+
+1414
+02:16:07,960 --> 02:16:12,400
+definir una métrica que en este caso es una métrica de costo
+
+1415
+02:16:12,400 --> 02:16:15,040
+cuál voy a escoger
+
+1416
+02:16:15,040 --> 02:16:16,360
+entonces
+
+1417
+02:16:16,360 --> 02:16:18,440
+eee
+
+1418
+02:16:18,440 --> 02:16:22,600
+tengo que escoger, yo podría hacer validación en este caso también
+
+1419
+02:16:22,600 --> 02:16:25,880
+pero dado que los PNUG eran sustancialmente mejores
+
+1420
+02:16:25,880 --> 02:16:27,880
+usted se planteó esa
+
+1421
+02:16:27,880 --> 02:16:30,960
+cuando defino
+
+1422
+02:16:30,960 --> 02:16:33,840
+el clasificador, el filtro de spam
+
+1423
+02:16:33,840 --> 02:16:37,400
+lo voy a aplicar en conjunto de datos de prueba, voy a sacar la métrica
+
+1424
+02:16:37,400 --> 02:16:40,680
+que en este caso lo definimos en términos de costos
+
+1425
+02:16:40,680 --> 02:16:42,040
+y luego
+
+1426
+02:16:42,040 --> 02:16:45,440
+ese filtro lo voy a ocupar
+
+1427
+02:16:45,440 --> 02:16:47,320
+para nuevos correos
+
+1428
+02:16:47,320 --> 02:16:52,960
+y este es un proceso iterativo, el naive bias conforme tengo más datos que están más representados
+
+1429
+02:16:52,960 --> 02:16:58,000
+va a mejorar su nivel de predicción
+
+1430
+02:16:58,000 --> 02:17:05,200
+no obstante, tengo que tener especial cuidado en cómo defino las señales y qué señales voy a incorporar dentro del modelo
+
+1431
+02:17:05,200 --> 02:17:12,880
+porque tienen que ser señales que efectivamente me están entregando algún indicio de identificación de la clase de interés
+
+1432
+02:17:12,880 --> 02:17:14,880
+por ejemplo
+
+1433
+02:17:14,880 --> 02:17:17,880
+sí
+
+1434
+02:17:19,160 --> 02:17:23,680
+una señal es que tenga, por ejemplo,
+
+1435
+02:17:23,680 --> 02:17:26,240
+arroba
+
+1436
+02:17:26,240 --> 02:17:30,880
+no me va a traer esa señal porque casi todos los correos tienen un arroba en algún sentido
+
+1437
+02:17:30,880 --> 02:17:35,880
+sobre todo de cómo está mi mensaje o tengo una letra en particular
+
+1438
+02:17:35,880 --> 02:17:39,880
+esa señal tiene que ser de cierta manera pensada entre el contexto del problema
+
+1439
+02:17:39,880 --> 02:17:43,880
+de que efectivamente me está dando alguna información que me va a servir
+
+1440
+02:17:43,880 --> 02:17:48,380
+me va a servir para identificar la clase de interés, por ejemplo en este caso en
+
+1441
+02:17:48,380 --> 02:17:52,700
+este contexto, de que identificar que ahí están.
+
+1442
+02:17:52,700 --> 02:17:55,500
+Entonces
+
+1443
+02:17:55,660 --> 02:18:01,480
+tenemos nuestros datos, separamos en entrenamiento y prueba, hacemos nuestra
+
+1444
+02:18:01,480 --> 02:18:07,600
+validación cruzada, aprendemos digamos el modelo o el filtro con AIPY en las
+
+1445
+02:18:07,600 --> 02:18:11,180
+distintas metodologías, puedo probar distintos suavizamientos, recuerden que yo
+
+1446
+02:18:11,180 --> 02:18:14,540
+puedo poner su adicionalista más grande también
+
+1447
+02:18:14,540 --> 02:18:19,620
+y tengo que definir digamos cuál de las metodologías será mejor con eso
+
+1448
+02:18:19,620 --> 02:18:25,060
+planteo el filtro y eso lo puedo implementar en nuevos datos
+
+1449
+02:18:26,740 --> 02:18:32,300
+claramente tengo que definir el umbral con el cual voy a tomar la decisión
+
+1450
+02:18:32,300 --> 02:18:39,760
+Nahid Valles llega hasta entregar una probabilidad de clasificación pero la
+
+1451
+02:18:39,760 --> 02:18:47,880
+decisión puede ser un poco menos natural cuando lo comparo con la probabilidad.
+
+1452
+02:18:47,880 --> 02:18:52,840
+Por ejemplo, si me entrega probabilidades 0,8 uno naturalmente tiende a decir
+
+1453
+02:18:52,840 --> 02:18:56,820
+bueno, si hay un 80% de probabilidad que se ha clasificado la clase de
+
+1454
+02:18:56,820 --> 02:19:01,800
+interés como positiva, por ejemplo, entonces
+
+1455
+02:19:01,800 --> 02:19:06,040
+voy a clasificarlo de esa manera. Pero dentro de distintos contextos no están así.
+
+1456
+02:19:06,040 --> 02:19:12,600
+por ejemplo si el costo de equivocarse es muy grande voy a querer estar muy muy
+
+1457
+02:19:12,600 --> 02:19:20,760
+seguro, pensemos clasificar si un diagnóstico tiene que ser, se va a
+
+1458
+02:19:20,760 --> 02:19:28,640
+definir que es cáncer o no, entonces con un 80% 70% quizás es bajo si el costo
+
+1459
+02:19:28,640 --> 02:19:34,480
+de esa decisión es muy alta, costo en términos generales, voy a esperar que la
+
+1460
+02:19:34,480 --> 02:19:41,560
+probabilidad predicha o estimada sea muy alta, digamos 95, 98 por ciento, para
+
+1461
+02:19:41,560 --> 02:19:46,920
+efectivamente clasificarlo como cáncer. Entonces va a depender mucho del contexto
+
+1462
+02:19:46,920 --> 02:19:52,800
+del problema donde vamos a definir ese umbral y ese contexto del problema
+
+1463
+02:19:53,080 --> 02:19:58,560
+va a estar muy ligado a la calibración de los costos que nosotros tenemos
+
+1464
+02:19:58,560 --> 02:20:03,640
+asociados en la regla de decisión cuando hacemos un prueba.
+
+1465
+02:20:03,640 --> 02:20:08,520
+estos numeritos que le ponemos acá que simplemente es el costo
+
+1466
+02:20:08,520 --> 02:20:13,040
+se ve como que es muy poco simplemente pero la verdad es que tiene mucha
+
+1467
+02:20:13,040 --> 02:20:17,920
+incidencia dentro de la decisión que yo efectivamente voy a tomar y todas estas
+
+1468
+02:20:17,920 --> 02:20:22,600
+metodologías sirven para algo, nosotros no estamos utilizando como una herramienta para algo
+
+1469
+02:20:22,600 --> 02:20:27,400
+entonces y ese algo es tomar esa decisión entonces aquí nosotros mezclamos
+
+1470
+02:20:27,400 --> 02:20:32,360
+lo que es la metodología estatística de esencia de datos ya que hay varios, son
+
+1471
+02:20:32,360 --> 02:20:38,440
+distintas variantes con algo real que efectivamente es las repercusiones de
+
+1472
+02:20:38,440 --> 02:20:44,320
+tomar alguna decisión que están se ven reflejadas en los cortos
+
+1473
+02:20:46,280 --> 02:20:52,360
+entonces como resumen digamos los códigos están todos en el mundo ustedes
+
+1474
+02:20:52,360 --> 02:20:57,200
+lo pueden llegar y ejecutar
+
+1475
+02:20:57,200 --> 02:21:02,200
+y lo voy a compartir.
+
+1476
+02:21:18,200 --> 02:21:21,200
+Si os fijan acá, lo pueden ejecutar y está
+
+1477
+02:21:21,200 --> 02:21:28,560
+replicado cada uno de los gráficos que están disponibles en la presentación
+
+1478
+02:21:28,560 --> 02:21:39,400
+y además pueden entrar a los valores que nosotros calculamos en cada uno de estos
+
+1479
+02:21:39,400 --> 02:21:44,320
+pueden entrar en detalle y ustedes ya más o menos se manejan en cuanto a R
+
+1480
+02:21:44,320 --> 02:21:49,880
+Lo importante acá de toda esta metodología es que en el código nosotros lo hicimos manual
+
+1481
+02:21:49,880 --> 02:21:55,260
+ya pero hay metodologías que hay
+
+1482
+02:21:55,300 --> 02:21:56,360
+paquetes que hacen esto de manera
+
+1483
+02:21:56,400 --> 02:21:59,400
+automatizada, entonces, primero
+
+1484
+02:21:59,440 --> 02:22:08,440
+esto lo que la última iteración que nosotros hicimos
+
+1485
+02:22:08,480 --> 02:22:12,480
+tuvimos que una probabilidad de que sea spam muy muy alta
+
+1486
+02:22:12,520 --> 02:22:17,520
+entonces las señales que tenemos en nuestro conjunto de
+
+1487
+02:22:17,520 --> 02:22:23,120
+dato favorecen mucho la identificación de spam, entonces es una buena base de datos.
+
+1488
+02:22:26,080 --> 02:22:34,340
+No necesariamente podemos decir que esa proporción y esa predicción va a ser válida para nuevas
+
+1489
+02:22:34,340 --> 02:22:40,540
+observaciones, tampoco nos va a servir uno a uno en la calibración para la toma de decisiones en términos de
+
+1490
+02:22:40,540 --> 02:22:43,140
+sus costos
+
+1491
+02:22:43,540 --> 02:22:48,740
+y dice acá un clasificador reparte probabilidad entre sus clases aunque el
+
+1492
+02:22:48,740 --> 02:22:55,740
+caso resulte extraño porque si nosotros sobre todo hacemos su avistamiento le
+
+1493
+02:22:55,740 --> 02:23:01,540
+estamos dando un peso adicional a algo que es muy anómalo
+
+1494
+02:23:01,540 --> 02:23:06,980
+entonces aquí no hablo esta probabilidad no significa que la clasificación, estoy dando
+
+1495
+02:23:06,980 --> 02:23:13,220
+probabilidad de clasificación, en ningún caso estoy hablando de la frecuencia que eso suceda,
+
+1496
+02:23:13,220 --> 02:23:21,660
+si es que pasan ciertas señales yo tengo esta probabilidad de clasificar esta clase,
+
+1497
+02:23:21,660 --> 02:23:26,180
+son preguntas totalmente distintas, no hablo de la anomalía.
+
+1498
+02:23:26,180 --> 02:23:37,460
+Finalmente, y esto es lo que habíamos hablado recién, quiero comentarles sobre las herramientas
+
+1499
+02:23:37,460 --> 02:23:42,020
+disponibles para esto. Tal como casi todas las metodologías esenciales y las metodologías
+
+1500
+02:23:42,020 --> 02:23:50,900
+de estadística, tengo distintos paquetes para realizar lo mismo. Ya veces las formas
+
+1501
+02:23:50,900 --> 02:23:55,900
+de implementación son un poco distintas y entregan números que son ligeramente distintos.
+
+1502
+02:23:55,900 --> 02:24:02,920
+En R yo tengo una librería que se llama Naive Bias y tiene las tres metodologías
+
+1503
+02:24:02,920 --> 02:24:08,220
+que nosotros acabamos de ver. Bernoulli-Naive Bias, Gaussian-Naive Bias y Multinomial-Naive Bias
+
+1504
+02:24:08,220 --> 02:24:12,980
+Sobre todo que nosotros vimos las primeras dos. Y en Python tengo el Scikit-Learn
+
+1505
+02:24:12,980 --> 02:24:19,500
+que tiene un sinfín de herramientas en las cuales tengo Bernoulli-ND de Naive Bias,
+
+1506
+02:24:19,500 --> 02:24:23,940
+Gaussian-Nagy-Valles y multinomial-Nagy-Valles.
+
+1507
+02:24:23,940 --> 02:24:29,260
+R ocupa Predict al ser un lenguaje funcional, por lo cual Predict ocupa
+
+1508
+02:24:29,260 --> 02:24:35,900
+muchos paquetes, digamos. Y en Python ocupe el modelo que lo que definió por
+
+1509
+02:24:35,900 --> 02:24:39,380
+Predict la probabilidad para definir estas probabilidades de las nuevas
+
+1510
+02:24:39,380 --> 02:24:48,060
+observaciones. Estoy empezando acá en el conjunto de prueba utilizando estas
+
+1511
+02:24:48,060 --> 02:24:54,840
+estas funciones, yo puedo automatizar este clasificador e incluso puedo
+
+1512
+02:24:54,840 --> 02:25:00,640
+automa... este filtro, más bien, este clasificador, puedo automatizar la
+
+1513
+02:25:00,640 --> 02:25:07,320
+retroalimentación de nuevos datos para reestimar estas probabilidades. Se entiende
+
+1514
+02:25:07,320 --> 02:25:12,020
+que yo obtuve las probabilidades con cierto conjunto de datos.
+
+1515
+02:25:12,020 --> 02:25:15,660
+Pensemos el caso del spam que lo hemos visto a lo largo de toda la cátedra.
+
+1516
+02:25:15,660 --> 02:25:20,660
+si dejo pasar un mes voy a tener nuevos correos que van a estar clasificados o
+
+1517
+02:25:20,660 --> 02:25:25,420
+etiquetados correctamente y voy a querer incorporar esos
+
+1518
+02:25:25,420 --> 02:25:32,940
+esos nuevos correos dentro del conjunto datos para precisar más aún
+
+1519
+02:25:32,940 --> 02:25:37,220
+el filtro que yo estoy calculando y en principio las predicciones que estoy
+
+1520
+02:25:37,220 --> 02:25:43,860
+haciendo para clasificar cada uno de la clase, en particular en
+
+1521
+02:25:43,860 --> 02:25:48,960
+este caso la clase de interés que es si es spam o no. Toda esta metodología es
+
+1522
+02:25:48,960 --> 02:25:57,000
+aplicable para multiclase y además para cualquiera sea la clase. En general la
+
+1523
+02:25:57,000 --> 02:26:01,800
+clasificación binaria es la más interesante, la más relevante puesto que
+
+1524
+02:26:01,800 --> 02:26:07,340
+lleva directamente una acción. ¿Es así o no es así? Entonces yo puedo
+
+1525
+02:26:07,340 --> 02:26:11,980
+binarizar estas cosas y me facilito de cierta manera una decisión. Entonces por
+
+1526
+02:26:11,980 --> 02:26:17,660
+eso en ciencia de datos y en estadística nos focalizamos bastante en cosas binarias por el
+
+1527
+02:26:17,660 --> 02:26:28,700
+por el simple hecho de que tiene una implicancia directa en realizar o no una acción, cualquiera
+
+1528
+02:26:28,700 --> 02:26:37,180
+sea esto, cualquiera sea el contexto. Entonces independiente si ocupan más Python o R en ambos
+
+1529
+02:26:37,180 --> 02:26:41,580
+metodologías porque son metodologías que están ya establecidas y son bastante inutilizadas,
+
+1530
+02:26:41,580 --> 02:26:50,280
+como países sobre todo, podemos implementarlas, digamos, en cualquiera de los dos lenguajes
+
+1531
+02:26:50,280 --> 02:26:57,660
+fácilmente. Simplemente hay que ver, digamos, la documentación y la verdad es que no es mucho
+
+1532
+02:26:57,660 --> 02:27:03,260
+lo que hay que hacer, es simplemente definir cuál es mi conjunto de datos, cuáles min etiquetas y
+
+1533
+02:27:03,260 --> 02:27:10,420
+cuáles son mis señales. Ya con eso automáticamente esto lo calcula. Entonces van a tener, puede tener
+
+1534
+02:27:10,420 --> 02:27:14,900
+tres inputs dentro de cada de estas funciones.
+
+1535
+02:27:15,100 --> 02:27:24,180
+¿Alguna pregunta, duda que les haya surgido en la cátedra?
+
+1536
+02:27:27,860 --> 02:27:31,140
+Sí, no.
+
+1537
+02:27:32,300 --> 02:27:35,300
+Una
+
+1538
+02:27:35,300 --> 02:27:43,820
+pequeña información respecto al calendario
+
+1539
+02:27:43,820 --> 02:27:53,600
+recuerden que el 8 de octubre está el taller número 3 para que lo tengan
+
+1540
+02:27:53,600 --> 02:27:55,780
+presente
+
+1541
+02:27:56,140 --> 02:28:02,100
+no queda tanto por eso se lo mencionó es el próximo jueves entonces
+
+1542
+02:28:02,100 --> 02:28:05,820
+tengalo digamos presente dentro de su calendario para que no lo estén haciendo
+
+1543
+02:28:05,820 --> 02:28:10,460
+digamos para los tomates tan desprevenido
+
+1544
+02:28:11,700 --> 02:28:16,140
+en fin entonces damos por finalizada esta cátera nos volvemos a encontrar el
+
+1545
+02:28:16,140 --> 02:28:19,820
+próximo jueves en el taller
+

@@ -1,0 +1,268 @@
+# S40. Naive Bayes y clasificación probabilística. R base, sin paquetes adicionales.
+# Ejecutar los tramos 00-10 en orden y conservar la misma sesión.
+# Guardar el R, el Python y spam_s40.csv juntos, o conservar la carpeta clase.
+
+# %% 00. Entorno y funciones ----
+RUTA_MATERIAL <- "" # Opcional: carpeta que contiene spam_s40.csv.
+if (.Platform$OS.type=="windows" && !isTRUE(l10n_info()[["UTF-8"]])) {
+  invisible(Sys.setlocale("LC_CTYPE","English_United States.utf8"))
+}
+buscar_datos <- function() {
+  archivos <- unlist(lapply(sys.frames(), function(fr) fr$ofile), use.names=FALSE)
+  archivos <- c(rev(archivos), sub("^--file=", "", grep("^--file=",commandArgs(),value=TRUE)))
+  inicios <- if(nzchar(RUTA_MATERIAL)) RUTA_MATERIAL else c(archivos,getwd())
+  for(inicio in inicios) {
+    if(!file.exists(inicio)) next
+    base <- normalizePath(inicio,winslash="/",mustWork=TRUE)
+    if(!dir.exists(base)) base <- dirname(base)
+    padres <- base
+    while(!nzchar(RUTA_MATERIAL) && dirname(base)!=base) {
+      base <- dirname(base); padres <- c(padres,base)
+    }
+    for(padre in padres) for(carpeta in c(padre,file.path(padre,"datos"),
+      file.path(padre,"clase/datos"),file.path(padre,"sesiones/40_2026-10-01_naive_bayes/clase/datos"))) {
+      if(file.exists(file.path(carpeta,"spam_s40.csv"))) return(carpeta)
+    }
+  }
+  stop("Guardar spam_s40.csv junto al código o completar RUTA_MATERIAL.")
+}
+DATOS <- buscar_datos()
+destino <- if(basename(DATOS)=="datos") dirname(DATOS) else DATOS
+SALIDA <- file.path(Sys.getenv("DIPDS_RESULTADOS",file.path(destino,"resultados")),"r")
+dir.create(SALIDA,recursive=TRUE,showWarnings=FALSE)
+MOSTRAR <- interactive() && Sys.getenv("DIPDS_MOSTRAR_FIGURAS","1")=="1"
+AZUL <- "#4067A0"; NARANJA <- "#C66A25"; VERDE <- "#247D72"
+tabla <- function(nombre,x) {
+  write.csv(x,file.path(SALIDA,paste0(nombre,".csv")),row.names=FALSE,fileEncoding="UTF-8")
+  cat("\n",nombre,"\n"); print(head(x,12),digits=5,row.names=FALSE)
+  if(nrow(x)>12) cat("Mostradas 12 de",nrow(x),"filas. El CSV contiene la tabla completa.\n")
+}
+figura <- function(nombre,dibujar) {
+  pdf(file.path(SALIDA,paste0(nombre,".pdf")),width=8,height=4)
+  dibujar(); dev.off()
+  if(MOSTRAR) { par(mfrow=c(1,1)); dibujar() }
+}
+posterior <- function(log_conjunta) {
+  z <- sweep(log_conjunta,1,apply(log_conjunta,1,max),"-")
+  p <- exp(z); p/rowSums(p)
+}
+log_posterior <- function(log_conjunta) {
+  z <- sweep(log_conjunta,1,apply(log_conjunta,1,max),"-")
+  sweep(z,1,log(rowSums(exp(z))),"-")
+}
+medir <- function(y,p,t=.5,logp=NULL) {
+  q <- pmin(pmax(p,1e-15),1-1e-15); pred <- p>=t
+  if(is.null(logp)) logp <- cbind(log1p(-q),log(q))
+  perdida <- -mean(pmax(logp[cbind(seq_along(y),y+1)],log(1e-15)))
+  vn <- sum(y==0 & !pred); fp <- sum(y==0 & pred)
+  fn <- sum(y==1 & !pred); vp <- sum(y==1 & pred)
+  n1 <- sum(y==1); n0 <- sum(y==0)
+  auc <- (sum(rank(logp[,2]-logp[,1],ties.method="average")[y==1])-n1*(n1+1)/2)/(n1*n0)
+  data.frame(log_loss=perdida,brier=mean((y-p)^2),
+    auc=auc,accuracy=mean(pred==y),VN=vn,FP=fp,FN=fn,VP=vp,costo_1000=1000*(5*fp+fn)/length(y))
+}
+
+# %% 01. Bayes con una señal y cambio de prevalencia ----
+previas <- c(.20,.02)
+oferta_spam <- 16/20; oferta_legitimo <- 8/80
+p <- previas*oferta_spam/(previas*oferta_spam+(1-previas)*oferta_legitimo)
+tabla("01_bayes",data.frame(prior_spam=previas,posterior_oferta=p))
+figura("01_prior",function() {
+  g <- seq(.001,.999,length.out=300)
+  plot(g,g*oferta_spam/(g*oferta_spam+(1-g)*oferta_legitimo),type="l",col=AZUL,xlab="Probabilidad previa de spam",ylab="P(spam | oferta)",ylim=c(0,1))
+  points(previas,p,col=NARANJA,pch=19)
+})
+
+# %% 02. Bernoulli: presencia, ausencia y suavizado ----
+# Con alfa=1: oferta (8+1)/82 y (16+1)/22; ausencia de enlace
+# ((80-16)+1)/82 y ((20-14)+1)/22. Primero el cálculo de la diapositiva.
+s_legitimo <- (80/100)*(9/82)*(65/82)
+s_spam <- (20/100)*(17/22)*(7/22)
+p_spam <- s_spam/(s_legitimo+s_spam)
+print(p_spam)
+# La tabla siguiente automatiza el mismo cálculo, con y sin suavizado.
+# theta: probabilidad de presencia; primera fila legítimo, segunda spam.
+n <- c(80,20)
+conteos <- rbind(c(8,16),c(16,14)) # oferta, enlace
+x_nuevo <- c(1,0)
+filas <- lapply(c(0,1),function(alfa) {
+  theta <- (conteos+alfa)/(n+2*alfa)
+  logc <- log(n/sum(n))+rowSums(sweep(log(theta),2,x_nuevo,"*")+sweep(log1p(-theta),2,1-x_nuevo,"*"))
+  data.frame(alfa=alfa,theta_oferta_0=theta[1,1],theta_enlace_0=theta[1,2],
+    theta_oferta_1=theta[2,1],theta_enlace_1=theta[2,2],posterior=posterior(matrix(logc,nrow=1))[1,2])
+})
+tabla("02_bernoulli",do.call(rbind,filas))
+
+# %% 03. Duplicación de evidencia ----
+copias <- c(1,2,4)
+# Otro ejemplo: 100 correos por clase; señal en 80 spam y 20 legítimos.
+prior_copia <- 100/200
+senal_spam <- 80/100; senal_legitimo <- 20/100
+s_spam_copia <- prior_copia*senal_spam^copias
+s_legitimo_copia <- (1-prior_copia)*senal_legitimo^copias
+prob_copias <- s_spam_copia/(s_spam_copia+s_legitimo_copia)
+tabla("03_duplicacion",data.frame(copias=copias,posterior_nb=prob_copias,posterior_correcto=.8))
+figura("03_duplicacion",function() {
+  plot(copias,prob_copias,type="b",col=NARANJA,pch=19,ylim=c(.65,1.02),xlab="Copias de la señal",ylab="Probabilidad de clase 1")
+  abline(h=.8,col=AZUL)
+  legend("bottomright",c("NB: copias independientes","Misma información"),col=c(NARANJA,AZUL),lty=1,bty="n")
+})
+
+# %% 04. GaussianNB y MultinomialNB: cálculos ilustrativos ----
+figura("04_gaussiana",function() {
+  z <- seq(-3,5,length.out=400)
+  plot(z,.8*dnorm(z),type="l",col=AZUL,xlab="x",ylab="Densidad ponderada")
+  lines(z,.2*dnorm(z,2,1),col=NARANJA); abline(v=1.5,lty=3)
+  legend("topright",c("Clase 0: 0.8 f0(x)","Clase 1: 0.2 f1(x)"),col=c(AZUL,NARANJA),lty=1,bty="n")
+})
+# Medición ficticia x=1.5; medias 0 y 2, desviaciones estándar 1.
+densidad_0 <- dnorm(1.5,0,1); densidad_1 <- dnorm(1.5,2,1)
+s0_gauss <- .8*densidad_0; s1_gauss <- .2*densidad_1
+tabla("04_gaussiana",data.frame(x=1.5,densidad_0=densidad_0,
+  densidad_1=densidad_1,producto_0=s0_gauss,producto_1=s1_gauss,
+  posterior=s1_gauss/(s0_gauss+s1_gauss)))
+cuentas <- rbind(c(0,4,2),c(4,0,2))
+theta_m <- (cuentas+1)/(rowSums(cuentas)+3)
+mensajes <- rbind(c(1,0,1),c(2,0,1))
+pm <- posterior(log(.5)+mensajes %*% t(log(theta_m)))[,2]
+tabla("04_multinomial",data.frame(oferta=mensajes[,1],reunion=mensajes[,2],hoy=mensajes[,3],posterior=pm))
+
+# %% 05. Spambase y protocolo ----
+datos <- read.csv(file.path(DATOS,"spam_s40.csv"),check.names=FALSE)
+variables <- grep("^(word_freq_|char_freq_)",names(datos),value=TRUE)
+stopifnot(length(variables)==54,!anyNA(datos))
+ent <- datos[datos$conjunto=="entrenamiento",]; prueba <- datos[datos$conjunto=="prueba",]
+stopifnot(length(intersect(ent$grupo,prueba$grupo))==0)
+stopifnot(max(tapply(ent$fold,ent$grupo,function(z) length(unique(z))))==1)
+X <- as.matrix(ent[,variables]); y <- ent$spam; folds <- ent$fold
+RECETAS <- data.frame(modelo=c("FRECUENCIA","BERN_05","BERN_1","BERN_2","GAUSS_LOG"),
+  tipo=c("prior","bern","bern","bern","gauss"),valor=c(0,.5,1,2,1e-9))
+NOMBRES <- c(FRECUENCIA="Frecuencia de spam",BERN_05="Bernoulli: alfa 0.5",BERN_1="Bernoulli: alfa 1",BERN_2="Bernoulli: alfa 2",GAUSS_LOG="Gaussiana: log(1+x)")
+
+ajustar_predecir <- function(xa,ya,xv,tipo,valor) {
+  if(tipo=="prior") {
+    p <- rep(mean(ya),nrow(xv))
+    return(list(p=p,logp=cbind(log1p(-p),log(p))))
+  }
+  prior <- c(mean(ya==0),mean(ya==1))
+  if(tipo=="bern") {
+    a <- 1*(xa>0); v <- 1*(xv>0)
+    theta <- t(vapply(0:1,function(k) (colSums(a[ya==k,,drop=FALSE])+valor)/(sum(ya==k)+2*valor),numeric(ncol(xa))))
+    logc <- v %*% t(log(theta))+(1-v) %*% t(log1p(-theta))
+    logc <- sweep(logc,2,log(prior),"+")
+    lp <- log_posterior(logc)
+    return(list(p=exp(lp[,2]),logp=lp,theta=theta,prior=prior))
+  }
+  a <- log1p(xa); v <- log1p(xv)
+  # Varianza de máxima verosimilitud: divisor n, como GaussianNB.
+  var_ml <- function(m) colMeans(sweep(m,2,colMeans(m),"-")^2)
+  epsilon <- valor*max(var_ml(a))
+  mu <- t(vapply(0:1,function(k) colMeans(a[ya==k,,drop=FALSE]),numeric(ncol(a))))
+  varianza <- t(vapply(0:1,function(k) var_ml(a[ya==k,,drop=FALSE])+epsilon,numeric(ncol(a))))
+  logc <- sapply(1:2,function(k) {
+    d <- sweep(v,2,mu[k,],"-")
+    log(prior[k])-.5*sum(log(2*pi*varianza[k,]))-.5*rowSums(sweep(d^2,2,varianza[k,],"/"))
+  })
+  lp <- log_posterior(logc)
+  list(p=exp(lp[,2]),logp=lp,mu=mu,varianza=varianza,prior=prior)
+}
+particion <- aggregate(id~conjunto+spam,datos,length); names(particion)[3] <- "n"
+particion <- particion[order(particion$conjunto,particion$spam),]
+tabla("05_particion",particion)
+
+# %% 06. Predicciones fuera de pliegue y comparación ----
+oof <- list(); logs_oof <- list(); comparacion <- list()
+for(j in seq_len(nrow(RECETAS))) {
+  r <- RECETAS[j,]; pred <- numeric(length(y)); lp <- matrix(0,length(y),2)
+  for(k in sort(unique(folds))) {
+    val <- folds==k
+    ajuste <- ajustar_predecir(X[!val,,drop=FALSE],y[!val],X[val,,drop=FALSE],r$tipo,r$valor)
+    pred[val] <- ajuste$p; lp[val,] <- ajuste$logp
+  }
+  oof[[r$modelo]] <- pred
+  logs_oof[[r$modelo]] <- lp
+  comparacion[[j]] <- cbind(modelo=r$modelo,medir(y,pred,logp=lp))
+}
+comparacion <- do.call(rbind,comparacion)
+tabla("06_comparacion_oof",comparacion)
+tabla("06_predicciones_oof",data.frame(id=ent$id,y=y,fold=folds,oof,check.names=FALSE))
+ganador <- comparacion$modelo[which.min(comparacion$log_loss)]
+cat("Selección por log loss OOF:",NOMBRES[ganador],"\n")
+figura("06_comparacion",function() {
+  par(mar=c(4,10,1,1))
+  barplot(rev(comparacion$log_loss),names.arg=rev(NOMBRES[comparacion$modelo]),horiz=TRUE,las=1,
+    col=rev(ifelse(comparacion$modelo==ganador,VERDE,AZUL)),xlab="Log loss OOF (menor es mejor)")
+})
+
+# %% 07. Calibración descriptiva de probabilidades OOF ----
+cal <- list()
+for(clave in c("BERN_1","GAUSS_LOG")) {
+  pred <- oof[[clave]]; bins <- pmin(floor(pred*10),9)
+  for(b in sort(unique(bins))) {
+    m <- bins==b
+    cal[[length(cal)+1]] <- data.frame(modelo=clave,bin=b,n=sum(m),prob_media=mean(pred[m]),fraccion_spam=mean(y[m]))
+  }
+}
+cal <- do.call(rbind,cal); tabla("07_calibracion",cal)
+figura("07_calibracion",function() {
+  par(mfrow=c(1,2),mar=c(4,4,3,1))
+  for(clave in c("BERN_1","GAUSS_LOG")) {
+    d <- cal[cal$modelo==clave,]
+    plot(d$prob_media,d$fraccion_spam,xlim=c(0,1),ylim=c(0,1),pch=19,col=AZUL,
+      cex=.7+1.2*sqrt(d$n/max(d$n)),xlab="Probabilidad media",ylab="Fracción de spam",main=NOMBRES[clave])
+    abline(0,1,lty=3)
+  }
+})
+
+# %% 08. Probabilidades por clase para las señales de un correo ----
+modelo_bern <- ajustar_predecir(X,y,X,"bern",1)
+indice <- which.min(ent$id); b <- 1*(X[indice,]>0); th <- modelo_bern$theta
+aportes <- b*log(th[2,]/th[1,])+(1-b)*log((1-th[2,])/(1-th[1,]))
+prior_log <- log(mean(y)/(1-mean(y)))
+# Contar el estado observado: presencia si b=1, ausencia si b=0.
+# Alfa=1 agrega una unidad al conteo y dos al denominador por clase.
+coincide <- sweep(1*(X>0),2,b,"==")
+n0 <- sum(y==0); n1 <- sum(y==1)
+cuenta0 <- colSums(coincide[y==0,,drop=FALSE])
+cuenta1 <- colSums(coincide[y==1,,drop=FALSE])
+prob0 <- (cuenta0+1)/(n0+2); prob1 <- (cuenta1+1)/(n1+2)
+explicacion <- data.frame(variable=variables,presente=b,conteo_legitimo=cuenta0,
+  n_legitimo=n0,conteo_spam=cuenta1,n_spam=n1,prob_legitimo=prob0,
+  prob_spam=prob1,aporte_log_odds=aportes,row.names=NULL)
+tabla("08_aportes",explicacion)
+tabla("08_correo",data.frame(id=ent$id[indice],log_odds_prior=prior_log,suma_aportes=sum(aportes),posterior=modelo_bern$p[indice]))
+top <- explicacion[order(-abs(aportes),method="radix")[1:8],]; top <- top[order(top$aporte_log_odds),]
+# El detalle logarítmico permite reconstruir la probabilidad completa.
+# Para leer el gráfico basta comparar las probabilidades dentro de cada clase.
+figura("08_aportes",function() {
+  par(mar=c(4,10,3,1))
+  etiquetas <- paste(sub("^(word_freq_|char_freq_)","",top$variable),ifelse(top$presente==1,"(presente)","(ausente)"))
+  barplot(rbind(top$prob_legitimo,top$prob_spam),names.arg=etiquetas,horiz=TRUE,
+    beside=TRUE,las=1,col=c(AZUL,NARANJA),xlim=c(0,1),xlab="P(señal observada | clase)")
+  legend("top",inset=c(0,-.14),xpd=NA,horiz=TRUE,
+    c("Dentro de legítimos","Dentro de spam"),fill=c(AZUL,NARANJA),bty="n",cex=.9)
+})
+
+# %% 09. Regla de decisión y comprobación histórica ----
+umbrales <- (1:19)/20
+costos <- do.call(rbind,lapply(umbrales,function(t) cbind(umbral=t,medir(y,oof[[ganador]],t,logs_oof[[ganador]]))))
+elegido <- costos[order(costos$costo_1000,-costos$umbral),][1,]; umbral <- elegido$umbral
+tabla("09_umbrales",costos)
+figura("09_umbrales",function() {
+  plot(costos$umbral,costos$costo_1000,type="b",pch=19,col=AZUL,xlab="Umbral",ylab="Costo OOF por 1000 correos")
+  abline(v=umbral,col=NARANJA,lty=2)
+})
+r <- RECETAS[RECETAS$modelo==ganador,]
+ajuste <- ajustar_predecir(X,y,as.matrix(prueba[,variables]),r$tipo,r$valor)
+pp <- ajuste$p; yp <- prueba$spam
+resultado <- rbind(cbind(modelo=ganador,umbral=umbral,medir(yp,pp,umbral,ajuste$logp)),
+  cbind(modelo="SIEMPRE_NO_SPAM",umbral=1,medir(yp,rep(mean(y),length(yp)),1)))
+tabla("09_comprobacion_historica",resultado)
+tabla("09_predicciones_historicas",data.frame(id=prueba$id,y=yp,p=pp,pred=as.integer(pp>=umbral)))
+cat("Los 921 correos ya se utilizaron al comparar clasificadores: comprobación retrospectiva, no nueva prueba independiente.\n")
+
+# %% 10. Síntesis y versiones ----
+cat("Prior de clase, verosimilitud y normalización producen la probabilidad.\n")
+cat("La representación determina la variante de Naive Bayes.\n")
+cat("Suavizar evita ceros; independencia y calibración requieren otra evaluación.\n")
+print(R.version.string)

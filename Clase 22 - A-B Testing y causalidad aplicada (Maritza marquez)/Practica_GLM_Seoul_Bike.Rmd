@@ -1,0 +1,990 @@
+---
+title: "Práctica de modelos lineales generalizados: demanda de bicicletas en Seúl"
+date: "`r format(Sys.Date(), '%d/%m/%Y')`"
+output:
+  html_document
+---
+
+```{r configuracion, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 10,
+  fig.height = 5,
+  fig.align = "center"
+)
+
+options(scipen = 999)
+set.seed(123)
+```
+
+# 1. Contexto del problema
+
+Los sistemas de bicicletas compartidas deben anticipar la demanda para disponer de suficientes bicicletas en los momentos de mayor uso. En esta práctica se analiza el número de bicicletas arrendadas por hora en Seúl, junto con variables meteorológicas y de calendario.
+
+La actividad adapta a **R** la lógica del tutorial de modelos lineales generalizados de *Transparent ML*, que compara la regresión lineal con la regresión de Poisson para estudiar datos de conteo:
+
+- Tutorial de referencia: <https://pykale.github.io/transparentML/08-glm-svm/glm.html>
+- Fuente original de los datos: <https://archive.ics.uci.edu/dataset/560/seoul+bike+sharing+demand>
+
+## Objetivos
+
+Al finalizar la práctica se espera que el estudiante pueda:
+
+1. reconocer una variable respuesta de conteo;
+2. explicar por qué una regresión lineal puede ser inadecuada para conteos;
+3. ajustar e interpretar un modelo de regresión de Poisson;
+4. evaluar la presencia de sobredispersión;
+5. ajustar un modelo quasi-Poisson como alternativa inferencial;
+6. construir una clasificación binaria sencilla mediante regresión logística;
+7. evaluar un clasificador mediante una matriz de confusión, métricas y curva ROC.
+
+# 2. Paquetes necesarios
+
+Antes de ejecutar el documento, instale una sola vez los paquetes que no tenga disponibles:
+
+```{r instalacion, eval=FALSE}
+install.packages(c(
+  "tidyverse",
+  "lubridate",
+  "broom",
+  "pROC",
+  "knitr"
+))
+```
+
+Cargamos los paquetes utilizados en el análisis.
+
+```{r paquetes}
+library(tidyverse)
+library(lubridate)
+library(broom)
+library(knitr)
+```
+
+# 3. Importación de la base de datos
+
+El archivo `SeoulBikeData.csv` debe encontrarse en la misma carpeta que este documento `.Rmd`.
+
+La codificación `latin1` es necesaria porque algunos nombres de variables contienen símbolos como grados Celsius.
+
+```{r importar-datos}
+archivo <- "SeoulBikeData.csv"
+
+if (!file.exists(archivo)) {
+  stop(
+    "No se encontró el archivo SeoulBikeData.csv. ",
+    "Guarde el archivo CSV en la misma carpeta del documento RMarkdown."
+  )
+}
+
+bike_raw <- read.csv(
+  file = archivo,
+  fileEncoding = "latin1",
+  check.names = FALSE,
+  stringsAsFactors = FALSE
+)
+
+dim(bike_raw)
+head(bike_raw, 4)
+```
+
+La base contiene una observación por cada combinación de fecha y hora. La variable respuesta es el número de bicicletas arrendadas durante esa hora.
+
+# 4. Preparación de los datos
+
+Primero reemplazamos los nombres originales por nombres breves en español. Luego convertimos la fecha y las variables categóricas al formato adecuado.
+
+```{r preparar-datos}
+names(bike_raw) <- c(
+  "fecha",
+  "bicicletas",
+  "hora",
+  "temperatura",
+  "humedad",
+  "velocidad_viento",
+  "visibilidad",
+  "punto_rocio",
+  "radiacion_solar",
+  "lluvia",
+  "nieve",
+  "estacion",
+  "feriado",
+  "funcionamiento"
+)
+
+meses_es <- c(
+  "Ene", "Feb", "Mar", "Abr", "May", "Jun",
+  "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"
+)
+
+bike <- bike_raw |>
+  mutate(
+    fecha = dmy(fecha),
+    estacion = trimws(estacion),
+    feriado = trimws(feriado),
+    funcionamiento = trimws(funcionamiento),
+    estacion = factor(
+      estacion,
+      levels = c("Winter", "Spring", "Summer", "Autumn"),
+      labels = c("Invierno", "Primavera", "Verano", "Otoño")
+    ),
+    feriado = factor(
+      feriado,
+      levels = c("No Holiday", "Holiday"),
+      labels = c("No", "Sí")
+    ),
+    funcionamiento = factor(
+      funcionamiento,
+      levels = c("No", "Yes"),
+      labels = c("No", "Sí")
+    ),
+    mes_num = month(fecha),
+    mes = factor(mes_num, levels = 1:12, labels = meses_es),
+    hora_f = factor(hora, levels = 0:23),
+    dia_semana = wday(fecha, week_start = 1),
+    dia_laboral = factor(
+      if_else(dia_semana <= 5 & feriado == "No", "Sí", "No"),
+      levels = c("No", "Sí")
+    ),
+    # Representaciones cíclicas útiles para clasificación y predicción temporal.
+    hora_sen = sin(2 * pi * hora / 24),
+    hora_cos = cos(2 * pi * hora / 24),
+    mes_sen = sin(2 * pi * mes_num / 12),
+    mes_cos = cos(2 * pi * mes_num / 12)
+  ) |>
+  arrange(fecha, hora)
+
+glimpse(bike)
+```
+
+## 4.1. Diccionario resumido de variables
+
+```{r diccionario}
+diccionario <- tribble(
+  ~variable, ~descripcion,
+  "fecha", "Fecha de la observación",
+  "bicicletas", "Número de bicicletas arrendadas durante la hora",
+  "hora", "Hora del día, entre 0 y 23",
+  "temperatura", "Temperatura en grados Celsius",
+  "humedad", "Humedad relativa, en porcentaje",
+  "velocidad_viento", "Velocidad del viento en metros por segundo",
+  "visibilidad", "Visibilidad medida en unidades de 10 metros",
+  "punto_rocio", "Temperatura del punto de rocío",
+  "radiacion_solar", "Radiación solar en MJ/m²",
+  "lluvia", "Lluvia en milímetros",
+  "nieve", "Nieve en centímetros",
+  "estacion", "Estación del año",
+  "feriado", "Indicador de día feriado",
+  "funcionamiento", "Indica si el sistema estaba funcionando"
+)
+
+kable(diccionario, align = c("l", "l"))
+```
+
+# 5. Exploración inicial
+
+## 5.1. Valores faltantes
+
+```{r valores-perdidos}
+faltantes <- bike |>
+  summarise(across(everything(), ~ sum(is.na(.x)))) |>
+  pivot_longer(
+    cols = everything(),
+    names_to = "variable",
+    values_to = "n_faltantes"
+  )
+
+kable(faltantes)
+```
+
+## 5.2. Resumen de la variable respuesta
+
+```{r resumen-respuesta}
+summary(bike$bicicletas)
+
+bike |>
+  summarise(
+    n = n(),
+    media = mean(bicicletas),
+    varianza = var(bicicletas),
+    desviacion = sd(bicicletas),
+    minimo = min(bicicletas),
+    maximo = max(bicicletas)
+  ) |>
+  kable(digits = 2)
+```
+
+Una variable de conteo toma valores enteros no negativos. En este caso, el número de bicicletas puede ser 0, 1, 2, y así sucesivamente.
+
+```{r histograma-respuesta}
+ggplot(bike, aes(x = bicicletas)) +
+  geom_histogram(bins = 50) +
+  labs(
+    title = "Distribución del número de bicicletas arrendadas",
+    x = "Bicicletas arrendadas por hora",
+    y = "Frecuencia"
+  ) +
+  theme_minimal()
+```
+
+## 5.3. Días sin funcionamiento
+
+Antes de modelar, verificamos qué ocurre cuando el sistema aparece como no operativo.
+
+```{r funcionamiento}
+bike |>
+  group_by(funcionamiento) |>
+  summarise(
+    observaciones = n(),
+    media = mean(bicicletas),
+    minimo = min(bicicletas),
+    maximo = max(bicicletas),
+    .groups = "drop"
+  ) |>
+  kable(digits = 2)
+```
+
+Los ceros registrados en días sin funcionamiento no representan una demanda naturalmente baja: representan horas en las que el servicio estaba cerrado. Por esta razón, para modelar la **demanda observada cuando el sistema opera**, trabajaremos únicamente con las horas de funcionamiento.
+
+```{r datos-operativos}
+datos_operativos <- bike |>
+  filter(funcionamiento == "Sí") |>
+  droplevels()
+
+nrow(datos_operativos)
+range(datos_operativos$bicicletas)
+```
+
+## 5.4. Demanda media según hora y estación
+
+```{r demanda-hora-estacion}
+datos_operativos |>
+  group_by(estacion, hora) |>
+  summarise(
+    demanda_media = mean(bicicletas, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  ggplot(
+    aes(
+      x = hora,
+      y = demanda_media,
+      group = estacion,
+      color = estacion
+    )
+  ) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 1.6) +
+  scale_x_continuous(breaks = seq(0, 23, by = 2)) +
+  labs(
+    title = "Demanda media por hora y estación del año",
+    x = "Hora",
+    y = "Número medio de bicicletas",
+    color = "Estación"
+  ) +
+  theme_minimal()
+```
+
+Este gráfico permite identificar patrones horarios. En una ciudad, la hora no debe interpretarse como una variable lineal ordinaria: la diferencia entre las 23:00 y las 00:00 no es comparable con una separación de 23 horas. En la primera parte la trataremos como factor, siguiendo el enfoque del tutorial de referencia.
+
+# 6. Regresión lineal como modelo inicial
+
+Aunque la respuesta es un conteo, comenzamos con una regresión lineal para observar sus limitaciones.
+
+El modelo utiliza:
+
+- mes del año;
+- hora del día como variable categórica;
+- temperatura;
+- humedad;
+- lluvia;
+- nieve;
+- indicador de día laboral.
+
+```{r formula-base}
+formula_base <- bicicletas ~
+  mes + hora_f + temperatura + humedad + lluvia + nieve + dia_laboral
+```
+
+## 6.1. Ajuste del modelo lineal
+
+```{r modelo-lineal}
+modelo_lineal <- lm(
+  formula = formula_base,
+  data = datos_operativos
+)
+
+summary(modelo_lineal)
+```
+
+Una interpretación directa de un coeficiente lineal es aditiva. Por ejemplo, manteniendo constantes las demás variables, un coeficiente de 20 para temperatura indicaría un aumento medio de 20 bicicletas por cada grado Celsius adicional.
+
+## 6.2. Coeficientes horarios
+
+La hora 0 es la categoría de referencia. Los coeficientes restantes representan diferencias respecto de esa hora, manteniendo constantes las otras covariables.
+
+```{r coeficientes-hora-lineal}
+coef_hora_lm <- tidy(modelo_lineal) |>
+  filter(str_detect(term, "^hora_f")) |>
+  mutate(hora = as.numeric(str_remove(term, "hora_f"))) |>
+  select(hora, estimate)
+
+coef_hora_lm <- bind_rows(
+  tibble(hora = 0, estimate = 0),
+  coef_hora_lm
+) |>
+  arrange(hora)
+
+ggplot(coef_hora_lm, aes(x = hora, y = estimate)) +
+  geom_hline(yintercept = 0, linetype = 2) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks = 0:23) +
+  labs(
+    title = "Coeficientes horarios del modelo lineal",
+    subtitle = "Diferencias estimadas respecto de las 00:00",
+    x = "Hora",
+    y = "Coeficiente"
+  ) +
+  theme_minimal()
+```
+
+## 6.3. Predicciones negativas
+
+La regresión lineal no restringe las predicciones al conjunto de valores no negativos.
+
+```{r predicciones-lineales}
+datos_operativos <- datos_operativos |>
+  mutate(pred_lineal = predict(modelo_lineal, newdata = datos_operativos))
+
+porcentaje_negativas <- mean(datos_operativos$pred_lineal < 0) * 100
+
+cat(
+  "Porcentaje de predicciones negativas:",
+  round(porcentaje_negativas, 2),
+  "%\n"
+)
+
+ggplot(datos_operativos, aes(x = pred_lineal)) +
+  geom_histogram(bins = 50) +
+  geom_vline(xintercept = 0, linetype = 2) +
+  labs(
+    title = "Distribución de las predicciones del modelo lineal",
+    subtitle = "La línea vertical marca el valor cero",
+    x = "Número predicho de bicicletas",
+    y = "Frecuencia"
+  ) +
+  theme_minimal()
+```
+
+En esta base, el modelo lineal produce aproximadamente `r round(porcentaje_negativas, 1)`% de predicciones negativas. Una cantidad negativa de bicicletas carece de interpretación práctica. La estadística, a veces, puede ser muy creativa; el estacionamiento de bicicletas, bastante menos.
+
+## 6.4. Relación entre media y variabilidad
+
+La dispersión de la demanda cambia considerablemente según la hora. Cuando la demanda media es alta, también suele aumentar la variabilidad.
+
+```{r boxplot-escala-original}
+ggplot(datos_operativos, aes(x = hora_f, y = bicicletas)) +
+  geom_boxplot(
+    fill = "lightblue",
+    colour = "navy",
+    alpha = 0.75,
+    outlier.colour = "red",
+    outlier.fill = "red",
+    outlier.shape = 21,
+    outlier.size = 2.5,
+    outlier.alpha = 0.9
+  ) +
+  labs(
+    title = "Distribución de la demanda según la hora",
+    subtitle = "Los puntos rojos representan valores potencialmente atípicos",
+    x = "Hora",
+    y = "Bicicletas arrendadas"
+  ) +
+  theme_minimal()
+```
+
+
+```{r boxplot-escala-log}
+ggplot(
+  datos_operativos,
+  aes(x = hora_f, y = log1p(bicicletas))
+) +
+  geom_boxplot(
+    fill = "lightblue",
+    colour = "navy",
+    alpha = 0.75,
+    outlier.colour = "red3",
+    outlier.fill = "red",
+    outlier.shape = 21,
+    outlier.size = 2.5,
+    outlier.alpha = 0.9
+  ) +
+  labs(
+    title = "Distribución de la demanda en escala logarítmica",
+    subtitle = "Los puntos rojos representan valores potencialmente atípicos",
+    x = "Hora",
+    y = "log(1 + bicicletas)"
+  ) +
+  theme_minimal()
+```
+
+El modelo lineal supone, entre otras cosas, una varianza residual aproximadamente constante. Los gráficos sugieren que este supuesto no es razonable para la respuesta original.
+
+# 7. Regresión de Poisson
+
+Si $Y_i$ representa el número de bicicletas arrendadas durante la hora $i$, el modelo de Poisson supone que
+
+$$
+Y_i \mid \mathbf{x}_i \sim \text{Poisson}(\lambda_i),
+$$
+
+donde
+
+$$
+\log(\lambda_i)
+= \beta_0 + \beta_1x_{i1}+\cdots+\beta_px_{ip}.
+$$
+
+Por lo tanto,
+
+$$
+\lambda_i
+= \mathbb{E}(Y_i\mid\mathbf{x}_i)
+= \exp(\beta_0 + \beta_1x_{i1}+\cdots+\beta_px_{ip}).
+$$
+
+La función exponencial garantiza que la media estimada sea positiva.
+
+## 7.1. Ajuste del modelo
+
+```{r modelo-poisson}
+modelo_poisson <- glm(
+  formula = formula_base,
+  family = poisson(link = "log"),
+  data = datos_operativos
+)
+
+summary(modelo_poisson)
+```
+
+## 7.2. Interpretación mediante razones de tasas
+
+En un modelo de Poisson, $\exp(\beta_j)$ es una **razón de tasas** o un factor multiplicativo.
+
+- Si $\exp(\beta_j)=1$, no hay cambio en la media esperada.
+- Si $\exp(\beta_j)>1$, la media esperada aumenta.
+- Si $\exp(\beta_j)<1$, la media esperada disminuye.
+
+Por ejemplo, si para temperatura se obtiene $\exp(\hat\beta)=1.04$, un aumento de un grado Celsius se asocia con una demanda media aproximadamente 4% mayor, manteniendo constantes las demás variables.
+
+```{r razones-tasas}
+efectos_poisson <- tidy(modelo_poisson) |>
+  mutate(
+    limite_inferior = estimate - 1.96 * std.error,
+    limite_superior = estimate + 1.96 * std.error,
+    razon_tasas = exp(estimate),
+    rr_inferior = exp(limite_inferior),
+    rr_superior = exp(limite_superior),
+    cambio_porcentual = 100 * (razon_tasas - 1)
+  ) |>
+  filter(term %in% c(
+    "temperatura",
+    "humedad",
+    "lluvia",
+    "nieve",
+    "dia_laboralSí"
+  )) |>
+  select(
+    termino = term,
+    coeficiente = estimate,
+    razon_tasas,
+    rr_inferior,
+    rr_superior,
+    cambio_porcentual,
+    p_value = p.value
+  )
+
+kable(efectos_poisson, digits = 4)
+```
+
+## 7.3. Coeficientes horarios del modelo de Poisson
+
+```{r coeficientes-hora-poisson}
+coef_hora_pois <- tidy(modelo_poisson) |>
+  filter(str_detect(term, "^hora_f")) |>
+  mutate(hora = as.numeric(str_remove(term, "hora_f"))) |>
+  select(hora, estimate)
+
+coef_hora_pois <- bind_rows(
+  tibble(hora = 0, estimate = 0),
+  coef_hora_pois
+) |>
+  arrange(hora)
+
+ggplot(coef_hora_pois, aes(x = hora, y = estimate)) +
+  geom_hline(yintercept = 0, linetype = 2) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks = 0:23) +
+  labs(
+    title = "Coeficientes horarios del modelo de Poisson",
+    subtitle = "Efectos en la escala logarítmica respecto de las 00:00",
+    x = "Hora",
+    y = "Coeficiente"
+  ) +
+  theme_minimal()
+```
+
+## 7.4. Predicciones del modelo de Poisson
+
+```{r predicciones-poisson}
+datos_operativos <- datos_operativos |>
+  mutate(
+    pred_poisson = predict(
+      modelo_poisson,
+      newdata = datos_operativos,
+      type = "response"
+    )
+  )
+
+range(datos_operativos$pred_poisson)
+```
+
+Las predicciones de Poisson no son necesariamente enteras, porque representan una **media esperada**, pero siempre son no negativas.
+
+
+## 7.5. Comparación visual entre valores observados y predichos
+
+```{r comparacion-por-hora}
+comparacion_hora <- datos_operativos |>
+  group_by(hora) |>
+  summarise(
+    observado = mean(bicicletas, na.rm = TRUE),
+    lineal = mean(pred_lineal, na.rm = TRUE),
+    poisson = mean(pred_poisson, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  pivot_longer(
+    cols = c(observado, lineal, poisson),
+    names_to = "serie",
+    values_to = "media"
+  )
+
+ggplot(comparacion_hora, aes(x = hora, y = media, color = serie)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 1.8) +
+  scale_x_continuous(breaks = 0:23) +
+  labs(
+    title = "Demanda media observada y predicha según la hora",
+    x = "Hora",
+    y = "Número medio de bicicletas",
+    color = "Serie"
+  ) +
+  theme_minimal()
+```
+
+
+## 7.6. Medidas descriptivas del ajuste
+
+Las siguientes medidas son calculadas sobre las mismas observaciones utilizadas para ajustar los modelos. Por lo tanto, describen el ajuste dentro de la muestra y no reemplazan una evaluación predictiva externa.
+
+```{r metricas-conteo}
+rmse <- function(real, predicho) {
+  sqrt(mean((real - predicho)^2))
+}
+
+mae <- function(real, predicho) {
+  mean(abs(real - predicho))
+}
+
+metricas_conteo <- tibble(
+  modelo = c("Lineal", "Poisson"),
+  RMSE = c(
+    rmse(datos_operativos$bicicletas, datos_operativos$pred_lineal),
+    rmse(datos_operativos$bicicletas, datos_operativos$pred_poisson)
+  ),
+  MAE = c(
+    mae(datos_operativos$bicicletas, datos_operativos$pred_lineal),
+    mae(datos_operativos$bicicletas, datos_operativos$pred_poisson)
+  ),
+  predicciones_negativas = c(
+    sum(datos_operativos$pred_lineal < 0),
+    sum(datos_operativos$pred_poisson < 0)
+  )
+)
+
+kable(metricas_conteo, digits = 2)
+```
+
+No debe elegirse un modelo exclusivamente por una métrica predictiva. También deben considerarse la naturaleza de la respuesta, el soporte de las predicciones, los supuestos y la interpretación.
+
+# 8. Diagnóstico de sobredispersión
+
+La distribución de Poisson supone que, condicionalmente a las covariables,
+
+$$
+\operatorname{Var}(Y_i\mid\mathbf{x}_i)
+=
+\mathbb{E}(Y_i\mid\mathbf{x}_i).
+$$
+
+Una comprobación sencilla consiste en calcular
+
+$$
+\widehat\phi
+=
+\frac{\sum_i r_{Pi}^{2}}{n-p},
+$$
+
+donde $r_{Pi}$ son los residuos de Pearson.
+
+```{r dispersion-poisson}
+dispersion_poisson <- sum(
+  residuals(modelo_poisson, type = "pearson")^2) / df.residual(modelo_poisson)
+
+dispersion_poisson
+```
+
+El cociente de dispersión estimado es `r round(dispersion_poisson, 2)`.
+
+Como regla descriptiva:
+
+- un valor cercano a 1 es compatible con la varianza de Poisson;
+- un valor claramente mayor que 1 sugiere sobredispersión;
+- un valor menor que 1 sugiere subdispersión.
+
+Esta regla no sustituye un diagnóstico completo, pero sirve como alerta inicial.
+
+## 8.1. Modelo quasi-Poisson
+
+El modelo quasi-Poisson conserva la media y el enlace logarítmico del modelo de Poisson, pero permite
+
+$$
+\operatorname{Var}(Y_i\mid\mathbf{x}_i)
+=
+\phi\,\mathbb{E}(Y_i\mid\mathbf{x}_i).
+$$
+
+Los coeficientes estimados suelen coincidir con los de Poisson, mientras que los errores estándar se corrigen por la dispersión estimada.
+
+```{r modelo-quasipoisson}
+modelo_quasipoisson <- glm(
+  formula = formula_base,
+  family = quasipoisson(link = "log"),
+  data = datos_operativos
+)
+
+summary(modelo_quasipoisson)
+```
+
+## 8.2. Comparación de errores estándar
+
+```{r comparar-errores-estandar}
+comparacion_errores <- tidy(modelo_poisson) |>
+  select(term, beta_poisson = estimate, se_poisson = std.error) |>
+  left_join(
+    tidy(modelo_quasipoisson) |>
+      select(term, beta_quasi = estimate, se_quasi = std.error),
+    by = "term"
+  ) |>
+  filter(term %in% c(
+    "temperatura",
+    "humedad",
+    "lluvia",
+    "nieve",
+    "dia_laboralSí"
+  ))
+
+kable(comparacion_errores, digits = 5)
+```
+
+El quasi-Poisson es especialmente útil para corregir la inferencia cuando existe sobredispersión. Sin embargo, como no especifica una distribución de probabilidad completa, no dispone de una verosimilitud ordinaria y no debe compararse mediante AIC con el modelo de Poisson.
+
+# 9. Clasificación sencilla mediante regresión logística
+
+Ahora formularemos un problema diferente. En lugar de predecir el número exacto de bicicletas, clasificaremos cada hora como:
+
+- **Alta demanda**: el conteo supera el percentil 75 observado en el conjunto de entrenamiento;
+- **Demanda normal**: el conteo no supera ese umbral.
+
+La definición es pedagógica. En una aplicación real, el umbral debería establecerse con criterios operativos, como la capacidad disponible o el costo de quedarse sin bicicletas.
+
+## 9.1. División temporal en entrenamiento y prueba
+
+Como las observaciones están ordenadas en el tiempo, utilizamos las primeras 80% para entrenar y las últimas 20% para evaluar. Esto es más exigente y más realista que mezclar aleatoriamente observaciones pasadas y futuras.
+
+```{r division-temporal}
+n_total <- nrow(datos_operativos)
+indice_corte <- floor(0.80 * n_total)
+
+entrenamiento <- datos_operativos |>
+  slice(1:indice_corte)
+
+prueba <- datos_operativos |>
+  slice((indice_corte + 1):n_total)
+
+range(entrenamiento$fecha)
+range(prueba$fecha)
+```
+
+El umbral de alta demanda se calcula **solo con entrenamiento**, evitando utilizar información de la muestra de prueba.
+
+```{r crear-respuesta-binaria}
+umbral_alta <- as.numeric(
+  quantile(entrenamiento$bicicletas, probs = 0.75)
+)
+
+entrenamiento <- entrenamiento |>
+  mutate(
+    alta_demanda = factor(
+      if_else(bicicletas > umbral_alta, "Alta", "Normal"),
+      levels = c("Normal", "Alta")
+    )
+  )
+
+prueba <- prueba |>
+  mutate(
+    alta_demanda = factor(
+      if_else(bicicletas > umbral_alta, "Alta", "Normal"),
+      levels = c("Normal", "Alta")
+    )
+  )
+
+cat("Umbral de alta demanda:", umbral_alta, "bicicletas\n")
+
+prop.table(table(entrenamiento$alta_demanda))
+prop.table(table(prueba$alta_demanda))
+```
+
+## 9.2. ¿Por qué usar seno y coseno para hora y mes?
+
+La hora y el mes son variables cíclicas. Las 23:00 están cerca de las 00:00, y diciembre está cerca de enero. Para conservar esta estructura utilizamos:
+
+$$
+\sin\left(\frac{2\pi h}{24}\right),\qquad
+\cos\left(\frac{2\pi h}{24}\right),
+$$
+
+junto con expresiones análogas para el mes.
+
+Además, esta codificación permite predecir meses futuros aunque algunos meses no aparezcan como categorías observadas en el conjunto de entrenamiento.
+
+## 9.3. Ajuste del modelo logístico
+
+Sea $Y_i=1$ si la hora tiene alta demanda y $Y_i=0$ en otro caso. El modelo logístico es
+
+$$
+\log\left(\frac{p_i}{1-p_i}\right)
+=
+\beta_0+\beta_1x_{i1}+\cdots+\beta_px_{ip},
+$$
+
+donde $p_i=P(Y_i=1\mid\mathbf{x}_i)$.
+
+```{r modelo-logistico}
+modelo_logistico <- glm(
+  alta_demanda ~
+    hora_sen + hora_cos +
+    mes_sen + mes_cos +
+    temperatura + humedad + lluvia +
+    dia_laboral,
+  family = binomial(link = "logit"),
+  data = entrenamiento
+)
+
+summary(modelo_logistico)
+```
+
+## 9.4. Odds ratios
+
+En regresión logística, $\exp(\beta_j)$ representa un **odds ratio**.
+
+```{r odds-ratios}
+odds_ratios <- tidy(modelo_logistico) |>
+  mutate(
+    limite_inferior = estimate - 1.96 * std.error,
+    limite_superior = estimate + 1.96 * std.error,
+    OR = exp(estimate),
+    OR_inferior = exp(limite_inferior),
+    OR_superior = exp(limite_superior)
+  ) |>
+  select(
+    termino = term,
+    coeficiente = estimate,
+    OR,
+    OR_inferior,
+    OR_superior,
+    p_value = p.value
+  )
+
+kable(odds_ratios, digits = 4)
+```
+
+Los efectos de `hora_sen`, `hora_cos`, `mes_sen` y `mes_cos` deben interpretarse en conjunto, porque representan ciclos completos y no incrementos unitarios ordinarios.
+
+## 9.5. Probabilidades y clases predichas
+
+Utilizamos inicialmente el punto de corte 0.50:
+
+$$
+\widehat Y_i =
+\begin{cases}
+1, & \widehat p_i \geq 0.50,\\
+0, & \widehat p_i < 0.50.
+\end{cases}
+$$
+
+```{r prediccion-logistica}
+punto_corte <- 0.50
+
+prueba <- prueba |>
+  mutate(
+    prob_alta = predict(
+      modelo_logistico,
+      newdata = prueba,
+      type = "response"
+    ),
+    clase_predicha = factor(
+      if_else(prob_alta >= punto_corte, "Alta", "Normal"),
+      levels = c("Normal", "Alta")
+    )
+  )
+
+prueba |>
+  select(
+    fecha,
+    hora,
+    bicicletas,
+    alta_demanda,
+    prob_alta,
+    clase_predicha
+  ) |>
+  head(10) |>
+  kable(digits = 3)
+```
+
+# 10. Evaluación del clasificador
+
+## 10.1. Matriz de confusión
+
+```{r matriz-confusion}
+matriz_confusion <- table(
+  Real = prueba$alta_demanda,
+  Predicho = prueba$clase_predicha
+)
+
+kable(addmargins(matriz_confusion))
+```
+
+La matriz contiene:
+
+- verdaderos negativos: demanda normal clasificada como normal;
+- falsos positivos: demanda normal clasificada como alta;
+- falsos negativos: demanda alta clasificada como normal;
+- verdaderos positivos: demanda alta clasificada como alta.
+
+## 10.2. Métricas de clasificación
+
+```{r metricas-clasificacion}
+division_segura <- function(numerador, denominador) {
+  ifelse(denominador == 0, NA_real_, numerador / denominador)
+}
+
+VN <- matriz_confusion["Normal", "Normal"]
+FP <- matriz_confusion["Normal", "Alta"]
+FN <- matriz_confusion["Alta", "Normal"]
+VP <- matriz_confusion["Alta", "Alta"]
+
+metricas_clasificacion <- tibble(
+  metrica = c(
+    "Exactitud",
+    "Sensibilidad",
+    "Especificidad",
+    "Precisión",
+    "Valor F1"
+  ),
+  valor = c(
+    division_segura(VP + VN, VP + VN + FP + FN),
+    division_segura(VP, VP + FN),
+    division_segura(VN, VN + FP),
+    division_segura(VP, VP + FP),
+    division_segura(
+      2 * VP,
+      2 * VP + FP + FN
+    )
+  )
+)
+
+exactitud_base <- max(prop.table(table(prueba$alta_demanda)))
+
+kable(metricas_clasificacion, digits = 3)
+cat("Exactitud del clasificador mayoritario:", round(exactitud_base, 3), "\n")
+```
+
+La exactitud debe compararse con el clasificador mayoritario. Si la clase de alta demanda es poco frecuente, un modelo que siempre prediga “Normal” puede obtener una exactitud aparentemente buena sin ser útil.
+
+## 10.3. Curva ROC y AUC
+
+```{r curva-roc}
+roc_logistica <- pROC::roc(
+  response = prueba$alta_demanda,
+  predictor = prueba$prob_alta,
+  levels = c("Normal", "Alta"),
+  direction = "<",
+  quiet = TRUE
+)
+
+auc_logistica <- as.numeric(pROC::auc(roc_logistica))
+
+plot(
+  roc_logistica,
+  main = paste0("Curva ROC: AUC = ", round(auc_logistica, 3)),
+  legacy.axes = TRUE
+)
+abline(a = 0, b = 1, lty = 2)
+
+auc_logistica
+```
+
+El AUC resume la capacidad del modelo para asignar probabilidades mayores a las observaciones de alta demanda que a las de demanda normal. Un AUC cercano a 0.5 corresponde a una discriminación similar al azar, mientras que valores mayores indican una mejor capacidad discriminante.
+
+## 10.4. Distribución de probabilidades predichas
+
+```{r probabilidades-por-clase}
+ggplot(prueba, aes(x = prob_alta, fill = alta_demanda)) +
+  geom_histogram(
+    position = "identity",
+    alpha = 0.45,
+    bins = 30
+  ) +
+  geom_vline(xintercept = punto_corte, linetype = 2) +
+  labs(
+    title = "Probabilidades predichas según la clase real",
+    subtitle = "La línea vertical corresponde al punto de corte 0.50",
+    x = "Probabilidad predicha de alta demanda",
+    y = "Frecuencia",
+    fill = "Clase real"
+  ) +
+  theme_minimal()
+```
+
+# 11. Comparación conceptual de los modelos
+
+| Modelo | Tipo de respuesta | Distribución | Función de enlace | Interpretación principal |
+|:--|:--|:--|:--|:--|
+| Lineal | Continua | Normal | Identidad | Cambio aditivo en la media |
+| Poisson | Conteo | Poisson | Logaritmo | Razón de tasas $\exp(\beta)$ |
+| Quasi-Poisson | Conteo sobredisperso | Cuasi-verosimilitud | Logaritmo | Razón de tasas con errores estándar corregidos |
+| Logístico | Binaria | Bernoulli/binomial | Logit | Odds ratio $\exp(\beta)$ |
+
+Los modelos comparten la estructura general
+
+$$
+g\{\mathbb{E}(Y\mid X)\}=X\beta,
+$$
+
+pero utilizan distintas distribuciones y funciones de enlace según la naturaleza de la variable respuesta.
+
+

@@ -1,0 +1,6132 @@
+1
+00:00:00,000 --> 00:00:20,000
+Antes de partir, el tema de hoy que son los modelos de Boosting, no sé si hay alguna pregunta de la semana pasada, algo que no haya quedado claro, algo con respecto a los ejercicios que quedaron como pendientes.
+
+2
+00:00:20,000 --> 00:00:30,000
+Bueno, todo claro.
+
+3
+00:00:30,000 --> 00:00:40,000
+Entonces seguimos con los modelos de Boosting.
+
+4
+00:00:40,000 --> 00:00:56,000
+Vamos aquí a pasear en el fondo.
+
+5
+00:00:56,000 --> 00:01:06,000
+No sé si la intuición es realmente la palabra, está ahí, pero qué es lo que está de fondo.
+
+6
+00:01:06,000 --> 00:01:11,000
+Bueno, puede ser la intuición detrás de los modelos de Boosting.
+
+7
+00:01:11,000 --> 00:01:17,000
+¿Cuál es la diferencia fundamental en el fondo por los modelos que ya vimos? Porque sigue siendo modelos ensamblados.
+
+8
+00:01:17,000 --> 00:01:21,000
+No estamos desviando de eso.
+
+9
+00:01:21,000 --> 00:01:26,000
+Así que sigue siendo mezclas de modelos.
+
+10
+00:01:26,000 --> 00:01:31,000
+Pero tienen otra idea por detrás, bien distinta.
+
+11
+00:01:31,000 --> 00:01:34,000
+Eso es un poco lo que vamos a partir.
+
+12
+00:01:34,000 --> 00:01:46,000
+Después de eso vamos a ir viendo en el fondo los modelos más simples, por decirlo así, o los que le dan como el piso a este tipo de modelos, que sería AdaBoost.
+
+13
+00:01:46,000 --> 00:02:00,000
+Para después ya pasar a los modelos más desarrollados, que en general tienen mejores desempeños.
+
+14
+00:02:00,000 --> 00:02:06,000
+A partir de primero ahí parece Caldus, pero no lo voy a hablar porque no hay al tiempo.
+
+15
+00:02:06,000 --> 00:02:13,000
+Solo puedo mencionar, si vamos a ver el XGBoost y el LightGBM, que son modelos típicos de este tipo de cosas.
+
+16
+00:02:13,000 --> 00:02:18,000
+Ahí vamos a ir comparando y viendo cómo es lo que son.
+
+17
+00:02:18,000 --> 00:02:31,000
+Entonces la idea de estos tipos de modelos es un poco ir equilibrando las capacidades de los modelos y tratando de sacarlos mejor.
+
+18
+00:02:31,000 --> 00:02:49,000
+En el fondo la evolución del bugging al Roundoff Forest era justamente que la variabilidad dentro de lo que teníamos, de proceso o de las predicciones, estaba metido la correlación entre los errores de los árboles.
+
+19
+00:02:49,000 --> 00:03:07,000
+Entonces si estaba mostrando bajo distintas muestras, porque es lo que hacen, evidentemente vamos a tener menos correlación entre esos errores, pero evidentemente podría estar ocurriendo.
+
+20
+00:03:07,000 --> 00:03:20,000
+Y por eso el Roundoff Forest viene en el fondo hacer un muestreo de las variables para dejarlos aún más independientes.
+
+21
+00:03:20,000 --> 00:03:35,000
+Pero decía en el fondo que cuando el error es cuando tenemos correlación alta, en el fondo no solo los modelos no bajan el error, sino que es síntoma de que al final del día tenemos los datos
+
+22
+00:03:35,000 --> 00:03:41,000
+y los modelos cometen el mismo error una y otra vez.
+
+23
+00:03:41,000 --> 00:03:52,000
+Y nosotros nos gustaría que eso no ocurra por supuesto, que si un modelo, como se dice en buen chilen, uno quiere tropezar dos veces con la misma piedra.
+
+24
+00:03:52,000 --> 00:04:05,000
+Entonces si un modelo tuvo mal desempeño en un conjunto de los datos, me gustaría que existiese alguna forma de que estos modelos pudiesen ir aprendiendo de esos errores.
+
+25
+00:04:05,000 --> 00:04:08,000
+¿Para lo de abajo?
+
+26
+00:04:08,000 --> 00:04:11,000
+Bien.
+
+27
+00:04:11,000 --> 00:04:16,000
+Y eso justamente lo que hacen todos los modelos de boosting.
+
+28
+00:04:16,000 --> 00:04:19,000
+Entonces vamos a ir avanzando en ello.
+
+29
+00:04:19,000 --> 00:04:25,000
+Entonces como les decía, los modelos de boosting en general simple.
+
+30
+00:04:25,000 --> 00:04:29,000
+Primero hay un cambio fundamental.
+
+31
+00:04:29,000 --> 00:04:47,000
+El caso de los modelos que hicimos antes, ya, el Roundoff Forest y de Bindin, teníamos que eran modelos que se podían paralizar, o sea que en el fondo eran todos independientes.
+
+32
+00:04:47,000 --> 00:04:56,000
+Tenías X muestras y tenías en el fondo un árbol en cada muestra y cada uno se entrenaba sobre su muestra y no le importaba el de al lado realmente.
+
+33
+00:04:56,000 --> 00:05:09,000
+En cambio, los modelos de boosting se entrenan de manera secuencial, es decir, se entrena un árbol y una vez que se entrene se entrena el siguiente.
+
+34
+00:05:09,000 --> 00:05:13,000
+¿Y por qué se hace eso?
+
+35
+00:05:13,000 --> 00:05:16,000
+Bueno, es por cómo sale este diagrama en esencia.
+
+36
+00:05:16,000 --> 00:05:18,000
+Nos tiramos los datos.
+
+37
+00:05:18,000 --> 00:05:19,000
+¿Cuáles son los datos?
+
+38
+00:05:19,000 --> 00:05:22,000
+Yo ajusto mi árbol.
+
+39
+00:05:22,000 --> 00:05:24,000
+Ahí sale como árbol 1.
+
+40
+00:05:24,000 --> 00:05:27,000
+Y ese árbol 1 comete ciertos errores.
+
+41
+00:05:27,000 --> 00:05:28,000
+Bien.
+
+42
+00:05:28,000 --> 00:05:34,000
+Y esa información de dónde está cometiendo errores se le pasa al siguiente árbol.
+
+43
+00:05:34,000 --> 00:05:43,000
+Por eso es que ahora no los puedo hacer en paralelo, porque la información del árbol 1 va a servir como feedback para el árbol 2.
+
+44
+00:05:43,000 --> 00:05:50,000
+De manera de que este puede aprender dónde el árbol 1 se equivocó y tratar de corregir esos errores.
+
+45
+00:05:50,000 --> 00:05:52,000
+Cosa que no hacía en los anteriores.
+
+46
+00:05:52,000 --> 00:05:54,000
+Ya.
+
+47
+00:05:54,000 --> 00:05:56,000
+¿Cuál pregunta si el árbol 2 opera con los mismos datos?
+
+48
+00:05:56,000 --> 00:05:58,000
+Exactamente con los mismos datos.
+
+49
+00:05:58,000 --> 00:06:00,000
+Ya.
+
+50
+00:06:00,000 --> 00:06:07,000
+Aquí la forma básica en el fondo de esto es que los modelos operan sobre todo el dataset.
+
+51
+00:06:07,000 --> 00:06:11,000
+A diferencia del anterior que operan sobre muestra.
+
+52
+00:06:11,000 --> 00:06:17,000
+Entonces acá el punto es ese.
+
+53
+00:06:17,000 --> 00:06:19,000
+Y después tiene un modelo 2.
+
+54
+00:06:19,000 --> 00:06:25,000
+Y a ese modelo 2 se le entrega información del modelo 1 para que no repita los errores.
+
+55
+00:06:25,000 --> 00:06:28,000
+Se entrena y vuelve y comete errores.
+
+56
+00:06:28,000 --> 00:06:30,000
+Aquí errores 2.
+
+57
+00:06:30,000 --> 00:06:33,000
+Y esos errores 2 van para el árbol 3 y así sucesivamente.
+
+58
+00:06:33,000 --> 00:06:45,000
+Bien. Entonces cada árbol entrega información a los siguientes como feedback.
+
+59
+00:06:45,000 --> 00:06:50,000
+Para que este en el fondo vaya mejorando y se vaya fijando exactamente dónde están los errores.
+
+60
+00:06:50,000 --> 00:06:55,000
+Y no que siga entrenándose de cualquiera. Así como sin digamos ningún ella.
+
+61
+00:06:55,000 --> 00:07:03,000
+Esa es la es la esencia digamos detrás de estos modelos.
+
+62
+00:07:03,000 --> 00:07:11,000
+Finalmente los modelos se terminan siendo un modelo aditivo.
+
+63
+00:07:11,000 --> 00:07:19,000
+Es decir tenemos todos estos árboles entre ellos y finalmente las respuestas se suman de una manera ponderada.
+
+64
+00:07:20,000 --> 00:07:23,000
+Donde cada uno está portando algo.
+
+65
+00:07:23,000 --> 00:07:27,000
+Profes.
+
+66
+00:07:27,000 --> 00:07:28,000
+Sí.
+
+67
+00:07:28,000 --> 00:07:29,000
+Sí.
+
+68
+00:07:29,000 --> 00:07:35,000
+Juan Vilches pregunta si el árbol 2 opera con los mismos datos que el 1.
+
+69
+00:07:35,000 --> 00:07:36,000
+Sí, sí, sí.
+
+70
+00:07:36,000 --> 00:07:38,000
+Entonces lo respondí.
+
+71
+00:07:38,000 --> 00:07:39,000
+Ah, no.
+
+72
+00:07:39,000 --> 00:07:40,000
+Sí, lo había dicho que sí.
+
+73
+00:07:40,000 --> 00:07:42,000
+Que opera con los mismos datos.
+
+74
+00:07:42,000 --> 00:07:43,000
+La la.
+
+75
+00:07:43,000 --> 00:07:50,000
+Entiendo que hay versiones tradicionales que esto también lo mezclan con con un poco de mostreo, pero.
+
+76
+00:07:50,000 --> 00:07:58,000
+La versión tradicional no ya porque de hecho por ejemplo en nada busque uno de los primeros que van a ver.
+
+77
+00:07:58,000 --> 00:08:04,000
+La forma en que estos errores se pasan árbol 2 es ponderando los mismos datos.
+
+78
+00:08:04,000 --> 00:08:09,000
+Entonces si tuviésemos muestra y saco en esa muestra donde me equivoqué en el árbol 1.
+
+79
+00:08:09,000 --> 00:08:12,000
+No se los voy a poder entregar como feedback al árbol 2.
+
+80
+00:08:12,000 --> 00:08:18,000
+Entonces como que no tiene mucho sentido acá optar por muestras distintas para cada uno de los árboles.
+
+81
+00:08:18,000 --> 00:08:21,000
+Sino que sobre todos los datos de entrenamiento por supuesto.
+
+82
+00:08:21,000 --> 00:08:26,000
+Yo voy pudiendo hacer cosas así que es todos los datos.
+
+83
+00:08:26,000 --> 00:08:27,000
+Bien.
+
+84
+00:08:27,000 --> 00:08:35,000
+Y entonces como decía el árbol final se construye como una suma de todos estos.
+
+85
+00:08:35,000 --> 00:08:38,000
+Y además tenemos un parámetro que se fijan.
+
+86
+00:08:38,000 --> 00:08:42,000
+Este que es un parámetro es un ETA.
+
+87
+00:08:42,000 --> 00:08:47,000
+Y este ETA controla.
+
+88
+00:08:47,000 --> 00:08:50,000
+Cuánto aporta cada nuevo modelo.
+
+89
+00:08:50,000 --> 00:08:51,000
+Y eso es un parámetro.
+
+90
+00:08:51,000 --> 00:08:57,000
+Un parámetro que uno puede entregarlo al modelo.
+
+91
+00:08:57,000 --> 00:09:01,000
+Para al fondo generar más o menos aprendizaje.
+
+92
+00:09:01,000 --> 00:09:02,000
+Y mejores modelos.
+
+93
+00:09:02,000 --> 00:09:07,000
+Si esto dice si se espera que los errores del árbol 2 sea igual o menor que los errores del árbol 1.
+
+94
+00:09:07,000 --> 00:09:08,000
+O podría aumentar.
+
+95
+00:09:08,000 --> 00:09:10,000
+También podría aumentar.
+
+96
+00:09:10,000 --> 00:09:13,000
+Lo que se espera.
+
+97
+00:09:13,000 --> 00:09:18,000
+No es que no cometa menos errores que el árbol 1.
+
+98
+00:09:18,000 --> 00:09:21,000
+Se espera que no cometa los mismos errores.
+
+99
+00:09:21,000 --> 00:09:24,000
+Ya.
+
+100
+00:09:24,000 --> 00:09:29,000
+Por eso en el fondo el de la muestra es el que se está haciendo.
+
+101
+00:09:29,000 --> 00:09:41,000
+Por eso en el fondo el árbol 1 va a poner a los datos donde él error.
+
+102
+00:09:41,000 --> 00:09:45,000
+Entonces el modelo 2 va a ponerle más atención a eso.
+
+103
+00:09:45,000 --> 00:09:48,000
+Y por decirlo así va a descuidar un poco los otros.
+
+104
+00:09:48,000 --> 00:09:49,000
+Pero el fondo del otro ya lo estoy aprendiendo bien.
+
+105
+00:09:49,000 --> 00:09:52,000
+Entonces voy a enfocarme más en eso.
+
+106
+00:09:52,000 --> 00:09:53,000
+Bien.
+
+107
+00:09:53,000 --> 00:10:01,000
+Eso es un poco la forma de cómo lo hace.
+
+108
+00:10:01,000 --> 00:10:02,000
+Bien.
+
+109
+00:10:02,000 --> 00:10:09,000
+Entonces como les decía hay como diferencia.
+
+110
+00:10:09,000 --> 00:10:12,000
+Los modelos de binding y modelo boosting.
+
+111
+00:10:12,000 --> 00:10:20,000
+Una de las principales diferencias automáticamente es uno es modelo paralelo y el otro es modelo secuencia.
+
+112
+00:10:20,000 --> 00:10:23,000
+Cada modelo va a una muestra distinta.
+
+113
+00:10:23,000 --> 00:10:29,000
+En el modelo boosting cada etapa usa un error que va haciendo acumulado sobre el mismo data set.
+
+114
+00:10:29,000 --> 00:10:33,000
+Las predicciones promedio ya no votan en el binding.
+
+115
+00:10:33,000 --> 00:10:37,000
+En boosting son contribuciones que se suman.
+
+116
+00:10:37,000 --> 00:10:42,000
+En ese sentido se puede entender también como un promedio ponderado.
+
+117
+00:10:42,000 --> 00:10:43,000
+En algunos casos.
+
+118
+00:10:43,000 --> 00:10:44,000
+¿Por qué?
+
+119
+00:10:44,000 --> 00:10:47,000
+Porque algunos modelos.
+
+120
+00:10:47,000 --> 00:10:48,000
+Ya.
+
+121
+00:10:50,000 --> 00:10:53,000
+Algunos modelos van a ser mejores que otros.
+
+122
+00:10:53,000 --> 00:10:54,000
+Algunos van a errar más.
+
+123
+00:10:54,000 --> 00:10:56,000
+Algunos van a errar menos.
+
+124
+00:10:56,000 --> 00:11:03,000
+Y cuando los modelos erran menos esto le va a dar más peso en la predicción final.
+
+125
+00:11:03,000 --> 00:11:07,000
+Mientras que cuando erran más se les va a quitar un poco el peso.
+
+126
+00:11:07,000 --> 00:11:12,000
+Y así va a ir controlando cómo.
+
+127
+00:11:12,000 --> 00:11:14,000
+Como estos van a ir aportando.
+
+128
+00:11:14,000 --> 00:11:19,000
+Vamos a ver en el fondo las fórmulas que están detrás de cada una de esas cosas que estamos diciendo.
+
+129
+00:11:19,000 --> 00:11:23,000
+Y por último el binding tiene el objetivo de reducir la varianza.
+
+130
+00:11:23,000 --> 00:11:26,000
+Como la habíamos visto mientras que el objetivo de boosting.
+
+131
+00:11:26,000 --> 00:11:29,000
+Reducir sesgo pero más que nada es el error.
+
+132
+00:11:29,000 --> 00:11:32,000
+Típicamente están pensados en reducir errores.
+
+133
+00:11:32,000 --> 00:11:36,000
+Por lo tanto hacer modelos más precisos.
+
+134
+00:11:36,000 --> 00:11:38,000
+Obviamente en términos de predicción.
+
+135
+00:11:42,000 --> 00:11:46,000
+El ciclo general del boosting como dice acá.
+
+136
+00:11:46,000 --> 00:11:49,000
+Es bueno se inicia.
+
+137
+00:11:49,000 --> 00:11:51,000
+Se mide.
+
+138
+00:11:51,000 --> 00:11:53,000
+Ya se mide en el fondo.
+
+139
+00:11:53,000 --> 00:11:59,000
+Típicamente estos modelos utilizan una.
+
+140
+00:11:59,000 --> 00:12:02,000
+Una.
+
+141
+00:12:02,000 --> 00:12:05,000
+Una función de pérdida que se llama.
+
+142
+00:12:05,000 --> 00:12:08,000
+Una función que ayuda a determinar el error.
+
+143
+00:12:08,000 --> 00:12:10,000
+Pues es pérdida cuadrática.
+
+144
+00:12:10,000 --> 00:12:12,000
+Pérdida logarítmica.
+
+145
+00:12:12,000 --> 00:12:15,000
+Pérdida absoluta etc.
+
+146
+00:12:15,000 --> 00:12:18,000
+Hay distintas métricas.
+
+147
+00:12:18,000 --> 00:12:22,000
+De función de pérdida que son como típicas de uso.
+
+148
+00:12:22,000 --> 00:12:24,000
+Muy ligadas.
+
+149
+00:12:24,000 --> 00:12:27,000
+Trísticamente a las distancias de Manhattan por ejemplo.
+
+150
+00:12:27,000 --> 00:12:29,000
+O a la estación de Ocligana.
+
+151
+00:12:29,000 --> 00:12:31,000
+En algunos casos.
+
+152
+00:12:31,000 --> 00:12:34,000
+Y en esos se mide eso.
+
+153
+00:12:34,000 --> 00:12:36,000
+Y con eso se ajusta.
+
+154
+00:12:36,000 --> 00:12:38,000
+Y se le llaman aprendices.
+
+155
+00:12:38,000 --> 00:12:41,000
+En el fondo a estos modelos y los datos.
+
+156
+00:12:41,000 --> 00:12:44,000
+Entonces.
+
+157
+00:12:44,000 --> 00:12:47,000
+En todos los casos tomamos una predicción.
+
+158
+00:12:47,000 --> 00:12:49,000
+Va a ser.
+
+159
+00:12:49,000 --> 00:12:51,000
+Hacemos predicciones.
+
+160
+00:12:51,000 --> 00:12:54,000
+Vemos la función de pérdida.
+
+161
+00:12:54,000 --> 00:12:56,000
+Vemos dónde se equivoca y dónde no.
+
+162
+00:12:56,000 --> 00:12:58,000
+Y donde se equivoca.
+
+163
+00:12:58,000 --> 00:13:01,000
+Vamos a generar un impacto a nivel.
+
+164
+00:13:01,000 --> 00:13:05,000
+Digamos de los datos.
+
+165
+00:13:05,000 --> 00:13:09,000
+Que nos permita ajustar un nuevo modelo.
+
+166
+00:13:09,000 --> 00:13:11,000
+Con esos errores en mente.
+
+167
+00:13:11,000 --> 00:13:17,000
+Y eso va a ir sumando a la contribución total de los modelos.
+
+168
+00:13:17,000 --> 00:13:19,000
+Y finalmente esto se detiene.
+
+169
+00:13:19,000 --> 00:13:23,000
+Una vez que se cumplen las etapas que uno necesita.
+
+170
+00:13:23,000 --> 00:13:25,000
+Al igual que los anteriores.
+
+171
+00:13:25,000 --> 00:13:27,000
+Puedo definir.
+
+172
+00:13:27,000 --> 00:13:29,000
+Cuántos modelos.
+
+173
+00:13:29,000 --> 00:13:31,000
+Voy a considerar.
+
+174
+00:13:31,000 --> 00:13:34,000
+En este caso también funcionan a base de árboles.
+
+175
+00:13:34,000 --> 00:13:36,000
+Cuántos árboles voy a considerar.
+
+176
+00:13:36,000 --> 00:13:38,000
+En cada caso.
+
+177
+00:13:38,000 --> 00:13:40,000
+Entonces.
+
+178
+00:13:40,000 --> 00:13:42,000
+Eso es un poco el.
+
+179
+00:13:45,000 --> 00:13:48,000
+Es como funciona y por ejemplo si yo dije mil árboles.
+
+180
+00:13:48,000 --> 00:13:50,000
+Entonces esto se va a ajustar hasta que tengamos mil árboles.
+
+181
+00:13:50,000 --> 00:13:54,000
+Y ahí va a terminar y va a aportar el estimador.
+
+182
+00:13:54,000 --> 00:13:56,000
+Bien.
+
+183
+00:13:56,000 --> 00:13:58,000
+Entonces.
+
+184
+00:13:58,000 --> 00:14:00,000
+El primer modelo es el AdaBoost.
+
+185
+00:14:00,000 --> 00:14:03,000
+Que como dices se enfoca en casos difíciles.
+
+186
+00:14:03,000 --> 00:14:06,000
+Comenta el peso de la observación en más clasificada.
+
+187
+00:14:06,000 --> 00:14:07,000
+Y combina.
+
+188
+00:14:07,000 --> 00:14:09,000
+Sus modelos según dicen pe.
+
+189
+00:14:09,000 --> 00:14:12,000
+Entonces ustedes tienen inicio con peso iguales.
+
+190
+00:14:12,000 --> 00:14:13,000
+Dice el árbol falla.
+
+191
+00:14:13,000 --> 00:14:15,000
+Arbol 1 falla en tres casos.
+
+192
+00:14:15,000 --> 00:14:16,000
+Bien.
+
+193
+00:14:16,000 --> 00:14:17,000
+Se responderán.
+
+194
+00:14:17,000 --> 00:14:19,000
+Esos casos para que pesen más.
+
+195
+00:14:19,000 --> 00:14:22,000
+Entonces el árbol 2 se concentra en ellos.
+
+196
+00:14:22,000 --> 00:14:23,000
+Bien.
+
+197
+00:14:23,000 --> 00:14:25,000
+Y el voto final.
+
+198
+00:14:25,000 --> 00:14:27,000
+Tiene un peso según calidad.
+
+199
+00:14:27,000 --> 00:14:29,000
+Ok.
+
+200
+00:14:29,000 --> 00:14:31,000
+Entonces cómo se mide esto.
+
+201
+00:14:31,000 --> 00:14:32,000
+Bueno.
+
+202
+00:14:32,000 --> 00:14:35,000
+Una de las primeras cosas es el error del modelo.
+
+203
+00:14:35,000 --> 00:14:36,000
+Ya.
+
+204
+00:14:36,000 --> 00:14:38,000
+El error del modelo.
+
+205
+00:14:38,000 --> 00:14:40,000
+Es.
+
+206
+00:14:40,000 --> 00:14:44,000
+Se mide como estos W que son los pesos.
+
+207
+00:14:44,000 --> 00:14:46,000
+Que en principio son todos iguales.
+
+208
+00:14:46,000 --> 00:14:47,000
+Bien.
+
+209
+00:14:47,000 --> 00:14:49,000
+Ahí está.
+
+210
+00:14:49,000 --> 00:14:51,000
+Por la.
+
+211
+00:14:51,000 --> 00:14:55,000
+Esto en el fondo está viendo si es que se cumple o no.
+
+212
+00:14:55,000 --> 00:14:56,000
+El objetivo.
+
+213
+00:14:56,000 --> 00:14:57,000
+Bien.
+
+214
+00:14:57,000 --> 00:14:59,000
+Entonces para cada observación.
+
+215
+00:14:59,000 --> 00:15:00,000
+H.
+
+216
+00:15:00,000 --> 00:15:01,000
+Y.
+
+217
+00:15:01,000 --> 00:15:03,000
+Este dice ser H.
+
+218
+00:15:03,000 --> 00:15:04,000
+M.
+
+219
+00:15:04,000 --> 00:15:05,000
+Dijen me lo voy a corregir.
+
+220
+00:15:05,000 --> 00:15:06,000
+Activo.
+
+221
+00:15:06,000 --> 00:15:09,000
+Porque no tengo.
+
+222
+00:15:09,000 --> 00:15:10,000
+Perdón.
+
+223
+00:15:10,000 --> 00:15:11,000
+Ahora.
+
+224
+00:15:11,000 --> 00:15:12,000
+Bien.
+
+225
+00:15:12,000 --> 00:15:13,000
+Entonces.
+
+226
+00:15:13,000 --> 00:15:16,000
+Esta parte de acá.
+
+227
+00:15:16,000 --> 00:15:17,000
+Entonces.
+
+228
+00:15:17,000 --> 00:15:20,000
+Esta parte de acá.
+
+229
+00:15:20,000 --> 00:15:23,000
+Esta parte.
+
+230
+00:15:23,000 --> 00:15:28,000
+Es una función que se llama indicatriz o indicadora.
+
+231
+00:15:28,000 --> 00:15:31,000
+Y lo único que hace es decir oye.
+
+232
+00:15:31,000 --> 00:15:32,000
+Si tu modelo.
+
+233
+00:15:32,000 --> 00:15:34,000
+En tus variables.
+
+234
+00:15:34,000 --> 00:15:35,000
+Es igual.
+
+235
+00:15:35,000 --> 00:15:36,000
+Y.
+
+236
+00:15:36,000 --> 00:15:37,000
+Y.
+
+237
+00:15:37,000 --> 00:15:38,000
+Y.
+
+238
+00:15:38,000 --> 00:15:39,000
+Y.
+
+239
+00:15:39,000 --> 00:15:40,000
+Y.
+
+240
+00:15:40,000 --> 00:15:41,000
+Y.
+
+241
+00:15:41,000 --> 00:15:42,000
+Y.
+
+242
+00:15:42,000 --> 00:15:43,000
+Y.
+
+243
+00:15:43,000 --> 00:15:44,000
+Y.
+
+244
+00:15:44,000 --> 00:15:45,000
+Y.
+
+245
+00:15:46,000 --> 00:15:52,000
+acknowledging o con vernieras.
+
+246
+00:15:52,000 --> 00:15:57,000
+Muy bajito nivel.
+
+247
+00:15:57,000 --> 00:16:12,720
+de a poco.
+
+248
+00:16:12,720 --> 00:16:21,760
+Entonces, como les decía, este de acá es una función indicadora.
+
+249
+00:16:21,760 --> 00:16:33,720
+Esta función es 1, va a ser 1 si es que la predicción del modelo es igual al valor
+
+250
+00:16:33,720 --> 00:16:36,000
+y 0 en caso contrario.
+
+251
+00:16:36,000 --> 00:16:43,360
+Entonces, esta función lo que está diciendo es 0, y se cumple lo que dice ahí, o sea,
+
+252
+00:16:43,360 --> 00:17:06,000
+y1, si y sub i, bien, perdón, esto es al revés, es igual a hmx.
+
+253
+00:17:06,000 --> 00:17:15,760
+Entonces, este es 1 y este es 0.
+
+254
+00:17:15,760 --> 00:17:17,800
+Entonces, ¿qué es lo que está haciendo esto?
+
+255
+00:17:17,800 --> 00:17:24,040
+Si se fijan, el error del modelo lo único que está haciendo es contando las veces en
+
+256
+00:17:24,040 --> 00:17:25,920
+que la predicción no es igual.
+
+257
+00:17:25,920 --> 00:17:34,160
+Eso es lo que está haciendo, porque es 1 cuando la predicción, que es h, estamos refiriendo
+
+258
+00:17:34,160 --> 00:17:36,840
+h como el modelo, es distinto del i.
+
+259
+00:17:36,840 --> 00:17:38,880
+Eso es que la predicción está mala.
+
+260
+00:17:38,880 --> 00:17:41,560
+Cuando está buena le ponen 0.
+
+261
+00:17:41,560 --> 00:17:46,440
+Entonces, fíjense que si el modelo fuese perfecto, es decir, para todos los i, o sea,
+
+262
+00:17:46,440 --> 00:17:49,800
+para todos mis registros y todos mis variables, hago la predicción y es exactamente igual
+
+263
+00:17:49,800 --> 00:17:55,520
+al valor objetivo, entonces serían puros 0, eso haría el número error 0 y haría el
+
+264
+00:17:55,520 --> 00:17:57,560
+error igual a 0.
+
+265
+00:17:57,560 --> 00:18:02,800
+Entonces, es el caso extremo cuando el modelo es perfecto.
+
+266
+00:18:02,800 --> 00:18:07,720
+Aquí el error está medido como un número entre 0 y 1.
+
+267
+00:18:07,720 --> 00:18:11,400
+En el caso de que se equivocara absolutamente en todos los valores, bueno, este va a ser
+
+268
+00:18:11,400 --> 00:18:15,440
+1, siempre, así que usted va a reemplazar esto por 1 y arriba le queda la suma de los
+
+269
+00:18:15,440 --> 00:18:19,200
+pesos dividido la suma de los pesos, por lo tanto eso es 1.
+
+270
+00:18:19,200 --> 00:18:24,960
+Entonces, el error del modelo se mira así, contando dónde el modelo está agarrando y
+
+271
+00:18:24,960 --> 00:18:31,160
+eso me va a generar un indicador entre 0 y 1 el error.
+
+272
+00:18:31,160 --> 00:18:34,280
+Mientras más cercan a 0, menos error quiere el modelo, mientras más cercan a 1, más
+
+273
+00:18:34,280 --> 00:18:37,280
+error quiere el modelo.
+
+274
+00:18:37,280 --> 00:18:52,480
+En base a eso se calcula el peso del modelo, como les decía, estos modelos tienen pesos
+
+275
+00:18:52,480 --> 00:18:58,040
+según el nivel de error que tengan.
+
+276
+00:18:58,040 --> 00:19:16,720
+Entonces acá tienen el peso como un medio del logaritmo natural de esto de acá.
+
+277
+00:19:16,720 --> 00:19:28,280
+Entonces como ven en el fondo, esto de acá es una función que va a ir, tienen que ir
+
+278
+00:19:28,280 --> 00:19:29,800
+viendo en el fondo qué es lo que vale.
+
+279
+00:19:29,800 --> 00:19:34,840
+Por ejemplo, en un medio, el error es un medio, esto es 1.
+
+280
+00:19:34,840 --> 00:19:43,360
+Bien, logaritmo 1 es 0, ya, entonces ahí va a poner peso 0.
+
+281
+00:19:43,360 --> 00:20:05,800
+Entonces, si este error es mayor que un medio, entonces típicamente este número de acá
+
+282
+00:20:05,800 --> 00:20:12,760
+va a ser menor que 1 y por lo tanto el logaritmo va a ser menor que 0.
+
+283
+00:20:12,800 --> 00:20:19,440
+Entonces va a castigar errores altos y va a premiar errores bajos.
+
+284
+00:20:19,440 --> 00:20:22,440
+Eso es lo que hace el peso del modelo.
+
+285
+00:20:22,440 --> 00:20:25,440
+Y el peso del modelo sirve para dos cosas.
+
+286
+00:20:25,440 --> 00:20:28,440
+Uno, para actualizar los pesos.
+
+287
+00:20:28,440 --> 00:20:33,440
+De aquí, el peso del modelo es el peso de la persona.
+
+288
+00:20:34,120 --> 00:20:37,120
+Y el peso del modelo sirve para dos cosas.
+
+289
+00:20:37,120 --> 00:20:40,120
+Uno, para actualizar los pesos.
+
+290
+00:20:40,120 --> 00:20:46,120
+De aquí a acá se actualizan los pesos.
+
+291
+00:20:46,120 --> 00:20:47,120
+¿Cómo se actualizan los pesos?
+
+292
+00:20:47,120 --> 00:20:54,120
+Bueno, en aquellos casos donde el modelo falla, se actualiza de esta forma.
+
+293
+00:20:54,120 --> 00:20:55,120
+Ese es el nuevo peso.
+
+294
+00:20:55,120 --> 00:21:02,120
+Si falló en el caso 1, entonces el W1 ahora se va a transformar en W1 por la exponencial
+
+295
+00:21:02,800 --> 00:21:11,800
+del peso del modelo por el valor de la variable por el valor que está entregando el modelo.
+
+296
+00:21:11,800 --> 00:21:14,800
+Ese es el peso que está entregando esto.
+
+297
+00:21:14,800 --> 00:21:23,800
+Entonces influyen el valor donde estamos mirando, el peso donde estamos del modelo y el modelo.
+
+298
+00:21:23,800 --> 00:21:30,800
+Acá hay una cosa que es importante y es que los I sub I, no sé si es tan importante,
+
+299
+00:21:31,480 --> 00:21:38,480
+pero en general esto se mide mucho, se ve mucho para valores, para datos categóricos,
+
+300
+00:21:41,480 --> 00:21:43,480
+que típicamente es donde más se muestran.
+
+301
+00:21:43,480 --> 00:21:46,480
+Y esto de acá, los típicos datos categóricos binarios son 0 y 1.
+
+302
+00:21:46,480 --> 00:21:51,480
+En realidad esto asume como que esto está entre menos y 1 y 1 para todos estos cálculos.
+
+303
+00:21:51,480 --> 00:21:56,480
+Si no está entre 1 y 1, hace las transformaciones adecuadas para que eso ocurra.
+
+304
+00:21:57,160 --> 00:22:00,160
+Solo para tener en mente que esto por ejemplo no se va a hacer 0.
+
+305
+00:22:00,160 --> 00:22:03,160
+Por ejemplo si la variable I fuese 0.
+
+306
+00:22:03,160 --> 00:22:08,160
+Por eso es 1 y menos 1, entonces este siempre va a ir cambiando el signo nomás.
+
+307
+00:22:08,160 --> 00:22:15,160
+El modelo también y este de acá, va a ir aportando el peso.
+
+308
+00:22:15,160 --> 00:22:19,160
+Y finalmente el A sub M también sirve para ponderar cada peso.
+
+309
+00:22:19,160 --> 00:22:23,160
+Aquí se fijan que con la suma ponderada de cada uno de los modelos,
+
+310
+00:22:23,160 --> 00:22:26,160
+acorde a lo que van incluyendo.
+
+311
+00:22:26,840 --> 00:22:27,840
+Ya.
+
+312
+00:22:28,840 --> 00:22:34,840
+Entonces acá, se fijan y aquí es donde es importante esto,
+
+313
+00:22:34,840 --> 00:22:38,840
+porque aquí yo estoy preguntando por el signo de esta expresión.
+
+314
+00:22:38,840 --> 00:22:41,840
+¿Por qué? Porque como vais ponderando entre medio,
+
+315
+00:22:41,840 --> 00:22:46,840
+me puede de repente dar un número 5 o de repente dar un menos 8.
+
+316
+00:22:46,840 --> 00:22:49,840
+Lo único que le interesa a esto es que si es positivo,
+
+317
+00:22:49,840 --> 00:22:54,840
+significa que habría más elementos asociados a valores positivos
+
+318
+00:22:55,520 --> 00:22:57,520
+de los modelos H.
+
+319
+00:22:57,520 --> 00:23:01,520
+Si hay valores negativos significa que van más asociados al menos 1.
+
+320
+00:23:01,520 --> 00:23:06,520
+Entonces cuando yo le pido el signo, estoy diciendo que transforme esto de acá,
+
+321
+00:23:06,520 --> 00:23:08,520
+lo que está acá adentro, a un 1 y un menos 1,
+
+322
+00:23:08,520 --> 00:23:11,520
+que es lo que hacen los modelos entre cada dos categorías.
+
+323
+00:23:11,520 --> 00:23:14,520
+Este es el caso binario de un cierto.
+
+324
+00:23:14,520 --> 00:23:17,520
+Pero esto es un poco cómo funciona.
+
+325
+00:23:19,520 --> 00:23:22,520
+Todo esto está por detrás.
+
+326
+00:23:23,200 --> 00:23:26,200
+No hay para qué tenerlo en cuenta, digamos.
+
+327
+00:23:26,200 --> 00:23:29,200
+No hay para qué aprender cosas de memoria ni nada.
+
+328
+00:23:29,200 --> 00:23:32,200
+Pero es lo que está por detrás de estos modelos.
+
+329
+00:23:32,200 --> 00:23:37,200
+Entonces para que tengan claro que son modelos que calculan los errores,
+
+330
+00:23:37,200 --> 00:23:43,200
+modelo a modelo, se los van pasando a otros en términos de peso de variables
+
+331
+00:23:43,200 --> 00:23:48,200
+y también van influyendo en cómo se hace el modelo final.
+
+332
+00:23:48,880 --> 00:23:53,880
+Antes era un promedio simple, ahora ya no es un promedio simple,
+
+333
+00:23:53,880 --> 00:23:59,880
+ahora es, digamos, ni siquiera es un promedio, es una suma ponderada.
+
+334
+00:23:59,880 --> 00:24:01,880
+De cada una las cosas.
+
+335
+00:24:02,880 --> 00:24:05,880
+Entonces mayor error del árbol, menor influencia.
+
+336
+00:24:05,880 --> 00:24:12,880
+Un caso más clasificado, menor influencia porque va a ser, digamos,
+
+337
+00:24:12,880 --> 00:24:14,880
+con este lo vamos a llevar para abajo.
+
+338
+00:24:15,560 --> 00:24:19,560
+Y un caso más clasificado va a pasar acá a la actualización de peso
+
+339
+00:24:19,560 --> 00:24:23,560
+y por lo tanto va a tener mayor peso en el siguiente.
+
+340
+00:24:26,560 --> 00:24:29,560
+Entonces acá hay un ejemplo súper simple.
+
+341
+00:24:31,560 --> 00:24:36,560
+Imagínense que esto está haciendo clasificación binaria
+
+342
+00:24:36,560 --> 00:24:39,560
+y ustedes tienen esto de acá.
+
+343
+00:24:40,240 --> 00:24:45,240
+Entonces la línea como medias verde, morada,
+
+344
+00:24:45,240 --> 00:24:48,240
+son como rondas en el fondo, el primer árbol, el segundo árbol,
+
+345
+00:24:48,240 --> 00:24:51,240
+porque como esto va avanzando de manera secuencial,
+
+346
+00:24:51,240 --> 00:24:58,240
+por eso muchas veces van a encontrar con esa forma de llamarle como rondas.
+
+347
+00:25:00,240 --> 00:25:06,240
+Entonces se fijan acá error en algunos puntos, particular.
+
+348
+00:25:06,920 --> 00:25:10,920
+Error en S, en S, en S no lo marcamos, pero en S, en S y en S.
+
+349
+00:25:12,920 --> 00:25:17,920
+Porque acá están mayormente azules, acá mayormente rojos,
+
+350
+00:25:17,920 --> 00:25:20,920
+entonces el lado izquierdo dicen ser apuro azules
+
+351
+00:25:20,920 --> 00:25:25,920
+y el lado derecho dice ser mayormente rojo.
+
+352
+00:25:26,920 --> 00:25:29,920
+Entonces aprendió y los marca.
+
+353
+00:25:29,920 --> 00:25:35,920
+Y si se fijan acá, esa pelotita, en esta me faltó, hay que grandarla,
+
+354
+00:25:36,600 --> 00:25:39,600
+pero en esas dos pelotitas que son las que venían marcadas amarillas,
+
+355
+00:25:39,600 --> 00:25:44,600
+que son las que erró en el caso anterior, ahora son más grandes.
+
+356
+00:25:44,600 --> 00:25:49,600
+Entonces la está, como se llama esto,
+
+357
+00:25:51,600 --> 00:25:54,600
+le está entregando un peso mayor gráficamente.
+
+358
+00:25:54,600 --> 00:25:55,600
+Entonces ¿qué es lo que va a hacer?
+
+359
+00:25:55,600 --> 00:26:01,600
+La ronda dos, no se va a fijar tanto en estos ni en estos,
+
+360
+00:26:02,280 --> 00:26:05,280
+se va a fijar más en aquellos donde erró,
+
+361
+00:26:05,280 --> 00:26:08,280
+que son estos dos en estos casos que solo querían los pesos mayores.
+
+362
+00:26:08,280 --> 00:26:12,280
+Entonces ahí lo que hace es tirar ahora esta línea horizontal,
+
+363
+00:26:12,280 --> 00:26:15,280
+porque esa se vara estos dos puntos gigantes.
+
+364
+00:26:15,280 --> 00:26:22,280
+Pero al hacer eso, por supuesto, no ahorrar en S y en S.
+
+365
+00:26:22,280 --> 00:26:25,280
+Entonces este proceso que es lo que va a ir haciendo,
+
+366
+00:26:25,280 --> 00:26:30,280
+después ya no va a ir tomando cada uno de estos pedacitos de ciertas formas
+
+367
+00:26:30,960 --> 00:26:34,960
+y finalmente se genera una línea como la que muestra el último,
+
+368
+00:26:34,960 --> 00:26:37,960
+que es la combinación final, que empieza a tener ya fronteras escalonadas
+
+369
+00:26:37,960 --> 00:26:40,960
+y va logrando separar de buena forma.
+
+370
+00:26:40,960 --> 00:26:43,960
+Por supuesto no es que llegue a la perfección como se muestra,
+
+371
+00:26:43,960 --> 00:26:49,960
+esto es simplemente una idea, una idea gráfica con estos puntos gigantes
+
+372
+00:26:49,960 --> 00:26:53,960
+de ir mostrando que efectivamente es donde el modelo va a poner el énfasis
+
+373
+00:26:53,960 --> 00:26:56,960
+y se va a olvidar un poco de los otros.
+
+374
+00:26:57,640 --> 00:27:00,640
+Eso es un poco la idea que está por detrás de todas estas cosas.
+
+375
+00:27:06,640 --> 00:27:15,640
+Bien, ventajas de estos modelos es que, bueno, creo que la intuición es muy clara.
+
+376
+00:27:15,640 --> 00:27:21,640
+No es que cada uno entregue información a siguiente para que mejore
+
+377
+00:27:21,640 --> 00:27:25,640
+y tratará de mejorar entre todos, más que ser independientes.
+
+378
+00:27:26,320 --> 00:27:32,320
+Tiene pocos parámetros, eso depende en el fondo del modelo que ocupemos,
+
+379
+00:27:32,320 --> 00:27:35,320
+pero como modelo en sí efectivamente tiene poquitos.
+
+380
+00:27:35,320 --> 00:27:45,320
+Tiene en general buen desempeño, a pesar de que es simple la forma de que estamos trabajando
+
+381
+00:27:45,320 --> 00:27:49,320
+y en el fondo con aprendices muy simples, el aprendice en el fondo son los modelos
+
+382
+00:27:49,320 --> 00:27:51,320
+que les llaman estas cosas.
+
+383
+00:27:52,000 --> 00:27:59,000
+Y en ese sentido, por ejemplo, cuando uno lo pone con árboles,
+
+384
+00:27:59,000 --> 00:28:03,000
+que son modelos muy simples, esto aún así tiene muy buen desempeño.
+
+385
+00:28:03,000 --> 00:28:08,000
+No necesita escalar variables para los árboles, por ejemplo,
+
+386
+00:28:08,000 --> 00:28:10,000
+así que eso también es bueno.
+
+387
+00:28:10,000 --> 00:28:16,000
+Y para clasificación y para regración tenemos la implementación en ambos casos.
+
+388
+00:28:16,680 --> 00:28:22,680
+Y bueno, estos ahora sí sufren exactamente los mismos problemas que cualquiera
+
+389
+00:28:22,680 --> 00:28:27,680
+de los modelos que son ensamblados de árboles,
+
+390
+00:28:27,680 --> 00:28:32,680
+que no logran salir del intervalo al que están entrenados.
+
+391
+00:28:32,680 --> 00:28:37,680
+Si ustedes tienen datos que están entrenados entre 10 y 100,
+
+392
+00:28:37,680 --> 00:28:42,680
+sus previsiones son entre 10 y 100 y no es capaz de predecir 200 ni 5,
+
+393
+00:28:42,680 --> 00:28:44,680
+aún cuando sean ensamblados.
+
+394
+00:28:45,360 --> 00:28:46,360
+Gustavo.
+
+395
+00:28:47,360 --> 00:28:52,360
+Sí, pero ¿puedo explicar de nuevo la diferencia en la lámina anterior?
+
+396
+00:28:52,360 --> 00:28:57,360
+No me quedó tan claro lo de las pelotas azules y rojas,
+
+397
+00:28:57,360 --> 00:28:59,360
+como que el color representaba algo...
+
+398
+00:28:59,360 --> 00:29:03,360
+Son dos clases, la clase azul y la clase roja.
+
+399
+00:29:03,360 --> 00:29:07,360
+O sea, es como una clasificación que tiene que hacer,
+
+400
+00:29:07,360 --> 00:29:09,360
+una etiqueta azul y una etiqueta roja.
+
+401
+00:29:09,360 --> 00:29:14,360
+Exacto, tiene dos clases, azul y rojo y el color tiene que hacerse para...
+
+402
+00:29:15,040 --> 00:29:18,040
+¿Cómo es que lo identifica el error de la ronda?
+
+403
+00:29:18,040 --> 00:29:22,040
+Porque está separando como por una línea en el fondo.
+
+404
+00:29:22,040 --> 00:29:25,040
+Y sí, todo esto no es exactamente como funciona, pero...
+
+405
+00:29:36,040 --> 00:29:39,040
+En el fondo lo que está haciendo esto es que tiene los puntos y dice
+
+406
+00:29:39,040 --> 00:29:42,040
+que yo con esta línea voy a separar, voy a dejar a un lado los azules
+
+407
+00:29:42,040 --> 00:29:44,040
+y a un lado los rojos.
+
+408
+00:29:44,720 --> 00:29:47,720
+Claramente a este lado hay más azules y a este lado hay más rojos.
+
+409
+00:29:47,720 --> 00:29:52,720
+Por lo tanto cualquier cosa que no se vea rojo al lado derecho de la línea
+
+410
+00:29:52,720 --> 00:29:54,720
+va a ser un error.
+
+411
+00:29:54,720 --> 00:29:56,720
+O sea, este de acá.
+
+412
+00:29:56,720 --> 00:30:01,720
+Cualquier cosa que se vea al lado izquierdo, esto insisto, es solo de manera pedagógica.
+
+413
+00:30:01,720 --> 00:30:03,720
+Sí, como visual.
+
+414
+00:30:03,720 --> 00:30:06,720
+Ok, marca ese rojo porque es el que está más lejos de la línea.
+
+415
+00:30:06,720 --> 00:30:09,720
+Claro, en realidad aquí me equivoqué, este tenía el marcado al lado...
+
+416
+00:30:09,720 --> 00:30:10,720
+Ah, ok, ok.
+
+417
+00:30:10,720 --> 00:30:12,720
+Son todos los que quiero.
+
+418
+00:30:13,400 --> 00:30:16,400
+Y el punto es que estos de acá, en esta siguiente...
+
+419
+00:30:16,400 --> 00:30:21,400
+Imagínate, también la vamos a hacer más grande aquí a la bala.
+
+420
+00:30:21,400 --> 00:30:23,400
+Bien, ahí.
+
+421
+00:30:23,400 --> 00:30:28,400
+Entonces claro, después el modelo dice ya, ya sé que me equivoqué
+
+422
+00:30:28,400 --> 00:30:32,400
+en esos tres, en estos dos que están aquí con puntos grandes.
+
+423
+00:30:32,400 --> 00:30:33,400
+Sí.
+
+424
+00:30:33,400 --> 00:30:35,400
+Y en este de acá.
+
+425
+00:30:35,400 --> 00:30:36,400
+Entonces en eso se va a fijar.
+
+426
+00:30:36,400 --> 00:30:42,400
+Y en eso el modelo, lo que hace es tirar esta línea horizontal.
+
+427
+00:30:43,080 --> 00:30:46,080
+Y en este caso ahora especifico bien estos.
+
+428
+00:30:46,080 --> 00:30:47,080
+Ya.
+
+429
+00:30:47,080 --> 00:30:49,080
+Y este también.
+
+430
+00:30:49,080 --> 00:30:55,080
+Por lo demás, ahora tiene cuatro azules y cuatro rojos a cada lado.
+
+431
+00:30:55,080 --> 00:30:59,080
+Antes tenía cuatro y tres.
+
+432
+00:30:59,080 --> 00:31:02,080
+Entonces además tiene un menor error.
+
+433
+00:31:02,080 --> 00:31:05,080
+Pero ahora el error en estos otros dos.
+
+434
+00:31:05,080 --> 00:31:06,080
+Bien.
+
+435
+00:31:06,080 --> 00:31:10,080
+Entonces la siguiente ronda a esto los va a poner con un círculo gigante
+
+436
+00:31:10,760 --> 00:31:12,760
+porque esos son los que va a poner énfasis.
+
+437
+00:31:12,760 --> 00:31:16,760
+Y entonces este ya va a empezar, después va a tirar las líneas más abajo.
+
+438
+00:31:16,760 --> 00:31:21,760
+Y esta es la línea más arriba que son finalmente las que están representadas aquí y acá.
+
+439
+00:31:21,760 --> 00:31:22,760
+Bien.
+
+440
+00:31:22,760 --> 00:31:25,760
+Y empieza a hacer este movimiento como no lineal.
+
+441
+00:31:25,760 --> 00:31:31,760
+Todos estos modelos son capaces de detectar patrónes no lineales en los datos.
+
+442
+00:31:31,760 --> 00:31:33,760
+Mientras claramente estos están separados.
+
+443
+00:31:33,760 --> 00:31:36,760
+Igual podría separarlos con una línea así como diagonal.
+
+444
+00:31:37,440 --> 00:31:42,440
+En este caso con una línea así como escalonada los separa perfecto.
+
+445
+00:31:42,440 --> 00:31:43,440
+Bien.
+
+446
+00:31:43,440 --> 00:31:48,440
+Y eso lo va encontrando justamente porque va poniendo énfasis en separar algunos puntos.
+
+447
+00:31:48,440 --> 00:31:53,440
+De aquí de la ronda 1 a la ronda 2 se fijó en estos tres que están con una flecha.
+
+448
+00:31:53,440 --> 00:31:57,440
+De la ronda 2 a la ronda 3 se fija en estos dos que están acá.
+
+449
+00:31:57,440 --> 00:32:02,440
+Y después ahí fijando en otros subesíamente hasta que llega a un modelo final.
+
+450
+00:32:02,440 --> 00:32:03,440
+Bien.
+
+451
+00:32:03,440 --> 00:32:04,440
+Bien.
+
+452
+00:32:05,120 --> 00:32:10,120
+Carolina pregunta cómo se relaciona este modelo con el KDNN.
+
+453
+00:32:10,120 --> 00:32:13,120
+No tiene ninguna relación finalmente.
+
+454
+00:32:13,120 --> 00:32:24,120
+El KDNN lo único que hace es que de un punto mira a los que están más cerca.
+
+455
+00:32:24,120 --> 00:32:29,120
+Esto no mira nada en relación a eso sino que mira errores del modelo.
+
+456
+00:32:29,120 --> 00:32:32,120
+De hecho no involucra distancia.
+
+457
+00:32:32,800 --> 00:32:38,800
+Por eso una de las cosas importantes es que no se necesita escalar variables.
+
+458
+00:32:38,800 --> 00:32:40,800
+Porque no basa en distancias.
+
+459
+00:32:40,800 --> 00:32:43,800
+KDNN es exclusivamente basado en distancias.
+
+460
+00:32:46,800 --> 00:32:47,800
+Bien.
+
+461
+00:32:49,800 --> 00:32:54,800
+Entonces como le decía es claro lo que quiere lograr.
+
+462
+00:32:54,800 --> 00:32:58,800
+Tiene buen desempeño incluso utilizando modelos simples como base.
+
+463
+00:32:58,800 --> 00:32:59,800
+En este caso los árboles.
+
+464
+00:33:00,480 --> 00:33:05,480
+Lo tenemos que escalar lo cual es algo bueno en el sentido de que es más simple
+
+465
+00:33:05,480 --> 00:33:08,480
+todo el procesamiento que tiene a causa de los datos.
+
+466
+00:33:08,480 --> 00:33:11,480
+Y podemos utilizar para reaccionar y clasificación.
+
+467
+00:33:11,480 --> 00:33:17,480
+Dentro de las limitantes es sensible al ruido y etiquetas incorrectas.
+
+468
+00:33:17,480 --> 00:33:18,480
+¿Por qué?
+
+469
+00:33:18,480 --> 00:33:24,480
+Porque como el modelo pone énfasis en los errores.
+
+470
+00:33:25,160 --> 00:33:30,160
+Si un dato está mal etiquetado por ejemplo y sus variables son super claras.
+
+471
+00:33:30,160 --> 00:33:35,160
+Supongamos que como los datos que teníamos la clase pasada.
+
+472
+00:33:35,160 --> 00:33:39,160
+De estos datos como de problemas al corazón.
+
+473
+00:33:39,160 --> 00:33:43,160
+Era como super claro que si tú eras de una edad bien avanzada,
+
+474
+00:33:43,160 --> 00:33:47,160
+tenías colesterol alto, tus pulsaciones por minuto eran bajas,
+
+475
+00:33:47,160 --> 00:33:48,160
+tenías la presión alta.
+
+476
+00:33:48,840 --> 00:33:53,840
+Era casi seguro que te iba a hacer una predicción como que eras digamos.
+
+477
+00:33:53,840 --> 00:33:56,840
+Que ibas a tener problemas al corazón.
+
+478
+00:33:56,840 --> 00:33:57,840
+¿Ya?
+
+479
+00:33:59,840 --> 00:34:02,840
+Si tú tienes un sujeto que efectivamente tenía problemas al corazón
+
+480
+00:34:02,840 --> 00:34:04,840
+pero estaba mal etiquetado y tenía todas estas cosas.
+
+481
+00:34:04,840 --> 00:34:08,840
+El modelo siempre lo va a errar porque en el fondo va en contra de la lógica
+
+482
+00:34:08,840 --> 00:34:10,840
+que tienen todos tus datos.
+
+483
+00:34:10,840 --> 00:34:11,840
+¿Bien?
+
+484
+00:34:11,840 --> 00:34:14,840
+Pero eso dice el ruido porque en el fondo ruido sería un dato que no está mal
+
+485
+00:34:15,520 --> 00:34:19,520
+etiquetado sino que es raro en relación a la relación usual.
+
+486
+00:34:19,520 --> 00:34:22,520
+O que esté mal etiquetado en ese caso.
+
+487
+00:34:22,520 --> 00:34:23,520
+¿Bien?
+
+488
+00:34:23,520 --> 00:34:24,520
+¿Y por qué?
+
+489
+00:34:24,520 --> 00:34:27,520
+Entonces casi siempre te va a decir hoy esta persona debe tener problemas
+
+490
+00:34:27,520 --> 00:34:29,520
+al corazón y tú va a ver la etiqueta original y decir no,
+
+491
+00:34:29,520 --> 00:34:30,520
+no tiene problemas al corazón.
+
+492
+00:34:30,520 --> 00:34:31,520
+¿Cómo no?
+
+493
+00:34:31,520 --> 00:34:32,520
+Si mira, a ver veámoslo no.
+
+494
+00:34:32,520 --> 00:34:34,520
+Sí, va a tener problemas al corazón.
+
+495
+00:34:34,520 --> 00:34:35,520
+¿Ya?
+
+496
+00:34:35,520 --> 00:34:43,520
+Entonces en ese sentido es importante digamos que eso es importante
+
+497
+00:34:44,200 --> 00:34:47,200
+tener en cuenta que ojalá que los datos estemos súper seguros de que vienen
+
+498
+00:34:47,200 --> 00:34:49,200
+con etiquetas bien correctas.
+
+499
+00:34:49,200 --> 00:34:50,200
+¿Ya?
+
+500
+00:34:50,200 --> 00:34:57,200
+Si es ese el caso el ruido puede hacerse digamos mediante un propio sensamiento
+
+501
+00:34:57,200 --> 00:34:59,200
+de los datos.
+
+502
+00:34:59,200 --> 00:35:04,200
+Mediante no sé también temas de outliers cosas por el estilo nosotros
+
+503
+00:35:04,200 --> 00:35:11,200
+podemos lograr separar ese ruido excesivo y mediante por supuesto como calidad
+
+504
+00:35:11,880 --> 00:35:15,880
+de datos podemos ver que estén no etiquetados correctamente porque lo que pasa es que en
+
+505
+00:35:15,880 --> 00:35:21,600
+esos datos siempre se va a equivocar y como los modelos ponen énfasis va a empezar ese
+
+506
+00:35:21,600 --> 00:35:29,600
+énfasis en esos datos que no va a poder nunca predecirlos bien va a quedarse como pegado
+
+507
+00:35:29,600 --> 00:35:32,600
+y dándole toda la importancia a eso y va a descuidar todos los demás.
+
+508
+00:35:32,600 --> 00:35:36,600
+Chuchu, si me dan un segundo que me están llevando de mercado libre por una palabra
+
+509
+00:35:36,600 --> 00:35:37,600
+clave, ¿pa' qué manera me entrega?
+
+510
+00:35:37,600 --> 00:35:38,600
+Me dan un segundo.
+
+511
+00:36:08,600 --> 00:36:15,600
+Ya, perdón, gracias.
+
+512
+00:36:15,600 --> 00:36:22,600
+No, no era AdaBoost lamentablemente, era Saiten, no más, pero muy bien.
+
+513
+00:36:22,600 --> 00:36:28,600
+Entonces ese es el problema cierto que tienen con las etiquetas, ¿ya?
+
+514
+00:36:28,600 --> 00:36:33,600
+Pues con la sensibilidad de ruido, es que el modo saque ha pegado en el error, lo vamos
+
+515
+00:36:33,600 --> 00:36:35,600
+a poder sacar de ahí.
+
+516
+00:36:36,600 --> 00:36:44,600
+El entrenamiento secuencial es una limitación en el sentido de que va lo va a ser más pesado,
+
+517
+00:36:44,600 --> 00:36:45,600
+¿bien?
+
+518
+00:36:45,600 --> 00:36:52,600
+El hecho de que sea más pesado en realidad más costoso el tiempo al no poder paralelizar
+
+519
+00:36:52,600 --> 00:36:58,600
+antes yo tenía mil árboles y tenía 10 procesadores y paralelizaba en el fondo y
+
+520
+00:36:58,600 --> 00:37:02,600
+iba a ser mil árboles pero en un tiempo de 100, ¿ok?
+
+521
+00:37:02,600 --> 00:37:07,600
+Pero acá si tengo mil árboles voy a demorarme el tiempo de mil, entonces 10 veces más
+
+522
+00:37:07,600 --> 00:37:09,600
+solo por el hecho de que no puedo paralelizar.
+
+523
+00:37:09,600 --> 00:37:15,600
+Entonces es una limitante y más que una limitante es algo digamos que le pega de mala
+
+524
+00:37:15,600 --> 00:37:24,600
+forma al modelo en el sentido del costo computacional, ¿ya?
+
+525
+00:37:24,600 --> 00:37:32,600
+Bueno y tienen menos flexibilidad que variantes modernas porque en el fondo el AdaBoost fue
+
+526
+00:37:32,600 --> 00:37:41,600
+uno de los primeros modelos de boost bien AdaBoost a todo esto significa additive boosting
+
+527
+00:37:41,600 --> 00:37:44,600
+bien porque en el fondo los modelos se van sumando, ¿ok?
+
+528
+00:37:44,600 --> 00:37:46,600
+Entonces se van agregando entre ellos.
+
+529
+00:37:46,600 --> 00:37:53,600
+Y las versiones modernas se refiere al otro que vamos a ver como el XGBoost, el Light
+
+530
+00:37:53,600 --> 00:37:54,600
+DBM, etc.
+
+531
+00:37:54,600 --> 00:38:05,600
+Así que bien, como dice entonces abajo es una buena línea base pensando en que cuando
+
+532
+00:38:05,600 --> 00:38:12,600
+los datos realmente vienen limpios y nosotros ya le hicimos tratamiento sabemos que no tenemos
+
+533
+00:38:13,600 --> 00:38:20,600
+ruido sabemos que no tenemos etiqueta incorrecta entonces debiese no hablar nada de mal, ¿bien?
+
+534
+00:38:20,600 --> 00:38:31,600
+Bien y después vienen los modelos de gradient boosting, ¿bien?
+
+535
+00:38:31,600 --> 00:38:38,600
+Y aquí la palabra en el fondo clave es el gradient ¿ya?
+
+536
+00:38:39,600 --> 00:38:42,600
+¿Qué es lo que uno hace?
+
+537
+00:38:42,600 --> 00:38:53,600
+Ya aquí no quiero meter digamos en temas muy técnicos pero ¿qué es lo que pasa?
+
+538
+00:38:53,600 --> 00:38:59,600
+Ustedes tienen en todos estos modelos tienen una función de pérdida ¿ya?
+
+539
+00:38:59,600 --> 00:39:14,600
+Básicamente lo que mide es cuánto está en diferencia el la variable con mi prediction
+
+540
+00:39:14,600 --> 00:39:15,600
+¿bien?
+
+541
+00:39:15,600 --> 00:39:20,600
+Entonces yo simplemente y esto puede ser insisto una pérdida cuadrática o sea que
+
+542
+00:39:20,600 --> 00:39:25,600
+la diferencia, ustedes van a ver la diferencia al cuadrado puede ser una diferencia logarítmica
+
+543
+00:39:25,600 --> 00:39:28,600
+y subesivamente existen distintos tipos ¿ok?
+
+544
+00:39:28,600 --> 00:39:38,600
+Y esta función lo que uno busca en todos estos modelos es optimizar esa pérdida, la
+
+545
+00:39:38,600 --> 00:39:42,600
+pérdida nunca va a ser buena imagínense que ustedes están en un negocio digamos y ustedes
+
+546
+00:39:42,600 --> 00:39:48,600
+quieren digamos siempre por supuesto minimizar las pérdidas ojalá que haya ganas ¿bien?
+
+547
+00:39:48,600 --> 00:39:53,600
+Pero siempre ahora quieren minimizar las pérdidas casi en todo esto en todo este tipo de entonces
+
+548
+00:39:53,600 --> 00:39:59,600
+Entonces ustedes van a ver una función sea o garcea y ustedes lo que buscan es esta es
+
+549
+00:39:59,600 --> 00:40:06,600
+llegar acá al mínimo ¿bien?
+
+550
+00:40:06,600 --> 00:40:11,600
+Ok pero estas funciones en general es difícil llegar al mínimo ¿bien?
+
+551
+00:40:11,600 --> 00:40:18,600
+Porque no los mínimos utilizan solamente estas funciones de pérdida tienen mínimos
+
+552
+00:40:18,600 --> 00:40:22,600
+que están hechas para eso yo no puedo ocupar cualquier función de pérdida pero con todo
+
+553
+00:40:22,600 --> 00:40:27,600
+pero encontrarlo es complicado ¿no?
+
+554
+00:40:27,600 --> 00:40:33,600
+Entonces lo que se hace se ocupan los gradientes y que son los gradientes son las direcciones
+
+555
+00:40:33,600 --> 00:40:38,600
+en donde se van a ir a encontrar estos valores ¿ya?
+
+556
+00:40:38,600 --> 00:40:41,600
+El gradiente básicamente son las derivadas ¿bien?
+
+557
+00:40:41,600 --> 00:40:48,600
+Son las derivadas pero en el fondo como esto tiene más variables podría digamos ser con
+
+558
+00:40:48,600 --> 00:40:51,600
+derivadas parciales como parecen ahora lo mismo lo que significa eso
+
+559
+00:40:51,600 --> 00:40:56,600
+en el fondo lo que hace es que ustedes se paran un punto y encuentran el gradiente
+
+560
+00:40:56,600 --> 00:41:02,600
+y el gradiente me determina con dirección y magnitud hacia donde está el mínimo ¿bien?
+
+561
+00:41:02,600 --> 00:41:07,600
+Y entonces de manera como iterativa esto va a ir encontrando puntos que se van a ir
+
+562
+00:41:07,600 --> 00:41:13,600
+encontrando en dirección hacia el mínimo y van a ir convergiendo sea el por supuesto
+
+563
+00:41:13,600 --> 00:41:16,600
+me voy a ir acercando mucho casi nunca voy a llegar a él ¿bien?
+
+564
+00:41:16,600 --> 00:41:19,600
+Pero en el fondo ese proceso me va a ir acercando
+
+565
+00:41:19,600 --> 00:41:27,600
+Y en general yo tengo aquí una cantidad de iteraciones o muchas veces para cada modelo
+
+566
+00:41:27,600 --> 00:41:31,600
+de boosting yo voy a llegar mediante un proceso de optimización numérico
+
+567
+00:41:31,600 --> 00:41:34,600
+así que va a existir un parámetro de tolerancia ¿bien?
+
+568
+00:41:34,600 --> 00:41:39,600
+Cuando de un paso a otro en la búsqueda este mínimo avance muy poquito entonces ya estoy muy cerca
+
+569
+00:41:39,600 --> 00:41:45,600
+eso es lo que dice la teoría entonces en ese caso tú paras el modelo y paras en el fondo la búsqueda
+
+570
+00:41:45,600 --> 00:41:47,600
+entonces en el fondo la búsqueda y dice ya llegué ¿bien?
+
+571
+00:41:47,600 --> 00:41:53,600
+numéricamente ya llegué me falta demasiado poco esa tolerancia típicamente es como 0.001
+
+572
+00:41:53,600 --> 00:42:02,600
+entonces cuando estoy a menos de 0.001 del mínimo en el fondo ya estamos ahí
+
+573
+00:42:02,600 --> 00:42:09,600
+Entonces eso es un poco lo que hace el boosting a diferencia del anterior ¿ya?
+
+574
+00:42:10,600 --> 00:42:19,600
+Entonces también utiliza los anteriores también utiliza un ¿cómo se llama esto?
+
+575
+00:42:19,600 --> 00:42:26,600
+este parámetro ¿bien? que este parámetro es el de aprendizaje ya vamos a ver si llama learning rate
+
+576
+00:42:26,600 --> 00:42:34,600
+el parámetro entonces va a ir entregando nuevos árboles y va a ir generando digamos información nueva
+
+577
+00:42:34,600 --> 00:42:46,600
+y así en el fondo vamos entregando información igual del error ¿ok?
+
+578
+00:42:46,600 --> 00:42:52,600
+¿en qué es lo que trabaja esto? trabaja en funciones del estilo y menos los modelos ¿ok?
+
+579
+00:42:52,600 --> 00:42:58,600
+entonces siempre trabaja sobre el error siempre el y menos los modelos son el error
+
+580
+00:42:58,600 --> 00:43:04,600
+la diferencia es que antes se fijaba en los valores específicos donde raba
+
+581
+00:43:04,600 --> 00:43:09,600
+ahora se fija en la función del error y esa es la que va a ir ajustando
+
+582
+00:43:09,600 --> 00:43:17,600
+entonces ustedes van a tener predicciones y van a tener predicciones buenas y van a tener algunas predicciones malas
+
+583
+00:43:17,600 --> 00:43:24,600
+y entonces ¿qué es lo que va a hacer? el nuevo modelo esto es muy simple y sobresimplificado de lo que significa
+
+584
+00:43:24,600 --> 00:43:30,600
+pero va a agarrar esto y va a decir ok sabí que de ti ya aprendí y voy a ajustar un modelo acá
+
+585
+00:43:30,600 --> 00:43:36,600
+entonces solo los errores pone como un árbol para solo aprender de estos valores ¿ya?
+
+586
+00:43:36,600 --> 00:43:42,600
+no es exactamente así, no es exactamente así, estoy sobresimplificando pero solo para que se entienda que básicamente
+
+587
+00:43:42,600 --> 00:43:49,600
+el otro ponía énfasis en los puntos, esto pone énfasis en los errores y aquí es donde ajusta el modelo
+
+588
+00:43:49,600 --> 00:43:54,600
+y asume en el fondo que este árbol va a seguir haciendo bien lo que ya se estaba haciendo bien
+
+589
+00:43:54,600 --> 00:43:58,600
+esto no quita que por supuesto acá abajo igual se puede equivocar
+
+590
+00:43:58,600 --> 00:44:06,600
+bien pero esas son las dos diferencias, esa es la diferencia entre los modelos de boosting y los modelos de add-a-boost como inicialmente
+
+591
+00:44:06,600 --> 00:44:11,600
+uno pone los pesos en los puntos para enseñar a los siguientes árboles
+
+592
+00:44:11,600 --> 00:44:19,600
+el otro va a través de los errores pasándole la información, el error como función digamos ya
+
+593
+00:44:19,600 --> 00:44:30,600
+como nuevo valor de apredecir, esa es la forma
+
+594
+00:44:30,600 --> 00:44:39,600
+pero ambos van al mismo objetivo, a entregar información de donde me equivoco, de un árbol al siguiente para que este pueda mejorar
+
+595
+00:44:42,600 --> 00:44:49,600
+bien, entonces los modelos se van actualizando y a medida que van a esto
+
+596
+00:44:49,600 --> 00:45:03,600
+entonces esto en el fondo es lo que uno busca, ustedes tienen las observaciones, tienen los valores y en el fondo tienen una apredicción como basada por así decirlo
+
+597
+00:45:03,600 --> 00:45:10,600
+esto está hecho muy simple para que quede claro
+
+598
+00:45:10,600 --> 00:45:15,600
+entonces uno que es lo que ve lo recibo o la diferencia, entonces ve y-f
+
+599
+00:45:15,600 --> 00:45:19,600
+entonces este es más 2, este es menos 3, ese es 1, ese es 0
+
+600
+00:45:19,600 --> 00:45:22,600
+y que es lo que hace entonces uno pone un árbol acá
+
+601
+00:45:22,600 --> 00:45:28,600
+bien por supuesto los ceros en el fondo es como que a dos categorías esta cosa
+
+602
+00:45:28,600 --> 00:45:36,600
+entonces sabe que los ceros van a ser alguien que está bien predicho y los números son alguien mal predicho
+
+603
+00:45:36,600 --> 00:45:39,600
+bien, más o menos, pero mal predicho
+
+604
+00:45:39,600 --> 00:45:42,600
+entonces nosotros ajustamos el árbol sobre estos valores
+
+605
+00:45:42,600 --> 00:45:48,600
+tenemos una parte base, 10 y después vamos a tener una predicción para ese error
+
+606
+00:45:48,600 --> 00:45:50,600
+entonces aquí vamos a poner el árbol 1
+
+607
+00:45:50,600 --> 00:45:59,600
+entonces el árbol 1 por ejemplo va a predecir para este 1, para este un menos 4, para este un 1 y para este un 0
+
+608
+00:45:59,600 --> 00:46:06,600
+bien, entonces si hace eso, este va a quedar bien, este va a quedar mal y este también va a quedar mal
+
+609
+00:46:06,600 --> 00:46:16,600
+pero en el fondo después con esa predicción, este va a quedar en 6
+
+610
+00:46:16,600 --> 00:46:25,600
+la predicción que es la suma de estos dos valores, este va a quedar en 11 y este va a quedar en 10
+
+611
+00:46:25,600 --> 00:46:37,600
+bien, entonces después tendrían un R2, este finalmente sería el y-r1 al final
+
+612
+00:46:38,600 --> 00:46:46,600
+y este R2 sería en este caso, este va a estar junto a un 1, este sería un 11
+
+613
+00:46:46,600 --> 00:47:02,600
+bien, en el fondo, esto de acá, esto generaría un F1
+
+614
+00:47:02,600 --> 00:47:09,600
+este sería el F1
+
+615
+00:47:09,600 --> 00:47:21,600
+y el F1 sería esto más la predicción, o sea 10 más 1, aquí sería 11, acá sería este más la predicción que era menos 4, así que sería 6
+
+616
+00:47:21,600 --> 00:47:25,600
+este sería 11 y este sería 10, bien
+
+617
+00:47:25,600 --> 00:47:35,600
+y ahora sí vendría el R2 que es la diferencia de F1 del y menos el F1
+
+618
+00:47:35,600 --> 00:47:42,600
+sorry, perdón, escribir con el mouse es una real pesadilla
+
+619
+00:47:42,600 --> 00:47:53,600
+entonces este sería el F1, y este sería y menos F1
+
+620
+00:47:53,600 --> 00:48:04,600
+entonces acá tendríamos y menos F1, este sería 11, este sería 11, 0, 0
+
+621
+00:48:05,600 --> 00:48:12,600
+y entonces ahora el modelo se va acercando, cometido menos errores, eso es un poco lo que va haciendo, como se fijó
+
+622
+00:48:12,600 --> 00:48:24,600
+más en estos tres valores que en este, la punto, y eso genera el R2
+
+623
+00:48:24,600 --> 00:48:35,600
+y así sucesivamente, entonces después el modelo va a tener un F2, va a ser F1 más un cierto modelo
+
+624
+00:48:35,600 --> 00:48:41,600
+bien, aquí vamos a generar otro modelo, vamos a generar un modelo, este era H1, este es H2
+
+625
+00:48:41,600 --> 00:48:50,600
+aquí H1 se generó sobre R1 y H2 se genera sobre R2, entonces ahora vamos a tratar de predecir estos valores
+
+626
+00:48:50,600 --> 00:48:57,600
+y como él sabe estos de acá son los que erraron y estos de acá son los que no erraron, y así sucesivamente
+
+627
+00:48:57,600 --> 00:49:02,600
+bien, uno tras otro va a ir sumando las cosas que corresponden
+
+628
+00:49:02,600 --> 00:49:07,600
+por supuesto además esto tiene un parámetro que es el parámetro de aprendizaje
+
+629
+00:49:07,600 --> 00:49:11,600
+ya lo vamos a ver en el fondo qué es lo que hace
+
+630
+00:49:11,600 --> 00:49:13,600
+entonces
+
+631
+00:49:13,600 --> 00:49:22,600
+eso es un poco cómo funciona, en un ejemplo insisto, muy simple
+
+632
+00:49:22,600 --> 00:49:28,600
+como para entender como el mecanismo
+
+633
+00:49:28,600 --> 00:49:34,600
+bien, entonces aquí hay algunos parámetros que son importantes
+
+634
+00:49:34,600 --> 00:49:42,600
+tener como súper en cuenta, uno es la pérdida, que es lo que define qué significa equivocarse
+
+635
+00:49:42,600 --> 00:49:51,600
+como les decía, las más típicas son la pérdida cuadrática, la pérdida logística, la pérdida absoluta
+
+636
+00:49:51,600 --> 00:49:56,600
+la tasa, la tasa NU
+
+637
+00:49:56,600 --> 00:50:07,600
+control al tamaño de cada paso, bien, y ese es el que se llama en los modelos un parámetro que se denomina learning rate
+
+638
+00:50:07,600 --> 00:50:16,600
+que es la tasa de aprendizaje, bien, a menor valor que el que se llama el parámetro de aprendizaje
+
+639
+00:50:16,600 --> 00:50:23,600
+a menor valor de la tasa de aprendizaje típicamente uno tiene un mejor desempeño del modelo
+
+640
+00:50:23,600 --> 00:50:30,600
+pero por supuesto, esto es como, imagínense que ustedes están estudiando por una prueba
+
+641
+00:50:30,600 --> 00:50:39,600
+una prueba que tienen unos más, si estudian un poquito todos los días lo más probable es que les vaya bien
+
+642
+00:50:39,600 --> 00:50:47,600
+si estudian todo la noche anterior lo más probable es que puedan salvar, si es que, ya, entonces
+
+643
+00:50:47,600 --> 00:50:52,600
+que para qué digo eso, típicamente cuando uno estudia de a pocos va interiorizando mejor
+
+644
+00:50:52,600 --> 00:50:57,600
+y por lo tanto va a generar un mejor aprendizaje y va a poder tener un mejor desempeño
+
+645
+00:50:57,600 --> 00:51:02,600
+si yo le doy el aprendizaje de golpe, lo más probable es que no va a poder
+
+646
+00:51:02,600 --> 00:51:06,600
+capturar todo y no va a tener un gran desempeño, ya
+
+647
+00:51:12,600 --> 00:51:17,600
+entonces, y finalmente, la complejidad que es lo que está dentro del modelo
+
+648
+00:51:17,600 --> 00:51:23,600
+y lo que limita lo que los árboles aprenden cada uno de ellos, bien, y ahí están los mismos parámetros
+
+649
+00:51:23,600 --> 00:51:27,600
+que nosotros ya habíamos visto, profundidad, hojas, muestra, etc.
+
+650
+00:51:27,600 --> 00:51:33,600
+entonces como les digo, típicamente una tasa de aprendizaje pequeña, genera mejores aprendizajes
+
+651
+00:51:33,600 --> 00:51:38,600
+pero si yo necesito, yo voy a aprender de a pocos, tengo una prueba fin de mes
+
+652
+00:51:38,600 --> 00:51:43,600
+no me puedo poner tres días antes a aprender porque no voy a tener tiempo suficiente para aprender todo
+
+653
+00:51:43,600 --> 00:51:50,600
+bien, acá, el análogo a los días de aprendizaje en el caso de la prueba
+
+654
+00:51:50,600 --> 00:51:55,600
+sería los árboles, cada árbol es su aprendizaje y eso es lo que le estamos dando que aprendan de a poquito
+
+655
+00:51:55,600 --> 00:52:02,600
+entonces, a menor tasa de aprendizaje, mayor cantidad de árboles yo necesito para poder aprender
+
+656
+00:52:02,600 --> 00:52:08,600
+entonces, si ustedes tienen mayor cantidad de árboles, por supuesto, significa un mayor costo computacional
+
+657
+00:52:08,600 --> 00:52:15,600
+pero en general esa combinación, más árboles y menos tasas, tiene un mayor costo computacional
+
+658
+00:52:15,600 --> 00:52:23,600
+pero en general esa combinación, más árboles y menos tasas, tiende también a tener modelos muchísimo más estables
+
+659
+00:52:23,600 --> 00:52:27,600
+en relación a ahora
+
+660
+00:52:31,600 --> 00:52:39,600
+bien, entonces vimos AdaBoost y los de Boosting o Gradient Boosting que son los modelos básicos
+
+661
+00:52:39,600 --> 00:52:46,600
+pero después, en el mundo de los modelos ensamblados de árboles
+
+662
+00:52:46,600 --> 00:52:58,600
+existe, digamos, hay hartos desarrollos asociados a estos tratando de, ok, muchos árboles
+
+663
+00:52:58,600 --> 00:53:06,600
+digamos, tenemos esta tasa de aprendizaje que tiene que ser baja, entonces, pucha, es como
+
+664
+00:53:06,600 --> 00:53:11,600
+difícil tener un buen modelo pero a la vez ser eficiente computacionalmente, etcétera, etcétera
+
+665
+00:53:11,600 --> 00:53:21,600
+entonces, en ese sentido, se desarrollaron varios modelos para ir mejorando esto
+
+666
+00:53:21,600 --> 00:53:28,600
+de hecho, están los modelos de Boosting, los de Gradient Boosting y después viene este que es el XGBoost
+
+667
+00:53:28,600 --> 00:53:32,600
+que viene de Extreme Gradient Boosting, ok
+
+668
+00:53:33,600 --> 00:53:45,600
+y es que es nada más que lo mismo que antes, solo que viene regularizado y viene, digamos, eficientado computacionalmente
+
+669
+00:53:45,600 --> 00:53:55,600
+entonces, ¿qué es lo que hace? es un sistema optimizado, como dice, de datos para adaptabulares y para ponerlo en producción
+
+670
+00:53:55,600 --> 00:54:05,600
+el hecho de que sea regularizado significa que genera, digamos, todas las regularizaciones
+
+671
+00:54:05,600 --> 00:54:13,600
+siempre tienden a reducirse estos niveles de errores, las regularizaciones ocurren a nivel de pérdida
+
+672
+00:54:13,600 --> 00:54:21,600
+no vamos a entrar en detalle lo que significa eso, pero las regularizaciones vienen en todos los sistemas de optimización
+
+673
+00:54:21,600 --> 00:54:31,600
+y lo que hacen es que reducen el espacio donde esos óptimos se pueden encontrar y en general eso genera algunos beneficios
+
+674
+00:54:33,600 --> 00:54:40,600
+por otro lado, también usa su muestro de filas y columnas, similar a como el Random Forest, entonces él lo está mezclando
+
+675
+00:54:42,600 --> 00:54:48,600
+tiene tratamiento eficiente de la dispersión, o sea, cuando hay alta variabilidad él se puede adaptar
+
+676
+00:54:48,600 --> 00:54:56,600
+además también tiene un tratamiento de datos nulos que viene incorporado, que no todos los modelos lo tienen
+
+677
+00:54:57,600 --> 00:55:07,600
+no es la gran cosa porque en general los datos nulos uno debiese, digamos, tenerlos, uno debiese tratarlos, pero aquí es importante
+
+678
+00:55:07,600 --> 00:55:12,600
+bien, y los ingredientes, primero de todo, tampoco los puedo explicar, pero son cosas, digamos, de fondo para
+
+679
+00:55:12,600 --> 00:55:22,600
+simplemente los puse para que vean que tiene hasta más cosas que la anterior, o sea, todo lo anterior más regularización, más submetreo, más distintos tipos de gradientes, etc.
+
+680
+00:55:23,600 --> 00:55:36,600
+entonces finalmente tiene en el fondo una optimización en la función de pérdida en el entrenamiento, lo cual genera típicamente mejores resultados
+
+681
+00:55:36,600 --> 00:55:47,600
+y tiene una penalización, que viene en la regularización por complejidad, es decir, impide que los árboles que están dentro sean excesivamente complejos, premio a la simplicidad
+
+682
+00:55:48,600 --> 00:55:53,600
+entonces, todas estas cosas se meten en la juguera y sale un mejor modelo
+
+683
+00:55:54,600 --> 00:56:04,600
+el XGBoost típicamente es uno de los mejores modelos que hay, de tipo ensamblado, por supuesto más costoso computacionalmente
+
+684
+00:56:04,600 --> 00:56:15,600
+y por otro lado, tan costoso computacionalmente, está optimizado todo, pero es tan poderoso y son tantas cosas las que hace por adentro
+
+685
+00:56:16,600 --> 00:56:29,600
+que ni siquiera está programado en Python, ni siquiera está en Cycle, sino que el XGBoost es un modelo como en sí y que se llama
+
+686
+00:56:29,600 --> 00:56:38,600
+desde Python como un wrapper, está programado en C++, donde se pueden hacer todos estos cálculos de manera eficiente
+
+687
+00:56:39,600 --> 00:56:45,600
+si ustedes llevaron el mismo modelo a Python o a R, probablemente sería muy lento
+
+688
+00:56:46,600 --> 00:56:51,600
+entonces ustedes lo tienen programado en C++ y lo llamas desde Python para poder ocuparlo
+
+689
+00:56:51,600 --> 00:56:55,600
+pero una de las cosas que tiene en particular es que no está en Cycle Learn
+
+690
+00:56:56,600 --> 00:57:06,600
+y eso siempre en todo este mundo, cuando uno ocupa lenguajes que son open source
+
+691
+00:57:07,600 --> 00:57:16,600
+entonces tienes la dependencia de que alguien lo haya programado bien, de que alguien lo mantenga, que se preocupe de mantenerlo actualizado
+
+692
+00:57:16,600 --> 00:57:20,600
+que funcione ese que se cae, que lo levanten, etc.
+
+693
+00:57:21,600 --> 00:57:26,600
+cuando tú estás en el mundo Cycle Learn es algo que está súper bien trabajado esa parte
+
+694
+00:57:27,600 --> 00:57:34,600
+cuando te vas a módulos fuera puedes correr ese riesgo, entonces ahí también, no digo que haya un riesgo porque ahora está bien mantenido
+
+695
+00:57:35,600 --> 00:57:42,600
+pero puede ocurrir, no es bueno que esté para el Cycle Learn, pero no lo podías meter nunca porque como les digo es de afuera
+
+696
+00:57:46,600 --> 00:57:56,600
+y después además tenemos otro modelo, se llama Light-GBM, que es Light Gradient Boosting Machine
+
+697
+00:57:57,600 --> 00:58:10,600
+eso significa el GBM, y lo que hace es que, esto lo que está acá, básicamente lo más importante es esto que dice acá
+
+698
+00:58:10,600 --> 00:58:20,600
+el árbol Leafwise, no es un modelo que busca dividir los árboles para todos lados
+
+699
+00:58:21,600 --> 00:58:27,600
+no que toma uno, toma el nuevo principal, lo divide en dos, siempre tiene que dividir en dos
+
+700
+00:58:28,600 --> 00:58:39,600
+después dentro de las dos hojas que quedaron, se mira las preguntas correspondientes y ve cuál es la que tiene un mejor criterio de información
+
+701
+00:58:40,600 --> 00:58:45,600
+recuerden que los árboles dividen por criterios de información, ya sea entropía o formación de Gini
+
+702
+00:58:46,600 --> 00:58:54,600
+entonces, imagínense que tienen el criterio de información de Gini, y ustedes tienen estas dos hojas y dicen bueno esto me da X, esto me da Y
+
+703
+00:58:55,600 --> 00:59:01,600
+Y es más información que X, entonces sólo voy a dividir acá, y divide esa hoja, no la da ya
+
+704
+00:59:01,600 --> 00:59:04,600
+y después quedan tres nodos, porque hemos dividido dos
+
+705
+00:59:06,600 --> 00:59:10,600
+vamos a dibujarlo, es más fácil que estén mirando mis manos
+
+706
+00:59:11,600 --> 00:59:17,600
+entonces teníamos nuevo principal, esto siempre vivía en dos, no uno, no dos
+
+707
+00:59:18,600 --> 00:59:24,600
+después entonces este se pregunta, cuál es la información que yo gano acá, X, ¿cuál es la información que yo gano acá? Y
+
+708
+00:59:24,600 --> 00:59:29,600
+¿cuál es mayor? Y, listo, entonces divido acá, divido en dos
+
+709
+00:59:30,600 --> 00:59:34,600
+y ahora quedaron tres nodos, este, este y este
+
+710
+00:59:35,600 --> 00:59:41,600
+bueno, ¿cuánto información gano acá? X, acá Y, acá Z, ¿cuál es la mayor? Y de nuevo
+
+711
+00:59:42,600 --> 00:59:50,600
+entonces acá, bien, entonces no es un árbol simétrico, es un árbol que va creciendo con la información
+
+712
+00:59:50,600 --> 00:59:56,600
+al no tener que dividir absolutamente todo, se hace mucho, mucho más eficiente
+
+713
+00:59:57,600 --> 00:59:59,600
+en términos computacionales
+
+714
+01:00:00,600 --> 01:00:05,600
+y después vuelve a preguntar, y acá tengo X, acá tengo Y, acá tengo Z, acá tengo doble, ¿cuál es el más grande? X
+
+715
+01:00:06,600 --> 01:00:09,600
+y ahora sí divido acá, puede volver acá, no es que se fue siempre a su lado
+
+716
+01:00:10,600 --> 01:00:15,600
+y así va creciendo, bien, entonces finalmente eso es lo que se denomina X
+
+717
+01:00:16,600 --> 01:00:18,600
+expande la hoja con mayor ganancia
+
+718
+01:00:18,600 --> 01:00:25,600
+entonces, no es un árbol simétrico que va, digamos, dividiéndose de dos por ambos lados
+
+719
+01:00:26,600 --> 01:00:30,600
+sino que es un árbol que va tomando la división donde más gana
+
+720
+01:00:31,600 --> 01:00:36,600
+y eso hace que en particular este sea un modelo que uno preferiría
+
+721
+01:00:39,600 --> 01:00:44,600
+cuando tiene una cantidad de datos muy muy grande, bien, porque tiene una cantidad de datos gigante
+
+722
+01:00:44,600 --> 01:00:50,600
+más probable es que el XGBoost y todos los modos anteriores tengan, digamos, un desempeño no muy bueno
+
+723
+01:00:51,600 --> 01:00:53,600
+o sea, van a ser muy costosos computacionalmente
+
+724
+01:00:54,600 --> 01:01:02,600
+mientras que este puede permitir tener información muy buena, perdón, muy grande y tener resultados muy buenos
+
+725
+01:01:03,600 --> 01:01:08,600
+siendo aún eficiente computacionalmente gracias a esto que divide no de forma pareja
+
+726
+01:01:09,600 --> 01:01:13,600
+sino que va dividiendo por donde más gana, como mapuquilla, ¿no?
+
+727
+01:01:14,600 --> 01:01:16,600
+y eso es lo que se sentía
+
+728
+01:01:17,600 --> 01:01:24,600
+bien, entonces lo que les decía, típicamente XGBoost crece por nivel, o sea, dividimos una vez
+
+729
+01:01:25,600 --> 01:01:29,600
+de ese nivel dividimos de nuevo, a tal vez es como le digamos, porque tiene los mismos parámetros que tenía
+
+730
+01:01:30,600 --> 01:01:35,600
+random forest, que tenía el bagging, que son los parámetros asociados a los árboles
+
+731
+01:01:36,600 --> 01:01:42,600
+mientras que likeDVM es por hojas, que es lo que les decía, DVM2, después agarra una, esa la divide
+
+732
+01:01:42,600 --> 01:01:44,600
+y después busca otra, y esa la divide, según ganancia
+
+733
+01:01:45,600 --> 01:01:51,600
+bien, este crecimiento es eficiente, puede generar un peor desempeño que este, pero insisto, en datos grandes
+
+734
+01:01:52,600 --> 01:02:00,600
+pueden tener desempeños competitivos con una eficiencia computacional que es muy superior a este de acá
+
+735
+01:02:00,600 --> 01:02:10,600
+bien, entonces, los hiperparámetros en el fondo que realmente tienen impacto acá, que los podemos ver
+
+736
+01:02:11,600 --> 01:02:21,600
+son algunos que están acá, particular, creo que en estos modelos, si me preguntan, que yo, que yo he
+
+737
+01:02:21,600 --> 01:02:25,600
+trabajado más, creo que este es muy importante, porque es la cantidad de árboles que yo voy a ocupar
+
+738
+01:02:26,600 --> 01:02:31,600
+la cantidad de árboles en general siempre va a ser un buen parámetro, porque a medida que yo tengo más espacio
+
+739
+01:02:32,600 --> 01:02:37,600
+para ir trabajando mis errores en este caso, más voy a poder ir logrando
+
+740
+01:02:38,600 --> 01:02:46,600
+un buen parámetro, porque a medida que yo tengo más espacio para ir trabajando mis errores en este caso, más voy a poder ir
+
+741
+01:02:46,600 --> 01:02:55,600
+más voy a poder ir logrando mejora, digamos, y un mejor modelo
+
+742
+01:02:56,600 --> 01:02:59,600
+el learning rate, que es el que yo les decía, es el aporte que produce cada etapa
+
+743
+01:03:00,600 --> 01:03:05,600
+típicamente valores pequeños, bien, de esto es preferible
+
+744
+01:03:07,600 --> 01:03:15,600
+y valores, menor que uno, no es un valor, digamos, bajo, así como 0 como 9, no es bajo, digamos, estamos hablando de que
+
+745
+01:03:16,600 --> 01:03:24,600
+0,03, es como la tasa de aprendizaje típica, bien, no es, uno tiene que tener como un porcentaje, simplemente la tasa
+
+746
+01:03:25,600 --> 01:03:32,600
+y en el fondo eso es lo que va a ir multiplicando, ya el peso, pero eso es como se traduce al final del día
+
+747
+01:03:33,600 --> 01:03:40,600
+en, cómo se va a traducir en el aporte en total, no es realmente un porcentaje, bien, sino es como
+
+748
+01:03:41,600 --> 01:03:44,600
+la porción que aporta en cada etapa, ¿no es?
+
+749
+01:03:44,600 --> 01:03:54,600
+el max depth siempre es bueno, ya, el max depth es siempre un buen parámetro porque es uno que nos permite
+
+750
+01:03:55,600 --> 01:03:58,600
+primero que el árbol no se vaya infinito y cuando el árbol no se va muy grande
+
+751
+01:03:59,600 --> 01:04:06,600
+automáticamente ustedes tienen una ganancia en términos de
+
+752
+01:04:06,600 --> 01:04:16,600
+tienen una ganancia en términos de no, que no haya sobreajuste, ¿ok?
+
+753
+01:04:17,600 --> 01:04:27,600
+después en regularización, escucha, en general la regularización que es típica es L2, ya, L2 sirve mucho en el fondo
+
+754
+01:04:27,600 --> 01:04:40,600
+para regularizar y bajar, bajar en general los errores de clasificación y también la complejidad del problema, ya
+
+755
+01:04:45,600 --> 01:04:53,600
+y la aleatoriedad que nosotros ya la hemos visto, ok, sub-sample, call-sample, son los asociados más o menos como era random forest, ok
+
+756
+01:04:54,600 --> 01:05:02,600
+así que eso es un poco, en general me preguntan, este es importante, este es importante, este es importante
+
+757
+01:05:03,600 --> 01:05:09,600
+yo no lo metería con la regularización porque hay que entender bien qué significa y qué es lo que produce cada regularización
+
+758
+01:05:10,600 --> 01:05:15,600
+ahora, si ustedes la quieren meter dentro de un optimizador, bueno, allá ustedes, digamos, ahí el optimizador va a ser la pega
+
+759
+01:05:16,600 --> 01:05:21,600
+pero creo que es importante entender qué significa cada regularización y eso no es tan simple porque van a tener que meter
+
+760
+01:05:21,600 --> 01:05:28,600
+a ver, ok, si estoy regularizando con L2, ¿qué significa en términos de mi proceso de optimización?
+
+761
+01:05:29,600 --> 01:05:35,600
+eso no es tan simple, hay que saber alta matemática, no digo que no la sepan, simplemente que no todo el mundo se va a querer meter ahí
+
+762
+01:05:36,600 --> 01:05:43,600
+porque de repente puede enredar más de lo que pueda ayudar, entonces si es que lo quieren meter de repente en un proceso de optimización, bien
+
+763
+01:05:44,600 --> 01:05:49,600
+pero si no, así como cambiarlos porque a mí me tinkó, yo usaría L2 que es lo típico, ya
+
+764
+01:05:49,600 --> 01:05:56,600
+y la aleatoriedad, bueno, creo que esto sí es algo que se prueba, porque me parece que en el random forest funciona bien
+
+765
+01:05:57,600 --> 01:06:05,600
+acá puede ser contraproducente en el sentido de, sobre todo en esta, las dos en realidad, el hecho de que
+
+766
+01:06:06,600 --> 01:06:14,600
+que un error con una muestra y algunas columnas no necesariamente puede ser error en otro lado, ya
+
+767
+01:06:14,600 --> 01:06:24,600
+o sea con otra muestra y otras columnas, eso me refiero, eso puede ser algo, digamos, digamos que uno podría tener ahí
+
+768
+01:06:25,600 --> 01:06:34,600
+su cierto, digamos, como conservador y ocupar todas las muestras, pero si uno se quiere arriesgar también es una buena opción
+
+769
+01:06:35,600 --> 01:06:39,600
+por lo menos en el random forest sabemos que funciona bien
+
+770
+01:06:39,600 --> 01:06:46,600
+bien, pues acá tenemos una especie como de resumen de lo que
+
+771
+01:06:47,600 --> 01:06:55,600
+de lo que tenemos como los modelos, tenemos el August, bien, que en el fondo tenemos
+
+772
+01:06:56,600 --> 01:07:07,600
+que el ponder en el fondo, casi difícil es predecir, ponder a los datos, mientras que los modelos de gradiente
+
+773
+01:07:07,600 --> 01:07:15,600
+desde ahí para abajo todos ocupan el gradiente de la función de perdida para tratar de minimizar dicha perdida
+
+774
+01:07:16,600 --> 01:07:28,600
+en el caso del XzBus y el LightGBM, en el fondo el XzBus tiene regularización para
+
+775
+01:07:28,600 --> 01:07:40,600
+controlar la complejidad del modelo y tiene sistemas escalables que significa que lo hacen súper buenos en el sentido de
+
+776
+01:07:41,600 --> 01:07:47,600
+cuando yo lo quiero por ejemplo poner en producción para ocuparlo, ya, y el LightGBM tiene este tema de que los árboles se abren
+
+777
+01:07:47,600 --> 01:08:01,600
+con ese concepto de Livewise, o sea que son muy fáciles digamos de estimar y por ende lo hacen un candidato ideal cuando los datos son grandes
+
+778
+01:08:02,600 --> 01:08:11,600
+todos pueden ocupar variables categoricas, pero en los tres primeros hay que codificarlas, ahora dice que el XzBus depende de la implementación
+
+779
+01:08:11,600 --> 01:08:17,600
+pero usualmente hay que codificarla, hay veces que la implementación es la que llama, este XzBus típicamente tiene un propio
+
+780
+01:08:18,600 --> 01:08:26,600
+procesamiento, hay veces que hay que codificarlas o no, el LightGBM las puede admitir casi como nativas
+
+781
+01:08:26,600 --> 01:08:40,600
+ahí están las velocidades de computación, tenemos la media, esta velocidad media en el caso del XzBus y a media que van con el gradient boosting
+
+782
+01:08:41,600 --> 01:08:46,600
+van creciendo, tienen media baja en el gradient boosting, después alta y muy alta en el caso del LightGBM
+
+783
+01:08:46,600 --> 01:08:56,600
+ok, riesgos principales, bueno ya lo vimos, ruidos y outliers en el caso del LightGBM, porque se quedan pegados los mismos errores siempre
+
+784
+01:08:57,600 --> 01:09:09,600
+ajuste sensible en el caso del gradient boosting, porque como esto trabaja directo sobre los errores, entonces es muy sensible
+
+785
+01:09:09,600 --> 01:09:23,600
+el XzBus es más complejo en el tuning, tuning significa la elección de parámetros, porque tiene muchos, como tiene regularización
+
+786
+01:09:23,600 --> 01:09:32,600
+tiene todas estas cosas, lo hacen más complejo como modelo, entonces si uno se está manejando muy bien en ese lado, de repente puede en el fondo
+
+787
+01:09:32,600 --> 01:09:52,600
+puede ir en redax, en el caso del LightGBM puede tender a hacer un overfitting cuando tiene datos pequeños, el LightGBM está pensado en una porción de datos grandes
+
+788
+01:09:52,600 --> 01:10:03,600
+muy grande, no está pensado en datos pequeños, entonces ahí uno tiene que tener mucha cuidado, entonces fijan cada uno se ajusta a un problema particular
+
+789
+01:10:04,600 --> 01:10:15,600
+cada uno puede ayudar en una situación en particular, ahí son los típicos ejemplos que tienen, como aplicaciones que uno podría tener
+
+790
+01:10:15,600 --> 01:10:31,600
+y en el fondo, como uno puede ir eligiendo, es preguntándose en qué domina el problema que tenemos
+
+791
+01:10:31,600 --> 01:10:45,600
+entonces si es un problema de base simple, entonces el AdaBoost basta, piensa que esto es más creciendo en complejidad de modelos
+
+792
+01:10:45,600 --> 01:11:01,600
+como tal, miren, si uno quiere este control didáctico, dice en el fondo, si podemos en el fondo, querer tener cierto control sobre los errores de manera bien específica
+
+793
+01:11:02,600 --> 01:11:10,600
+porque los otros se desaparecen, en el fondo, la enboosting era bien fácil de explicar, no sé si fácil, quizás es mala la palabra que estoy ubando
+
+794
+01:11:10,600 --> 01:11:19,600
+se podía explicar cómo el modelo con este cierto que vimos con el F0, después con ese R1 que calculábamos, después sacábamos el F1
+
+795
+01:11:20,600 --> 01:11:31,600
+es simple en ese sentido ir siguiendo como el árbol está creciendo, pero cuando ustedes ya llegan a XGBoost o LightGBM, todos estos modelos ya esas cosas desaparecen
+
+796
+01:11:31,600 --> 01:11:42,600
+porque son tan enredados por dentro que es muy difícil poder hacer el seguimiento, entonces yo elegiría el XGBoost cuando es el mejor que tiene el rendimiento en general
+
+797
+01:11:43,600 --> 01:11:52,600
+o sea debiese ser si es que el AdaBoost no está funcionando bien, LightGBM no sirve para tanto, el XGBoost debiese ser el candidato por defecto
+
+798
+01:11:53,600 --> 01:11:56,600
+porque es el que tiene el mejor rendimiento a nivel general
+
+799
+01:11:56,600 --> 01:12:06,600
+y si ustedes tienen muchos datos, entonces para una gran escala de datos el LightGBM es el candidato porque el XGBoost va a ser muy costoso a completación alante
+
+800
+01:12:07,600 --> 01:12:16,600
+y finalmente uno que no vimos pero que también existe dentro de esta familia es el CatBoost, el CatBoost es para cuando si bien lo vimos antes
+
+801
+01:12:16,600 --> 01:12:27,600
+entonces todos estos modelos aceptan variables categóricas, bueno cuando tienen muchas variables categóricas, entonces el CatBoost puede ser una mejor opción
+
+802
+01:12:28,600 --> 01:12:37,600
+pero todos por ejemplo imagínense que tienen un dataset con puras variables categóricas, bueno el XGBoost va a funcionar, si va a funcionar, LightGBM va a funcionar, si va a funcionar
+
+803
+01:12:38,600 --> 01:12:44,600
+pero realmente ahí el CatBoost es el que yo debiese utilizar para tener un mejor rendimiento
+
+804
+01:12:47,600 --> 01:12:49,600
+bien
+
+805
+01:12:50,600 --> 01:13:05,600
+y así como para cerrar lo que serían nuestros modelos, tenemos que nuestros modelos a diferencia de lo que estaban moviendo la semana pasada
+
+806
+01:13:05,600 --> 01:13:10,600
+y así como para boosting aprende de forma secuencial
+
+807
+01:13:11,600 --> 01:13:16,600
+lo vimos eso, en comillas es una limitante
+
+808
+01:13:19,600 --> 01:13:29,600
+y genera un costo mayor no computacionalmente porque todos son costosos en algún sentido computacionalmente
+
+809
+01:13:29,600 --> 01:13:31,600
+ya
+
+810
+01:13:34,600 --> 01:13:47,600
+pero si va a ser muy costoso en tiempo, vamos a perder la ganancia que tiene en tiempo el hacer el digamos el entrenamiento en paralelo
+
+811
+01:13:47,600 --> 01:14:00,600
+dicho sea a paso, el XGBoost está tan bien hecho que todos los procesos al interior del que puede si bien es secuencial en los árboles
+
+812
+01:14:01,600 --> 01:14:11,600
+dentro de cada uno de esos árboles y cada una de las cosas que hace hay procesos que si me veo pegado, me escuchan o no?
+
+813
+01:14:13,600 --> 01:14:16,600
+si se escucha pero no se ve la imagen
+
+814
+01:14:17,600 --> 01:14:19,600
+si escuchas
+
+815
+01:14:20,600 --> 01:14:30,600
+perfecto, entonces como le decía, el XGBoost si bien los árboles son secuenciales, los procesos dentro de cada uno de esos elementos en la secuencia
+
+816
+01:14:31,600 --> 01:14:36,600
+tienen mini procesos por decirlo así que si son
+
+817
+01:14:37,600 --> 01:14:46,600
+si son paralelizables y en ese caso XGBoost si lo hace, eso es parte del fondo de la optimización interior que tiene
+
+818
+01:14:47,600 --> 01:14:58,600
+así que si bien son secuenciales y perdimos eso, el XGBoost por eso también dentro de las velocidades como modelo que aparecían, tenía velocidad alta porque está muy bien programado
+
+819
+01:14:59,600 --> 01:15:01,600
+muy bien aprovechado todo
+
+820
+01:15:02,600 --> 01:15:06,600
+ahora tiene una pregunta pero te voy a terminar con esta lámina y te responde
+
+821
+01:15:08,600 --> 01:15:17,600
+la perdida, la función de perdida es en los casos de boosting es lo que define cómo se corrige en cada etapa
+
+822
+01:15:18,600 --> 01:15:33,600
+si ustedes ponen la perdida cuadrática es un resultado, si ponen la perdida logarítmica es otro resultado porque es cómo el modelo le va a decir al siguiente que es lo que tiene que corregir
+
+823
+01:15:34,600 --> 01:15:48,600
+y esto de acá, como dice KBiloteca prioriza un problema distinto, aquí es Biloteca, refiero a modelo, cada función que es lo que vamos a ver en Python prioriza problemas distintos y eso uno tiene que tenerlo en claro antes
+
+824
+01:15:48,600 --> 01:16:02,600
+así como vamos a hacer nosotros que vamos a comparar los modelos bajo el mismo pipeline y vamos a ver cómo funciona
+
+825
+01:16:03,600 --> 01:16:17,600
+entonces aquí están algunas preguntas que dejo pero que cambia entre adus y line boosting, ya lo habéis de saber hasta ahora, por qué el enrate va de la mano con número de árboles y cuando uno que lo usaría like gibi
+
+826
+01:16:18,600 --> 01:16:27,600
+entonces voy con la pregunta de Alan que dice en su trabajo actual cuál de estos modelos le ha tocado usar más y por qué lo ha seleccionado
+
+827
+01:16:30,600 --> 01:16:39,600
+de estos modelos hemos ocupado, mi equipo, yo ya no veo modelo hace mucho rato
+
+828
+01:16:39,600 --> 01:16:49,600
+pero los que hemos ocupado acá ha sido particularmente el XGBoost y el random forest
+
+829
+01:16:50,600 --> 01:16:54,600
+así como los que tengo más en la cabeza que me acuerdo en este momento
+
+830
+01:16:55,600 --> 01:17:12,600
+en qué casos lo ocupamos, por ejemplo el XGBoost hace no mucho lo ocupamos en, teníamos que hacer ciertas predicciones de demanda para nuestros clientes
+
+831
+01:17:12,600 --> 01:17:27,600
+y estamos explorando modelos de serie de tiempo, son como los clásicos y otros no tan clásicos, típicos estos modelos como Arima, Sarima que son los modelos más estadísticos de punto de vista de serie de tiempo
+
+832
+01:17:28,600 --> 01:17:36,600
+son modelos complejos, son modelos con muchas restricciones de supuestos, entonces no nos están entregando buenos resultados
+
+833
+01:17:36,600 --> 01:17:46,600
+después dijimos bueno vamos con un cañón y nos fuimos a los modelos tipo GRU o LSTM que son basados en redes neuronales
+
+834
+01:17:47,600 --> 01:17:56,600
+los problemas de las redes neuronales es que cuando tú no tienes una cantidad suficiente de datos y en este caso era como era a nivel de cliente la predicción y era mensual
+
+835
+01:17:56,600 --> 01:18:09,600
+no tienes tanta data porque si en el fondo si miras una serie que tome 6 años, es 6 por 12, 72 registros de la serie de datos, no hay mucha información
+
+836
+01:18:10,600 --> 01:18:23,600
+entonces a pesar de ser tremendos modelos el GRU y el LSTM, las redes neuronales no funcionan bien cuando tienen poco datos, funcionan cuando tienen una cantidad gigante de información
+
+837
+01:18:23,600 --> 01:18:33,600
+por eso por ejemplo el LSTM ha tenido muy buenos resultados cuando ustedes hacen predicciones de valores de acciones intradariarias
+
+838
+01:18:34,600 --> 01:18:42,600
+porque ahí tienen un cambio durante todo el día a nivel de segundo, entonces ahí sí tienen una cantidad brutal de información y ahí es donde he visto sus mejores desempeños
+
+839
+01:18:43,600 --> 01:18:54,600
+y entonces que es lo que hicimos, bueno si no funcionaban los modelos más top de hoy en día de serie de tiempo, que son repasados en renal y no funcionaban los típicos
+
+840
+01:18:55,600 --> 01:19:06,600
+fuimos a algo más intermedio y toca la casualidad de que XGBoost también puede funcionar en base a modelos a series de tiempo
+
+841
+01:19:07,600 --> 01:19:26,600
+los datos se tienen que especificar de una manera muy muy muy particular, pero cuando uno lo logra el modelo es capaz de hacer predicciones a 1, 2, 3, 4 pasos que uno quiera hacia adelante tal como lo hacen las series de tiempo
+
+842
+01:19:27,600 --> 01:19:36,600
+de ese punto de vista además es un modelo ultra versátil, incluso puede hacer trabajos de series de tiempo
+
+843
+01:19:37,600 --> 01:19:52,600
+¿por qué se logra eso? bueno porque estos modelos son super como, estos se llaman modelos, son libres de supuestos, son libres de probabilidades, son libres de todo
+
+844
+01:19:53,600 --> 01:20:04,600
+Model FreeCroc que es el nombre técnico, entonces no tienen ningún tipo de supuestos, son super flexibles y se adaptan según las circunstancias que nosotros necesitemos
+
+845
+01:20:05,600 --> 01:20:10,600
+entonces ese es un punto grande a favor de ese tipo de modos
+
+846
+01:20:12,600 --> 01:20:16,600
+y la otra vez que ocupamos Random Forest, fue cuando teníamos un modelo
+
+847
+01:20:18,600 --> 01:20:29,600
+nosotros teníamos un modelo que permite a los liquidadores, y yo trajo en el monar, entonces cuando los camiones salen a repartir, en particular los supermercados
+
+848
+01:20:29,600 --> 01:20:46,600
+salen a repartir, ellos entregan la mercadería con una factura y el supermercado no dice, ah bueno si lo dice la factura eso es, no, ellos dicen ok quedate con tu factura, yo voy a revisar lo que me traes
+
+849
+01:20:47,600 --> 01:20:56,600
+y ellos revisan lo que tu le traes, y en base a lo que tu le traes ellos te emiten una nota de recepción que es lo que el supermercado certifica que recibió
+
+850
+01:20:56,600 --> 01:21:03,600
+y después tú tienes que en el proceso de liquidación, tú juntar estos dos documentos diversos que efectivamente están iguales o faltó algo
+
+851
+01:21:04,600 --> 01:21:14,600
+porque hay muchas veces que los productos se facturan, pero después por ejemplo no estaban en la bodega o se acabó el stock o los fueron a subir y se encuentran ansiosos, pero ocurrió un montón de cosas
+
+852
+01:21:15,600 --> 01:21:22,600
+y no se llevan, entonces pueden faltar, hay veces que el supermercado también dice que no lo recibió pero si lo recibió y ahí toca pelear
+
+853
+01:21:23,600 --> 01:21:30,600
+pero en el fondo como es responsabilidad del camión nosotros hacemos la liquidación y si falta algo la empresa de distribución es la que se tiene que acercar
+
+854
+01:21:31,600 --> 01:21:46,600
+entonces ese proceso lo hacemos nosotros antes así a mano, la gente recibía los papeles y tenía que ir ticket por ticket así como, ah si están todos y después subirlo a dos plataformas para hacer las notas de créditos que correspondían para poder hacer la cobrancia
+
+855
+01:21:46,600 --> 01:22:04,600
+entonces eso después lo empezamos a hacer nosotros ya de manera con modelos y lo primero que teníamos que hacer, bueno el problema principal era obtener los documentos, extraer la información y poder hacer toda esta conciliación de manera automática
+
+856
+01:22:04,600 --> 01:22:18,600
+y eso lo hicimos con modelos de reino oral que los típicos OCR que extraen información, pero era distinto extraer información de una factura de una nota de recepción
+
+857
+01:22:18,600 --> 01:22:27,600
+entonces tuvimos que generar un modelo que ayudara a determinar qué era, para que después entraran los modelos que extraían la información
+
+858
+01:22:28,600 --> 01:22:39,600
+y ese modelo que tenía que tomar el documento y clasificarlo como factura o como nota de recepción lo hicimos con un random offers, funcionó perfecto
+
+859
+01:22:39,600 --> 01:22:57,600
+de hecho en la página yo le subí un archivo que dice ejemplo de random offers en imágenes, algo así y es un modelo de random offers que sirve para clasificar imágenes
+
+860
+01:22:57,600 --> 01:23:03,600
+ahí para que lo prueben y en el fondo ver también la versatilidad de todos estos modelos
+
+861
+01:23:03,600 --> 01:23:17,600
+y ocupamos random offers porque la primera instrucción fue bueno, ocupemos una red oral convulsional que son los modelos por defecto típicos para poder hacer este tipo de cosas
+
+862
+01:23:17,600 --> 01:23:30,600
+coincidentemente cuando nosotros partimos esto no teníamos tanta información, la información en este caso serían los documentos, no teníamos tantos por ende nos costó entrenar la red neuronal y finalmente no entregaba tan buenos resultados
+
+863
+01:23:30,600 --> 01:23:44,600
+la diferencia del random offers que pudo captar automáticamente las diferencias y generamos un modelo y no es que esto vaya a ocurrir siempre pero dado la problemática en sí
+
+864
+01:23:44,600 --> 01:23:52,600
+era un modelo que tenía cero error, siempre clasificó bien y sigue clasificando perfecto hasta el día de hoy
+
+865
+01:23:52,600 --> 01:24:09,600
+no es lo usual pero en este caso es muy particular porque serán dos documentos y las facturas son súper fáciles de identificar porque tienen arriba un objeción que dice factura, número de factura, tienen el estampado del servicio impuesto interno
+
+866
+01:24:09,600 --> 01:24:16,600
+entonces tienen muchas cosas que le hacían fácil de decir y por eso funcionó súper bien y aún así las redes no le hicieron
+
+867
+01:24:16,600 --> 01:24:18,600
+así que
+
+868
+01:24:18,600 --> 01:24:28,600
+el sobreajuste solo se considera, yo estoy clasificando en dos
+
+869
+01:24:28,600 --> 01:24:42,600
+el sobreajuste solo se considera si es que el modelo hubiese sido bueno haciendo las predicciones en mi data set de entrenamiento pero cuando le pasaron al set de test entonces no era capaz de predecir nada
+
+870
+01:24:42,600 --> 01:24:50,600
+ahí es sobreajuste, si tu modelo anda bien, anda bien y no hay que estar triste por ello
+
+871
+01:24:50,600 --> 01:25:01,600
+siempre que revisen el fondo del rendimiento siempre se ve en el set de test y cuando el set de test anda bien está todo bien
+
+872
+01:25:01,600 --> 01:25:15,600
+en el set de test está mal porque el sobreajuste y el bajo ajuste son malos modelos
+
+873
+01:25:15,600 --> 01:25:24,600
+la diferencia entre ambos es que en el bajo ajuste ambos, tanto en el set de test como en el set de entrenamiento anda mal
+
+874
+01:25:24,600 --> 01:25:32,600
+el sobreajuste anda bien en el set de entrenamiento pero no en el de test
+
+875
+01:25:32,600 --> 01:25:46,600
+y si uno podría decirlo que se logró un modelo determinista, hasta el día de hoy no se ha equivocado, voy a tocar madera a que no falle porque está funcionando bastante bien
+
+876
+01:25:46,600 --> 01:25:58,600
+pero tienen dos ejemplos donde hoy día, nosotros lo hemos ocupado, han funcionado muy muy bien, así que nada que recriminal de estos modelos
+
+877
+01:25:58,600 --> 01:26:18,600
+ok, si no hay otra pregunta, propongo ir al descanso, igual que la pasaba hasta las 8.30 y volvemos con la parte más de práctica
+
+878
+01:26:18,600 --> 01:26:30,600
+entonces volvemos a las 8.30
+
+879
+01:51:18,600 --> 01:51:38,600
+bien, de vuelta
+
+880
+01:51:38,600 --> 01:51:44,600
+perfecto
+
+881
+01:51:44,600 --> 01:51:50,600
+voy a rendar la grabación
+
+882
+01:51:50,600 --> 01:52:08,600
+vamos a la parte práctica
+
+883
+01:52:08,600 --> 01:52:18,600
+vamos a hacer el civi de ayer, o sea del martes
+
+884
+01:52:18,600 --> 01:52:30,600
+vamos a usar los mismos dataset, ok, KERX para clasificación y Nameless Housing para regresión que ayer no lo alcanzó
+
+885
+01:52:30,600 --> 01:52:42,600
+bueno, esta es como la entrada, casi igual, solo que ahora tiene distintos modelos, y lo que les mencionaba en un comienzo
+
+886
+01:52:42,600 --> 01:52:52,600
+en el modelo de ensamblados trae el NadaBoost en clasificador y en regresor, y el GradientBoosting en clasificador y en regresor
+
+887
+01:52:52,600 --> 01:53:00,600
+pero el XGBoost y el LightDVM vienen desde modulos apartes
+
+888
+01:53:00,600 --> 01:53:06,600
+y los modos de acá tienen que instalarlos, vienen por defecto en python
+
+889
+01:53:06,600 --> 01:53:16,600
+si usan colab es probable que ahí sí vengan, pero si no cuando corran esto les va a arrojar al tiro el error
+
+890
+01:53:16,600 --> 01:53:26,600
+esto creo que cuando se lo subí tenía el fastmode como true, eso es para que se vea más rápido
+
+891
+01:53:26,600 --> 01:53:32,600
+así que lo subí así con false, que es como lo voy a correr yo
+
+892
+01:53:32,600 --> 01:53:40,600
+ok, entonces, vemos esto
+
+893
+01:53:40,600 --> 01:53:50,600
+y ahí está, bien, entonces en este caso lo que cambia en el fondo con el fastmode, una de las cosas que cambia
+
+894
+01:53:50,600 --> 01:53:56,600
+y que es bien pesada es esta, son las iteraciones del random research que las posamos allá
+
+895
+01:53:56,600 --> 01:54:08,600
+esta parte simplemente trae la data, bien, de las rutas asociadas a cada uno
+
+896
+01:54:08,600 --> 01:54:18,600
+bien, y acá lo único que está simplemente es lo mismo que antes, como un resumen de evaluación de clasificadores
+
+897
+01:54:18,600 --> 01:54:24,600
+y un resumen de evaluación de modelos de regresión
+
+898
+01:54:24,600 --> 01:54:34,600
+y esta primera simplemente es porque vamos a emular el mismo preprocesamiento que hicimos la vez pasada utilizando el pipeline
+
+899
+01:54:34,600 --> 01:54:44,600
+ok, entonces fijan, esto recibe un dataset, la función, y lo único que hace es que selecciona las que son numéricas
+
+900
+01:54:44,600 --> 01:54:52,600
+en el caso de la, para variar en numérica y para las categoricas, hace una selección excluyendo las numéricas
+
+901
+01:54:52,600 --> 01:55:03,600
+bien, entonces con eso llevamos las variables en cada caso y después tenemos este pipeline numérico
+
+902
+01:55:03,600 --> 01:55:10,600
+donde lo único que haremos es una imputación simple por la mediana, es exactamente lo mismo que alguien está rayando en la pizarra
+
+903
+01:55:12,600 --> 01:55:16,600
+por favor no raye a la pizarra, o sea a la pantalla
+
+904
+01:55:17,600 --> 01:55:27,600
+bien, y tenemos un imputador simple que es por la mediana y en el caso de las categoricas vamos a utilizar la moda
+
+905
+01:55:27,600 --> 01:55:32,600
+y además vamos a utilizar el one-hot encoder
+
+906
+01:55:36,600 --> 01:55:44,600
+bien, y finalmente lo que regresa a esta función es un transformador de columnas donde va a agarrar ambos pipelines
+
+907
+01:55:44,600 --> 01:55:52,600
+bien, uno que se vaya por num, que va a agarrar el pipeline numérico y lo va a aplicar sobre las variables numéricas
+
+908
+01:55:52,600 --> 01:55:59,600
+y cat, que es el pipeline categórico, va a tomar solo las variables categoricas
+
+909
+01:55:59,600 --> 01:56:08,600
+bien, así que esas son las tres funciones que están definidas acá, que son simplemente, es por ahorrar código más adelante
+
+910
+01:56:09,600 --> 01:56:19,600
+bien, entonces aquí tomamos los datos, lo mismo más o menos que antes, tenemos 303 y 14 variables
+
+911
+01:56:19,600 --> 01:56:27,600
+aquí están los tipos, ya, también lo habíamos visto, hay algunas que tenían datos faltantes, hay algunas que tenían datos numéricos
+
+912
+01:56:27,600 --> 01:56:35,600
+y estas cinco son las que nosotros consideramos numéricas, las demás se consideran categóricas en general
+
+913
+01:56:35,600 --> 01:56:47,600
+hay algunas distribuciones, esto ya lo habíamos visto, ok, esto es lo mismo que vimos el martes, aquí lo estamos viendo con histograma
+
+914
+01:56:47,600 --> 01:56:55,600
+el martes lo vimos con densidades, el histograma y la densidad es lo mismo, solo que esto es una aproximación de la densidad
+
+915
+01:56:55,600 --> 01:57:07,600
+bien, entonces acá tenemos la separación entre el set de entrenamiento y testeo, tenemos separamos la variable objetivo
+
+916
+01:57:07,600 --> 01:57:11,600
+hay alguien desmultiado
+
+917
+01:57:11,600 --> 01:57:15,600
+hay alguien desmultiado
+
+918
+01:57:15,600 --> 01:57:23,600
+y separamos la variable objetivo de las variables, las variables como dan, estos nuestros predictores
+
+919
+01:57:23,600 --> 01:57:32,600
+y la variable objetivo además hacemos el mismo mapeo que hicimos antes, los no, los llevamos a un cero y los y a uno
+
+920
+01:57:32,600 --> 01:57:41,600
+después tenemos entrenamiento de esteo, entrenamiento de esteo para los x y los y, hacemos 30 de split
+
+921
+01:57:41,600 --> 01:57:50,600
+pasamos los datos, hicimos un set de test de un 25%, esto queda stratificado por la variable objetivo
+
+922
+01:57:50,600 --> 01:58:00,600
+eso siempre es útil hacerlo independiente de que en este caso no hay un desbalance de clases, eso es lo que está acá
+
+923
+01:58:00,600 --> 01:58:13,600
+las clases están casi equilibradas, pero aún así es mejor siempre irse a la segura y tener las muestras stratificadas para que no te encorramos ningún riesgo
+
+924
+01:58:13,600 --> 01:58:24,600
+encorramos esto y ahí tienen las porciones positivas en el train y test, positivas se entiende como el uno
+
+925
+01:58:24,600 --> 01:58:30,600
+así que tenemos casi un 46% en ambos casos, lo cual es correcto
+
+926
+01:58:30,600 --> 01:58:36,600
+y aquí vamos a definir todos los modelos, lo primero que vamos a hacer es el preprocesador del pipeline
+
+927
+01:58:36,600 --> 01:58:44,600
+entonces simplemente tomamos el preprocesador y le metemos los datos del train
+
+928
+01:58:44,600 --> 01:58:46,600
+y eso me genera el preprocesador
+
+929
+01:58:46,600 --> 01:58:51,600
+y después nosotros hacemos los estimadores de clasificación y aquí tenemos varios
+
+930
+01:58:51,600 --> 01:58:55,600
+ustedes lo pueden poner como una lista y pasárselos todos al pipeline
+
+931
+01:58:55,600 --> 01:59:02,600
+entonces tenemos el AdaBoost que va a ser con el AdaBoost classifier porque en eso estamos
+
+932
+01:59:02,600 --> 01:59:08,600
+vamos a tomar la cantidad de estimadores que nosotros tenemos bien que 100
+
+933
+01:59:08,600 --> 01:59:16,600
+es 100 o 250 dependiendo de este parámetro fast mode
+
+934
+01:59:16,600 --> 01:59:20,600
+vamos a tomar un learning rate de 0.05 en todos
+
+935
+01:59:20,600 --> 01:59:24,600
+y el random take es 42
+
+936
+01:59:24,600 --> 01:59:29,600
+entonces se van acá encima para ver que este tiene hartos parámetros
+
+937
+01:59:29,600 --> 01:59:35,600
+y tiene un parámetro en particular que lo comparte con varios de estos modelos que es el estimador
+
+938
+01:59:35,600 --> 01:59:43,600
+el estimador es el modelo que va a ocupar y que va a repetir varias veces, es como la unidad base
+
+939
+01:59:43,600 --> 01:59:50,600
+recuerda que el random forest era el árbol pero bagging nos permitía poner un estimador en particular
+
+940
+01:59:50,600 --> 01:59:52,600
+que nosotros usamos el árbol porque es la típica
+
+941
+01:59:52,600 --> 01:59:56,600
+bien, acá el AdaBoost permite exactamente lo mismo
+
+942
+01:59:56,600 --> 02:00:00,600
+el AdaBoost, o sea aquí el clasificador base lo podríamos cambiar
+
+943
+02:00:00,600 --> 02:00:08,600
+en este caso, por defecto es que es el árbol de clasificación
+
+944
+02:00:08,600 --> 02:00:12,600
+cuando ese parámetro es null que es el valor por defecto
+
+945
+02:00:12,600 --> 02:00:19,600
+en cambio, cuando ustedes tienen por ejemplo Gradient Boosting es automáticamente basado en árboles
+
+946
+02:00:19,600 --> 02:00:23,600
+lo mismo con el XGBoost y el LightGBM
+
+947
+02:00:23,600 --> 02:00:31,600
+entonces, por eso, en particular cuando ustedes se meten al AdaBoost
+
+948
+02:00:31,600 --> 02:00:35,600
+por ejemplo cuando se meten a esta aparecen muchos parámetros
+
+949
+02:00:35,600 --> 02:00:43,600
+como por ejemplo este el min_samples_split, min_samples_leaf, max depth, etc.
+
+950
+02:00:43,600 --> 02:00:50,600
+son parámetros que nosotros sabemos, el ccp_alpha, son parámetros que sabemos corresponden a los árboles
+
+951
+02:00:50,600 --> 02:00:54,600
+en cambio, cuando ustedes se meten al AdaBoost no aparece ninguno de ellos, ¿por qué?
+
+952
+02:00:54,600 --> 02:00:57,600
+porque el estimador no necesariamente es un árbol
+
+953
+02:00:57,600 --> 02:01:01,600
+en el caso de que lo sea, ustedes lo pueden agregar
+
+954
+02:01:01,600 --> 02:01:06,600
+como dentro de este asterisco o directamente poniendo en el fondo estimador, árbol de decisión
+
+955
+02:01:06,600 --> 02:01:09,600
+y adentro de él poniendo los parámetros que uno quiera
+
+956
+02:01:09,600 --> 02:01:17,600
+entonces todos los árboles con lo mismo, salvo algunos
+
+957
+02:01:17,600 --> 02:01:27,600
+que es que por ejemplo acá vamos a poner la profundidad máxima 2, acá 3, acá max depth menos 1
+
+958
+02:01:27,600 --> 02:01:34,600
+significa no limit, o sea no tenemos un limit
+
+959
+02:01:34,600 --> 02:01:44,600
+en el caso del XGBoost y el LightGBM se fijan tienen subsamples y column samples de 0.8
+
+960
+02:01:44,600 --> 02:01:52,600
+o sea van a tomar el 80% de la muestra y el 80% de las columnas
+
+961
+02:01:52,600 --> 02:01:59,600
+el muestreo acá se hace sin repetición
+
+962
+02:01:59,600 --> 02:02:09,600
+tiene un parámetro asociado al boosted
+
+963
+02:02:09,600 --> 02:02:13,600
+típicamente lo tiene cuando uno quiere elegir si es con repetición
+
+964
+02:02:13,600 --> 02:02:22,600
+entonces esos son los modelos y este en el fondo diccionario gigante los define
+
+965
+02:02:22,600 --> 02:02:25,600
+y después lo agregamos en el pipeline
+
+966
+02:02:26,600 --> 02:02:34,600
+el pipeline completo ya es en el fondo primero el preprocesamiento y luego los estimadores
+
+967
+02:02:34,600 --> 02:02:37,600
+nosotros vamos a generarlo para cada uno de ellos
+
+968
+02:02:44,600 --> 02:02:48,600
+lo anterior solo define las cosas
+
+969
+02:02:48,600 --> 02:02:52,600
+entonces aquí si se fijan esto es un for, solo que el for está abajo
+
+970
+02:02:52,600 --> 02:02:56,600
+entonces ustedes sacan el nombre y el estimador
+
+971
+02:02:56,600 --> 02:02:59,600
+el nombre y el estimador
+
+972
+02:02:59,600 --> 02:03:02,600
+y eso los va a ir colocando donde corresponde
+
+973
+02:03:02,600 --> 02:03:05,600
+entonces el nombre va a ir acá para que cree un diccionario
+
+974
+02:03:05,600 --> 02:03:09,600
+y el estimador va a ir acá para que cree en el fondo esto dentro de un pipeline
+
+975
+02:03:09,600 --> 02:03:13,600
+y ahora lo que tenemos que hacer es ajustar estas cosas
+
+976
+02:03:15,600 --> 02:03:20,600
+el ajuste se hace, bueno aquí si se fijan tengo un diccionario vacío
+
+977
+02:03:20,600 --> 02:03:31,600
+con los clasificadores y en esta lista vacía lo voy a tener con los resultados de la clasificación
+
+978
+02:03:31,600 --> 02:03:34,600
+y después de nuevo tomo el pipeline de clasificación
+
+979
+02:03:34,600 --> 02:03:37,600
+y voy tomando los valores que necesito
+
+980
+02:03:37,600 --> 02:03:44,600
+entonces voy a tomar esto, le voy a entregar el nombre, el pipeline que le corresponde
+
+981
+02:03:44,600 --> 02:03:47,600
+los datos de entrenamiento y los datos de test
+
+982
+02:03:47,600 --> 02:03:51,600
+si ustedes van a esta función en la que está arriba
+
+983
+02:03:51,600 --> 02:03:58,600
+es esta y esto recibe justamente el nombre del modelo, cuál pipeline le corresponde
+
+984
+02:03:58,600 --> 02:04:02,600
+el entrenamiento de test para entrenar el modelo
+
+985
+02:04:02,600 --> 02:04:06,600
+y después de test para yo poder hacer las predicciones y todas las variaciones
+
+986
+02:04:06,600 --> 02:04:15,600
+entonces esto de acá va a ajustar el modelo y va a entregar los resultados
+
+987
+02:04:15,600 --> 02:04:23,600
+los modelos ajustados los voy a guardar en el diccionario que dice fitted clasifiers
+
+988
+02:04:23,600 --> 02:04:30,600
+y en los resultados los voy agregando a esta lista de classification results
+
+989
+02:04:30,600 --> 02:04:33,600
+eso es lo que hace todo este for
+
+990
+02:04:33,600 --> 02:04:40,600
+y finalmente acá lo estoy arreglando un poquito, lo estoy pasando en DataFrame
+
+991
+02:04:40,600 --> 02:04:53,600
+y estamos haciendo un ordenamiento de valores utilizando el RockAUC de manera descendente
+
+992
+02:04:53,600 --> 02:05:00,600
+y vamos a hacer un reset de los index porque en el fondo esta cosa puede dejar la tabla media distorsionada
+
+993
+02:05:00,600 --> 02:05:03,600
+y después finalmente imprimimos
+
+994
+02:05:03,600 --> 02:05:05,600
+lo estremos un poquito y ahí está
+
+995
+02:05:05,600 --> 02:05:08,600
+entonces tenemos acá nuestros modelos
+
+996
+02:05:08,600 --> 02:05:17,600
+y acá tenemos en el fondo los valores
+
+997
+02:05:17,600 --> 02:05:20,600
+entonces si se fijan
+
+998
+02:05:20,600 --> 02:05:27,600
+esto habría que verlo más en detalle pero estos tienen buenos resultados en el set de test
+
+999
+02:05:27,600 --> 02:05:33,600
+pero fíjense el LightDVM tiene un accuracy de 1
+
+1000
+02:05:34,600 --> 02:05:39,600
+o sea en el set de test de entrenamiento no se equivoca en nada
+
+1001
+02:05:39,600 --> 02:05:50,600
+estos dos uno podría ver si es que existe algo de sobreajuste
+
+1002
+02:05:50,600 --> 02:05:57,600
+aunque existiera sobreajuste en este caso igual tienen buen indicador
+
+1003
+02:05:57,600 --> 02:06:01,600
+pero en este caso el que está agrandando es este
+
+1004
+02:06:02,600 --> 02:06:13,600
+tiene mejor RockAUC, tiene mejor F1, está empatado en Recall, tiene mejor precisión y tiene mejor accuracy en general
+
+1005
+02:06:13,600 --> 02:06:19,600
+entonces este es el que está agrandando no solo por esto
+
+1006
+02:06:19,600 --> 02:06:24,600
+y todo lo indicador en general sino que además estos de acá
+
+1007
+02:06:24,600 --> 02:06:31,600
+no podría tender a pensar de que es raro que un modelo tenga un mejor desempeño en el set de entrenamiento
+
+1008
+02:06:31,600 --> 02:06:34,600
+y un mal desempeño en el set de test
+
+1009
+02:06:34,600 --> 02:06:40,600
+entonces estos de acá pueden estar un poco sobreajustando sin dejar de ser un mal modelo
+
+1010
+02:06:41,600 --> 02:06:47,600
+y eso es en general porque estos modelos pueden estar siendo más complejos
+
+1011
+02:06:47,600 --> 02:06:53,600
+en particular nosotros pusimos en el gradient boosting por ejemplo profundidad máxima 2
+
+1012
+02:06:53,600 --> 02:06:57,600
+mientras que en este pusimos 3 y en este sin límite
+
+1013
+02:06:58,600 --> 02:07:01,600
+la profundidad del árbol es un parámetro en sí de complejidad
+
+1014
+02:07:01,600 --> 02:07:05,600
+por ende si es que este tiene un 3 y este un 2 este es más complejo
+
+1015
+02:07:05,600 --> 02:07:08,600
+si este tiene sin límite es más complejo
+
+1016
+02:07:08,600 --> 02:07:14,600
+así que tiene sentido lo que está ocurriendo dado estos nubes
+
+1017
+02:07:14,600 --> 02:07:17,600
+si nosotros acá cambiamos el parámetro 2
+
+1018
+02:07:17,600 --> 02:07:21,600
+no lo voy a cambiar aquí bien, si lo voy a cambiar en este
+
+1019
+02:07:21,600 --> 02:07:23,600
+a ver si es que algo se modifica
+
+1020
+02:07:23,600 --> 02:07:29,600
+y ahora el XGBoost se fijan bajó bastante en el de curación
+
+1021
+02:07:29,600 --> 02:07:36,600
+este lo sigue manteniendo pero ya ahora está un poquito más balanceado
+
+1022
+02:07:36,600 --> 02:07:40,600
+y ahora si se fijan el AUC del XGBoost es el mejor
+
+1023
+02:07:41,600 --> 02:07:45,600
+entonces le bajamos lo que estábamos viendo en el resultado anterior
+
+1024
+02:07:45,600 --> 02:07:48,600
+es que estaba un poquito pasado a sobreajuste
+
+1025
+02:07:48,600 --> 02:07:54,600
+no existe tal cosa porque en el gráfico típico es sobreajuste
+
+1026
+02:08:00,600 --> 02:08:02,600
+es este
+
+1027
+02:08:03,600 --> 02:08:05,600
+este
+
+1028
+02:08:08,600 --> 02:08:14,600
+aquí dice early stopping pero muchas veces esto de acá se llama también como
+
+1029
+02:08:18,600 --> 02:08:26,600
+así como este el mejor ajuste o sweet spot depende de la
+
+1030
+02:08:26,600 --> 02:08:28,600
+pero en el fondo este es el mejor ajuste
+
+1031
+02:08:28,600 --> 02:08:33,600
+el mejor ajuste igual es difícil encontrarlo porque en el fondo ustedes tienen una complejidad del modelo
+
+1032
+02:08:33,600 --> 02:08:37,600
+que en este caso la estamos controlando con en parte
+
+1033
+02:08:37,600 --> 02:08:41,600
+en parte no todo con el parámetro profundidad
+
+1034
+02:08:41,600 --> 02:08:44,600
+entonces que es lo que ocurra
+
+1035
+02:08:45,600 --> 02:08:49,600
+uno puede estar aquí en el mejor modelo pero si yo me voy un poquito para allá o un poquito para acá
+
+1036
+02:08:49,600 --> 02:08:52,600
+no voy a ver muchas diferencias
+
+1037
+02:08:52,600 --> 02:08:58,600
+donde si en este caso debo estar un poquito hacia la derecha en el XGBoost
+
+1038
+02:08:58,600 --> 02:09:00,600
+pero no estamos acá
+
+1039
+02:09:00,600 --> 02:09:04,600
+en el fondo con un error altísimo
+
+1040
+02:09:04,600 --> 02:09:07,600
+en el CTT si un error bajo en el centro de entrenamiento
+
+1041
+02:09:07,600 --> 02:09:11,600
+entonces si yo estoy un poquito acá está un poquito sobreajustado
+
+1042
+02:09:11,600 --> 02:09:18,600
+pero no necesariamente es así como se va bien el acabo del mundo
+
+1043
+02:09:18,600 --> 02:09:24,600
+sino que bueno puedo tratar de controlar un poco eso pero tampoco es que voy a poder llegar siempre a ese mejor ajuste
+
+1044
+02:09:24,600 --> 02:09:28,600
+voy a tratar de que mi resultado y eso es lo que debe predominar en general
+
+1045
+02:09:28,600 --> 02:09:36,600
+es que mi resultado sea tenga un buen desempeño y un desempeño que a mi me sirva en el CTT
+
+1046
+02:09:36,600 --> 02:09:39,600
+porque eso está demolando como funcionan los datos reales
+
+1047
+02:09:39,600 --> 02:09:48,600
+y sobre ajuste bajo ajuste siempre indican un muy mal desempeño en el CTT
+
+1048
+02:09:48,600 --> 02:09:55,600
+así que en este caso bueno este es el que tiene mejor indicador en el AUC
+
+1049
+02:09:55,600 --> 02:10:00,600
+pero en los otros indicadores es competitivo en relación a la embuste
+
+1050
+02:10:01,600 --> 02:10:15,600
+nadie tiene que tomar una decisión en cuanto a qué modelo va a elegir y qué indicador se va a fijar
+
+1051
+02:10:15,600 --> 02:10:18,600
+ahora en este caso son todos re buenos
+
+1052
+02:10:18,600 --> 02:10:26,600
+podrías cualquier factera y básicamente estaría generando el mismo impacto
+
+1053
+02:10:30,600 --> 02:10:34,600
+hay algunos desempeños como forma gráfica
+
+1054
+02:10:34,600 --> 02:10:40,600
+la mayoría tiene un mayor desempeño en CTT lo cual es normal
+
+1055
+02:10:40,600 --> 02:10:44,600
+lo importante es que estos gráficos no se vean con una diferencia gigante
+
+1056
+02:10:44,600 --> 02:10:50,600
+las diferencias aquí son bastante reguladas así que está perfecto
+
+1057
+02:10:52,600 --> 02:10:58,600
+acá están las matrices de confusión que a pesar de los indicadores siempre igual es bueno verlas
+
+1058
+02:10:58,600 --> 02:11:07,600
+y por ejemplo en predicciones el likegvm y el XGBoost están bastante parecidos
+
+1059
+02:11:07,600 --> 02:11:14,600
+este que está mejor en boosting tiene uno menos en este error
+
+1060
+02:11:14,600 --> 02:11:17,600
+y el AdaBoost es el peor
+
+1061
+02:11:17,600 --> 02:11:21,600
+tiene sentido en el fondo estas cosas iban en orden de complejidad
+
+1062
+02:11:21,600 --> 02:11:25,600
+el AdaBoost sea el peor está bien
+
+1063
+02:11:25,600 --> 02:11:28,600
+ahora sigue siendo competitivo con los otros
+
+1064
+02:11:31,600 --> 02:11:32,600
+está súper bien
+
+1065
+02:11:32,600 --> 02:11:39,600
+acá hay un ejercicio en el fondo pueden ir comparando en el fondo que es lo que acabo un poco de hacer
+
+1066
+02:11:39,600 --> 02:11:44,600
+y ahora vamos a hacer una optimización pero no los vamos a optimizar todos
+
+1067
+02:11:44,600 --> 02:11:46,600
+sino se va a demorar mucho
+
+1068
+02:11:46,600 --> 02:11:51,600
+entonces vamos a optimizar el AdaBoost y el XGBoost
+
+1069
+02:11:51,600 --> 02:11:54,600
+el peor y el mejor en algún sentido
+
+1070
+02:11:54,600 --> 02:12:08,600
+igual que antes tenemos acá la validación cruzada stratificada que aquí lo estamos creando
+
+1071
+02:12:08,600 --> 02:12:12,600
+que es la misma que han ocupado ambos
+
+1072
+02:12:12,600 --> 02:12:16,600
+y después tenemos el grid search
+
+1073
+02:12:17,600 --> 02:12:19,600
+el grid search está aquí definido
+
+1074
+02:12:19,600 --> 02:12:21,600
+esto está definido en los parámetros iniciales
+
+1075
+02:12:21,600 --> 02:12:25,600
+entonces la cantidad de estimadores 50 o 150
+
+1076
+02:12:25,600 --> 02:12:28,600
+en el fast mode vamos a tener 50, 150 y 300
+
+1077
+02:12:28,600 --> 02:12:33,600
+y en el caso del learning rate vamos a tener 0.05 y 0.2
+
+1078
+02:12:33,600 --> 02:12:38,600
+en el caso del fast mode tienen 0.03, 0.1 y 0.30
+
+1079
+02:12:38,600 --> 02:12:42,600
+el scoring va a ser el rock AUC
+
+1080
+02:12:43,600 --> 02:12:48,600
+y vamos a ocupar todos los procesadores
+
+1081
+02:12:48,600 --> 02:12:53,600
+y vamos a entrenar el score de entrenamiento también
+
+1082
+02:12:53,600 --> 02:12:57,600
+entonces escorran esto, no se debes asegurar mucho
+
+1083
+02:12:59,600 --> 02:13:00,600
+ahí está
+
+1084
+02:13:00,600 --> 02:13:04,600
+entonces los mejores parámetros son learning rate 0.3
+
+1085
+02:13:04,600 --> 02:13:07,600
+y 50 estimadores
+
+1086
+02:13:07,600 --> 02:13:12,600
+el rock AUC promedio en validación es 0.88
+
+1087
+02:13:12,600 --> 02:13:16,600
+es bastante más bajo de lo que habíamos recibido arriba
+
+1088
+02:13:18,600 --> 02:13:20,600
+donde está aquí
+
+1089
+02:13:20,600 --> 02:13:23,600
+aquí habíamos recibido 0.90 y algo
+
+1090
+02:13:23,600 --> 02:13:28,600
+y una de las cosas interesantes es que acá nosotros ocupamos 0.05
+
+1091
+02:13:28,600 --> 02:13:31,600
+del learning rate entonces
+
+1092
+02:13:32,600 --> 02:13:35,600
+si uno quiere que siempre esto
+
+1093
+02:13:37,600 --> 02:13:39,600
+vamos a agregarlo
+
+1094
+02:13:46,600 --> 02:13:50,600
+si uno hace pruebas como con los modelos
+
+1095
+02:13:50,600 --> 02:13:55,600
+si uno hace pruebas con un parámetro y después quiere mejorar
+
+1096
+02:13:55,600 --> 02:14:00,600
+es bueno incluir los parámetros como bases que teníamos antes
+
+1097
+02:14:00,600 --> 02:14:03,600
+porque si tú no los incluyes en el fondo
+
+1098
+02:14:03,600 --> 02:14:06,600
+y ese era mejor que el que tienes
+
+1099
+02:14:06,600 --> 02:14:09,600
+entonces automáticamente va a seleccionar el mejor dentro de lo que está
+
+1100
+02:14:09,600 --> 02:14:12,600
+pero puede no ser el mejor dentro de lo que está
+
+1101
+02:14:12,600 --> 02:14:15,600
+entonces vamos a tener que tenerlo en cuenta
+
+1102
+02:14:15,600 --> 02:14:17,600
+y vamos a tener que tenerlo en cuenta
+
+1103
+02:14:17,600 --> 02:14:20,600
+y ahora veremos si es que tenemos un mejor
+
+1104
+02:14:20,600 --> 02:14:22,600
+vamos a llamar tu igual
+
+1105
+02:14:22,600 --> 02:14:24,600
+bien, no cambia nada
+
+1106
+02:14:26,600 --> 02:14:29,600
+al cambiar el fasmo igual tu
+
+1107
+02:14:29,600 --> 02:14:31,600
+cambia el orden de los modelos
+
+1108
+02:14:34,600 --> 02:14:37,600
+y ahora vamos a cambiar el parámetro
+
+1109
+02:14:37,600 --> 02:14:40,600
+y ahora vamos a cambiar el parámetro
+
+1110
+02:14:40,600 --> 02:14:43,600
+y ahora vamos a cambiar el parámetro
+
+1111
+02:14:43,600 --> 02:14:45,600
+vamos a cambiar el parámetro
+
+1112
+02:14:48,600 --> 02:14:50,600
+donde
+
+1113
+02:14:51,600 --> 02:14:53,600
+aquí
+
+1114
+02:14:56,600 --> 02:14:58,600
+al fuego
+
+1115
+02:14:59,600 --> 02:15:02,600
+no debiese, acá no influye el fasmo
+
+1116
+02:15:05,600 --> 02:15:08,600
+el fasmo solo sirve para esquivar
+
+1117
+02:15:09,600 --> 02:15:12,600
+aquí no hay nada asociado a eso
+
+1118
+02:15:13,600 --> 02:15:16,600
+cambiar es el orden en que corren las cosas con la semilla
+
+1119
+02:15:16,600 --> 02:15:18,600
+pero no debiese
+
+1120
+02:15:18,600 --> 02:15:22,600
+debiese obtener lo mismo, lo que si yo cambié acá es un parámetro
+
+1121
+02:15:22,600 --> 02:15:26,600
+este por defecto estaba en 3 y yo lo cambié a 2 y ahí se movieron
+
+1122
+02:15:26,600 --> 02:15:32,600
+no sé si es eso, pero no es el fasmo entra acá
+
+1123
+02:15:32,600 --> 02:15:36,600
+en la optimización, estos valores dependen de él
+
+1124
+02:15:36,600 --> 02:15:38,600
+pero no otros
+
+1125
+02:15:40,600 --> 02:15:42,600
+bien, y acá
+
+1126
+02:15:43,600 --> 02:15:47,600
+fija, estoy con el Xtbus
+
+1127
+02:15:47,600 --> 02:15:51,600
+bien, y lo voy a hacer con el Render My Search
+
+1128
+02:15:51,600 --> 02:15:55,600
+ahí tienen el pipeline que corresponde
+
+1129
+02:15:55,600 --> 02:16:00,600
+y aquí están todos los parámetros con los valores y esto va generando combinaciones de manera
+
+1130
+02:16:00,600 --> 02:16:02,600
+arbitraria
+
+1131
+02:16:05,600 --> 02:16:09,600
+y esto logró un RockAuse de 0.90
+
+1132
+02:16:10,600 --> 02:16:12,600
+la clasificación final
+
+1133
+02:16:13,600 --> 02:16:23,600
+tenemos que el AdaBoost optimizado tiene un RockAuse de 0.93.4 y este 0.93.2
+
+1134
+02:16:28,600 --> 02:16:32,600
+creo que andan por ahí con los que teníamos antes, 0.93 algo
+
+1135
+02:16:32,600 --> 02:16:34,600
+el Xtbus de hecho bajó
+
+1136
+02:16:35,600 --> 02:16:41,600
+que vean en el fondo, cuáles son los parámetros que cogió y por qué bajó
+
+1137
+02:16:43,600 --> 02:16:47,600
+este cambio
+
+1138
+02:16:48,600 --> 02:16:52,600
+no sé si la cantidad de estimuares parece que también
+
+1139
+02:16:52,600 --> 02:16:54,600
+pero
+
+1140
+02:16:54,600 --> 02:17:00,600
+tenemos un modelo que no anda mal y en este caso gana al menos por AUC
+
+1141
+02:17:00,600 --> 02:17:02,600
+no gana en todo
+
+1142
+02:17:02,600 --> 02:17:04,600
+el AdaBoost
+
+1143
+02:17:06,600 --> 02:17:09,600
+uno podría preguntarse por qué gana el AdaBoost
+
+1144
+02:17:09,600 --> 02:17:12,600
+si el AdaBoost es más simple que el Xtbus
+
+1145
+02:17:12,600 --> 02:17:17,600
+esa misma aseveración es la respuesta
+
+1146
+02:17:20,600 --> 02:17:24,600
+a problemas complejos ustedes usan modelos complejos
+
+1147
+02:17:24,600 --> 02:17:30,600
+a problemas más simples uno tiene que pensar en modelos más simples
+
+1148
+02:17:31,600 --> 02:17:37,600
+no porque el Xtbus típicamente sea el modelo más avanzado va a ser con los mejores resultados
+
+1149
+02:17:38,600 --> 02:17:44,600
+probablemente si aquí nosotros seguimos tonteando con los parámetros y haciendo más optimización
+
+1150
+02:17:45,600 --> 02:17:48,600
+puede ser que eventualmente logre que el Xtbus gane
+
+1151
+02:17:49,600 --> 02:17:51,600
+pero lo que estamos viendo
+
+1152
+02:17:52,600 --> 02:17:55,600
+es que aunque gane los modelos son competitivos
+
+1153
+02:17:58,600 --> 02:18:02,600
+el AdaBoost está ganando pero no gana, no es un no caud
+
+1154
+02:18:05,600 --> 02:18:08,600
+es muy al límite, están desempeñándose muy parecidos
+
+1155
+02:18:09,600 --> 02:18:15,600
+ustedes ya lo vieron arriba, lo único que hacía es que erraba en un muchacho más el Xtbus
+
+1156
+02:18:17,600 --> 02:18:20,600
+eso también está influido por el tamaño muestro
+
+1157
+02:18:20,600 --> 02:18:27,600
+si ese 1 es en una muestra mucho más grande también estas cosas son más cercanas
+
+1158
+02:18:28,600 --> 02:18:32,600
+así que el mensaje es que todos los modelos son útiles
+
+1159
+02:18:33,600 --> 02:18:36,600
+no es que 1 es el mejor de todos y siempre ocupo ese
+
+1160
+02:18:37,600 --> 02:18:39,600
+es lo que les decía el martes también
+
+1161
+02:18:40,600 --> 02:18:44,600
+es importante fijarse más en el problema, cómo solucionamos problemas
+
+1162
+02:18:45,600 --> 02:18:48,600
+más que en un modelo en particular porque me gusta lo voy a ocupar
+
+1163
+02:18:50,600 --> 02:18:52,600
+ahí como ejercicio ustedes hagan
+
+1164
+02:18:57,600 --> 02:19:01,600
+lo mismo pero para el gradient boosting y para el LightGBM
+
+1165
+02:19:02,600 --> 02:19:06,600
+a ver si es que mejoran los resultados que tuvimos con el AdaBoost y con el Xtbus
+
+1166
+02:19:08,600 --> 02:19:11,600
+y día si vamos a alcanzar a ver la parte de regresión
+
+1167
+02:19:12,600 --> 02:19:15,600
+vamos un poco más rápido porque ya vimos todo esto el martes también
+
+1168
+02:19:16,600 --> 02:19:20,600
+bien, a este luego vamos a tener que ver un poco más en detalle porque son
+
+1169
+02:19:21,600 --> 02:19:23,600
+son datos que no vimos la semana pasada
+
+1170
+02:19:24,600 --> 02:19:28,600
+entonces estos son datos de casas en una ciudad Ames
+
+1171
+02:19:29,600 --> 02:19:32,600
+bien donde mi variable objetivo a predecir es esta que se llama cell price
+
+1172
+02:19:33,600 --> 02:19:34,600
+que es el precio de venta de la casa
+
+1173
+02:19:35,600 --> 02:19:39,600
+tenemos casi 3000 casas 81 variables
+
+1174
+02:19:40,600 --> 02:19:41,600
+entonces acá
+
+1175
+02:19:45,600 --> 02:19:47,600
+tenemos variables que tienen
+
+1176
+02:19:50,600 --> 02:19:52,600
+muchos valores faltantes
+
+1177
+02:19:54,600 --> 02:19:56,600
+tenemos variables categóricas
+
+1178
+02:19:57,600 --> 02:19:58,600
+y variables numéricas
+
+1179
+02:19:59,600 --> 02:20:05,600
+son muchas variables así que tenemos aquí 35 numéricas y 46 categóricas
+
+1180
+02:20:06,600 --> 02:20:10,600
+entonces en general variables numéricas
+
+1181
+02:20:10,600 --> 02:20:14,600
+numéricas son todas las que dicen int y las que dicen string
+
+1182
+02:20:15,600 --> 02:20:21,600
+van a ser las categóricas que mientras no tengan una cantidad brutal de categorías las podemos ocupar
+
+1183
+02:20:24,600 --> 02:20:28,600
+aquí en el gráfico en el fondo más o menos como es la distribución de nuestra variable objetivo
+
+1184
+02:20:29,600 --> 02:20:34,600
+típicamente tenemos un pic de valores aquí
+
+1185
+02:20:35,600 --> 02:20:39,600
+esto está en 150 mil 170 mil
+
+1186
+02:20:40,600 --> 02:20:45,600
+creo que el proveo la mediana anda en 175 mil dólares
+
+1187
+02:20:46,600 --> 02:20:48,600
+el supuesto precio
+
+1188
+02:20:49,600 --> 02:20:52,600
+así que eso es un poco como la media
+
+1189
+02:20:55,600 --> 02:20:58,600
+también tenemos variables como la
+
+1190
+02:20:59,600 --> 02:21:01,600
+la superficie habitable
+
+1191
+02:21:02,600 --> 02:21:05,600
+bien que este es el ground leave area
+
+1192
+02:21:05,600 --> 02:21:11,600
+con el precio de venta y se ve que tiene una relación relativamente lineal
+
+1193
+02:21:12,600 --> 02:21:14,600
+es igual es es empático
+
+1194
+02:21:15,600 --> 02:21:17,600
+está bien y está de acá
+
+1195
+02:21:18,600 --> 02:21:20,600
+bien en el fondo es tienen una
+
+1196
+02:21:23,600 --> 02:21:30,600
+una variable bien que es como una clasificación de qué tan bueno está el lugar
+
+1197
+02:21:30,600 --> 02:21:37,600
+y se fijan tienen sobre promedio en el promedio buena muy buena excelente
+
+1198
+02:21:38,600 --> 02:21:44,600
+muy excelente muy mala mala ahí como como férrez como regular de bajos promedio
+
+1199
+02:21:45,600 --> 02:21:51,600
+bien y claramente en el fondo cuando estamos bajo promedio irregular o muy malo
+
+1200
+02:21:52,600 --> 02:21:56,600
+los precios son más bajos y van subiendo a medida que tienen una clasificación mejor
+
+1201
+02:21:56,600 --> 02:21:57,600
+claramente el
+
+1202
+02:21:58,600 --> 02:22:00,600
+excellent es el que tiene mejor
+
+1203
+02:22:01,600 --> 02:22:05,600
+la mejor distribución o más alta distribución en precios
+
+1204
+02:22:06,600 --> 02:22:08,600
+y eso son variables
+
+1205
+02:22:09,600 --> 02:22:11,600
+bien la variable
+
+1206
+02:22:12,600 --> 02:22:14,600
+aquí hay preguntas cierto la distribución de los precios
+
+1207
+02:22:15,600 --> 02:22:17,600
+parece no ser simétrica
+
+1208
+02:22:18,600 --> 02:22:23,600
+tiene aquí un alto y después de cae y se fijan que aquí aparezcan 700.000 porque hay valores ahí
+
+1209
+02:22:23,600 --> 02:22:31,600
+base es que por temas de escala no se ven pero en el fondo si aparece 700.000 porque hay si hubiesen solo llegado hasta aquí
+
+1210
+02:22:32,600 --> 02:22:34,600
+el gráfico me lo hubiese cortado ya
+
+1211
+02:22:35,600 --> 02:22:38,600
+efectivamente este monito ya
+
+1212
+02:22:39,600 --> 02:22:41,600
+vamos a hacer un dibujito
+
+1213
+02:22:43,600 --> 02:22:45,600
+es un monito que sube así
+
+1214
+02:22:46,600 --> 02:22:49,600
+y después de cae y llega hasta por allá
+
+1215
+02:22:49,600 --> 02:22:58,600
+bien entonces claramente tengo una cola larga hacia la derecha por tanto hay un nivel de asimetría ya cuando hay asimetría
+
+1216
+02:22:59,600 --> 02:23:04,600
+típicamente uno puede aplicarse transformaciones ya
+
+1217
+02:23:05,600 --> 02:23:11,600
+ya sea funciones exponenciales o logarítmica dependiendo del tipo de asimetría que yo quiera
+
+1218
+02:23:12,600 --> 02:23:19,600
+o regiro ya cuando quiero traer datos grandes más hacia la masa es decir cuando la cola está hacia la derecha
+
+1219
+02:23:20,600 --> 02:23:25,600
+típicamente aplico logaritmo cuando es al revés aplica exponencial o alguna otra función está la
+
+1220
+02:23:27,600 --> 02:23:29,600
+ah eso me olvidaron
+
+1221
+02:23:30,600 --> 02:23:32,600
+la de box cox es una
+
+1222
+02:23:33,600 --> 02:23:36,600
+también se puede aplicar la raíz cuadrada
+
+1223
+02:23:37,600 --> 02:23:42,600
+y la de yao jenkins también funciona hay distintas funciones que son
+
+1224
+02:23:43,600 --> 02:23:45,600
+las que sirven para hacer este tipo de
+
+1225
+02:23:46,600 --> 02:23:48,600
+de correcciones cuando uno quiere que la variable
+
+1226
+02:23:50,600 --> 02:23:56,600
+la variable precio o sea pero la variable objetivo esté un poco más simétrica y eso muchas veces te traduce en que
+
+1227
+02:23:57,600 --> 02:24:02,600
+cosas que uno no las ve relacionadas cuando uno las transforma así se ve una relación entonces no puede ayudar
+
+1228
+02:24:03,600 --> 02:24:04,600
+ya
+
+1229
+02:24:05,600 --> 02:24:15,600
+después dice observan ahí se ven observaciones atípicas entre relación superficie y precio yo diría que sí hay valores que en el fondo estos de acá se ve bastante atípico en el fondo terrenos muy grandes
+
+1230
+02:24:16,600 --> 02:24:25,600
+con precios muy bajos entonces no podría aplicarse porque sea aquí la tendencia es que a a mientras más grande el terreno más
+
+1231
+02:24:26,600 --> 02:24:29,600
+es el precio entonces igual es raro
+
+1232
+02:24:29,600 --> 02:24:30,600
+bien
+
+1233
+02:24:32,600 --> 02:24:34,600
+entonces aquí la última pregunta es por qué incluye
+
+1234
+02:24:35,600 --> 02:24:43,600
+conviene incluir variables categorías en lugar de solo trabajar con las colores numéricas bueno esto de aquí claramente me está diciendo que la categoría tiene un impacto en cómo se parece
+
+1235
+02:24:44,600 --> 02:24:45,600
+ya
+
+1236
+02:24:46,600 --> 02:24:47,600
+aquí
+
+1237
+02:24:47,600 --> 02:25:01,600
+vamos a hacer un drop y aquí lo que me faltó es algo lo que voy a hacer es un drop también de las variables latitud y longitud ya solo para hacer el problema un poco más simple
+
+1238
+02:25:02,600 --> 02:25:10,600
+y porque la latitud y longitud en general hay que trabajarlas así como por defecto no entregan información ya así que eso se me fue
+
+1239
+02:25:17,600 --> 02:25:18,600
+bueno
+
+1240
+02:25:40,600 --> 02:25:41,600
+bien
+
+1241
+02:25:41,600 --> 02:25:42,600
+entonces ahí
+
+1242
+02:25:43,600 --> 02:25:51,600
+para las X eliminé el precio-venta por supuesto y también la latitud y la longitud y nos quedamos con la variable objetivo el precio-venta
+
+1243
+02:25:52,600 --> 02:26:05,600
+bien hacemos la división entre entrenamiento y test aquí 20% para el test y ojo que aquí no aparece la stratificación cuando la variable es continua
+
+1244
+02:26:05,600 --> 02:26:17,600
+estamos en un problema de regresión la stratificación carece de sentido ya si ustedes la ponen el computador obediente pero en realidad no va a afectar mucho no va a hacer nada y solo va a estar dando más trabajo
+
+1245
+02:26:18,600 --> 02:26:24,600
+así que tienen que preocuparse en el fondo de eliminar la stratificación cuando eso ocurra
+
+1246
+02:26:25,600 --> 02:26:43,600
+y en este caso tenemos 2340 para entrenar tenemos 78 variables y 586 para testear precios medianos de train es 160 y precios medianos en test es 165
+
+1247
+02:26:44,600 --> 02:26:46,600
+ya si ustedes quieren
+
+1248
+02:26:47,600 --> 02:26:48,600
+podemos
+
+1249
+02:26:48,600 --> 02:26:49,600
+podemos
+
+1250
+02:26:49,600 --> 02:26:59,600
+podemos poner el promedio
+
+1251
+02:27:00,600 --> 02:27:03,600
+lo que yo le había dicho que andaba como en 170 algo
+
+1252
+02:27:04,600 --> 02:27:10,600
+así que tenemos los precios promedios los precios medianos la diferencia entre la mediana y el promedio
+
+1253
+02:27:10,600 --> 02:27:22,600
+el promedio hace evidente justamente la simetría que tiene hacia la derecha la distribución de los precios
+
+1254
+02:27:23,600 --> 02:27:35,600
+siempre que la mediana esté antes que el promedio evidencia una cola larga hacia la derecha la mediana no se ve tan afectada por valores grandes valores aularios valores extremos mientras que el promedio sí
+
+1255
+02:27:35,600 --> 02:27:44,600
+y si al revés el promedio está antes que la mediana entonces la cola va hacia la izquierda en distribuciones simétricas la mediana y el promedio deben ser muy cerca
+
+1256
+02:27:47,600 --> 02:27:55,600
+bien entonces acá de nuevo hacemos el pre-procesamiento tenemos los estimadores normalmente es AdaBoost ahora a la diferencia que se llama AdaBoost regreso
+
+1257
+02:27:55,600 --> 02:27:57,600
+ok
+
+1258
+02:27:57,600 --> 02:27:59,600
+también lo va a cambiar por un
+
+1259
+02:27:59,600 --> 02:28:01,600
+vamos con un 3.1
+
+1260
+02:28:03,600 --> 02:28:04,600
+ok
+
+1261
+02:28:04,600 --> 02:28:20,600
+aquí corremos todos los modelos hacemos el pipeline es igual que el anterior y este también ya ahora la diferencia en el fondo es que los modelos estos son un poquito más pesados porque tenemos la misma cantidad de modelos pero mayor cantidad de data
+
+1262
+02:28:20,600 --> 02:28:33,600
+así que si se va a mejorar un poquito más y las métricas que vamos a ocupar en este caso son el rmdc el maer cuadrado bien son los típicos
+
+1263
+02:28:33,600 --> 02:28:57,600
+bien entonces acá nosotros vamos a estar clasificando vamos a estar ordenando por el rmdc ya el rmdc es una forma de estimar como la varianza de la diferencia de la o la advertencia standard pero de la diferencia de las predicciones con los valores reales
+
+1264
+02:28:57,600 --> 02:29:14,600
+ok se me está diciendo más o menos que están alejados de las predicciones de los valores reales y en este caso por ejemplo el gradient boosting que es el que tiene el mejor resultado tiene un rmdc de 25 mil
+
+1265
+02:29:14,600 --> 02:29:34,600
+ya eso quiere decir que estoy en esencia errando super en bruto y no es tan así de nuevo estoy sobre simplificando pero estoy errando en 25 mil dólares en el precio ya entonces si una casa mi modelo me dice
+
+1266
+02:29:34,600 --> 02:29:40,600
+insisto estoy sobre simplificando no se tomen esto es como para interpretar de manera más simple
+
+1267
+02:29:40,600 --> 02:30:09,600
+si mi modelo me dice que el precio el precio de predicción de una casa es 200 mil dólares entonces yo debiese pensar que anda entre 175 mil y 225 mil entonces como que estas métricas de desempeño de los modelos me dan un poco una métrica cerca de la incertidumbre que hay respecto a las
+
+1268
+02:30:09,600 --> 02:30:30,600
+a las predicciones y por otro lado también ayudan bastante ya a discriminar entre modelos nuevamente like gbm fíjense se equivoca muy poquito en el set de entrenamiento se equivoca bastante en el set de test entonces el like gbm en este momento está sobre ajustando
+
+1269
+02:30:30,600 --> 02:30:46,600
+y el AdaBoost en este caso anda muchísimo más mal que los demás en el caso anterior de no y este anda muchísimo más y el rmdc de adarado que también es un valor que es bien interesante porque mide la calidad de ajuste entonces a medida que más se acerca uno también hay más evidencia de que es un mejor modelo
+
+1270
+02:30:46,600 --> 02:30:55,600
+y el rmdc de adarado que también es un valor que es bien interesante porque mide la calidad de ajuste entonces a medida que más se acerca uno también hay más evidencia de que es un mejor modelo
+
+1271
+02:30:55,600 --> 02:31:06,600
+y así que en este caso estos dos que sería el graienboosting y el XGBoost son los que andan mejor y están entrenando los mejores resultados
+
+1272
+02:31:06,600 --> 02:31:08,600
+bien
+
+1273
+02:31:08,600 --> 02:31:10,600
+bien
+
+1274
+02:31:10,600 --> 02:31:12,600
+bien
+
+1275
+02:31:12,600 --> 02:31:25,600
+acá están en el fondo lo que yo les decía cuando tienen esta diferencia tan grande es que hay un posible sobre ajuste
+
+1276
+02:31:25,600 --> 02:31:35,600
+de hecho el XGBoost también tiene un poco menos en el fondo pero también tiene un gap más o menos interesante acá
+
+1277
+02:31:35,600 --> 02:31:41,600
+bien
+
+1278
+02:31:41,600 --> 02:31:50,600
+bien entonces aquí tienen un poco el valor precio promedio versus precio predicho el AdaBoost claramente es el que está desempleando peor
+
+1279
+02:31:50,600 --> 02:32:04,600
+primero hay muchísima más dispersión en las predicciones versus los valores reales tenemos un problema en la cola inferior o sea los precios bajos y también tenemos un problema evidentemente los precios altos
+
+1280
+02:32:04,600 --> 02:32:17,600
+en los precios altos en general todos tienen problemas ya pero el graienboosting que es el que ganó si se fijan junto con el XGBoost son los que tienen un menor grado de dispersión alrededor de esta recta
+
+1281
+02:32:17,600 --> 02:32:19,600
+bien
+
+1282
+02:32:19,600 --> 02:32:21,600
+bien
+
+1283
+02:32:21,600 --> 02:32:31,600
+que es en el fondo que debiese si es que el modelo fuese perfecto el precio real con el precio predicho debiese ser igual por tanto estarían todos sobre encima de esa recta
+
+1284
+02:32:31,600 --> 02:32:43,600
+mientras menos se despegan de esa recta es más evidencia de que es un mejor modelo por eso les digo en el fondo aquí uno ve que este y este like demand también un poco pero tienen mucha más dispersión acá en medio
+
+1285
+02:32:43,600 --> 02:32:51,600
+bien estos son los que tienen menor grave dispersión y como les dije en la lado derecho o sea precios altos son los que están más
+
+1286
+02:32:51,600 --> 02:32:59,600
+digamos como aquí es donde todos están fallando ya entonces antes de seguir
+
+1287
+02:32:59,600 --> 02:33:11,600
+Ignacia pregunta por qué ahora no se ve el recall en la cura si para comparar modelos y vemos esta métrica porque los modelos de regresión no pueden no ocupan aquí ahora si ni recall y nada de eso
+
+1288
+02:33:11,600 --> 02:33:26,600
+el record el accuracy la precisión f1 rock auxet todas esas cosas son para modelos de clasificación este es un modelo de regresión dado que la variable objetivo es una variable numérica continua
+
+1289
+02:33:27,600 --> 02:33:30,600
+por eso es que tuvimos que cambiar las
+
+1290
+02:33:31,600 --> 02:33:41,600
+las métricas y Walter dice profesor no me quedó claro cómo interpretar el regreso de este dinero es la deviación estándar o sea
+
+1291
+02:33:42,600 --> 02:33:47,600
+si no es exactamente eso porque son otras métricas no estamos viendo la
+
+1292
+02:33:47,600 --> 02:33:55,600
+de la estandar típicamente se mide derechamente como eso ya es cuánto uno se desvía en promedio
+
+1293
+02:33:56,600 --> 02:34:05,600
+de la media ya esto no es eso es en promedio cuánto están desviado mis predicciones de los valores reales eso es lo que mide
+
+1294
+02:34:06,600 --> 02:34:09,600
+no es la media
+
+1295
+02:34:15,600 --> 02:34:25,600
+por eso decía de fondo cuando tú tienes una predicción puedes decir bueno mis predicciones están en promedio alejada 25 mil dólares del valor real
+
+1296
+02:34:25,600 --> 02:34:33,600
+de vis a estar más o menos entre x y x monto ya eso es lo que es lo que yo tengo que decir
+
+1297
+02:34:36,600 --> 02:34:46,600
+y finalmente aquí tenemos una optimización ya acá no se hace se fijaron antes en la
+
+1298
+02:34:46,600 --> 02:34:52,600
+en la en la en la validación cruzada nosotros teníamos uno que se llamaba como stratified
+
+1299
+02:34:53,600 --> 02:34:59,600
+ahora ya no se usa eso porque es de regresión es importante esos detalles para que no cometamos errores
+
+1300
+02:35:00,600 --> 02:35:05,600
+bien y acá son varias cosas similares a antes no lo voy a explicar
+
+1301
+02:35:05,600 --> 02:35:16,600
+lo que sí es importante que el scoring cambia ya en el caso anterior todo esto se hizo tratando de optimizar el rock AUC
+
+1302
+02:35:17,600 --> 02:35:26,600
+en este caso lo que nosotros vamos a optimizar acá es el root minus square error que es el RMSE que es el mismo que estábamos viendo acá
+
+1303
+02:35:26,600 --> 02:35:28,600
+acá ok
+
+1304
+02:35:33,600 --> 02:35:39,600
+el RMSE por si no lo saben bien
+
+1305
+02:35:42,600 --> 02:35:45,600
+el RMSE se define como
+
+1306
+02:35:45,600 --> 02:35:57,600
+el RMSE se define como la raíz cuadrada
+
+1307
+02:35:58,600 --> 02:36:04,600
+de
+
+1308
+02:36:11,600 --> 02:36:12,600
+del promedio
+
+1309
+02:36:16,600 --> 02:36:19,600
+bien de la suma
+
+1310
+02:36:23,600 --> 02:36:28,600
+igual a uno hasta el uno lo que sea uno digamos de
+
+1311
+02:36:32,600 --> 02:36:35,600
+de las predicciones
+
+1312
+02:36:40,600 --> 02:36:42,600
+menos los valores reales
+
+1313
+02:36:45,600 --> 02:36:47,600
+y
+
+1314
+02:36:49,600 --> 02:36:51,600
+y
+
+1315
+02:36:53,600 --> 02:36:57,600
+este es el RMSE me faltó algo perdón
+
+1316
+02:36:59,600 --> 02:37:10,600
+y esto va al cuadrado ahí sí bien entonces son las diferencias entre los valores predichos y los valores reales al cuadrado se suman todos y después se promedian
+
+1317
+02:37:11,600 --> 02:37:21,600
+si ustedes cambian en vez del valor predicho cambian el promedio de los y entonces rescatan la aplicación standard belly por eso es que es muy similar
+
+1318
+02:37:22,600 --> 02:37:31,600
+exacto por eso son mediciones de error bien root minus square error es el error cuadrático medio en raíz
+
+1319
+02:37:31,600 --> 02:37:43,600
+bien entonces acá eso es lo que tienen que hacer si ustedes se meten a la página de scikit learn pueden ver todos a eso creo que lo vimos en mate
+
+1320
+02:37:44,600 --> 02:37:53,600
+entonces se meten a la página de scikit learn ustedes pueden ver absolutamente todos los tipos de scoring que existen para tanto modelos de regresión como modelos de clasificación
+
+1321
+02:37:54,600 --> 02:38:00,600
+entonces si ustedes desean cambiarlo o experimentar con otro basta con que se metan a la página de scikit learn y los busquen
+
+1322
+02:38:00,600 --> 02:38:18,600
+entonces vamos a correr esto no tiene nada del otro mundo la única diferencia es que ya no usamos variación cruzada stratificada y cambiamos el scoring por un scoring que corresponda a un modelo de regresión
+
+1323
+02:38:18,600 --> 02:38:20,600
+es un modelo de regresión
+
+1324
+02:38:23,600 --> 02:38:25,600
+si desean cambiar mucho
+
+1325
+02:38:27,600 --> 02:38:29,600
+es un poquito parado así que
+
+1326
+02:38:48,600 --> 02:38:50,600
+bueno
+
+1327
+02:38:51,600 --> 02:38:53,600
+cuando lo probé
+
+1328
+02:38:54,600 --> 02:39:00,600
+en la tarde lo probé con el otro modo
+
+1329
+02:39:01,600 --> 02:39:03,600
+fast mode
+
+1330
+02:39:04,600 --> 02:39:06,600
+true
+
+1331
+02:39:07,600 --> 02:39:09,600
+ahí no sabemos lo nuevo pero esto es lo que tenemos que hacer
+
+1332
+02:39:09,600 --> 02:39:11,600
+a ver
+
+1333
+02:39:12,600 --> 02:39:14,600
+a ver
+
+1334
+02:39:15,600 --> 02:39:17,600
+funcionando esto
+
+1335
+02:39:18,600 --> 02:39:20,600
+el computador está a tope
+
+1336
+02:39:21,600 --> 02:39:23,600
+bueno digo que debes de bajar pronto
+
+1337
+02:39:24,600 --> 02:39:27,600
+mientras corren no sé si hay alguna pregunta algo que no haya quedado claro
+
+1338
+02:39:28,600 --> 02:39:30,600
+o si hay alguna pregunta que no hay que hacer
+
+1339
+02:39:31,600 --> 02:39:33,600
+o si hay alguna pregunta que no hay que hacer
+
+1340
+02:39:34,600 --> 02:39:36,600
+o si hay alguna pregunta que no hay que hacer
+
+1341
+02:39:36,600 --> 02:39:39,600
+mientras corren no sé si hay alguna pregunta algo que no haya quedado claro
+
+1342
+02:39:46,600 --> 02:39:48,600
+¿no tengo bien?
+
+1343
+02:39:53,600 --> 02:39:55,600
+un 2 para arriba 12 para arriba
+
+1344
+02:39:56,600 --> 02:39:58,600
+pero bueno tienes 2 para arriba
+
+1345
+02:39:59,600 --> 02:40:01,600
+bien
+
+1346
+02:40:01,600 --> 02:40:03,600
+lo que sigue
+
+1347
+02:40:04,600 --> 02:40:06,600
+voy a contarles lo que sigue para que no tengamos que estar esperando aquí
+
+1348
+02:40:07,600 --> 02:40:09,600
+que ya mientras termina
+
+1349
+02:40:10,600 --> 02:40:12,600
+después tiene lo mismo
+
+1350
+02:40:13,600 --> 02:40:15,600
+el like y bien pero tiene con el random way search
+
+1351
+02:40:16,600 --> 02:40:19,600
+la única diferencia y después al igual que el otro
+
+1352
+02:40:20,600 --> 02:40:22,600
+generamos un
+
+1353
+02:40:23,600 --> 02:40:26,600
+una digamos como comparación entre estos dos
+
+1354
+02:40:27,600 --> 02:40:29,600
+y aquí lo que ustedes pueden ver es
+
+1355
+02:40:29,600 --> 02:40:31,600
+en el fondo
+
+1356
+02:40:32,600 --> 02:40:34,600
+ver que es lo que ocurre con el XGBoost
+
+1357
+02:40:35,600 --> 02:40:37,600
+y compararlo con el like y bien
+
+1358
+02:40:38,600 --> 02:40:40,600
+nosotros acá estamos haciéndolo con el
+
+1359
+02:40:41,600 --> 02:40:43,600
+random boosting y el like y bien
+
+1360
+02:40:44,600 --> 02:40:47,600
+entonces ustedes pueden comparar el XGBoost que típicamente es el mejor
+
+1361
+02:40:48,600 --> 02:40:50,600
+uno de los que entrega
+
+1362
+02:40:51,600 --> 02:40:53,600
+general sobre todo cuando ya tienen más datos como este
+
+1363
+02:40:54,600 --> 02:40:56,600
+debiese uno esperar que entregara un mejor resultado
+
+1364
+02:40:56,600 --> 02:40:59,600
+el caso anterior de desclasificación es particular porque
+
+1365
+02:41:00,600 --> 02:41:02,600
+ustedes tienen
+
+1366
+02:41:03,600 --> 02:41:05,600
+ustedes tienen digamos
+
+1367
+02:41:06,600 --> 02:41:08,600
+poquitos datos eran como 300
+
+1368
+02:41:09,600 --> 02:41:13,600
+entonces en esos contextos estos modelos más poderosos no funcionan bien
+
+1369
+02:41:14,600 --> 02:41:16,600
+ahora que ya tenemos algo como 3000
+
+1370
+02:41:17,600 --> 02:41:19,600
+debiese a lo mejor andar un poquito mejor bien
+
+1371
+02:41:20,600 --> 02:41:22,600
+acá están los mejores parámetros tenemos
+
+1372
+02:41:23,600 --> 02:41:25,600
+el learning rate de 0.12
+
+1373
+02:41:26,600 --> 02:41:28,600
+max depth 3
+
+1374
+02:41:29,600 --> 02:41:31,600
+y tenemos 350 árboles
+
+1375
+02:41:32,600 --> 02:41:34,600
+tenemos con un RMS promedio
+
+1376
+02:41:35,600 --> 02:41:37,600
+de 25000
+
+1377
+02:41:38,600 --> 02:41:40,600
+ok
+
+1378
+02:41:41,600 --> 02:41:43,600
+solo para
+
+1379
+02:41:44,600 --> 02:41:46,600
+para que sea más rápido digamos ya estamos más o menos en la obra
+
+1380
+02:41:47,600 --> 02:41:49,600
+voy a cambiar el
+
+1381
+02:41:50,600 --> 02:41:52,600
+perdón
+
+1382
+02:41:52,600 --> 02:41:54,600
+perdón
+
+1383
+02:41:55,600 --> 02:41:57,600
+ya está en false lo vamos a dejar en true solo para que
+
+1384
+02:41:58,600 --> 02:42:02,600
+este corra más rápido y podamos tener la comparación final que va a ser
+
+1385
+02:42:03,600 --> 02:42:07,600
+no tan buena porque en el fondo este tuvo menos opciones digamos ya
+
+1386
+02:42:08,600 --> 02:42:10,600
+por aquí está la
+
+1387
+02:42:11,600 --> 02:42:13,600
+la optimización y ahí tenemos igual bajó
+
+1388
+02:42:14,600 --> 02:42:16,600
+bien el RMS en promedio
+
+1389
+02:42:17,600 --> 02:42:19,600
+bien y tenemos al final del día
+
+1390
+02:42:19,600 --> 02:42:21,600
+que ahí está el gradient boosting
+
+1391
+02:42:22,600 --> 02:42:24,600
+en un RMS
+
+1392
+02:42:25,600 --> 02:42:27,600
+menor en test
+
+1393
+02:42:28,600 --> 02:42:32,600
+bien que el otro el más en test andan competitivos y en el R cuadrado andan
+
+1394
+02:42:33,600 --> 02:42:35,600
+bastante parecidos bien
+
+1395
+02:42:36,600 --> 02:42:40,600
+entonces me fijan general aquí el gradient boosting tuvo mejor desempeño
+
+1396
+02:42:41,600 --> 02:42:43,600
+el ejercicio que queda planteado es buscar
+
+1397
+02:42:44,600 --> 02:42:48,600
+optimizar el XGBoost y comparar en el fondo con el like y bien o con el gradient boosting
+
+1398
+02:42:49,600 --> 02:42:51,600
+y bueno
+
+1399
+02:42:52,600 --> 02:42:54,600
+ya y
+
+1400
+02:42:55,600 --> 02:42:58,600
+acá están las variables en general
+
+1401
+02:42:59,600 --> 02:43:02,600
+que más utiliza o que tienen mayor importancia para el modelo
+
+1402
+02:43:03,600 --> 02:43:05,600
+ya en cada caso
+
+1403
+02:43:06,600 --> 02:43:08,600
+en la arriba son las variables
+
+1404
+02:43:09,600 --> 02:43:11,600
+con mayor importancia para el XGBoost y tiene
+
+1405
+02:43:12,600 --> 02:43:16,600
+las categóricas está la esta que se llama a tal el dolor en el pecho
+
+1406
+02:43:16,600 --> 02:43:18,600
+dentro de las numéricas está este que se llama ca
+
+1407
+02:43:19,600 --> 02:43:25,600
+y así su decisivamente bien y el tal de nuevo que aparece porque está en el fondo recuerdo que el one-hod encoder lo que
+
+1408
+02:43:25,600 --> 02:43:31,600
+hace es que agarra una variable categórica y le separan múltiples variables dummy para cada una de las categorías por eso dice tal normal y tal
+
+1409
+02:43:32,600 --> 02:43:34,600
+reversal
+
+1410
+02:43:35,600 --> 02:43:37,600
+mientras que para la equivalencia se fijan
+
+1411
+02:43:38,600 --> 02:43:41,600
+tiene muchas variables numéricas y la gran mayoría son
+
+1412
+02:43:42,600 --> 02:43:44,600
+asociadas a
+
+1413
+02:43:44,600 --> 02:43:49,100
+el tamaño de la casa del lugar bien aquí tienen el
+
+1414
+02:43:50,600 --> 02:43:52,600
+area tiene el
+
+1415
+02:43:52,600 --> 02:43:56,600
+tiene el total en pies cuadrados s f significa pies cuadrados
+
+1416
+02:43:57,600 --> 02:44:04,600
+del sótano del primer piso el área del garage en los pies cuadrados del porch trato que es como el frontis
+
+1417
+02:44:05,600 --> 02:44:13,600
+del segundo piso etc etc etc entonces aquí claramente uno entiende que las dimensiones tanto del terreno como de la casa
+
+1418
+02:44:14,600 --> 02:44:19,600
+son las variables que están impactando de mayor forma en nuestras predicciones
+
+1419
+02:44:20,600 --> 02:44:23,600
+y lo demás son cosas digamos que pueden hacer
+
+1420
+02:44:25,600 --> 02:44:27,600
+cuestionarse y
+
+1421
+02:44:29,600 --> 02:44:33,600
+bien alguna consulta duda
+
+1422
+02:44:37,600 --> 02:44:39,600
+todo claro
+
+1423
+02:44:40,600 --> 02:44:44,600
+a ver Walter dice que estoy trabajando en un modelo
+
+1424
+02:44:44,600 --> 02:44:48,600
+considerando que los datos de computador
+
+1425
+02:44:48,600 --> 02:44:51,600
+me preceden muchas variables categóricas
+
+1426
+02:44:51,600 --> 02:44:53,600
+con variables continuos
+
+1427
+02:44:54,600 --> 02:44:58,600
+cuando hay implementaciones suelo hacer un mejor balance de velocidad y precisión
+
+1428
+02:44:58,600 --> 02:45:01,600
+para problemas de chocin y fitting
+
+1429
+02:45:01,600 --> 02:45:08,600
+CatBoost es cuando tú tienes una cantidad excesiva de variables categoricas entonces creo que es el único que
+
+1430
+02:45:10,600 --> 02:45:21,600
+creo que es el único modelo que yo descartaría ya y entre el XGBoost y el like gbm creo que la la el el punto que te hace
+
+1431
+02:45:21,600 --> 02:45:24,600
+elegir entre uno y otro es la cantidad de datos
+
+1432
+02:45:25,600 --> 02:45:28,600
+ya si tienes un modelo de CatBoost
+
+1433
+02:45:28,600 --> 02:45:37,600
+ya si tú tienes muchísimos datos entonces el like gbm va a generar una mejor equilibrio entre precisión y velocidad
+
+1434
+02:45:38,600 --> 02:45:43,600
+si no tienes tantos entonces eso lo debes hacer el XGBoost
+
+1435
+02:45:45,600 --> 02:45:47,600
+en particular
+
+1436
+02:45:47,600 --> 02:45:56,600
+en particular por si no esto va a depender exclusivamente de modelos es como lo que acabamos de hacer acá en el papel
+
+1437
+02:45:56,600 --> 02:46:03,600
+uno hubiese pensado a lo mejor que el XGBoost era el mejor modelo pero cuando tú miras los resultados no fue el mejor
+
+1438
+02:46:04,600 --> 02:46:07,600
+entonces en general la siempre
+
+1439
+02:46:08,600 --> 02:46:10,600
+la
+
+1440
+02:46:11,600 --> 02:46:14,600
+el consejo en este tipo de modelos es
+
+1441
+02:46:14,600 --> 02:46:24,600
+en este tipo de modelos es prueben ya aquí tienes distintas opciones prueba y con eso anda mirando y mira el set de entrenamiento
+
+1442
+02:46:25,600 --> 02:46:31,600
+también mira el set de test las métricas para que tú puedas ir identificando si es que estás cayendo en overfilling o no
+
+1443
+02:46:32,600 --> 02:46:34,600
+y un punto importante típicamente los modelos
+
+1444
+02:46:35,600 --> 02:46:37,600
+como de churn
+
+1445
+02:46:38,600 --> 02:46:45,600
+las clases son bien desbalanceadas entonces ahí ojalá ocupar un modelo también que te ayude a trabajar las clases que están en desbalance
+
+1446
+02:46:46,600 --> 02:46:51,600
+en general varios de estos modelos lo pueden hacer los tienen un parámetro que permite hacerlo
+
+1447
+02:46:52,600 --> 02:46:56,600
+si no también lo puedes hacer tú dentro del mismo muestreo en el set de entrenamiento
+
+1448
+02:46:59,600 --> 02:47:04,600
+Rodrigo dice, ¿puedo hacer una pequeña reseña de los árboles de decisión?
+
+1449
+02:47:04,600 --> 02:47:06,600
+el análisis de decisión
+
+1450
+02:47:07,600 --> 02:47:09,600
+el análisis de decisión estaba
+
+1451
+02:47:10,600 --> 02:47:12,600
+de M cansado
+
+1452
+02:47:13,600 --> 02:47:15,600
+que significa eso
+
+1453
+02:47:17,600 --> 02:47:19,600
+ah, demasiado cansado, perdón
+
+1454
+02:47:22,600 --> 02:47:24,600
+escucha que los árboles
+
+1455
+02:47:25,600 --> 02:47:28,600
+los árboles de decisión son simplemente modelos que
+
+1456
+02:47:29,600 --> 02:47:31,600
+tienen una forma de elegir
+
+1457
+02:47:32,600 --> 02:47:35,600
+entonces tú tienes estos datos y perfectamente tú podrías decir
+
+1458
+02:47:38,600 --> 02:47:42,600
+si fuese la que te tenga más información el ground area entonces puedes decir
+
+1459
+02:47:43,600 --> 02:47:50,600
+voy a separar las casas en aquellas que tienen un área de más de 2000 y una menor de 2000
+
+1460
+02:47:51,600 --> 02:47:56,600
+y después cada uno ellos dice, bueno acá voy a separar por la cantidad de autos que entran en el garage
+
+1461
+02:47:57,600 --> 02:47:59,600
+si entran 3 o más las separo para acá
+
+1462
+02:47:59,600 --> 02:48:03,600
+menos de 3 para el otro lado y empieza a hacer preguntas
+
+1463
+02:48:04,600 --> 02:48:08,600
+que por supuesto tiene un modelo por detrás, tiene una fórmula matemática
+
+1464
+02:48:09,600 --> 02:48:14,600
+y eso genera en el fondo que tú después para cualquier dato nuevo tú le hagas las mismas preguntas
+
+1465
+02:48:15,600 --> 02:48:18,600
+y vas a ver en qué nodo puede terminar y con eso tú puedes hacer predicciones
+
+1466
+02:48:19,600 --> 02:48:23,600
+esos son los árboles, esos son unos de los modelos más simples que uno puede hacer
+
+1467
+02:48:24,600 --> 02:48:26,600
+es un modelo basado en preguntas y respuestas
+
+1468
+02:48:26,600 --> 02:48:34,600
+lo único que hace es si desarrollar, todos estos son algoritmos
+
+1469
+02:48:35,600 --> 02:48:38,600
+y lo que tiene por dentro el árbol es que él te dice
+
+1470
+02:48:39,600 --> 02:48:42,600
+cuáles son las preguntas que tú tienes que hacer para llegar acá a predicción
+
+1471
+02:48:43,600 --> 02:48:45,600
+y eso está dentro del algoritmo del árbol mínimo
+
+1472
+02:48:47,600 --> 02:48:53,600
+pero pucha en los 0 minutos que quedan no podría explicar mucho más que eso Rodrigo
+
+1473
+02:48:53,600 --> 02:48:59,600
+pero busca en internet y va a ver bien poco eso
+
+1474
+02:49:03,600 --> 02:49:06,600
+¿uno debería acompañar árboles con regresión por ejemplo?
+
+1475
+02:49:07,600 --> 02:49:08,600
+¿es una lección común?
+
+1476
+02:49:09,600 --> 02:49:11,600
+no entiendo la pregunta Ignacio
+
+1477
+02:49:11,600 --> 02:49:16,600
+¿A parte de lo que usted nos pasó que está en Moodle
+
+1478
+02:49:18,600 --> 02:49:21,600
+¿qué se podría leer como para acompañar la materia también?
+
+1479
+02:49:22,600 --> 02:49:25,600
+para reforzar el contenido
+
+1480
+02:49:26,600 --> 02:49:27,600
+¿qué nos recomienda?
+
+1481
+02:49:28,600 --> 02:49:32,600
+hay un libro, no me acuerdo el autor pero
+
+1482
+02:49:32,600 --> 02:49:35,600
+es de Haste y Tip Chirani y todo este tipo
+
+1483
+02:49:36,600 --> 02:49:40,600
+que se llama An Introduction to Statistical Learning
+
+1484
+02:49:41,600 --> 02:49:44,600
+este libro es el clásico para todos estos cursos
+
+1485
+02:49:45,600 --> 02:49:48,600
+estos se pueden descargar de manera gratuita
+
+1486
+02:49:49,600 --> 02:49:54,600
+y tú lo puedes descargar con aplicaciones en R
+
+1487
+02:49:55,600 --> 02:49:58,600
+y tú puedes descargar con aplicaciones en R
+
+1488
+02:49:58,600 --> 02:50:03,600
+y tú lo puedes descargar con aplicaciones en R o en Python
+
+1489
+02:50:04,600 --> 02:50:06,600
+los libros son exactamente iguales
+
+1490
+02:50:07,600 --> 02:50:10,600
+son los mismos autores, James, Whitney, Haste y Tip Chirani
+
+1491
+02:50:11,600 --> 02:50:15,600
+y acá está Jonathan Taylor pero ese de haber cambiado a Python
+
+1492
+02:50:16,600 --> 02:50:18,600
+en esencia los libros son exactamente iguales
+
+1493
+02:50:19,600 --> 02:50:20,600
+los ejemplos son exactamente iguales
+
+1494
+02:50:21,600 --> 02:50:23,600
+lo único que cambia es que no esté programado con R y R con Python
+
+1495
+02:50:24,600 --> 02:50:26,600
+ustedes los descargan y tienen el libro
+
+1496
+02:50:26,600 --> 02:50:29,600
+a ver si se me descarga rápido
+
+1497
+02:50:30,600 --> 02:50:32,600
+es medio pesado pero
+
+1498
+02:50:37,600 --> 02:50:40,600
+este libro tiene absolutamente todo
+
+1499
+02:50:43,600 --> 02:50:45,600
+lo que uno necesita saber
+
+1500
+02:50:47,600 --> 02:50:51,600
+ustedes sabrán contenidos, se fijan que es el libro estadístico
+
+1501
+02:50:51,600 --> 02:50:55,600
+tiene harto tema en el fondo de qué es lo que significa una estimación
+
+1502
+02:50:56,600 --> 02:51:00,600
+qué es lo que significa el concepto de aprendizaje supervisado versus no supervisado
+
+1503
+02:51:01,600 --> 02:51:03,600
+problemas de clasificación versus problemas de regresión
+
+1504
+02:51:04,600 --> 02:51:10,600
+que es una de las cosas que estaban con dudas quien me preguntó
+
+1505
+02:51:13,600 --> 02:51:14,600
+en Ignacia por ejemplo
+
+1506
+02:51:15,600 --> 02:51:20,600
+acá hay harto tema en el fondo de cómo uno mide bien un ajuste
+
+1507
+02:51:21,600 --> 02:51:24,600
+después tiene todos los modelos, tienes modelos de regresión lineal
+
+1508
+02:51:25,600 --> 02:51:28,600
+aquí hay modelos de clasificación donde tienes regresión logística
+
+1509
+02:51:29,600 --> 02:51:33,600
+análisis de componentes, análisis de discriminantes
+
+1510
+02:51:34,600 --> 02:51:38,600
+tienes después modelos con métodos resampleados
+
+1511
+02:51:39,600 --> 02:51:44,600
+y acá tenemos distintas cosas y por aquí aparecen los modelos basados en árboles
+
+1512
+02:51:45,600 --> 02:51:47,600
+entonces tú tienes aquí los árboles de decisión
+
+1513
+02:51:48,600 --> 02:51:50,600
+tienes Vagin, Random Forest, Boosting, etc.
+
+1514
+02:51:51,600 --> 02:51:54,600
+aquí está todo, después tienes Super Vector Machine, todo eso lo van a ver
+
+1515
+02:51:55,600 --> 02:52:00,600
+modelos de Deep Learning, modelos de SuperNC sobrevivencia, etc.
+
+1516
+02:52:01,600 --> 02:52:07,600
+es un muy buen libro, un libro que está pensado en la aplicación más que en la teoría
+
+1517
+02:52:08,600 --> 02:52:10,600
+entonces cuando ustedes vayan a cualquier lado
+
+1518
+02:52:11,600 --> 02:52:14,600
+por ejemplo Vagin, Random Forest van a poder leer
+
+1519
+02:52:15,600 --> 02:52:18,600
+les va a dar los aspectos técnicos y matemáticos de los modelos
+
+1520
+02:52:18,600 --> 02:52:21,600
+pero no va a entrar en un detalle que sea muy denso
+
+1521
+02:52:22,600 --> 02:52:24,600
+sino que se va a ir más a la aplicación misma
+
+1522
+02:52:25,600 --> 02:52:27,600
+entonces en esos sentidos bien común
+
+1523
+02:52:29,600 --> 02:52:30,600
+¿Qué es lo primero?
+
+1524
+02:52:31,600 --> 02:52:34,600
+Bien, entonces estaríamos por hoy
+
+1525
+02:52:37,600 --> 02:52:39,600
+casi me salgo del tiro
+
+1526
+02:52:42,600 --> 02:52:43,600
+para compartir
+
+1527
+02:52:44,600 --> 02:52:47,600
+nos vemos el sábado, la última sesión que tienen conmigo
+
+1528
+02:52:48,600 --> 02:52:50,600
+y tenemos repaso, así que vamos a hacer más que nada
+
+1529
+02:52:51,600 --> 02:52:55,600
+ejemplo y ejercicio asociado a lo que hemos visto en estas dos sesiones
+
+1530
+02:52:56,600 --> 02:52:59,600
+bien, así que eso, que tengan
+
+1531
+02:53:00,600 --> 02:53:02,600
+buenas noches, descansen, nos vemos sábado
+
+1532
+02:53:05,600 --> 02:53:07,600
+chau chicos, buenas noches
+
+1533
+02:53:08,600 --> 02:53:10,600
+que les vaya bien, buenas noches
+

@@ -1,0 +1,1439 @@
+Bueno, ya somos como clase 80.
+Empezamos la clase. Buenas tardes a todos. Vamos a empezar ahora una clase, un curso de, en este caso, vamos a hablar sobre detección de anomalías.
+Bueno, es una área muy interesante. Voy a poder presentar un par de métodos de cómo podemos hacer la detección de outliers, detección de anomalías.
+Es una área que está siempre surgiendo nuevos métodos. Los métodos son nuevos, no son tan antiguos.
+Y bueno, para mí es una área muy entretenida, principalmente porque no puedo ver cómo va a utilizar algunos métodos que ya conoce.
+Bueno, hasta el momento vimos varios, al menos conmigo, algunos métodos como...
+¿Profesor?
+Sí.
+Un segundo para empezar la grabación que no se haya comenzado.
+Ah sí, por empezar entonces.
+Ya.
+Muchas gracias.
+Mucho gracias.
+Verdad.
+Sí. Bueno, hay más gente para ser aceptado ahí.
+Bueno, buenos días a todos. De nuevo, vamos a empezar nuestra clase de detección de anomalías, ¿vía?
+O detección de outliers, como quieran llamar.
+Bueno, me gusta bastante esa mirada de intentar buscar outliers.
+Yo creo que es una área entretenida, muy importante, principalmente porque como van a ver, outliers funcionan con nuestros resultados.
+Pero lo más interesante para mí es poder tener una mirada de cómo se aplican otros métodos que vimos, que conocemos, para detectar outliers.
+Entonces, la primera vez que me presentaron ese método, yo pensé, oh, no, no, yo creo que yo no habría propuesto una cosa como esa.
+Fue muy, con una mirada muy distinta.
+Y así me gustó bastante la propuesta que hace, principalmente, Isolation Forest.
+Cuando empecé a dar con árboles, después cuando vi Isolation Forest, empecé a usar una R&D.
+Bueno, ya vimos hasta ahora, al menos conmigo, varios métodos de análisis criminante, como lineal, cuadrático, Navy Base, regresión horística,
+métodos para poder hacer la clasificación, diferentes métricas, que más vimos también la parte de clusterización, como no poder trabajar con camins, camut, con prototype.
+Pero yo sé que tuvieron clases con otros profesores y vieron, por ejemplo, métodos como árboles y R&D, bushing, ojalá tengan visto bushing también,
+PCA conocen análisis de componentes principales, y bueno, va a haber un método acá que no conocen, pero también se utiliza para detección de outliers.
+Entonces, una cosa que va a ser interesante es que algunos de estos métodos que voy a presentar ahora, inicialmente fueron pensados para hacer regresión o clasificación,
+y después uno lo adaptó para trabajar con detección de anomalías.
+Bueno, vamos a hablar un poco sobre distancias, densidad, PCA, isolation force.
+El material ya pide para que Vanessa lo suba, pues ustedes deberían tener la vía positiva, los códigos en R, en Python, y los activos necesarios.
+Novamente, voy a intentar hablar despacio, sé que el portunión no es la mejor forma de aprender la clase,
+entonces he intentado el máximo posible, me expresaré de la mejor manera para ustedes, pero si no entienden alguna cosa, si no comprenden, me comentan,
+voy hablando más despacio e intento presentar de una forma distinta.
+Lo importante es que al final puedan aplicar el método con facilidad, siempre con utilización.
+Entonces, ¿cómo va a ser la cosa? Bueno, generalmente, cuando vamos a hablar con nuestra base de datos,
+tenemos datos, generalmente tenemos datos con una simetría muy grande, muchas veces tenemos dificultad para evaluar los supuestos que estamos poniendo en nuestro modelo,
+principalmente muchos ponen supuestos de normalidad, los datos tienen una simetría, idealmente hay que evaluar varias situaciones,
+por ejemplo, cuando me llega una base de datos, tenemos que evaluar si lo que está ahí es un outlier,
+fue un error, de hecho fue un error si acabamos poniendo un valor que está malo, por ejemplo, una estatura fue registrada con 1800 cm,
+por supuesto, no hay una persona que tiene este tamaño.
+A mí siempre me toca, muchas veces, la primera cosa cuando bajo un artículo en Excel, voy a empezar a hacer una análisis estadística, es trabajar con la idad,
+al tiro ya encuentro idades con valores negativos, entonces personas con 120, 150 años,
+yo sé que aunque es posible que alguna persona haya 120, pero es altamente improbable, y a 150 casi es imposible,
+tal vez ustedes pueden encontrar un outlier, no sé cuántos millones de personas que tuvieron, pero tener una persona con una idad tan alta,
+es muy probable, entonces hay que hacer una evaluación, hay que hacer una validación, volver a la base de datos,
+es muy importante volver a la base de datos, no simplemente sacar esos elementos, ya sea posible, porque ellos realmente tienen una fuente de información,
+si ustedes eliminan esos elementos sin ninguna justificativa, pueden tener ciesgos en sus estimativas.
+Bueno, de todas las formas, vamos a suponer que ustedes van a trabajar con algunos modelos, es importante hacer evaluación de outliers,
+varias áreas son extremamente importantes, los alumnos que trabajaron con series temporales, y es terrible, series outliers, principalmente en temas de vendas,
+entonces hay que evaluar si se puede dividir las vendas, se puede de alguna manera trabajar de una forma distinta, porque ellos influencian las estimativas y los parámetros.
+Bueno, hablando un poco sobre las anomalías globales, contextuales y conjuntas, podemos tener un monto muy alejado de todos los demás,
+tenemos que evaluar eso lo que pasa, por ejemplo, un contextual, un consumo habitual de día, pero inusual por ejemplo de madrugada,
+y multivariada, que son valores individuales comunes pero una combinación poco frecuente.
+Realmente los problemas que tenemos más son esos elementos, esas anomalías globales, por ejemplo vendas, siempre tienen un período, no sé, cyber, acá, en Estados Unidos Black Friday,
+el momento que siempre nos pone muy complicado con el modelo, porque nos complica cuando vamos a hacer los ajustes, hay un aumento de vendas muy grande.
+Entonces tenemos que intentar evaluar eso, lo sacamos y trabajamos con ese punto de una forma separada, pero siempre me va a informar,
+ya profesor, sacamos esa observación, va a tener pérdida de información.
+Bueno, si ustedes saben lo que va a pasar por ejemplo en Black Friday, pueden trabajar exactamente con ese punto y planificar por ejemplo cómo hacer vendas, stock,
+advertisement, propaganda, publicidad, lo que sea, exactamente para esa fecha, pero mantener un outlier en su base solamente porque no hace sentido removérselo,
+puede hacer con que todos los otros resultados sean altamente influenciados por el outlier.
+Para eso les dejo un ejemplo muy sencillo, todos conocen cómo ajustar una regresión lineal, entonces ya saben ahí, una regresión lineal, tenemos nuestro Y, nuestra variable de respuesta Y,
+acá, Xbeta, y vamos a ajustar ese beta de alguna manera acá, beta cero, beta uno, tenemos beta cero acá, medio inicial, beta uno que nos va a dar exactamente la inclinación de la red.
+Lo estimamos con mínimos cuadrados sin ningún problema, si la base viene limpia, sin autilares, y tiene una relación lineal, logramos hacer acá el ajuste,
+sin ninguna dificultad, pero vamos a suponer que nuestros datos tienen esta información acá, y por algún momento, por alguna situación muy específica, pero que de hecho es una situación real, que debe de tener una explicación,
+me viene un punto exactamente acá, esto acá es solamente un punto en la regresión lineal, uno observación, cuando intentamos correr nuevamente la regresión lineal, la reta que debería ser así, ahora cambió completamente para esta dirección.
+Bueno, si uno va a intentar hacer alguna interpretación con ese beta, o utilizar ese beta para hacer predicciones, va a tener muy malas predicciones, ya van a tener resultados muy malos, no va a funcionar, es decir, solamente un punto está influenciando de forma demasiado en la estimación de beta cero, y beta uno, ya?
+De una forma que ellos están muy lejos, son muy distintos del verdadero.
+Bueno, una de las formas de pensar evaluar esto es un posible autilar, entendemos lo que pasó acá, evaluamos su significancia, su importancia en nuestro análisis estadístico, y lo sacamos, corremos nuevamente nuestros parámetros, y ahí sí vamos a tener exactamente el ajuste que nos gusta acá.
+Ya?
+Realmente no me gusta poner información en la basura porque son importantes, pero nos complica para hacer la estimación de los otros parámetros.
+Ya?
+Bueno, hay formas de hacer eso, una de las formas de sacar el punto, en regresión lineal uno puede hacer un análisis conocido como inferencia robusta, inferencia robusta va a dar muy pesos muy pequeños para valores como ese, y al final van a tener un ajuste más o menos como ese acá.
+Ya?
+De alguna manera va a ser un descarto, va a dar poco peso en valores que son muy lejos o son autilares, por ejemplo.
+Conciernos que hay gente hoy proponiendo métodos de inferencia robusta para poder hacer inferencia, son algunos métodos que están siendo desarrollados.
+Una otra área va exactamente por esta detección de anomalías, ya?
+Vamos a continuar acá.
+Bueno, cosas que son importantes a hacer antes de eliminar, verificar las unidades, verificar si están duplicadas, faltantes, problemas en el registro, consultar el contexto de los casos marcados y a distinguir un error corregible de un evento real poco frecuente, comparar sus resultados con y sin y verificar si afecta su análisis.
+Ya?
+En fraudes o fallas, los casos poco frecuentes pueden ser el objeto del estudio.
+En otros análisis, interesa reducir su influencia sin perder la información.
+Y bueno, eso pasa a ser muy importante porque algunas áreas, varias áreas que son muy importantes, que buscan evaluar fraudes o fallas, buscan exactamente intentar evaluar esos autilares.
+Ya?
+Por ejemplo, yo tengo alumnos que trabajan en la Receita Federal de Brasil que hacen exactamente la evaluación de fraudes en términos de emisiones de boletas, de honorarios.
+Ya?
+Entonces, bueno, ellos intentan sacar el texto, evaluar valores, demás, algún montón de información e intentan evaluar eso desde el punto de vista de busca por autilares.
+Ya?
+Es una persona que hace eso de una forma un poco distinta de lo que realmente los otros hacen o su comportamiento.
+Se cambia acto, es un posible autilaje, una posible fraude y ahí van a tener los alertas que ellos hacen para poder intentar buscar más información y de alguna manera hacer la punición necesaria de esa persona.
+Sí?
+Entonces, hay mucha gente que trabaja con eso.
+Pero como le comenté, el contexto acá pasa a ser fundamental.
+¿Verdad?
+Ahora el contexto pasa a ser fundamental porque necesitamos evaluar si podemos eliminar esa base y cómo vamos a tratar exactamente los puntos que fueron eliminados.
+Ya?
+Porque eso es.
+Alunos que tengo que trabajar con vendas intentan hacer proyecciones de vendas, siempre tienen problemas exactamente con Black Friday.
+Ya?
+Si uno mete Black Friday ahí y hace el ajuste de una serie temporal, va a ver que solamente este punto que es muy discrepante, como es un autilaje muy significativo, influencia acto en todas las otras estimativas.
+Aumentando demasiado el error, creando muchos problemas.
+Ya?
+Entonces, una de las sugerencias es, ya sabemos que en ese período tenemos una venda histórica más o menos con esos valores.
+Entonces, no saco esa información, voy a analizar la serie temporal de la forma normal, pero yo sé que en algunos periodos específicos como Black Friday o una fecha muy específica de Navidad, vamos a tener un aumento de vendas muy discrepante, un autilaje muy grande ahí.
+Y ahí podemos intentar trabajar solamente con esas informaciones para nos planificar o para poder hacer la planificación de caja que vamos a tener.
+Si?
+Entonces, es muy importante distinguir eso.
+También es importante distinguir lo que son errores.
+Ya?
+Conozco a un montón de gente, principalmente cuando llega a la base, cuando empezaron a mirar, encuentran la edad.
+Como 99 años, eliminan a esa persona y corren el análisis.
+Ya?
+Super mal hacer eso porque uno puede hacer la corrección, se puede llamar la persona que no hizo o la persona que estaba trabajando con la base de datos.
+Muchas veces eso puede ser, ellos pueden corregir los errores.
+Ya?
+Eso le va a ayudar a tener más información y por supuesto menor sesgo.
+Ya?
+Entonces van a tener mejores predicciones con eso.
+Entonces también es muy importante intentar hacer las correcciones cuando posible.
+Ya?
+Como eso puede influenciar?
+Por ejemplo, emocionar un gráfico, acá van a dar los muy sencillos.
+Vamos a suponer que tenemos 1, 2, 3, 3 observaciones.
+La media acaba a ser de 2.
+Ya?
+Vamos a suponer que ahora incorporo solamente un autilaje con el valor 30.
+Se ve que la media se cambia de 2 a 9.
+Ya?
+Y bueno, cuando vamos a hacer una regresión o ajustar por ejemplo un K-meets, si vamos a minimizar estos valores en términos de un clúster específico,
+va a ver que el residuo ahí va a ser extremamente significativo, en torno de 400.
+Ya?
+Entonces un caso solo por influenciar mucho, aunque sea solo una observación.
+Generalmente no vamos a hacer solamente una observación.
+Vamos a intentar eliminar 5%, 4, 3% de las observaciones y correr nuevamente nuestra base.
+Ya?
+Bueno.
+Para eso vamos a discutir algunos métodos.
+Voy a presentar varios.
+Vamos a ver que estamos usando la mina 7.
+Solamente una idea de lo que vamos a hablar inicialmente acá.
+Vamos a hablar sobre la regla del rango intercuantilico.
+Ya?
+Enrique.
+Después, voy a hablar un poco sobre distancias.
+Vamos a hablar un poco sobre la parte de milares o de distancia de Majara 9.
+Ya?
+Sus aplicaciones.
+Vamos a utilizar los cables y los más cercanos.
+No sé si tuvieron una clase con el KNN.
+Es un excelente método de regresión y clasificación.
+Ya?
+Los cables y los más cercanos.
+Vamos a utilizarlo para hacer la detección de outliers.
+Local outlier factor.
+Ya?
+Entonces, ese es un método que no conocía, pero un método muy bueno.
+Una forma de utilizar, a pensar, es no supervisar.
+Sí, Claudia?
+Buenas tardes, profesor.
+Una duda.
+¿Hasta qué punto una outlier puede desplazar el centroide y terminar afectando no solo el error dentro del cluster,
+sino también la asignación de las demás observaciones, por ejemplo?
+Una outlier va a influenciar demasiado el centroide del cluster.
+De hecho, dependiendo de muchas veces, cuando uno quiere intentar definir centroides o outliers,
+uno puede intentar definir, aumentar el número de clusters,
+y si tenemos una outlier, es posible que él va a ser exactamente un centroide específico.
+Eso es super malo porque si tenemos…
+Por ejemplo, el mismo valor que usted tenía de 400 fuera 1000, por ejemplo.
+¿Eso va a estar permitido por la clusterización o…?
+Usted como analista va tendo que evaluar, en este caso no tener una regla de oro como informaría
+segundo a Cami informo que yo tengo que ser exactamente eso.
+No es exactamente como aplicar por ejemplo un KNL, sabemos como aplicar un KNL, o no
+va a evaluar, sabemos como se va a hacer el enteramento del KNL, como se va a estimar.
+Víctor parece que se puede dibujar.
+Sí profesor parece que sí.
+Parece que sí, parece que ustedes también pueden dibujar si no les gusta.
+Pero vamos a poner acá, este es el centroide, vamos a poner el otro por acá, estoy correndo
+el método, tengo un punto acá y tengo otro punto acá, claramente estos son outliers.
+El cláusula debería ser alguna cosa como esta con el centroide exactamente, este debería
+ser un centroide y el centro del centroide debería estar acá, debería ser un centroide
+acá y acá.
+Cuando tenemos más observaciones se espera que esas más observaciones van a influenciar
+menos en nuestro centroide, pero aún si no tenemos tantas observaciones y el outlier
+está muy lejos, es posible que cuando fuemos a ajustar el centroide, él estaba acá, él
+se va a deslocar más o menos para acá y ese va a ser el cláusula que se va a ajustar.
+Lo mismo va a tocar acá, acá fue lo que teníamos, acá fue el ajustado y tenemos
+este posible cláusula.
+Es malo, porque cuando ustedes van a evaluar y calcular el VWSS van a ver que ese valor
+va a estar muy alto, entonces ese valor está muy alto y van a poder tener una indicación
+de que tiene alguna cosa mala ahí.
+Vamos a suponer que de alguna manera ustedes van a poner ahí para correr cuatro cláusulas.
+Casi es seguro, depende del punto inicial que van a poner, que me va a salir un cluster
+acá, un cluster acá, otro acá y otro acá.
+Entonces, a veces el camino puede ser una forma de hacer detección de outliers.
+Por eso es importante que cuando estén haciendo el dibujo de su cluster, cuando estén ajustando
+un cluster, cuando estén ajustando sus modelos, evaluar los outliers porque los outliers
+van a influenciar alto todo, pero van a influenciar alto de manera significativa.
+Por ejemplo, este alumno que estaba comentando en series temporales fue un alumno de un MBA
+en Data Science en Brasil.
+El alumno se quedó cinco meses evaluando los outliers, haciendo divisiones e intentando
+sacar algunos para evaluar, pero era muy sencillo de evaluar que cuando uno ponía el outlier
+allá el modelo que él estaba ajustando, el modelo ARMA, ARIMAS, ARIMA, los modelos
+Prophet, LSTM, se quedaban super malos, pero super malos, no tenían ningún buen
+ajuste.
+Se influenciaban no solamente los outliers, pero influenciaban todos porque se cambian
+altos parámetros para que en algún momento este punto logre llegar en ese serie.
+Tiene una serie más o menos así de vendas, más o menos así que pasa en situaciones
+como esta, como Black Friday.
+Entonces el modelo, sí, intentaba hacer más o menos algo así, cuando sacaba el outlier.
+Cuando intentaba poner el outlier, el modelo, hacía más o menos así.
+Entonces se vio que este otro modelo ajustado con el outlier no alcanzaba nada, estaba super malo.
+Entonces la clase de obra será importante exactamente por eso, para que ustedes tengan
+en consideración que se pueda hacer una análisis para ello y evaluar lo que están influenciando
+en sus modelos.
+Ya, esta es una área muy importante, pero muy importante mismo.
+Detección de outliers es una área de estadística que tiene un respecto muy grande y mucha gente
+trabaja con eso.
+Tenemos buenos profesores de la católica, Vanessa Conocer, Manuel Galea, Alejandra,
+que trabajan solamente con diagnóstico de influencia, lo que estos puntos están influenciando
+en nuestra análisis, incluso outliers.
+Entonces es muy importante evaluar los outliers cuando fomos a hacer una análisis.
+Bueno, como ya estábamos hablando sobre camins, acá no voy a presentar exactamente camins,
+voy a presentar un método que le comenté en algún momento, que es un método también
+de clasarización que se llama DB scan.
+Entonces él intenta de alguna manera de una forma mejor evaluar clústeres que tienen
+una alta densidad de puntos.
+Y básicamente con esta idea vamos a informar a Yacy, tenemos altas densidades de puntos
+El punto que está muy lejos de esta densidad debería ser un posible outlier.
+Entonces vamos a ajustar eso, evaluar cómo miramos estos posibles outliers a lo largo
+de nuestra clase.
+Voy a mostrar un poco cómo se utiliza PCA para poder hacer detección de outliers, vamos
+a aplicar eso en una base de dados.
+Y al final vamos a hablar un poco sobre Isolation Forest, que también es una aplicación de
+random forest, exactamente para hacer la evaluación de outliers.
+Entonces eso es lo que esperamos hoy para nuestra clase.
+Bueno, el primero método es un método conocido como Reguling Rango Interquantílico.
+El Rango Interquantílico se va a calcular como LRCI, y va a mirar exactamente el cuantil
+3, que va a ser 0.75, y el cuantil 1.
+Así que cuando ustedes van a hacer la división de su base, van a tener acá 0.25%,
+0.50, y 0.75.
+Lo que vamos a intentar mirar es exactamente los puntos que deberían estar dentro de esta
+región acá.
+O sea, los puntos que vamos a estar considerando ahí en torno de 50% de los valores, no vamos
+exactamente a mirar en esos puntos, vamos a hacer una pequeña modificación para poder
+abarcar un poco más esos puntos.
+Pero básicamente vamos a intentar hacer un dibujo y mirar los puntos que están muy lejos
+cuando miramos ellos desde el punto de vista de cuantiles.
+Y ahí nos miramos con posibles outliers.
+Para eso, cuando miramos acá utilizamos el 150% de los datos, no la media y la división
+estándar.
+Voy a comentar por qué no, vamos a ver una aplicación de cuando ponemos la media y la
+división estándar, puede nos dificultar para hacer la decisión de outliers.
+Un resultado interesante es que este tipo de detector de outliers no va a requerir una
+distribución normal, entonces no tendrá una suposición de normalidad.
+En variadas muy asimétricas pueden marcar valores variados y la cola.
+Bueno, es una regla de exploración o una prueba automática de Ruhl.
+La mayoría de los métodos que vamos a discutir acá son reglas de exploración.
+Entonces, uno va a utilizar PCA, va a tener algunas indicaciones de outliers, vamos a utilizar
+Isosation Forest, vamos a hacer otras indicaciones de outliers.
+El profesor de etio es un outlier, va a depender del modelo que uno ajusta, si usted va a
+ajustar una distribución normal, por eso va a ser solo un outlier.
+Sería trabajar con una distribución que tiene colas pesadas y no se puede eliminar
+esos puntos, no se va a considerar como outliers.
+Entonces son posibles outliers, generalmente con modelos más flexibles, podrían ser considerados.
+Pero bueno, ahí tenemos que evaluar exactamente lo que está influyendo en nuestro análisis.
+Vamos a hacer esto también al final de la clase, no se preocupen porque acá parece
+que estoy muy como, podemos hacer esto, podemos hacer de esta forma, tampoco pueden hacer lo que quieren.
+Hay algunas formas de evaluar y vamos a llegar en algunas reglas para poder eliminar al final.
+Pero no va a tener un p-valor que me va a llamar ya, voy a eliminar ese valor acá con
+p-valor de 0.5, si está abajo de 0.05 elimino ese valor con base a un p-valor específico.
+Bueno, estaba comentando sobre el HIC, o regla del rango intercontílico.
+Vamos a suponer que tenemos algunas observaciones acá solamente como otro ejemplo, después
+explicamos un poquito más adelante una base real. Vamos a ver que tenemos valores acá,
+10, 11, 12, 13, 14, 15. No necesitamos de un método E30, no necesitamos de un método formal para
+evaluar que 30 es un outlier, pero lo importante es que ustedes tengan en cuenta si el método
+nos ayuda a de hecho eliminar esos posibles puntos.
+Lo que vamos a intentar hacer es dibujar nuestros intercuantiles,
+nuestros cuartiles interpolados con los códigos, entonces los cuartiles que
+vamos a ser dibujados acá 25, 50, más aquel límite que vamos a hacer la modificación.
+Tenemos que hacer los límites que vamos a dibujar acá, vamos a utilizar nuestro HIC,
+nuestro rango intercontílico, y junto con este rango intercontílico vamos a dibujar
+límites, ya? O límite inferior va a ser dibujado por ese punto, o el límite superior
+va a ser dibujado por ese punto. Y eso acá es exactamente el cuartil 3, los 75% de
+observaciones, no, ese es el cuartil 1, no, pueden ver que estoy multiplicando por 1.5
+acá para dar una dimensión mayor. Entonces cuando vamos a calcular ese L que va a ser
+el límite inferior y U que va a ser el límite superior, él va a tomar en cuenta nuestro
+rango intercontílico como uno va a calcular, va a calcular el cuartil 1, ya? 11.75, el
+cuartil 3, 14.25 y el HIC acá. Pero donde está sacando 11.75, siendo que tenemos acá
+11, 12, si? Cuando ustedes fueran a entrar allá con una función no para calcular exactamente
+esos puntos para evaluar toda la región, si ustedes fueran a sacar un cuartil, él va
+a dar una estimativa que debe estar acá entre 11.75, 14.25, ya? Bueno, esto es muy importante,
+estoy utilizando exactamente este rango acá para desarrollar un artículo que estoy haciendo
+de detección de enfermedades en algunos animales acá en Chile. Básicamente utilizamos la regla
+intercontílico para poder hacer el ajuste, por eso pensé que era bueno poner acá las
+láminas para ustedes, era una regla muy útil. Y bueno, ajustando nuestro cuartil 1 que se
+mantiene acá, también nuestro cuartil 3 que se va a mantener acá, vamos a calcular el
+rango intercontílico que va a ser la diferencia entre este punto y ese punto, ya? Esta diferencia
+va a ser de 2.5, se suma 2.5 acá, va a llegar a este punto acá, ya? Multiplicamos por 1.5,
+vamos a tener el límite inferior de 8 y el límite superior de 18. Dibujamos o hacemos
+una condición en el E y en el Python, si el valor es superior a 8 y es menor que 18,
+mantenemos nuestras observaciones, si está fuera, desesamos, lo asumimos como posibles
+outliers, ya? Posibles outliers, hay que revisar. Entonces, cuando hacemos el dibujo de los
+intercontiles, vamos a tener 8, el límite 8 acá, 18, los puntos 10, 11, 12, 13, 14 y 15, ya?
+Por supuesto, tenemos algunos empates acá, por eso incluso vamos a hacer esta aproximación
+11.65, dado los empates que tenemos y el punto 30 fue exactamente definido acá como
+un posible outlier, ya? Entonces, esta regla nos ayuda a tener una posible regla formal de evaluar
+nuestros outliers, ya? Es la forma más sencilla de tener una metodología sofisticada como PCA.
+PCA tiene una mirada muy interesante, me gusta bastante la idea de PCA, por ejemplo,
+ustedes van a tener que estimar parámetros, hacer una construcción y después volver a la
+construcción original y calcular la diferencia. Esta diferencia de reconstrucción debería ser
+nuestra outlier, ya? Algunos métodos van a utilizar reglas estadísticas sencillas, otros van a utilizar
+métodos más sofisticados, si? Por ejemplo, acá estoy tratando con quantiles, pero uno puede
+evaluar esto desde el punto de vista de...
+por evaluar esto desde el punto de vista de medias, ya? Entonces, podemos hacer una estandarización
+en nuestra base de dados y evaluar cuáles son los puntos que están se alejando demasiado de la
+media, ya? No me gusta mucho esto, ustedes van a ver que no es la mejor. Bueno, va a tener
+comentar preguntas acá, no hay nada que vaya ayudando. Si tienen alguna duda adicionales,
+después pueden comentar.
+Y bueno, hay otra forma sencilla de mirar esto, desde el punto de vista de hacer una estandarización
+en nuestra base. Entonces, simplemente tengo las observaciones que tenemos anteriormente acá.
+Voy a calcular el promedio de estas observaciones, la dirección estándar y va a ser la estandarización,
+¿cierto? Bueno, en esta base de dados vamos a tener un problema muy específico. Como tenemos
+una observación que es claramente una outlier ahí, ella va a influenciar demasiado en la media, ya?
+Entonces, la media que debería ser alguna cosa en torno a no sé, 12, debe estar más o menos como
+12,5, cuando calculamos la media va para 14,62. Lo malo es que esto también va a influenciar
+mucho en la deviación estándar, está un punto muy lejos. Entonces, cuando vamos a hacer la estandarización
+entre el 30 que fue la outlier menos la media que fue estimada a partir de la deviación estándar,
+tuvimos aproximadamente un valor de 2,39, ya? Se ve que es un valor extremo, pero generalmente
+este método utiliza como sugerencia asumir que va a ser detectar como outlier los valores que
+tuvieron, el módulo mayor que 3, porque el módulo vamos a suponer que acá fue 30, pero de todas
+las formas también tenemos un valor que debería ser 1 acá, si tenemos por ejemplo 1, 10, 11, 12, por ahí adelante.
+Cuando vamos a calcular este valor acá va a ser menos 1,9, o menos 2, alguna cosa así, ya?
+Entonces va a ser un valor negativo si este valor está muy abajo de la media,
+entonces, bueno, de todas las formas vamos a ver nuestro valor calculado,
+estos valores deberían estar distribuidos en torno de un valor como 0, ya?
+Y no tener una variancia muy grande. Cuando intentamos mirar como posibles outliers,
+una regla muy utilizada de corte es asumir que son outliers los valores que están arriba de 3, ya?
+En este caso, esto es malo porque claramente este punto 30 es un outlier,
+acá nadie tiene ninguna duda que este punto 30 es un outlier, pero este método de estandarización
+nos va a dar esta indicación, entonces el HIC que apreciamos anteriormente, intercuantilico,
+marca 30 como outlier, pero el corte de módulo DZ cuando hacemos la evaluación por medio de los valores extremos
+utilizando esta estandarización no nos va a marcar como posible el outlier, ya?
+El propio extremo elevó la media y la dirección estándar, entonces barro normal aproximadamente 4.55 queda fuera de más 2 sigma
+y 0.2, 20% se va a quedar fuera de 3.0 sigma, ya?
+Esto es muy interesante porque básicamente lo que estamos intentando hablar acá es que el 4.45 por ciento de los valores no se queda fuera
+si utilizamos esta regla, no es exactamente esta regla de decisión, si miramos solamente 2
+y en este caso estamos asumiendo un 3.0 sigma, acá cuando hacemos la estandarización este sigma debería ser 1, ya?
+Entonces estamos mirando exactamente en este 2.27 por ciento acá, ya?
+Esto es lo que los japoneses intentaron mirar a un buen tiempo cuando intentaban desarrollar el control a riesgo de calidad, ya?
+Utilizaban una política de 3 signas, entonces no querían los valores que podrían fallar, serían valores muy extremos, si?
+Después fueron aumentando estos signas, 4, 5, una política de 6 signas, o sea, 1 a cada 1 milión de valores, a cada 1 milión de productos solamente va a fallar
+entonces de 1 milión de computadores 1 solamente falla, si?
+Conforme aumentamos este sigma vamos dejando un límite más extremo, ya?
+Realmente asumimos este 3 sigma, pero por supuesto no podemos definir otras reglas
+Vemos acá que este 3 sigma, cuando ponemos este 3 sigma como regla decisión no vamos a tener un rechazo o una indicación de que 30 es posiblemente un outlier, ya?
+Entonces debemos utilizar varios de los métodos conjuntamente y después una sugerencia es utiliza todos los métodos que pueden
+después intenta seleccionar los puntos en que los métodos tienen una concordancia, si?
+Bueno, el nombrado va a depender del objetivo, ninguna de estas reglas es universal, si?
+Como lo hacemos en R&Python de una manera muy sencilla, vamos definiendo estos valores, acá, 10 hasta 30, vamos calcular los cuantiles, ya?
+En el punto 0.25 y 0.65 me va a salir aquellos valores, calculamos el RIC que va a ser la diferencia, el límite inferior, exactamente como aparece en la expresión,
+el límite superior y simplemente una alerta mirando si los valores fueron abajo o arriba del límite superior.
+En Python la misma diferencia, simplemente lo único que se puede cambiar ahora es utilizando la función, bueno, definimos NP acá, calculamos el cuantil,
+la función NP.Cuantil y calculamos todo bien, entonces NP.Array y básicamente calculamos de la misma forma que fue definida en R&Python.
+Bueno, siguiendo acá, ya vamos a empezar a hablar sobre algunas otras escalas de distancia, pero hasta el momento todo tranquilo,
+alguna duda, después vamos a correr juntos, ustedes también tienen los codios, pero vamos a correr acá los primeros ejemplos, ya?
+Por ejemplo, acá cuando miramos la regla intercuantile, cuando miramos el RIC, la forma que le mostré, el print, ya?
+Y la indicación de que posiblemente sería un outlier, una alerta de un posible outlier nos va a salir exactamente como esta función.
+Entonces vamos a hacer exactamente como salió todo, límite inferior, límite superior, alerta que va a tener las condiciones y fiel,
+después hago un print acá de las posibles indicaciones, sí?
+Bueno, en este caso también ya había hecho el cálculo del Z como una posibilidad utilizando la estandardización y el alerta con la función alertaZ,
+que fue exactamente utilizando esta regla de decisión acá, no nos informó que este valor acá era un posible outlier, ya?
+Entonces hasta ahora hay un método informando que es un posible outlier, otro método informando que está dentro de lo que se espera.
+Bueno, estos métodos son sencillos, ahora vamos a empezar a hablar de otros métodos basados en distancias, ya?
+Bueno, para eso vamos a cambiar ahora un poco la base de dados, como vamos a empezar a calcular distancias, vamos a mirar una base un poco más compleja, ya?
+Bueno, vamos a hablar un poco sobre la escala y los dados, básicamente la escala de los dados, vamos a considerar un conjunto simulado de 200 observaciones,
+ahí ustedes tienen un artículo que se llama puntos.csv, ya? Y vamos a tener observaciones simuladas correlacionadas y vamos a tener seis casos adicionales ahí que son problemáticos, ya?
+Bueno, vamos a hacer la estandarización, acá dejé algunas informaciones importantes, como por ejemplo una variable en pesos y otra en metros no son directamente comparables, por eso es importante hacer la estandarización.
+Estandarizar fija una escala común, no elimina atípicos ni correlaciones, nuevamente eso es muy importante porque a veces cuando uno va a trabajar con un sueldo o una variable que es muy distante,
+si miramos métricas basadas en distancia, se espera que esos valores muy grandes van a dominar toda la métrica de distancia final, si?
+O sea, si quiero calcular la distancia entre un individuo basado en su edad y su sueldo solamente en esos dos puntos y dejamos sin hacer ninguna estandarización, la edad no, vamos a ver la altura, la altura y su sueldo, ya?
+Si queremos evaluar los individuos por similitud con base en su altura y su sueldo, por supuesto la altura va a estar 1.54, 1.66, 1.7, 1.8, pero la diferencia es muy pequeña,
+en cuanto al sueldo uno va a ser 1 milion, otro va a ser 2 miliones, otro 3, otro 4, 5 y va subiendo, entonces la diferencia pasa a ser en millones, entonces cuando uno va a mirar las distancias,
+si no están estandarizadas, el sueldo va a dominar como 99% de la información, la edad no va a tener casi ninguna contribución, es importante hacer la estandarización acá, ya?
+Una otra forma va a ser por base, conocida como la distancia de Mahalanobis, ella toma como base una distancia más formal, va a intentar hacer un dibujo, ahora tomando en cuenta toda la estructura de nuestros X de una forma conjunta, ya?
+De esta forma va a ser posible evaluar o dibujar posibles estructuras de elipsis acá, básicamente vamos calcular la distancia de Mahalanobis, donde ésta va a ser la matriz de variances y covariantes, ya?
+Vamos ajustar la distancia por medio de las variances y correlaciones, vamos tomar como referencia valores que vienen de una discusión normal con P variables, vamos ver que acá tenemos 20 covariables, o sea el sueldo, la edad y varios otros de dimensión de tamaño P, vamos tener ahí una normal con esas 20 covariables ya?
+Y vamos definir un corte de referencia cuando miramos ya, esto es lo que se esperaba tener una discusión normal y esto fue lo que fue observado, ya?
+Como sabemos como debería ser la curva de la discusión normal, podemos hacer un dibujo acá informando ya, con 95% los puntos deberían estar en esta región, con 95% debería estar en una región un poco mayor, ya?
+Y empezamos a mirar cuáles son los puntos de referencia y posibles elementos, ya?
+Estos eran los puntos que fueron dibujados en nuestra base original, de estos puntos que fueron dibujados, tenemos que estos eran autilajes, ya?
+Ese punto, ese punto, ese, ese, ese, sí?
+Pero profesor, ¿por qué ese punto está muy a la mitad acá?
+Bueno, estoy haciendo una proyección de una dimensión muy alta para una dimensión más chica, entonces se va a perder un poco de información cuando miramos solamente X1 y X2, ya?
+Si tenemos más covariables ahí, por supuesto, vamos a suponer que ustedes van a hacer un cambio y ese punto está muy alto, ya?
+Entonces vamos a suponer que acá tenemos varios puntos y tiene un punto que está muy alto acá.
+Si uno hace una proyección de ese punto para abajo, ese punto va a acabar se mudando con todos, ya?
+Entonces, si tuviésemos una cosa en tres dimensiones, en una dimensión el punto está muy lejos y muy alto,
+cuando bajamos a dos dimensiones es posible que ese punto acá se junte a nosotros, entonces se va a perder información, ¿sí?
+Bueno, lo que vamos a tomar en consideración entonces va a ser, bueno, esto va a ser una aproximación comparando los estimados, no una garantía de 1% de falsos alertas, ya?
+Acá estamos haciendo una suposición un poco fuerte de que los dados que estamos comparando elementos con distribuciones normales, hay críticas en ese punto,
+por ejemplo, esta forma de dibujar acá, claramente se ve que se parece con una curva de una secución normal, bueno, una proyección de una secución normal, con dos parámetros correlacionados ahí, ¿sí?
+Pero se espera que depende de la estructura podríamos tener en algunas situaciones donde tenemos curvas que van a inglobar a otros puntos, ya?
+Un poco más flexes en consideración de que podría tener modelos que agreguen colas, entonces hacer una suposición normalidad no es muy razonable.
+Bueno, vamos a tener el cálculo de la materia de variance y covariance de nuestra base, ellos están estandarizados, van a ser variances 1,
+pero la correlación sí se muestra que los dados están altamente correlacionados, la variencia es 1, como está estandarizado, vamos a ver la correlación 1 acá,
+pero la covariancia entre las dos posibles variables es extremamente alta, 0.9, ¿cierto?
+Tenemos que, como vamos a calcular esta matriz, esta distancia de Mahalo-Novi, tenemos que sacar nuestra matriz de covariancia, en este caso exactamente la matriz de correlación,
+y invertemos esta matriz, ¿bien?
+Y después empezamos a mirar los puntos 1,1, por ejemplo, cuando calculamos la distancia ocrigena de 1,1,1,
+se va a ver que estos elementos no están tan lejos, bueno, acá hacemos las cuentas de la distancia al cuadrado de los puntos,
+y acá cuando tenemos un posible outlier, en este caso está considerando el posible outlier 1.18, está dividido por 0.19 que viene de esta distancia de Mahalo-Novi,
+básicamente se calculó estos S, estos Z aquí, y este S, y cuando fuimos a calcular este D al cuadrado tuvimos estos valores 1.05 y me salió 20,
+bueno, tenemos que mirar estos valores y evaluar si son posibles o no posibles valores outliers,
+bueno, Mahalo-Novi nos va a devolver, nos va a retornar exactamente esta distancia al cuadrado, no el D,
+la matriz de covariancia debe ser invertible, y extremos fuertes pueden distorsionarla, bueno, hay formas más robustas de estimar cuando tienen esta situación,
+pero con la licencia de Mahalo-Novi vamos a estimar estos valores y conociendo esta distancia vamos a poder evaluar valores que están fuera de lo que debería ser comparado con un D al cuadrado de referencia,
+porque estimamos, calculamos el D y después comparamos con lo que debería venir de un valor elegido de una exhibición normal,
+entonces te calculo acá estos valores 1.05 y 20, entonces cuando fueron a calcular la distancia de Mahalo-Novi en estos puntos, este D al cuadrado me salió 1.05 y 20,
+lo que hago con esto, no estoy entendiendo nada, hasta el momento acá no me llegó ninguna conclusión,
+si, miramos exactamente con el valor de referencia, para una referencia aproximadamente normal, con P variables, un corte orientativo debería ser,
+si este valor va a ser mayor que un valor de referencia de 9.21, si tenemos por ejemplo dos covariables,
+si tenemos tres, tenemos que recalcular este valor de la equidad cuadrada con tres, si tenemos cuatro covariables, se va calculando con cuatro,
+estos valores van cambiando conforme tenemos más covariables, y calculamos nuestro valor, si este valor fuera mayor que se espera en una exhibición normal,
+podría ser definido como un posible outline, entonces este valor acá sería un posible outline, desde el 41, si se acabe la distancia de Mahalo-Novi con 95%,
+clasificamos 1, 2, 3, 4, 1, 2, 3, 4 elementos correctamente y un elemento de forma incorrecta,
+4, 5, con 95, cuando aumentamos para 99 clasificamos 1, 2, 3, 4, y vamos si clasificamos 1 de forma mal,
+por supuesto conforme ponemos más confianza o está aumentando la confianza, estamos aumentando nuestro límite,
+estamos aumentando las colas de la exhibición normal, los puntos que son más extremos ahí, pasan a ser valores muy grandes,
+y básicamente estamos eliminando ellos con posibles valores, entonces si no vamos a poner 99.9 de confianza, es posible que va a dejar de considerar este y este punto,
+hasta que en algún momento, si la confianza es muy grande, no vamos a llegar a clasificar ninguno de los individuos como outlines,
+aproximadamente no podemos eliminar 95 o 99, tenemos otro método que puede ayudarnos,
+bueno, la mejor forma, podemos ir para métodos que son un poco más conocidos en la idea de machine learning,
+por ejemplo el método basado en KNN, para que se conozcan, tuvieron clases de KNN acá, solamente para que yo esté al tanto,
+conocen KNN, chat, me escucho, o estoy pegado, el profesor comenta que sí, perfecto,
+entonces se ve que la idea de KNN es extremamente sencilla pero muy poderosa, si tenemos puntos acá de una regresión, puede ser una regresión original,
+lo que el método va a intentar hacer es, me gustaría hacer una previsión, por ejemplo, en un término acá,
+lo que vamos a intentar hacer es evaluar la cantidad de posibles vecinos más cercanos, hacemos eso con validación cruzada,
+encontramos el mejor K que nos va a dar mejores predicciones, pero empezamos a mirar los individuos que están cerca,
+por ejemplo si sacamos un K igual a 3 por validación cruzada, empezamos a mirar las variables respuestas que vamos a tener tanto en ese punto,
+tanto en ese, tanto en ese, sacamos un promedio de estos individuos acá y debemos tener una buena representación de este punto que no fue observado.
+¿De acuerdo?
+¿Por qué es una idea muy buena?
+Primero, si tenemos vecinos que son muy similares esperamos que la respuesta también va a estar en torno a lo que se espera.
+Para los que vivimos desde el punto de vista teórico, van a ver que los KNM tienen excelentes propiedades teóricas,
+convergen para la verdadera función de regresión, va a tener, o sea, el método funciona bien, no va a ser, no va a tener ciego,
+bueno, si tóricamente no va a tener ciego, tiene un montón de tajas minimax, limitas que uno puede definir,
+en fin, tiene un método muy bueno para hacer regresión, tiene sus ventas y sus desventas, tiene que, costo computacional,
+a veces no es tan preciso, pero un método muy establecido.
+Y la idea pasa a ser exactamente intentar utilizar esa idea de los vecinos más cercanos para hacer una búsqueda de la cantidad de autívars.
+Entonces podemos utilizar KNM para detectar puntos aislados, se va a calcular la distancia a los k vecinos más cercanos excluyendo el propio punto.
+Aquí usamos como puntaje la distancia al vecino, entonces, bueno, después de calcular,
+después de tener nuestra distancia calculada vamos a excluir eso, ya vamos con el propio punto,
+y vamos a evaluar cuáles son los individuos que están más menos.
+La idea es de alguna manera elegir una cantidad de vecinos, por ejemplo, vamos a elegir acá,
+igual a 10, después uno puede cambiar eso por sensibilidad.
+Y empezamos a evaluar.
+Vamos a calcular la distancia.
+Que ese punto, por ejemplo, tiene en relación a sus 10 vecinos.
+Y bueno, ese punto que tiene en relación a sus 10 vecinos.
+Uno va a ver que si tenemos un vecino que está muy lejos,
+cuando vamos a calcular la distancia en relación a,
+mismo que sean los 10 puntos, vamos a tener puntajes muy elevadas ahí.
+Bueno, después voy a comentar exactamente cómo elegimos eso, pero vamos a calcular estas distancias.
+Por ejemplo, para acá igual a 3, vamos a suponer que tengo ahí el punto A y el punto B,
+la distancia es igual a 10,
+por ejemplo, para acá igual a 3, vamos a suponer que tengo ahí el punto A y el punto B,
+la distancia a los tres vecinos más cercanos, 0.2, 0.3 y 0.5.
+Definimos, podemos definir acá, vamos a ver si está formada, sacamos el máximo,
+sacamos el máximo, la distancia máxima entre esos puntos,
+y se ve que por ejemplo, en relación al vecino más cercano,
+ese punto tiene una distancia de 0.5.
+Bueno, vamos a intentar hacer eso para todos los posibles puntos.
+Cuando miramos,
+este dividido con este, con este, con este, con este, con este, con este, con este,
+bueno, este acá está calculando el máximo, pero uno podría calcular después la distancia media.
+Acá podría ser una puntaje máxima,
+una hora, pero sí, yo creo que más sazonable es sacar la puntaje media.
+Después de calcular la distancia entre esos tres vecinos,
+vamos a ver la distancia de 0.2, 0.3 y 0.5.
+Podemos definir o el máximo o una otra media, como por ejemplo la media,
+y evaluamos si en media o en máximo,
+ese divido está muy distante en términos de nuestros vecinos.
+Si la distancia fue muy grande, hay una gran indicación de que ese punto está muy lejos de sus vecinos
+y debería ser considerado como un outline.
+Bueno, acá es el número de vecinos, no es un número de clusters.
+Tenemos que elegir ese K con una sabedoria, voy a comentar cómo lo hacemos.
+Inicialmente podemos poner el odd como 10,
+pero al final, cómo va a funcionar la cosa?
+Vamos a calcular, aunque yo hable exactamente de calcular eso desde el punto de vista de sacar la media,
+lo que al final él acaba haciendo es algo un poco distinto.
+El gráfico de la distancia en relación a una cantidad de vecinos
+será un ordenamiento de lo cuánto estos individuos están o más distantes de sus vecinos,
+puede ser la distancia máxima acá, o después podemos hacer con la media, generalmente es suma y máxima.
+Y cuando hacemos el ordenamiento de estas distancias,
+por ejemplo, no es porque el vecino uno está más distante,
+esto fue alguno de los individuos y cuando fuimos a calcular la distancia entre ellos y sus vecinos,
+él tenía un valor de distancia muy pequeño,
+fue derecho la distancia a cero.
+Para algunos vecinos el punto va a empezar a aumentar.
+Bueno, acá no podemos, la ecuación del escótero debería haber ponido acá,
+pero se puede obtener un límite que va a ser una distancia en relación a la cantidad de vecinos que estamos lejos.
+Cuando uno va a hacer esa cuenta sale en ese gráfico la distancia máxima,
+y cuando uno va a hacer esa cuenta,
+el punto de vista de la distancia en relación a la cantidad de vecinos que estamos lejos,
+esa cuenta sale en ese gráfico la distancia uno.
+Y ahí definimos los individuos que estuvieron arriba de esa distancia uno como posibles outliers.
+Funciona de forma real, bueno, después voy a actualizar la lâmina o voy a enviar por el personal de esta manera separado,
+cómo salen las cuentas. Interesante es que no se quiere solamente la información,
+porque esa distancia ya sale al tiro acá por esta función KNN distance.
+Entonces sería interesante saber cómo definimos este umbral acá.
+Nos va a salir una puntaje, vamos definiendo umbral,
+este umbral ya sale exactamente de la función quanti, de este puntaje que calculamos acá,
+pero este umbral para este ejemplo acá fue cerca de 0.98, una cosa así.
+Ya, entonces me recuerdo, va a tener la distancia entre los vecinos,
+vamos a suponer que sacamos el promedio máximo entre esos vecinos,
+y vamos a tener una distancia en promedio en torno de cuatro.
+Entonces vamos a suponer acá.
+Acá, me voy a volver, aquí no se quiere mucho confuso.
+Bueno, tenemos tres vecinos, me sale la distancia, 0.2, 0.3 y 0.5.
+Ya, inicialmente, esta regla que ellos definieron inicialmente es sacar el valor
+con la distancia máxima entre sus vecinos, los vecinos que están más distantes.
+Los vecinos que están más distantes fueron de 0.5, ya sé que ese vecino tiene un valor de 0.5.
+Cuando fui a mirar a otro vecino, yo vi que ese vecino específico tenía una distancia de 2,
+de 2.3, 2.8 de otro individuo.
+Saco el valor que ocorre con la distancia máxima.
+Esta es una medida racional porque cuando miramos, ahora cuando pienso bien en termos de lo gráfico,
+si tenés este individuo y tenía otros puntos acá,
+este individuo está muy lejos, cuando voy a calcular la distancia entre ellos, me salió 2, 2.3 y 2.8.
+Y eso aquí informo exactamente, la distancia era igual a esa.
+Si tengo un vecino que está muy cerca de los otros, acá, esta distancia tendría a ser muy pequeña, 0.5.
+Es decir, no es posiblemente un autilite, entonces ese es el valor de 0.5.
+Cuando fuimos a empezar a calcular estas distancias para un montón de gente, me va a salir valores.
+Con la distancia 0, 0.1, 0.2, 0.3, 0.3, se recuerda que estoy ordenando, ya?
+Esta distancia 0 fue el individuo con ID 40.
+El individuo 40 estaba con una distancia básicamente 0 de sus vecinos.
+El individuo 50 tenía una distancia de 0.01.
+El individuo 62 tenía una distancia de 0.2.
+Y después de hacer todo este ordenamiento, voy a sacar exactamente acá,
+acá, 0.95.
+Es decir, voy a sacar exactamente el punto que está más lejos acá, en torno de 0.95.
+Este valor va a ser valor extremamente alto.
+Después de 0 de 95 acá, vamos a empezar teniendo valores como 1,
+1.0, 2.1, por ahí adelante.
+Entonces ya sé que el umbral va a ser la cantidad que me va a informar 5% de los individuos.
+Y ahí este umbral que salió para aquel ejemplo específico era Kc1.
+El valor K que salió de este umbral.
+Se recuerda que este umbral viene de la función quantil, que salió de la puntaje que calculó las distancias.
+Entonces este umbral salió como 0.91.
+Entonces todos los individuos que están arriba de 0.98 son posibles individuos que están muy lejos.
+O sea, tienen una distancia de esos 10 vecinos de al menos 4.
+Un punto tiene al menos 4, un individuo va a ser 3, otro 2.
+Estos individuos están muy lejos, son posiblemente outliers.
+De hecho, sintiendo hacer un plot bidimensional de estos individuos acá, vamos a ver que tenemos estos puntos específicos.
+Estos puntos fueron los que fueron elegidos por KNN.
+Entonces se ve que la gran mayoría está lejos de su centro.
+Si tu hubieses utilizado el KNN para hacer selección de outliers,
+estos puntos con KNN seríamos dedicados.
+¿Por qué? Porque la distancia entre él y sus vecinos es muy grande.
+La distancia de éste entre sus vecinos no es tan grande, pero fue lo suficiente para ser arriba de 1.
+O de los 95%, estos son los 5% de los individuos más lejos internos del grupo general.
+Entonces se ve que los individuos que están más cerca, este cuando no va a calcular la distancia, va a ser una distancia pequeña.
+Esta tiene ésta acá, una distancia pequeña.
+Pero éste sí, todos los puntos son extremamente distantes.
+Bueno, si los vecinos están demasiado separados,
+una cosa que puede ocurrir es que todos los puntos están demasiado separados.
+Por supuesto, cuando fuémos a calcular la distancia, ellos van a tener una distancia razonavelmente mayor,
+pero un sino va a ser una distancia tan grande.
+La única cosa que va a estar cambiando acá va a ser la escala de esta distancia.
+Osea, si son casas que están más lejos, entonces está aumentando promedios,
+sendo 150 metros de distancia entre ellos.
+De forma general, ellos van a estar cerca pero en términos de 100 metros.
+Pero si va a tener alguna persona que vive en el campo,
+tiene una casa que está muy lejos, 1.5 km.
+Y ahí el método va a ayudar a identificar a esa persona.
+No es porque estos puntos están extremamente conjuntos,
+que si abrimos un poco más, el método va a fallar.
+No, él va a sacar exactamente los 5% de los individuos que están más distantes.
+No se va a pujar lo que está más distante.
+Entonces funciona de esta forma, va a mirar todos los vecinos y evaluar si los son más distantes.
+Si estos puntos estuvieran más distantes,
+entonces el método va a caer en el campo.
+Si estos puntos estuvieran más lejos,
+estos acá también estarían más lejos.
+De todas maneras, la distancia entre estos puntos
+seguiría siendo grande y continuaríamos identificando
+a ellos como posibles vecinos cercanos.
+Bueno, paramos, ya estamos a 1h10, paramos ahora para un café,
+volvemos a las 8h00 y cerramos a las 9h00.
+La clase acaba hasta las 9h00.
+¿Se atoma esa?
+¿Sí?
+Perfecto.
+Ya.
+¿Paramos la grabación?
+Literalmente ya la dos en la grabación.
+Perfecto.
+Volvemos a las 8h00, la clase va hasta las 9h00.
+Ya, perfecto.
+Ya, perfecto.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Gracias.
+Hola a todos, estamos de vuelta.
+¿Me escuchan?
+Sí, sí se le escuchan.
+Gracias, Maurice.
+Bueno, seguimos entonces.
+Un de los alumnos que fue Jesús Alexander, había hecho una excelente pregunta.
+¿Qué se pasa si las casas están cerradas?
+¿Qué se pasa si las casas están demasiado separadas o el barrio es gigante?
+Bueno, llegamos a este punto.
+No quería hablar sobre exactamente esta situación.
+Una vez nos acercamos.
+No debería ser tan influente, pero la idea es que este método funcione exactamente para
+situaciones como esta.
+Se llama local outlier factor.
+Densidad local.
+El loft comparado a densidad alrededor de un punto con la de sus vecinos.
+Entonces básicamente acá va a tener exactamente la respuesta que Alexander había nos hecho.
+¿Qué pasa si tenemos algunos locales que tienen vecindades mayores?
+Vamos a tener en cuenta exactamente cuál es el promedio de las distancias de las vecindades
+pero mirando en densidad, de la densidad alrededor, con la densidad que yo tengo.
+Bueno, si es más separado y ellos tienen una densidad similar a la mía, los locales pueden
+ser más separados, pero no hay problema.
+Vamos a ser equivalentes en esta comparación.
+Entonces este método mira más, tiene exactamente esta mirada.
+Entonces el loft compara la densidad alrededor de un punto con la de sus vecinos.
+El va a calcular el reach que va a ser el máximo de la distancia entre los puntos y rota
+y la k distancia entre rota.
+Después, él va a calcular una otra medida que se llama LRDK que va a ser uno sobre el promedio de este reach.
+Y llegamos al loft que va a ser el promedio.
+Bueno, acá tiene varias métricas.
+Una métrica importante es como ser loft.
+Voy a mostrar después como sale la cuenta para quien tiene básicamente el promedio de LRDK de sus vecinos
+dividido por exactamente la densidad de este individuo.
+Entonces quiero saber cuál es LRDK o básicamente esta densidad promedia.
+Acá en vez de estos vecinos.
+Quiero saber cómo está el promedio de mis vecinos con lo que yo tengo de densidad.
+Bueno, cuando comparo el promedio de LRDK de mis vecinos con lo mío,
+somos muy similares y este valor debería ser cercano a uno.
+Si los valores son mucho mayores, tenemos un problema muy grande
+y posiblemente este individuo tiene una alta y ansia de ser un outlier.
+Entonces miramos exactamente pensando en este punto uno.
+Por ejemplo, para un punto A, las distancias de accesibilidad a tres vecinos son exactamente 0.4, 0.5 y 0.6.
+El promedio de estos tres vecinos va a ser de 0.5.
+Cuando voy a intentar calcular esta densidad que yo tengo en relación a los vecinos va a ser 1 dividido por este promedio acá.
+Entonces fue 2.
+Para cada uno de los vecinos que tiene sus propias distancias en relación a los otros,
+voy a tener un vecino con un valor igual a 6, otro con un valor igual a 5,
+y otro con un valor igual a 7.
+Como son tres vecinos que están cerca, voy a calcular la densidad comparada con estos vecinos.
+Cuando saco un promedio de estas densidades, tengo el valor 6.
+Ahora tengo que calcular la densidad que tengo en relación a los vecinos con la densidad que salió para mí.
+Entonces tengo que mirar exactamente este partido 2.
+6 dividido por 2, me sale un valor igual a 3.
+Es un valor alto.
+Entonces, quiere decir, mis vecinos están cerca de 6, 5, 7.
+¿Cierto? Yo más 2.
+Ves que estoy muy lejos de mis vecinos.
+Si encuentro mis vecinos en promedio 6, yo estoy con un valor de 2.
+Entonces tengo ahí una diferencia de 3.
+Esto no es una probabilidad, nada de tipo, es una métrica.
+¿Cuál sería el valor de referencia?
+Si yo fuese más cercano a mis vecinos, cuando fuese calcular este valor acá,
+y fuese saliendo este valor, y saliera acá alguna cosa con 5 o 6, más o menos ahí, 5 y medio por ahí.
+Y ahí sí, ese valor estaría cercano a uno.
+Si tengo un valor 5, 5 y medio o 6, o va a ser exactamente 1, o va a ser algún valor ahí 1.2, 1.3, por ahí.
+Entonces, A tiene menor densidad que su entorno.
+El valor 3 no es una probabilidad.
+Entonces la idea es cómo va a funcionar este valor.
+Entonces podemos mirar y elegir algunos puntos.
+Después de hablar de DBSCAMP, yo quería que él des una mirada en el ejemplo que estábamos presentando anteriormente.
+Yo quiero que damos una mirada en cómo estaban los puntos, los individuos que eran posiblemente altilares, que están muy lejos acá.
+Y cuando vamos a calcular este LOF que acabé de enseñar, local outlier factor,
+cuando voy a calcular el LOF, o local outlier factor, voy a mirar el valor 1, son individuos que están muy cercanos a mí.
+Voy a definir un punto de corte, acá ellos utilizan como suherencia 1.5, si el valor es mayor que 1.5,
+defino a estos individuos como posiblemente altilares.
+Entonces cuando voy a calcular la densidad que yo tengo como la de 10.000 vecinos,
+este valor toma en cuenta exactamente estas distancias, ya que fue exactamente lo que nuestro alumno hizo una muy buena pregunta, Alexander,
+exactamente para esta solución.
+Entonces en este caso debemos ir con LOF que va a ser muy bien representativo.
+Yo entiendo que el representante KNE, LOF, va teniendo un montón de métodos acá,
+al final ustedes van a salir con varios métodos y por ello confundir cuál de ellos es mejor seguido.
+Vamos a ver una tabla al final que varios de los métodos tienen un nivel de concordancia entre ellos.
+Entonces es uno de los métodos que se puede utilizar.
+Como implementamos, tiene una función que se llama LOF que va a calcular,
+va a depender exactamente de la cantidad de vecinos que queremos elegir.
+Definí un brand de 1.5 acá y después para hacer un alert exactamente si el valor o esa puntaje fue menor que 1.5.
+En Python, la misma tiene sus versiones acá.
+Ahora vamos para una otra mirada.
+Este método de Bayescan no fue representado como método de clasificación.
+Bueno, voy a dejar con su vencencia Ricardo que preparo una clase exactamente hablando sobre Bayescan.
+Me gusta bastante, siempre enseño a los alumnos del curso de...
+Yo creo que Mauricio no se entiende de clases de Bayescan.
+Tuvimos plazas con este método, ¿o no?
+Yo estoy muy seguro, no está dentro de los principales al menos.
+Puede que lo hayamos comentado más por encima.
+Yo sé que bueno, yo realmente lo presento al menos para el majista, entonces siempre lo tengo.
+Tengo las láminas preparadas y me gusta el método porque él tiene una mirada muy buena.
+Yo sé que acá en este curso no lo representamos, entonces eso es triste.
+Es triste, ¿por qué? Porque el Bayescan es otra forma de hacer clasificación.
+En cuanto camins, va a tener un centroide y va a buscar los individuos cerca de su centroide.
+El Bayescan mira más en torno de la densidad que tenemos, ¿cierto?
+Mira que acá yo tengo una alta densidad de puntos.
+Entonces él intenta buscar una alta densidad y forma.
+Y ah, este acá posiblemente es un cluster, ¿sí?
+Y después va a identificar a estos individuos como lejos del cluster y posiblemente podría ser outliers.
+Pero básicamente lo que el Bayescan es, él va, tenemos que definir.
+Posiblemente, ¿cuáles van a ser nuestros, nuestros?
+Acá no definimos el número de grupos, ¿sí?
+El Bayescan va a tener una otra mirada en este caso.
+El Bayescan va a tener dos parámetros que son muy importantes.
+Uno que va a ser el radio que va a considerar y el mínimo de puntos que va a considerar dentro de una legión.
+Entonces, lo que el Bayescan va a intentar hacer, va a ser muy bueno acá para ustedes.
+Acá tenemos ya, entonces, muy fácil de clavar.
+Vamos a suponer que acá él va a intentar definir un centroide, ¿cierto?
+O un punto que debería ser posiblemente un centroide.
+Y va a evaluar si dentro de ese punto tengo al menos seis observaciones.
+Entonces, es posible que él sea el centro del centroide.
+Una otra situación que podría ocurrir es que este valor acá no va a tener seis puntos cuando miramos conjuntamente.
+Este va a tener no sé, uno, dos, ese debería tener seis.
+Pero vamos a ver, por ejemplo, este acá si miramos,
+puede ser este acá.
+Este acá vamos a mirar y al final cuando vamos a entrar a hacer la región que él va a considerar,
+él tiene un punto de centroide y intento mirar algunos individuos.
+Llegó solamente en dos posibles puntos de similitud que está dentro de una posible legión que puede componer un clúster.
+Pero mira que estos puntos acá están lejos y no parecen ser centroides.
+Entonces, lo que él va a intentar hacer es, voy a definir algunos puntos como posibles centroides acá.
+Estos van a ser nuestros puntos, nuestros centros que nos van a dar esa alta densidad, que tienen al menos seis individuos más cercanos.
+Va a tener algunos puntos que no, cuando miramos de forma generaria,
+él no va a tener los seis individuos, pero aunque no tenga los seis individuos, tiene ese posible centroide o ese posible punto de alta densidad como un punto en común que está dentro de la región.
+Entonces lo que él va a intentar hacer es que va a tener puntos de alta densidad, aunque va a tener puntos en la borda, en una región aca limita,
+porque realmente estos individuos no van a ser considerados fuera de este clúster.
+Porque aunque este punto no es precisamente un centroide, un punto de alta densidad,
+está siendo ligado con este punto que es un punto de alta densidad.
+Bueno, ustedes van a ver que acá vamos a tener varios puntos.
+Casi todos estos puntos que tenemos acá son puntos de alta densidad, porque ellos están siendo linkados con seis puntos o más.
+Lo que sería un punto de alta densidad, un punto que tiene al menos seis vecinos cercanos.
+Si definimos una región acá como una región, como un círculo,
+ese es un punto de alta densidad, si conocemos el dibujo del círculo, él tiene seis individuos.
+Vamos a ver que hacer un círculo para todos.
+Este punto es un punto de alta densidad, no, pero mira, este punto está linkado con un punto de alta densidad.
+Este es un punto de alta densidad, probablemente no, porque cuando vamos a hacer el dibujo acá,
+él no acaba linkando todos.
+No sé si ustedes pueden verlo, pero este individuo que tiene una relación con este individuo,
+este sí, cuando vamos a hacer el dibujo, si sacamos el centro,
+este tiene al menos seis individuos.
+Entonces, decir así, esta persona o este individuo no tiene seis vecinos cercanos,
+hacemos un dibujo de una región.
+Este valor acaba de ser lo mismo para todos, este valor.
+¿Dónde va a venir este valor? Va a venir exactamente
+de esta cantidad acá.
+¿Dónde está?
+¿De B-scala? ¿Va a venir exactamente de este épsilon que tenemos que definir?
+Y la cantidad mínima de puntos. Este épsilon va a definir exactamente la región que estamos asumiendo.
+Determinados valores de épsilon, van a permitir regiones mucho más largas.
+Otros valores de épsilon, van a definir valores más pequeños.
+Y el punto mínimo, la cantidad mínima de puntos que hay que tener para ser un punto de alta densidad.
+A ver si tengo otra denominación.
+Bueno, acá son las denominaciones que tenemos en D-B-scala.
+Épsilon va a ser esta región, este radio que vamos a tener para considerar los puntos que están cercanos.
+El mínimo de puntos va a ser la cantidad mínima dentro de este radio que vamos a tener.
+Y vamos a tener puntos con tres clasificaciones distintas.
+Tiene al menos seis puntos en su radio, o sea, es conocido como núcleo.
+En esta situación hay un núcleo, este individuo tiene al menos seis puntos dentro de
+este círculo que él dibujó.
+Va a tener algunos puntos que no van a tener exactamente seis vecinos cercanos,
+que no van a tener seis puntos dentro de esta región.
+Pero él está cerca, bueno, él contiene un individuo que es un núcleo.
+Vamos a encontrar quiénes son los núcleos, va a tener una infinidad de núcleos acá.
+Y si al menos este individuo está alincado con el núcleo, él pasa a ser un punto de borde.
+Bueno, si no es un punto de borde, tampoco es un núcleo, él va a ser considerado como un ruido.
+Y este ruido sería nuestro outlier.
+Entonces, básicamente es esto que el DBscan intenta hacer acá.
+En una clase, exactamente, de enseñando a hacer clasificación, hacer clasificación con DBscan,
+nosotros ponemos después un dibujo acá de quién sería...
+Ponemos un dibujo después de quién serían los núcleos.
+Entonces cada uno de estos puntos son posibles núcleos.
+Así usted va a ver que varios de estos puntos acá, varios de ellos,
+cuando furen empezar a evaluar muchos de ellos, van a ser núcleos.
+Algunos que van a estar en algunas regiones acá, más a la limita no van a ser núcleos,
+pero van a ser bordes, van a estar en la borda.
+Y al final va a tener individuos que no van a estar alincados.
+Ningún lado no va a ser en borda, que van a estar alincados con núcleo.
+No es un núcleo, tampoco es una borda.
+Entonces, estos individuos que están muy lejos, pasan a ser exactamente...
+DBscan, este es acá.
+Estos individuos pasan a ser exactamente conocidos como ruidos.
+Y bueno, estos ruidos pueden...
+En clasificación después, ellos pueden estar en otro grupo.
+Vamos a ver que después vamos a tener acá un otro grupo como posible ruido,
+como posible cluster, y DBscan ayuda a construir.
+Este podría ser un cluster y este podría ser un cluster.
+Tenemos los clusters, y estos otros individuos acá que serían clusters individuos,
+serían posiblemente outliers.
+Pero mira que DBscan hace muy bien esta idea de evaluar.
+Individuos que están altamente agrupados,
+y nos ayuda exactamente con esto.
+No sé si ustedes se recuerdan, pero en algún momento en una clase yo había hecho
+un diburro que tenía unos puntos así.
+Había un grupo que tenía varios puntos arriba,
+y después tenían varios abajo, que eran azules.
+Deja que me deje, déjame ver la clase.
+A ver si les vamos a ver.
+Aquí está.
+Por favor.
+Dejen que me dejen.
+Dejemos que se vean.
+Dejemos que se vean.
+Dejemos que se vean.
+Dejemos que se vean.
+y
+y
+y
+y cuando se ve una buena situación para utilizar debes que cuando intentamos correr
+correr camins nos vemos cuenta de que el camins va a encontrar un centroide acá
+un punto que va a ser acá, un centro
+y después de eso va a clasificar todos los individuos que están dentro
+dentro de esta región como individuos dentro de este cluster
+otra región, seria un centroide acá
+y iria dibujar estos individuos
+dentro de otro cluster
+debes no va a mirar exactamente de esta forma como le comenté lo que le hace es
+evalúa densidades entonces este individuo está cerca de un núcleo si todos
+estos individuos acá pero todos
+van a estar o van a ser núcleos o van a ser bordas
+entonces al final el debes va a informar
+y este acá es un grupo
+y este acá es otro grupo
+no va a ser perder en una situación como esta como ocurrió con camins
+pero profesor este está muy cerca de este no hay una distancia muy grande este está
+mucho más cerca de este individuo que este
+pero profesor este está muy cerca de este no hay una distancia muy grande este está
+mucho más cerca de este individuo pero este próximo también está cerca entonces
+ellos van a ser agrupando entonces todos estos puntos van a estar siempre agrupados
+en relación a los individuos que tienen más densidad
+entonces el método intenta evaluar exactamente esta agrupación de densidades
+entonces ahí si debes iria hacer la clasificación de este método por eso que le comenté
+a veces camins funciona bien? si pero acá hay una limitación en esta
+situación específica de B-scan debería salir mejor
+bueno en este ejemplo específico que estábamos haciendo y aplicando para los
+otros metros la distancia de Mahalanos entre otros aplicamos tanto Lof que le
+comenté ahora hace poco y estos fueron indicados como posibles
+a ultilaires tuvimos una indicación de que éstos son los posibles a ultilaires
+los métodos tienen una concordancia no mira que Lof informó que éstos individuos
+no son a ultilaires, DBScan informó que éstos puntos acá son a ultilaires
+entonces algunos métodos van a clasificar un grupo otros van a clasificar otro
+por ejemplo en KNN éstos tres puntos fueron clasificados como
+como ultilaires en cuanto con Lof no fue clasificado
+entonces KNN si lo clasificó como ultilaires Lof no lo clasificó
+al final cada uno de los metros clasifica unos puntos específicos claramente
+hay varios puntos que son a ultilaires con todos los metros pero los puntos que
+están más cerca a veces son los más difíciles de clasificar
+en este caso cuando hacemos una evaluación acá hay algunos puntos donde
+claramente todos están de acuerdo de 2001 hasta
+201, 202, 203 y 205 hay una concordancia con todos los puntos
+solamente 204 que Mahalanob indicó que no, el caso 206 es un punto que está en la
+mitad y no fue clasificado con ninguno entonces ninguno de los metros clasificó
+como un posible ultilaires pero se ve que hay una concordancia en varios de los
+puntos o la gran mayoría de los puntos entre todos los metros
+coincidencias y diferencias entre detectores solamente acá 204 Mahalanob no
+identificó bueno le apresente hasta ahora 4 métodos para ser detenidos de ultilaires
+cerramos acá nos seguimos un poquito más creo que para una clase de dos horas
+le puedo presentar como seis métodos uno de ellos es por medio de una técnica de
+componentes principales la idea es muy sencilla
+ustedes saben cómo crear nuestros componentes principales
+voy a presentar una función un poco más
+para los que utilizaron la notación un poco distinta tenemos acá nuestros
+componentes nuestros ex originales y acá nuestros fis que son nuestros
+nuestros auto vetores y lo que hacemos es que creamos componentes
+principales que va a ser un valor y, recuerdo que ese y no es la variable
+respuesta por ejemplo un vw capa para que no se pierda básicamente salimos de una
+dimensión ex que tiene una dimensión de tamaño p y estamos creando una otra
+también de dimensión tamaño p pero vamos solamente nos mantener en en vez de
+trabajar con las p dimensiones en el componente principal voy a elegir menos
+entonces así estoy con una un conjunto de covariables que tienen una dimensión de
+tamaño 20 me llegó dados del banco tengo ahí 20 covariables ya yo pensó ya
+creo que varias covariables están muy relacionadas bueno estoy teniendo
+dificultad para hacer los ajustes voy a hacer una reducción de dimensión voy
+a aplicar pca ya y ahí como se aplica pca van a crear componentes principales
+pero se recuerda que ustedes siempre van a crear la misma cantidad de
+dimensiones entonces se tengo 20 variables originales el pca va a tener 20
+variables ya pero se acuerdan que el pca mueve o acaba moviendo toda la
+variabilidad para los primeros puntos entonces no hay la necesidad de mantener
+las 20 los 20 componentes principales siendo que no sé 4 o 5 y a mantener más de
+80% de la variabilidad entonces yo puedo poner la basura 15 covariables y me
+mantengo solamente con las cinco ya cuál es la idea la idea que se uv doble es
+construido a partir de fi dado x
+recuerda que eso acaba ser estimado vamos a poner que voy a intentar hacer
+ahora en revés yo tengo los componentes principales
+yo puedo aplicar acá alguna transformación inversa e reconstruir las
+variables originales si debería ser posible se yo voy e creo componentes
+principales yo sé cuál fueron las transformaciones que logré hacer yo puedo
+envolver y crear las variables originales ya entonces antes yo tenía en el banco
+yo tengo no sé 20 covariables no quiero trabajar con las 20 que trabajar con 5
+entonces acabé haciendo una reducción de dimensión de 20 para 5 pero el truco
+acá es que si estoy saliendo de x que tiene 20 y estoy llegando en este que
+tiene 5 se va a tratar de hacerlo inverso ahora voy a salir de uv doble con 5 y
+tiempo recriar x con 20
+cuál va a ser la diferencia entre el x y el uv doble que fue creado
+y eso acaba siendo el error de reconstrucción
+si el método funciona bien el método está muy bien como tengo las buenas
+oposiciones los valores no son tan raros no son tan no son autiláeos este error
+debería ser lo menor posible bien entonces miramos exactamente con
+eso y ahí viene una idea muy rara de componentes principales
+lo que vamos a intentar hacer es tenemos nuestra matriz z de variables
+centrales o sea nuestros x que ya fueron centrales estandarizados ya tenemos
+nuestros auto vetores orto normalizados acá están como las cargas de las
+primeras r componentes ya si tengo z y tengo pr yo tengo ahora entonces los
+componentes principales el tr acá que está siendo llamado ya
+entonces tr contiene las coordenadas en el subespaço retrimido la palabra que
+está un poco complicada lo que tenemos acá en nuestros componentes principales
+pero el juego ahora es hacer el cambio yo tenía las variables originales como
+le comenté las con variables del banco logré hacer una reducción de
+dimensión ahora que al intentar recriar las variables originales
+simplemente teniendo los componentes ajustados y esa reducción de dimensión
+que logramos hacer bueno yo tengo una estimativa de cómo
+debes decir las variables originales tengo estimado los ex ahí que me vio del
+banco pero yo conozco cual fue los reales entonces puedo calcular la diferencia
+entre ellos y voy a tener exactamente ese error ya
+entonces ahí va a ser nuestro error con reconstrucción entonces la diferencia
+midi lo que no quedó bien representado ya entonces vamos a tener una diferencia
+porque yo estaba en 20 barria 5 ahora estoy intentando volver a 20 o ver una
+pérdida de información ahí ya y miramos exactamente en esa pérdida
+de información
+nuestro objetivo entonces va a ser durante esta reconstrucción los
+individuos que están más malo reconstruidos son individuos que tienen un
+comportamiento más lejos de lo que se espera y para que se vea el cambio
+y pasan a ser considerados altilares ya pues es cuando voy a intentar hacer la
+reconstrucción original van a ver que ellos tienen casi el mismo comportamiento
+pero va a tener puntos ahí por ejemplo un punto acá y un punto acá que está muy
+lejos de la reconstrucción original pero muy lejos ya b está muy lejos del
+centro ya también está lejos del centro pero también pero b permanece la
+reta ya a no está tampoco en la reta acá y tampoco permanece en el centro
+el objetivo es tener los puntos lo más cerca de la reta y también del centro
+si entonces se ve que se ve y se ha sido los puntos que me parecen más raros en
+esta base no se podrían ser considerados posiblemente altilares pero
+profesor hay otros otros podemos mirar en esos puntos ese podría ser un
+y se podría ser también un posible y ahí pasa a tener esa estructura la
+reconstrucción acá algo muestro para ustedes cómo hacemos las cuentas lo que
+creo que para ustedes no va a ser una cosa muy interesante pero básicamente
+lo que intentamos hacer es exactamente esta ida hacemos reducción de dimensiones
+pues hacemos la vuelta ya
+y ahí esa diferencia entre ellos pasa a ser esa reconstrucción bueno voy a hacer
+una aplicación acá para que vean cómo funciona la cosa vamos a aplicar un
+control de dados que son canciones tiene siete variables numéricas entonces la
+idea es hay algunas canciones que tienen variables que hacen son tan distintas
+que acabo nación no con que sean consideradas como altilares y entonces
+vamos a evaluar si hay variantes canciones que son muy distinto de que
+realmente está como un promedio bueno para eso voy a tener algunas variables
+originales acá la acusness que un carácter acústico la danciabilidad que
+se una bailabilidad energía energy liveness la presencia del público
+gravación en vivo la unis nivel de solonidad es piscines la presencia de
+voz hablada y instrumentales se tiene un carácter más instrumental por
+supuesto la música tiene un carácter instrumental debe ser un poco más
+distinto de uno que tiene una presencia muy grande de voz si los objetivos
+intentar bueno esos valores cómo funciona esos valores fueron construidos
+con base a una métrica específica y también con una base de una métrica
+específica ya y esas métricas van a tener un escor específico cada una de
+ellas ya entonces lo que vamos a hacer acá va a ser yo tengo uno dos tres cuatro
+cinco seis siete entonces el ex que tengo acá
+tiene una dimensión de tamaño 7 ya bueno no voy a trabajar con ex porque
+necesito estandarizar los dados para hacer la transformación y el
+transformación en z que también va a tener la dimensión de tamaño 7 ya lo que
+voy a intentar hacer ahora va a ser crear un y acá un v doble que podría ser los
+dos que va a ser esa representación de parámetros estimados acá
+autovetores que hace la construcción y este es el centro
+entonces voy a intentar estimar los componentes con eso voy a trabajar con un
+v doble de dimensión de tamaño 7 no ya lo que voy a intentar hacer es voy a
+trabajar con él de una dimensión de tamaño no sé cuatro
+y ahí tengo ahora una cosa que está saliendo de siete y está indo a cuatro
+o una reducción de dimensión la pregunta que no puede tener es
+es posible reconstruir eso con conocen los parámetros originales que
+fueron utilizados y el uv doble que se estimó
+salió una buena representación no sé tengo que calcular la diferencia de lo que
+tenemos y lo que fue estimado ya voy a tener un momento de acá este error no
+será exactamente los puntos que nos van a identificar cuáles son nuestros
+las músicas están todas el oceano y acá puedo poner los reales de dimensión de
+tamaño 7 entonces va a ser una cosa que va a salir de los reales y también va
+para los reales
+bueno
+entonces ya sabemos cuáles son los covariables tengo siete covariables acá
+197 canciones y voy evaluando cuánto de la variencia sabemos que el componente
+principal nos da esta información voy evaluando cuánto de esta variencia es
+explicada por cada uno de los componentes ya entonces el primero
+componente va a explicar 30% de la variabilidad segundo 40 el tercero casi
+60 el cuarto casi 70 después de 80% 81% 5 componentes de la variabilidad
+después de 80% 81% 5 componentes ser tenidas tengo más de 80% de la variabilidad
+entonces estoy poniendo en la basura dos puntos
+ya bueno después de hacer todo isso y acelerar de burro acá en ese punto voy
+utilizar estos componentes principales que fueron creados
+voy a intentar hacer ahora la reconstrucción y voy a calcular la
+diferencia o voy a calcular este error que le comenté ya está
+ya bueno este error va a ser el cu en una escala estandarizada
+va a ser exactamente estos posibles puntos acá
+entonces estos fueron los puntos que tuvimos mayor dificultad para hacer la
+reconstrucción entonces es posible que estos puntos
+tengan una alta probabilidad de que estos puntos sean los outliers
+los especiales ayuda a ser eso de una forma más estadística más formal
+comparando los estimados tener una regla decisión un poco más bien definida
+las primeras cinco componentes explican 87.75% de la varianza
+el corte de cu en el cuantio 95 marca 10 canciones para revisar ya bueno
+explicar mucha varianza no va a garantizar detectar todas las anomalías
+generalmente mantenemos más de 80% de la variabilidad como tenemos ese cambio
+hacemos este tipo de aplicación si bueno yo le comparto con
+con el r que va a tener las canciones que van a sacar
+las con variables acá de las canciones va a hacer la transformación
+o va a ser la estandarización y después ajustar los componentes principales
+después de ajustar los componentes principales vamos a ir vamos a tener la proyección
+entonces voy a intentar hacer la predicción
+voy a intentar estimar que el nube doble que había comentado ya con base en los
+componentes principales y nuestros ex acá después de hacer
+esto voy a intentar hacer la reconstrucción entonces voy a comparar ya voy a intentar
+construir lo que había comentado anteriormente voy a intentar construir
+acá voy a intentar construir ese valor después de construir
+eso ya en esta proyección voy a intentar hacer la reconstrucción ahora
+ya o bueno ese acá fue la proyección
+ahora voy a intentar hacer la reconstrucción la reconstrucción va a ser de ese acá
+el ese lado ya después de hacer la construcción la
+reconstrucción voy a calcular la diferencia entre las la reconstrucción y
+los valores originales ya y ahí voy a tener ahí este umbral de 0 de
+95% definimos como es el valor de por medio del contín
+y clasifico las posibilidades de utilizar los que están muy lejos o 5%
+más arriba en términos de los contínuos ya y bueno ese es una forma
+interesante de utilizar a componentes principales
+bueno también se puede hacer en paíton ya vamos a seguir un poco por
+tiempo de tiempo de los tres recibimos dos códigos en paíton vamos a hacer lo mismo
+tiene que ser nuevamente primeramente la construcción en pca pca.fi de con los
+estandarizados después va a ser la proyección ya después de hacer la
+proyección tiene que hacerla con reconstrucción o lo que sale de la proyección en los
+componentes principales después calcula la diferencia bueno por medio de las
+canciones el cu acá que tuvimos indica que las posibles canciones
+133 65 109 148 y 38 son posibles
+a utilizar el que está influenciando demasiado en nuestra la vez entonces
+ustedes tienen que hacer una análisis de la vez de su trabajo
+podrían aplicar ese método y evaluar cuáles son los posibles puntos que salieron
+como el tiempo después de salir estos puntos como el tiempo hay que evaluar porque
+ellos están teniendo este comportamiento si es posible por temas de un error o una
+cosa del tipo ser más alguna de roa y a ver cuenta que estos individuos se
+están influenciando demasiado estamos haciendo con que tenga malas predicciones
+y ahí nos eliminan bueno monitorear observaciones nuevas con pca
+vamos a ajustar las medias vamos a hacer las escalas de los componentes con los
+dados de referencia establecer el corte con esa referencia o con la
+sensación se puede ser cruzada estandarizar cada nuevo dato con la misma
+media escala o sea no tener vazamento acá siempre que tenemos nuevos dados
+tener que tener cuidado con ese es el pan de vazamento de dados
+proyectar reconstruir comparar con un correto de fixo y investigar las alertas
+y revisar cambios persistentes del proceso ya bueno eso pasa demasiado es
+muy importante hacer los cambios no eliminar los datos por ejemplo mi esposa
+está siendo doctorado y llegó exactamente cuando algunas personas comenza
+tenía varias observaciones que los dados tenían no debería tener cero y
+tenía cero o debería ser un valor 3 o 4 o 3 o 4 o 5 pero en la base parece 3 o 4
+entonces después de poner estas observaciones en la basura
+tiene que evaluar lo que estaba pasando ya para no tener que perder información
+bueno
+es una forma muy interesante de hacer la cosa por medio de componentes
+principales entonces ahora conocemos cinco metros de dirección de utilares
+mi objetivo es presentar el último que se llama Isolation Forest
+bueno Isolation Forest es un metro muy interesante me gusta bastante la idea de
+como fue construido o como viene la idea de hacer la construcción de
+de
+de esta identificación de utilares ya
+utilizo de una forma muy inteligente básicamente lo que va a hacer es
+vamos a tener los puntos varios puntos acá
+la idea es la siguiente si ustedes estaban trabajando con
+hábitos que tenían una variable respuesta para dar una mirada
+intentaban minimizar o encontrar la división acá
+intentaban estimar cuál sería la mejor división por ejemplo si voy a ser la división
+así
+la cosa que una árbol lo que la va a hacer es un espacio de particiones
+básicamente voy a tener una situación como ésta y evalúo
+si se corta el mensaje bien ya por ser voy a tener acá
+un árbol donde x2 es menor que 1 ya
+y evalúo este punto interesante o no, entonces voy a intentar hacer cortes acá
+y el mejor corte que minimizo es el punto que va a ayudar a mejorar la
+predicción
+entonces lo que va a hacer es empezar a hacer varios puntos de corte
+acá intentamos hacer de una forma más inteligente
+tener un punto así y un punto así después empezar a hacer otras divisiones
+otro punto acá
+cuál es la idea del isolation force lo que va a intentar hacer es
+vamos a crear divisiones aleatóricas
+no voy a determinizar nada acá, voy a generar una posible división aleatórica
+la posible división aleatórica sería esta
+ok
+vamos siguiendo con esta división, una posible y otra segunda división podría ser
+esta
+mira que interesante
+con solamente dos divisiones, una división así y otra así
+yo alcance a isolar un punto específico
+bueno ustedes están de acuerdo que este punto acá fue extremamente fácil de isolar
+pero recuerden que estas divisiones se hacen de forma aleatória
+entonces la próxima división puede venir acá
+una otra puede venir acá
+bueno, perdón
+una otra puede venir acá
+pero es muy poco probable que existan tan cercanas al menos al inicio
+entonces lo que va a pasar son divisiones así, aleatóricas
+una cosa que es muy importante es que estos puntos que no parecen ser autilares
+tal vez este, acá no, este también no tiene la indicación que debería ser
+pero puntos como este, estos que están más lejos podrían ser posibles autilares
+pero hay varios puntos que están cerca
+de hecho, si voy corriendo demasiado este tipo de división
+me va a tomar mucho tiempo para crear una regla donde voy a isolar este punto acá
+¿cierto?
+bueno yo alcance a isolar este, este, este, este y este
+y ahí viene la idea de Isolation Forest
+vamos a crear varias particiones aleatórias
+voy a crear varios caminos aleatórios acá
+varias particiones aleatórias y voy a evaluar
+cuántas veces me tomó, cuántos cortes o cuántas divisiones tuve que hacer
+para que este punto fuese separado o fuese de alguna manera isolado
+y mira que interesante, este punto fue isolado de una forma muy rápida
+en 12 interacciones solamente, 2, 3
+este acá se quedó isolado en 3 o 4, este también 3 o 4
+pero estos otros puntos acá van a tomar como no sé, 40, 50, 60, 70
+tal vez 1000 divisiones para isolar cada uno de estos puntos
+entonces el método que intenta hacer es, él intenta evaluar
+cómo fue la división
+vamos a hacer un conteo de cuántas divisiones
+cuántas divisiones nos tomó para isolar cada uno de estos puntos
+Outliers deberían ser isolados en pocos pasos
+estos puntos acá que están muy aglomerados le van a tomar muchos pasos para isolarlo
+mientras estos puntos se quedaran isolados con una rapidez muy grande
+y esa es la idea, vamos a crear árboles, vamos a intentar isolarlos
+voy a crear una otra, voy a intentar isolar, voy a crear otra, voy a intentar isolar
+voy a intentar hacer esto muchas veces y después evaluo cuáles fueron los puntos que lograron ser isolados
+de una forma más rápida, de forma general
+porque una cosa que no me puede pasar es, ok, de alguna manera
+alcancé a isolar este punto acá, en tres interacciones
+pero si voy a correr esto un montón de veces, ¿esto va a pasar?
+no, creo que puede ser poco probable, de hecho acá no fue lo que ocurrió
+si replico esto un montón de veces, este punto fue isolado en algún momento
+pero en general no va a ser isolado, entonces no es un posible Outlier
+la idea va a ser, vamos a intentar hacer, crear árboles de aislamiento
+vamos a intentar isolar, o dejar aislado
+con algo de isolar acá, se va a aislar
+dejamos ellos como separados solos
+pues cada árbol de aislamiento usa una subamoestra de los dados
+vamos a hacer esto un montón de veces con las muestras que fueron creadas
+vamos a elegir una variabilidad al azar, básicamente esto es el paso que funciona con Randall Forest
+vamos a elegir cuáles son las variabilidades que van a entrar
+y después elegimos las variabilidades, si empezamos a hacer divisiones
+cómo se quedan estos puntos, vamos a elegir un corte al azar
+dentro de su rango, vamos a separar los puntos a ambos lados y repetir
+se detiene al aislar puntos o alcanzar la limita de profundidad
+vamos a utilizar el corte al azar, vamos a separar los puntos a ambos lados y repetir
+cada ahorro con varios puntos requiere una corrección de longitud
+la idea es que ustedes van a hacer divisiones
+conforme van a hacer divisiones
+la idea es que se voy a hacer divisiones acá
+varios divisiones en el espacio, donde voy a tener varios puntos
+ya
+si vamos a hacer un montón de divisiones, al final lo que estamos haciendo es
+creando árboles
+y ustedes están haciendo una árbol extremamente profunda
+entonces la idea es que tampoco la árbol sea muy profunda
+entonces ellos no van a intentar penalizar eso para que las árboles no sean muy profundas
+y básicamente como esto va a funcionar, va a ser varias divisiones
+va a ser un conteo de las veces que logramos isolar estos puntos
+por ejemplo un punto central se va a requerir más cortes
+pero mira que en algún momento ya empezamos a isolar estos puntos
+después de correr este algoritmo varias veces como hacemos en Ramon Flores
+vamos a tener ahí los posibles puntos que aparecieron con una gran frecuencia
+bueno acá es una otra forma de calcular
+puntar el isolation forest, una forma clásica de calcular el puntar
+12 elevado a la esperanza
+de una función artx de partido phi psi
+donde esa esperanza es la longitud media corrida del camino
+y si, si normaliza por el tamaño de la subiamosa
+básicamente acá estamos mostrando una suma de las frecuencias
+básicamente acá estamos mostrando más o menos como funciona por vista
+un poquito más detallado
+básicamente vamos a tener algos, podemos ajustar acá 300 algos
+y lo que va a controlar, cuántos caminos se combinan para obtener el puntaje
+una subiamosa después de 256
+cuántos regíso en cada árbol no son 256 variables
+la contaminación en Skyland es determinada por el número de arbol
+en Skyland determina el corte o convertir puntarres clásicas
+para el final de continuo 95
+lo que vamos a hacer, vamos a aplicar el conjunto de dados cardio
+que había empezado a aplicar en ustedes anteriormente
+lo que vamos a hacer es, tenemos en una situación con dados cardio
+1655 personas normales
+y 166 personas que tienen alguna dificultad y alguna anomalía
+son cosas que no salieron bien durante la evaluación de la imagen
+pero el objetivo es, ok, en esta base yo conozco quiénes somos normales y quiénes no somos anómalos
+pero puedo utilizar estos métodos para intentar reconstruir los posibles anómalos
+es decir, el método aplicado desde el punto de vista de evaluar individuos anómalos
+individuos que tienen un comportamiento más raro
+de hecho, alcanzamos a hacer eso
+para hacer eso voy a hacer una división entre el conjunto de entrenamiento y validación
+voy a ajustar el modelo de Isolation Forest en el conjunto de entrenamiento
+y después lo comparo en un conjunto de prueba
+acá estoy dividiendo en 70-30%
+pero profesor, no tenemos el label, la idea es que ustedes no registren el label
+entonces en una aplicación real no se puede hacer ese tipo de validación
+pero acá como otro ejemplo sí lo podemos hacer
+entonces en el conjunto de entrenamiento tenemos 1159 observaciones
+y de donde esos 1000 son normales
+y 122 son anómalos, en total 1281
+en el conjunto de prueba dejamos casi 500 personas normales fuera
+y 54 demos anómalos
+voy a evaluar cómo funciona el método para acá y después intentar informar
+en esos puntos alcanzamos clasificar los 54 como posibles anómalos
+entonces inicialmente voy a hacer la reconstrucción con PCA
+entonces la misma cosa, ajusto el PCA con ese conjunto acá
+voy a hacer la reconstrucción con ese conjunto acá
+después de hacer la reconstrucción voy a aplicar el nuevo conjunto de prueba
+o sea ese conjunto no fue utilizado para estimar los parámetros acá
+después de evaluar el conjunto de prueba me pasaré posibles valores
+este total aquí, 450
+y ahí voy a comparar de los normales, cuántos anómalos clasifico correctamente como normal
+los anómalos, cuántos clasifico correctamente como anómalos
+recuerda que durante el entrenamiento no utilizamos exactamente esa minimización
+no minimizamos los resultados con base en el label
+entonces este label acá no fue utilizado para entrenar el modelo como conocemos y aprendizamos en supervisado
+bueno, aplico el PCA, acá ya vamos a ver cómo salen los resultados
+pero también aplico Isolation Forest, que es tanto IR como IPyte
+bueno, tenemos la batería de confusión que no salió
+ya con esta base nueva, eran 500 y pocas observaciones
+mira que el método clasifico correctamente las personas normales que no tenían ninguna modificación
+483% de las veces, ahí está super bien
+pero para detectar los puntos que eran anómalos, fue solamente 16%
+entonces el PCA dejó
+de clasificar 38 personas o 38 exames de cardio
+que de hecho eran anómalos pero la precisión salió normal
+muestra que el método no tiene una precisión muy perfecta
+pero tampoco es un método tan malo
+la acuracia de este método es 0.9
+pero ahí que es muy importante evaluar la sensibilidad
+mira, la sensibilidad solo tenía un número de personas
+entonces el método identifica posibles autilajes, posibles informaciones anómalas
+pero no identifica de una forma con una precisión muy grande
+bueno, intentamos aplicar estas tres versiones
+tanto con el PCA, como con Isolation Forest
+ya?
+y todo eso
+ya está, ya está, ya está
+ya está, ya está, ya está
+ya está, ya está, ya está
+ya está, ya está
+ese tipo de precisión
+en el conjunto, intentamos
+ajustamos el modelo
+sin utilizar la vagabina expuesta en PCA
+y ajustamos también con Isolation Forest
+ajustado a esto, aplicamos este modelo en un conjunto de prueba
+el segundo de prueba no fue utilizado para el entrenamiento
+no sé la acuracia funcionó bien
+de hecho Isolation Forest en él no sale con 0.91
+pero la sensibilidad
+no sale supermalo, está siempre clasificando malo un montón de gente
+está clasificando siempre malo
+clasificó bien en el ejercicio
+entonces clasificó malo ahí
+predito que él fue malo, predito como malo
+entonces al final la clasificación salió como 51
+51 de 500 y poco
+bueno, 10% de caso está clasificando malo
+ya?
+bueno, la sensibilidad está mala
+hay que mejorar esto, este modelo no tiene una buena sensibilidad
+entonces no nos ayuda mucho
+y bueno, puedo calcular también por la área sobre la curva rock
+pero una cosa así
+el PCA va a coincidir
+tanto en las lenguajes
+ya no va a tener problemas con R-Python
+pero los bosses como hacemos construcciones de forma aleatoria
+entonces, segura que el PCA lo estimamos
+lo estimamos, siempre con el proceso de maximización
+es lo mismo
+Presolation Forest
+tiene un componente aleatorio
+la semilla no es la misma que utilizamos en R
+por eso eso cambia
+por supuesto luego cambian los resultados
+y ahí hacemos una comparación
+entonces podemos tratar de comparar el método como si tuviésemos el label
+como si tuviesemos una variable de respuesta
+solamente para confirmar que el método funciona
+pero en general no vamos a tener los labels
+bueno, dibujé también la área sobre la curva rock acá
+se ve que el ESF funciona mejor
+y bueno, uno puede cambiar el umbral para ver también si mejora
+la clasificación de la sensibilidad
+y en este caso cuando cambiamos el umbral para 0.4994
+tuvimos un cambio de sensibilidad mejorado un poco para 0.815
+con un corte mayor, menos alertas aquí y menor sensibilidad
+entonces el ranking no cambia
+la área sobre la curva rock siempre será mantenida en 0.9
+porque acá si vamos cambiando el umbral
+recuerda que la área sobre la curva rock no toma en cuenta el umbral
+calcula la área, exactamente cambiando estos valores del umbral
+pero por supuesto el umbral nos va a informar o va a cambiar
+en términos de la sensibilidad
+bueno, el ESF va a hacerse varios cortes
+y nos va a ayudar exactamente a clasificar a estos individuos
+de forma general le presenté varios métodos
+como el HIC, Mahalanobis, KNL, Loft, TBScan, PCA
+y Isolation Forest
+ahora se conoce varios métodos para poder hacer clasificación
+y ojalá pueda aplicar al menos alguno de ellos en su trabajo
+era esto que quería hablar por hoy
+cerramos exactamente a las 9
+dejamos solamente algunas decisiones acá
+para ver si hay etiquetas, lo que hacer si no hay etiquetas
+básicamente las formaciones que ya conocemos
+si tenemos etiquetas vamos a pensar en supervisar
+si no hay etiquetas nada que hacer
+era esto que quería comentar con Ceres
+los códigos están disponibles
+pueden correr
+en la próxima ayudantía me junto con Ceres para revisar el contenido
+y ahí corremos más ejemplos
+pero todos están acá, la distancia de Mahalanobis
+si no corre el código no va a tener problemas
+la distancia de Mahalanobis, el KNL como había comentado
+Lofty
+TBScan
+PCA
+y por fin
+ah sí, ese no
+está todo acá, la base PtD
+entonces como corre el código no va a tener problemas
+el TBS va a salir exactamente a la base PtD
+ahí no vamos a ver el chip program
+el nombrar y los componentes que me sacan
+los scores, el nombrar, todo lo que necesita
+como ser isolation for, es cual fue lo mejor nombrar
+entre otros
+y como se ve aquí, el nombre de la base PtD
+el nombre de la base PtD
+y como se calcula la area sobre la cruzahog para estos casos
+como cambia también la sensibilidad cuando vamos a hablar con quantiles
+cuando vamos a hablar con quantiles
+bueno, en fin, sería eso que había planificado para ustedes
+tienen los códigos
+ya saben cómo aplicar varios métodos para detección de outliers
+bueno, cuando le preguntan, saben cómo evaluar detección de outliers
+a la hora saben varios métodos y los métodos muy poderosos
+los que damos acá no porque
+se tienen problemas con outliers
+pueden buscar siempre métodos nuevos
+yo vi gente trabajando con su support vector machine
+con redes neuronales, hay varias formas nuevas de intentar detectar outliers
+estas son las más conocidas
+que ya están bien implementadas, esencias para que ustedes puedan trabajar
+y tener un poder muy bueno para detectar los posibles valores outliers
+bueno, era eso que había planificado para hoy
+estoy disponible a preguntas
+profesor, una pregunta Claudia por acá
+en relación a la clase del jueves
+se nos va a presentar el taller que tenemos que resolver
+y así mismo la clase va a estar enfocada presentando el taller
+o va a ser una clase distinta?
+esa es una excelente pregunta Claudia
+yo vi la programación y el profesor que va a estar responsable por el taller es Eloy
+voy a dejar una pregunta para Eloy, exactamente para eso
+porque no sé si él no sabe cómo va a ser
+tiene que preguntar a Ricardo
+pero lo ideal sería que los ayudantes ya tienen esa información
+ahí esa duda debería contestar a Claudia lo más pronto posible
+todavía si no tengo idea cómo va a ser el taller
+Ricardo no me informó
+entonces, bueno, voy a tener la clase de ahora
+que fue ahora ese martes
+y tengo la próxima el próximo martes
+y ahí encerra mi participación en el diplomado
+entonces la de jueves ahora tenemos que preguntar
+exactamente para Eloy porque él es responsable por ese curso
+aproveché de preguntar como usted siempre dice que siempre están en contacto con el profesor
+por eso aproveché de la instancia
+Eloy, por ejemplo, lo que yo hago con el vacío
+en ese sábado no tenemos, no hay repaso, solamente el próximo
+entonces mañana yo iría preguntarle a Eloy, ¿cómo está la cosa?
+¿podemos compartir el material?
+porque ahí yo preparo un repaso conjunto
+pero como no tenemos repaso no voy a abrir con Eloy
+entonces no sé cómo Eloy va a hacer con el tema del taller
+pero si no, yo vi a Eloy hoy en la universidad
+entonces como tres veces hablamos pero no le pregunté sobre eso
+lo siento Claudia
+yo vi ese tema del taller también me quedé curioso
+¿cómo va a ser? porque no es una clase, Eloy no va a aplicar, ¿cómo va a ser?
+los ayudantes no tendrán que apoyar en eso
+realmente lo siento, no tengo la información
+o qué?
+gracias de todas formas
+gracias, bueno, lo siento
+pero Mauricio, Vanessa, tienen la duda ahí
+idealmente hablen con Ricardo mañana temprano
+y envíen un correo para Claudia y para los alumnos ya informados cómo va a ser
+ok, sí le vamos a hacer llegar la pregunta
+perfecto, muy bien
+si no hay nada más nos vemos el próximo martes
+me junto con ustedes el próximo martes
+que le va muy bien muchas gracias a todos que tengan una buena noche
+gracias profe, chau chau
+gracias, buena noche
+chau que tengan una buena noche

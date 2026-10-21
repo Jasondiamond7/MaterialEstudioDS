@@ -1,0 +1,125 @@
+# CLASIFICADORES: REGRESION LOGISTICA Y SVM
+# Ejecutar de arriba hacia abajo, por bloques, en RStudio.
+# En toda la clase: 0 = benigno; 1 = maligno.
+
+# 1. Preparar la sesion ----------------------------------------------------
+# Instalar solo una vez, desde la consola:
+# install.packages(c("e1071", "pROC"))
+
+library(e1071)
+setwd("D:/codigos")
+
+# 2. Leer y mirar los datos ------------------------------------------------
+datos <- read.csv("wisconsin_clase.csv")
+print(head(datos))
+print(table(datos$maligno))
+
+# El color indica la clase real. Estos son solo dos de los cuatro predictores.
+plot(datos$radio, datos$textura,
+     col = ifelse(datos$maligno == 1, "tomato3", "steelblue"), pch = 19,
+     xlab = "Radio", ylab = "Textura", main = "Datos: clases reales")
+legend("topright", legend = c("Benigno", "Maligno"),
+       col = c("steelblue", "tomato3"), pch = 19)
+
+# 3. Separar entrenamiento y prueba ---------------------------------------
+# La particion ya viene en el CSV: 398 casos para aprender y 171 para evaluar.
+# No usamos los casos de prueba para ajustar los modelos.
+entrenamiento <- subset(datos, conjunto == "entrenamiento")
+prueba <- subset(datos, conjunto == "prueba")
+
+variables <- c("radio", "textura", "suavidad", "concavidad")
+x_entrenamiento <- entrenamiento[, variables]
+y_entrenamiento <- factor(entrenamiento$maligno, levels = c(0, 1))
+x_prueba <- prueba[, variables]
+y_prueba <- factor(prueba$maligno, levels = c(0, 1))
+
+# 4. Regresion logistica ---------------------------------------------------
+logistica <- glm(maligno ~ radio + textura + suavidad + concavidad,
+                 data = entrenamiento, family = binomial())
+print(summary(logistica))
+
+# type = "response" entrega P(maligno = 1), no una clase.
+probabilidad <- predict(logistica, newdata = prueba, type = "response")
+print(head(probabilidad))
+
+# Fijamos el umbral en 0.5: una probabilidad de 0.7 se clasifica como 1.
+clase_logistica <- factor(ifelse(probabilidad >= 0.5, 1, 0), levels = c(0, 1))
+matriz_logistica <- table(Real = y_prueba, Prediccion = clase_logistica)
+print(matriz_logistica)
+
+# Filas = clase real; columnas = clase predicha. El orden es 0, 1.
+# [1,1] = VN; [1,2] = FP; [2,1] = FN; [2,2] = VP.
+# Exactitud = (VN + VP) / total.
+# Sensibilidad = VP / (VP + FN): proporcion de malignos detectados.
+# Especificidad = VN / (VN + FP): proporcion de benignos bien clasificados.
+
+# 5. SVM lineal ------------------------------------------------------------
+# La respuesta es factor para indicar que hacemos clasificacion.
+# scale = TRUE estandariza con el entrenamiento y reutiliza esa escala al predecir.
+# En R, cost es el parametro C de las diapositivas.
+svm_lineal <- svm(x = x_entrenamiento, y = y_entrenamiento,
+                  kernel = "linear", cost = 0.1, scale = TRUE)
+clase_lineal <- predict(svm_lineal, newdata = x_prueba)
+matriz_lineal <- table(Real = y_prueba, Prediccion = clase_lineal)
+print(matriz_lineal)
+
+# 6. SVM radial ------------------------------------------------------------
+# cost penaliza las violaciones del margen; gamma controla el alcance de la similitud.
+# Usamos las configuraciones de la clase, sin elegirlas mirando prueba.
+svm_radial <- svm(x = x_entrenamiento, y = y_entrenamiento,
+                  kernel = "radial", cost = 10, gamma = 0.1, scale = TRUE)
+clase_radial <- predict(svm_radial, newdata = x_prueba)
+matriz_radial <- table(Real = y_prueba, Prediccion = clase_radial)
+print(matriz_radial)
+
+# 7. Comparar los resultados -----------------------------------------------
+# mean(prediccion == real) es la proporcion de aciertos.
+comparacion <- data.frame(
+  Modelo = c("Logistica", "SVM lineal", "SVM radial"),
+  Exactitud = c(mean(clase_logistica == y_prueba),
+                mean(clase_lineal == y_prueba), mean(clase_radial == y_prueba)),
+  Sensibilidad = c(matriz_logistica[2, 2] / sum(matriz_logistica[2, ]),
+                   matriz_lineal[2, 2] / sum(matriz_lineal[2, ]),
+                   matriz_radial[2, 2] / sum(matriz_radial[2, ])),
+  Especificidad = c(matriz_logistica[1, 1] / sum(matriz_logistica[1, ]),
+                    matriz_lineal[1, 1] / sum(matriz_lineal[1, ]),
+                    matriz_radial[1, 1] / sum(matriz_radial[1, ]))
+)
+print(comparacion, digits = 3, row.names = FALSE)
+
+# Mirar sensibilidad ademas de exactitud: los errores no tienen el mismo costo.
+barplot(comparacion$Sensibilidad, names.arg = comparacion$Modelo,
+        col = c("steelblue", "darkorange", "seagreen"), ylim = c(0, 1),
+        ylab = "Sensibilidad", main = "Malignos detectados en prueba")
+
+# 8. Predecir un caso nuevo ------------------------------------------------
+nuevo <- data.frame(radio = 14, textura = 20, suavidad = 0.10, concavidad = 0.08)
+print(predict(logistica, newdata = nuevo, type = "response"))  # Probabilidad de maligno.
+print(predict(svm_radial, newdata = nuevo))                   # Clase: 0 o 1.
+# Los modelos pueden discrepar. Este ejemplo es docente, no un diagnostico.
+
+# 9. AUC de los tres modelos ----------------------------------------------
+# La AUC usa probabilidades o puntajes continuos, NO las clases 0/1.
+# Compara el ordenamiento entre benignos y malignos al variar el umbral.
+auc_logistica <- pROC::auc(y_prueba, probabilidad,
+                          levels = c("0", "1"), direction = "<", quiet = TRUE)
+
+pred_lineal <- predict(svm_lineal, newdata = x_prueba, decision.values = TRUE)
+pred_radial <- predict(svm_radial, newdata = x_prueba, decision.values = TRUE)
+
+# En estos ajustes de e1071, la columna "1/0" compara maligno con benigno.
+# Un puntaje mayor favorece la clase 1. No es una probabilidad.
+puntaje_lineal <- attr(pred_lineal, "decision.values")[, "1/0"]
+puntaje_radial <- attr(pred_radial, "decision.values")[, "1/0"]
+
+# levels fija 0 = control y 1 = caso; direction="<" indica puntajes mayores en 1.
+# Fijamos la direccion, sin elegirla automaticamente a partir de prueba.
+auc_lineal <- pROC::auc(y_prueba, puntaje_lineal,
+                       levels = c("0", "1"), direction = "<", quiet = TRUE)
+auc_radial <- pROC::auc(y_prueba, puntaje_radial,
+                       levels = c("0", "1"), direction = "<", quiet = TRUE)
+
+comparacion$AUC <- c(auc_logistica, auc_lineal, auc_radial)
+print(comparacion, digits = 4, row.names = FALSE)
+# AUC = 0.5: ordenamiento al azar como referencia; AUC = 1: ordenamiento perfecto.
+# Una AUC de 0.98 NO significa 98% de clasificaciones correctas.

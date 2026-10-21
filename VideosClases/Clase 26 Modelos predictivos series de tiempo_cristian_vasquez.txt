@@ -1,0 +1,511 @@
+ya está disponible en el portal del curso. Pueden acceder a él. Lo actualicé una diapositiva hace un ratito, ¿ya? Pero básicamente cambié un par de cositas. Un par de detalles.
+A ver, la clase del día de hoy está enfocada en modelos para series de tiempo estacionarias. ¿Ya?
+La clase pasada vimos una breve introducción, hablamos un poco del concepto de ruido blanco, hablamos del concepto de cuando una serie de tiempos es estacionaria, y hablamos también de la descomposición inicial que se puede realizar una serie de tiempos y ilustramos la descomposición aditiva.
+Eso fue lo que hicimos. Entonces, hoy día vamos a entrar ya en profundidad los modelos de series de tiempo estacionarios que se utilizan en la práctica. A ver, hay una amplia cantidad de modelos que son estacionarios, ¿ya?
+Ya sea por la estructura que sea, o por la definición misma que tengan estos procesos. Y lo que vamos a hacer nosotros, nosotros vamos a revisar los modelos de Box y Jenkins, que son una familia de modelos ARMA, ¿ya?
+ARMA es la sigla que significa autorregresivo de medias móviles y la gracia de estos modelos, que estos modelos nos permiten aproximar cualquier fenómeno que sea de corta memoria, que sea un modelo estacionario de corta memoria.
+La experiencia en general, tanto en la economía, en el análisis económico-financiero, en la ecología, etcétera, muchos fenómenos reales pueden ser aproximados por este tipo de modelos. Por eso vamos a revisar estos modelos.
+Y son los modelos que más se utilizan en la práctica, los modelos de Box y Jenkins. A ver, estos modelos son unos modelos que vienen ya de la década de los 70 y los clasificamos de la siguiente manera.
+Están los modelos AR, ahí se aparece un P, que son los modelos autorregresivos de orden P. Están los modelos de medias móviles, los modelos MA de orden Q.
+Y están los modelos ARMA(p, q), que son modelos autorregresivos y además de medias móviles. O sea, tienen ambos componentes. Yo no sé si alguno de ustedes ha escuchado hablar de estos modelos antes. ¿No? Ya, perfecto.
+Estos modelos son muy conocidos en el ámbito de la econometría.
+De hecho, si ustedes alguna vez estudiaron econometría, usualmente este es uno de los tópicos finales que se ve en los cursos de econometría o directamente si tomaron un curso de series de tiempo.
+A ver, vamos a partir con el modelo más intuitivo, que son los modelos autorregresivos.
+Si nosotros estamos analizando una secuencia aleatoria, que aquí por conveniencia la llamamos Y sub t, nosotros vamos a decir que el modelo es un modelo autorregresivo.
+Si este modelo se puede representar estocásticamente, está una representación estocástica, de la siguiente forma.
+La secuencia en el tiempo t va a ser igual a una constante, que es llamada mu, más un coeficiente, que aquí en la presentación se llama phi sub 1, que acompaña a la secuencia en el período anterior, más un componente phi sub 2 que acompaña a la secuencia hace dos períodos, y así sucesivamente hasta que aparece un coeficiente que acompaña a la serie rezagado en p períodos.
+Y de forma aditiva aparece un componente que es un ruido blanco.
+Un componente aleatorio, que muchas veces uno asume que es normal con media cero y con varianza sigma cuadrado, pero aquí vamos a relajar un poco este supuesto y vamos a suponer solo que es ruido blanco, cero sigma cuadrado.
+Si ustedes se dan cuenta, este modelo se denomina como modelo autorregresivo, porque justamente se puede expresar como una regresión lineal, donde las dimensiones independientes son los rezagos de la misma secuencia.
+Y cada uno de esos valores rezagados está ponderado por un coeficiente. ¿Se entiende, cierto? ¿De dónde viene el nombre? ¿O no?
+Ya, entonces, se llama autorregresivo porque justamente es el mismo proceso al que está rezagado, la representación estocástica tiene la misma serie de tiempos pero rezagada en el tiempo.
+Tiene un rezago 1, un rezago 2, y como es de orden P, tiene un rezago P. Ya, por ejemplo, entonces el orden del modelo autorregresivo nos va a decir la cantidad de rezagos que tiene.
+Por ejemplo, el modelo autorregresivo de orden 1, es ese modelo que aparece ahí, donde y sub t es generado por una constante que es mu, más un coeficiente phi, multiplicado por la serie de tiempos rezagadas en el periodo anterior y sub t menos 1 si estamos hablando de días, por ejemplo el presente está expresado en función del pasado de un día al pasado más un ruido blanco que aparece de manera aditiva.
+Un modelo autorregresivo de orden 2 es similar, solo que además de estar la serie de tiempos rezagadas en un periodo aparece de manera aditiva rezagada en dos periodos por un coeficiente.
+Más nuevamente este ruido que es aditivo este ruido blanco. Ya. Si nosotros conocemos los coeficientes phi en el fondo y la constante mu podríamos tener una predicción en base a esa estructura de dependencia, ¿cierto?
+Esa es la idea. Podríamos tener una predicción a varios pasos. Ya. Pero ¿cuál es lo importante de este tipo de modelos?
+Primero, cuando uno analiza un fenómeno saber reconocer que el fenómeno que estamos analizando tiene estas características después proponer el orden adecuado y una vez que propone uno el orden adecuado bueno, tiene que entrar en un proceso de estimación de los parámetros, ¿ya?
+Y ver si son estadísticamente significativos, etc. ¿Profe? ¿Si, dígame? ¿A qué se refiere cuando definimos el orden adecuado? Porque, por ejemplo...
+Es la forma en que vamos a definir qué vamos a cuantificar primero, a quién le vamos a dar prioridad.
+Lo que pasa es que cuando tú analizas un fenómeno nadie te va a decir si el proceso que tú estás analizando primero, es autoregresivo y segundo, ¿qué proceso es?
+Si un proceso autoregresivo de orden 1 de orden 2, de orden 3 hay que hacer un análisis previo para saber eso. Ya. El tema es que aquí hay algo que es bien importante.
+Estos procesos autoregresivos tienen que cumplir con ciertas condiciones para que sean estacionarios. ¿Por qué? Porque nosotros vamos a ajustar modelos autoregresivos cuando sean estacionarios.
+Ahí tenemos, ahí la matemática nos va a garantizar que podemos estimar bien los parámetros, que tenemos el teorema del límite central para tomar decisiones frente a los coeficientes, etc. Ya.
+Y bueno las condiciones no son tan difíciles de obtener, pero por ejemplo yo aquí las quise especificar los modelos autoregresivos de orden 1, es decir que solo dependen de un rezago, para que sean estacionarios los valores de los coeficientes tienen que estar entre menos 1 y 1, el valor del coeficiente.
+Es decir, el phi no puede tomar un valor 1.5. Si toma el valor 1.5, automáticamente ese proceso autoregresivo, ese modelo autoregresivo no es estacionario.
+Para el modelo autoregresivo de orden 2 tiene que cumplir con esas 3 condiciones que aparece ahí. La suma de los coeficientes tiene que ser menor que 1.
+El coeficiente del segundo rezago, el primero tiene que ser menor que 1, y el valor absoluto del segundo coeficiente tiene que ser menor que 1.
+Y cuando uno aumenta el orden de los modelos autoregresivos tiene uno que evaluar todas las condiciones.
+Usualmente los software cuando estiman los parámetros, siempre estiman los parámetros asumiendo que el proceso es autoregresivo. Que las condiciones se cumplen. Aquí están hablando en el chat.
+¿Cómo vamos a identificar nosotros cuando un modelo es autoregresivo? Miren, la forma de identificarlo es por medio de la función de autocorrelación.
+¿Se acuerdan ustedes que la función de autocorrelación de la clase anterior mide la correlación entre la secuencia y la secuencia rezagada k-periodos?
+¿Cómo se puede identificar la función de la secuencia y la secuencia rezagada k-periodos? Donde si el k es 0 nos da 1 porque es la varianza dividido por la varianza.
+Si el k vale 1 es la covarianza de la secuencia de la serie tiempo en y sub t, coma calcula la covarianza con y sub t menos 1 dividido por la varianza también. Y así sucesivamente.
+Entonces, las características que tienen los procesos autoregresivos justamente son las que aparecen acá. El proceso autoregresivo de orden 1, la función de autocorrelación exacta es esta que aparece aquí a mano derecha.
+La función de autocorrelación de orden k es el coeficiente elevado a k. Y justamente en este gráfico que aparece hay una simulación donde el phi vale 0,8.
+Si nosotros vamos al código, vamos a los códigos que yo les compartí, vamos a ver cómo se puede identificar los códigos. Yo los compartí pero saben que se los voy a dar acá, a ver. Están aquí los códigos. Pero...
+Vamos a ver si les envío el enlace mejor. A ver. Ahí está. Ya, este es el código. Creo que me parece que mejor que no. Y aquí está el código.
+Creo que me parece que mejor les voy a compartir el enlace en el chat. Y compartir el enlace. Creo que es más cómodo que lo descarguen y que después lo importen. Ahí se les debería generar una copia. Ya. Ya.
+Entonces, estas son las las librerías que hay que instalar. Hay que dejar esto ejecutando. Bueno, hay que esperar a que esté conectado.
+Para la clase de hoy vamos a necesitar un archivo que también está disponible en el en el portal del curso. Yo voy a subirlo acá directamente. Es... este. Ya. Ya. Esto... Vamos a ver. Vamos a dejar que está...
+Bueno, eso es el... que está el problema de trabajar en la nube, ¿cierto? Con colab. Las librerías que no están previamente instaladas en el notebook hay que volver a instalarlas en cada sesión, ¿cierto? Ya. A ver.
+Esto, como se está ejecutando los otros, por mientras los voy a ejecutar desde RStudio. Solo por mientras. Mientras instalan esas librerías. Ya. A ver. Aquí estamos. Acá. Miren, lo que hice yo acá fue lo siguiente.
+Este es el mismo código que tiene usted, pero se lo voy a mostrar acá mientras instala la librería en el notebook. Aquí simulé, hice una simulación con esta función que se llama Arima.Sim.
+Y aquí un proceso autoregresivo de orden 1. Aquí está el orden.
+Aquí va el P, aquí va el Q y esto mientras lo vamos a dejar en 0. Un proceso autoregresivo donde el coeficiente vale 0,8 y simulé 200 datos. Ahí está, AR1. Ahí está. Estos datos. Y la función.
+A ver, esto se puede graficar como una serie de tiempos si les interesa. Pero el objetivo ahora es... Ahí está la serie que grafiqué. La serie que simulé.
+Pero yo creo que lo que es interesante si nosotros miramos esto, no vamos a ver cuál es el orden del... del proceso autoregresivo. No vamos a tener mayor idea. Ya. Pero aquí lo que hice fue graficar la función de autocorrelación.
+Ahí está. Si ustedes ven el gráfico que aparece acá, que es el mismo que está en la presentación. Fíjense en lo que pasa. Cuando... Cuando K vale 1 es aproximadamente 0,8 porque es una simulación, no es exacto.
+Luego 0,8 al cuadrado y así sucesivamente.
+Entonces, las características que tiene de manera empírica, son similares a las que tenemos nosotros acá con el coeficiente de autocorrelación teórico que es phi elevado a k, donde phi vale 0,8.
+Entonces, cuando ustedes ajusten una serie de tiempos y tengan esas características, ustedes van a decir ah, miren aquí hay un decaimiento.
+Uno dice, bueno, en realidad, al parecer esta serie tiene características de ser un modelo autoregresivo. Eso es lo que está pasando.
+ ¿Cuéntame? ¿Alguien está dando la mano? Sí. Hola, profesor.
+Consulta con respecto a la clase pasada como... De lo que vimos la clase pasada saltando a esto. Mi pregunta es nosotros vimos ya la serie de tiempos este modelo. Es como que me salté un paso quizás.
+¿Por qué el supuesto de ruido blanco no se cumplía en el modelo pasado? Ya, y esto es como una convergencia, como que uno convierte esta ecuación, digamos, para eliminar, o sea, para que al final el error sea ruido blanco.
+Sí, sí, tiene algo de eso. Lo que pasa es que en la serie de tiempo, la manera inicial uno, cuando tiene tendencia, es quitarle la tendencia.
+Cuando tienen estacionalidad, remover la estacionalidad a partir de los coeficientes con una regresión.
+Pero la secuencia que te queda finalmente, que seguramente no tiene tendencia, y si es homocedástica, te va a quedar un modelo de serie de tiempo estacionario. De hecho, es muy raro que se te cumpla el supuesto de ruido blanco.
+Acá nosotros estamos mostrando fenómenos que automáticamente son estacionarios, pero estamos ajustando modelos estacionarios para esa serie de tiempo.
+Ya, claro, pero en la clase pasada quedamos que el ruido al final tenía estacionalidad igual. Algo así me... Tenía patrones. Dijimos que no era ruido blanco. Claro, claro. Pero nos dijimos que tenía estacionalidad.
+Aparecía por ahí la función de autocorrelación, uno en la que eran significativos, por lo tanto, concluíamos que no era ruido blanco. Ya, entonces...
+Pero estamos analizando series que ya no tienen tendencia, ya no tienen estacionalidad. La estamos analizando directamente y para eso estamos proponiendo modelos de serie de tiempo estacionario. Ya, ya me queda claro. Muchas gracias.
+Super. Entonces, en este tipo de series, como esta que aparece acá, que es una simulación obviamente, esto es una serie. Esto es una serie que tiene largo 200 y no tiene tendencia. Está en torno al cero, al parecer.
+Al principio un poco más bajo, después un poco más alto, pero la gran parte de la serie está en torno al cero. Y al parecer no tiene problemas de que la varianza crece o decrece.
+Por lo tanto, en este tipo de situaciones nosotros deberíamos intentar inmediatamente ajustar un modelo de serie de tiempo estacionario.
+El autorregresivo es el más intuitivo, pero para proponer un modelo autorregresivo de orden 1 o del orden que sea, hay que evaluar la función de autocorrelación.
+Si la función de autocorrelación tiene estas características de manera empírica, nosotros vamos a sugerir que el modelo es autorregresivo, porque la correlación decrece lentamente a través del tiempo. No tan lento, pero decrece.
+Y esta es la función de autocorrelación empírica. La teórica es muy similar porque en el caso del modelo autorregresivo de orden 1 es phi elevado a k. Entonces, si phi está entre 0 y 1, 0,8 elevado a 1 es 0,8.
+0,8 elevado a 2, ¿cuánto es? 0,64. Entonces, si ustedes se dan cuenta, aquí está el 0,6, da la sensación de que es 0,64. Entonces empíricamente y teóricamente se parecen mucho.
+Ahí me están preguntando, ¿el coeficiente puede oscilar entre menos 1 y 1 para que sea estacionario? El coeficiente no está entre menos 1 y 1, no es estacionario esa serie de tiempo.
+Hay que aplicar otras técnicas de transformación para hacerla estacionario.
+En el caso que el parámetro sea negativo, porque puede pasar en la práctica que ustedes estiman un modelo o están analizando un modelo de serie de tiempo, pero que el parámetro sea, no sé, menos 0,8, menos 0,7, cambian las características.
+La característica es también, la función de autocorrelación también va a ser phi elevado a k, pero al ser negativo el decaimiento va de la función de autocorrelación entre valores positivos y oscila y entre valores negativos.
+Aquí está esa simulación. Se dan cuenta que menos 0,75 después, menos 0,75 al cuadrado que es positivo, después menos 0,75 al cubo que es negativo y así sucesivamente.
+A este tipo de decaimientos se le conoce decaimiento exponencial, porque caen a 0, tienden a 0 en 5 o 6 pasos. La estructura de dependencia, cambia el modelo completamente.
+Si el modelo es positivo, imagínate, si el modelo es positivo quiere decir que el valor que está observando mañana depende del valor que observaste hoy directamente más una constante y sumándole una perturbación aleatoria.
+Pero si es negativo es el valor, es un coeficiente que está multiplicando el valor anterior pero de manera negativa. ¿Te das cuenta? La estructura te lo dice todo, porque la estructura, tú tienes que ver la estructura.
+Si la estructura es negativa, el impacto que tiene el valor de ayer en el valor de hoy día va a ser menor, ¿cierto? Además que está multiplicando por un coeficiente, que está entre menos 1 y 1.
+Entonces cambia la estructura de dependencia. De hecho aquí en los mismos gráficos cambia. Esta es la estructura de dependencia cuando es negativo y cuando es positivo esta es la estructura de dependencia. Ya. Ya.
+¿Cuánto alguien me podría decir? Bueno, perfecto Cristian, pero ¿y cómo sé yo si es un AR1, si es un modelo autoregresivo de orden 2, como es que aparece acá? Si es un modelo autoregresivo de orden 3.
+Bueno, vamos a necesitar otra herramienta porque miren, aquí hay una simulación de un AR2, ya, y la función de autocorrelación se escribe recursivamente.
+Se escribe la, se escribe recursivamente donde phi 1 acompaña la función de autocorrelación en el paso anterior y el coeficiente phi 2 acompaña la función de autocorrelación en dos pasos.
+Y ahí está cuánto vale en el primer paso y cuánto vale en el segundo. Pero fíjense. Si nosotros vemos esta simulación, esto está acá.
+Aquí tenemos dos simulaciones, aquí tenemos la simulación de proceso autoregresivo de orden 2, donde el primer coeficiente, el phi 1, vale 0,5 y el otro coeficiente vale 0,3 y además vamos a tomar 400 datos para que esto se vea un poco mejor.
+Ahí está. ¿Lo alcanzan a ver o no? A ver, voy a hacer un zoom. Entonces, si ustedes se dan cuenta, se parece mucho al primer gráfico.
+Claro, quizá un poquitito más lento al final, pero igual termina cayendo a 0 la función de autocorrelación o a valores muy pequeños que son no significativos porque están dentro de esas bandas azules de confianza.
+Entonces, bueno, aquí me podría decir, pero Christian, ¿simulaste, hiciste una simulación de un proceso autoregresivo de orden 2?
+¿Hiciste una simulación de un AR1 donde los coeficientes también eran positivos y la función de autocorrelación se parece bastante? ¿Qué modelo propongo para estos datos? ¿Propongo un modelo AR1, propongo un modelo AR2, etc.? Ya.
+Hay una herramienta que la vamos a acompañar junto con la función de autocorrelación, que es la función de autocorrelación parcial. En la práctica, ¿cómo identificamos P?
+¿Cómo sabemos que a partir de la función de autocorrelación empírica, si es correcto proponer un AR1 o si es correcto proponer una R2? Y ahí aparece una otra función que es la función de autocorrelación parcial.
+Esta función de autocorrelación es relevante para identificar la estructura de dependencia de la serie tiempo. La función de autocorrelación se calcula como la correlación entre el residuo y el y el residuo en el paso K más uno.
+Entiéndase como residuo que es el valor uno menos el valor uno estimado, la mejor predicción lineal.
+Y en el caso de la función de autocorrelación, cuando K vale uno, es equivalente a la función de autocorrelación parcial que es igual a la función de autocorrelación parcial.
+Y cuando el K es mayor que uno, cuando es dos, tres, cuatro, cinco, seis, se calcula con esta fórmula. Bueno, obviamente depende del modelo van a cambiar estas funciones de autocorrelación parcial.
+Para esto nosotros vamos a ver en R, por lo menos en R. Bueno, en Python también se hace. Está esta función GGACF y se le puede indicar cuál es la estructura. También está la función PACF, que es función de autocorrelación parcial.
+Entonces, para identificar un modelo ARMA o AR, o ARMA en general, esto aplica para los AR pero también aplica para los MA y para los ARMA, lo que hay que hacer siempre es un gráfico de la serie.
+Asegurar de manera empírica que no presenta tendencia, asegurar de manera empírica que la varianza no aumenta a través del tiempo o disminuye a través del tiempo, y luego vamos a aplicar el gráfico ACF y PACF.
+Es decir, vamos a graficar la función de autocorrelación y vamos a graficar la función de autocorrelación parcial. Y con eso, con esas dos herramientas nos van a permitir tener una idea de cuál es el orden del modelo. Entonces, la función ACF debería tener un decaimiento. Y la función PACF aquí nos va a indicar el orden.
+Yo creo que el colab ya debe estar listo. Sí, ya está listo. Bueno, esto le debería funcionar bien. Agrandé un poco la letra para que lo puedan ver. Aquí pueden probando todas las simulaciones que yo tengo en la presentación.
+Ahí está. El AR con coeficiente positivo, el AR con coeficiente negativo, el AR2. Ya. Ya. Entonces, como les comenté, R y Python también.
+De hecho pueden usar el asistente que les entrega directamente el código en Python porque hace lo mismo. Tienen las funciones ACF y PACF para hacer estos gráficos, función de autocorrelación y función de autocorrelación parcial.
+Y para tener unas visualizaciones más estéticas, sobre todo si estos gráficos van en un documento, en algún reporte para justificar la elección del modelo, utilizan las funciones GGACF y GGPACF. Es lo mismo.
+Esto no va a cambiar mucho. Ya. Y estas funciones pertenecen a esta librería que se llama Forecast. Ya. Acá está la función. Yo le entrego los datos.
+En el tipo le indico si es la función de autocorrelación o la función de autocovarianza. Recuerden que la función de autocovarianza es igual al numerador de la función de autocorrelación.
+Y ahí aparece un parámetro que se llama el máximo, que es el K máximo que se va a graficar, que podría ser 20, 30, 40, etc. Usualmente uno considera 20. Sobre todo si los datos son mensuales.
+Si los datos son diarios quizás habría que tener un lag más grande para ver si no hay algún tema estacional o algo por el estilo. Ya. Miren.
+Por ejemplo, aquí hay un modelo autoregresivo de orden 1 que fue el primero que graficamos donde el phi valía 0,8. Ya.
+A la izquierda está la función de autocorrelación que ya la habíamos graficado y que tenía un decaimiento que se llama decaimiento exponencial. O sea, esto decae porque es phi, es decir, es 0,8 elevado a K, teóricamente. Ya.
+Y decae. Bueno, esto no grafica cuando el K vale 0 porque cuando K vale 0 la función de autocorrelación siempre vale 1. No lo grafica. Ya.
+Y miren la función de autocorrelación parcial que es la correlación pero ahora de los residuos. ¿Qué es lo que ocurre? ¿Qué ven ustedes? ¿Se mantiene dentro del intervalo de confianza?
+Sí, es que el intervalo de confianza el intervalo de confianza aquí es constante siempre. Para los que lo dan. El lag 1 es el que se escapa, digamos, del intervalo y que se ve que es el más grande. Justamente.
+Cuando el K vale 1, si ustedes se dan cuenta, solo aparece una función de autocorrelación parcial significativa cuando el K vale 1. Ya. Eso nos va a decir el orden.
+Si este es un modelo autoregresivo de orden 2 deberíamos tener dos funciones de autocorrelación parcial significativas. De hecho, si ustedes se dan cuenta, es el mismo valor cercano a 0,8 que aparece en las dos funciones.
+¿Se dan cuenta? Solo un valor alto. Ya. Miren, aquí está el segundo ejemplo que vimos nosotros de que el coeficiente era negativo. Si no, que era el modelo autoregresivo de orden 2 donde el phi1 vale 0,5 y el phi2 vale 0,3.
+Si ustedes se dan cuenta, tenemos en el gráfico en la función de autocorrelación, tenemos el decaimiento exponencial y ahora en la PACF tenemos solo dos autocorrelaciones parciales que son significativas.
+El resto son dentro de la banda confianza aproximadamente. Entonces, eso nos va a indicar que este modelo es un modelo autoregresivo de orden 2.
+Cuando nosotros analicemos una serie de tiempos y tengamos el gráfico de la serie, idealmente que esté en torno a una constante, que tenga varianza constante, y ustedes hacen estos gráficos, ustedes van a decir, ah, para esta serie de tiempos podríamos proponer un modelo autoregresivo de orden 2.
+¿Se entiende? Y si tuviera 3 en la PACF, sería un modelo autoregresivo de orden 3. ¿Sí? Entonces, hay que mirar las dos funciones.
+Por un lado, que tenga este decaimiento, que decae hacia cero, la ACF, y la PACF que tiene que tener el orden del modelo que nosotros vamos a proponer, es la cantidad de valores que son estadísticamente distintos de cero o fuera de las bandas de confianza.
+¿Se entiende, no? ¿Sí? Si es autoregresivo de orden 1, siempre te va a dar al menos 1. Si es ruido blanco, no te debía dar ninguno. En ninguna de las dos. ¿Profe? Sí, dígame.
+Me imagino que la altura, digamos, de las líneas, de los K en el gráfico del PACF van a ser directamente proporcionales al valor de los phi, ¿no? Sí.
+Si el phi 1 fuera mayor que el phi 2, sería más grande la línea o hasta dónde llega el k 2, ¿no?
+Sí, lo que pasa es que no es tan directo, porque mira, si nosotros vemos la fórmula teórica, acá los tenemos, mira, el rho 1, la función de autocorrelación en el lag 1 para un modelo autoregresivo de orden 2, este cálculo que aparece acá.
+Y para el phi 2, es esta cantidad que aparece acá. Entonces, claro, depende qué tan grande es el phi 1, qué tan grande es el phi 2, etcétera. Ya.
+Pero para que sea estacionario también es que recordar que los coeficientes tienen que cumplir con estas condiciones. ¿Sí? Sí. Ya. Luego, aparece un modelo que es un modelo que viene utilizado en la práctica también.
+De hecho, yo les hice un ejemplo en la clase pasada, les pedí que calculara, lo calculamos juntos, la función de autocorrelación, que es el modelo de medias móviles. Ya.
+El modelo de medias móviles es aquella secuencia que tiene la siguiente representación estocástica.
+Depende de una constante, depende de una suma ponderada de perturbaciones pasadas.
+Ahí aparece una perturbación en el presente, menos un coeficiente multiplicando una perturbación en el período anterior, menos otro coeficiente en dos períodos anteriores y así sucesivamente hasta un coeficiente específicamente hasta un coeficiente que acompaña multiplicando una perturbación rezagada en Q periodos.
+Ese modelo se conoce como el modelo de medias móviles de orden Q, Q de queso. Y aquí las perturbaciones que aparecen acá en esta representación, estamos suponiendo que son ruidos blancos.
+Entonces, esta serie, Y sub t, en el fondo es una suma ponderada de ruidos. Es una suma ponderada de ruidos y conservamos siempre el último K ruido.
+Por ejemplo, el modelo MA1 que aparece ahí, donde Y sub t, es igual a una constante que acá es mu, más una perturbación que es ruido blanco, menos theta, por esta perturbación ruido blanco pero rezagada en el periodo anterior.
+Y con ese modelo nosotros hicimos unos cálculos en la clase pasada, que yo les mostré cómo calcular la función de autocorrelación, cuál era la varianza, cuál era la esperanza, etcétera.
+Lo que pasa es que asumí que el mu valía cero. Y este modelo MA2, bueno, es similar solo que además incorpora el rezagado del ruido blanco en dos periodos multiplicado por un coeficiente. Ya.
+A ver, estos modelos de medias móviles siempre, siempre, siempre son estacionarios. Es una ventaja, independiente que el coeficiente sea muy alto, siempre van a ser estacionarios.
+Sin embargo, en la práctica, cuando uno trabaja con medias móviles y uno quiere hacer predicciones, necesita que estos modelos además cumplan con una condición y esta condición es la siguiente.
+En el caso del modelo de medias móviles de orden 1, el parámetro theta, este que aparece acá, se acompaña al ruido blanco rezagado en un periodo, el módulo tiene que ser menor que 1 y en el caso del modelo de medias móviles de orden 2, debe cumplir con estas condiciones.
+¿Por qué? Porque si el modelo de medias móviles cumple con estas condiciones, siempre estacionario, pero si cumple con estas condiciones, nosotros después lo podemos representar como un modelo AR para hacer predicciones.
+Eso es lo importante. Me estoy adelantando un poco, pero por eso viene la importancia que los parámetros estén acá, que cumplan con estas condiciones.
+En estos modelos, al igual que en los modelos autoregresivos, la función de autocorrelación y la función de autocorrelación parcial van a ser las herramientas para identificar el orden del modelo de medias móviles.
+Porque claro, el modelo de medias móviles podría ser un modelo de medias móviles de orden 1, de orden 2, de orden 3, de orden 4, etc. Entonces también tenemos que hacer un análisis gráfico para proponer un modelo.
+Entonces Q, en este caso si el Q vale 1, o aquí el Q vale 2, indica en la función de autocorrelación cuántas correlaciones son significativas distintas de 0. ¿Ya? Son significativas o distintas de 0, estadísticamente.
+Ya, independiente del valor de Q, podría ser un MA1, un MA2, un MA3, la función de autocorrelación parcial siempre va a tener un decaimiento exponencial. Entonces se invierten los papeles.
+En el modelo autoregresivo, la función de autocorrelación tiene decaimiento exponencial y la función de autocorrelación parcial, el número de autocorrelaciones significativas nos entrega el orden. ¿A qué ocurre? Todo lo contrario.
+En la función de autocorrelación, el número de autocorrelaciones significativas o distintas de 0 nos entrega el orden de las medias móviles y la función de autocorrelación parcial siempre tiene decaimiento exponencial.
+Ya, por ejemplo, ahí hay un ejemplo, ese cálculo lo hicimos nosotros, la clase pasada, ahí está el modelo MA1, modelo de medias móviles de orden 1, la función de autocorrelación nosotros la calculamos, no digo esto, claro que lo hicimos que creo que un valor positivo, ¿o no me acuerdo?
+No, creo que no digo lo mismo. O sea, cuando K vale 1 es esto y cuando K es mayor o igual que 2 siempre es 0.
+En el caso de la función de autocorrelación parcial, que es la que aparece como alfa K, cuando K vale 1 es ese valor y después recursivamente se calcula de esta manera.
+Ejemplo, aquí hay un ejemplo de un modelo de medias móviles de orden 1 donde el parámetro theta vale menos 0,9. Vamos a ver esto en el colab. Ahí está, ya. Ya lo hicimos, aquí está.
+Aquí, bueno, la semilla es para que la simulación a ustedes y a mí nos dé la misma, por eso fijo la semilla aleatoria. Aquí tengo un modelo MA1. Está bien esto, no es verdad? Ya, ahí está.
+Entonces miren, la función de autocorrelación tiene solo un lag significativo, de hecho mayor que 0,5 y luego la función de autocorrelación parcial tiene un decaimiento exponencial, donde oscila entre valores positivos y valores negativos.
+Lo pueden ver, ¿cierto? Sí, perfecto. Ya, en el caso de un modelo de medias móviles de orden 2, tenemos aquí las perturbaciones.
+Está la perturbación en el tiempo 1, en el presente, en el tiempo 1, en el tiempo 2 y aquí estamos suponiendo que el parámetro theta 1 es menos 0,7 y el parámetro theta 2 es menos 0,2.
+Entonces, si ustedes se dan cuenta, ahora en la ACF tenemos dos autocorrelaciones que son distintas de 0, el resto son todas cercanas a 0 y en el caso de la PACF, la función de autocorrelación parcial, tenemos un decaimiento exponencial pero mucho más rápido.
+Ahí está. ¿Sí? ¿Alguna duda hasta el momento? El ACF se ve que va aumentando. ¿Cuándo aumenta? ¿La ACF? ¿Cuándo aumenta? ¿La ACF?
+¿En cuál de los ejemplo...? Profes, viendo que el módulo al principio decrece, pero después cuando va pasando el tiempo, por ejemplo, a los 25, como que va aumentando el módulo. Eso significa algo... ¿Es lo que aparece acá? ¿Dónde?
+Claro. Claro, pensando como menos desde el punto 5 hasta el 25, se ve que cada vez va aumentando un poquito más. Desde el 5 hasta...
+Ah, no, lo que pasa es que como son simulaciones empíricas y no teóricas, claro, te puede quedar algo, pero como están dentro de las bandas de confianza, las últimas salen un poquitito, uno asume que no son estadísticamente distintas de 0.
+Perfecto. Muchas gracias. Super. Claro, y va apalancado de esta estructura.
+Nosotros hicimos este cálculo en la clase pasada, por lo menos trabajamos con el modelo de medias móviles de orden 1 y concluimos que la función de autocorrelación era esta, no calculamos la función de autocorrelación parcial.
+¿Por qué más difícil? Ya no es tan fácil. Demando mucho más tiempo y nos podríamos quedar pegados fáciles unos minutos haciéndose cálculos. Ya, entonces, recapitulando un poco lo que hemos visto.
+La función de autocorrelación y la función de autocorrelación parcial son las herramientas que nos van a permitir, nos van a sugerir qué modelo es adecuado para nuestros datos.
+Estamos suponiendo que estamos analizando datos estacionarios que no tienen tendencia y que son homocedásticos, que no tienen rachas de que sean heterogéneos o que aumento o disminuya la variante a través del tiempo.
+Entonces, la función, siempre tenemos que graficar la función de autocorrelación y la función de autocorrelación parcial. De hecho, hay más herramientas. Yo me enfoco solo en estas dos. Ya.
+Y el otro modelo es el modelo autoregresivo de medias móviles. Este modelo es un modelo que considera la parte autoregresiva y también considera la parte de medias móviles. Mezcla ambas. Es un modelo mucho más completo.
+Estos modelos terminan siendo una generalización de lo que vimos antes. Es una generalización de los AR, es una generalización de los MA y como es una generalización, tiene la estructura de ambos.
+Entonces, estos son los clásicos modelos que uno escucha en la literatura como ARMA(p, q). P es el orden de la parte autoregresiva, Q es el orden o el número de rezagos que tiene la parte de medias móviles.
+Y se representa estocásticamente de esta manera.
+Tenemos que, si estamos analizando el fenómeno, que nosotros lo estamos llamando Y sub t, tenemos una constante, ojo que está constante, que aparece ahí como mu, no es la media, mucha gente cree que es la media, no es la media.
+Más un coeficiente phi sub 1 que acompaña a la serie T por rezagada en un periodo, a la secuencia rezagada en un periodo. Así sucesivamente aparece el coeficiente phi sub p acompañando ahí, pero rezagado en un periodo.
+Y luego aparece esta parte que es una suma ponderada de ruidos blancos. Epsilon T menos theta 1, epsilon T menos 1 y así sucesivamente.
+Y ese va a ser el supuesto que más adelante nos va a permitir que nos vayan a checar las estimaciones. ¿Hay alguien que está hablando en el chat? Claro, como son simulaciones, son casos experimentales.
+Teóricamente esto te da cero después.  Pero claro, como son casos, de hecho vamos a ver un ejemplo.
+En los casos reales, claro, hay que acotar un poco las cosas y después de un cierto rezago en adelante, como están dentro de las bandas, supone que son cero. ¿Cuál es la ventaja de los modelos ARMA?
+Que en muchas series de tiempo presentan ambas características autoregresivas y de medias móviles. Y damos un modelo que complemente las dos.
+En algunos casos podría pasar que ustedes podrían sugerir un modelo MA5, por ejemplo, porque ven cinco rezagos significativos o cuatro rezagos significativos en la función de autocorrelación.
+Y en la función de autocorrelación parcial ven un decremento exponencial. Pero ese mismo trabajo lo podría hacer un ARMA11.
+Entonces, en muchas situaciones el ARMA11 simplifica tener modelos autoregresivos muy altos o modelos de medias móviles de orden muy alto.
+Entonces necesita menos enfoque que los modelos autoregresivos o que los modelos de medias móviles por separado.
+Cuando hay agregación de información, por ejemplo, si nosotros estamos sumando dos series de tiempo, etc., también podemos aplicar estos modelos.
+Entonces, si nosotros estamos agregando dos secuencias, las estamos analizando, el modelo final nos va a dar un modelo ARMA.
+Ya, los modelos ARMA en la función de autocorrelación siempre presentan decremento exponencial, en la función de autocorrelación parcial siempre presentan decremento exponencial, y también tenemos condiciones para los valores de phi y de theta para que el proceso sea estacionario.
+Eso es lo que nos interesa a nosotros. Ya, entonces ustedes meigan, bueno, en los modelos autoregresivos sabemos cómo calcular el orden de P. En los modelos de medias móviles sabemos cómo calcular el orden de Q.
+Podríamos identificar si el fenómeno que estamos analizando es un MA2, es un MA3, es un MA1, etc. ¿Cómo lo hacemos con los ARMA?
+Bueno, con los ARMA es más complejo, porque tanto la función de autocorrelación como la función de autocorrelación parcial tienen decremento exponencial.
+Entonces, al tener ambas decrementos exponenciales, lo que hace uno en la práctica evalúa diferentes configuraciones. Un ARMA1-1, un ARMA1-2, un ARMA2-1, un ARMA2-2, y así sucesivamente. Eso es lo que se hace en la práctica.
+Es un poquito más complejo. Pero claro, cuando uno ve que ambas curvas tienen, que ambas funciones tienen decremento exponencial, uno dice, bueno, esto es ARMA y hay que evaluar qué ARMA es.
+Ya, por ejemplo, acá tenemos un ARMA1-1, donde la secuencia depende de phi por este menos uno, donde el phi ahí es 0,8, y luego los ruidos blancos que aparecen de manera aditiva, el coeficiente theta que acompaña al ruido blanco rezagado es 0,5.
+Ya, si ustedes ven, la función de autocorrelación tiene un decremento exponencial y la función de autocorrelación parcial tiene también un decremento, pero mucho más abrupto. ¿Sí? Pero cada cero. Ya.
+Ahora, justamente este es un tema con la serie de tiempo, porque alguien podría sugerir otro modelo para este modelo ARMA, solo viendo este gráfico. ¿Qué se le ocurre a ustedes?
+¿Qué modelo podría ser adecuado de los que vimos anteriormente si nosotros solo analizamos las funciones? Un AR, ¿cierto?
+Alguien podría decirlo, pero yo eso perfectamente podría ser también una AR3, porque tiene 3 lag significativo en la PACF. ¿Sí? ¿Se dan cuenta?
+Alguien puede decirlo y tiene el decremento exponencial en la función de autocorrelación, pero la PACF tiene 3 lag significativo. Entonces podría ser perfectamente una AR3, pero hay una diferencia.
+Que el modelo autoregresivo de orden 3 tendría 3 phi, phi1, phi2 y phi3. Entonces sería menos parsimonioso que este, que tiene solo dos parámetros, phi y theta. ¿Se tiene? Ya, vamos a ver acá. En el notebook.
+Ahí está, bueno, volví a usar la función ARMA.Sim. ¿Profe? Sí, digame. ¿Puedo volver a la imagen anterior? Ahí. ¿Por qué en el ACF solamente los primeros están en el modelo ARMA? ¿Por qué no?
+Porque el modelo ARMA tiene un modelo de la PACF, que es el modelo ARMA. En el ACF solamente los primeros son significativamente mayores de cero.
+Y en el PACF hay 3, siendo que el tercer valor es muy parecido al, no sé, creo que antevenúltimo del ACF. A ver, la ACF tiene un decremento exponencial. Claro, en el fondo tiene varios lags.
+Decae rápido al cero, cerca del lag 8, ¿cierto? Claro, pero en el fondo... Si solamente nos enfocamos en el gráfico, ¿qué es significativamente mayor o qué es significativamente cercano a cero?
+O sea, nosotros cercanos a cero quiere decir que las funciones, que no exista autocorrelación a través del tiempo cuando uno tiene más de 8 rezagos.
+Quiere decir que la secuencia que estamos analizando depende, tiene una correlación alta con el anterior, con dos períodos antes, con tres períodos antes, con cuatro períodos antes, hasta el octavo.
+Ya después se pierde la correlación. Vale. Ya, aquí me confundieron con el gráfico. Gracias.
+Y la ACF es lo mismo, pero el primero contra el segundo, el primero contra el tercero, pero del residuo, el primero contra el cuarto, el primero contra el quinto. Ve cuánto queda de remanente. Ok.
+Ya, entonces, acá está, bueno, aquí está la simulación de este proceso... Este es un arma, le puse M2, es un arma, no equivoco, es el nombre. Ahí está. No me gusta mucho lo gráfico que hace el colab. Son...
+No sé si se pueden guardar, exportar. Bueno, cuando uno trabaja con colab lo ideal siempre es documentar todo y después exportarlo en... Dejar que la salida se genera en algún tipo de documento directo, pero no me gusta.
+Ya, a ver, la pregunta es, ahora la pregunta es, bueno, uno dice... Bueno, perfecto, ¿cierto?
+Uno puede estimar los parámetros P, o puede tener una idea de cuánto es P, cuánto es Q, y uno puede proponer un modelo para los datos y estimar los parámetros asociados a ese modelo, ¿cierto?
+En el caso de un arma 1-1, por ejemplo, sería el parámetro FI, el parámetro theta y el parámetro sigma cuadrado, que es la varianza del ruido blanco.
+Hay varios métodos para estimar los parámetros de los modelos de serie tiempo estacionario. El método de Yule-Walker se aplica solo para series que son autoregresivas.
+Básicamente se utiliza mínimo cuadrado, porque la representación podría ser perfectamente a través de una regresión lineal. ¿Vacuas como lo vieron ustedes ya? Acá.
+Esa representación puede ser perfectamente una regresión lineal donde los Y están rezagados. Hay otros métodos de estimación.
+Está el estimador de máxima verosimilitud, que me imagino que lo han escuchado ya hablar durante el diplomado, que se maximiza la función de verosimilitud.
+Hay unos estimadores que se llaman estimadores de espacio de estados porque se escriben recursivamente las ecuaciones de esperanza condicional y varianza condicional.
+Y también está el estimador de Whittle, un estimador bien famoso que en el fondo aproxima las estructuras de varianza covarianza.
+Bueno, R y Python en general tienen todos esos métodos de estimación y dan valores muy similares, no hay mucha diferencia.
+Por ejemplo, si ustedes quieren calcular el estimador de máxima verosimilitud, que hay que hacer el software por lo general, tienen que trabajar con la distribución normal. Hay un supuesto que es importante.
+Los errores, uno está asumiendo que los epsilon que aparecen en estos modelos son ruido blanco de media cero y de varianza sigma cuadrado.
+Pero al momento de estimarlos de manera paramétrica, es decir, uno está proponiendo un modelo para los datos, vamos a suponer que son gausianos.
+Y al suponer que son gausianos que tienen distribución normal, la secuencia original va a ser generada por esa secuencia normal y por lo tanto también va a tener distribución normal.
+Entonces, si nosotros tenemos 100 datos, ahí el N puede ser 100, 200, 800, lo que sea, y nosotros tenemos empíricamente nuestros datos, nosotros podemos suponer que ese vector sigue una distribución normal multivariada, donde por ahí aparece el vector de media que es mu, que podríamos asumir que es constante para todos, y aparece una matriz sigma que aparece ahí en esa función, que es la matriz de varianza covarianza.
+Y la función de densidad se escribe de esa forma, el mu va a ser un vector de media, va a ser la misma media para todos en el fondo, va a estar repetido el mu en N veces, el mismo paramétrico.
+Y la matriz sigma que aparece en esa representación es esa matriz que aparece ahí, la matriz de varianza covarianza.
+Entonces, en la diagonal están las varianzas y en la triangular superior o la triangular inferior de esa matriz aparecen las funciones de autocovarianza.
+Ahora, uno esto lo puede reescribir también en función de la autocorrelación, da lo mismo. Pero si somos pulcros, la matriz sigma contiene las funciones de autocovarianza.
+Y siempre aparecen como diagonales, se dan cuenta, al medio aparece la diagonal de las funciones de autocovarianza en cero, después la diagonal en uno, no la diagonal principal, y así sucesivamente.
+Y lo que hace el software reemplaza esas funciones gamma que aparecen ahí por eso que aparece ahí, pero multiplicado por 1 más theta cuadrado.
+El reemplaza la estructura teórica y a partir de los datos busca los parámetros que maximizan eso.
+Entonces, si usted me imagino que vieron el principio de máxima verosimilitud, lo que hace en el fondo el software, es buscar los parámetros mu, theta, phi y sigma cuadrado que maximizan esas funciones que dio. Pasa a ser un problema ya de optimización. Y las estimaciones que nos va a reportar el software van a ser esas.
+Va a buscar qué valores de mu, qué valores de theta, qué valores de phi y sigma cuadrado maximizan esas funciones que dio. Que es logaritmo de la función de verosimilitud. ¿Alguien está haciendo una pregunta? Ah. Super. Ya.
+Para hacer las estimaciones prácticas, ¿cierto? Las librerías más populares que tiene R. Python no sé si tiene la librería Tseries. Ahí estoy como me confundí. Está la función Arima, que es básica del software R.
+La librería Forecast, que tiene la función Arima con una mayúscula. Es muy similar a la función Arima. La librería Tseries, que tiene la función Arma. Y esta librería ya no funciona.
+A ver, era una librería muy buena que se llamaba FArma con F mayúscula. Y que fue desarrollada por la gente de Rmetrics. Tenía varias librerías bastante potentes. El tema es que esa gente dejó de prestar soporte.
+Soporte a las librerías que habían desarrollado. Y después cuando se actualizó el lenguaje máquina de estos software como R. Python, ya dejaron de funcionar. Yo lo he tratado de usarla muchas veces y no he podido. Ya.
+Todas las librerías que yo les mencioné. Utilizaron estimadores de mínimos cuadrados, el de máxima verosimilitud. El de Yule-Walker. Hay otro tipo de modelo que yo se los menciono porque son una extensión de los modelos Arma.
+Que son los modelos Arfima. Que la función, la librería FMtools. Tiene funciones que permiten estimar los parámetros de un modelo Arfima. Las librerías todas reportan valores similares. Así que da lo mismo ahí cual utilicen.
+Las diferencias van a ser mismas. No van a cambiar los resultados. Ya, a ver. Y aquí hay un tema de gustos que viene importante. Porque por ejemplo la función Arima. Y viene por defecto en R.
+Entrega el valor estimado y la desviación estándar. Pero no nos entrega... No nos dice si el parámetro que estamos estimando es estadísticamente significativo. O es estadísticamente distinto a 0. No nos entrega el valor estimado.
+Y no nos dice si el parámetro que estamos estimando es estadísticamente significativo. Por eso a mí me gusta más la librería Tseries. Porque te entrega el reporte tal cual como si fuese una regresión lineal.
+Eso es lo que encuentro yo como.  Entonces por eso depende del gusto de la persona. Ya, a ver. ¿Les parece si hacemos un break? Antes de entrar al ejemplo. ¿Les parece si nos tomamos un break de 15 minutos? ¿O no?
+¿Les parece si nos tomamos un break de 15 minutos? Y continuamos para no cortar el ejemplo a la mitad. Ya, perfecto. Sube. Ya. Vamos entonces al break y continuamos después. Ya.
+[Pausa: recreo de aprox. 15 minutos]
+Entonces, bueno, recapitulando un poco lo que les comenté antes de la pausa del break.
+Que R, bueno tanto R como Python tienen varias librerías que permiten estimar los parámetros de los modelos que nosotros vamos a proponer para los datos. Ok. Yo en particular me gusta trabajar en R con la librería T series.
+Me encuentro que es cómoda, las salidas son buenas, etc. La librería básica de R, uno con las salidas puede hacer los otros cálculos pero no es tan sencillo, no es tan directo. Esto es directo.
+Ya, para hacer la ilustración de lo que hemos hablado durante la clase. Perdón.
+Vamos a ver un ejemplo. Vamos a trabajar con un archivo que se llama tree, que está en formato Excel, en XLSX. Y son, es un ejemplo de dendrocronología. Ya.
+Ahí tenemos mediciones anuales de los anillos de un árbol, de anillos de árboles. Ya. En Idaho USA. Estas series se utilizan para, son bien útiles para evaluar cómo ha sido el comportamiento climático de una zona en el pasado.
+Entonces lo que se hace ahí se analiza, se saca una sección del árbol. A partir de esa información se miden los aros de los anillos del árbol.
+Y los anillos dan cuenta de si el año fue seco, si el año fue lluvioso, si hubo incendios forestales. Y con esas series se reconstruye un poco la historia de la zona.
+Permite reconstruir clima, precipitación, temperaturas del pasado, etc. Claro, porque si ustedes lo piensan nosotros no tenemos tantas mediciones registradas de temperaturas máximas, mínimas y históricas.
+Sobre todo sectores que nunca fueron tan bien poblados. O que fueron poblados quizás recientemente. Ya. Entonces básicamente lo que ocurre es lo siguiente.
+Si ustedes talaran un árbol de manera horizontal, no se talan de esa forma en todo caso, pero ahí está la figura. Cada anillo de ese árbol representa un año. Está el núcleo, que es el primer año de crecimiento.
+Lo que está más al centro es un árbol. Perfecto, obviamente. Los árboles siempre los núcleos nunca están ahí al medio. Los aros que son anchos, los anillos que son anchos, indican que fue una época lluviosa.
+Fue una época de abundante agua durante ese año. Cuando los anillos son delgaditos nos indican ahí que fueron años muy secos, con mucha sequía, etc.
+Y cuando se talan estos árboles y se encuentran esas cicatrices, por lo general son indicios de incendios forestales o algún otro evento.
+Entonces, ¿qué es lo que se hace en la práctica cuando se quieren reconstruir seres climatológicas? Lo que se hace es como si fuese un taladro. Se perfora, pero solo por un sector el árbol.
+Se toma una muestra que queda como una varilla. Y en esa varilla están todos los años, hay una forma de reconstruir a que año pertenece cada anillo. Y se calculan el ancho. Y el ancho está en milímetro.
+Y ahí se reconstruye la secuencia histórica. Esa es la información que está en el Excel. Se va a Excel. Yo se los compartir. Lo tienen ahí en... Ahí está. Ahí está. No sé si lo alcanzan a ver en mi computador. Sí, se ve.
+Se ve la presentación, por eso. Claro. Ahí. Ahí sí. Ya. Claro, si ustedes se dan cuenta, gracias a la dendrochronología, tenemos mediciones que son del año 1492, ¿cierto? O sea, tenemos información de los últimos... ¿Cuántos años? De los últimos... 500 y tantos años. Ya. Y en esa época, obviamente, no teníamos mediciones de temperatura ni nada por el estilo. Es un sector de Estados Unidos. Ya.
+Y estas mediciones que aparecen acá son en milímetro. La columna B está en milímetro. Usualmente cuando... Cuando el ancho de un anillo en un árbol... Es menor que uno... Se dice que es un año que hubo sequía.
+Y cuando es mayor que 1.5 se dice que es un año que hubo abundante agua. O mayor que uno, creo. Está los parámetros en... En cualquier sitio están los parámetros. De hecho, ahí hay 1.8, etc. Ya.
+Entonces, esta es una secuencia que tenemos a través del tiempo y las mediciones son en milímetro. Y vamos a estudiar esto. Ya. Para eso, vamos acá al notebook. Acá. Ahí está. Aquí está el ejemplo, ahí está el archivo.
+Yo ya cargué el archivo, así que lo suben a esta carpeta en... En el colab. Ya, yo ya lo tengo. Usted lo sube directamente a su computador. Vamos a utilizar la librería readxl que permite leer archivos que son en Excel.
+Les estoy diciendo que es un libro que se llama... Que son archivos que son en Excel. Les estoy diciendo que lea la hoja 1, pero creo que solo tenía una hoja. Creo que no había problema con eso. Da lo mismo. Ya.
+Y les estoy diciendo que la primera columna... Les estoy dando el formato de las columnas. Aunque no es necesario, creo yo. Esta puede ser necesaria. Porque capaz que le interprete 1492... Ah, pero igual está en orden.
+Si no, debería generar problemas. Claro, numérico, numérico. Si no, debería generar problemas. Ya, ahí están los valores importados. Ya. Entonces, lo primero que hay que hacer siempre es graficar esta serie. Ya.
+Calcular la estética de la que va a graficar la serie. Eso siempre es lo primero que uno hace con cualquier set de datos. Vamos acá. Aquí está el gráfico. Estoy usando la librería ggplot2, que tiene la función ggplot.
+Le doy el set de datos. En el aesthetic mapping, mapeo las variables que van a... A tener un rol estético dentro del gráfico. En el eje X van a estar los años. En el eje Y va a estar la medición de los anillos. En milímetro.
+Voy a hacer una geometría de línea para que se vea esto. La fecha y el ancho... Esto no es en centímetro, es en milímetro. Ya, ahí está. Yo lo voy a hacer en R para que sea un poco mejor. Para que no se vean bien en el colab.
+Acá está. Ya. ¿Notan alguna característica en particular? Igual tiene una estacionalidad. Bueno, como entiendo que es por un crecimiento del árbol. Es que en algunos momentos del año crecen más que en otros momentos del año.
+Claro, pero las mediciones son anuales acá. Hay que tener ojo con eso. Como las mediciones son anuales. Porque claro, como se saca una varilla del árbol cuando se tala. Solo tenemos el ancho de ese anillo. Tenemos una medición.
+Entonces, estos impulsos... Por ejemplo, esos valores altos. Y esos valores altos no sé si son tan equidistantes. No sé si tienen frecuencia C, frecuencia 8, frecuencia 10. Que uno podría pensar que está asociado a algún fenómeno.
+Fenómeno de la niña, fenómeno del niño, qué sé yo. Bueno, no iba a decir que... No iba a decir que cada vez que yo... Es que yo en el chat los picos son cada vez menos. Claro, sí, eso puede ser. Quizá el árbol es más...
+Esas mediciones están más fuera de la corteza. Puede estar un poco más... Quizás las mediciones antiguas de un árbol muy viejo tienen 1500 años. Entonces, un árbol de 1500 años puede estar un poquito deforme.
+Pero sí, se supone que esto está corregido. Hace con computador después. Lo otro es que parece que está como una medición un tanto acotada, digamos. Tienen marcado los mínimos y máximos. Y como que la media ronda al valor de 1. Sí.
+Ya, justamente esa es una buena observación. Si ustedes se dan cuenta, parece que la serie se mueve en torno al 1, ¿cierto? Está siempre en torno al 1. Hay valores altos, valores bajos.
+Pero parece que el tendencia se mueve cerca a un milímetro. Y claro, sí tiene unos valores que están cercanos a 2. Y tiene algunos valores que están cercanos a, qué sé yo, 0.2 milímetros. ¿Cierto? Los que están más abajo.
+Como en el año 1700, 1650, 1820, qué sé yo. Da la sensación de que después no, ¿cierto? Parece ser que no. Ya, y la varianza, parece ser que la dispersión es constante. Quizá aquí entre el mil...
+Entre el mil 550 y el mil 680 tiene algunos picos que sean altos. Pero el resto de la serie está siempre a bordea entre el 0.5 milímetro y 1.5 milímetro. Habría que evaluar si tiene problemas de homocedasticidad.
+Yo no lo veo tan claro. No como los ejemplos que vimos en la clase pasada, ¿cierto? Cual es el gráfico que yo le hice. Ya, entonces esto nos da un indicio de que lo que podríamos proponer podría ser un modelo estacionario.
+Porque parece que el fenómeno que nosotros estamos analizando, solo este gráfico tiene características estacionarias. Ya, aquí hay algunas estadísticas que son interesantes. A ver.
+La lata que acá me va a imprimir todo de un golpe, ¿cierto? Sí, a ver, no lo voy a ver acá. Vamos acá. Ya, por ejemplo, vamos a ver cuál es la media. La mediana. La desviación estándar, la varianza, el rango intercuartil.
+Y un resumen, general. Ya venimos. Vamos acá. Efectivamente, el promedio de estas mediciones es en 1 milímetro. La mediana también está cercana a 1 milímetro, el percentil 50.
+La desviación estándar está en 0.3 milímetros aproximadamente. Uno podría pensar que estos datos que están alrededor de 1.600 y 1.650 picos altos quizás fueron valores extremos.
+Luego, bueno, la varianza no está en la misma escala de la variable, así que no es tan relevante. Y el rango intercuartil son aproximadamente 0.4 milímetros ya. El rango intercuartil es 0.4 milímetros.
+Es decir, ese valor que está ahí, menos ese. Eso es lo que da el rango intercuartil. Claro, porque muchas veces las medidas de dispersión, como la desviación estándar y la varianza, se ven influenciadas cuando el dato es extremo.
+Entonces, el rango intercuartil es un estadístico de dispersión que atenúa ese efecto. Ahí también. El rango intercuartil es el valor que está ahí, menos el valor que está ahí.
+Y este resumen estadístico que aparece acá es siempre útil porque te entrega directamente el valor mínimo, el primer cuartil, la mediana, la media, el tercer cuartil y el valor máximo. Nos entrega todo eso.
+ Entonces, claro, si parece que la distribución podría ser un poco asimétrica desde uno hacia valores altos.
+Esa es la sensación que me da. Ya. Ya. Entonces, ¿qué es lo que deberíamos hacer ahora? Bueno, graficamos la función de autocorrelación y la función de autocorrelación parcial y veamos qué es lo que ocurre. Aquí está en el colab.
+Ya. Aquí se ve, creo que se ve mejor en la presentación. Ya. ¿Qué notan ustedes a partir de estos dos gráficos? ¿No están algo en particular? No.
+¿Qué me podrían decir a partir de lo que discutimos antes con respecto a los modelos autorregresivos? Que decrecen de forma exponencial. Claro. Alguien me pregunta.
+Justamente esta es la discusión que quería plantear porque, miren, alguien podría decir, oye, parece que el modelo más adecuado para este tipo de datos, ambos tienen un decaimiento exponencial, podría ser un arma.
+O alguien podría decir, oye, pero podría ser una R2, ¿cierto? Porque veo dos funciones de autocorrelación parcial significativas y veo un decaimiento exponencial en la ACF.
+O alguien podría decir perfectamente, es un MA3, ¿cierto? Porque tiene tres lags significativos en la ACF. Entonces, justamente, al parecer, todos esos modelos podrían proponerse para este tipo de datos. ¿Se entiende?
+Entonces, lo que hay que hacer, lo que vamos a hacer ahora, vamos a ajustar varios modelos que parecen ser adecuados, vamos a estimar los parámetros de esos modelos, los phi1, phi2, theta1, theta2, sigma cuadrados.
+Nos vamos a resguardar que esos parámetros sean significativos, es decir, estadísticamente distintos de cero. Y luego vamos a hacer una selección de modelos, dentro de los modelos que sean adecuados. ¿Se tiene? Sí, profesor. Ya.
+Ya, vamos al colab. Ya, entonces, ¿alguien podría proponer un AR de orden 3? Sí, yo creo... No, perdón, ¿un modelo de medias móviles de orden 3? Sí, porque hay tres rezagos significativos en la ACF.
+Vamos a ver el modelo 1, con la función arma de la librería tseries.
+Le damos el objeto, le damos los valores, y aquí en el orden, le indicamos cuánto es la parte autoregresiva, que es cero, y la parte de medias móviles, que es tres, por lo tanto le estamos explicando una MA3. Ya. Aquí está.
+Miren, el parámetro, el theta1, que sería el MA1, es 0.24 aproximadamente, el valor T es ese, y el P-valor es enano, ¿cierto? 0.000000114.
+Eso quiere decir que es menor que 0.05, por lo tanto, si nosotros evaluáramos ese parámetro, estaríamos diciendo que con la evidencia que tenemos es significativo, o es estadísticamente distinto a cero.
+Lo mismo con el parámetro MA2. Sí, también es chico. 0.00, o sea, el parámetro 0.17, ahí está la desviación estándar del estimador.
+La división de los dos, el estimado dividido por el error estándar, te va a dar el T-valor, y el P-valor, es decir, la probabilidad de que una variable te destude. De hecho, dice T, no debería ser esto zeta, es normal.
+Eso no está bien. Es 0.000119. Es significativo también, porque es menor que 0.05. Ya.
+El parámetro, si nosotros queremos proponer un modelo de medias móviles de orden tres, es decir, el parámetro theta sub tres, da este valor, pero miren, está en el límite.
+Usualmente el cutoff que uno utiliza para evaluar si los parámetros son o no son significativos, es si el P-valor, esta cantidad que está acá, es menor que 0.05 y acá está en límite. Es casi 0.06. El intercepto es uno.
+Por lo tanto, este modelo parece ser un modelo adecuado, pero el parámetro theta sub tres está en el límite. No hay una fuerte evidencia empírica para decir que el theta sub tres, si hacemos test de hipótesis, es distinto de 0. Ya.
+Por otro lado, podríamos proponer entonces un modelo MA2, el que aparece acá.
+Modelo dos, arma, le entregamos los datos en el orden, le decimos que la parte autoregresiva es de orden 0 y la parte de medias móviles de orden dos y hacemos lo mismo. Ya. Acá. ¿Qué observamos ahora?
+En base a lo que hicimos recién. Ambos valores son significativos, el MA1 y el MA2. Perfecto. El valor de MA1 es significativo, el valor de MA2 es significativo, el intercepto también es significativo.
+Ya, ahí está el sigma cuadrado estimado. Pareció al otro, ¿no? Sí, es casi el mismo. La suma de cuadrados de error también es casi la misma. Ya. Y nosotros vamos a usar esta cantidad que aparece acá. El AIC.
+Después voy a explicar eso. Ya. Entonces, este modelo parece ser un modelo adecuado, después hay que analizar los residuos, porque los residuos tienen que cumplir con los supuestos, ¿cierto?
+O sea, el residuo, de cualquier modelo, tiene que ser ruido blanco. Si no es ruido blanco, tenemos que elegir otro modelo. Esto no es tan rápido. Hay que estar preguntando. Ah. Ya.
+Justamente, pues vamos a hablar un poco del... Sí, porque mira, hay tres niveles significativos en la función de autocorrelación.
+Pero esos tres niveles significativos podrían ser perfectamente en una parte autoregresiva que tiene decaimiento. No necesariamente implica que es un MA3. ¿Se entiende? De hecho, podría ser un AR2, ¿cierto?
+Porque tenía un decaimiento en la función de autocorrelación y la función de autocorrelación parcial tenía dos niveles significativos. Por eso es que hay que evaluar las posibilidades, Francisco.
+Uno creería que la respuesta siempre es una, pero no siempre es una. ¿Hay alguien que me hizo otra pregunta? Perdón.
+Sí, también se puede evaluar el AR1, aunque yo creo que el AR1 no tiene cómo ganar acá porque seguramente si calculamos los residuos del AR1, alguna correlación se nos va a quedar pegando los residuos. Vale, muchas gracias, profe.
+Super. Ya. El... El modelo 3 va a ser un AR1. El orden de la parte autoregresiva es 1. Y el orden de la parte media móvil es 0. Ahí está. Claro, aquí es todo significativo, ¿cierto? Pero...
+Claro, después tienen que pasar el test de blancura. Tienen que ser ruido blanco. Y vamos a ver una herramienta para ver que sean ruido blanco más allá del análisis gráfico que hicimos en la clase pasada. Ya.
+Luego tenemos un modelo autoregresivo de orden 2. Ahí está. El modelo autoregresivo de orden 2 tiene parámetro... Bueno, aquí lo mismo, ¿cierto? El parámetro phi1 es un parámetro que es muy significativo.
+El parámetro phi2 también es un parámetro que es bien significativo. El intercepto... Baja. Sí, baja porque el intercepto cambia las condiciones cuando va en un modelo autoregresivo de orden 2.
+Y claro, el sigma estimado siempre es el mismo. No cambia en ningún ajuste. Siempre 0.07. Siempre es el mismo. Y tenemos un AIC que baja. Y finalmente, el último modelo que vamos a proponer es un modelo ARMA11. El modelo ARMA11.
+Ya. Ya, aquí es lo que tenemos acá. Tenemos que el coeficiente que acompaña la parte autoregresiva es significativo. El coeficiente que acompaña la parte de medias móviles es significativo.
+El sigma cuadrado estimado del ruido blanco, que estamos suponiendo que aquí es gaussiano. También es 0.07. Y el AIC es 97.41. Entonces tenemos cinco modelos propuestos. Vamos acá. Esa zona. El primer modelo es el MA3.
+El segundo modelo es el MA2. El primer modelo, el tercer modelo es el AR1. El cuarto modelo es el AR2. Y el último modelo es el ARMA1. Ahí está la salida. Pero yo les quiero mostrar algo que igual quiero que lo tengan presente.
+Por ejemplo, yo aquí usé la función arma de la librería tseries. Este. Está en el código. Pero alguien se podría haber tentado a utilizar la función Arima. Arima, que trae R. O la función K.
+O la librería Arima con la mayúscula, de la librería forecast. ¿Qué ocurre en estos casos? Voy a comentar esto en realidad para que no se me vea en todas las salidas. Ahí está.
+¿Notan alguna diferencia con lo que hicimos antes? Los valores estimados son los mismos, creo. Perdón. Creo que son los mismos, ¿cierto? 0.2351, 0.17. 0.23, 0.17. Sí, hay una diferencia, pero muy poca. Muy poca. 0.08. Acá está.
+0.8. ¿Pero notan alguna diferencia, además? ¿El AIC es más alto, o eso? Creo que era el mismo, ¿no? 123. No sé, ¿verdad? No me vi. Ah, claro, el AIC está calculado diferente. Sí, está calculado diferente.
+Lo que pasa es que puede que el AIC no esté penalizado por el número parámetro. Pero hay una diferencia entre el número parámetro y el número de parámetros. ¿No? Pero hay una diferencia que es más relevante.
+Y por eso yo hice los ajustes con las otras funciones. Sí, ya, él dice mayor. Yo no me había dado cuenta, la verdad. Ah, pero este, ¿o no? Sí, pero igual da mayor. Creo que había mirado el BIC, ¿o no? 102. Sí, pero da distinto.
+Sí, da distinto. Ya, pero hay una diferencia que es más importante y es con la que ustedes tienen que tomar decisiones. Fíjese que con esta función, ustedes ¿cómo saben si un parámetro significativo o no significativo?
+Ahí no está el P-valor. En esta salida está el coeficiente estimado. Por ejemplo, ahí en el MA1 sería el theta1 estimado. Y la desviación estándar de ese theta1 estimado. Pero no aparece el valor P ni el valor z.
+Entonces, tendrían que ustedes hacer los cálculos a más de 1. Y si ustedes les ponen la mano para evaluar si este parámetro es, bajo usted hipótesis, significativo. Esa es la diferencia fundamental. Claro, ahí lo dice Rodrigo.
+No tiene el valor P. De hecho, yo no me había dado cuenta que el AIC da distinto. O sea, esto AIC, con este método deben ser consistentes entre sí. Se pueden comparar.
+Claramente no se pueden comparar con el otro porque lo calcula de una manera distinta. Ya, pero se entendió entonces. ¿Por qué yo utilicé la otra librería?
+Porque la otra librería me entrega automáticamente, me entrega el valor estimado, la desviación estándar, el valor z, no sé por qué le llamaba valor t, y el P-valor asociado al t de hipótesis.
+Y uno evalúa el tiro si no son significativos. De hecho acá es de entregar los códigos. Significativo, significativo, significativo. Y estas funciones no lo hacen. Por eso no me gusta. ¿Se entendió entonces?
+Claro, la librería es más completa. Sí, es una librería más completa. De hecho yo diría que la librería anterior, la que ahora está de baja, fArma era más completa todavía.
+Ya, entonces, ya lo que vamos a hacer es ver cómo se puede ver. Ya, entonces, aquí tenemos los ajustes, los mismos ajustes que vimos nosotros en el notebook, están acá en la presentación. Ya, y ahí están los AIC.
+De hecho creo que pegué los otros AIC, me equivoqué acá. A ver, sí creo que me equivoqué los de la otra función. Hay un error acá. 102, ¿no? 102, 104, 105, ¿sí, nada? Voy a revisar eso porque...
+Sí, me equivoqué ahí, pegué los de esta función. A ver. 102, 104, 105, 100 y 100. Sí, pegué los otros. Perdón, me equivoqué ahí. Ya, eso lo voy a corregir y voy a actualizar la presentación al pegado de los otros AIC.
+Ya, entonces, cuando ustedes seleccionan un modelo, si varios modelos son pertinentes o pueden ser útiles para un set de datos, un criterio que viene utilizado es el del AIC. ¿Lo han escuchado, no?
+Me imagino que en regresión lo escucharon, ¿no? Sí, lo vimos en nuestra regresión. ¿Qué significa eso? ¿Cómo seleccionamos nosotros por AIC? Nosotros vamos a seleccionar el modelo que tiene menor AIC.
+Justamente lo que dice Juan, el más bajo. Ya, muy bien.  Esperamos un segundito, no me muero nada. Hicimos la medición de series. De series. Bien, pues, vamos a ver.
+Este tiene un AIC de 97. Este tiene un AIC de 94. Da la sensación de que el R2 es mejor. Este tiene un AIC de 100. Este tiene un AIC de 98. Este tiene un AIC de 96.
+Bueno, ah, pero es que hay un problema porque este parámetro no es significativo. Entonces, el M3 queda descartado por eso. Entonces, al final, los modelos que aquí parecen ser los más adecuados son el ARMA1-1 y el AR2.
+Bueno, cualquiera de los dos modelos parece ser adecuado. Sí, son casi iguales. De hecho, aquí también la diferencia es muy poca. Bueno, con la función que utilicé yo era un poco más notable la diferencia. Profes. Cuénteme.
+Una consulta. En el modelo ARMA, o sea, R2. Sí. El... Tienen parámetros más significativos en comparación con el ARMA1-1. Eh... Sí. Sí. Sí. Sí. Es la evidencia... Lo que pasa es que no se miran así las cosas.
+Usualmente lo que hace es evaluar si son o no son significativos. O sea, claro, lo ideal... A ver, el P-valor siempre es una métrica que muestra una evidencia empírica en contra de la hipótesis nula, ¿cierto? Es una métrica.
+Uno utiliza usualmente el punto de corte 0,05. Pero aquí, claro, en realidad estos parámetros ya son muy cercanos. O sea, el P-valor es muy chico. Si uno lo evalúa acá... Claro, la diferencia es que es como el doble el otro.
+O el triple quizá. Pero no... Son todos significativos, la verdad. Ya. Comprendo. Sí. Lo que pasa es que... eso. Ya. Eh... De hecho... Claro, aquí se podría ver usado, ¿qué era de los dos modelos?
+Son los dos los que tienen menor AIC. Y son los dos donde todos los parámetros son significativos y tienen una diferencia sustancial en el AIC con respecto al otro. O sea, por ejemplo, con respecto al... Al AR1.
+Tiene un AIC mucho más grande. Y además... A ver, esto es bien importante. Nosotros podemos proponer el modelo autorregresivo de orden 2 o el modelo ARMA11.
+Pero cuando nosotros hacemos el ajuste, estimamos los parámetros y traemos los residuos, los residuos tienen que pasar el test de blancura.
+Muchas veces, por ejemplo, nosotros podríamos proponer un AR1, pero pueden que los residuos no pasen el test de blancura. Todavía tengan una estructura de dependencia a la función de autocorrelación. ¿Se entiende? Sí, profesor.
+Uno, cuando propone modelos, nosotros aquí elegimos para AIC, pero ¿qué es lo que nos puede pasar en la práctica? Que podemos perfectamente elegir el AR2. Y el AR2 puede que no nos pase el test de blancura, los residuos.
+Eso, épsilon que aparece ahí, que nosotros lo estimamos como el residuo, que es el valor observado menos el predicho, el ajustado, puede que no nos pase el test de blancura. Y ahí sí que vamos a tener un problema.
+Tenemos que recurrir al siguiente modelo. Ya. ¿Esto es como un método de filtrar los modelos? Claro. O ir acercándonos a la respuesta. Claro. De hecho, aquí no hay una respuesta de que... de cuál es el modelo...
+Aquí hay varios modelos que pueden... Por lo menos hay dos o tres modelos que son útiles para los datos. De esos tres modelos que son útiles para los datos, nosotros vamos a elegir el que es más parsimonioso, que es mejor, etc.
+Pero puede que no los tres modelos, los residuos pasen el test de blancura. Ustedes lo vieron en modelos lineales. También tenían que evaluar los supuestos de los residuos en las regresiones lineales. Aquí es lo mismo. Ok. Super.
+Ya. Ya. El modelo que propuse yo, solo por un tema de conveniencia, fue el modelo ARMA1-1. Donde tenemos los parámetros estimados. Y tenemos el sigma estimado.
+Si nosotros queremos el ajuste, ¿cómo se ajusta este modelo a los datos? En regresión lineal, ustedes estimaban la recta media, ¿cierto? Y en la recta media, ustedes estimaban la recta media.
+Y en la recta media, ustedes estimaban la recta media. En regresión lineal, ustedes estimaban la recta media, ¿cierto? Que era, en el fondo, la esperanza condicional con los coeficientes ajustados.
+Aquí nosotros también podemos pedir el ajuste con esta estructura, utilizando la función predict, la función forecast, etc. ¿Ok? Entonces, yo por conveniencia dejé el modelo 5. Aquí está el ajuste.
+Le pido que ajuste los valores a partir del modelo que se estimó. Los voy a guardar de una nueva columna que se llama ajuste. Entonces, voy a sacar esto un momento para que lo vean. ¿Qué es eso? Ahí está.
+Entonces, aquí está el año, aquí está el valor observado, y aquí está el ajuste. Bueno, el primer ajuste es NA, porque depende del valor del año anterior, ¿cierto? Y no existe. Como es un arma 1-1, ¿dónde está la presentación?
+Ese valor no lo tenemos observado en la tabla, así que no podemos hacer este ajuste. Por eso NA. De hecho, si ajustamos el modelo AR2, vamos a perder dos datos. ¿Cuál era el modelo 4, cierto?
+Eso es para que lo tengan presente, ¿ya? En el AR2, perdimos dos datos, ¿no es? ¿Se entiende? Ya, pero como estamos haciendo la presentación con el modelo 5, no vamos a caer con el modelo 5. ¿Alguien me está haciendo una pregunta?
+Claro, todos los P-valores pueden ser significativos, pero nos puede quedar algo en la estructura que no consideramos y que tenemos que volver a ajustarlo. Ya.
+Lo que vamos a hacer ahora, entonces, es graficar la serie observada con la serie ajustada. Voy a quitar esto. Ya, ahí está. Con azul es la serie observada y el modelo 5 es la serie ajustada. Ya, ahí está.
+Con azul es la serie observada y la serie ajustada está con rojo. ¿Se entiende? Da la sensación de que el ajuste en la tendencia media va bien, ¿cierto? Claro, como es un ajuste donde nosotros no tenemos pico.
+¿Se acuerdan que en la clase anterior, las estacionalidades nos producían una demanda de pasajeros muy alta en los vuelos internacionales y nosotros incorporamos variables dummy y capturaban ese efecto? Bueno, aquí no lo tenemos.
+Aquí todo es aleatorio, ¿cierto? Entonces, nosotros estamos modelando aquí solamente la parte media. ¿Qué es lo que aparece acá? Ahí. El valor real con el valor ajustado. ¿Les funcionó el ejemplo? Ya.
+Ahora, tenemos el valor observado y el valor ajustado. Es decir, la estimación que hacemos nosotros de los valores mediante el modelo que estimamos. 
+Lo que hay que hacer ahora es extraer los residuos. Es decir, el valor observado menos el valor ajustado. ¿OK? Espera, ¿Qué es esto? Basta, es el valor ajustado. ¿OK? Perdón. Estamos... Ahora, perdón.
+Ya, con la función residuals, extraemos los residuos del modelo. Vamos a tener un NA. ¿Por qué? Porque el primer valor ajustado era NA en el primer año que está en el set de datos.
+Entonces, por ahí nos va a quedar un NA que después lo vamos a tener que remover ya. Entonces, aquí tenemos el histograma, es decir, la distribución de los errores, y por acá tenemos el gráfico QQ plot.
+Comparamos los percentiles teóricos de la distribución normal con los empíricos, que no tienen los residuos. La idea es que todos los datos estén en torno a una recta. Ya, y ahí está. Ahora lo voy a ver en R. Aquí. Y acá.
+Eeeeh, ¿dónde estaba esto? Acá. No, y se la ajusta. Acá. Perdón. Ya, ahí están los modelos. Acá está la ajuste. Este es el gráfico que vimos recién en la presentación. Y este es el... No, este. Este. Ya, ahí están los residuos.
+Aquí se los vamos a ver un poco mejor. Ya, a ver, bueno, este efecto que se ve acá, los residuos parecen estar centrados en cero. La desviación estándar ya nos la entregó. El software control era 0.07 aproximadamente, ¿cierto?
+Y parece que tenemos algunos valores extremos. O sea, la mayoría de los residuos están entre menos 0.05 y 0.05. Y si bien aquí se pasa un poquitito hacia la izquierda, hacia los valores negativos, tenemos uno que es cercano a uno.
+Dos cercanos, dos cercanos, y tiene frecuencia además. Eso hay que revisarlo, esto, porque parece ser que esto tiene una forma aproximada de una campana de Gauss. Pero esos valores de ahí podrían generar problemas.
+Y en el gráfico que está a la derecha, esa línea recta que aparece ahí, es la recta que se ajusta entre los percentiles teóricos y los percentiles empíricos que aparecen acá, en el eje X y en el eje Y.
+Cuando esos puntos están todos en torno a la recta, uno dice, bueno, en realidad, todos los percentiles siguen, se parecen mucho los percentiles de la distribución normal teórica, los empíricos.
+Aquí parece que hay una diferencia en los valores extremos, poquitito. La hay, pero poquitito. Entonces vamos a tener que hacer un test de hipótesis para ver si los residuos siguen en una distribución normal.
+O sea, no es que siguen, si existe evidencia empírica para descartar la distribución normal. Pregunta, ¿qué otro gráfico nos falta para valorar estos residuos? Porque la idea es que estos residuos sean ruido blanco, ¿cierto?
+¿Con esto nos basta?
+Supongamos que hacemos un test de hipótesis y nos permite saber que los residuos efectivamente siguen una distribución, o sea, no existe evidencia empírica para descartar que los residuos siguen una distribución normal.
+¿Qué podríamos, qué nos falta? ¿Qué hicimos en la clase pasada? ¿Qué creen ustedes? Nos falta la ACF y la PACF de los residuos. Claro, y ahí vamos a revisar los supuestos reglajos justamente.
+Entonces, esta función que está acá, que es de la librería Forecast, se llama ggtsdiag. Ah, no. Lo hacemos directamente con la... No, me estoy saltando un paso. ¿Cómo se llama? Me equivoqué acá. Era esta. Voy a usar esta función.
+Acá. ggacf de los residuos. ¿Dónde está el residuo acá? Ahí está. Ahí, vamos a ver. Ya, miren. Fíjense que los residuos no tienen ninguna función autocrelación significativa.
+Se acuerdan que es uno de los supuestos de un ruido blanco. El ruido blanco, los datos no tienen covarianza a través del tiempo, por lo tanto, no tienen correlación a través del tiempo. Y en la PACF va a pasar lo mismo. Bueno.
+Lo mismo. Es decir, estos datos, a partir del modelo que ajustamos, parece ser que estos residuos son ruido blanco. Parece que la distribución se parece a una campana de Gauss, igual tenemos que hacer un test de hipótesis.
+Cuando comparamos los percentiles teóricos de la campana de Gauss con los percentiles empíricos de los residuos, son casi lo mismo.
+Y al evaluar la función de autocorrelación y la función de autocorrelación parcial, en estos residuos no encontramos que ninguna correlación o correlación parcial era significativa.
+Eso nos entrega un indicio de que los residuos parecen ser ruido blanco. Nos queda un pequeño detalle, eso sí. Porque todo esto es gráfico. Todo esto es gráfico. Ya. Entonces, nos falta un diagnóstico un poco más profundo.
+Ahora, si en el gráfico de la función de autocorrelación de los residuos vemos que tenemos autocorrelaciones que son altas y son significativas, claro, a partir de eso vamos a saber que no son un ruido blanco.
+Ahora, hicimos un análisis gráfico donde tenemos la idea, la entusiasmo que son ruidos blancos. Pero, para evaluar esto, hay un diagnóstico de ruido blanco. Y se llama el test de Ljung-Box. Es un test de hipótesis.
+Este test lo que permite es verificar si estos residuos son o no son correlacionados a través del tiempo.
+Entonces, la hipótesis nula es que todas las correlaciones en el lag 1, en el lag 2, hasta el lag M, que el M podría ser 10, 20, 30, son todas iguales a cero.
+Versus la hipótesis alternativa que al menos una de esas funciones de autocorrelación es distinta de cero. Para alguno de los valores, para el valor 1, para el 7, para el 10, que se yo, etc.
+El estadístico se utiliza, es el Q, el Q sub M, que depende del tamaño muestral de la serie, que es el N que aparece ahí, en nuestro caso no me acuerdo cuánto era la serie, 1500 creo que era.
+El M es hasta dónde le vamos a pedir el test de Ljung-Box. Usualmente se piden 20, o más.
+No puede ser un valor menor, porque supongamos que algo es estacional y tiene un pico cada 12 meses, y nosotros no removimos esa estacionalidad, debería aparecer un pico o una correlación alta a los 12 meses.
+Entonces, si lo hacemos más corto nos parece que es ruido blanco, si lo hacemos más largo nos parece que no es ruido blanco.
+Aparecen las funciones de autocorrelaciones empírica y cuadrado, y aparece este denominador corregido por el sumando.
+Ya, este estadístico bajo H0 tiene una distribución chi cuadrado con M grados de libertad, y en el fondo se compara si el estadístico Q es mayor o es menor, igual, que el percentil de la distribución chi cuadrado.
+O si el software no reporta el P valor, lo vemos con el P valor. Ese es el test de Ljung-Box.
+Ahora, da la sensación de que es algo complicado, no, no es complicado porque el software lo hace automáticamente y nosotros podemos tomar decisiones inmediatamente con el P valor. Vamos acá. Ahí está, ggtsdiag.
+Ya, y este es el gráfico mío. Me acasan a ver, ¿cierto? Sí. Ya, el primer gráfico donde dice residuos estandarizados, básicamente están los residuos, se le restó la media y se dividió por la desviación estandar.
+Se ve que todos los residuos se mueven más o menos entre menos 2 y 2, así que quizá un poquito más de 2, pero no hay problema.
+Luego, este diagnóstico nos entrega la función de autocorrelación de los residuos donde ninguno es significativo. Bueno, hay uno como al nivel de 20, 20, 21, 22, 21, 22, el 24 parece que se escapa un poquitito, pero muy poquitito.
+Y esta columna, la que aparece al final es la más importante, que es donde está el test de Ljung-Box. Cuando el M vale 1, no existe evidencia empírica para descartar que la correlación sea distinta de 0.
+Cuando el M es 2, quiere decir que se está valuando la autocorrelación de orden 1 y la correlación de orden 2. Como el P-valor es grande, no existe evidencia empírica para descartar que ambas sean iguales a 0.
+Cuando el M vale 3, cuando el M vale 4, y así sucesivamente, no importa el M que utilicemos, siempre los valores P son grandes.
+Por lo tanto, siempre vamos a concluir que no existe evidencia empírica para decir que todas las correlaciones son iguales a 0.
+Entonces, este test es la herramienta más útil para decir, bueno, en realidad no existe ninguna correlación que sea relativamente significativa, que nos permita descartar la hipótesis de ruido blanco.
+Y usualmente uno lo hace a nivel 20 o a nivel 30, porque muchas veces los datos pueden ser mensuales y pueden aparecer patrones anuales con estacionalidad cada 12 meses.
+Entonces, claro, el test de Ljung-Box puede venir muy bien, pero en el lag 12 se te cae porque justamente hay una correlación muy alta cada 12 meses. Ya. Así se lee el test de Ljung-Box. ¿Se entendió?
+¿O alguien quedó con alguna duda de eso? Sí, esto es difícil. Yo estoy completamente de acuerdo que esto no es muy fácil trabajar con datos que no son independientes.
+Uno en la mayoría de las áreas de la estadística trabaja con datos que son independientes. Uno agrega asociación y correlación a través del tiempo y aquí ya todo se dificulta exponencialmente.
+De hecho, el curso de serie de tiempo es un curso que para las carreras de estadística es un curso de cuarto año, un curso a un mes. Mira, Antonia, el test de Ljung-Box, a partir del análisis gráfico, volvamos al análisis gráfico.
+Nosotros podemos concluir que los residuos siguen una distribución que parece una campana de Gauss y los percentiles teóricos con los empíricos se parecen bastante a los de... los percentiles de los residuos se parecen bastante a los percentiles teóricos de la distribución normal.
+Ese es el gráfico QQ. Y luego lo que hicimos fue graficar la función de autocorrelación de los residuos. Que era esta.
+Era... graficamos las dos, pero en realidad bastaba con la primera nomás. Esto. Aquí estaba el gráfico. Esto fue lo primero que hicimos.
+Y dijimos, bueno, en realidad aquí no hay... o sea, los residuos tienen media cero, tienen varianza constante, y no son autocorrelacionados a través del tiempo, por lo menos empíricamente lo vemos a través del gráfico.
+Pero claro, la distribución también la estamos viendo a través del gráfico. Parece ser una campana de Gauss, parece ser homocedástico, y según este gráfico al parecer no tenemos correlaciones significativas.
+Pero lo que te garantiza eso es el test de Ljung-Box.
+Este test de hipótesis que es Ljung-Box lo que evalúa es si tú quieres hacer el test hasta las 20 primeras correlaciones, asumes que el M vale 20, y evalúa si todas las autocorrelaciones son iguales y son iguales a cero.
+Esa va a ser tu hipótesis nula. Y tu hipótesis alternativa es que exista al menos una que sea distinta de 0.
+Y el estadístico es que aparece acá abajo que depende del tamaño de la serie de tiempo y aparece... obviamente tiene que intervenir las autocorrelaciones desde 1 hasta M en el sumando de la cuadrada.
+Y esto se compara con los percentiles de la distribución chi cuadrado porque este estadístico tiene distribución chi cuadrado. Ahora, eso nosotros no lo vamos a usar. ¿Para qué vamos a usar eso?
+Si el software lo grafica automáticamente y nos entrega los P valores en el gráfico.
+Entonces, el software lo que hace, dice bueno, con esta función ggtsdiag le damos el modelo, le damos el largo y le pedimos que nos entregue el diagnóstico. Y ahí está el diagnóstico. Vamos a hacerlo ahora.
+Aquí está el diagnóstico completo. ¿Qué pasó? ¿Qué pasó? Ahí sí, ya. Entonces, aquí, en el primer gráfico tenemos los residuos estandarizados que no vemos que a medida que aumente o disminuye el tiempo...
+Hoy me he equivocado a unos 500 datos, yo creo que dije 1500 datos. No vemos que aumente o disminuye la varianza. Ya.
+En la función de autocorrelación que fue la que nosotros ya graficamos todos los residuos, vemos que ninguna correlación es significativa. Pero abajo, en el último gráfico en el que está más hacia abajo, aparece el test de Ljung-Box.
+Entonces, todos esos puntitos que aparecen ahí, el primero es cuando m vale 1, 2, 3, perdón, cuando m vale 0. Cuando m vale 1, 2, 3, 1, 2, 3, 4, no, m vale 1, perdón, m vale 1, 2, 3, 4, 5. Ya.
+Entonces, se hace el test de Ljung-Box cuando el m vale 1, cuando el m vale 2, cuando el m vale 3, cuando el m vale 4, y me voy a tener cuando el m vale 5. Cuando el m vale 5, el p-valor del test de hipótesis es cercano a 1.
+Y tú rechazas la hipótesis nula cuando el p-valor es pequeño.
+Entonces, tú estás diciendo que el test de hipótesis, cuando el m vale 5, dice que está evaluando la hipótesis nula si las cinco primeras autocorrelaciones son iguales a 0, versus que exista al menos una que sea distinta.
+Y el test de Ljung-Box te dice, no, oye, no hay evidencia empírica para concluir eso, el p-valor es casi 1. Para que hubiera evidencia empírica, el p-valor tendría que ser pequeño.
+De hecho, la banda de confianza está ahí abajo, con azul. Ningún puntito está abajo de esa banda.
+Pero claro, alguien me puede decir, oye, pero Christian, quizás en 5 muy poco, quizás por ahí aparece una correlación alta en, por ejemplo, ahí aparece una correlación alta en 25, en 24.
+Quizás esa correlación te descarta la hipótesis de ruido blanco.
+Pero a pesar de que nosotros aumentamos el m y llegamos hasta un m igual 20, no existe evidencia empírica para concluir que todas esas autocorrelaciones son iguales a 0. Así se interpreta el test de Ljung-Box.
+Porque todos esos valores p, esos puntos están cercanos al 1.
+Si esos puntos son menores que esa banda, que esa banda está en el punto 0.05, entonces nosotros decimos, oye, ojo, que acá hay correlación que no hemos removido, por lo tanto, no podemos concluir que los residuos son ruido blanco.
+¿Se entendió? Claro, lo que dice Jesús.
+Claro, porque justamente lo que puede pasar, supongamos que estos datos fueran mensuales y seguramente lo que pasaría, si es que no incorporamos un modelo que tenga un efecto estacional, el ACF residual en 12 se va a disparar.
+Entonces, nuestro test de Ljung-Box en el 12, como es el caso de la parte R, en el 12 de un lado se va a caer. Y eso nos va a decir ¡ah!
+Tenemos todavía que remover algo de dependencia y podríamos incluir un modelo, podríamos rezagar 12 veces un residuo, 12 veces la serie tiempo, la parte R o la parte Mea para remover eso.
+Eso lo vamos a discutir de hecho en la clase del día martes. Ya. Ahí está, ahí está. Y hay otro tema que es relevante. Yo no sé si ustedes lo vieron en el curso pero lo que hice acá fue hacer el test de Kolmogorov-Smirnov.
+Es un test de hipótesis que evalúa la hipótesis nula si los residuos provienen de una distribución normal o si no provienen de una distribución normal, aquí tuve que quitar el N que estaba al principio. Ya.
+Entonces, la hipótesis nula en este test de hipótesis es que los residuos provienen de una distribución normal compara la distribución empírica contra la distribución teórica normal, el valor del estadístico D que compara la máxima diferencia entre la función de distribución acumulada empírica de los datos versus la teórica de la distribución normal.
+Pero el P-valor es 0.25 y como no es menor que 0.05, no existe evidencia para descartar la hipótesis nula. Es decir, no tenemos evidencia a partir de los datos para decir que los residuos no provienen de una distribución normal.
+Entonces, vamos a concluir que sí tienen una distribución normal. ¿Sí? Y por último, me parece que aquí hay una función que es bien interesante que se llama fitdist, que es de la librería que está arriba, fitdistrplus.
+A mí me gusta esta función porque encuentro que hace toda la pegan, ¿no? ¿Dónde está esto? Esta. fitdistrplus. Ya. Vamos acá. ¿Qué es lo que hace? Nos va a entregar un gráfico súper completo.
+Va a tomar los residuos, va a calcular la distribución empírica, la va a comparar con la distribución teórica en histograma. Después va a comparar la distribución, la función de distribución acumulada empírica y teórica, etcétera.
+Nos va a hacer todo lo gráfico. Ahí está. Bueno, se ve mejor acá en el... Voy a hacerlo en RStudio y no en el colab. Para que se vea un poco mejor. Acá está. Eso ya lo hicimos, ya lo hicimos. Este. Ahí está. Le voy a...
+Va a hacer un zoom. Ahí está. Entonces miren. Con gris está el histograma de los residuos y con rojo está la campana de Gauss.
+Quizá hay una diferencia acá leve, pero ya este hipótesis nos dice que no existe evidencia para descartar la campana de Gauss. Aquí está el QQ plot que nosotros ya lo hemos graficado.
+Los cuantiles teóricos de la campana de Gauss con los cuantiles empíricos. Miren, este gráfico es muy bueno porque el gráfico que está en la parte inferior izquierda.
+Con rojo está la función de distribución acumulada de la normal para los diferentes valores de los residuos. Y con negro está la empírica. Ya.
+Cuántos valores están bajo un cierto valor los cuenta y los divide por el tamaño muestral. Y después compara las probabilidades empíricas con las probabilidades teóricas, que son casi las mismas.
+Entonces esto nos da una garantía de que lo que nos está entregando es que la hipótesis está bien. Entonces, efectivamente, después del modelo que ajustamos, los errores parecen ser ruidos blancos.
+O no tenemos evidencia empírica para decir que no son ruidos blancos. Ya. Y por último, algo que es bien importante, que lo hemos usado pero no lo hemos abordado, es cómo se hacen las predicciones.
+A ver, las predicciones, los ajustes y las predicciones, se hacen con la esperanza condicional.
+Si nosotros además demostrar que nuestros residuos son ruido blanco y además evaluamos si la distribución normal es una distribución que se adecua a los residuos, la esperanza condicional va a ser súper útil porque vamos a utilizar la esperanza condicional de una distribución normal para hacer las predicciones.
+Entonces, el valor estimado, el valor predicho, para hacer la esperanza condicional de ese valor, ajustado a la información que nosotros tenemos en la muestra.
+Claro, como nosotros no tenemos infinitos datos, nuestra muestra es agotada, nos vamos a limitar a hacer este cálculo que aparece acá. Eso lo hace el software. Bueno, cada modelo tiene una fórmula recursiva para hacer esto.
+No quiero entrar en los detalles porque eso sí que ya es complicado. Pero lo que hace el software está haciendo este cálculo dependiendo de qué modelo sea. Si es un AR, tiene una fórmula.
+Si es un MA, tiene una cierta fórmula, las pueden encontrar en la bibliografía. No creo que les sea de alto interés, yo creo que ustedes quieren ver los resultados.
+Y eso, nosotros no vamos a hacer ese cálculo, se lo vamos a pedir al software. Este caso es un poco feo, pero aquí está un poco más decente.
+Entonces, le entregamos el modelo, además nos entrega las bandas de confianza de las predicciones.
+Yo le pedí que fueran a 95, les pedí que nos entregaran las 10 próximas predicciones, es decir, del último dato que nos entregara, 10 datos más perdidos en adelante.
+Lo vamos a guardar con un objeto que se llama forecast1 y vamos a usar un autoplot. Ahí está. Bueno, acá no se ve tan bien. Ahí están las bandas de confianza con gris. Lo voy a hacer mejor en RStudio. Acá. Ya.
+Aquí creo que se ve un poco mejor. Ahí. Tampoco es que se vea tan espectacular. Pero si alcanzan a ver, ahí están las predicciones. Ya, estos modelos, siempre las predicciones caen en la media. Perdón, caen en la tendencia.
+Como aquí la tendencia era 1, en el paso 10 ya las tendencias caen en 1, las estimaciones de los valores predichos o cercanas a 1. Y lo que está con gris son las bandas de confianza, el límite inferior y límite superior.
+En la medida que uno hace proyecciones más lejanas, aumenta estas bandas de confianza. Yo en la presentación lo hice un poco más detallado, que aparece ahí. Ahí se ve un poco más con detalle.
+Entonces, ahí está la predicción a 1 paso, a 2 paso, a 3 paso, hasta el paso 10 que llega casi al valor 1. Y con rojo está el intervalo de confianza al 80% y con amarillo está el 95%. Ok. Y ahí tenemos las predicciones.
+Y esas son las predicciones, las pueden observar después. ¿Dónde está esto? Acá. Ahí está. Ahí está la predicción puntual. Ahí está el límite inferior del intervalo de confianza al 95% y ahí está el límite superior.
+Y ahí están las 10 predicciones que les pedí que estaban incluidas en el gráfico. Lo que pasa es que el gráfico lo hace completo. Como aparece ahí. Me grafica los datos originales, hasta y me agrega los 10 forcas que yo le pedí.
+Ya estimados, estamos en la hora de alguna consulta. ¿Alguna duda? No, fe. Utilizando los mismos datos, ¿se pueden estimar más años? Sí. ¿20, 30? Sí, les puedo pedir 20. Yo les pedí 10 y les puedo pedir 20, 30 predicciones.
+Lo que pasa es que hay que tomar en cuenta que estos modelos en particular, como tienen esta estructura de dependencia que se conoce de estos modelos Arma, se conoce como modelos de corta memoria.
+Si tú te das cuenta, los datos estaban centrados en un milímetro, ¿cierto? Entonces ya en el paso 10 ya caían en la constante 1. Y después se queda pegado en un 1. Déjame ver.
+Por mucho que yo le pida más datos, va a estar siempre pegado en 1. Sí, porque las predicciones, porque son modelos de corta memoria. Las cosas fluctúan muy poco en el corto plazo, pero en el largo plazo caen en la media.
+En la tendencia, preguntar. Lo que puedo entender, sí profe, entonces es que si nosotros le alimentamos con más historia, los primeros datos van a ser con las predicciones más fiables. Sí, que los estimadores van a ser mejores.
+Mira, aquí les puedo poner 50 predicciones. Yo estoy exagerando un poco porque no... Ah, pero mira, ¿por qué me exprime solo lo...? No está compartiendo un poco, si es así. Ah, no estoy compartiendo, perdón. Un segundo.
+Ya, voy a hacer acá. A ver. Perdón. Acá. Acá están a ver, ahí le pedí 50 predicciones. Y acá están a ver lo que pasó, ¿no? Tiende a la media. Y aquí está la tendencia que era uno. De hecho, les podemos pedir...
+Pero claro, no tiene mucho sentido, porque estos modelos, de hecho, los voy a explicar en la otra clase, los modelos ARMA, son conocidos como los modelos de corta memoria, porque en el corto plazo caen en las tendencias.
+Mira, ahí se dan cuenta, ¿no? Y eso. Ya, ¿alguna otra duda?
+Sí, lo otro que se puede hacer, bueno, ya lo comenté, si falta algún dato, porque pueden haber datos faltantes acá, se pueden imputar utilizando la esperanza condicional, con la información de antes del dato y con la información después del dato.
+O se puede reconstruir el pasado, pero también serían estimaciones que van a caer en la tendencia. Sí, a ver, Antonio, lo que tú dices, se hace.
+Esa pregunta es bastante interesante, sobre todo para la gente que trabaja en realidad en el sector de la información, es muy interesante, sobre todo para la gente que trabaja en riesgo de crédito, o en riesgo, claro, y tiene que fijar escenarios de estrés.
+Si tú me dices, ¿sabes qué? Pero yo quiero tener un escenario optimista o pesimista, sí. Lo que haces tú, por lo general en esos casos, te vas a los límites de las bandas de confianza.
+Entonces, lo que haces, tiras un, utilizas la banda inferior en un escenario pesimista, va a suponer que sus años van a ser secos, etcétera, optimista, y te excede a los límites superiores de los intervalos de confianza.
+En este ejemplo, en el ejemplo de las tasas de interés, tú puedes además apoyarte en predictores, porque estos modelos ARMA también se pueden agregar predictores, variables exógenas, y puedes ponerte en escenarios pesimistas en las variables exógenas también.
+Se puede hacer harto, para hacer, por ejemplo, test de estrés, cosas de ese tipo. ¿Alguna otra consulta, chicos?

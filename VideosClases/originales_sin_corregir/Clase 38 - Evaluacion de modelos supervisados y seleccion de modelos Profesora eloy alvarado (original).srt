@@ -1,0 +1,6268 @@
+1
+00:00:00,000 --> 00:00:14,000
+¿Cómo o bajo qué criterio, qué métrica vamos a estar decidiendo qué es lo que nosotros vamos a llamar el mejor modelo bajo cierto contexto?
+
+2
+00:00:14,000 --> 00:00:23,000
+Entonces, primero tenemos que preguntar, ¿qué estamos estimando? ¿Qué es lo que nosotros estábamos modelando?
+
+3
+00:00:23,000 --> 00:00:27,720
+estaba modelando un número, estaba modelando una categoría.
+
+4
+00:00:27,720 --> 00:00:31,480
+En la sesión pasada con Pedro, ustedes vieron la matriz de confusión.
+
+5
+00:00:31,480 --> 00:00:34,520
+Ya, aquí vieron lo que eran los falsos positivos, falsos negativos y métricas
+
+6
+00:00:34,520 --> 00:00:39,320
+asociadas a esta...
+
+7
+00:00:39,320 --> 00:00:42,200
+¿cómo se llama esto?
+
+8
+00:00:42,200 --> 00:00:46,440
+A esta clasificación, ya. Y en general vieron los clasificadores clásicos,
+
+9
+00:00:46,440 --> 00:00:49,800
+ya sea una regla de su logística,
+
+10
+00:00:49,800 --> 00:00:51,800
+algún
+
+11
+00:00:51,800 --> 00:00:54,400
+soporte vector machine o más que nada de soporte vectorial
+
+12
+00:00:54,920 --> 00:00:59,600
+con algún distinto kernel pero la salida de eso era efectivamente
+
+13
+00:01:00,440 --> 00:01:08,340
+una clasificación y decía era a o b para clases o 0 o 1 para clases binarias o a b o c para multiclasos
+
+14
+00:01:09,280 --> 00:01:12,000
+y trataban en particular para el caso binarios
+
+15
+00:01:12,800 --> 00:01:15,560
+lo que hacían era tratar de tener una métrica y decir
+
+16
+00:01:15,560 --> 00:01:24,080
+la precisión, cuánto se equivoca, cómo se está equivocando porque no es lo mismo, pero si se fijan
+
+17
+00:01:24,080 --> 00:01:29,760
+ahí estamos en un proceso de clasificación, ya que tenemos que tener ciertas métricas para decidir
+
+18
+00:01:29,760 --> 00:01:38,960
+lo que hicimos ya con ese modelo u otro porque hay más modelos de clasificación, es una buena métrica,
+
+19
+00:01:38,960 --> 00:01:49,440
+es un buen indicador de decisión del modelo, o de decisión del modelo,
+
+20
+00:01:49,440 --> 00:01:54,120
+es decir, recuerden que cuando uno está en la práctica, que uno va a tener
+
+21
+00:01:54,120 --> 00:01:58,400
+distintas metodologías, distintas herramientas, con lo cual va a poder hacer
+
+22
+00:01:58,400 --> 00:02:05,000
+o va a tratar de atacar el problema. Pero cuando ya tengo que tomar eso y llevarlo
+
+23
+00:02:05,000 --> 00:02:11,320
+tengo que decidir decidirme por alguna de esas de algunos de esos modelos y ahí tengo que entrar
+
+24
+00:02:11,320 --> 00:02:19,880
+en el proceso de evaluación qué voy a evaluar cómo lo voy a evaluar cómo voy a decidir en el caso de
+
+25
+00:02:19,880 --> 00:02:32,840
+la clasificación binaria qué tipo de error es el que yo voy a sopesar más ya pensemos el típico
+
+26
+00:02:32,840 --> 00:02:40,200
+ejemplo de fraude. El tipo de ejemplo de fraude es que es peor que una
+
+27
+00:02:40,200 --> 00:02:45,040
+transacción yo la detecte como fraude y no era fraude o al revés, decir que no
+
+28
+00:02:45,040 --> 00:02:49,520
+era fraude y efectivamente era fraude. Entonces el segundo tiene un peso mayor
+
+29
+00:02:49,520 --> 00:02:53,560
+dentro de ese contexto. Entonces no tiene el mismo
+
+30
+00:02:53,560 --> 00:02:59,160
+peso el tipo de error. Entonces para efectos de esta sesión nosotros vamos a
+
+31
+00:02:59,160 --> 00:03:06,760
+trabajar con dos ejemplos de los cuales están, la base de datos están en el Moodle. Primero vamos
+
+32
+00:03:06,760 --> 00:03:15,200
+a trabajar con un modelo que trabaja con, o sea que presenta resistencias de una mezcla de hormigón
+
+33
+00:03:15,200 --> 00:03:22,080
+para distintos compuestos y la idea de ese modelo, que nosotros vamos a hablar de varios, es predecir
+
+34
+00:03:22,080 --> 00:03:26,640
+digamos, la resistencia bajo los distintos
+
+35
+00:03:26,640 --> 00:03:31,760
+compuestos que tiene esa sustancia.
+
+36
+00:03:31,880 --> 00:03:36,200
+Lo que nosotros en general vamos a querer, si se fijan en ese contexto, es un
+
+37
+00:03:36,200 --> 00:03:41,960
+modelo que trata de estimar, trata de modelar una cantidad numérica,
+
+38
+00:03:41,960 --> 00:03:48,120
+cuantitativa. En general nosotros tenemos una métrica usual, que basada en la
+
+39
+00:03:48,120 --> 00:03:52,320
+diferencia entre lo observado y lo que yo estoy prediciendo, o estoy modelando.
+
+40
+00:03:52,320 --> 00:03:58,860
+Hay que hacer todas las métricas que están asociadas a la discrepancia entre lo
+
+41
+00:03:58,860 --> 00:04:05,800
+observado y lo predicho. Puedo dar suma cuadrada de error, el error medio cuadrático,
+
+42
+00:04:05,800 --> 00:04:09,480
+la raíz del error medio cuadrático, y así sumisíguelo que puedo tener distintas métricas,
+
+43
+00:04:09,480 --> 00:04:17,240
+incluso coeficientes de determinación como lo son el R cuadrado, el R cuadrado ajustado.
+
+44
+00:04:17,240 --> 00:04:22,360
+Pero tenemos que ver y tener claridad de cuáles de esto nos sirven.
+
+45
+00:04:22,360 --> 00:04:26,640
+En cambio, si estoy tomando esto en un proceso de clasificación,
+
+46
+00:04:26,640 --> 00:04:32,920
+un problema de clasificación, voy a tener otras métricas de las cuales yo voy a tomar parte y voy
+
+47
+00:04:32,920 --> 00:04:38,800
+a tener como criterios para decidir qué modelo voy a escoger yo cuando
+
+48
+00:04:38,800 --> 00:04:41,040
+efectivamente tenga que tomar una decisión.
+
+49
+00:04:41,040 --> 00:04:43,840
+La gran mayoría de estos modelos, sobre todo en ciencia de datos,
+
+50
+00:04:43,840 --> 00:04:50,080
+objetivo principal es predecir con vistas a tomar una decisión, por
+
+51
+00:04:50,080 --> 00:04:57,200
+consecuencia tenemos que tener bastante claridad de qué modelos ocupamos para
+
+52
+00:04:57,200 --> 00:05:03,360
+realizar una acción. Ahora, en el caso idóneo, todas nuestras opciones nos
+
+53
+00:05:03,360 --> 00:05:08,600
+entregan la misma respuesta, no obstante en la práctica cuando uno hace estas
+
+54
+00:05:08,600 --> 00:05:13,400
+cosas, dependiendo del modelo yo voy a probablemente tomar distintas
+
+55
+00:05:13,400 --> 00:05:17,960
+decisiones porque voy a estar sopesando
+
+56
+00:05:18,400 --> 00:05:23,280
+distintas cosas que yo voy a considerar malas o peores ya en términos de
+
+57
+00:05:23,280 --> 00:05:28,560
+errores ya por ejemplo qué tanto voy a penalizar el error
+
+58
+00:05:28,560 --> 00:05:33,860
+errores pequeños lo voy a tratar de dar un mayor una mayor magnitud en el
+
+59
+00:05:33,860 --> 00:05:39,300
+sentido de que quiero equivocarme muy poco o qué tan laxo soy ya en el
+
+60
+00:05:39,300 --> 00:05:45,300
+sentido de voy a permitir equivocarme al punto de que pueda mejorar mi
+
+61
+00:05:45,300 --> 00:05:49,500
+precisión o mi predicción de manera global que lo deben haber visto de
+
+62
+00:05:49,500 --> 00:05:55,020
+manera tan especial cuando vieron máquinas de soporte espectorial.
+
+63
+00:05:56,340 --> 00:06:02,460
+Así entonces este concepto de mejor modelo es un poco etéreo. Tenemos que
+
+64
+00:06:02,460 --> 00:06:08,460
+definir qué es y formalizar qué es un mejor modelo porque no siempre no hay un
+
+65
+00:06:08,460 --> 00:06:12,940
+modelo que le gana todo va a depender mucho del contexto cuál es el objetivo
+
+66
+00:06:12,940 --> 00:06:17,300
+de lo que ustedes quieren realizar o quieren resolver o modelar con las
+
+67
+00:06:17,300 --> 00:06:24,220
+distintas opciones que van a tener ya sea revisión, el super vector machine
+
+68
+00:06:24,220 --> 00:06:30,660
+o el rayo de neuronorales etcétera todas esas herramientas a la larga me
+
+69
+00:06:30,660 --> 00:06:35,580
+entregan una misma predicción o me entregan predicciones distintas
+
+70
+00:06:35,580 --> 00:06:41,980
+pero me entregan predicciones. Entonces, la pregunta que va a guiar esta sesión es,
+
+71
+00:06:41,980 --> 00:06:47,580
+¿cómo decido cuál de esas predicciones de los distintos modelos es mejor?
+
+72
+00:06:47,580 --> 00:06:56,700
+Uno siempre intenta o tiene cierta tendencia a trabajar con las mismas métricas que le han
+
+73
+00:06:56,700 --> 00:07:04,420
+resultado anteriormente, pero para hacer un proceso más o menos adecuado, tengo que evaluar las
+
+74
+00:07:04,420 --> 00:07:10,780
+metodologías con distintas métricas, que en esencia es tener una imagen completa
+
+75
+00:07:10,780 --> 00:07:15,700
+de lo que estoy modelando. Entonces, este concepto de mejor modelo lo vamos a
+
+76
+00:07:15,700 --> 00:07:20,720
+tener que definir de alguna manera. ¿Qué tipo de errores van a importar? ¿Por qué
+
+77
+00:07:20,720 --> 00:07:25,420
+los voy a usar? Y en principio tenemos que también considerar la literaridad de
+
+78
+00:07:25,420 --> 00:07:32,980
+cómo estamos probando. Ustedes vieron con el martes con Pedro la noción de
+
+79
+00:07:32,980 --> 00:07:45,980
+validación cruzada ya y la noción de los pies. Entonces, ese concepto va a ser fundamental cuando nosotros queramos evaluar la predicción.
+
+80
+00:07:45,980 --> 00:07:48,980
+Siguiendo entonces.
+
+81
+00:07:51,980 --> 00:07:57,980
+Los modelos que nosotros vamos a trabajar, o los problemas que nosotros vamos a trabajar, en principio es
+
+82
+00:07:57,980 --> 00:08:06,300
+es la modelación o la estimación de una resistencia en términos de los
+
+83
+00:08:06,300 --> 00:08:10,780
+compuestos de concreto.
+
+84
+00:08:11,780 --> 00:08:17,420
+Avisionalmente, en el caso de probabilidad, cuando nosotros estamos
+
+85
+00:08:17,420 --> 00:08:24,700
+modelando la clasificación de correos, que es la otra problemática que vamos a
+
+86
+00:08:24,700 --> 00:08:33,880
+ver dentro de esta sesión es yo no voy a estar modelando si es que es un sí o un no, sino voy a
+
+87
+00:08:33,880 --> 00:08:37,780
+estar modelando la probabilidad de que sea de la clase 1 o sea de la clase 2.
+
+88
+00:08:40,060 --> 00:08:47,600
+Adicionalmente, ya cuando modelo la probabilidad yo voy a tener que tener una regla de decisión
+
+89
+00:08:47,600 --> 00:08:53,020
+porque esos modelos me van a entregar una probabilidad de que pertenezca a la clase 1
+
+90
+00:08:53,020 --> 00:08:57,980
+o una probabilidad de que tenga la clase 2, entonces posterior a ello voy a
+
+91
+00:08:57,980 --> 00:09:02,340
+necesitar una regla o definir un umbral en el cual yo voy a considerar esa
+
+92
+00:09:02,340 --> 00:09:08,740
+probabilidad como 1 y esa probabilidad como 0. Si me dan 5 segundos
+
+93
+00:09:08,740 --> 00:09:12,980
+necesito atender algo un poco urgentes.
+
+94
+00:09:23,020 --> 00:09:37,460
+Entonces, tenemos las dos problemáticas, tenemos la moderación de la resistencia,
+
+95
+00:09:37,460 --> 00:09:45,520
+la moderación de los modelos que quieren clasificar, pero que en principio no clasifican
+
+96
+00:09:45,520 --> 00:09:52,540
+en los labels, en las marcas entre 0 y 1 positivo y negativo o distintas clases, sino que lo
+
+97
+00:09:52,540 --> 00:10:02,420
+estiman es la una probabilidad esa probabilidad tiene que ser digamos evaluada porque dependiendo
+
+98
+00:10:02,420 --> 00:10:08,100
+del umbral es lo que me va a hacer pasar a una acción entonces esa probabilidad que
+
+99
+00:10:08,100 --> 00:10:15,220
+nos que nos la podemos la podemos obtener desde los problemas de clasificación en
+
+100
+00:10:15,220 --> 00:10:22,300
+principio binarios ya si bien puede ser extendido a multiclase expresa esta incertidumbre no
+
+101
+00:10:22,300 --> 00:10:25,860
+obstante luego de ello está el siguiente paso pasar a una acción tomar una
+
+102
+00:10:25,860 --> 00:10:30,140
+decisión entonces la evaluación probablemente tal de los modelos es
+
+103
+00:10:30,140 --> 00:10:34,740
+bastante fundamental cuando estoy resolviendo un problema porque es el
+
+104
+00:10:34,740 --> 00:10:40,100
+último paso que efectivamente tienen una interacción con lo real ya no es
+
+105
+00:10:40,100 --> 00:10:46,740
+simplemente el modelar que tiene una relevancia súper súper alta pero una
+
+106
+00:10:46,740 --> 00:10:51,620
+vez que tengo muchos modelos tengo que ver cómo paso efectivamente a la acción
+
+107
+00:10:51,620 --> 00:10:58,100
+hace un plan de decisión, una regla y ello implica tener buenas métricas y en
+
+108
+00:10:58,100 --> 00:11:03,180
+principio seleccionar el modelo correcto para la problemática que yo estoy
+
+109
+00:11:03,180 --> 00:11:05,940
+planteando.
+
+110
+00:11:08,820 --> 00:11:14,260
+En esa en esa noción de evaluar correctamente la
+
+111
+00:11:14,260 --> 00:11:20,500
+el modelo en el contexto y problemática que estoy analizando, si solo me guío
+
+112
+00:11:20,500 --> 00:11:26,340
+por una pura métrica, ya, pensemos los problemas de regresión, siempre trabajamos con R cuadrado,
+
+113
+00:11:26,340 --> 00:11:32,700
+R cuadrado o la IC o el criterio valleciano o alguna otra métrica que venga en función de la
+
+114
+00:11:32,700 --> 00:11:37,940
+verosimilitud o en términos de la suma cuadrada de errores. Si siempre trabajo con los mismos,
+
+115
+00:11:37,940 --> 00:11:45,300
+mis resultados van a estar bastante cercados. Es lo bueno de trabajar con muchas métricas,
+
+116
+00:11:45,300 --> 00:11:50,820
+Lo bueno es que si las cosas andan bien y los resultados que estoy encontrando
+
+117
+00:11:50,820 --> 00:11:57,380
+tienen efectivamente una evidencia sustancial de que están siendo modelados correctamente,
+
+118
+00:11:57,380 --> 00:12:06,100
+entonces todas las métricas van a tender a reflejar lo mismo. El problema está en cuando
+
+119
+00:12:06,100 --> 00:12:13,180
+esas métricas no son del todo absolutistas, en el sentido de que todo me dice lo mismo y dependiendo
+
+120
+00:12:13,180 --> 00:12:19,660
+de la métrica voy a escoger un distinto modelo. Entonces, si escojo distintos modelos dependiendo
+
+121
+00:12:19,660 --> 00:12:24,740
+de la métrica tengo que tener bastante claridad en por qué estoy ocupando esa métrica, cuáles
+
+122
+00:12:24,740 --> 00:12:32,420
+son los pros y los contras de ocupar esa métrica y decidir, ya, decidir acorde al objetivo
+
+123
+00:12:32,420 --> 00:12:38,820
+de mi problemática. Entonces, ¿cómo voy a escoger esa métrica? Y en principio yo
+
+124
+00:12:38,820 --> 00:12:47,740
+tengo que definir un plan antes de realizar toda la metodología, voy a tener que plantear,
+
+125
+00:12:47,740 --> 00:12:54,820
+yo voy a escoger el mejor modelo con una métrica, pensemos, de suma a cuadrado de error. Voy a
+
+126
+00:12:54,820 --> 00:13:00,980
+tener que definir que el modelo, voy a tener que identificar dónde se va a utilizar el modelo.
+
+127
+00:13:00,980 --> 00:13:06,780
+En principio, la gran mayoría de los casos de las problemáticas modeladas mediante herramientas
+
+128
+00:13:06,780 --> 00:13:12,320
+de esencia de datos tienden a priorizar la predicción. Entonces tenemos que tener
+
+129
+00:13:12,320 --> 00:13:16,240
+bien claro cuáles van a ser los casos futuros. Las nuevas observaciones que
+
+130
+00:13:16,240 --> 00:13:19,720
+nosotros vamos a estar utilizando se comportan igual que los mismos datos que
+
+131
+00:13:19,720 --> 00:13:23,920
+estamos utilizando para generar el modelo, es decir, nuestro conjunto de
+
+132
+00:13:23,920 --> 00:13:28,440
+entrenamiento se va a parecer efectivamente a las observaciones con
+
+133
+00:13:28,440 --> 00:13:32,480
+las cuales en el futuro vamos a evaluar el modelo. Tenemos que evaluar la
+
+134
+00:13:32,480 --> 00:13:38,040
+importancia de cada error, sobre todo en el caso de clasificación, no es lo mismo
+
+135
+00:13:38,040 --> 00:13:44,320
+equivocarse con un falso positivo, decir que algo no era y si lo era, que decir
+
+136
+00:13:44,320 --> 00:13:47,840
+que si lo era y no lo era. Dependiendo del contexto puede cambiar
+
+137
+00:13:47,840 --> 00:13:53,680
+mucho la interpretación y evaluación de ese modelo.
+
+138
+00:13:53,680 --> 00:14:01,040
+Finalmente voy a tener que dejar un conjunto de datos para validar
+
+139
+00:14:01,040 --> 00:14:08,240
+lo que yo estoy haciendo. Entonces todas las métricas que vamos a ver y vamos a mencionar hoy, de alguna manera
+
+140
+00:14:08,940 --> 00:14:12,160
+tratan de cuantificar el error
+
+141
+00:14:13,400 --> 00:14:19,260
+en lo que eso sea en un principio, digamos, porque principio el error lo consideramos como, bueno,
+
+142
+00:14:19,600 --> 00:14:24,840
+los datos observados menos lo que yo digo que me está diciendo o me está entregando el modelo.
+
+143
+00:14:25,320 --> 00:14:27,920
+Y en función a ese valor yo
+
+144
+00:14:27,920 --> 00:14:35,200
+le le aplicó funciones, ya sea el cuadrado, la suma, etcétera, pero son funciones de esa discrepancia
+
+145
+00:14:35,200 --> 00:14:40,360
+que le pueden dar distinto orden de importancia a valores pequeños o valores grandes.
+
+146
+00:14:43,480 --> 00:14:53,440
+En ese contexto yo siempre voy a tener que dejar un conjunto afuera, un conjunto afuera que al principio
+
+147
+00:14:53,440 --> 00:14:57,600
+le llamamos prueba, pero que va a funcionar como oráculo en principio, en el
+
+148
+00:14:57,600 --> 00:15:01,280
+sentido de yo hago todas mis cosas, aplico todas las herramientas
+
+149
+00:15:01,280 --> 00:15:06,720
+metodológicas que tengo para generar los distintos modelos y una vez que defino
+
+150
+00:15:06,720 --> 00:15:13,160
+los modelos voy a tener que evaluarlo en el conjunto de prueba. En principio yo
+
+151
+00:15:13,160 --> 00:15:20,000
+genero y ajusto los modelos con el conjunto de entrenamiento y selecciono
+
+152
+00:15:20,000 --> 00:15:26,120
+entre modelos con el conjunto de
+
+153
+00:15:43,500 --> 00:15:47,520
+mucho el error de entrenamiento podemos mejorar mucho la forma en que se ajustan
+
+154
+00:15:47,520 --> 00:15:53,040
+los datos que nosotros tenemos pero nunca podemos asegurar que eso va a
+
+155
+00:15:53,040 --> 00:15:58,040
+funcionar en nuevos datos. Nosotros esperamos que sí porque decimos si estos
+
+156
+00:15:58,040 --> 00:16:02,160
+datos que tenemos son buenos ya o representan el fenómeno que queríamos
+
+157
+00:16:02,160 --> 00:16:07,800
+evaluar y luego llegan nuevos datos ya o se evalúa o este modelo es aplicado en
+
+158
+00:16:07,800 --> 00:16:12,440
+nuevos datos que esperamos sean similares a los datos con los cuales
+
+159
+00:16:12,440 --> 00:16:16,880
+nosotros generamos nuestro modelo entonces el modelo debería comportarse bien
+
+160
+00:16:16,880 --> 00:16:24,160
+No obstante, no podemos asegurarlo fielmente porque puede cambiar la dinámica,
+
+161
+00:16:24,160 --> 00:16:33,580
+pueden haber problemas con el modelo mismo o que justo la muestra que tenemos era una muestra
+
+162
+00:16:33,580 --> 00:16:37,780
+inusual y nosotros la consideramos que era representativa de la población.
+
+163
+00:16:37,780 --> 00:16:42,800
+Entonces, en ese sentido nosotros tratamos de hacer lo mejor posible pero no podemos asegurar
+
+164
+00:16:42,800 --> 00:16:48,520
+que los modelos en términos de predicción van a ser necesariamente buenos.
+
+165
+00:16:48,520 --> 00:16:53,420
+Nosotros podemos coger un modelo en términos de ciertas métricas con
+
+166
+00:16:53,420 --> 00:16:59,320
+nuestros datos y desechar otros y cuando lo evaluamos en la prueba
+
+167
+00:16:59,320 --> 00:17:06,760
+debísemos haber escogido otro. Entonces tenemos que tener claridad de eso,
+
+168
+00:17:06,760 --> 00:17:15,700
+tener una buena idea del contexto en el cual está, digamos, inmerso en la
+
+169
+00:17:15,700 --> 00:17:19,700
+problemática que estamos haciendo, tener una muy buena claridad del conjunto de
+
+170
+00:17:19,700 --> 00:17:26,180
+datos con el que estamos trabajando. Entonces, porque esa claridad que
+
+171
+00:17:26,180 --> 00:17:34,180
+vamos a tener respecto del tipo de datos, o la problemática
+
+172
+00:17:34,180 --> 00:17:38,740
+que estamos tratando de evaluar, nos va a ayudar de cierta manera a
+
+173
+00:17:38,740 --> 00:17:44,580
+decidir de mejor manera una métrica o criterio para la selección del modelo
+
+174
+00:17:44,580 --> 00:17:47,740
+y para evaluarlo probablemente.
+
+175
+00:17:47,740 --> 00:17:49,240
+Chau bien.
+
+176
+00:17:49,240 --> 00:17:55,440
+Hola, buenas tardes profesor. Según su experiencia, algunas métricas comunes en
+
+177
+00:17:55,440 --> 00:18:02,140
+casos como en el caso bancario, fraude, no fraude, o en los casos médicos si es un
+
+178
+00:18:02,140 --> 00:18:08,380
+tomor benigno maligno algo que se
+
+179
+00:18:18,700 --> 00:18:24,580
+transacciones no son fraude y pocas son
+
+180
+00:18:24,580 --> 00:18:31,060
+pocas en comparación al total son fraude el caso de exámenes por ejemplo
+
+181
+00:18:31,060 --> 00:18:36,820
+en lo que mencionaba la gran mayoría de las detecciones de alguna enfermedad
+
+182
+00:18:36,820 --> 00:18:42,820
+tienden a ser no tan graves, digamos, o sea, sobre todo si una enfermedad un poco más rara.
+
+183
+00:18:42,820 --> 00:18:49,500
+Entonces, cuando la clasificación o el evento de clasificación es muy anómalo,
+
+184
+00:18:49,500 --> 00:18:54,260
+nosotros hablamos de que probablemente nuestro conjunto no va a estar balanceado,
+
+185
+00:18:54,260 --> 00:18:58,060
+es decir, si tengo mil datos, o si pensé en transacciones nuevamente,
+
+186
+00:18:58,060 --> 00:19:05,660
+tengo mil transacciones yo esperaría no sé que 5 o 10 o pongamos un exceso 20
+
+187
+00:19:05,660 --> 00:19:11,220
+sean transacciones fraudulentas y en ese sentido nuestro modelo de cierta manera
+
+188
+00:19:11,220 --> 00:19:16,420
+tiene tiene que aprender de esas 20 observaciones pero a su vez tiene muchas
+
+189
+00:19:16,420 --> 00:19:19,660
+más observaciones que le están diciendo lo contrario entonces ahí tenemos que
+
+190
+00:19:19,660 --> 00:19:26,100
+entrar en metodologías de balanceo de datos de la clase
+
+191
+00:19:26,100 --> 00:19:29,980
+que va a depender un poco de la metodología propiamente tal, hay
+
+192
+00:19:29,980 --> 00:19:33,580
+distintas formas de balancearlo y ahí cuando trabajamos por ejemplo en
+
+193
+00:19:33,580 --> 00:19:38,860
+clasificación binaria usualmente podemos hacer cosas bastante más sofisticadas
+
+194
+00:19:38,860 --> 00:19:43,220
+pero tratamos de trabajar con la matriz de confusión pero no por ejemplo con la
+
+195
+00:19:43,220 --> 00:19:51,900
+con el accuracy porque la accuracy toma sopesa digamos los los dos tipos de
+
+196
+00:19:51,900 --> 00:19:57,020
+eventos correctos, es decir que no era fraude y efectivamente no era fraude y
+
+197
+00:19:57,020 --> 00:20:02,820
+decir que si era fraude y efectivamente lo era. Entonces no tienen el mismo peso y
+
+198
+00:20:02,820 --> 00:20:06,300
+general ahí nosotros incluso podemos hacer problemas de optimización etcétera
+
+199
+00:20:06,300 --> 00:20:10,620
+pero ahí trabajamos con métricas que
+
+200
+00:20:10,940 --> 00:20:16,900
+vienen desde la matriz de confusión ya que lo vamos a tocar un poco hoy.
+
+201
+00:20:16,900 --> 00:20:20,980
+Las problemáticas que son anómalas tienden a ser todo un problema en general
+
+202
+00:20:20,980 --> 00:20:27,060
+porque como pasan poco es difícil reconocer o predecir cuando van a pasar
+
+203
+00:20:27,060 --> 00:20:31,300
+y ese es el gran problema cuando tengo datos que son muy nuevos o eventos que
+
+204
+00:20:31,300 --> 00:20:33,900
+son muy nuevos
+
+205
+00:20:33,900 --> 00:20:36,980
+ok
+
+206
+00:20:40,740 --> 00:20:46,300
+entonces siempre creo que deben estar un poco más familiarizados con esta
+
+207
+00:20:46,300 --> 00:20:50,260
+separación, entrenamiento, variación y prueba siempre tenemos que tener claro
+
+208
+00:20:50,260 --> 00:20:55,820
+que la prueba es el último caso y la prueba no se puede ocupar o los datos de prueba no se pueden ocupar en ningún
+
+209
+00:20:55,820 --> 00:21:02,320
+en ninguna etapa antes de eso, pero si no es como hacer trampas, si yo voy a evaluar o voy a utilizar los
+
+210
+00:21:02,320 --> 00:21:10,900
+datos con los cuales voy a evaluar mis modelos, en generar mis modelos, entonces los modelos van a aprender de esos datos
+
+211
+00:21:10,900 --> 00:21:18,620
+y se van a tratar de acercar a esas observaciones, entonces la prueba tiene que ser, se saca al principio y no se toca hasta el final
+
+212
+00:21:20,260 --> 00:21:26,260
+Así entonces, ya, volvamos al caso de esta predicción.
+
+213
+00:21:26,260 --> 00:21:36,820
+Entonces, pensemos que tenemos la resistencia de hormigón, ya, en el caso, en el Moodle
+
+214
+00:21:36,820 --> 00:21:41,100
+está disponible el CSB, están los códigos que lo vamos a ver un poquito más adelante.
+
+215
+00:21:41,100 --> 00:21:46,220
+En esencia, ahí se expresa la resistencia en megapascales, ya, aquí hay una unidad de
+
+216
+00:21:46,220 --> 00:21:50,960
+presión y nos preguntamos cuánto nos equivocaremos en una composición que
+
+217
+00:21:50,960 --> 00:21:59,320
+quedó fuera del ajuste es decir una mezcla, por lo que en esta
+
+218
+00:21:59,320 --> 00:22:04,880
+en este hormigón digamos en esta composición tiene distintos compuestos y
+
+219
+00:22:04,880 --> 00:22:11,400
+puede que haya una proporción distinta de compuestos que no está dentro del
+
+220
+00:22:11,400 --> 00:22:17,280
+conjunto de datos. Entonces es una observación ya hipotética, diga ser, que
+
+221
+00:22:17,280 --> 00:22:22,120
+no pertenece al conjunto de entrenamiento por lo cual el modelo no la
+
+222
+00:22:22,120 --> 00:22:25,760
+conoce, no la ha visto. Entonces de cierta manera un modelo cuando lo
+
+223
+00:22:25,760 --> 00:22:30,800
+tratamos de lo evaluamos con el conjunto de prueba,
+
+224
+00:22:30,800 --> 00:22:36,960
+replican este conjunto de pruebas, replican esa situación. Es decir, yo
+
+225
+00:22:36,960 --> 00:22:42,200
+genero un modelo con mi conjunto de entrenamiento? Bueno, qué tan bueno es la
+
+226
+00:22:42,200 --> 00:22:47,000
+generalización? Cómo se comporta ese modelo con nuevos datos que no conoce?
+
+227
+00:22:47,000 --> 00:22:54,040
+Esa es una de las grandes mentiras que nosotros vamos a tratar de definir y ahí vamos a ver cómo nos vamos a definir.
+
+228
+00:22:54,200 --> 00:22:59,720
+Entonces, si fijan acá en el gráfico tengo la edad, que en esencia son la
+
+229
+00:22:59,720 --> 00:23:04,640
+resistencia de hormigón por la composición que tiene la sustancia y
+
+230
+00:23:04,640 --> 00:23:10,360
+además la edad del compuesto. Se fijan en los días en escala
+
+231
+00:23:10,360 --> 00:23:15,040
+eucarístmica y la resistencia propiamente tal, pareciera que hay
+
+232
+00:23:15,040 --> 00:23:22,640
+cierta fatiga de material con muchos días y cuando es el tiempo es muy
+
+233
+00:23:22,640 --> 00:23:27,920
+corto aún así tienen menos en promedio digamos menos resistencia. Entonces
+
+234
+00:23:27,920 --> 00:23:33,880
+hay, pareciera haber un número de días óptimo donde ese hormigón estaría en el mejor
+
+235
+00:23:33,880 --> 00:23:39,440
+estado posible. Y también pudo trabajar, si se fijan, la
+
+236
+00:23:39,440 --> 00:23:43,620
+resistencia, pudo verlo, cómo se comporta y esto es parte del análisis proletario de datos
+
+237
+00:23:43,620 --> 00:23:47,920
+que es en esencia es entender con los datos que estoy trabajando, saber a
+
+238
+00:23:47,920 --> 00:23:50,580
+cabalidad lo que estoy haciendo, lo que estoy tratando de
+
+239
+00:23:50,580 --> 00:23:56,320
+muela. La resistencia es un número que está prácticamente sobre 5 y llegando un
+
+240
+00:23:56,320 --> 00:24:01,560
+poquito sobre 80 y se fijan mis observaciones están
+
+241
+00:24:01,560 --> 00:24:07,300
+más menos centradas en 30 40 y tengo observaciones en las colas, digamos
+
+242
+00:24:07,300 --> 00:24:11,480
+observaciones con resistencia muy baja observaciones con resistencia muy alta
+
+243
+00:24:11,480 --> 00:24:16,360
+tengo que tener claridad esto porque si mi modelo cualquiera sea y se fijan todo
+
+244
+00:24:16,360 --> 00:24:21,760
+lo que estoy haciendo acá yo es un poco agnóstico de
+
+245
+00:24:21,760 --> 00:24:26,280
+qué modelo estamos trabajando porque nosotros vamos a considerar que todos
+
+246
+00:24:26,280 --> 00:24:33,800
+modelos me entregan una predicción y la forma en que lo hacen es parte de ese
+
+247
+00:24:33,800 --> 00:24:38,000
+modelo en principio. Cuando nosotros trabajamos y tratamos de alguna
+
+248
+00:24:38,000 --> 00:24:44,040
+problemática real, en general nosotros nos vamos con un modelo a ganar, digamos.
+
+249
+00:24:44,040 --> 00:24:49,200
+Entonces probamos distintos modelos y después los evaluamos y en función a
+
+250
+00:24:49,200 --> 00:24:53,320
+esa evaluación que es lo que vamos a formalizar hoy, yo empiezo a decidir qué
+
+251
+00:24:53,320 --> 00:24:59,320
+modelo me sirve, qué modelo no me sirve, pero no voy con una predisposición.
+
+252
+00:24:59,320 --> 00:25:03,560
+Entonces, en estos datos tienen que ser relativamente diversos porque si tengo,
+
+253
+00:25:03,560 --> 00:25:08,320
+por ejemplo, si tengo sólo datos entre 30 y 40, mi modelo nunca me van a
+
+254
+00:25:08,320 --> 00:25:13,280
+predecir fuera de su umbral, llegamos mucho más lejanos a eso. Entonces, tengo que
+
+255
+00:25:13,280 --> 00:25:17,720
+tener una claridad, tengo que acelerar, digamos, que mi conjunto de
+
+256
+00:25:17,720 --> 00:25:22,960
+entrenamiento se va a parecer al conjunto de prueba, digamos, los datos futuros los
+
+257
+00:25:22,960 --> 00:25:30,640
+cuáles se van a evaluar. Entonces, no, todo esto nos acaba, digamos, con
+
+258
+00:25:30,640 --> 00:25:34,940
+simplemente hacer una predicción, porque si fuese así es fácil, yo siempre
+
+259
+00:25:34,940 --> 00:25:40,720
+ocupo el mismo modelo y en un acto de fédigo, este es el modelo mejor, el
+
+260
+00:25:40,720 --> 00:25:44,480
+mejor modelo y con este me quedo. Pero en la práctica no siempre es así, a veces hay
+
+261
+00:25:44,480 --> 00:25:50,000
+modelos que son sobre tener una complejidad mayor, que entregan menos
+
+262
+00:25:50,000 --> 00:25:55,100
+nivel de predicción que un modelo que es bastante más sencillo. Pensemos
+
+263
+00:25:55,100 --> 00:26:00,300
+regresión logística en comparación con una red neuronal o un supervector machine.
+
+264
+00:26:00,300 --> 00:26:04,820
+Entonces el supervector machine tiene una complejidad bastante mayor que
+
+265
+00:26:04,820 --> 00:26:08,620
+una simplemente una regresión logística y hay muchos casos los cuales
+
+266
+00:26:08,620 --> 00:26:12,780
+simplemente una regresión, que es algo bastante común, bastante base que
+
+267
+00:26:12,780 --> 00:26:20,940
+usualmente se ocupa como modelo a vencer, es decir, si tengo ese modelo dado que lo
+
+268
+00:26:20,940 --> 00:26:26,100
+puedo interpretar a cabalidad, si no que no un nivel de predicción sustancial no
+
+269
+00:26:26,100 --> 00:26:30,420
+voy a cambiarlo, entonces no puedo ir con una predisposición a que este modelo
+
+270
+00:26:30,420 --> 00:26:36,100
+siempre gana porque para ello tengo que tener evidencia de que efectivamente
+
+271
+00:26:36,100 --> 00:26:40,860
+gana respecto a una métrica y en principio estamos tratando de responder
+
+272
+00:26:40,860 --> 00:26:48,820
+esta pregunta de cuál es el mejor modelo en algún sentido. Entonces, en ningún caso, yo hago la
+
+273
+00:26:48,820 --> 00:26:54,820
+predicción y hago el modelo, que a veces nos concentramos mucho en esa parte de modelar bien,
+
+274
+00:26:54,820 --> 00:27:04,100
+de cómo se programa, de cómo tengo que hacer las cosas, pero en el general, digamos, cuando uno lo vea
+
+275
+00:27:04,100 --> 00:27:10,740
+a tono amplio, yo voy a tener, siempre voy a tener muchos modelos, entonces voy a tener que tomar una
+
+276
+00:27:10,740 --> 00:27:17,380
+decisión más global. Entonces tengo que comparar todos esos modelos, nunca voy con una predisposición.
+
+277
+00:27:21,380 --> 00:27:27,480
+En este conjunto de datos que yo le puse a disposición que es los datos de hormigón, yo tengo 7
+
+278
+00:27:27,480 --> 00:27:34,420
+ingredientes que están en unidad de kilogramos metro cúbico y tengo la edad en días. Entonces
+
+279
+00:27:34,420 --> 00:27:41,140
+voy a tener mi vector de predictores que son 8, 7 ingredientes y la edad y de
+
+280
+00:27:41,140 --> 00:27:46,140
+alguna manera voy a hacer un ajuste y si se fijan ese ajuste no estoy imponiendo
+
+281
+00:27:46,140 --> 00:27:51,140
+una forma funcional sobre ese F estimado sino que estoy diciendo hay algún
+
+282
+00:27:51,140 --> 00:27:57,940
+procedimiento que me entrega un ajuste, una predicción de esa función
+
+283
+00:27:57,940 --> 00:28:03,780
+puede ser regresión, regresión múltiple, regresión logística, SVM, cualquier
+
+284
+00:28:03,780 --> 00:28:08,740
+cualquier modelo que en este caso dado que lo que nosotros queremos modelar es
+
+285
+00:28:08,740 --> 00:28:13,420
+resistencia y es un número puede ser
+
+286
+00:28:13,540 --> 00:28:17,760
+cualquier cualquier modelo que me mida o me modele una respuesta
+
+287
+00:28:17,760 --> 00:28:26,340
+cuantitativa. Ese procedimiento de ajuste me va a entregar en esencia muchos y
+
+288
+00:28:26,340 --> 00:28:32,540
+sub y para las distintas observaciones ajustados porque cuando yo le aplica
+
+289
+00:28:32,540 --> 00:28:37,560
+nuevos datos en términos de predicción, yo voy a conocer los ingredientes y su
+
+290
+00:28:37,560 --> 00:28:42,220
+edad y yo voy a meter eso al modelo y me va a entregar
+
+291
+00:28:42,220 --> 00:28:47,240
+una predicción. Entonces cada modelo me va a entregar un vector de
+
+292
+00:28:47,240 --> 00:28:51,020
+predicciones que yo voy a tener que evaluar.
+
+293
+00:28:51,020 --> 00:28:57,260
+En el caso de esta base de datos tengo 1030 mediciones, 8 predictores numéricos
+
+294
+00:28:57,260 --> 00:29:00,900
+que son los 7 ingredientes y la respuesta es continua que es la resistencia.
+
+295
+00:29:00,900 --> 00:29:05,940
+Los ingredientes son cementos, coria, ceniza, agua superplastificante y
+
+296
+00:29:05,940 --> 00:29:11,020
+agregado de grueso y fino para tener un poco más de contexto. Entonces, I sub I
+
+297
+00:29:11,020 --> 00:29:18,380
+sin el gorrito, digamos, es la observación que yo tengo y observo en mi conjunto de
+
+298
+00:29:18,380 --> 00:29:22,280
+entrenamiento. El I sub I con la estimación es la
+
+299
+00:29:22,280 --> 00:29:28,220
+predicción que me entrega los distintos modelos, pero en particular uno.
+
+300
+00:29:28,220 --> 00:29:32,540
+y el identificador digamos que no va a ser un predictor porque al final me va a estar diciendo
+
+301
+00:29:32,540 --> 00:29:40,140
+si es que pertenece o no al conjunto de entrenamiento o no o si es que tengo algún identificador de
+
+302
+00:29:40,140 --> 00:29:48,900
+otra índole digamos que me de otra característica para efectos de este de este de esta baseados ya
+
+303
+00:29:48,900 --> 00:29:54,780
+el identificador hace referencia a qué conjunto de datos pertenece recuerden que la separación
+
+304
+00:29:54,780 --> 00:30:00,080
+entre entrenamiento y validación y prueba tampoco es trivial, hay que tener
+
+305
+00:30:00,080 --> 00:30:04,620
+ciertas precauciones, por ejemplo, qué pasa si mis datos están indexados
+
+306
+00:30:04,620 --> 00:30:10,200
+temporalmente, no puedo hacer simplemente una separación en términos de muestra
+
+307
+00:30:10,200 --> 00:30:15,240
+aleatoria, por ejemplo, tengo que mantener esas ventanas de
+
+308
+00:30:15,240 --> 00:30:19,440
+temporales, porque en ningún caso puedo ocupar información del futuro para
+
+309
+00:30:19,440 --> 00:30:22,360
+predecir el pasado, no tiene sentido dentro de ese contexto, entonces tengo que
+
+310
+00:30:22,360 --> 00:30:28,320
+tener ciertas precauciones cuando tengo de dependencia entre los datos que son
+
+311
+00:30:28,320 --> 00:30:32,400
+ya sea temporal, ya sea espacial, ya sea algún otro tipo. O sea, no puedo
+
+312
+00:30:32,400 --> 00:30:38,080
+simplemente llegar y hacer un muestreo y separarlo de manera aleatoria.
+
+313
+00:30:38,080 --> 00:30:44,880
+Ahora, en este conjunto de datos pasa que
+
+314
+00:30:44,880 --> 00:30:50,780
+hay observaciones que tienen la misma composición pero sólo difieren en la
+
+315
+00:30:50,780 --> 00:30:56,540
+edad. Entonces, es un problema bien especial y cómo tratamos ese
+
+316
+00:30:56,540 --> 00:31:04,780
+problema en este contexto es que voy a agruparlos, que los voy a considerar
+
+317
+00:31:04,780 --> 00:31:11,060
+agrupar cuando tienen igualdad exacta porque sino puede pasar que uno de esos
+
+318
+00:31:11,060 --> 00:31:17,140
+conjuntos de observaciones se cole digamos a la prueba entonces van a ver
+
+319
+00:31:17,140 --> 00:31:25,260
+una observación en entrenamiento que en siete de sus ocho predictores se parece a
+
+320
+00:31:25,260 --> 00:31:30,700
+la a una observación que está en la prueba. Entonces tenemos que tener cuidado
+
+321
+00:31:30,700 --> 00:31:35,820
+con esas tareas en general cuando los predictores son continuos.
+
+322
+00:31:35,820 --> 00:31:39,740
+Es muy raro que pase eso por eso estoy hablando de un caso bien anómano
+
+323
+00:31:39,740 --> 00:31:43,220
+respecto de esta base A.
+
+324
+00:31:43,220 --> 00:31:51,580
+Así entonces, tengo modelos que me entregan predicciones, me entregan un vector de predicciones
+
+325
+00:31:51,580 --> 00:31:58,980
+y que yo lo ajusto con un conjunto de entrenamiento a definir.
+
+326
+00:31:58,980 --> 00:32:03,160
+Lo típico que se hace es hacer una separación 80-20, pero como les comentaba, dependiendo
+
+327
+00:32:03,160 --> 00:32:06,900
+de las características de la base A, y si es por ejemplo serie de tiempo, no puedo hacer
+
+328
+00:32:06,900 --> 00:32:08,940
+el 80-20 como si nada.
+
+329
+00:32:08,940 --> 00:32:12,940
+Yo tengo que hacer por ejemplo ventanas incrementales.
+
+330
+00:32:12,940 --> 00:32:18,140
+principio los modelos se van a entrenar con el conjunto de entrenamiento
+
+331
+00:32:18,140 --> 00:32:25,180
+que estuviese bien definido. Voy a ajustar ese procedimiento con mi conjunto
+
+332
+00:32:25,180 --> 00:32:30,340
+de entrenamiento y voy a considerar, una vez que tengo el modelo, nuevamente de
+
+333
+00:32:30,340 --> 00:32:34,100
+manera vira-gnóstica, cuál es el modelo, no hemos dicho, porque todas estas
+
+334
+00:32:34,100 --> 00:32:38,500
+metodologías van a ser aplicables a todos los otros modelos y
+
+335
+00:32:38,500 --> 00:32:41,980
+otras metodologías que han visto, digamos, en el continuo.
+
+336
+00:32:41,980 --> 00:32:47,620
+Y yo voy a evaluar eso en un nuevo dato, un nuevo dato que no conoce el modelo.
+
+337
+00:32:47,620 --> 00:32:51,960
+Entonces estoy tratando de cierta manera evaluar el poder de
+
+338
+00:32:51,960 --> 00:32:58,180
+generalización que tienen los distintos modelos en particular.
+
+339
+00:32:58,180 --> 00:33:05,660
+Y en este concepto sale la noción de pérdida. Y pérdida, si se fijan acá,
+
+340
+00:33:05,660 --> 00:33:11,980
+lo voy a llamar una función L que depende del valor observado y que es mi
+
+341
+00:33:11,980 --> 00:33:19,420
+variable de interés y mi valor predicho de la variable de interés, es decir, y es lo
+
+342
+00:33:19,420 --> 00:33:25,100
+que yo observé en mis datos y este y gorrito es lo que el modelo me entregó.
+
+343
+00:33:25,100 --> 00:33:30,080
+Yo voy a definir la pérdida en este caso, yo la puedo generalizar también, como la
+
+344
+00:33:30,080 --> 00:33:36,820
+diferencia del cuadrado y si se fijan tiende a ser la discrepancia, es decir, lo
+
+345
+00:33:36,820 --> 00:33:41,160
+que era efectivamente con lo que yo dije o el modelo dijo que era, entonces
+
+346
+00:33:41,160 --> 00:33:46,000
+es cuánto me equivoqué lo que está dentro del numerador
+
+347
+00:33:46,000 --> 00:33:52,440
+y al cuadrado cuál es la finalidad que tiene es penalizar, equivocarse mucho
+
+348
+00:33:52,440 --> 00:33:56,960
+porque al final yo voy a tratar de que este número sea lo más chico posible
+
+349
+00:33:56,960 --> 00:34:00,080
+entonces
+
+350
+00:34:00,080 --> 00:34:04,800
+si esta discrepancia es muy grande, es decir, me equivoqué o el modelo me está
+
+351
+00:34:04,800 --> 00:34:08,360
+entregando predicciones que están muy lejanas de la realidad del dato
+
+352
+00:34:08,360 --> 00:34:13,960
+observado, ese cuadrado me va a amplificar esa discrepancia, ese número,
+
+353
+00:34:13,960 --> 00:34:20,920
+esa magnitud y por consecuencia voy a identificar bastante más rápido que el
+
+354
+00:34:20,920 --> 00:34:23,800
+modelo no está haciendo bueno, se está equivocando mucho.
+
+355
+00:34:23,800 --> 00:34:27,380
+esto es lo que nosotros vamos a llamar la función de perdida
+
+356
+00:34:27,380 --> 00:34:33,300
+y debido a que estos i estimados son los valores
+
+357
+00:34:33,300 --> 00:34:38,800
+que se obtienen a través de la estimación del modelo, este f sub t es
+
+358
+00:34:38,800 --> 00:34:43,880
+simplemente el modelo que yo entrené, que yo realicé, utilicé y que cuando lo
+
+359
+00:34:43,880 --> 00:34:51,100
+valúo en nuestros datos x, que son, pensemos, nuevas composiciones y nueva edad,
+
+360
+00:34:51,100 --> 00:34:59,020
+me va a entregar como un todo este i estimado. Cuando tengo ese i estimado
+
+361
+00:34:59,020 --> 00:35:03,900
+voy a poder evaluar la función de pérdida y se fijan yo puedo evaluar la
+
+362
+00:35:03,900 --> 00:35:08,340
+función de pérdida en varios conjuntos, por ejemplo el conjunto de entrenamiento
+
+363
+00:35:08,340 --> 00:35:14,140
+yo lo puedo separar en distintos subconjuntos y evaluar esta cantidad en
+
+364
+00:35:14,140 --> 00:35:17,780
+distintas, en distintos datos previamente de datos. Entonces voy a tener una noción de
+
+365
+00:35:17,780 --> 00:35:21,760
+variabilidad y en principio voy a poder sacar una esperanza condicional respecto
+
+366
+00:35:21,760 --> 00:35:27,660
+de este valor de entrenamiento y a esa esperanza nosotros le vamos a decir que
+
+367
+00:35:27,660 --> 00:35:32,620
+es, le vamos a llamar riesgo, que es el promedio de la pérdida que acabamos de
+
+368
+00:35:32,620 --> 00:35:37,820
+definir como L, es la población de interés, si fijan la población de
+
+369
+00:35:37,820 --> 00:35:42,220
+interés que tenemos que tener claro.
+
+370
+00:35:42,220 --> 00:35:45,020
+Ahora
+
+371
+00:35:47,780 --> 00:35:56,740
+formas que yo tengo de evaluar esta discrepancia o una métrica para definir que tanto se equivocas
+
+372
+00:35:56,740 --> 00:36:03,260
+en modelo y poder comparar porque al final eso es lo que quiero recuerden que siempre van a tener
+
+373
+00:36:03,260 --> 00:36:11,020
+distintos modelos que pueden hacer incluso si ustedes escogen un mismo tipo de metodología
+
+374
+00:36:11,020 --> 00:36:15,860
+pensemos en regresión múltiple, ustedes también pueden tener
+
+375
+00:36:15,860 --> 00:36:21,060
+muchas regresiones múltiples porque pueden tener distintos
+
+376
+00:36:21,060 --> 00:36:25,100
+predictores asociados, distintas penalizaciones y así sumisiguen con
+
+377
+00:36:25,100 --> 00:36:30,300
+todas las variantes que está dentro de la metodología. Entonces, cuando uno abarca
+
+378
+00:36:30,300 --> 00:36:37,420
+o trata de solucionar o analizar un problema un poco más complejo, la
+
+379
+00:36:37,420 --> 00:36:42,740
+cantidad de modelos individuales que uno evalúa son bastantes porque si solo
+
+380
+00:36:42,740 --> 00:36:45,980
+evalúo regresiones múltiples ya me estoy acotando entonces y en la
+
+381
+00:36:45,980 --> 00:36:49,580
+regresión múltiples puedo tener muchos tipos de regresión conforme cuántos
+
+382
+00:36:49,580 --> 00:36:52,740
+predictores tenga y cuántas que tan sofisticado quiero que sea la regresión
+
+383
+00:36:52,740 --> 00:36:58,740
+puedo hacer distintos tipos de penalización el lazo, reach, puedo hacer spline,
+
+384
+00:36:58,740 --> 00:37:02,860
+puedo hacer un sinfín de cosas dentro del conjunto un poco más deterioro de lo que
+
+385
+00:37:02,860 --> 00:37:08,200
+son modelos lineales o lo que son
+
+386
+00:37:08,200 --> 00:37:14,040
+familia de metodologías, en la práctica uno tiene muchas otras, entonces con la
+
+387
+00:37:14,040 --> 00:37:18,400
+experiencia uno va entendiendo más menos que qué modelo funciona mejor que
+
+388
+00:37:18,400 --> 00:37:23,000
+otros en los distintos contextos, pero en principio si yo no tuviese una
+
+389
+00:37:23,000 --> 00:37:27,800
+experiencia digamos sobre la problemática en particular, yo debiese
+
+390
+00:37:27,800 --> 00:37:31,320
+evaluar todos esos modelos, entonces tengo que tener claridad en cómo los voy a
+
+391
+00:37:31,320 --> 00:37:41,760
+a evaluar cuáles son métricas comparables y en ese contexto tal en dos métricas particulares
+
+392
+00:37:41,760 --> 00:37:47,620
+el error absoluto medio o el error medio absoluto y la raíz del error cuadrático medio o el
+
+393
+00:37:47,620 --> 00:37:55,200
+error medio cuadrático que por su sigla Nikleli llamamos MAE y RMSE
+
+394
+00:37:55,200 --> 00:38:04,200
+si se fijan acá, el MAE define la discrepancia entre el valor observado y el valor predicho
+
+395
+00:38:04,200 --> 00:38:12,560
+en valor absoluto porque yo me puedo equivocar sobreestimando y subestimando. Entonces, para
+
+396
+00:38:12,560 --> 00:38:17,720
+sacarnos el problema del signo, le aplico el valor absoluto y saco su promedio. Si se
+
+397
+00:38:17,720 --> 00:38:25,680
+fijan acá el error tiene un peso lineal no le doy más peso si es que
+
+398
+00:38:25,680 --> 00:38:32,280
+esa discrepancia es más grande en cambio en la raíz del error cuadrático
+
+399
+00:38:32,280 --> 00:38:37,900
+medio tengo la discrepancia el cuadrado entonces a mayores discrepancias entre
+
+400
+00:38:37,900 --> 00:38:42,960
+lo observado y lo predicho esa cantidad va a ser mayor y por consecuencia al ser
+
+401
+00:38:42,960 --> 00:38:48,560
+mayor el RMSE pasa el mayor por consecuencia cuando evaluó esa cantidad
+
+402
+00:38:48,560 --> 00:38:57,360
+voy a estar dándole una mayor magnitud entonces si leo al cuadrado o la
+
+403
+00:38:57,360 --> 00:39:02,240
+apética estar al cuadrado voy a estar en principio la filosofía que está detrás
+
+404
+00:39:02,240 --> 00:39:13,520
+o la idea más bien es penalizar errores muy grandes, esa es la idea.
+
+405
+00:39:15,680 --> 00:39:20,960
+Así entonces, ¿por qué es importante las distintas métricas?
+
+406
+00:39:20,960 --> 00:39:25,800
+Hay una pregunta aquí, dice en la práctica cuando se utiliza uno y el otro, a eso
+
+407
+00:39:25,800 --> 00:39:30,800
+vamos, ese es como todo al dejar de lo que queremos ver, como que veamos, pero
+
+408
+00:39:30,800 --> 00:39:37,700
+porque como tantos modelos tengo,
+
+409
+00:39:48,300 --> 00:39:54,980
+lo que yo me preguntaría para definir si voy a ocupar más de ORMCE es qué tanto
+
+410
+00:39:54,980 --> 00:40:01,380
+quiero penalizar errores graves, ya, errores de mucha distancia, discrepancia, ya. Si yo de verdad no me
+
+411
+00:40:01,380 --> 00:40:06,380
+quiero equivocar tanto y quiero que sea una predicción más menos consistente en términos
+
+412
+00:40:06,380 --> 00:40:12,900
+de el conjunto entrenamiento, voy a querer penalizar cuando esa discrepancia es muy grande, ya.
+
+413
+00:40:14,300 --> 00:40:20,420
+Entonces esa es la forma, la forma de verlo digamos, porque una está al cuadrado y la otra está no,
+
+414
+00:40:20,420 --> 00:40:23,540
+entonces la que está al cuadrado viraliza más cuando hay discrimación
+
+415
+00:40:23,540 --> 00:40:28,900
+mayor en términos de magnitud, pero lo que se hace en realidad es ver el
+
+416
+00:40:28,900 --> 00:40:36,500
+abanico de cosas, usualmente uno no elige solo o no evalúa solo una
+
+417
+00:40:36,500 --> 00:40:43,420
+métrica, sino que yo puedo por ejemplo antes de evaluar la metodología yo puedo
+
+418
+00:40:43,420 --> 00:40:49,040
+definir, bueno, voy a ocupar cinco métricas para evaluar, para evaluar la
+
+419
+00:40:49,040 --> 00:40:54,560
+la abundancia los modelos y voy a escoger y esto lo hago previo a obtener
+
+420
+00:40:54,560 --> 00:40:57,720
+los resultados porque si no es como hacer trampa digamos, o sea no puedo ver los
+
+421
+00:40:57,720 --> 00:41:01,360
+resultados y decir ah ya ese porque voy a estar tratando de convencer
+
+422
+00:41:01,360 --> 00:41:06,120
+sino que yo lo tengo que definir a priori, digo si tengo cinco métricas de
+
+423
+00:41:06,120 --> 00:41:11,680
+evaluación ya sea el mal, el r cuadrado, el aic, cualquiera que ustedes lo que
+
+424
+00:41:11,680 --> 00:41:15,920
+lo vamos a ver un poco más adelante yo puedo decir bueno es que gana
+
+425
+00:41:15,920 --> 00:41:22,000
+4 de 5 entonces es el que voy a escoger. Entonces me externalizo un poco de la
+
+426
+00:41:22,000 --> 00:41:27,820
+decisión porque definí la regla de definir cuál es el mejor modelo con
+
+427
+00:41:27,820 --> 00:41:32,400
+ellas previo a ver los resultados. Entonces yo aprende lo sabía, entonces
+
+428
+00:41:32,400 --> 00:41:38,520
+definí un plan de acción previo a ajustar con los datos.
+
+429
+00:41:38,520 --> 00:41:41,040
+Ahora
+
+430
+00:41:41,040 --> 00:41:45,620
+la métrica, vamos aquí a mostrar en el contexto de que voy a escoger una
+
+431
+00:41:45,620 --> 00:41:50,220
+métrica pero uno podría también decir si es que ganan dos métricas es mejor
+
+432
+00:41:50,220 --> 00:41:55,580
+que ganen que ganan sólo una pero vamos a trabajar con una métrica
+
+433
+00:41:55,580 --> 00:42:02,580
+porque porque si yo cojo sólo una métrica como la de verdad y en función
+
+434
+00:42:02,580 --> 00:42:09,960
+a ese es cómo voy a escoger el mejor modelo si yo lo escojo bien ya o las
+
+435
+00:42:09,960 --> 00:42:14,460
+repercusiones que tiene escoger una métrica sobre otra o el mar en este caso
+
+436
+00:42:14,460 --> 00:42:21,360
+sobre la raíz del error cuadrático medio, puedo escoger un modelo distinto, ya, para
+
+437
+00:42:21,360 --> 00:42:29,300
+tomar una decisión. Si se fijan acá, el error absoluto es para los distintos casos
+
+438
+00:42:29,300 --> 00:42:38,500
+y en el modelo A tengo un más de 2 y una raíz del error cuadrático medio de 4 y el
+
+439
+00:42:38,500 --> 00:42:42,880
+el modelo B tiene un maé de 3 y un error cuadrático, una raíz del error
+
+440
+00:42:42,880 --> 00:42:49,320
+cuadrático medio de 3. Entonces, con el maé vamos a escoger el 2 porque es menor
+
+441
+00:42:49,320 --> 00:42:56,040
+y con el rmce vamos a escoger el B
+
+442
+00:42:56,040 --> 00:43:02,840
+porque el rmce es 3. Entonces va a depender mucho de
+
+443
+00:43:02,840 --> 00:43:09,240
+la noción que tengo yo de la función de pérdida y al final todo ahí, qué tanto
+
+444
+00:43:09,240 --> 00:43:14,160
+estoy yo dispuesto a equivocarme en la clasificación que la voy a mover a otro tema
+
+445
+00:43:14,160 --> 00:43:20,680
+pero qué tanto estoy yo dispuesto a equivocarme más y en la
+
+446
+00:43:20,680 --> 00:43:28,720
+predicción o el moveramiento continuo ese equivocarme más hace referencia a
+
+447
+00:43:28,720 --> 00:43:34,600
+que tanto es la discrepancia entre lo
+
+448
+00:43:34,600 --> 00:43:43,060
+de clasificación es exactamente clasificar mal. Y si ustedes lo vieron,
+
+449
+00:43:43,060 --> 00:43:49,940
+la vislación de Pedro, cuando vieron
+
+450
+00:43:49,940 --> 00:43:56,980
+el margen máximo, uno puede, digamos, definir, equivocarse un poco tal que a
+
+451
+00:43:56,980 --> 00:44:00,940
+nivel global tenga mejor ajuste.
+
+452
+00:44:00,940 --> 00:44:11,060
+Ahora, vimos el MAE, vimos la raíz del error cuadrático medio, otro que quizás están
+
+453
+00:44:11,060 --> 00:44:19,740
+familiarizados que es el R cuadrado. El R cuadrado en esencia, por su definición, digamos
+
+454
+00:44:19,740 --> 00:44:25,300
+formal, es la proporción de variabilidad que es explicada por el modelo. Entonces,
+
+455
+00:44:25,300 --> 00:44:34,900
+es un número que está entre 0 y 1. Si está 1 es que el R cuadrado explica de manera perfecta
+
+456
+00:44:34,900 --> 00:44:41,140
+la variabilidad. Y si no se han dado cuenta, toda la estadística ronda en tratar de cuantificar
+
+457
+00:44:41,140 --> 00:44:47,140
+la variabilidad y la incertidumbre, porque al final eso es en principio. Entonces, el
+
+458
+00:44:47,140 --> 00:44:55,540
+recuadrado trata de cuantificar la variabilidad explicada. En estadística en
+
+459
+00:44:55,540 --> 00:45:00,100
+general y en sencilla, todos están bien, ustedes sabrán el concepto de sobreajuste
+
+460
+00:45:00,100 --> 00:45:02,260
+que lo vamos a ver un poquito más adelante, pero yo creo que ya deben estar
+
+461
+00:45:02,260 --> 00:45:08,540
+familiarizados. Si las cosas andan muy bien, tengo ajustes muy buenos, muy
+
+462
+00:45:08,540 --> 00:45:13,940
+buenos en general, tiende a ser malo, porque si algo es muy bueno
+
+463
+00:45:13,940 --> 00:45:20,480
+probablemente en realidad no lo era, y estoy entrando en un sobreajuste, ya, que a mí me gusta
+
+464
+00:45:20,480 --> 00:45:25,100
+definirlo como no estoy modelando el fenómeno, el problema, sino que estoy
+
+465
+00:45:25,100 --> 00:45:30,440
+modelando mis datos, y ahí ya es una particularización de algo que debiese
+
+466
+00:45:30,440 --> 00:45:35,580
+ser mayor. Entonces, en esta métrica de R cuadrado
+
+467
+00:45:36,300 --> 00:45:42,480
+la evaluamos como uno menos, si se fijan acá arriba en el numerador, es la
+
+468
+00:45:42,480 --> 00:45:47,940
+discrepancia entre lo observado y lo predicho al cuadrado entre la suma en
+
+469
+00:45:47,940 --> 00:45:52,420
+todas las observaciones y abajo lo mismo pero con el promedio de
+
+470
+00:45:52,420 --> 00:45:55,740
+observaciones evaluadas
+
+471
+00:45:56,140 --> 00:45:59,740
+este número es tanto es 0 y 1 ya
+
+472
+00:45:59,860 --> 00:46:05,300
+y digamos va a ser otra otro insumo de métrica que nosotros vamos a utilizar en
+
+473
+00:46:05,300 --> 00:46:10,660
+conjunto con el MAI y la raíz del ero cuadrático medio para definir y decidir
+
+474
+00:46:10,660 --> 00:46:18,380
+qué o cuál es el mejor modelo. Una cosa que tenemos que tener cuidado en
+
+475
+00:46:18,380 --> 00:46:23,280
+cualquiera sea los modelos y sobre todo con estas métricas es si los datos están
+
+476
+00:46:23,280 --> 00:46:28,140
+correlacionados. Si han estudiado regresiones múltiples estarán familiarizados con el
+
+477
+00:46:28,140 --> 00:46:34,300
+concepto de multicolinearidad y esa multicolinearidad no es sólo un
+
+478
+00:46:34,300 --> 00:46:38,220
+problema en las metodologías de modelos lineales y las metodologías de
+
+479
+00:46:38,220 --> 00:46:41,340
+de relaciones múltiples, sino que también en otros tipos de modelos.
+
+480
+00:46:41,340 --> 00:46:46,060
+Por ejemplo, si acá tengo una correlación muy fuerte,
+
+481
+00:46:46,060 --> 00:46:50,300
+dígase 1, entre lo observado y lo predicho,
+
+482
+00:46:50,300 --> 00:46:55,900
+si se fijan son los mismos datos que difieren en 10 unidades,
+
+483
+00:46:55,900 --> 00:47:00,260
+me da una correlación 1, el RMC me da 10 y el R cuadrado me da un
+
+484
+00:47:00,260 --> 00:47:01,300
+número negativo.
+
+485
+00:47:01,300 --> 00:47:04,060
+Y al tener un número negativo significa que aquí hay
+
+486
+00:47:04,060 --> 00:47:04,740
+problemas.
+
+487
+00:47:04,740 --> 00:47:10,900
+Entonces, esta problemática tiene que ser vista y evaluada con cuidado.
+
+488
+00:47:10,900 --> 00:47:11,400
+¿Ya?
+
+489
+00:47:16,100 --> 00:47:24,540
+Ahora, volviendo al conjunto de datos de hormigón,
+
+490
+00:47:24,540 --> 00:47:30,020
+el conjunto de datos de hormigón, yo tenía estos compuestos y les dije que
+
+491
+00:47:30,020 --> 00:47:35,160
+muchas observaciones tenían lo mismo porcentaje, los mismos predictores en
+
+492
+00:47:35,160 --> 00:47:41,520
+términos de su cantidad en los distintos componentes, pero diferían en la
+
+493
+00:47:41,520 --> 00:47:49,400
+cantidad de días. Y para ello les dije voy a juntarlos. Y al juntarlos
+
+494
+00:47:49,400 --> 00:47:56,780
+voy a quedar con 342 composiciones distintas y que hacen o que
+
+495
+00:47:56,780 --> 00:48:03,060
+representan 806 mediciones de las 1.030 que yo tenía en un inicio
+
+496
+00:48:03,060 --> 00:48:05,660
+entonces
+
+497
+00:48:05,660 --> 00:48:10,220
+esas composiciones que voy a tener acá
+
+498
+00:48:10,220 --> 00:48:14,620
+yo las voy a separar, no voy a mostrar tanto en detalle cómo se separaron
+
+499
+00:48:14,620 --> 00:48:18,940
+porque vamos queremos el foco de esta clase es
+
+500
+00:48:18,940 --> 00:48:23,740
+digamos concentrarnos en la evaluación y la selección pero el tema de separar el
+
+501
+00:48:23,740 --> 00:48:29,900
+conjunto de datos no es menor porque si tengo particularidades como yo les
+
+502
+00:48:29,900 --> 00:48:35,820
+mencionaba de si tengo datos por ejemplo indexado en el tiempo la separación no
+
+503
+00:48:35,820 --> 00:48:43,400
+simplemente 80 20 y se acabó ya hay una segunda iteración que
+
+504
+00:48:43,400 --> 00:48:49,340
+que realizar puesto que no puedo el principio ocupar datos del futuro para
+
+505
+00:48:49,340 --> 00:48:55,140
+decir cosas del pasado tienen que tener una coherencia la forma en que
+
+506
+00:48:55,140 --> 00:49:00,140
+evaluo y ajusto mis modelos con la realidad
+
+507
+00:49:00,140 --> 00:49:05,260
+entonces a una separación entre un conjunto de entrenamiento que lo voy a
+
+508
+00:49:05,260 --> 00:49:11,140
+utilizar con validación cruzada que lo mencionaron y lo vieron con Pedro
+
+509
+00:49:11,140 --> 00:49:17,180
+voy a utilizar cinco pliegues y voy a dejar una prueba de 224
+
+510
+00:49:17,180 --> 00:49:20,540
+mediciones.
+
+511
+00:49:21,260 --> 00:49:28,220
+En total voy a tener 428 composiciones distintas y voy a reservar el 20%
+
+512
+00:49:28,220 --> 00:49:34,540
+de los grupos para la prueba propiamente tal, que va a ser la noción del
+
+513
+00:49:34,540 --> 00:49:38,420
+conjunto oráculo con el que yo efectivamente voy a evaluar los modelos.
+
+514
+00:49:38,420 --> 00:49:42,340
+En el entrenamiento yo los puse a parar en validación y entrenamiento para
+
+515
+00:49:42,340 --> 00:49:46,780
+mejorar, digamos, la forma en que yo voy a definir los parámetros y voy a hacer el
+
+516
+00:49:46,780 --> 00:49:52,260
+ajuste voy a generar el modelo pero la prueba última es la evaluación y larga
+
+517
+00:49:52,260 --> 00:49:57,260
+la redundancia en el conjunto de prueba. La idea es que en este caso la idea es que
+
+518
+00:49:57,260 --> 00:50:03,300
+ninguna composición de los distintos de los siete distintos sustancias que están
+
+519
+00:50:03,300 --> 00:50:11,540
+en el hormigón no aparecen las distintas particiones es decir una
+
+520
+00:50:11,540 --> 00:50:16,980
+observación no puede estar en el entrenamiento y en prueba a la vez, ya
+
+521
+00:50:16,980 --> 00:50:20,860
+porque si no, estoy replicando información en la prueba que no debiese
+
+522
+00:50:20,860 --> 00:50:26,100
+conocerla y como el modelo la conoció en el entrenamiento va a tratar de
+
+523
+00:50:26,100 --> 00:50:30,620
+acercarse a ella cuando lo valúen el modelo, cuando se ajusta el modelo y
+
+524
+00:50:30,620 --> 00:50:33,940
+después posteriormente se valúen el conjunto de pruebas. Entonces, de cierta
+
+525
+00:50:33,940 --> 00:50:41,140
+manera es como un poquito hacer trampa, la idea es ajustar con cosas que
+
+526
+00:50:41,140 --> 00:50:48,040
+o sea probar el modelo con cosas que no ha visto antes para analizar la noción de generalización del modelo.
+
+527
+00:50:51,320 --> 00:50:53,320
+Ahora,
+
+528
+00:50:54,060 --> 00:50:58,700
+yo puedo evaluar mis modelos en un subconjunto del conjunto de entrenamiento que es
+
+529
+00:50:59,700 --> 00:51:06,440
+que nosotros llamamos el la avaliación, o lo puedo hacer el conjunto de entrenamiento en principio, sobre todo cuando hago
+
+530
+00:51:06,440 --> 00:51:13,440
+ligación cruzada y en general cuando
+
+531
+00:51:24,160 --> 00:51:30,940
+voy a tener resultados mejor de lo que debiesen ser, es muy raro que pasa el
+
+532
+00:51:30,940 --> 00:51:39,300
+revés. Si es que pasa, digamos. Entonces, si se fijan acá, ya, en este ejemplo, digamos,
+
+533
+00:51:39,300 --> 00:51:48,660
+hipotético, ya, conocemos algo que en un problema real no conoceríamos, ya.
+
+534
+00:51:48,660 --> 00:51:55,180
+Tenemos los seis candidatos, o estos seis, uno, dos, tres, cuatro, cinco, seis, tienen el mismo
+
+535
+00:51:55,180 --> 00:51:59,060
+error esperado
+
+536
+00:51:59,860 --> 00:52:05,900
+si te fijan acá todos están centrados en términos de su valor esperado del
+
+537
+00:52:05,900 --> 00:52:09,180
+error en 10
+
+538
+00:52:09,660 --> 00:52:16,420
+sin embargo cuando valúo ese error en la muestra de validación me va a dar
+
+539
+00:52:16,420 --> 00:52:20,660
+distintos valores
+
+540
+00:52:20,660 --> 00:52:25,740
+¿Qué es lo que me provoca esto? de que la separación particular que yo hice
+
+541
+00:52:25,740 --> 00:52:30,060
+para el conjunto entrenamiento y validación me está favoreciendo esta
+
+542
+00:52:30,060 --> 00:52:36,220
+cantidad que está acá. Entonces todos los modelos tienen
+
+543
+00:52:36,220 --> 00:52:42,940
+aquí dice 6 pero en realidad son 7, los 6 modelos tienen el error esperado 10
+
+544
+00:52:42,940 --> 00:52:48,980
+y vamos a elegir el modelo, ah no, son 6 porque este es de la leyenda
+
+545
+00:52:48,980 --> 00:52:53,940
+elegimos el modelo 5, que es el que está acá, porque su error de
+
+546
+00:52:53,940 --> 00:53:00,260
+evaluación es 8,7 que es el menor en términos de la escala I.
+
+547
+00:53:00,260 --> 00:53:07,260
+Y eso también hay que considerarlo, puede que el modelo que
+
+548
+00:53:07,260 --> 00:53:13,100
+nosotros estamos escogiendo, solo ganó por una cosa aleatoria,
+
+549
+00:53:13,100 --> 00:53:20,380
+digamos, porque la muestra a la cual lo estamos evaluando le salió favorable.
+
+550
+00:53:20,380 --> 00:53:26,820
+No quiere decir que en toda muestra posible va a ganar eventualmente o
+
+551
+00:53:26,820 --> 00:53:29,740
+consistentemente.
+
+552
+00:53:29,740 --> 00:53:34,220
+Y esto es el conjunto de validación. Entonces, nosotros hacemos la metodología
+
+553
+00:53:34,220 --> 00:53:38,620
+con entrenamiento y validación, pero nuevamente la prueba, la evaluación en el
+
+554
+00:53:38,620 --> 00:53:46,380
+conjunto de prueba es el examen último, digamos, para definir cuál vendría a
+
+555
+00:53:46,380 --> 00:53:50,380
+ser mejor porque evaluamos su poder de generalización.
+
+556
+00:53:50,380 --> 00:53:54,820
+Entonces, ¿cómo ocupamos estos conjuntos de entrenamiento y
+
+557
+00:53:54,820 --> 00:54:00,320
+variación? Con el entrenamiento, dentro de los distintos candidatos que son los
+
+558
+00:54:00,320 --> 00:54:04,620
+distintos modelos, yo voy a querer estimar los coeficientes,
+
+559
+00:54:04,620 --> 00:54:10,020
+medias y escalas, el martes ustedes vieron la penalización reach, ya hay la penalización reach
+
+560
+00:54:10,020 --> 00:54:14,300
+o los distintos tipos de penalización
+
+561
+00:54:15,340 --> 00:54:20,940
+tienen digamos que estandarizar, ya al estandarizar le resto una media, le digo una
+
+562
+00:54:20,940 --> 00:54:24,820
+de que es un estándar, puedo cambiar de escala las cosas, ya pero todo tiene que
+
+563
+00:54:24,820 --> 00:54:29,060
+ser hecho, por ejemplo si a todos, a mis predictores, a mis datos, le quiero
+
+564
+00:54:29,060 --> 00:54:34,820
+restar una media para centrarlos entonces no puedo sacar el promedio que
+
+565
+00:54:34,820 --> 00:54:40,940
+le voy a restar a cada uno de los datos con todos los datos, no puedo sacarlos
+
+566
+00:54:40,940 --> 00:54:44,780
+porque si ocupo todos los datos estoy incluyendo los datos de prueba y eso
+
+567
+00:54:44,780 --> 00:54:52,060
+sería ocupar datos que no debía ser o el modelo no debía ser, entonces el ajuste
+
+568
+00:54:52,060 --> 00:54:56,760
+dentro de los distintos candidatos que son los modelos va, voy a realizarlo
+
+569
+00:54:56,760 --> 00:55:02,220
+digamos con el conjunto de prueba. Y para las elecciones, para seleccionar entre
+
+570
+00:55:02,220 --> 00:55:08,100
+los distintos modelos de distintos candidatos, yo voy a utilizar el error de
+
+571
+00:55:08,100 --> 00:55:12,900
+evaluación en los distintos pliegues.
+
+572
+00:55:12,900 --> 00:55:20,620
+Cada modelo, cada candidato que yo evalúe y lo ponga como un posible futuro
+
+573
+00:55:20,620 --> 00:55:26,500
+modelo a utilizar para tomar una decisión, es una receta completa. Es decir, yo puedo
+
+574
+00:55:26,500 --> 00:55:32,580
+tener dos modelos de regresión y uno es centrado y el otro no, uno tiene penalización y el
+
+575
+00:55:32,580 --> 00:55:37,580
+otro no, entonces yo tengo que evaluar todas esas combinaciones posibles. Ahora, ¿cuál
+
+576
+00:55:37,580 --> 00:55:44,760
+es el problema cuando tengo muchos predictores y muchos modelos a disposición? Y esto por
+
+577
+00:55:44,760 --> 00:55:50,380
+eso es la noción de entender esta problemática y no simplemente automatizar todo y probar
+
+578
+00:55:50,380 --> 00:55:54,500
+todos los casos posibles o todos los modelos posibles, porque no se puede, a decir si tengo
+
+579
+00:55:54,500 --> 00:56:01,660
+100 predictores tengo un sinfín de combinaciones, por ejemplo, no puedo ocupar solo un predictor,
+
+580
+00:56:01,660 --> 00:56:04,820
+el primero y el segundo, el primero y el tercer, el primero y el cuarto, y así sumisí, y
+
+581
+00:56:04,820 --> 00:56:09,180
+no puedo tomar las combinaciones posibles. Y hoy en día, cuando tengo un conjunto de
+
+582
+00:56:09,180 --> 00:56:15,820
+datos muy grandes y con muchos predictores, cuando combino toda la combinación para la
+
+583
+00:56:15,820 --> 00:56:21,460
+reunanza de predictores posibles, más las distintas metodologías, más las distintas
+
+584
+00:56:21,460 --> 00:56:29,820
+particularidades dentro de cada metodología, la cantidad de modelos a
+
+585
+00:56:29,820 --> 00:56:34,840
+probar o de posibles candidatos sube exponencialmente. Entonces no puedo
+
+586
+00:56:34,840 --> 00:56:40,460
+probar todo para definir cuál es el mejor. Tengo que tener un una noción
+
+587
+00:56:40,460 --> 00:56:44,880
+predefinida de cuáles van a ser las cosas que voy a probar y eso es una
+
+588
+00:56:44,880 --> 00:56:49,360
+mezcla entre el quiz experto entender la problemática y entender la
+
+589
+00:56:49,360 --> 00:56:54,680
+metodología subyacente que estamos ocupando, ya sea metodología más estadística, metodología
+
+590
+00:56:54,680 --> 00:57:01,880
+más de cienciatros, que en la práctica tienden a competir entre sí, ya, y ahí tenemos una
+
+591
+00:57:01,880 --> 00:57:06,520
+diferenciación entre el objetivo principal, si ya sea más predecir o si ya sea más interpretar.
+
+592
+00:57:08,600 --> 00:57:13,800
+Entonces cada candidato tiene una receta completa, es decir, no es sólo un modelo, es decir, hizo una
+
+593
+00:57:13,800 --> 00:57:19,860
+regresión múltiple, sino que es, hizo una regresión múltiple con estos
+
+594
+00:57:19,860 --> 00:57:25,480
+predictores, es ahí que hice estas transformaciones y así sumisibles, toda una
+
+595
+00:57:25,480 --> 00:57:28,480
+receta prácticamente tal.
+
+596
+00:57:29,000 --> 00:57:34,280
+Esa misma receta es la que yo utilizo en el conjunto de pre-a.
+
+597
+00:57:34,280 --> 00:57:38,600
+Siguiendo entonces, ¿qué modelos voy a comparar a lo largo de esta sesión?
+
+598
+00:57:38,600 --> 00:57:42,080
+Voy a comparar un modelo constante, ya que simplemente tomo las
+
+599
+00:57:42,080 --> 00:57:47,300
+observaciones que yo observe y le saqué el promedio, voy a modelar una regresión
+
+600
+00:57:47,300 --> 00:57:51,540
+múltiple y una regresión cuadrática con penalización reach. Si se fijan la
+
+601
+00:57:51,540 --> 00:57:56,260
+penalización reach tiene todos sus parámetros lineales
+
+602
+00:57:56,260 --> 00:58:01,660
+con los parámetros al cuadrado y además 28 interacciones. Entonces es bastante más
+
+603
+00:58:01,660 --> 00:58:07,140
+complicada en términos de parámetros, en el número de parámetros que tiene y
+
+604
+00:58:07,140 --> 00:58:12,920
+además esta misma regresión la voy a evaluar con distintos candidatos de
+
+605
+00:58:12,920 --> 00:58:17,860
+penalización ya sea alfa o lambda como le pusieron cualquiera de los dos es
+
+606
+00:58:17,860 --> 00:58:25,800
+valido digamos es el parámetro de costo digamos de penalización de reach y
+
+607
+00:58:25,800 --> 00:58:31,160
+hablar con 0 1 1 10 100 y 1000 y se fijan cuando empieza a hacer todas las
+
+608
+00:58:31,160 --> 00:58:34,240
+combinaciones entre los distintos modelos distintos pre-editorio distinta
+
+609
+00:58:34,240 --> 00:58:41,360
+interacciones, distintos hiperparámetros, ya las cosas son, digamos, muchas para probar
+
+610
+00:58:41,360 --> 00:58:45,600
+manualmente, sobre todo si por ejemplo tengo que hacer diagnóstico, hablar y cosas de
+
+611
+00:58:45,600 --> 00:58:50,800
+ese tipo. Entonces, ¿cómo ajustamos este modelo rich?
+
+612
+00:58:50,800 --> 00:59:00,340
+Ya, si se fijan acá, esto es lo observado menos lo predicho, el beta 0 más la combinación
+
+613
+00:59:00,340 --> 00:59:05,220
+lineal de los beta al cuadrado, es decir, tengo estos por definición una suma
+
+614
+00:59:05,220 --> 00:59:09,020
+cuadrado del error y las penalizaciones al cuadrado
+
+615
+00:59:09,020 --> 00:59:16,020
+grids que vienen dadas por este tipo de metodología. Si el landa es pequeño se
+
+616
+00:59:16,020 --> 00:59:22,160
+permite un coeficiente de mayor magnitud, si el landa es grande se contraen de
+
+617
+00:59:22,160 --> 00:59:26,380
+manera más rápida porque penaliza, penaliza en esencia que los betas sean
+
+618
+00:59:26,380 --> 00:59:32,860
+muy grande. Nunca nos lleva a cero, como por ejemplo la penalización lazo, pero
+
+619
+00:59:32,860 --> 00:59:41,000
+digamos nunca voy a tener, sobre todo con los betas muy grandes, porque va a
+
+620
+00:59:41,000 --> 00:59:46,000
+haber un dado que está al cuadrado, una penalización mucho mayor. Y esto se
+
+621
+00:59:46,000 --> 00:59:50,660
+minimiza, esto es un problema de optimización.
+
+622
+00:59:50,660 --> 01:00:00,520
+si se fijan acá los coeficientes los ajusto pero el lambda los comparo o los cojo al evaluar los
+
+623
+01:00:00,520 --> 01:00:07,780
+errores de evaluación y volviendo un poco a lo que mencionaba antes que era la noción de sobreajuste
+
+624
+01:00:07,780 --> 01:00:14,660
+la noción de sobreajuste que ya overfitting que quizás están ya familiarizados pero aquí
+
+625
+01:00:14,660 --> 01:00:19,900
+entra dentro del contexto de la evaluación que nosotros vamos a hacer, si se fijan acá,
+
+626
+01:00:19,900 --> 01:00:27,980
+si yo os cojo como que la métrica de definir que algo es el mejor modelo, no es agnóstico a otros
+
+627
+01:00:27,980 --> 01:00:35,100
+conceptos que son un poco más generales. Por ejemplo, si yo os cojo la raíz del error cuadrático medio
+
+628
+01:00:35,100 --> 01:00:45,140
+en una regresión con grado 2, si se fijan esto tiene un número 0,67 con los datos de entrenamiento
+
+629
+01:00:45,140 --> 01:00:51,540
+y cuando lo pruebo con datos nuevos es 0.64, de hecho es raro que pasa y se equivoca menos
+
+630
+01:00:53,540 --> 01:01:02,180
+pero si hago el mismo modelo pero con un polinomio de grado o un parámetro, un predictor con grado 12
+
+631
+01:01:02,180 --> 01:01:07,660
+el ajuste va a ser mejor porque dado que tengo un mayor grado de polinomio tengo
+
+632
+01:01:07,660 --> 01:01:13,940
+mayor flexibilidad para ajustar menos datos pero cuando lo evaluó en datos
+
+633
+01:01:13,940 --> 01:01:16,260
+nuevos
+
+634
+01:01:16,900 --> 01:01:22,640
+esa raíz del error cuadrático medio es mayor ¿por qué? porque estoy
+
+635
+01:01:22,640 --> 01:01:29,580
+restringiendo, estoy haciendo un trade-off entre
+
+636
+01:01:29,580 --> 01:01:37,260
+ajustar mejor mis datos pero voy a bajar el nivel de generalización porque el
+
+637
+01:01:37,260 --> 01:01:43,740
+polinomio o la revisión con gravo 12 o con un coeficiente de gravo 12 va a
+
+638
+01:01:43,740 --> 01:01:50,100
+ajustar por el mayor permeabilidad de flexibilidad que tiene de ajustarse a
+
+639
+01:01:50,100 --> 01:01:55,540
+los distintos puntos es decir un gravo, un polinomio de gravo 2 tiene cierta forma
+
+640
+01:01:55,540 --> 01:02:03,300
+un polinomio de grau 12 puede tener bastante más curvas y bastante mayor flexibilidad para la redundancia.
+
+641
+01:02:03,300 --> 01:02:09,860
+Pero esa flexibilidad viene con un costo. Y ese costo es predecir datos que no se conocen bien.
+
+642
+01:02:09,860 --> 01:02:16,220
+Porque este polinomio, este modelo aprendió muy bien de estos datos.
+
+643
+01:02:16,220 --> 01:02:22,980
+Y solo modela muy bien esos datos. Entonces entra un problema sobre ajuste que a mí me gusta definirlo como
+
+644
+01:02:22,980 --> 01:02:28,780
+modelar los datos y no modelar el fenómeno que tengo interés en particular.
+
+645
+01:02:28,780 --> 01:02:36,300
+Entonces, en este caso, el poder de generalización viene con un modelo menos complejo, porque
+
+646
+01:02:36,300 --> 01:02:41,460
+el de grado 12 va a tener una mayor complejidad, sobre todo computacional y en términos de
+
+647
+01:02:41,460 --> 01:02:48,740
+analíticos, en principio. Entonces, esto está englobado dentro de tres conceptos que
+
+648
+01:02:48,740 --> 01:02:56,060
+son los principales en términos de este tipo de error. El sesgo, la varianza y el ruido. Son
+
+649
+01:02:56,060 --> 01:03:02,140
+las tres formas que me puedo estar equivocando. El error cuadrático esperado va a ser el sesgo
+
+650
+01:03:02,140 --> 01:03:07,060
+al cuadrado, su varianza y un ruido. Empecemos por el ruido. El ruido no me lo puedo sacar nunca
+
+651
+01:03:07,060 --> 01:03:13,860
+porque siempre hay una electoridad de por medio que está inherente. El sesgo es la distancia entre
+
+652
+01:03:13,860 --> 01:03:20,120
+la señal que es lo que yo observe y el ajuste promedio y la varianza es que
+
+653
+01:03:20,120 --> 01:03:25,620
+tanto varía ese ajuste conforme yo cojo distintos datos para ajustarlo
+
+654
+01:03:25,620 --> 01:03:30,380
+entonces todos estos modelos igual pueden ser visto como una función más
+
+655
+01:03:30,380 --> 01:03:35,220
+un ruido yo le puedo dar supuestas distribucionales el ruido pero en
+
+656
+01:03:35,220 --> 01:03:38,380
+principio es algo que no me puedo sacar un río que está ahí y va a estar
+
+657
+01:03:38,380 --> 01:03:41,180
+permanentemente ahí que tenemos que lidiar lo que nosotros queremos hacer es
+
+658
+01:03:41,180 --> 01:03:46,620
+que no haya un ruido adicional o una una fuente de variabilidad adicional que se
+
+659
+01:03:46,620 --> 01:03:53,360
+mezcle con eso. Entonces, aumentar esta flexibilidad con por ejemplo los
+
+660
+01:03:53,360 --> 01:04:00,440
+grados mayores, un grado 12, puede reducir el sesgo, es decir, entre lo que yo
+
+661
+01:04:00,440 --> 01:04:05,640
+observé y el ajuste promedio, esto de acá,
+
+662
+01:04:05,640 --> 01:04:11,480
+puede decir va a tener un mejor ajuste pero va a aumentar la variabilidad porque
+
+663
+01:04:11,480 --> 01:04:15,660
+cuando lo evalúo en una nueva muestra, en los nuevos dados, quien no conoce el
+
+664
+01:04:15,660 --> 01:04:20,760
+modelo, estoy excedo exactamente esto, estoy cambiando la muestra, entonces
+
+665
+01:04:20,760 --> 01:04:27,640
+quiero tener un buen balance entre sesgo y varianza, el ruido está idio, está
+
+666
+01:04:27,640 --> 01:04:30,680
+permanente
+
+667
+01:04:30,680 --> 01:04:38,080
+Así entonces, yo quiero estar interesado en las predicciones, y en las predicciones
+
+668
+01:04:38,080 --> 01:04:44,240
+fuera de un pliegue, que le voy a llamar OUF, que es Out of Fold, fuera del pliegue.
+
+669
+01:04:44,240 --> 01:04:47,440
+¿Qué quiere decir eso?
+
+670
+01:04:47,440 --> 01:04:54,240
+Con cada ajuste que yo hago, siempre voy a sacar un pliegue, es decir, yo les comentaba
+
+671
+01:04:54,240 --> 01:05:00,640
+que el conjunto de entrenamiento lo separé en 5 pliegue, es decir, ese 80%, lo separé
+
+672
+01:05:00,640 --> 01:05:10,200
+en cinco conjuntos, ya de 20. Si, 2, 4, 6, 8, no, de 80 y 5.
+
+673
+01:05:10,200 --> 01:05:15,680
+Y ahora ese conjunto de estos cinco conjuntos yo voy a sacar uno y voy a
+
+674
+01:05:15,680 --> 01:05:20,680
+evaluar con cuatro, después voy a sacar otro y voy a incorporar el primero y así
+
+675
+01:05:20,680 --> 01:05:26,020
+sumo a siguiente. Entonces voy a quedar con todas las observaciones evaluadas fuera del
+
+676
+01:05:26,020 --> 01:05:33,380
+pliegue, es decir, voy a estar sacando predicciones que lo que hacen son
+
+677
+01:05:33,380 --> 01:05:39,180
+es evaluar la función estimada, la función que estoy realizando, con todos
+
+678
+01:05:39,180 --> 01:05:46,920
+los datos menos el pliegue yésimo, y con ello voy a obtener y puedo calcular la
+
+679
+01:05:46,920 --> 01:05:51,220
+raíz del error cuadrático medio con todos esos datos, los voy a juntar y puedo
+
+680
+01:05:51,220 --> 01:05:54,500
+calcular esa cantidad.
+
+681
+01:05:54,500 --> 01:05:59,500
+que no es, si se fijan acá, lo junto y saco el error cuadrático medio
+
+682
+01:05:59,500 --> 01:06:05,500
+que no es lo mismo que promediar los error cuadrático medio
+
+683
+01:06:05,500 --> 01:06:09,500
+sino que es el error cuadrático, la raíz del error cuadrático medio
+
+684
+01:06:09,500 --> 01:06:12,500
+fuera de pie, dan números distintos
+
+685
+01:06:12,500 --> 01:06:16,500
+no son uno mejor que otro, sino que son decisiones distintas
+
+686
+01:06:16,500 --> 01:06:23,500
+porque la raíz no es lineal y si yo saco el promedio y lo saco la raíz
+
+687
+01:06:23,500 --> 01:06:32,140
+lo mismo que sacar el primero la raíz y luego el 9, el orden va a importar en este caso.
+
+688
+01:06:32,140 --> 01:06:37,260
+O sea, nosotros nos vamos a quedar en este sentido con esta cantidad, el 2.2 y se fijan
+
+689
+01:06:37,260 --> 01:06:41,380
+no es tan distinto pero va a depender mucho de los valores con los cuales yo estoy trabajando.
+
+690
+01:06:42,820 --> 01:06:47,580
+Entonces estas recetas que van a ser los distintos candidatos, los distintos modelos,
+
+691
+01:06:47,580 --> 01:06:54,460
+van a tener, sobre todo con la metodología de validación cruzada que es muy usada,
+
+692
+01:06:54,460 --> 01:07:02,340
+digamos, dentro de este contexto, es una prescripción clara de qué es lo que
+
+693
+01:07:02,340 --> 01:07:05,580
+conlleva todo el modelo. Por ejemplo, hay modelos que yo no voy a necesitar
+
+694
+01:07:05,580 --> 01:07:16,260
+necesitar no necesitar estigmatizar pero voy a tener otras particularidades ya
+
+695
+01:07:16,260 --> 01:07:23,180
+entonces yo voy a querer evaluar y hacer el ajuste con el con los distintos
+
+696
+01:07:23,180 --> 01:07:27,860
+pliegues voy a estimar voy a transformar voy a hacer efectivamente el modelo lo
+
+697
+01:07:27,860 --> 01:07:34,980
+voy a generar y voy a tener parámetros fijos ya voy a estimar luego de ello
+
+698
+01:07:35,580 --> 01:07:40,480
+voy a, suponiendo que tenemos los cinco pliegues con cuatro voy a hacer todo eso
+
+699
+01:07:40,480 --> 01:07:43,760
+la prescripción que les he mencionado y luego voy a aplicar todas las
+
+700
+01:07:43,760 --> 01:07:48,880
+transformaciones a el conjunto de validación y luego de ello voy a
+
+701
+01:07:48,880 --> 01:07:53,580
+calcular alguna métrica de error, en particular aquí la raíz del error
+
+702
+01:07:53,580 --> 01:07:57,800
+cuadrativo médico. Entonces todas esas prescripciones
+
+703
+01:07:57,800 --> 01:08:02,960
+tienen que tener una receta. ¿Qué es lo que nosotros queremos hacer?
+
+704
+01:08:02,960 --> 01:08:08,160
+debemos evitar la fuga de datos o data leakage que en esencia es ocupar en el
+
+705
+01:08:08,160 --> 01:08:13,160
+ajuste datos que no debiesen ser vistos. Por ejemplo, ocupar datos
+
+706
+01:08:13,160 --> 01:08:17,960
+de evaluación en el ajuste de entrenamiento o ocupar datos de prueba
+
+707
+01:08:17,960 --> 01:08:21,040
+en el conjunto de entrenamiento para generar los modelos porque la idea es no
+
+708
+01:08:21,040 --> 01:08:28,240
+no hacer trampa, ocupar que evaluar los modelos en datos
+
+709
+01:08:28,240 --> 01:08:36,400
+que no conoce en principio, ya pueden ser similares pero no conoce, ya no los tiene en su poder digamos cuando se hizo el ajuste
+
+710
+01:08:37,360 --> 01:08:38,400
+entonces
+
+711
+01:08:38,400 --> 01:08:44,800
+¿Cuál es el protocolo general? primero tengo que definir qué es lo que voy a hacer y la métrica con la cual voy a evaluar
+
+712
+01:08:45,720 --> 01:08:48,600
+voy a comparar de manera interna con validación cruzada
+
+713
+01:08:48,960 --> 01:08:55,000
+voy a escoger el modelo y voy a reajustar una vez que escogí el modelo voy a decir ya este es el modelo que voy a utilizar
+
+714
+01:08:55,000 --> 01:09:01,860
+utilizar. Ahora voy a ocupar todo el conjunto de entrenamiento sin hacer discrepancia entre
+
+715
+01:09:01,860 --> 01:09:07,140
+o diferencia entre el entrenamiento y la validación. Lo voy a evaluar con todo y finalmente voy
+
+716
+01:09:07,140 --> 01:09:15,460
+a utilizar el conjunto de pre-o y ahí voy a tener recién una métrica de el modelo
+
+717
+01:09:15,460 --> 01:09:22,660
+que yo estaba utilizando y una buena evaluación de qué tan bueno es mi modelo.
+
+718
+01:09:22,660 --> 01:09:29,900
+Ahora, una vez que hago la evaluación y no me dieron buenos resultados, no puedo coger
+
+719
+01:09:29,900 --> 01:09:34,180
+otro, ya, porque si no voy a hacer trampos, o sea, por eso uno planifica en un principio
+
+720
+01:09:34,180 --> 01:09:40,360
+cuál va a ser tu criterio de aceptación. Y algo que toma tiempo, digamos, definir,
+
+721
+01:09:40,360 --> 01:09:44,980
+ya, más que simplemente hacer los modelos, toma más tiempo definir el plan de acción
+
+722
+01:09:44,980 --> 01:09:51,020
+que se va a hacer antes de hacer el modelamiento per se, pero tengo que definir criterios de
+
+723
+01:09:51,020 --> 01:10:01,020
+decir si el mae o la raíz del error cuadrático medio, el conjunto prueba supera o es menor a tal valor, entonces
+
+724
+01:10:01,020 --> 01:10:07,740
+puede utilizarlo, pero sin antes, pero eso se tiene que hacer, digo, antes de hacer todo el resto, tengo que
+
+725
+01:10:07,740 --> 01:10:13,060
+tener un criterio predefinido y adecuarme a eso.
+
+726
+01:10:13,060 --> 01:10:19,060
+Ahora creo que podemos ir al break, creo que estamos en la hora, vamos a cerrar?
+
+727
+01:10:19,060 --> 01:10:21,060
+Si
+
+728
+01:10:21,060 --> 01:10:26,060
+Así que, ¿cuánto dura? Creo que dura 15 o media hora, me recuerda
+
+729
+01:10:29,060 --> 01:10:32,060
+Creo que es como 20 minutos
+
+730
+01:10:32,060 --> 01:10:39,060
+Ya, dejémoslo en 20 minutos, vamos un poquito a las 9.05 a PP, ¿les parece?
+
+731
+01:10:39,060 --> 01:10:43,000
+Des 마.
+
+732
+01:10:43,380 --> 01:10:46,160
+¡Tenemos Behind!
+
+733
+01:10:48,880 --> 01:10:49,580
+Ya, vamos a continuar.
+
+734
+01:11:01,380 --> 01:11:01,420
+más.
+
+735
+01:11:06,160 --> 01:11:07,160
+.
+
+736
+01:11:09,060 --> 01:11:14,340
+Bueno, continuada con este segundo módulo.
+
+737
+01:11:15,820 --> 01:11:20,820
+En el módulo están disponibles
+
+738
+01:11:20,820 --> 01:11:25,700
+cuatro archivos más la presentación, son 50 total.
+
+739
+01:11:25,700 --> 01:11:32,340
+Dos de estos son códigos y los dos restantes son
+
+740
+01:11:32,460 --> 01:11:37,620
+la base de datos de esta sección 38 en principio.
+
+741
+01:11:37,620 --> 01:11:46,740
+ambos códigos están en R y en Python, en ese se son lo mismo, o intentan hacer lo mismo,
+
+742
+01:11:46,740 --> 01:11:50,540
+pueden haber pequeñas discrepancias debido a la implementación computacional que tienen los
+
+743
+01:11:50,540 --> 01:11:57,900
+distintos paquetes o módulos, pero el principio sigue siendo el mismo, la metodología es exactamente
+
+744
+01:11:57,900 --> 01:12:05,420
+igual. Entonces para ello, ustedes pueden utilizar el editor, digamos, o el entorno que ustedes
+
+745
+01:12:05,420 --> 01:12:11,660
+prefieran, yo tengo mis propias
+
+746
+01:12:11,860 --> 01:12:15,540
+pero quizás puedo re-encontrar, de hecho, que vamos a ver ahora.
+
+747
+01:12:15,860 --> 01:12:20,220
+En general, uno tiende a trabajar
+
+748
+01:12:20,420 --> 01:12:25,220
+estadísticas más en R y cosas más de esencia de datos en Python, pero
+
+749
+01:12:25,420 --> 01:12:31,060
+la decisión, digamos, es personal, cada uno tiene sus pro y sus contras.
+
+750
+01:12:31,260 --> 01:12:33,420
+Ambos son lenguajes
+
+751
+01:12:33,420 --> 01:12:39,360
+de alto nivel, por lo que por debajo en los paquetes tienen que igual utilizar
+
+752
+01:12:39,360 --> 01:12:43,980
+códigos de bajo nivel como C o Fortran o cosas de ese estilo para poder hacer
+
+753
+01:12:43,980 --> 01:12:50,300
+computó un poquito más sofisticado, digamos, para que no sean tan lentos.
+
+754
+01:12:50,300 --> 01:12:54,700
+Ya, entonces vamos a comenzar con
+
+755
+01:12:54,860 --> 01:12:59,340
+cómo implementamos esto, cómo tomamos estas decisiones, cómo
+
+756
+01:12:59,340 --> 01:13:05,460
+evaluamos los modelos y recuerden que
+
+757
+01:13:05,460 --> 01:13:10,860
+diferencia grande entre los problemas
+
+758
+01:13:11,740 --> 01:13:17,280
+de movilamiento numérico, ya, en el sentido de movilamiento cuantitativo,
+
+759
+01:13:17,280 --> 01:13:22,340
+es decir, la variable respuesta es un número, ya, y se entiende como un número,
+
+760
+01:13:22,340 --> 01:13:28,300
+no una clasificación o una categoría que está categorizada o evaluada,
+
+761
+01:13:28,300 --> 01:13:31,780
+identificada con números.
+
+762
+01:13:31,780 --> 01:13:35,340
+Por ejemplo, serie 1, si todas son serie 1, por mucho que sean números, siguen
+
+763
+01:13:35,340 --> 01:13:43,020
+siendo categóricas y los problemas de clasificación porque vamos a utilizar
+
+764
+01:13:43,020 --> 01:13:48,140
+métricas distintas y en eso es parte de lo que tenemos que entender
+
+765
+01:13:48,140 --> 01:13:52,380
+qué métrico ocupar y cuándo
+
+766
+01:13:53,060 --> 01:13:58,940
+entonces tenemos el código de R, tenemos código Python, ambos son válidos para
+
+767
+01:13:58,940 --> 01:14:07,020
+está para replicar esto y lo vamos a ir viendo. Entonces, vamos a cerrar esto un poco.
+
+768
+01:14:08,740 --> 01:14:15,420
+Así entonces, si lo pueden bajar y me confirma si lo pueden ejecutar sería
+
+769
+01:14:15,420 --> 01:14:23,300
+idóneo. Yo les voy a compartir en R, porque me acomodo un poco más, pero
+
+770
+01:14:23,300 --> 01:14:28,020
+lo tengo todo abierto. Y les puedo dar una recomendación también de otro
+
+771
+01:14:28,020 --> 01:14:38,380
+software que yo utiliza al menos. No sé si todos están familiarizados con RStudio, que es como el
+
+772
+01:14:38,380 --> 01:14:48,460
+software para R, que usualmente se utiliza, a menos que lo ocupen por consolas, pero la misma
+
+773
+01:14:48,460 --> 01:15:00,460
+empresa tiene un software que se llama Positron y sirve para Python y R.
+
+774
+01:15:00,460 --> 01:15:06,100
+Entonces no tengo que andar cambiándome de software ni mi cosa de ese estilo, solo que puedo ocupar
+
+775
+01:15:06,100 --> 01:15:13,300
+uno para él mismo. Si se fijan acá, esto está, lo que estoy compartiendo es en R.
+
+776
+01:15:13,300 --> 01:15:20,700
+y si ustedes dejan toda la... pueden poner la ruta del material acá,
+
+777
+01:15:20,700 --> 01:15:24,380
+están más o menos tanto explicativo con comentarios,
+
+778
+01:15:25,700 --> 01:15:33,500
+pero pueden ejecutar todo el paquete, digamos, todo el código y les va a tirar un circuit de plot
+
+779
+01:15:33,500 --> 01:15:41,500
+que vamos viendo poco a poco. Y si ustedes quieren hacerlo con
+
+780
+01:15:42,500 --> 01:15:46,500
+Python, ya,
+
+781
+01:15:49,340 --> 01:15:54,500
+si lo quieren hacer con Python, debería ser esto.
+
+782
+01:15:54,500 --> 01:16:00,300
+Colab no lo reconoce por el hecho de que Colab está hecho para archivos de
+
+783
+01:16:00,300 --> 01:16:07,980
+Jupiter, ya al principio. Entonces la extensión es IpyNV o Notebook de Python.
+
+784
+01:16:07,980 --> 01:16:18,140
+Eso está en códigos, digamos, directos. Ahora, de igual manera tú puedes ir copiando el
+
+785
+01:16:18,140 --> 01:16:22,660
+bloque a bloque, como dice Juan, digamos.
+
+786
+01:16:22,660 --> 01:16:27,240
+Esto es válido, cualquiera de las... Si lo quieren ocupar de manera cloud, lo quieren ocupar de
+
+787
+01:16:27,240 --> 01:16:33,320
+manera local. Se puede ir copiando fácilmente. Para la próxima sesión yo creo que
+
+788
+01:16:33,320 --> 01:16:38,160
+me lo voy a pasar el código en Jupyter para que lo puedan llegar y abrirlo.
+
+789
+01:16:38,160 --> 01:16:42,720
+Así entonces, si se fijan ahora, creo que estoy compartiendo el código en Python.
+
+790
+01:16:42,720 --> 01:16:48,200
+Si se fijan acá es otra ventana
+
+791
+01:16:48,200 --> 01:17:00,120
+y me ejecuta exactamente lo mismo pero en pipe. Pues tengo un, al menos yo esto lo recomiendo
+
+792
+01:17:00,120 --> 01:17:06,600
+porque así tengo todo de manera unificada, de hecho yo pudiese abrirlo en el mismo tab
+
+793
+01:17:06,600 --> 01:17:14,560
+pero para efectos de orden propio lo ocupo en este acampo.
+
+794
+01:17:14,560 --> 01:17:20,560
+hasta aquí, esto es en R y en Python estoy compartiendo el de Python que es el de acá
+
+795
+01:17:20,560 --> 01:17:24,120
+si se fijan
+
+796
+01:17:24,920 --> 01:17:33,720
+me realiza todos los códigos que están en los archivos de disposición
+
+797
+01:17:37,000 --> 01:17:39,760
+de hecho
+
+798
+01:17:39,760 --> 01:17:46,760
+vamos a ponerlo con blanco para que se vea mejor
+
+799
+01:17:46,760 --> 01:17:49,760
+ya
+
+800
+01:17:51,760 --> 01:17:55,760
+el programa lo va a escribir por si le interesa, se llama Positron
+
+801
+01:17:55,760 --> 01:18:03,760
+es de la misma empresa que hizo RStudio que es Posit
+
+802
+01:18:03,760 --> 01:18:12,760
+Almas acomoda mucho más porque si uno trabaja solo con el estudio que, digamos, está un poco más obsoleto, uno se encasilla mucho.
+
+803
+01:18:12,760 --> 01:18:22,760
+Y la verdad es que hay que tener cierta versatilidad porque hay cosas en las que Python es preferible por sobre R y cosas que R es preferible por sobre Python.
+
+804
+01:18:22,760 --> 01:18:31,760
+Entonces, hay que tener esa flexibilidad de ir cambiando de lenguaje conforme sea necesario.
+
+805
+01:18:31,760 --> 01:18:36,760
+Entonces, voy a compartir en R.
+
+806
+01:18:41,760 --> 01:18:46,760
+Y si fijan acá, todos pudieron, alguien tuvo algún problema para ejecutar el código.
+
+807
+01:18:46,760 --> 01:18:50,760
+Todos bien.
+
+808
+01:18:52,760 --> 01:19:00,760
+Vamos a volver a la presentación.
+
+809
+01:19:01,760 --> 01:19:05,760
+Lo pueden ir ejecutando conforme vamos avanzando en la presentación.
+
+810
+01:19:08,760 --> 01:19:09,760
+Ya.
+
+811
+01:19:09,760 --> 01:19:14,760
+Entonces, si ustedes ejecutan, si se fijan, los códigos están por secciones.
+
+812
+01:19:14,760 --> 01:19:17,760
+Las primeras dos secciones son de configuración en principio,
+
+813
+01:19:17,760 --> 01:19:26,760
+y la primera sección de metodología es en la sección 03, que yo puse como comentario.
+
+814
+01:19:26,760 --> 01:19:41,180
+Entonces, esa sección lo que hace es ajustar cada modelo pero sin considerar el pliegue
+
+815
+01:19:41,180 --> 01:19:45,340
+en particular porque eso se le tiene que ocupar para hacer la validación.
+
+816
+01:19:45,340 --> 01:19:53,220
+Entonces nosotros ajustamos con los modelos, o sea con los pliegues que son del entrenamiento
+
+817
+01:19:53,220 --> 01:20:02,620
+pero no con el pliegue propiamente tal que voy a utilizar en esa iteración para la avaliación.
+
+818
+01:20:02,620 --> 01:20:09,300
+Por eso estoy haciendo un anidado de 4 entre 1 y 6, porque aquí hay la diferencia 5, ¿cierto?
+
+819
+01:20:09,300 --> 01:20:14,900
+Y dijimos en un principio que van a ser 5 pliegues, ¿ya?
+
+820
+01:20:14,900 --> 01:20:25,920
+Entonces, en Python, nosotros vamos a hacer este fit, digamos, y vamos a hacer la predicción
+
+821
+01:20:25,920 --> 01:20:32,400
+con este conjunto que le vamos a llamar, que se llama, valida. Y vamos, si se fijan acá,
+
+822
+01:20:32,400 --> 01:20:37,640
+voy a ocupar este subconjunto valida con su negación, que es la tilde, para ajustarlo.
+
+823
+01:20:37,640 --> 01:20:53,640
+Si se fijan acá, este modelo que es el clone, ajusto con los X, que son los predictores que no están en el pliegue de validación y con los Y que no están en el pliegue de validación.
+
+824
+01:20:53,640 --> 01:20:58,640
+y calculo con la función predict
+
+825
+01:21:01,760 --> 01:21:08,360
+la raíz del error cuadrático medio fuera del pliegue y los voy guardando
+
+826
+01:21:08,360 --> 01:21:13,160
+si se fijan acá lo que estoy haciendo es exactamente esta fórmula que está aquí
+
+827
+01:21:13,160 --> 01:21:20,360
+es exactamente esta fórmula que definimos un poquito más atrás
+
+828
+01:21:20,360 --> 01:21:29,480
+que está aquí, pero evaluando correctamente en la
+
+829
+01:21:29,480 --> 01:21:34,680
+en el conjunto o subconjunto de validación, que es lo que nosotros queremos
+
+830
+01:21:34,680 --> 01:21:37,400
+hacer porque después queremos hacer eso e iterarlo a través de todos los
+
+831
+01:21:37,400 --> 01:21:41,880
+conjuntos de validación para obtener efectivamente la raíz del error
+
+832
+01:21:41,880 --> 01:21:48,200
+cuadrático medio de nuestro proceso de ajuste, digamos. Y en R, algo muy similar,
+
+833
+01:21:48,200 --> 01:21:54,260
+defino cuál es el fold y respecto a esa variable que voy a ir iterando voy a
+
+834
+01:21:54,260 --> 01:22:01,140
+ajustar con los datos que no están en el fold de validación, ya por eso te hacen la
+
+835
+01:22:01,140 --> 01:22:07,060
+negación de esta validación, es decir, los X que no están en este
+
+836
+01:22:07,060 --> 01:22:13,620
+subconjunto X y los Y que no están en este conjunto Y
+
+837
+01:22:13,620 --> 01:22:17,900
+y voy a predecir con los conjuntos del pliegue en particular y voy a hacer eso
+
+838
+01:22:17,900 --> 01:22:24,100
+cinco veces porque son cinco pliegues. Luego voy a juntarlos y voy a sacar la raíz del promedio de
+
+839
+01:22:24,100 --> 01:22:29,620
+estas distancias al cuadrado, de esta discrepancia al cuadrado que en esencia es la raíz del error
+
+840
+01:22:29,620 --> 01:22:34,780
+cuadrático medio. Entonces todas estas transformaciones, todas estas modelos se aprenden dentro del ajuste
+
+841
+01:22:37,340 --> 01:22:45,500
+y yo voy a ir calculando la raíz del error cuadrático medio en los distintos pliegues.
+
+842
+01:22:45,500 --> 01:22:55,600
+ambas son equivalentes. Si hacemos eso con los modelos que acabamos de mencionar,
+
+843
+01:22:55,600 --> 01:22:59,720
+si se fijan, cuando lo hicimos un poquito más atrás, dijimos que íbamos a evaluar
+
+844
+01:23:01,920 --> 01:23:08,160
+7 candidatos, el modelo constante, modelo de regresión de línea múltiple y regresiones
+
+845
+01:23:08,160 --> 01:23:15,020
+cuadráticas con penalización rich, con distintos parámetros de costo de esta penalización.
+
+846
+01:23:15,500 --> 01:23:21,100
+Así entonces, cuando lo iteramos, si se fijan, ustedes pueden...
+
+847
+01:23:21,100 --> 01:23:24,500
+Voy a volver ahora a R.
+
+848
+01:23:24,500 --> 01:23:28,500
+Ustedes ejecutan.
+
+849
+01:23:32,500 --> 01:23:39,100
+En particular, pueden ir ejecutando por bloques si tienen este programa.
+
+850
+01:23:39,100 --> 01:23:44,300
+A pesar de no ser interactivo, uno puede ejecutar todos los barrios.
+
+851
+01:23:45,500 --> 01:23:52,820
+se fijan acá, vamos a ver un poco más grande
+
+852
+01:23:53,820 --> 01:24:04,980
+acá replico los mismos datos que están en la presentación ya y si lo hago en R
+
+853
+01:24:04,980 --> 01:24:10,460
+o sea en Python perdón también voy a tener
+
+854
+01:24:10,460 --> 01:24:20,460
+la misma cantidad. Vamos a volver entonces lo que vi en la presentación para que esté
+
+855
+01:24:20,460 --> 01:24:32,860
+un poco más fácil de entender. Entonces acá tengo el resumen, tengo el resumen al hacer
+
+856
+01:24:32,860 --> 01:24:36,780
+el proceso, digamos, al evaluar estos cambios. Y recuerden que todo lo que estamos haciendo
+
+857
+01:24:36,780 --> 01:24:42,840
+es de cierta manera un poco agnóstico el modelo que vamos a utilizar, ya, porque tal como hacemos
+
+858
+01:24:42,840 --> 01:24:48,840
+regresión lineal o una regresión cuadrática o con las distintas penalizaciones, yo podría tener
+
+859
+01:24:48,840 --> 01:24:53,120
+otros modelos, podría tener una red neuronal, podría tener un SBM, podría tener alguna otra
+
+860
+01:24:53,120 --> 01:25:00,200
+metodología que me sirva para atacar, digamos, tratar de evaluar y predecir la variable de interés.
+
+861
+01:25:00,200 --> 01:25:09,020
+Entonces, en ese sentido estos ejemplos son bastante anecdóticos porque pueden ser
+
+862
+01:25:09,020 --> 01:25:13,280
+todas las metodologías que ustedes saben y conforme uno va estudiando más uno va aprendiendo
+
+863
+01:25:13,280 --> 01:25:18,320
+más metodologías pero en la práctica cuando queremos tomar decisiones tenemos que llevar
+
+864
+01:25:18,320 --> 01:25:24,080
+digamos a la evaluación y contrastar unos con otros porque no porque va a ser más complicado
+
+865
+01:25:24,080 --> 01:25:28,480
+otro modelo en el sentido de que más sofisticado tiene más parámetro necesariamente va a ser
+
+866
+01:25:28,480 --> 01:25:34,120
+mejor. Entonces ahí está el juego, digamos, de
+
+867
+01:25:34,120 --> 01:25:38,960
+modelar y tener, digamos, procesos iterativos de modelación que sean
+
+868
+01:25:38,960 --> 01:25:44,260
+bastante razonables, porque si no voy a perder todo el tiempo en modelar y no
+
+869
+01:25:44,260 --> 01:25:50,040
+voy a tomar efectivamente una decisión o una acción, probablemente. No puedo
+
+870
+01:25:50,040 --> 01:25:54,800
+recomendar algo. Entonces, aquí voy a evaluar. Ya está
+
+871
+01:25:54,800 --> 01:26:03,960
+la ordena, digamos, estos siete candidatos por la raíz del error cuadrático medio
+
+872
+01:26:03,960 --> 01:26:12,560
+fuera de pliegue, de menor a mayor. Y también tengo el MAE.
+
+873
+01:26:12,560 --> 01:26:22,520
+Ahora, las columnas muestran este RMSE y el MAE que están en los micropascales,
+
+874
+01:26:22,520 --> 01:26:29,120
+me voy a buscar eso, el MPAC, la unidad de respuesta de nuestra variable de
+
+875
+01:26:29,120 --> 01:26:36,760
+interés. No son coeficientes sino que simplemente los valores que nosotros
+
+876
+01:26:36,760 --> 01:26:41,680
+evaluamos en los distintos modelos. Estas van a ser nuestras métricas, nuestras
+
+877
+01:26:41,680 --> 01:26:49,040
+métricas que nosotros tenemos que tomar, analizar y en lo posible escoger un
+
+878
+01:26:49,040 --> 01:26:53,240
+modelo a través de estas dos. También pudiese escoger el recuadrado de ese paso
+
+879
+01:26:53,240 --> 01:26:57,280
+u otra métrica. Hay varias métricas que vamos a ver un poquito más adelante para
+
+880
+01:26:57,280 --> 01:27:04,880
+los distintos problemas. Si se fijan acá, la media de entrenamiento,
+
+881
+01:27:04,880 --> 01:27:12,120
+que se fijan, es el modelo que es un poco más ingenuo, que es
+
+882
+01:27:12,120 --> 01:27:18,400
+simplemente tomar las respuestas y promediarlas, es el modelo que entrega
+
+883
+01:27:18,400 --> 01:27:24,680
+los peores resultados. Y obvio, porque no estoy considerando
+
+884
+01:27:24,680 --> 01:27:29,960
+en ningún aspecto los predictores. Entonces no tomo ningún aspecto, no tomo
+
+885
+01:27:29,960 --> 01:27:35,480
+consideración los componentes ni la edad del hormigón
+
+886
+01:27:35,480 --> 01:27:38,560
+probablemente tal para definir la resistencia. Entonces lo que estoy
+
+887
+01:27:38,560 --> 01:27:49,200
+en este modelo es como si no subiesen nada, no subiesen nada más que simplemente la resistencia, es decir, yo les pregunto
+
+888
+01:27:50,000 --> 01:27:55,960
+solo les digo una columna de resistencia si les pregunto, bueno, para una nueva observación
+
+889
+01:27:55,960 --> 01:28:02,160
+cuál crees tú que será la nueva resistencia o cuál resistencia me aprendices
+
+890
+01:28:02,160 --> 01:28:09,220
+lo mejor que tú puedes hacer es sacar el promedio. Y así se fijan, una
+
+891
+01:28:09,220 --> 01:28:16,160
+regresión lineal con términos cuadráticos y un costo muy alto de 1000, lo cual
+
+892
+01:28:16,160 --> 01:28:23,160
+significa que como habíamos dicho anteriormente
+
+893
+01:28:23,160 --> 01:28:38,240
+penaliza bastante, por ahí está la definición, digamos, del parámetro de costo dentro de una
+
+894
+01:28:38,240 --> 01:28:42,840
+revisión con penalización rich. Si se fijan, penalizó tanto que
+
+895
+01:28:45,880 --> 01:28:51,800
+la raíz del error cuadrático medio fuera de pliegue salió muy mala,
+
+896
+01:28:51,800 --> 01:28:56,660
+y sustancialmente mal, digamos, no tan malas como solo sacar el promedio porque igual está ocupando
+
+897
+01:28:56,660 --> 01:29:03,900
+información de coeficientes y los coeficientes y predictores están parte, son parte de ese modelo
+
+898
+01:29:03,900 --> 01:29:10,980
+debido a que Bridge no tira parámetros a cero, no lo, no lo, no lo, digamos, lleva a cero, sino que
+
+899
+01:29:10,980 --> 01:29:15,260
+simplemente les baja una dimensión, entonces lo más probable es que cuando veamos los parámetros,
+
+900
+01:29:15,260 --> 01:29:21,240
+coeficientes de separables que tengan betas muy pequeños o muy cercanos a cero.
+
+901
+01:29:21,240 --> 01:29:26,300
+Siguiendo entonces una regresión lineal normal sin penalización, que tiende a
+
+902
+01:29:26,300 --> 01:29:34,020
+ser el modelo base cuando quiero hacer predicción cuantitativa, ya, y
+
+903
+01:29:34,020 --> 01:29:38,580
+por consecuencia cuando quiero hacer predicción o categorización en
+
+904
+01:29:38,580 --> 01:29:44,940
+principio de cosas binarias, tengo como modelo base la regresión logística y se
+
+905
+01:29:44,940 --> 01:29:50,500
+entiende que son modelos buenos conforme su objetivo, que es predecir
+
+906
+01:29:50,500 --> 01:29:57,520
+correctamente, pero su principal característica es que son modelos que
+
+907
+01:29:57,520 --> 01:30:01,340
+son muy interpretables. Yo sé exactamente qué es lo que pasa en cada uno de esos
+
+908
+01:30:01,340 --> 01:30:07,220
+modelos. Por consecuencia, si es que necesito o quiero evaluar nuevos modelos,
+
+909
+01:30:07,220 --> 01:30:12,480
+tengo que tener, a lo menos, un error de ajuste, ya, y por consecuencia una métrica
+
+910
+01:30:12,480 --> 01:30:20,800
+menor en términos del euro cuadrado tipo medio en raíz, tiene que ser bastante menor que simplemente
+
+911
+01:30:20,800 --> 01:30:27,160
+el módulo clásico. Porque siguen siendo los modelos básicos, los modelos van a ser cuando hago
+
+912
+01:30:27,160 --> 01:30:32,480
+previsión cuantitativa, naturalmente voy a arbitrar a una regresión múltiple y cuando quiero hacer
+
+913
+01:30:32,480 --> 01:30:37,560
+clasificación binaria voy a arbitrar a una regresión logística. Y una vez que hago ello,
+
+914
+01:30:37,560 --> 01:30:43,560
+estos dos modelos, en cualquiera de los dos casos que estén, puedo
+
+915
+01:30:43,960 --> 01:30:50,360
+empezar a tratar de mejorar. Vale la redundancia y les comento que yo puedo
+
+916
+01:30:50,360 --> 01:30:54,560
+pasar de una predicción cuantitativa a una predicción binaria, de
+
+917
+01:30:54,560 --> 01:30:59,920
+clasificación binaria, pero al revés no puedo, por la noción de escala de
+
+918
+01:30:59,920 --> 01:31:05,720
+medición. ¿Qué quiere decir esto? Que si yo quiero predecir la resistencia,
+
+919
+01:31:05,720 --> 01:31:10,900
+también yo me puedo hacer la pregunta, bueno, en vez de saber el valor de la
+
+920
+01:31:10,900 --> 01:31:14,960
+resistencia y predecir el valor de la resistencia, voy a estar interesado en si
+
+921
+01:31:14,960 --> 01:31:20,440
+la resistencia es mayor a cierto umbral o menor a cierto umbral y si es mayor a
+
+922
+01:31:20,440 --> 01:31:25,280
+cierto umbral lo voy a clasificar como 1 y si es que no como 0 o viceversa y ahí
+
+923
+01:31:25,280 --> 01:31:30,680
+pasé de una predicción cuantitativa a una predicción
+
+924
+01:31:30,680 --> 01:31:36,700
+o una clasificación binaria. Al revés no puedo, puedo pasar el número a
+
+925
+01:31:36,700 --> 01:31:40,400
+categoría pero no puedo pasar la categoría a número. Entonces en general
+
+926
+01:31:40,400 --> 01:31:46,040
+siempre vamos a querer trabajar con cosas numericas, es la enseñanza que tenemos.
+
+927
+01:31:46,040 --> 01:31:52,020
+Entonces aquí evaluamos nuevamente el error cuadratico medio para todo
+
+928
+01:31:52,020 --> 01:31:58,640
+estas parámetros. En general, ¿cuál le gana? Gana la reglación
+
+929
+01:31:58,640 --> 01:32:04,800
+lineal múltiple con una penalización de 0,1
+
+930
+01:32:05,360 --> 01:32:09,960
+ahora esta es la forma en que nosotros hacemos, escogimos este coste de reach
+
+931
+01:32:09,960 --> 01:32:15,000
+en esencia probar distintos alfas o lambda dependiendo de que no me
+
+932
+01:32:15,000 --> 01:32:21,280
+conozca una notación utilizada o la conocen y vemos que
+
+933
+01:32:21,280 --> 01:32:27,480
+la regresión lineal múltiple con una alfa 0,1 es el que tiene
+
+934
+01:32:27,480 --> 01:32:33,160
+una raíz del error cuadrático medio menor y a su vez también tener el mal.
+
+935
+01:32:33,160 --> 01:32:38,600
+Entonces este es un caso bien... bueno porque si nosotros a priori no sabemos
+
+936
+01:32:38,600 --> 01:32:45,000
+como me habían preguntado antes qué métrica voy a escoger, incluso si yo no
+
+937
+01:32:45,000 --> 01:32:49,640
+hubiese no la hubiese escogido en una primera instancia, independiente de cuál
+
+938
+01:32:49,640 --> 01:32:52,600
+haya escogido, me van a estar dando el mismo resultado porque voy a estar
+
+939
+01:32:52,600 --> 01:32:58,480
+elegiendo este modelo de regresión línea cuadrática con una alfa 0 1
+
+940
+01:32:58,480 --> 01:33:03,400
+por sobre el resto. El problema viene cuando tengo bastante más métricas, que pasa
+
+941
+01:33:03,400 --> 01:33:08,440
+si tengo cinco métricas y uno de los modelos ganan tres y el otro modelo ganan
+
+942
+01:33:08,440 --> 01:33:13,360
+otras dos métricas que no son las primeras tres del primer modelo, el primer
+
+943
+01:33:13,360 --> 01:33:19,120
+candidato. Ahí tengo que tener un mayor entendimiento de cuál o qué
+
+944
+01:33:19,120 --> 01:33:24,760
+métrica le voy a dar más peso. Entonces, ¿cómo voy a leer esto?
+
+945
+01:33:24,760 --> 01:33:29,800
+siempre voy a tener que tener la raíz del error cuadrático medio o alguna
+
+946
+01:33:29,800 --> 01:33:34,560
+trámite fuera de play, si no es fuera de play entonces estoy haciendo trampa
+
+947
+01:33:34,560 --> 01:33:38,800
+tengo un data leakage en principio, una fuga de datos.
+
+948
+01:33:38,800 --> 01:33:45,760
+Y esto es el que va a elegir al candidato y a pesar de que yo pueda definir o
+
+949
+01:33:45,760 --> 01:33:52,420
+pre-establecer cuál va a ser la métrica con la cual voy a escoger mi modelo, en la práctica
+
+950
+01:33:52,420 --> 01:33:57,520
+también te culo las otras métricas para tener un mayor entendimiento de lo que está pasando,
+
+951
+01:33:57,520 --> 01:34:03,640
+porque lo que hace el MAE en contraste a la raíz del error cuadrático medio es simplemente
+
+952
+01:34:03,640 --> 01:34:10,000
+darme otra dimensión, otra cuantificación de ese error o de la problemática. Tienden a ser
+
+953
+01:34:10,000 --> 01:34:15,920
+similares en términos de la decisión que se va a tomar puesto que ambos
+
+954
+01:34:15,920 --> 01:34:22,200
+están realizados o se calculan desde la discrepancia entre lo observado y lo
+
+955
+01:34:22,200 --> 01:34:28,200
+predicho pero no van a tener la misma magnitud
+
+956
+01:34:28,200 --> 01:34:33,880
+ahora gana el alfa con 0 1 pero
+
+957
+01:34:33,880 --> 01:34:41,640
+no gana por tanto con respecto a un
+
+958
+01:34:52,600 --> 01:34:57,920
+de cierta manera algo arbitrario estoy diciendo alfa 0 1 en potencia de 10
+
+959
+01:34:57,920 --> 01:35:05,480
+ahí vamos, diála a menú 1, diála a 0, diála a 1, diála a 2 y así, y diála a 3.
+
+960
+01:35:05,480 --> 01:35:11,960
+Pero yo pudiese hacer un mallado un poco más fino y pudiese por ejemplo ver 001, 002 y
+
+961
+01:35:11,960 --> 01:35:16,760
+así. Obviamente eso va a aumentar sustancialmente el costo computacional,
+
+962
+01:35:16,760 --> 01:35:23,920
+entonces tengo que tener un balance entre el mallado que estoy haciendo en
+
+963
+01:35:23,920 --> 01:35:25,920
+este parámetro de costo de la
+
+964
+01:35:25,920 --> 01:35:28,600
+valorización REACH y efectivamente los
+
+965
+01:35:28,600 --> 01:35:31,520
+distintos parámetros porque si se fijan
+
+966
+01:35:31,520 --> 01:35:34,840
+acá tengo 7 candidatos pero si voy a
+
+967
+01:35:34,840 --> 01:35:38,720
+evaluar un mallado mucho más fino voy a
+
+968
+01:35:38,720 --> 01:35:40,560
+empezar a evaluar ahora o a escoger
+
+969
+01:35:40,560 --> 01:35:44,000
+entre 30 candidatos, 50 candidatos y
+
+970
+01:35:44,000 --> 01:35:45,760
+esto sin incorporar nueva metodología
+
+971
+01:35:45,760 --> 01:35:47,840
+aquí en principio estamos haciendo 2
+
+972
+01:35:47,840 --> 01:35:49,600
+modelos lineales, una revisión lineal
+
+973
+01:35:49,600 --> 01:35:52,320
+múltiple, una revisión lineal múltiple
+
+974
+01:35:52,320 --> 01:35:57,160
+cuadrática y sacar el promedio que también está incluido dentro de que lo
+
+975
+01:35:57,160 --> 01:36:01,720
+mismo que una regresión sin coeficiente, solo con intercepto.
+
+976
+01:36:01,720 --> 01:36:05,120
+Entonces estamos siempre dentro del contexto de modelos lineales o modelos
+
+977
+01:36:05,120 --> 01:36:10,840
+de regresiones lineales. Entonces tengo que exceso pesar eso. Si
+
+978
+01:36:10,840 --> 01:36:15,160
+pongo mucho un mallado muy fino para estos parámetros y empiezo a probar
+
+979
+01:36:15,160 --> 01:36:24,160
+muchos mayados finos, irme muy al detalle, voy a tener un costo
+
+980
+01:36:24,160 --> 01:36:29,040
+computacional bastante alto que me va a restringir
+
+981
+01:36:29,280 --> 01:36:35,560
+el abanico de posibilidades de distintos modelos que tú puedes tener. Entonces, un
+
+982
+01:36:35,560 --> 01:36:42,360
+primer buen acercamiento es no por ejemplo hacer algo de este estilo en el
+
+983
+01:36:42,360 --> 01:36:47,360
+sentido de que voy a hacer muchas regresiones lineales cuadráticas con
+
+984
+01:36:47,360 --> 01:36:50,840
+distintos parámetros, sino que voy a hacer un par de regresiones múltiples
+
+985
+01:36:50,840 --> 01:36:53,600
+pero también voy a probar otras metodologías que sean distintas, entonces me
+
+986
+01:36:53,600 --> 01:36:57,640
+den una un abanico de posibilidades en las cuales, por ejemplo, si gana la
+
+987
+01:36:57,640 --> 01:37:02,720
+regresión lineal múltiple con términos cuadráticos, entonces empiezo a
+
+988
+01:37:02,720 --> 01:37:07,760
+desentramar, digamos, y a ver más en detalle ese modelo, entonces voy como
+
+989
+01:37:07,760 --> 01:37:11,840
+por paso, entonces si la regresión múltiple ganó, entonces bueno, puedo sofisticar y puedo
+
+990
+01:37:11,840 --> 01:37:16,980
+mejorar esta regresión lineal múltiple dentro de la misma metodología de
+
+991
+01:37:16,980 --> 01:37:20,260
+regresión múltiple que pasa si puedo hacer transformaciones que mejoran esto
+
+992
+01:37:20,260 --> 01:37:26,100
+que pasa si agrego un término adicional y así sumi sigue entonces no nunca es en un
+
+993
+01:37:26,100 --> 01:37:31,020
+primer etapa evaluar todos los modelos o todas las metodologías con todos los
+
+994
+01:37:31,020 --> 01:37:34,340
+parámetros o parámetros adicionales configuraciones adicionales que tengo
+
+995
+01:37:34,340 --> 01:37:38,940
+porque si no no me da el costo computacional y el tiempo también las
+
+996
+01:37:38,940 --> 01:37:44,920
+cosas se demora. Entonces, este resultado que está acá y esta pequeña discrepancia
+
+997
+01:37:44,920 --> 01:37:51,960
+entre alfa 0 1 y alfa 1, me sugiere que quizás este alfa no es el óptimo y por
+
+998
+01:37:51,960 --> 01:37:55,600
+consecuencia debiese seguir probante.
+
+999
+01:37:57,520 --> 01:38:03,920
+¿Cómo veo esto ahora? Voy a evaluar y seguir evaluando esto acá. Tengo en este
+
+1000
+01:38:03,920 --> 01:38:10,760
+gráfico y se fijan acá el alfa es lo que estoy evalando
+
+1001
+01:38:10,760 --> 01:38:16,580
+y lo tengo evaluado en las filas que fueron utilizadas para estimar y en la
+
+1002
+01:38:16,580 --> 01:38:22,700
+evaluación entonces tengo estos tres valores alfa 0 1 10 y 1000 y voy a
+
+1003
+01:38:22,700 --> 01:38:33,860
+tener el valor del ajuste y su raíz del error cuadrático medio fuera de pie
+
+1004
+01:38:33,920 --> 01:38:44,080
+8.22, 8.4 y 13. Entonces con un coste muy alto van a aumentar ambos
+
+1005
+01:38:44,080 --> 01:38:49,680
+los ambos errores, ya, el error de ajuste y el error fuera de pliegue, ya.
+
+1006
+01:38:49,680 --> 01:38:55,040
+Cuando digo el error de ajuste me refiero el error obtenido cuando solo utilizo en
+
+1007
+01:38:55,040 --> 01:39:05,960
+este caso cuatro pliegues, ya, y el cuarto es el conjunto de validación.
+
+1008
+01:39:05,960 --> 01:39:12,400
+Entonces esta penalización restringe demasiado
+
+1009
+01:39:12,400 --> 01:39:19,820
+el ajuste, digamos, en esta comparación. ¿Qué quiere decir eso? Que alfas muy
+
+1010
+01:39:19,820 --> 01:39:27,540
+altos me están entregando errores muy altos. Por consecuencia,
+
+1011
+01:39:27,540 --> 01:39:36,940
+veo la tendencia. Estoy diciendo que a menores alfas va a disminuir la raíz del
+
+1012
+01:39:36,940 --> 01:39:42,500
+error cuadrático médio. Pero esto, si se fijan más a la derecha, porque
+
+1013
+01:39:42,500 --> 01:39:46,620
+significa tener una mayor penalización, el error sube. Pero conforme voy a la
+
+1014
+01:39:46,620 --> 01:39:54,020
+izquierda el error baja pero de cierta manera se estabiliza ya entonces o los
+
+1015
+01:39:54,020 --> 01:39:59,540
+cambios no son tan sustanciales yo voy a querer buscar un mínimo entre estas y
+
+1016
+01:39:59,540 --> 01:40:03,180
+eso uno lo puede hacer computacionalmente probando el modelo como un
+
+1017
+01:40:03,180 --> 01:40:10,260
+mallado muy fino de alfas y encontrar un alfa de cierta manera óptimo siempre
+
+1018
+01:40:10,260 --> 01:40:14,340
+nos vamos a querer y vamos a evitar a utilizar las metrias que están fuera de
+
+1019
+01:40:14,340 --> 01:40:32,820
+pero en la práctica, por ejemplo, si acá es 0-1, yo me quedo con el 0-1 y después, porque me está dando el mejor resultado dentro de los candidatos que tengo,
+
+1020
+01:40:32,820 --> 01:40:43,920
+voy a tratar de evaluar otras metodologías, ya, y una vez que tengo candidatos que todos son relativamente buenos o van dentro del mismo, digamos,
+
+1021
+01:40:43,920 --> 01:40:47,640
+cercanía términos de error, ahí puedo empezar a hacer un cosa un poquito más
+
+1022
+01:40:47,640 --> 01:40:54,240
+sofisticada. En general uno nunca se va directamente a un modelo
+
+1023
+01:40:54,240 --> 01:40:59,760
+muy complicado, ya, puesto que
+
+1024
+01:41:01,840 --> 01:41:04,800
+puesto que
+
+1025
+01:41:04,800 --> 01:41:09,120
+nosotros igual tenemos un principio de parsemonia. Siempre nosotros vamos a
+
+1026
+01:41:09,120 --> 01:41:12,400
+querer hacer
+
+1027
+01:41:12,600 --> 01:41:18,540
+el modelo lo más sencillo que resuelve la problemática que nosotros queremos
+
+1028
+01:41:18,540 --> 01:41:22,480
+hacer, no queremos complicarnos porque sí.
+
+1029
+01:41:23,600 --> 01:41:27,860
+Gonzalo dice, si ya puede ser lento aplicar estos modelos de manera local y
+
+1030
+01:41:27,860 --> 01:41:30,980
+hacer los análisis, ¿cómo es que lo hacen los que trabajan con servidores
+
+1031
+01:41:30,980 --> 01:41:37,360
+dedicados que contienen un volumen mucho más alto de datos? Ese otro tema que es
+
+1032
+01:41:37,360 --> 01:41:43,560
+bastante delicado porque ahí convergen varias cosas. Primero,
+
+1033
+01:41:43,560 --> 01:41:47,860
+esta metodología de estimación y es parte de la computación estadística en
+
+1034
+01:41:47,860 --> 01:41:53,720
+principio, se pueden mejorar, ya se pueden hacer por ejemplo las
+
+1035
+01:41:53,720 --> 01:42:01,800
+aproximaciones muy buenas que son mucho menos costosas computacionalmente y dan
+
+1036
+01:42:01,800 --> 01:42:06,880
+buenas aproximaciones. No es exactamente lo mismo pero dan buenas aproximaciones.
+
+1037
+01:42:06,880 --> 01:42:17,880
+Y además, eso converge con el... o se mezcla también con los avances computacionales en términos de software y hardware.
+
+1038
+01:42:17,880 --> 01:42:23,880
+Por ejemplo, cuando quiero trabajar con muchos datos o un gran volumen de datos, no estoy trabajando ni en Excel,
+
+1039
+01:42:23,880 --> 01:42:29,880
+no estoy trabajando en SQL, sino que estoy trabajando en bases de datos distribuidas
+
+1040
+01:42:29,880 --> 01:42:33,880
+o alguna otra metodología o tecnología que están hechas para eso.
+
+1041
+01:42:33,880 --> 01:42:40,080
+Un ejemplo clásico son, yo estoy trabajando por ejemplo con metodologías de machine learning,
+
+1042
+01:42:40,080 --> 01:42:46,420
+bases de datos vectoriales, es una tecnología bien particular, digamos,
+
+1043
+01:42:46,420 --> 01:42:54,560
+sirve bastante para trabajar, digamos, análisis cuantitativos en términos de análisis cuantitativos
+
+1044
+01:42:54,560 --> 01:42:59,320
+con metodologías de caja negra, renoranálisis, cosas de ese estilo,
+
+1045
+01:42:59,320 --> 01:43:03,680
+por la concepción que tiene de cercanía entre puntos, ya.
+
+1046
+01:43:03,680 --> 01:43:15,680
+pero ahí convergen distintas cosas. Primero, yo puedo mejorar la metodología en términos de buenas aproximaciones o hacer de lleno otra metodología que son menos costosas computacionalmente
+
+1047
+01:43:15,680 --> 01:43:23,680
+y la mezcla de los amantes de software, digamos, y de tecnología de almacenamiento de datos y de procesamiento.
+
+1048
+01:43:23,680 --> 01:43:29,680
+Entonces, es una mezcla. Siempre se convergen, digamos, a tratar de mejorar ambos a la vez.
+
+1049
+01:43:29,680 --> 01:43:45,040
+Pero eso tiene como una cota, digamos. Yo por mucho que mejoro la metodología, por mucho que mejoro el costo computacional,
+
+1050
+01:43:45,040 --> 01:43:52,280
+el término de software y hardware, siempre voy a llegar a un límite, digamos.
+
+1051
+01:43:52,280 --> 01:43:58,680
+No es como que puedo hacer todas las cosas sencillas y rápidas, siempre hay como un límite teórico.
+
+1052
+01:43:58,680 --> 01:44:10,260
+Entonces, volviendo acá, tengo en estos modelos, en estos candidatos, tengo 7 candidatos y
+
+1053
+01:44:10,260 --> 01:44:16,800
+este lambda01 me está entregando el mejor de los resultados dentro de este candidato,
+
+1054
+01:44:16,800 --> 01:44:21,700
+en ningún caso estoy diciendo que es el mejor, sino que es el mejor dentro del conjunto de
+
+1055
+01:44:21,700 --> 01:44:25,640
+datos que yo estoy evaluando.
+
+1056
+01:44:25,640 --> 01:44:33,120
+vemos acá entonces que a mayor penalización la raíz del error cuadrático medio sube bastante
+
+1057
+01:44:33,120 --> 01:44:40,680
+y conforme bajo la penalización se va disminuyendo pero las ganancias en términos de la metría
+
+1058
+01:44:40,680 --> 01:44:46,720
+que decidí utilizar que es la raíz del error cuadrático medio se más o menos estabiliza
+
+1059
+01:44:46,720 --> 01:44:56,720
+Ahora, si entramos en detalle, porque recuerden que esto es el error cuadrático medio a través
+
+1060
+01:44:56,720 --> 01:45:03,000
+de todos los pliegues, yo puedo entrar en detalle, puedo decir, bueno, quiero ver qué tanto se está equivocando
+
+1061
+01:45:03,000 --> 01:45:09,560
+o qué tanto es la métrica que decidí para definir qué tan bueno es el modelo en la
+
+1062
+01:45:09,560 --> 01:45:16,160
+raíz del error cuadrático medio por pliegue, es decir, ahora estoy desagregando lo que
+
+1063
+01:45:16,160 --> 01:45:20,160
+me estoy equivocando o la medida que quiero utilizar porque también puedo
+
+1064
+01:45:20,160 --> 01:45:25,400
+tener entrar en el cuestionamiento de que quizás estos cinco pliegues
+
+1065
+01:45:25,660 --> 01:45:31,720
+de manera de lazar, digamos, la forma en que lo
+
+1066
+01:45:31,720 --> 01:45:36,400
+en que lo escogí se
+
+1067
+01:45:37,120 --> 01:45:43,720
+digamos mezclaron para yo tener un cierto resultado, es decir, quiero decir, quiero
+
+1068
+01:45:43,720 --> 01:45:50,960
+quiero que los resultados que yo tenga y la decisión que tome no haya sido
+
+1069
+01:45:50,960 --> 01:45:53,960
+necesariamente
+
+1070
+01:45:55,200 --> 01:45:59,960
+por la muestra que yo evalué porque se fijan los cinco pliegues fueron escogidos
+
+1071
+01:45:59,960 --> 01:46:04,480
+de manera aleatoria, qué pasa si hubiese escogido hago la misma selección con
+
+1072
+01:46:04,480 --> 01:46:10,160
+otros cinco conjuntos, los resultados me van a cambiar, se fijen ahí es lo que yo
+
+1073
+01:46:10,160 --> 01:46:16,160
+nosotros llamamos la varianza dentro de estos errores que puedo separar entre el
+
+1074
+01:46:16,160 --> 01:46:20,320
+sesgo, la varianza y el ruido. Entonces, quiero que mis resultados no dependan
+
+1075
+01:46:20,320 --> 01:46:23,700
+tanto de la muestra que yo estoy utilizando y por consecuencia la selección
+
+1076
+01:46:23,700 --> 01:46:27,020
+que yo hago dentro de entrenamiento y evaluación. Entonces, cuando veo por
+
+1077
+01:46:27,020 --> 01:46:31,280
+pliegue veo que para los distintos dos penalizaciones que los dos modelos que
+
+1078
+01:46:31,280 --> 01:46:37,160
+tenía con alfa 0 1 y con 0 y con 1, con 0 1, si se fijan en el primer pliegue
+
+1079
+01:46:37,160 --> 01:46:42,920
+pareciera andar muy similar. En el segundo ya hay pequeñas diferencias, en el
+
+1080
+01:46:42,920 --> 01:46:47,960
+tercero muy similar, en el cuarto muy similar y en el quinto bastante similar.
+
+1081
+01:46:47,960 --> 01:46:51,560
+Entonces, si se fijan, en el segundo pliegue la diferencia es bastante más
+
+1082
+01:46:51,560 --> 01:46:56,080
+sustancial que en contraste con el resto porque tengo 0,4
+
+1083
+01:46:56,080 --> 01:47:02,740
+digamos de diferencia absoluta. Entonces, el alfa que yo con esta
+
+1084
+01:47:02,740 --> 01:47:10,000
+primera con esta primera resumen yo diría bueno alfa 0 1 es el mejor
+
+1085
+01:47:10,000 --> 01:47:15,500
+pero eso es un primer nivel de análisis, entonces ahora voy al desagregado
+
+1086
+01:47:15,500 --> 01:47:24,700
+alfa 0 1 es mejor en tres de los cinco pliegues entonces no es el mejor
+
+1087
+01:47:24,700 --> 01:47:29,620
+en su totalidad porque acabamos de decir que con alfa 0 1 y alfa 1 la
+
+1088
+01:47:29,620 --> 01:47:34,660
+diferencia no es tanto, no es tan sustancial, o sea, es de 8.2 a 8.3
+
+1089
+01:47:34,660 --> 01:47:40,060
+entonces quiero analizar eso y cuando lo veo pliega a pliegue el alfa 0 1
+
+1090
+01:47:40,060 --> 01:47:45,140
+mejora en tres pliegues en el segundo,
+
+1091
+01:47:45,140 --> 01:47:50,820
+en el segundo, en el tercero y en el cuarto, según lo ve en este gráfico y en el
+
+1092
+01:47:50,820 --> 01:47:58,400
+primero y en el tercero gana alfa igual a 1, entonces no es que la elección de
+
+1093
+01:47:58,400 --> 01:48:04,560
+este costo de la relación rich
+
+1094
+01:48:04,560 --> 01:48:12,000
+gane siempre. Entonces, tengo que tener cuidado con eso, con aseverar que
+
+1095
+01:48:12,000 --> 01:48:18,880
+el modelo escogido a través de una métrica que es de resumen, como lo es la
+
+1096
+01:48:18,880 --> 01:48:23,600
+raíz del error cuadrático medio en fuera de pliegue a través de todos los
+
+1097
+01:48:23,600 --> 01:48:29,060
+pliegues significa que esa métrica en cada uno de los pliegues es mejor, entonces
+
+1098
+01:48:29,060 --> 01:48:32,660
+no puedo acelerar ese mejor siempre porque esa selección de los cinco
+
+1099
+01:48:32,660 --> 01:48:35,600
+pliegues puede haber sido por el azar y estos resultados pueden haber sido por el azar
+
+1100
+01:48:35,600 --> 01:48:40,160
+que pasa si cojo otra muestra y quizás alfa igual a 1 hubiese sido mejor
+
+1101
+01:48:40,160 --> 01:48:46,160
+entonces estos ajustes comparten datos porque ocupan los mismos pliegues
+
+1102
+01:48:46,840 --> 01:48:52,240
+entonces tengo que tener pequeñas particularidades respecto a ello
+
+1103
+01:48:52,240 --> 01:48:59,740
+entonces una regla de decisión o de elección más bien de entre modelos no
+
+1104
+01:48:59,740 --> 01:49:05,500
+implica que el modelo necesariamente es el mejor porque yo estoy decidiendo
+
+1105
+01:49:05,500 --> 01:49:10,320
+cuál es la métrica y cuál es la regla que yo voy a utilizar si yo digo voy a utilizar la
+
+1106
+01:49:10,320 --> 01:49:14,580
+raíz telerero cuadrático medio y voy a escoger el modelo que tiene esa métrica
+
+1107
+01:49:14,580 --> 01:49:21,860
+más baja, entonces esta es mi decisión, pero no significa que siempre
+
+1108
+01:49:21,860 --> 01:49:26,360
+que siempre va a ganar y sobre todo no va que si ese modelo va a tener mejor
+
+1109
+01:49:26,360 --> 01:49:30,260
+rendimiento en otros datos que no se conoce, la generalización es otro
+
+1110
+01:49:30,260 --> 01:49:36,980
+problema. Entonces ahí cuando tengo dos modelos que son muy similares, en términos
+
+1111
+01:49:36,980 --> 01:49:42,940
+de la evaluación fuera del pliegue, digamos, los resultados fuera del pliegue,
+
+1112
+01:49:42,940 --> 01:49:48,040
+trato de evaluar uno y tener el segundo como backup, porque son tan distintos
+
+1113
+01:49:48,040 --> 01:49:53,000
+que puede haber sido que simplemente la elección de la muestra haya generado
+
+1114
+01:49:53,000 --> 01:49:58,200
+esa decisión.
+
+1115
+01:49:58,200 --> 01:50:05,020
+Pero siguiendo, una vez que escojo el modelo, en este caso yo dije
+
+1116
+01:50:05,020 --> 01:50:08,640
+voy a escogerlo en términos de la raíz del error cuadrático y voy a escoger el
+
+1117
+01:50:08,640 --> 01:50:17,520
+modelo con alfa 0 1 yo lo decidí y ahora tengo que implementarlo
+
+1118
+01:50:17,520 --> 01:50:22,280
+aplicarlo a todos los datos de entrenamiento porque recuerden que
+
+1119
+01:50:22,280 --> 01:50:26,280
+cuando yo hice la selección y calculé esta la raíz del error cuadratico medio
+
+1120
+01:50:26,280 --> 01:50:31,480
+fuera de pliegue siempre dije un conchito fuera, ¿cierto?
+
+1121
+01:50:31,480 --> 01:50:38,120
+dije el conjunto de evaluación fuera para sacar la raíz del error
+
+1122
+01:50:38,120 --> 01:50:42,800
+cuadratico medio en ese pliegue, después ocupé otro pliegue, otro pliegue, otro pliegue, lo hice cinco veces y después
+
+1123
+01:50:42,800 --> 01:50:48,600
+calculé la raíz del error cuadratico medio fuera pliegue como un todo, que es la métrica de resumen que yo veo acá.
+
+1124
+01:50:48,600 --> 01:50:57,320
+Entonces por eso tengo cinco raíces de errores cuadratico medio por pliegue.
+
+1125
+01:50:57,320 --> 01:51:05,240
+Cuando lo resumo, yo vuelvo a la otra. Entonces una vez que escogí, digo ya, este es el modelo que voy a ocupar con una
+
+1126
+01:51:05,240 --> 01:51:10,220
+receta predefinida, porque es toda la configuración del modelo y ahora digo
+
+1127
+01:51:10,220 --> 01:51:14,420
+no voy a hacer discrepancia entre el entrenamiento y la validación y voy a
+
+1128
+01:51:14,420 --> 01:51:19,300
+ocupar todo el entrenamiento para ajustar ese modelo. Aquí es lo que se
+
+1129
+01:51:19,300 --> 01:51:26,980
+hace en esta parte del código, aquí en la sección 5, que está en Python y en R.
+
+1130
+01:51:26,980 --> 01:51:38,140
+Y ahora, si se fijan yo había escogido la revisión lineal múltiple con parámetros
+
+1131
+01:51:38,140 --> 01:51:44,100
+cuadráticos y una penalización rich con alfa 0 1, voy a tener entonces la métrica.
+
+1132
+01:51:44,100 --> 01:51:52,300
+Si se fijan, acá escogí o decidí utilizar la raíz del error cuadrático medio como
+
+1133
+01:51:52,300 --> 01:52:01,900
+métricas de elección del modelo, pero cuando lo evaluo, ya, en las 224
+
+1134
+01:52:01,900 --> 01:52:06,780
+observaciones de prueba, yo igual puedo calcular las otras métricas que no las
+
+1135
+01:52:06,780 --> 01:52:11,220
+utilicé para la selección del modelo, pero sí las puedo ocupar para la
+
+1136
+01:52:11,220 --> 01:52:16,700
+evaluación en la prueba, para tener un diagnóstico y una imagen, digamos, más
+
+1137
+01:52:16,700 --> 01:52:23,060
+clara de cómo se está comportando el modelo que escogí con nuevos datos.
+
+1138
+01:52:23,060 --> 01:52:26,060
+Entonces, si se fijan acá,
+
+1139
+01:52:28,660 --> 01:52:35,700
+comparándolo, la raíz de los cuadrados de comodidad da 8.8 y cuando
+
+1140
+01:52:35,700 --> 01:52:42,220
+lo hacemos en el entrenamiento es 8.2. Entonces, lo que pasa es que en
+
+1141
+01:52:42,220 --> 01:52:48,460
+en el entrenamiento siempre tenemos resultados un poco más favorables, pero ahora con todo y todo
+
+1142
+01:52:48,460 --> 01:52:56,500
+estos resultados en prueba tienden a ser bastante buenos. Si se fijan aquí uno puede hacer la
+
+1143
+01:52:56,500 --> 01:53:04,620
+predicción versus la resistencia real y hay digamos una correlación bastante razonable.
+
+1144
+01:53:04,620 --> 01:53:12,140
+También puedo analizar el MAE y el R cuadrado y voy a tener una esencia métrica bastante
+
+1145
+01:53:12,140 --> 01:53:18,480
+razonable, un r cuadrado 0,7 es bastante bueno dentro de muchos contextos, ya, que eso va a
+
+1146
+01:53:18,480 --> 01:53:26,100
+depender también de la problemática en particular. No son valores absolutos en
+
+1147
+01:53:26,100 --> 01:53:34,160
+el sentido de que no te puedo decir un r cuadrado más que 0,7 es bueno y bajo 0,7
+
+1148
+01:53:34,160 --> 01:53:39,940
+es malo porque va a depender mucho del contexto, por ejemplo en
+
+1149
+01:53:39,940 --> 01:53:47,180
+en áreas de ciencias sociales, tener un R cuadrado de 0.3 ya es bastante.
+
+1150
+01:53:47,180 --> 01:53:53,380
+Escas son cosas más cuantitativas tipo ingeniería, tener un R cuadrado de 0.3 es considerado bajo,
+
+1151
+01:53:53,380 --> 01:54:01,620
+o no muy bueno más bien, porque no explica, recuerden que el R cuadrado es el porcentaje de la probabilidad explicada por el modelo.
+
+1152
+01:54:01,620 --> 01:54:08,700
+30% explicado por un modelo en algo bien cuantitativo y bien concreto es no
+
+1153
+01:54:08,700 --> 01:54:13,620
+visto como algo bueno, pero en ciencia social explicar el 30%
+
+1154
+01:54:13,620 --> 01:54:18,180
+de la variabilidad con un modelo en ese contexto tiene otra interpretación un
+
+1155
+01:54:18,180 --> 01:54:22,780
+poquito más favorable. Ahora,
+
+1156
+01:54:22,780 --> 01:54:29,940
+veis acá, tengo el gráfico entre lo que yo predigo y el real. En esencia,
+
+1157
+01:54:29,940 --> 01:54:36,380
+estoy analizando que también se comporta y el predicho va a tener un
+
+1158
+01:54:36,380 --> 01:54:44,020
+el promedio va a estar centrado en cero en este caso, acá yo puedo ver residuos
+
+1159
+01:54:44,020 --> 01:54:49,860
+si tengo digamos residuos positivos significa que
+
+1160
+01:54:49,860 --> 01:54:56,380
+si tengo residuos positivos recuerden que esto es lo observado menos lo
+
+1161
+01:54:56,380 --> 01:55:02,640
+predicho entonces significa que es i sub i menos i sub i estimado. Cuando digo
+
+1162
+01:55:02,640 --> 01:55:08,600
+residuos positivos estoy diciendo que esa resta es mayor que cero, lo que
+
+1163
+01:55:08,600 --> 01:55:13,480
+significa que el valor observado es más grande que el valor que yo estoy
+
+1164
+01:55:13,480 --> 01:55:18,700
+estimando o estoy prediciendo, por consecuencia estoy subestimando y al
+
+1165
+01:55:18,700 --> 01:55:23,100
+revés al contrario si tengo residuos muy negativos estoy sobreestimando, mi
+
+1166
+01:55:23,100 --> 01:55:27,800
+predicción está solo estimando el valor real. Entonces yo voy a querer que esas
+
+1167
+01:55:27,800 --> 01:55:32,880
+predicciones, esos errores, esos residuos tengan un promedio más o menos a cero, más
+
+1168
+01:55:32,880 --> 01:55:36,600
+o menos cercano a cero, porque así a veces me equivoco por más, a veces me
+
+1169
+01:55:36,600 --> 01:55:40,620
+equivoco por menos, entonces no tengo una tendencia o un sesgo en la
+
+1170
+01:55:40,620 --> 01:55:44,360
+predicción que yo estoy realizando.
+
+1171
+01:55:45,940 --> 01:55:51,440
+Ahora, tienen que sacar, ¿cómo cerramos la parte de
+
+1172
+01:55:51,440 --> 01:55:56,160
+predicción cuatritativo. Tenemos que escoger la métrica de selección
+
+1173
+01:55:56,160 --> 01:56:04,040
+del modelo previamente, ya en el caso que estábamos viendo es la raíz del
+
+1174
+01:56:04,040 --> 01:56:10,240
+error cuadrático mediata y con esas escogimos, pero para la prueba
+
+1175
+01:56:10,240 --> 01:56:17,280
+podemos tener una un abanico, digamos, de métricas que me ayuden a efectivamente
+
+1176
+01:56:17,280 --> 01:56:20,480
+discernirse el modelo que estoy utilizando, el modelo que estoy
+
+1177
+01:56:20,480 --> 01:56:26,660
+escogiendo que es bueno, si es que no es bueno y no cumple cierto umbral
+
+1178
+01:56:26,660 --> 01:56:32,220
+digamos que yo predefino, entonces voy a tener que hacer un nuevo
+
+1179
+01:56:32,220 --> 01:56:38,660
+procedimiento para escoger otro modelo y analizar nuevas metodologías que
+
+1180
+01:56:38,660 --> 01:56:44,340
+quizás no tomen consideración, pero eso es la parte de predicción cuantitativa.
+
+1181
+01:56:44,340 --> 01:56:53,580
+Si yo quiero hacer ahora problemas de clasificación, ya, en donde, como lo vieron con Pedro el martes
+
+1182
+01:56:53,580 --> 01:56:58,580
+pasado, por ejemplo, la revisión logística, y en este contexto vamos a trabajar con la
+
+1183
+01:56:58,580 --> 01:57:06,820
+detección de spam, ya de correo de spam, que es lo que hace, digamos, todos los servidores
+
+1184
+01:57:06,820 --> 01:57:08,820
+o los servicios de correo electrónico
+
+1185
+01:57:10,820 --> 01:57:12,820
+la base de datos, si se fijan
+
+1186
+01:57:12,820 --> 01:57:16,820
+tiene algo relativamente balanceado
+
+1187
+01:57:16,820 --> 01:57:18,820
+es decir, dentro de mis datos
+
+1188
+01:57:18,820 --> 01:57:20,820
+el 60.6% son no-spam
+
+1189
+01:57:20,820 --> 01:57:22,820
+o ejemplos de no-spam
+
+1190
+01:57:22,820 --> 01:57:28,820
+y el 39.4% son ejemplos de spam
+
+1191
+01:57:28,820 --> 01:57:32,820
+ya, idóneamente nosotros tuviésemos 50-50
+
+1192
+01:57:32,820 --> 01:57:34,820
+pero eso no pasa
+
+1193
+01:57:34,820 --> 01:57:40,020
+y sobre todo si tengo eventos muy anómalos, como el caso de los fraudes que le mencionaba
+
+1194
+01:57:40,020 --> 01:57:47,420
+al inicio y cuando el evento de interés, en el caso del ejemplo de fraude, es muy anómalo,
+
+1195
+01:57:47,420 --> 01:57:55,060
+al modelo le cuesta aprender cuándo pasa ese evento anómalo.
+
+1196
+01:57:55,060 --> 01:58:01,020
+Entonces, idealmente nosotros queremos tener un cierto tipo de balanceo y hay técnicas para
+
+1197
+01:58:01,020 --> 01:58:07,260
+balancear estas cosas y tratar de aprenderlo de mejor manera. En este conjunto de datos,
+
+1198
+01:58:07,260 --> 01:58:15,460
+el objetivo es detectar spam y la clasificación o la forma en que voy a evaluarlo es el spam,
+
+1199
+01:58:15,460 --> 01:58:23,120
+que lo voy a categorizar como igual a 1 y cuando es un correo legítimo es un igual a 0. Ya todo
+
+1200
+01:58:23,120 --> 01:58:30,740
+no ha pasado y de repente nos mandan un correo que no es spam y está en el spam, que es un
+
+1201
+01:58:30,740 --> 01:58:36,220
+tipo de error bastante más grave que a tu bandeja entrada entre algo que fuese
+
+1202
+01:58:36,220 --> 01:58:43,820
+spam, ¿viste? Al uno, al mismo no, al mismo visión, digamos. Usted puede tener otra opinión.
+
+1203
+01:58:43,820 --> 01:58:50,460
+De hecho, podemos diseñar incluso en qué tan más malo es uno que otro.
+
+1204
+01:58:50,460 --> 01:58:56,140
+Pues en este conjunto de datos tengo 4601 correos, tengo 57 entradas
+
+1205
+01:58:56,140 --> 01:59:04,140
+numéricas, cuales que en esencia resumen el número de palabras, el número de caracteres,
+
+1206
+01:59:06,140 --> 01:59:12,580
+medias de mayúsculas y cosas que describen de cierta manera los correos. Vamos a conservar
+
+1207
+01:59:12,580 --> 01:59:20,780
+digamos esta separación y como en los problemas de clasificación uno no simplemente predice
+
+1208
+01:59:20,780 --> 01:59:27,220
+si es spam o no spam, sino que es un proceso dos etapas en el principio. En
+
+1209
+01:59:27,220 --> 01:59:31,500
+principio yo primero lo que yo estoy tratando de modelar es la probabilidad
+
+1210
+01:59:31,500 --> 01:59:37,660
+de cierta manera de que sea spam o no lo sea y luego yo voy a definir un
+
+1211
+01:59:37,660 --> 01:59:43,660
+umbral para definir si es spam o no. Dos cosas que habían visto con Pedro el
+
+1212
+01:59:43,660 --> 01:59:46,820
+martes que lo vamos a recomendar y lo vamos a tratar de publicizar un poco que son el
+
+1213
+01:59:46,820 --> 01:59:50,820
+concepto de falso positivo y falso negativo. En este contexto el falso
+
+1214
+01:59:50,820 --> 01:59:56,700
+positivo es el correo que es donde es legítimo y lo marqué como spam o el
+
+1215
+01:59:56,700 --> 02:00:03,280
+modelo lo marcó como spam que oculta un mensaje que quizás el dueño del
+
+1216
+02:00:03,280 --> 02:00:09,620
+correo lo quería leer. Y al revés, el falso negativo es un mensaje o
+
+1217
+02:00:09,620 --> 02:00:15,580
+correo que es spam y lo dejamos pasar. ¿Qué pasa con eso entonces a
+
+1218
+02:00:15,580 --> 02:00:20,760
+consecuencia del falso negativo me va a generar una bandeja de entrada del
+
+1219
+02:00:20,760 --> 02:00:25,960
+correo más llena y quizás voy a tener
+
+1220
+02:00:25,960 --> 02:00:29,760
+yo que manualmente es designarlo como spam y de hecho si ustedes han tenido
+
+1221
+02:00:29,760 --> 02:00:34,120
+correo en Gmail o cosas de ese estilo cuando pasa cuando pasa eso hay alguna
+
+1222
+02:00:34,120 --> 02:00:41,880
+una una opción para decir marcar como spam lo que hace eso es en esencia
+
+1223
+02:00:41,880 --> 02:00:46,920
+alimentar el mismo algoritmo de la empresa para que aprenda de mejor
+
+1224
+02:00:46,920 --> 02:00:53,320
+manera cuando los correos son spammy y cuando no.
+
+1225
+02:00:53,320 --> 02:00:58,400
+Con este problema de clasificación yo puedo hacer problemas de o puedo
+
+1226
+02:00:58,400 --> 02:01:03,640
+generar la matriz de confusión. Y de esa matriz de confusión yo puedo ver
+
+1227
+02:01:03,640 --> 02:01:08,560
+métricas. Entonces ustedes vieron los falsos positivos, la que ahora sí que lo
+
+1228
+02:01:08,560 --> 02:01:18,060
+con Pedro del Marte. Pero lo importante en este, dentro de este
+
+1229
+02:01:18,060 --> 02:01:22,700
+contexto, lo que queremos resaltar hoy que la evaluación de estos modelos y la
+
+1230
+02:01:22,700 --> 02:01:27,460
+selección por consecuencia es preguntarnos y una pregunta
+
+1231
+02:01:27,460 --> 02:01:33,940
+supernatural aquí, ¿qué es peor? o también que igual es válido,
+
+1232
+02:01:33,940 --> 02:01:38,300
+¿hay alguno que sea peor? ¿qué tipo de tipo de errores distinto? porque si
+
+1233
+02:01:38,300 --> 02:01:45,060
+se fijan el falso positivo y el falso negativo ambos son tipos de errores
+
+1234
+02:01:45,060 --> 02:01:52,460
+por consecuencia si son igual de malos, diga ser en cierto sentido
+
+1235
+02:01:52,460 --> 02:01:56,700
+voy a ocupar ciertas métricas y si no lo son voy a querer hacer otra metodología
+
+1236
+02:01:56,700 --> 02:02:03,700
+entonces pensémos acá que tengo cinco spam reales y 95 que son no spam
+
+1237
+02:02:03,700 --> 02:02:08,200
+las reglas predicen siempre no spam, por ejemplo yo tengo un bueno que siempre me
+
+1238
+02:02:08,200 --> 02:02:13,520
+dice nada es spam nada es spam nada es spam y todo lo pasa, todo pasa y ya deja de entrar
+
+1239
+02:02:13,520 --> 02:02:22,200
+no hay ninguna ninguna exigición digamos de spam, entonces si se fijan ahí
+
+1240
+02:02:22,200 --> 02:02:27,680
+si tengo de 100 correos y 5 son spam entonces
+
+1241
+02:02:27,680 --> 02:02:33,760
+la precisión o la accuracy va a ser el 95% porque describe la cantidad de
+
+1242
+02:02:33,760 --> 02:02:43,480
+aciertos, es decir de 100 95 le achuntó y 5 no le achuntó, pero esos 5 nunca hubo una
+
+1243
+02:02:43,480 --> 02:02:47,680
+decisión de marcarlo siquiera como spam porque nunca marcó nada como spam, en
+
+1244
+02:02:47,680 --> 02:02:53,480
+esta regla siempre se marca todo como no spam, como correo
+
+1245
+02:02:53,480 --> 02:02:59,160
+válido, entonces no estoy haciendo nada al principio, estoy simplemente diciendo
+
+1246
+02:02:59,160 --> 02:03:04,740
+nada es spam y lo que más me voy a equivocar son los spam probablemente tal
+
+1247
+02:03:04,740 --> 02:03:09,720
+que son reales, entonces no tengo un modelo en principio, simplemente te decimos
+
+1248
+02:03:09,720 --> 02:03:16,060
+regla. Ahora yo puedo hablar, cuando les comentaba hacer esta pregunta de
+
+1249
+02:03:16,060 --> 02:03:22,180
+qué tipo de error es peor, yo también lo puedo definir y lo puedo
+
+1250
+02:03:22,180 --> 02:03:29,540
+cuantificar qué tipo de error me cuesta más.
+
+1251
+02:03:29,540 --> 02:03:36,440
+Entonces yo puedo decir que el falso positivo que es el correo legítimo y lo
+
+1252
+02:03:36,440 --> 02:03:41,900
+marco como spam, el correo es lo debiese leer y pasar la bandeja
+
+1253
+02:03:41,900 --> 02:03:45,060
+a entrar y lo marqué como spam
+
+1254
+02:03:45,060 --> 02:03:52,420
+pesa cinco unidades más que el falso negativo que es cuando el correo se
+
+1255
+02:03:52,420 --> 02:03:57,380
+spam y lo dejó pasar y quizás todos podemos acordar o una gran mayoría
+
+1256
+02:03:57,380 --> 02:04:03,020
+podría decir yo prefiero que un correo que debiese haber llegado a mi
+
+1257
+02:04:03,020 --> 02:04:06,260
+bandeja de entrada
+
+1258
+02:04:06,380 --> 02:04:11,100
+o sea que un correo que debiese haber sido spam pase a mi bandeja de entrada
+
+1259
+02:04:11,100 --> 02:04:16,260
+que al revés, que un correo que debiese estar en bandeja de entrada está en spam,
+
+1260
+02:04:16,260 --> 02:04:22,400
+porque uno nunca revisa el spam. Entonces yo le estoy dando de manera
+
+1261
+02:04:22,400 --> 02:04:30,260
+arbitraria un costo 5, ya 5 veces mayor al falso positivo por el falso negativo.
+
+1262
+02:04:30,260 --> 02:04:36,780
+Y estoy enfatizando de que eso es arbitrario.
+
+1263
+02:04:36,780 --> 02:04:42,540
+entonces tengo un costo y voy a definir este costo estimado ahora yo puedo hacer
+
+1264
+02:04:42,540 --> 02:04:46,260
+una iteración con reglas de negocio incluso y puedo optimizar y tratar de
+
+1265
+02:04:46,260 --> 02:04:50,900
+llegar a algo un poquito más sofisticado en este estilo por ejemplo
+
+1266
+02:04:50,900 --> 02:04:53,780
+si yo tengo
+
+1267
+02:04:54,700 --> 02:04:59,580
+problemas o sea tengo la problemática de fraude
+
+1268
+02:04:59,580 --> 02:05:05,340
+y tengo el fraude que no he detectado y la transacción
+
+1269
+02:05:05,340 --> 02:05:10,140
+válida que es detectada como fraude.
+
+1270
+02:05:10,140 --> 02:05:16,260
+Entonces uno se pudiese preguntar en una entidad bancaria, ¿qué es más caro que una transacción
+
+1271
+02:05:16,260 --> 02:05:23,580
+válida fuera declarada como fraude, ya, o fuera marcada como fraude, o que un fraude
+
+1272
+02:05:23,580 --> 02:05:31,220
+fuese marcada como transacción válida? Yo creo que este último tiene un costo
+
+1273
+02:05:31,220 --> 02:05:38,740
+dicen, y uno si en una en una empresa uno puede cuantificar eso ya porque si hay un fraude y lo
+
+1274
+02:05:38,740 --> 02:05:43,740
+marqué como válido entonces va a haber un procedimiento que quizás va a tener costos
+
+1275
+02:05:43,740 --> 02:05:48,460
+operacionales, costos legales, etcétera, dependiendo de la magnitud del fraude probablemente
+
+1276
+02:05:48,460 --> 02:05:54,140
+tal, entonces yo puedo tratar de estimar el costo ya aquí le estoy dando cinco unidades por so a los
+
+1277
+02:05:54,140 --> 02:05:58,340
+falsos positivos por soles los falsos negativos pero en principio yo podría estimar esos costos
+
+1278
+02:05:58,340 --> 02:06:02,800
+términos del conocimiento del rule y la problemática del negocio que tengo en
+
+1279
+02:06:02,800 --> 02:06:06,620
+particular. Entonces, ¿qué estoy diciendo con esto? Estoy diciendo que bloquear un
+
+1280
+02:06:06,620 --> 02:06:13,140
+correo legítimo vale 5 o cuesta 5 y dejar pasar spam es 1 unidad. Entonces, ambos
+
+1281
+02:06:13,140 --> 02:06:19,260
+son malos pero no son igual de malos. Ya sepamos multiplicar esto por mil para
+
+1282
+02:06:19,260 --> 02:06:23,020
+comparar costos en una escala común.
+
+1283
+02:06:23,020 --> 02:06:27,820
+Esto es una razón 5-1 nuevamente es arbitrario.
+
+1284
+02:06:28,340 --> 02:06:35,340
+entonces si se fijan acá tengo ejemplos de dos matrices de confusión, ya tengo
+
+1285
+02:06:35,340 --> 02:06:39,060
+lo real y lo predicho
+
+1286
+02:06:41,300 --> 02:06:46,740
+el 890 es, yo dije que el modelo dijo que no era uno spam y efectivamente era
+
+1287
+02:06:46,740 --> 02:06:55,780
+no spam y cuando dije y aquí dije que 60 eran spam y 60 no lo fueron
+
+1288
+02:06:55,780 --> 02:07:02,800
+perdón y cuando dije que era spam y no era efectivamente spam
+
+1289
+02:07:02,800 --> 02:07:06,900
+era 10 entonces si fijan las métricas que ustedes vieron con Pedro el martes
+
+1290
+02:07:06,900 --> 02:07:12,500
+pasado si yo le hubiese y yo estuviese interesado más en el
+
+1291
+02:07:12,500 --> 02:07:17,540
+acierto ya que no tiene tanta relevancia porque si ustedes lo piensan
+
+1292
+02:07:17,540 --> 02:07:24,620
+si el modelo dice que un correo no era spam y efectivamente no lo era como que
+
+1293
+02:07:24,620 --> 02:07:30,180
+no pasó nada porque no hubo spam, no hubo nada y cuando era spam y efectivamente
+
+1294
+02:07:30,180 --> 02:07:35,380
+era spam, bueno ahí sí, ahí tiene una noción un poquito más beneficiosa
+
+1295
+02:07:35,380 --> 02:07:41,180
+porque estoy identificando el spam. Ahora si yo saco el
+
+1296
+02:07:41,180 --> 02:07:45,940
+el accuracy que estoy diciendo acá o la función de costo más bien, aquí
+
+1297
+02:07:45,940 --> 02:07:51,860
+en una cura si el 95% y acá también tengo una
+
+1298
+02:07:54,340 --> 02:07:58,380
+otro cura si el 95%
+
+1299
+02:07:58,380 --> 02:08:04,700
+en ese sentido ya lo único que estoy variando es la noción de costo entonces
+
+1300
+02:08:04,700 --> 02:08:08,380
+cuando lo valúo en la noción de costo que yo lo puse con dividido de n pero
+
+1301
+02:08:08,380 --> 02:08:12,740
+dije que le vamos a explicar por mil para tener
+
+1302
+02:08:12,740 --> 02:08:21,860
+en una misma escala, en el modelo A, ya, esa métrica
+
+1303
+02:08:21,860 --> 02:08:32,460
+se ha estimado, mi función de costo vale 90 y en la función B es 210.
+
+1304
+02:08:32,460 --> 02:08:39,380
+Entonces, yo esos costos los tengo que definir previamente, entonces
+
+1305
+02:08:39,380 --> 02:08:45,380
+una vez que lo defino, yo lo puedo estimar y lo puedo sofisticar porque en este caso
+
+1306
+02:08:45,380 --> 02:08:51,660
+ejemplo yo lo estoy definiendo de manera arbitraria. Yo también puedo ver otras métricas, por
+
+1307
+02:08:51,660 --> 02:08:58,340
+ejemplo la precisión, el recall, en donde le estoy dando distintos pesos a distintas cosas y el F1
+
+1308
+02:08:58,340 --> 02:09:03,740
+que lo vieron un poco más en detalle con Pedro, digamos, todas estas métricas con distintos ejemplos.
+
+1309
+02:09:03,740 --> 02:09:13,900
+Ahora, todos estos modelos me van a entregar de cierta manera probabilidades, probabilidades
+
+1310
+02:09:13,900 --> 02:09:17,780
+de que sea spam, probabilidades de que sea, no spam, probabilidades de que sea un evento
+
+1311
+02:09:17,780 --> 02:09:19,100
+positivo o un evento negativo.
+
+1312
+02:09:19,100 --> 02:09:24,860
+Aquí vamos a ver un ejemplo, dice un filtro asigna probabilidades de spam a tres correos,
+
+1313
+02:09:24,860 --> 02:09:31,220
+es decir, lo que me está entregando, me está entregando el I estimado, el I corrido.
+
+1314
+02:09:31,220 --> 02:09:37,920
+el correo A es 0,9, en el correo B es 0,6 y en el correo C es 0,2. Entonces esta es la
+
+1315
+02:09:37,920 --> 02:09:42,520
+probabilidad que me entrega el modelo de que sea
+
+1316
+02:09:44,240 --> 02:09:50,200
+de que el modelo lo considera que sea spam. ¿Qué realizamos primero? El correo A,
+
+1317
+02:09:50,200 --> 02:09:57,120
+luego el B o el C. ¿Es fiable 90% de probabilidad de que sea así?
+
+1318
+02:09:57,120 --> 02:10:04,620
+si yo estoy en 90% tengo una probabilidad y te digo este correo 90% o la probabilidad que creo que sea spam es 90%
+
+1319
+02:10:06,280 --> 02:10:12,120
+y general lo vamos a marcar como spam, pero con el 06 ya quizás sí
+
+1320
+02:10:12,800 --> 02:10:15,420
+02 ya empezamos a decirlo, entonces naturalmente
+
+1321
+02:10:16,560 --> 02:10:23,560
+empezamos o hacemos la diferencia del 05, el punto del medio, pero no en todas las problemáticas ese punto del medio va a ser
+
+1322
+02:10:23,560 --> 02:10:30,200
+válido. Entonces, este umbral que yo voy a hacer, que me va a hacer la
+
+1323
+02:10:30,200 --> 02:10:36,280
+pasar de probabilidades de clasificación a
+
+1324
+02:10:39,280 --> 02:10:45,480
+clasificaciones per se, va a depender mucho. Entonces, porque si se fijan, con
+
+1325
+02:10:45,480 --> 02:10:55,760
+un umbral de 0,5 el tercer, cuarto y quinto correo son marcados como spam y con una probabilidad
+
+1326
+02:10:55,760 --> 02:11:04,200
+de 0,8, con un umbral de 0,8, solo prácticamente 1 es marcado como spam. Entonces uno podría
+
+1327
+02:11:04,200 --> 02:11:11,480
+preguntarse también aquí en Transjuego, hacemos el ejemplo de
+
+1328
+02:11:11,480 --> 02:11:16,640
+fraudes.
+
+1329
+02:11:16,640 --> 02:11:20,720
+¿Qué tan seguro quiero estar yo para decir que una transacción es fraude?
+
+1330
+02:11:20,720 --> 02:11:24,640
+Porque si pongo 0.5 quizás voy a marcar muchas transacciones como fraudulentas,
+
+1331
+02:11:24,640 --> 02:11:29,320
+que también es un problema. Entonces tampoco quiero decir de cierta manera que
+
+1332
+02:11:29,320 --> 02:11:35,000
+cualquier hora extingir o al menos estar muy seguro que una transacción es
+
+1333
+02:11:35,000 --> 02:11:40,600
+fraudulenta para efectivamente realizar un plan de acción. Entonces esta
+
+1334
+02:11:40,600 --> 02:11:46,520
+decisión tiene que jugar, digamos, tiene que sopesarse con reglas de negocio, de
+
+1335
+02:11:46,520 --> 02:11:52,480
+la del industria o el contexto en el cual yo estoy trabajando.
+
+1336
+02:11:53,120 --> 02:11:56,980
+Fíjense acá que yo también puedo tener otras distintas métricas como es el
+
+1337
+02:11:56,980 --> 02:12:05,540
+LockLoss, la pérdida en escala logarítmica y que
+
+1338
+02:12:05,540 --> 02:12:11,460
+cuando veo, digamos, distintos modelos
+
+1339
+02:12:11,460 --> 02:12:17,220
+puedo tener en principio métricas similares o que en promedio son similares
+
+1340
+02:12:17,220 --> 02:12:23,780
+pero que para observaciones en particular son bastante distintas. Entonces
+
+1341
+02:12:23,780 --> 02:12:31,940
+tengo que tener tal como tuvimos la la certeza de que
+
+1342
+02:12:31,940 --> 02:12:39,380
+como lo vimos en el caso cuantitativo no simplemente gana siempre en todos los
+
+1343
+02:12:39,380 --> 02:12:44,340
+en todos los pliegues sino que puede ganar en unos cuantos y en otros no
+
+1344
+02:12:44,340 --> 02:12:48,300
+acá también puede pasar lo mismo sino que para cierta observación estima
+
+1345
+02:12:48,300 --> 02:12:51,060
+estima bien
+
+1346
+02:12:51,060 --> 02:13:00,060
+y para otras no estima también, o sobreestima o subestima las probabilidades de clasificación.
+
+1347
+02:13:02,540 --> 02:13:08,580
+Esta función de pérdida o esta métrica del lock-lock que las vamos a utilizar para los
+
+1348
+02:13:08,580 --> 02:13:13,380
+problemas de clasificación, lo que hace es penalizar probabilidades equivocadas.
+
+1349
+02:13:13,380 --> 02:13:20,700
+Y cuando uno lo ve teóricamente en términos gráficos, si se fijan acá,
+
+1350
+02:13:20,700 --> 02:13:31,700
+esta es la curva de no-spam y la curva de spam. En el 0,5 maximizo esa
+
+1351
+02:13:31,700 --> 02:13:35,220
+función, digamos, la mezcla de las dos funciones. Lo que hace esto es que
+
+1352
+02:13:35,220 --> 02:13:39,580
+defino una pérdida logarítmica
+
+1353
+02:13:40,340 --> 02:13:47,380
+y en general, como casi todas las pérdidas, mientras es menos es mejor.
+
+1354
+02:13:47,380 --> 02:13:54,300
+Entonces, si se fijan acá, la pérdida no es lineal a lo largo de toda la probabilidad.
+
+1355
+02:13:54,300 --> 02:14:05,300
+Entonces, ¿qué es lo que hace esto? Para una, por ejemplo, una probabilidad de 0,9 se va a aportar 0,1.
+
+1356
+02:14:05,300 --> 02:14:11,000
+Y para una probabilidad de 0,1 se va a aportar 2,3.
+
+1357
+02:14:11,000 --> 02:14:18,440
+entonces predecir con bajo nivel de probabilidad o una probabilidad muy baja aporta más en
+
+1358
+02:14:18,440 --> 02:14:24,360
+la pérdida digamos logarítmica. Otra métrica que también tenemos es el
+
+1359
+02:14:24,360 --> 02:14:30,400
+Breyer score o Breyer seca que lo que hace es la noción de error cuadrático pero aplicado
+
+1360
+02:14:30,400 --> 02:14:40,760
+a probabilidades y con ello entonces esto va a ser, si tengo una respuesta binaria el
+
+1361
+02:14:40,760 --> 02:14:46,160
+es corto va a ser binaria también y mientras menos es mejor es la definición digamos binaria
+
+1362
+02:14:46,160 --> 02:14:53,960
+del error cuadrativo medio. ¿Qué es lo que estoy dando aquí? Estoy de igual manera definiendo
+
+1363
+02:14:53,960 --> 02:15:01,840
+en esta y en la otra formas de cuantificar qué tanto me estoy equivocando, ¿ya? ¿Cuánto
+
+1364
+02:15:01,840 --> 02:15:07,280
+voy a sopesar una diferencia muy grande, una diferencia más pequeña? Y dándole distintas
+
+1365
+02:15:07,280 --> 02:15:18,960
+cantidades, digamos magnitudes. Entonces, si yo defino, digamos, una probabilidad de 0.8
+
+1366
+02:15:18,960 --> 02:15:27,960
+de clasificar con spam, nosotros esperamos que cerca del 80% de spam, si las probabilidades
+
+1367
+02:15:27,960 --> 02:15:36,800
+también cadiradas. Entonces, esto juega bastante con la identificación dentro del conjunto
+
+1368
+02:15:36,800 --> 02:15:45,680
+de entrenamiento, es decir, si yo tengo muchos spam en mi conjunto o mi muestra
+
+1369
+02:15:45,680 --> 02:15:49,400
+con el cual estoy analizando, voy a tratar o voy a atender al modelo a
+
+1370
+02:15:49,400 --> 02:15:53,720
+identificarlo correctamente. Si son datos muy anómalos y no tengo mucha
+
+1371
+02:15:53,720 --> 02:15:57,760
+información sobre esto, estas probabilidades o esta estimación de las
+
+1372
+02:15:57,760 --> 02:16:02,200
+probabilidades, las predicciones van a ser muy inestables y por consecuencia el
+
+1373
+02:16:02,200 --> 02:16:07,900
+modelo no va a ser generalizable porque va a aprender de tan poco datos que al
+
+1374
+02:16:07,900 --> 02:16:11,540
+ver un dato nuevo que puede ser muy distinto no va a saber identificarlo y
+
+1375
+02:16:11,540 --> 02:16:15,820
+lo más probable es que lo identifique erróneamente. Otra de las métricas que
+
+1376
+02:16:15,820 --> 02:16:21,820
+tenemos es la curva ROP que tiene el nombre reciben o predicten characteristic
+
+1377
+02:16:21,820 --> 02:16:28,460
+o la curva característica operativa y en esencia grafica métricas que vienen
+
+1378
+02:16:28,460 --> 02:16:35,420
+desde la matriz de confusión. Y en general aquí estamos interesados en una métrica bien particular
+
+1379
+02:16:35,420 --> 02:16:42,280
+que es el área bajo la curva, que es la curva que está dentro, o sea el área que está bajo la
+
+1380
+02:16:42,280 --> 02:16:54,860
+curva rock. Cuando lo grafico y veo la curva rock, mientras más áreas está debajo de eso, en general
+
+1381
+02:16:54,860 --> 02:17:00,900
+yo tengo mejores resultados. Si se fijan, estos los ejes son métricas que vienen
+
+1382
+02:17:00,900 --> 02:17:06,580
+desde la matriz de confusión. Lo que hace la curva ROCK y por consecuencia
+
+1383
+02:17:06,580 --> 02:17:13,180
+también la precisión promedio describen el ranking.
+
+1384
+02:17:14,380 --> 02:17:22,100
+Ahora, algo que le comentaba recién, que esta frecuencia de spam, es decir, la
+
+1385
+02:17:22,100 --> 02:17:28,460
+la prevalencia de que tantas veces se repite en mi conjunto de entrenamiento
+
+1386
+02:17:28,460 --> 02:17:33,340
+el evento de interés que en este caso es un correo spam va a cambiar la
+
+1387
+02:17:33,340 --> 02:17:39,060
+precisión, por consecuencia si tengo una misma sensibilidad del
+
+1388
+02:17:39,060 --> 02:17:44,580
+80% con una misma tasa de falsos positivos en mil correos voy a tener
+
+1389
+02:17:44,580 --> 02:17:52,940
+estas distintas métricas pero si es que tengo
+
+1390
+02:17:52,940 --> 02:17:57,860
+una distinta frecuencia en el conjunto de entrenamiento entonces me va a cambiar
+
+1391
+02:17:57,860 --> 02:18:01,940
+en principio los números que están dentro de la matriz de confusión
+
+1392
+02:18:01,940 --> 02:18:08,140
+entonces si hay pocos spam los negativos van a ser mucho ya y si hay más spam los
+
+1393
+02:18:08,140 --> 02:18:13,140
+positivos van a ser mucho en el sentido de que tengo más en mis datos tengo más
+
+1394
+02:18:13,140 --> 02:18:18,620
+ejemplos o observaciones que son spam, entonces el modelo va a aprender a
+
+1395
+02:18:18,620 --> 02:18:23,340
+reconocerlo de mejor manera y por consecuencia va a tratar de predecir, ya,
+
+1396
+02:18:23,340 --> 02:18:29,940
+si es que hay observaciones que se parezcan a esas observaciones, más
+
+1397
+02:18:29,940 --> 02:18:38,840
+spam. En cambio, cuando es muy anómalo o no es tan frecuente la observación de
+
+1398
+02:18:38,840 --> 02:18:45,820
+interés, el modelo tiende a predecir siempre lo contrario y por consecuencia
+
+1399
+02:18:45,820 --> 02:18:52,700
+quedarse con una tasa de acierto bastante buena a pesar de que no sea útil.
+
+1400
+02:18:52,700 --> 02:18:59,320
+Entonces, todo esto depende del conjunto de datos y este problema de clases
+
+1401
+02:18:59,320 --> 02:19:06,040
+desbalanceadas, es decir, que tengo, pensemos, 10.000 datos y la observación de
+
+1402
+02:19:06,040 --> 02:19:09,960
+interés o el evento de interés sólo son 10 es un problema súper grave porque
+
+1403
+02:19:09,960 --> 02:19:16,120
+es súper difícil sacar información de esos 10 observaciones. Si se fijan
+
+1404
+02:19:16,120 --> 02:19:22,660
+el evento de interés son 10 de los 1000 datos, entonces yo estoy
+
+1405
+02:19:22,660 --> 02:19:31,720
+interesado al principio en 10 observaciones más que los 9.990 restantes.
+
+1406
+02:19:31,720 --> 02:19:41,200
+los 9.990 restantes, simplemente me sirven para identificar cuándo no es el evento de interés,
+
+1407
+02:19:41,200 --> 02:19:43,680
+pero no cumplo un objetivo propiamente tal.
+
+1408
+02:19:43,680 --> 02:19:55,560
+Entonces, uno de los protocolos que yo podría plantear para la clasificación binaria,
+
+1409
+02:19:55,560 --> 02:20:01,440
+yo voy a definir con la cantidad de correos que tengo 921 para la prueba
+
+1410
+02:20:01,440 --> 02:20:07,560
+3680 para el ajuste y la selección, es decir, para hacer los pliegues
+
+1411
+02:20:08,400 --> 02:20:13,720
+voy a comparar ahora no voy a ocupar la raíz del error cuadrático medio porque
+
+1412
+02:20:13,720 --> 02:20:19,400
+la raíz del error cuadrático medio se entiende para respuestas cuantitativas
+
+1413
+02:20:19,400 --> 02:20:24,360
+en este caso voy a ocupar la pérdida cuadrática fuera de pliegue
+
+1414
+02:20:24,360 --> 02:20:30,960
+y voy a escoger el ganador, o el ganador respecto a esta métrica, voy a escoger
+
+1415
+02:20:30,960 --> 02:20:36,960
+distintos umbrales para el corto. Voy a remaluar cuando cojo el modelo con el
+
+1416
+02:20:36,960 --> 02:20:44,240
+conjunto de validación, voy a hacer la separación y voy a evaluar
+
+1417
+02:20:44,240 --> 02:20:50,560
+todo mi modelo escogido dentro de todo mi conjunto de entrenamiento
+
+1418
+02:20:50,560 --> 02:20:57,960
+y luego voy a pasar a evaluar el conjunto de pre-a.
+
+1419
+02:20:57,960 --> 02:21:04,960
+Si les fijan acá, la parte del costo de definir cuánto va a valor uno sobre otro es otro tema adicional,
+
+1420
+02:21:04,960 --> 02:21:14,960
+que tiene que ser, digamos, visto caso a caso, porque requiere saber mucho más del contexto del problema.
+
+1421
+02:21:14,960 --> 02:21:24,260
+Entonces, todos estos candidatos van a ser, digamos, modelos. Al final, cuando yo les
+
+1422
+02:21:24,260 --> 02:21:29,400
+comentaba todas estas metodologías son un poco agnósticas de qué modelo es el que
+
+1423
+02:21:29,400 --> 02:21:35,840
+yo voy a evaluar. La gracia de todo esto es que conforme uno va estudiando, uno va ampliando
+
+1424
+02:21:35,840 --> 02:21:44,540
+esas posibilidades. Entonces, tengo... Si tengo una probabilidad constante, es el
+
+1425
+02:21:44,540 --> 02:21:50,720
+equivalente de usar un modelo que era solo el promedio en el caso
+
+1426
+02:21:50,720 --> 02:21:55,860
+cuantitativo. Una regresión logística, que la vieron con Pedro el martes, y hay una
+
+1427
+02:21:55,860 --> 02:22:01,360
+petición de C, también me permite generar una clasificación minaria y un
+
+1428
+02:22:01,360 --> 02:22:05,980
+bosque aleatorio y que también me permite clasificar. Si se fijan acá son tres, estos
+
+1429
+02:22:05,980 --> 02:22:11,320
+son el símil para el problema de clasificación que teníamos de los
+
+1430
+02:22:11,320 --> 02:22:17,320
+siete modelos en el caso de clasificación continuo.
+
+1431
+02:22:17,320 --> 02:22:22,320
+Entonces en Python se fijan
+
+1432
+02:22:22,320 --> 02:22:27,240
+el código es bastante similar, simplemente estoy cambiando las formas
+
+1433
+02:22:27,240 --> 02:22:30,420
+que estoy haciendo un ajuste porque no estoy haciendo los mismos modelos en
+
+1434
+02:22:30,420 --> 02:22:38,740
+principio y hago nuevamente el ajuste para calcular estas probabilidades de
+
+1435
+02:22:38,740 --> 02:22:43,940
+predicción en el conjunto de validación porque aún no escojo el modelo y al igual que
+
+1436
+02:22:43,940 --> 02:22:50,500
+en el caso cuantitativo de predicción cuantitativa yo puedo resumir
+
+1437
+02:22:50,500 --> 02:22:58,660
+y si fijan acá tengo pequeñas discrepancias entre R y Python
+
+1438
+02:22:58,660 --> 02:23:05,140
+Tienden a ser de implementación y recuerden que NR y en Python para hacer una misma metodología
+
+1439
+02:23:05,140 --> 02:23:11,300
+usualmente tengo bastantes librerías y paquetes que hacen lo mismo, entonces la implementación y
+
+1440
+02:23:11,300 --> 02:23:17,940
+problemas numéricos pueden salir ya sobre todo en el bosque aleatorio, en el random forest que dado
+
+1441
+02:23:17,940 --> 02:23:25,380
+que tiene una profundidad 8 pueden haber discrepancias numéricas pero no me cambian la decisión. Si se
+
+1442
+02:23:25,380 --> 02:23:31,180
+fijan acá en términos de la frecuencia en Python y en R me dan lo mismo
+
+1443
+02:23:31,180 --> 02:23:38,000
+en cuanto a el estadístico o el score de Ryre también me dan lo mismo en un
+
+1444
+02:23:38,000 --> 02:23:42,900
+caso logístico me dan todo exactamente igual
+
+1445
+02:23:42,900 --> 02:23:49,660
+y en el bosque aleatorio o el random forest me entrega distintas métricas
+
+1446
+02:23:49,660 --> 02:23:56,860
+y aquí tengo una pequeña discrepancia en términos de el LogLoss y el Bright.
+
+1447
+02:23:56,860 --> 02:24:04,860
+No obstante, sigue siendo más chico en todos los casos que las otras, los otros dos modelos.
+
+1448
+02:24:06,740 --> 02:24:13,820
+Entonces, uno puede entrar en por qué son estas discrepancias, pero en esencia es de
+
+1449
+02:24:13,820 --> 02:24:22,340
+implementación computacional más que la implementación metodológica,
+
+1450
+02:24:22,340 --> 02:24:25,340
+el modelo que se está haciendo.
+
+1451
+02:24:29,580 --> 02:24:35,180
+Ahí Rodrigo menciona, dice, ¿R entrega mejores modelos? No es necesariamente
+
+1452
+02:24:35,180 --> 02:24:41,940
+mejor, sino que son dos formas de calcular distintos. El modelo
+
+1453
+02:24:41,940 --> 02:24:46,500
+teórico que está detrás es igual, o sea yo podría correr esto con otra semilla
+
+1454
+02:24:46,500 --> 02:24:51,340
+y pueden ser los resultados al revés, el punto es que me dan dos modelos
+
+1455
+02:24:51,340 --> 02:24:55,620
+distintos y si yo voy a evaluar por ejemplo
+
+1456
+02:24:55,900 --> 02:25:04,700
+no puedo evaluar para la redundancia este número con este número, si voy a
+
+1457
+02:25:04,700 --> 02:25:08,540
+hacer, voy a evaluar las métricas en Python, la evaluo en Python, entonces la
+
+1458
+02:25:08,540 --> 02:25:14,180
+implementación es consistente a lo largo de todo mi análisis. Son implementaciones
+
+1459
+02:25:14,180 --> 02:25:20,420
+de computacionales en vez de decir que uno es mejor que otro. El número en este
+
+1460
+02:25:20,420 --> 02:25:24,800
+caso, en esta realización es menor pero no significa que sea mejor, como
+
+1461
+02:25:24,800 --> 02:25:29,020
+probablemente tal, sino que una cosa de implementación computacional.
+
+1462
+02:25:29,020 --> 02:25:34,860
+Ahora, fíjense acá, esta es la curva ROCK y el precision recal y se fijan acá en la
+
+1463
+02:25:34,860 --> 02:25:41,900
+tasa de falsos positivos y el real, tengo la curva de ambas, en particular voy a
+
+1464
+02:25:41,900 --> 02:25:50,120
+estar interesado en la curva rock, el área bajo la curva de este gráfico,
+
+1465
+02:25:50,120 --> 02:25:56,780
+digamos, de esta métrica y se fijan 0.97 0.96 hay pequeñas discrepancias porque
+
+1466
+02:25:56,780 --> 02:26:02,700
+nuevamente es la clasificación, es la implementación, perdón, computacional de
+
+1467
+02:26:02,700 --> 02:26:09,060
+estas cosas. Es súper común que suceda eso, la idea es ser consistente, es decir,
+
+1468
+02:26:09,060 --> 02:26:16,180
+si hago las cosas en R, verificar que la implementación sean similares.
+
+1469
+02:26:18,940 --> 02:26:25,540
+Ya vamos un poquito finalizando, digamos, pero el AUC ya no garantiza que esté
+
+1470
+02:26:25,540 --> 02:26:32,100
+bien calibrado, ya en esencia yo quiero tener AUCs muy cercanos a unos, pero
+
+1471
+02:26:32,100 --> 02:26:40,060
+nuevamente la prueba real siempre es con la evaluación del conjunto del
+
+1472
+02:26:40,060 --> 02:26:44,100
+entrenamiento. Entonces, no que tenga un buen abuse significa que las
+
+1473
+02:26:44,100 --> 02:26:49,580
+probabilidades están siendo correctamente predichas.
+
+1474
+02:26:49,660 --> 02:26:56,260
+Ahora, volvemos al problema del costo en la clasificación. Si se fijan,
+
+1475
+02:26:56,260 --> 02:27:04,520
+podemos escoger el umbral usando el costo en la evaluación del conjunto de
+
+1476
+02:27:04,520 --> 02:27:09,100
+el conjunto de validación y si les dije acá esto es el costo fuera del pliegue
+
+1477
+02:27:09,100 --> 02:27:13,660
+por mil porque lo que estamos haciendo para comparar en el mil en la misma
+
+1478
+02:27:13,660 --> 02:27:18,860
+escala perdón y yo puedo ver el costo fuera del pliegue por cada mil correos
+
+1479
+02:27:18,860 --> 02:27:25,660
+ya y si pongo por ejemplo un umbral 0 5 el costo asociado va a estar en
+
+1480
+02:27:25,660 --> 02:27:34,380
+132, si pongo un costo o el umbral de la probabilidad en 0,6 el costo va a ser
+
+1481
+02:27:34,380 --> 02:27:40,300
+128 y cuando subí subiendo a 0,65 el costo empezó a subir entonces
+
+1482
+02:27:40,300 --> 02:27:45,320
+identifique que hay una especie de mínimo, ahora uno podría decir bueno
+
+1483
+02:27:45,320 --> 02:27:50,980
+qué pasa si es 0,61, ahí uno puede entrar y digamos sofisticar un poco más este
+
+1484
+02:27:50,980 --> 02:27:56,020
+este problema pero la idea es que, la idea principal es que hay un umbral
+
+1485
+02:27:56,020 --> 02:28:05,140
+óptimo en principio, que minimiza el costo asociado a la clasificación
+
+1486
+02:28:05,260 --> 02:28:09,140
+si se fijan las probabilidades acaso es la misma solamente estoy cambiando el
+
+1487
+02:28:09,140 --> 02:28:14,180
+umbral, es decir, desde qué valor voy a decir que sí y desde qué valor voy a
+
+1488
+02:28:14,180 --> 02:28:16,740
+decir que es no
+
+1489
+02:28:16,740 --> 02:28:30,140
+Ahora, si se fijan, tengo pequeña discrepancia entre implementaciones en Python y en R, pero
+
+1490
+02:28:30,140 --> 02:28:38,460
+tienden a ser implementaciones o discrepancias en la implementación, usualmente incluso
+
+1491
+02:28:38,460 --> 02:28:46,340
+dentro del mismo lenguaje, si uno ocupa dos librerías distintas, tienden a tener resultados
+
+1492
+02:28:46,340 --> 02:28:50,900
+un poco distintos. Entonces, hay que tener cuidado, la idea es ser consistente, es decir,
+
+1493
+02:28:50,900 --> 02:28:56,020
+no que un modelo lo aplique con cierto paquete, otro con otro, porque si no voy a estar mezclando
+
+1494
+02:28:56,020 --> 02:29:00,740
+cosas que son muy distintas. La idea es ocupar, si voy a ocupar una implementación, ocupar
+
+1495
+02:29:00,740 --> 02:29:10,820
+esa implementación a lo largo de todo mi análisis. Ahora, una última cosa ya para ir cerrando.
+
+1496
+02:29:10,820 --> 02:29:16,500
+En general, los costos asociados que yo puedo tener en estos problemas de clasificación,
+
+1497
+02:29:16,500 --> 02:29:21,740
+uno pudiese decir que hay un umbral teórico, es decir, el umbral óptimo que yo debiese
+
+1498
+02:29:21,740 --> 02:29:27,380
+empezar a escoger que el evento sea positivo y que el evento sea negativo.
+
+1499
+02:29:27,380 --> 02:29:31,620
+En general, uno puede hablar de eso si conoce la distribución, etc., pero en cosas que
+
+1500
+02:29:31,620 --> 02:29:37,200
+son más cercanas a la práctica, uno tiene que ir probando, llegar a ese umbral de manera
+
+1501
+02:29:37,200 --> 02:29:39,980
+empírica tal que el costo sea el mínimo.
+
+1502
+02:29:39,980 --> 02:29:47,100
+Entonces, la decisión de qué tanto, cuál es mi función de costo, que era en esencia este 5 fp
+
+1503
+02:29:47,100 --> 02:29:54,980
+más 1 fn, el costo o el ratio entre los falsos positivos y los falsos negativos, es súper
+
+1504
+02:29:54,980 --> 02:30:02,860
+importante. Entonces, conocer las repercusiones de las decisiones en términos de los costos y una
+
+1505
+02:30:02,860 --> 02:30:08,820
+cuantificación de esos costos súper relevante para la implementación de todas estas metodologías.
+
+1506
+02:30:09,980 --> 02:30:14,540
+Entonces, en este caso yo voy a escoger el random forest, digamos que tenía una
+
+1507
+02:30:14,540 --> 02:30:18,700
+profundidad 8 de manera arbitraria porque son, digamos, candidatos. Recuerden que
+
+1508
+02:30:18,700 --> 02:30:23,660
+todas estas cosas son un poco agnósticas al modelo que estamos
+
+1509
+02:30:23,660 --> 02:30:29,660
+definiendo, o sea, un poco agnóstica a los candidatos posibles. Voy a escoger un
+
+1510
+02:30:29,660 --> 02:30:34,220
+umbral de 0,6 porque vimos que eso minimiza el costo
+
+1511
+02:30:34,220 --> 02:30:39,960
+y luego que lo decidí, eso ya escogí el modelo, voy a revaluarlo en todo el
+
+1512
+02:30:39,960 --> 02:30:44,680
+conjunto de entrenamiento sin hacer
+
+1513
+02:30:44,680 --> 02:30:50,800
+entrenamiento y evaluación y voy a evaluarlo posteriormente en el conjunto de
+
+1514
+02:30:50,800 --> 02:30:57,040
+prueba y ahí recién voy a tener métricas digamos asociadas
+
+1515
+02:30:57,040 --> 02:31:02,160
+con voy a poder tratar de entender la generalización de mi modelo que tan
+
+1516
+02:31:02,160 --> 02:31:04,480
+bueno es
+
+1517
+02:31:07,960 --> 02:31:13,520
+si se fijan en este caso evalúo en los datos de prueba que son los datos
+
+1518
+02:31:13,520 --> 02:31:24,320
+reservado y veo que en este caso tengo un 93.7% de aciertos y las distintas
+
+1519
+02:31:24,320 --> 02:31:29,600
+métricas y puedo calcular también el costo asociado. Entonces al igual que
+
+1520
+02:31:29,600 --> 02:31:34,920
+hicimos en la predicción cuantitativa, cuando evaluó en el conjunto de prueba
+
+1521
+02:31:34,920 --> 02:31:41,820
+no me restringo sólo a la métrica que yo utilicé para
+
+1522
+02:31:42,820 --> 02:31:48,680
+para escoger el modelo, ya, yo aquí amplío digamos las métricas y ahí puedo
+
+1523
+02:31:48,680 --> 02:31:52,680
+poner más incluso para tener un panorama bien claro de cómo se están
+
+1524
+02:31:52,680 --> 02:31:59,080
+comportando y qué tan bueno es el modelo en datos que no conoce
+
+1525
+02:31:59,080 --> 02:32:11,640
+Finalmente, ya haciendo un poquito de síntesis, digamos, tenemos que evaluar,
+
+1526
+02:32:11,640 --> 02:32:17,720
+una vez que evaluadas en el conjunto de entrenamiento, tenemos que ser un poquito más honestos y
+
+1527
+02:32:17,720 --> 02:32:24,600
+no ocupar esa información para poder revaluar y rehacer, digamos, ocupando información
+
+1528
+02:32:24,600 --> 02:32:30,520
+que obtuvimos desde la evaluación de conjunto de pre-a. Entonces, si evaluamos la relargía
+
+1529
+02:32:33,760 --> 02:32:39,320
+y escojo un modelo y no es satisfactorio, tengo que hacer un procedimiento nuevo con
+
+1530
+02:32:39,320 --> 02:32:43,720
+nuevas selecciones, nueva evaluación independiente, nuevos modelos de tal manera que
+
+1531
+02:32:45,840 --> 02:32:53,760
+para el análisis mismo y la forma en que llegue al modelo mismo que voy a utilizar para tomar
+
+1532
+02:32:53,760 --> 02:32:59,980
+decisiones es digamos honesto en ese sentido de que no ocupa información que no debies ocupar.
+
+1533
+02:32:59,980 --> 02:33:07,880
+Entonces, fíjate acá, hay muchos paralelismo entre la predicción cuantitativa y la clasificación.
+
+1534
+02:33:07,880 --> 02:33:14,760
+Entonces, siempre tengo que predefinir lo que voy a hacer antes de hacerlo. Aquí está un poco la
+
+1535
+02:33:14,760 --> 02:33:20,760
+referencia y el material. Hay muchos datos que vienen de internet que ya están más o menos
+
+1536
+02:33:20,760 --> 02:33:27,040
+definido y a modo muy muy resumen
+
+1537
+02:33:27,040 --> 02:33:30,840
+cómo evaluaba y cómo seleccionaba el modelo que en esencia tomó la sesión de
+
+1538
+02:33:30,840 --> 02:33:35,320
+la clase. Tenemos que evaluar qué esperamos como
+
+1539
+02:33:35,320 --> 02:33:38,880
+error y en eso tenemos que definir métricas. Entonces voy a tener que definir
+
+1540
+02:33:38,880 --> 02:33:41,680
+qué es lo que quiero hacer, qué es lo que voy a evaluar y qué métrica voy a
+
+1541
+02:33:41,680 --> 02:33:46,960
+utilizar para escoger el modelo. En general voy a tratar de hacer
+
+1542
+02:33:46,960 --> 02:33:52,780
+valiación cruzada para poder escoger el modelo y una vez que lo escojo voy a
+
+1543
+02:33:52,780 --> 02:33:56,480
+reescutar con el entrenamiento, con todo conjunto de entrenamiento y finalmente
+
+1544
+02:33:56,480 --> 02:34:03,840
+evaluar. Entonces la selección se hace utilizando la valiación cruzada y el
+
+1545
+02:34:03,840 --> 02:34:09,640
+conjunto de entrenamiento. Por ejemplo en estos casos, en el caso de hormigón se
+
+1546
+02:34:09,640 --> 02:34:15,600
+tiende a escoger, sobre todo en problemas de predicción cuatrativa, la raíz del
+
+1547
+02:34:15,600 --> 02:34:19,000
+error cuadrático medio porque es bastante estándar, digamos, penaliza
+
+1548
+02:34:19,000 --> 02:34:25,440
+discrepancias muy grandes. Y en la clasificación se tiene a utilizar el
+
+1549
+02:34:25,440 --> 02:34:30,280
+lock-lock pero hay muchas más variantes porque el costo toma un valor, o sea, toma
+
+1550
+02:34:30,280 --> 02:34:38,040
+un un raw fundamental y el umbral también. Entonces, en ese sentido sí
+
+1551
+02:34:38,040 --> 02:34:43,520
+hay más variabilidad. Entonces, pequeñas recomendaciones. Tengo que definir bien
+
+1552
+02:34:43,520 --> 02:34:49,700
+la métrica que voy a utilizar y la referencia, de fin, distinguir probabilidades de decisión en
+
+1553
+02:34:49,700 --> 02:34:56,120
+clasificación, ya porque va a depender de varias cosas, no simplemente el método, verificar siempre
+
+1554
+02:34:56,120 --> 02:35:02,440
+que no tengo fuga de datos, no tengo que tener data liquid porque eso me mata en principio el
+
+1555
+02:35:02,440 --> 02:35:10,760
+problema, no puedo tener una fuga de datos porque si no mi modelo no está bien definido, o sea,
+
+1556
+02:35:10,760 --> 02:35:14,720
+estoy ocupando datos que no debiesen ocuparse, que ocupar es como ocupar
+
+1557
+02:35:14,720 --> 02:35:20,000
+información que es privilegiada, en principio, que estoy reservando para la prueba,
+
+1558
+02:35:20,000 --> 02:35:24,260
+que es mi oráculo, digamos, de cómo voy a evaluar efectivamente el desempeño de
+
+1559
+02:35:24,260 --> 02:35:29,960
+mi modelo. Tengo que decidir cuál es la configuración y la receta de cada uno de
+
+1560
+02:35:29,960 --> 02:35:36,320
+los candidatos y finalmente tengo que ver las estabilidades de mi modelo,
+
+1561
+02:35:36,320 --> 02:35:41,920
+cuando lo valúo tras evaluarlo más bien en el conjunto de prueba. Y una quinta, digamos,
+
+1562
+02:35:41,920 --> 02:35:45,640
+es siempre después de todas estas cosas se tiene que ver la utilidad porque todo esto llega a un
+
+1563
+02:35:45,640 --> 02:35:51,320
+repercute en una toma de decisión, en un plan de acción, en algo, digamos, o una recomendación.
+
+1564
+02:35:51,320 --> 02:35:55,920
+Entonces, siempre se tienen que sorprender estos resultados, estas formas metodológicas con la
+
+1565
+02:35:55,920 --> 02:36:02,480
+práctica, digamos, con la realidad, con lo que se pasa efectivamente. Eso por hoy. Me pasé un
+
+1566
+02:36:02,480 --> 02:36:08,480
+poquito pero ya estamos en la hora. No sé si hay alguna pregunta, duda,
+
+1567
+02:36:08,480 --> 02:36:15,680
+si no, volvemos el próximo jueves. Próximo martes tienen...
+

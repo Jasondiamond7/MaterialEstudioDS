@@ -1,0 +1,945 @@
+"""Genera el notebook guiado de detección de anomalías (Clase 41).
+
+Uso normal:      python notebook_c41.py             -> Guias/notebooks/C41_Anomalias.ipynb
+Modo de prueba:  C41_TEST=1 python notebook_c41.py  -> las soluciones se emiten como celdas de código
+                                                       (para ejecutar el notebook completo con nbclient).
+Los números del texto se leen de c41_numeros.json (lo escribe figuras_c41.py) con marcas [[ruta|decimales]].
+Usa numpy, pandas, matplotlib, scipy y scikit-learn.
+"""
+import json
+import os
+import re
+from pathlib import Path
+
+TEST = os.environ.get("C41_TEST") == "1"
+HERE = Path(__file__).resolve().parent
+DIR = HERE.parent / "notebooks"
+OUT = DIR / ("_C41_Anomalias_test.ipynb" if TEST else "C41_Anomalias.ipynb")
+N = json.loads((HERE / "c41_numeros.json").read_text(encoding="utf-8"))
+cells = []
+
+
+def _get(obj, parts):
+    if not parts:
+        return obj
+    for i in range(len(parts), 0, -1):          # claves con punto (p. ej. "0.95") se resuelven uniendo partes
+        k = ".".join(parts[:i])
+        if isinstance(obj, list):
+            if i == 1 and parts[0].isdigit():
+                return _get(obj[int(parts[0])], parts[1:])
+        elif k in obj:
+            return _get(obj[k], parts[i:])
+    raise KeyError(parts)
+
+
+def val(m):
+    obj = _get(N, m.group(1).split("."))
+    d = m.group(2)
+    return str(obj) if d is None else f"{float(obj):.{int(d)}f}"
+
+
+def fill(text):
+    return re.sub(r"\[\[([\w.]+)(?:\|(\d+))?\]\]", val, text)
+
+
+def md(text):
+    cells.append({"cell_type": "markdown", "metadata": {}, "source": fill(text).strip("\n")})
+
+
+def code(text):
+    cells.append({"cell_type": "code", "metadata": {}, "execution_count": None, "outputs": [], "source": text.strip("\n")})
+
+
+def solution(code_text, note=""):
+    if TEST:
+        code(code_text)
+        return
+    body = f"{fill(note)}\n\n" if note else ""
+    md(f"<details><summary><b>Ver solución</b> (inténtalo al menos 5 minutos antes)</summary>\n\n{body}```python\n{code_text.strip()}\n```\n\n</details>")
+
+
+# ---------------------------------------------------------------- encabezado
+md("""
+# Clase 41 · Detección de anomalías
+**Diplomado Data Science** · Prof. Pedro Luiz Ramos · aplica las Clases 30 (calidad de datos), 31–32 (K-means, PCA), 35 (árboles y bosques) y 37 (SVM); la evaluación usa las ideas de la Clase 38
+
+Material de apoyo:
+- `Guias/C41_Guia_Anomalias.pdf` — guía visual de la clase.
+- `Guias/apuntes/C41_Apuntes_Anomalias.pdf` — apuntes con ejemplos resueltos y pistas.
+- `Guias/apuntes/C41_Ejercicios_Cuaderno_Anomalias.pdf` — ejercicios en papel (antes o después de este notebook).
+- Material del profesor (carpeta «Clase 41 …»): `deteccion_anomalias.pdf` (diapositivas), `anomalias.py` y `anomalias.R`, `puntos.csv`, `canciones.csv` y `cardio.csv`.
+- Transcripción: `VideosClases/Clase 41 - … .txt` (versión corregida).
+
+⚠️ **Antes de empezar**: necesitas `numpy`, `pandas`, `matplotlib`, `scipy` y `scikit-learn`. Si no los tienes:
+```
+pip install numpy pandas matplotlib scipy scikit-learn
+```
+
+**Datos**: `puntos.csv` (206 puntos con 2 variables: 200 simulados y 6 casos añadidos, ids 201–206), `canciones.csv` (197 canciones con 7 variables numéricas, sin etiquetas) y `cardio.csv` (1 831 registros con 21 variables, la etiqueta `anomalia` y la columna `conjunto` con la partición del profesor: 1 281 de entrenamiento y 550 de prueba). El notebook busca los archivos en la carpeta de la Clase 41 **sin modificarla** (el script del profesor usa `os.chdir("D:/Anomalias")`; aquí no hace falta).
+
+### Objetivos
+1. Distinguir anomalías **globales, contextuales y conjuntas** y saber que una alerta es una pista, no un veredicto.
+2. Aplicar y **reproducir** los métodos del profesor: RIC, puntaje z, Mahalanobis, kNN, LOF, DBSCAN, PCA con error de reconstrucción e Isolation Forest.
+3. Entender **por qué** cada método ve cosas distintas (y por qué el z puede no alertar nunca con pocos datos).
+4. Evaluar con etiquetas (cardio) **sin fuga**: escala, componentes, bosque y corte con entrenamiento; la prueba, una vez.
+5. Leer exactitud, sensibilidad, precisión, ROC y precisión–recall cuando las anomalías son el 9.8 %.
+6. Traducir **R ↔ Python** y reconocer lo impreciso del material.
+
+### Plan
+| Parte | Min | Bloque |
+|---|---|---|
+| — | 10 | Preparación |
+| A | 15 | A1 · RIC y puntaje z |
+| A | 10 | A2 · ¿Por qué el z no alerta? Cota y alternativa robusta |
+| A | 20 | A3 · Mahalanobis sobre `puntos.csv` |
+| A | 15 | A4 · kNN: distancia al vecino k |
+| A | 20 | A5 · LOF |
+| A | 15 | A6 · DBSCAN |
+| A | 15 | A7 · Coincidencias entre detectores y covarianza robusta |
+| B | 20 | B1 · PCA con canciones: Q y T² |
+| B | 20 | B2 · Isolation Forest: longitud de camino y puntaje |
+| B | 10 | B3 · One-Class SVM (puente con la Clase 37) |
+| C | 15 | C1 · Cardio: partición y preparación sin fuga |
+| C | 15 | C2 · PCA con Q en cardio |
+| C | 15 | C3 · Isolation Forest en cardio |
+| C | 20 | C4 · Evaluación: matriz, ROC y precisión–recall |
+| C | 15 | C5 · Efecto del corte y elección con validación |
+| C | 20 | C6 · Robustez: semillas, componentes y entrenamiento contaminado |
+| D | 15 | D1 · Alertas del material, verificadas con código |
+| D | 10 | D2 · Tabla de correspondencia R ↔ Python |
+| — | 35 | Ejercicio de cierre **sin ayuda** |
+
+### Cómo usar este notebook
+- Ejecuta las celdas en orden (`Shift + Enter`).
+- Las celdas marcadas con ✍️ son **tuyas**: escribe el código antes de abrir la solución.
+- Cada ejercicio tiene una solución desplegable. Intenta **al menos 5 minutos** antes de abrirla.
+- Los números del texto fueron verificados contra la salida real de este notebook. Los métodos aleatorios usan semilla fija; con otras versiones de las librerías pueden variar en la última cifra.
+""")
+
+# ---------------------------------------------------------------- preparación
+md("## Preparación")
+code("""
+import warnings
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from IPython.display import display
+
+import sklearn
+from scipy.stats import chi2, norm
+from sklearn.cluster import DBSCAN
+from sklearn.covariance import MinCovDet
+from sklearn.decomposition import PCA
+from sklearn.ensemble import IsolationForest
+from sklearn.metrics import (average_precision_score, confusion_matrix, f1_score, precision_recall_curve,
+                             precision_score, recall_score, roc_auc_score, roc_curve)
+from sklearn.model_selection import StratifiedKFold
+from sklearn.neighbors import LocalOutlierFactor, NearestNeighbors
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import OneClassSVM
+
+warnings.filterwarnings("ignore")
+plt.rcParams.update({"figure.dpi": 100, "axes.grid": True, "grid.alpha": 0.3})
+RS = 2026   # semilla para todo lo aleatorio
+print("scikit-learn:", sklearn.__version__)
+""")
+md("""
+### Mini-repaso (Clases 30, 31, 32, 35 y 38)
+- **Estandarizar** = restar la media y dividir por la desviación **muestral** (`ddof=1`, como `scale()` de R y `std()` de pandas). Lo que se aprende (media, desviación, componentes, bosque, corte) se aprende con **entrenamiento**.
+- **PCA** (Clase 32): componentes ordenadas por varianza; con las primeras `r` se puede **reconstruir** cada caso.
+- **Árboles de cortes aleatorios** (Clase 35): sin variable de respuesta, aíslan puntos.
+- **Matriz de confusión, precisión, sensibilidad, ROC y PR** (Clase 38). Aquí **1 = anomalía** y **0 = normal**.
+
+### Funciones comunes
+""")
+code("""
+def buscar_clase():
+    for base in [Path.cwd(), *Path.cwd().parents]:
+        for p in base.glob("Clase 41*/puntos.csv"):
+            return p.parent
+        if (base / "puntos.csv").exists():
+            return base
+    raise FileNotFoundError("No encuentro puntos.csv: abre el notebook dentro de la carpeta del curso.")
+
+
+CARPETA = buscar_clase()
+
+
+def estandarizar(x):
+    # como el script del profesor: media y desviación muestral (ddof=1)
+    x = pd.DataFrame(x)
+    return ((x - x.mean()) / x.std(ddof=1)).to_numpy()
+
+
+def mahal2(a):
+    # distancia de Mahalanobis AL CUADRADO respecto de la media y la covarianza muestrales de a
+    c = a - a.mean(axis=0)
+    return np.sum((c @ np.linalg.inv(np.cov(a, rowvar=False))) * c, axis=1)
+
+
+def c_psi(n):
+    # longitud media de un camino fallido en un árbol binario de búsqueda (normalización del Isolation Forest)
+    return 0.0 if n <= 1 else (1.0 if n == 2 else 2 * (np.log(n - 1) + np.euler_gamma) - 2 * (n - 1) / n)
+
+
+def boxplot_h(v, **kw):
+    try:
+        return plt.boxplot(v, orientation="horizontal", **kw)
+    except TypeError:          # versiones antiguas de matplotlib
+        return plt.boxplot(v, vert=False, **kw)
+
+
+def metricas(y, clase, score):
+    vn, fp, fn, vp = confusion_matrix(y, clase, labels=[0, 1]).ravel()
+    return dict(VN=int(vn), FP=int(fp), FN=int(fn), VP=int(vp), exactitud=float((vn + vp) / len(y)), sensibilidad=float(vp / (vp + fn)),
+                precision=float(vp / (vp + fp)) if vp + fp else 0.0, AUC=float(roc_auc_score(y, score)), AP=float(average_precision_score(y, score)))
+
+
+print("Material:", CARPETA.name)
+""")
+
+# ================================================================== PARTE A
+md("""
+## Parte A · Una y dos variables: reglas, distancias y densidad
+
+### A1 · RIC y puntaje z (15 min)
+Pregunta: **¿qué valor de `10, 11, 12, 12, 13, 14, 15, 30` es raro?** A simple vista, el 30. ¿Lo confirman las reglas? El **RIC** usa cuartiles: marca lo que queda fuera de `[Q1 − 1.5·RIC, Q3 + 1.5·RIC]`. El **puntaje z** usa media y desviación: marca `|z| > 3`.
+""")
+code("""
+valores = np.array([10, 11, 12, 12, 13, 14, 15, 30])
+q1, q3 = np.quantile(valores, [0.25, 0.75])
+ric = q3 - q1
+limite_inferior, limite_superior = q1 - 1.5 * ric, q3 + 1.5 * ric
+alerta_ric = (valores < limite_inferior) | (valores > limite_superior)
+puntaje_z = (valores - valores.mean()) / valores.std(ddof=1)
+print(f"Q1 = {q1}, Q3 = {q3}, RIC = {ric}, límites = [{limite_inferior}, {limite_superior}]")
+print(f"media = {valores.mean():.3f}, desviación muestral = {valores.std(ddof=1):.3f}")
+display(pd.DataFrame({"Valor": valores, "Alerta_RIC": alerta_ric, "Z": puntaje_z.round(3), "Alerta_Z": abs(puntaje_z) > 3}))
+boxplot_h(valores, widths=0.5)
+plt.axvline(limite_inferior, color="tab:red", ls="--"); plt.axvline(limite_superior, color="tab:red", ls="--")
+plt.xlabel("valor"); plt.title("Límites del RIC: 8 y 18"); plt.yticks([]); plt.show()
+""")
+md("""
+**El RIC marca el 30; el z no** (z = [[ricz.z30|3]], menor que 3). Es lo que muestran las diapositivas 8 y 9: los cuartiles son [[ricz.q1|2]] y [[ricz.q3|2]], el RIC [[ricz.ric|1]] y los límites 8 y 18. Con el 30 la media sube a 14.625 (sin él es [[ricz.media_sin30|3]]) y la desviación a [[ricz.sd|3]] (sin él, [[ricz.sd_sin30|3]]): **el propio extremo se «esconde»** al inflar la referencia.
+
+### ✍️ Ejercicio A1
+Con `tiempos = [50, 52, 53, 55, 56, 58, 60, 95]` calcula los límites del RIC, qué valores se marcan y el z del 95. (Los números son distintos a los de la clase.)
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+tiempos = np.array([50, 52, 53, 55, 56, 58, 60, 95])
+a, b = np.quantile(tiempos, [0.25, 0.75])
+lim = (a - 1.5 * (b - a), b + 1.5 * (b - a))
+print(f"Q1 = {a}, Q3 = {b}, límites = ({lim[0]:.3f}, {lim[1]:.3f}) -> marcados:", tiempos[(tiempos < lim[0]) | (tiempos > lim[1])])
+zt = (tiempos - tiempos.mean()) / tiempos.std(ddof=1)
+print(f"z del 95 = {zt[-1]:.3f}")
+""", "Q1 = 52.75, Q3 = 58.5, límites (44.125, 67.125): se marca el 95; su z es 2.413 (< 3, no alerta).")
+
+md("""
+### A2 · ¿Por qué el z no alerta? Cota y alternativa robusta (10 min)
+No es mala suerte. Con `n` datos y desviación muestral, **ningún** valor puede tener `|z|` mayor que `(n − 1)/√n`. Con `n = 8` el máximo es 2.47; para superar 3 hace falta `n ≥ 11`. Una alternativa que no se deja arrastrar es el **z modificado**: `0.6745·(x − mediana)/MAD`, con corte habitual 3.5.
+""")
+code("""
+n = len(valores)
+print(f"cota (n − 1)/√n con n = {n}: {(n - 1) / np.sqrt(n):.3f}  | con desviación poblacional: {np.sqrt(n - 1):.3f}")
+print("primer n que permite |z| > 3:", next(k for k in range(2, 100) if (k - 1) / np.sqrt(k) > 3))
+# comprobación numérica: el máximo se alcanza con un solo extremo y el resto iguales
+caso = np.r_[np.zeros(n - 1), 1.0]
+print("|z| máximo con (0, …, 0, 1):", round(float(abs((caso - caso.mean()) / caso.std(ddof=1)).max()), 3))
+med = np.median(valores); mad = np.median(np.abs(valores - med))
+z_mod = 0.6745 * (valores - med) / mad
+print(f"mediana = {med}, MAD = {mad} -> z modificado del 30 = {z_mod[-1]:.2f}  (corte 3.5)")
+# 6 sigmas: ¿uno en un millón?
+print("P(|Z| > 2) =", round(2 * norm.sf(2), 4), "| P(|Z| > 3) =", round(2 * norm.sf(3), 4), "| P(|Z| > 6) =", f"{2 * norm.sf(6):.2e}")
+""")
+md("""
+El z modificado del 30 es **[[ricz.zmod30|2]]**: sí alerta. Sobre los «seis sigmas»: fuera de ±6σ queda ≈ 2 por mil millones; el «3.4 por millón» de la calidad industrial supone un desplazamiento de 1.5σ del proceso.
+
+### ✍️ Ejercicio A2
+¿Qué tamaño mínimo de muestra necesitas para que un valor pueda tener `|z| > 2.5`? Compruébalo con la cota.
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+print(next(k for k in range(2, 100) if (k - 1) / np.sqrt(k) > 2.5))
+""", "Con n = 8 el máximo es 2.47 (no alcanza 2.5) y con n = 9 es 2.67: hace falta n ≥ 9.")
+
+md("""
+### A3 · Mahalanobis sobre `puntos.csv` (20 min)
+`puntos.csv` trae 200 puntos simulados y correlacionados más 6 casos añadidos (ids 201 a 206). Primero se **estandariza** (el id no participa). Luego se calcula `D² = (x − m)ᵀ S⁻¹ (x − m)` y se compara con `χ²(p; 0.99)`; `mahalanobis()` de R también devuelve `D²`.
+""")
+code("""
+puntos = pd.read_csv(CARPETA / "puntos.csv")
+z = estandarizar(puntos[["x1", "x2"]])
+dist_m = mahal2(z)
+umbral_m = chi2.ppf(0.99, df=z.shape[1])
+alerta_m = dist_m > umbral_m
+print("Umbral de Mahalanobis al cuadrado:", round(umbral_m, 4))
+display(puntos.loc[alerta_m])
+for q in (0.90, 0.95, 0.99, 0.999):
+    print(f"χ²({q}) = {chi2.ppf(q, 2):.3f} -> {int((dist_m > chi2.ppf(q, 2)).sum())} alertas, ids {list(puntos.id[dist_m > chi2.ppf(q, 2)])}")
+print("¿Cambia si no estandarizamos? diferencia máxima de D²:", float(np.abs(dist_m - mahal2(puntos[["x1", "x2"]].to_numpy())).max()))
+plt.scatter(z[:, 0], z[:, 1], c=np.where(alerta_m, "firebrick", "steelblue"), s=20)
+plt.xlabel("x1 estandarizada"); plt.ylabel("x2 estandarizada"); plt.title("Mahalanobis: puntos marcados en rojo"); plt.show()
+""")
+md("""
+Resultado de las diapositivas 13 a 15: umbral **9.210**, **5 alertas** (ids 95, 201, 202, 203 y 205). Con 95 % hay [[maha.n_alertas.0.95]] alertas y con 90 %, [[maha.n_alertas.0.9]]. Puntos a notar:
+- El caso **95** es un punto simulado, no añadido: con 200 puntos normales se esperan ≈ 2 alertas al 99 %. Es una aproximación, **no una garantía de 1 % de falsas alertas**.
+- La **estandarización no cambia Mahalanobis** (diferencia ≈ 1e-14): corrige escala y correlación por sí misma. Sí importa para kNN, LOF y DBSCAN.
+- Cuenta de la diapositiva 14 (referencia hipotética con correlación 0.9): `D²(1, 1) = 1.053` y `D²(1, −1) = 20` aunque ambos están a la misma distancia euclidiana.
+
+### ✍️ Ejercicio A3
+Verifica con NumPy las dos cuentas de la diapositiva 14 usando `S = [[1, 0.9], [0.9, 1]]` y centro `(0, 0)`.
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+S = np.array([[1, 0.9], [0.9, 1]])
+for p in ([1, 1], [1, -1]):
+    p = np.array(p, float)
+    print(p, "D² =", round(float(p @ np.linalg.inv(S) @ p), 3), "| distancia euclidiana al cuadrado =", float(p @ p))
+""", "D²(1, 1) = 1.053 y D²(1, −1) = 20; la distancia euclidiana al cuadrado es 2 en ambos.")
+
+md("""
+### A4 · kNN: distancia al vecino k (15 min)
+Puntaje = distancia al **vecino k** (sin contar el propio punto). Con `k = 10` y corte en el **cuantil 95 %**. En scikit-learn, `kneighbors()` **sin pasar X** excluye al propio punto de entrenamiento. Ojo: un cuantil fija **cuántas** alertas habrá (≈ 5 %), no si son errores.
+""")
+code("""
+k = 10
+vecinos = NearestNeighbors(n_neighbors=k).fit(z)
+distancias, indices = vecinos.kneighbors()          # sin X: excluye al propio punto
+puntaje_knn = distancias[:, -1]
+umbral_knn = np.quantile(puntaje_knn, 0.95)
+alerta_knn = puntaje_knn > umbral_knn
+print(f"umbral (cuantil 95 %) = {umbral_knn:.4f} | alertas: {int(alerta_knn.sum())} de {len(z)} ({alerta_knn.mean():.1%})")
+display(puntos.loc[alerta_knn])
+plt.plot(np.sort(puntaje_knn), ".", color="steelblue"); plt.axhline(umbral_knn, color="firebrick", ls="--")
+plt.xlabel("observaciones ordenadas"); plt.ylabel("distancia al vecino 10"); plt.show()
+""")
+md("""
+**11 de 206** puntos superan el umbral **[[knn.umbral|3]]** (no 0.98 como se dijo en clase). El profesor explicó la idea con la **media** de las distancias, pero el script usa la **distancia al vecino k** (la máxima de las k).
+
+### ✍️ Ejercicio A4
+Repite con `k = 5` y `k = 20`: ¿cuántas alertas hay y cuántas coinciden con las de `k = 10`?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+base = set(puntos.id[alerta_knn])
+for kk in (5, 10, 20):
+    sc = NearestNeighbors(n_neighbors=kk).fit(z).kneighbors()[0][:, -1]
+    al = sc > np.quantile(sc, 0.95)
+    print(f"k = {kk}: {int(al.sum())} alertas, coinciden con k = 10: {len(base & set(puntos.id[al]))}")
+""", "Con el cuantil 95 % siempre hay 11 alertas (5.3 %); lo que cambia es **cuáles**: casi todas coinciden entre k = 5, 10 y 20.")
+
+md("""
+### A5 · LOF: densidad relativa (20 min)
+`reach(i, j) = max{d(i, j), k-dist(j)}`, `lrd(i) = 1 / promedio de reach` y `LOF(i) = promedio de lrd de los vecinos / lrd(i)`. Cerca de **1**: densidad parecida a la de su entorno; mucho mayor: menos densa. Primero a mano en una recta pequeña (para entender), luego con scikit-learn.
+""")
+code("""
+def lof_manual(x, k):
+    x = np.asarray(x, float)
+    D = np.abs(x[:, None] - x[None, :]); np.fill_diagonal(D, np.inf)
+    vec = np.argsort(D, axis=1, kind="stable")[:, :k]
+    kd = np.array([D[i, vec[i, -1]] for i in range(len(x))])
+    lrd = np.array([1 / np.mean([max(D[i, j], kd[j]) for j in vec[i]]) for i in range(len(x))])
+    return kd, lrd, np.array([np.mean(lrd[vec[i]]) / lrd[i] for i in range(len(x))])
+
+
+xs = [1, 2, 3, 4, 6, 15]
+kd, lrd, lof_m = lof_manual(xs, 2)
+lof_sk = -LocalOutlierFactor(n_neighbors=2).fit(np.array(xs)[:, None]).negative_outlier_factor_
+display(pd.DataFrame({"x": xs, "k-dist": kd, "lrd": lrd.round(3), "LOF a mano": lof_m.round(3), "LOF sklearn": lof_sk.round(3)}))
+# el ejemplo de la diapositiva 20: lrd(A) = 2 y vecinos con lrd 6, 5, 7
+print("LOF(A) =", np.mean([6, 5, 7]) / 2)
+""")
+code("""
+modelo_lof = LocalOutlierFactor(n_neighbors=k)
+modelo_lof.fit_predict(z)
+puntaje_lof = -modelo_lof.negative_outlier_factor_      # sklearn guarda el opuesto: cambiamos el signo
+alerta_lof = puntaje_lof > 1.5                           # corte ilustrativo, no universal
+print("alertas con LOF > 1.5 (k = 10):", int(alerta_lof.sum()), "ids", list(puntos.id[alerta_lof]))
+for kk in (3, 5, 10, 20, 30, 40):
+    s_ = -LocalOutlierFactor(n_neighbors=kk).fit(z).negative_outlier_factor_
+    print(f"k = {kk:2d}: {int((s_ > 1.5).sum()):2d} alertas | LOF del caso 206 = {s_[205]:.3f}")
+""")
+md("""
+**LOF compara con el entorno.** Con `k = 10` marca **10** puntos (diapositiva 24). Pero el corte 1.5 **no es universal**: con `k = 30` hay [[lof.cuenta_por_k.6]] alertas y el caso 206, que con `k = 10` vale [[lof.lof206_por_k.3|2]], llega a [[lof.lof206_por_k.6|2]] y pasa el corte. En R, `lof(z, minPts = k + 1)` (minPts incluye al propio punto) equivale a `n_neighbors = k`.
+
+### ✍️ Ejercicio A5
+Calcula con `lof_manual` el LOF del valor 9 en `[0, 1, 2, 3, 9]` con `k = 2` y compáralo con scikit-learn (es el Bloque 3 del cuaderno en papel).
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+v5 = [0, 1, 2, 3, 9]
+print("a mano:", lof_manual(v5, 2)[2].round(3))
+print("sklearn:", (-LocalOutlierFactor(n_neighbors=2).fit(np.array(v5)[:, None]).negative_outlier_factor_).round(3))
+""", "LOF(9) = 4.333: sus vecinos (3 y 2) tienen lrd 0.667 y él solo 0.154 (reach 6 y 7); los demás valen 1.")
+
+md("""
+### A6 · DBSCAN: ruido no significa error (15 min)
+Con `ε = 0.45` y `minPts = 6` (incluyendo al propio punto): un punto es **núcleo** si tiene al menos 6 puntos en su radio; **borde** si no lo es pero está cerca de un núcleo; **ruido** si no es ninguno. DBSCAN es un método de **agrupamiento** (no supervisado); sirve para detectar anomalías porque deja el ruido fuera. En scikit-learn el ruido es `-1`; en R, `0`.
+""")
+code("""
+epsilon, min_puntos = 0.45, 6
+db = DBSCAN(eps=epsilon, min_samples=min_puntos).fit(z)
+nucleo = np.zeros(len(z), bool); nucleo[db.core_sample_indices_] = True
+alerta_db = db.labels_ == -1
+borde = (db.labels_ >= 0) & ~nucleo
+print(f"núcleos: {nucleo.sum()} | bordes: {borde.sum()} | ruido: {alerta_db.sum()}")
+print(pd.Series(db.labels_).value_counts().sort_index().to_dict())
+kdist = np.sort(NearestNeighbors(n_neighbors=min_puntos - 1).fit(z).kneighbors()[0][:, -1])   # gráfico del vecino 5
+plt.plot(kdist); plt.axhline(epsilon, color="firebrick", ls="--"); plt.xlabel("observaciones ordenadas"); plt.ylabel("distancia al vecino 5"); plt.show()
+for e in (0.3, 0.45, 0.6, 0.8):
+    print(f"ε = {e}: ruido = {int((DBSCAN(eps=e, min_samples=min_puntos).fit(z).labels_ == -1).sum())}")
+""")
+md("""
+Resultado: **179 núcleos, 11 bordes y 16 de ruido** (una sola agrupación). El ruido cae de [[dbscan.ruido_por_eps.0.25]] puntos con ε = 0.25 a [[dbscan.ruido_por_eps.1]] con ε = 1: **elegir ε es una decisión**, y la diapositiva 23 aclara que no se importa el ε de otra escala. 11 de los 16 puntos de ruido son puntos simulados normales que quedaron en la cola.
+
+### ✍️ Ejercicio A6
+Con `ε = 0.45`, ¿cuántos puntos de ruido hay si `minPts = 10`? ¿Y cuántos de los seis casos añadidos?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+db10 = DBSCAN(eps=0.45, min_samples=10).fit(z)
+ruido10 = db10.labels_ == -1
+print("ruido con minPts = 10:", int(ruido10.sum()), "| casos añadidos en el ruido:", int(ruido10[200:].sum()), "de 6")
+""", "Con minPts = 10 hay 25 puntos de ruido y los seis casos añadidos (incluso el 206) quedan en el ruido: subir minPts exige más vecinos para ser núcleo y aumenta el ruido.")
+
+md("""
+### A7 · Coincidencias entre detectores y covarianza robusta (15 min)
+El profesor sugiere usar **varios métodos** y mirar dónde coinciden (diapositiva 25). Y la diapositiva 15 menciona que los extremos distorsionan la covarianza: una alternativa es estimarla de forma **robusta** (`MinCovDet`).
+""")
+code("""
+revision = pd.DataFrame({"ID": puntos["id"], "Mahalanobis": alerta_m, "kNN": alerta_knn, "LOF": alerta_lof, "DBSCAN": alerta_db})
+print(revision.drop(columns="ID").sum().to_dict())
+print(revision.tail(6).to_string(index=False))
+votos = revision.drop(columns="ID").sum(axis=1)
+print("puntos según cuántos métodos los marcan:", votos.value_counts().sort_index().to_dict())
+print("marcados por los cuatro:", list(puntos.id[votos == 4]))
+# covarianza clásica frente a robusta
+mcd = MinCovDet(random_state=0).fit(z)
+d_rob = mcd.mahalanobis(z)
+print("correlación con 200 puntos:", round(np.corrcoef(z[:200].T)[0, 1], 3), "| con los 206:", round(np.corrcoef(z.T)[0, 1], 3), "| MCD:", round(mcd.covariance_[0, 1] / np.sqrt(mcd.covariance_[0, 0] * mcd.covariance_[1, 1]), 3))
+print("D² del caso 204: clásica", round(dist_m[203], 2), "| robusta", round(d_rob[203], 2), "| umbral", round(umbral_m, 2))
+print("alertas robustas:", int((d_rob > umbral_m).sum()), list(puntos.id[d_rob > umbral_m]))
+""")
+md("""
+Concordancia (diapositiva 25): **201, 202, 203 y 205** los marcan los cuatro métodos; el **204** no lo marca Mahalanobis (D² = [[maha.d2_adic.3|2]], bajo 9.21); el **206 = (1.9, 1.9)** sigue la relación de la nube y **no** lo marca ninguno. Con la covarianza robusta el 204 sí alerta (D² = [[maha.d2_adic_mcd.3|1]]): los casos añadidos «enmascaran» a la covarianza clásica (la correlación baja de [[maha.corr_200|2]] a [[maha.corr_todos|2]]).
+
+### ✍️ Ejercicio A7
+¿Qué ids marcan **al menos tres** de los cuatro métodos? ¿Y cuáles solo uno? Comenta si los marcados por uno solo parecen errores.
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+print("al menos 3 métodos:", list(puntos.id[votos >= 3]))
+print("exactamente 1 método:", list(puntos.id[votos == 1]))
+""", "Al menos tres: 25, 95, 201–205. Solo uno: 2, 24, 37, 79, 118, 170, 181 y 196: son puntos simulados en las colas; una alerta de un solo método pide revisar contexto, no eliminar.")
+
+# ================================================================== PARTE B
+md("""
+## Parte B · Reconstrucción y aislamiento
+
+### B1 · PCA con canciones: Q y T² (20 min)
+`canciones.csv` tiene 197 canciones y 7 variables numéricas (el `id` queda fuera). Se estandariza, se ajusta el PCA y se **reconstruye** con las primeras `r = 5` componentes. `Q = Σ (z − ẑ)²` mide lo que no quedó representado; las canciones con mayor Q son combinaciones poco habituales. **No hay etiquetas**: no se calcula exactitud.
+""")
+code("""
+canciones = pd.read_csv(CARPETA / "canciones.csv")
+x_can = canciones.drop(columns="id")
+z_can = estandarizar(x_can)
+pca_c = PCA().fit(z_can)
+varianza = pca_c.explained_variance_ratio_
+print(pd.DataFrame({"Componente": range(1, 8), "Varianza": varianza.round(4), "Acumulada": np.cumsum(varianza).round(4)}).to_string(index=False))
+r = 5
+cargas = pca_c.components_[:r]
+proyeccion = z_can @ cargas.T
+reconstruccion = proyeccion @ cargas
+q_can = np.sum((z_can - reconstruccion) ** 2, axis=1)
+umbral_can = np.quantile(q_can, 0.95)
+alerta_can = q_can > umbral_can
+ranking = pd.DataFrame({"ID": canciones["id"], "Q": q_can, "Alerta": alerta_can}).sort_values("Q", ascending=False)
+print("umbral Q (cuantil 95 %):", round(umbral_can, 4))
+print(ranking.head(10).round(3).to_string(index=False))
+# T²: posición extrema DENTRO del subespacio retenido
+t2_can = np.sum(proyeccion ** 2 / pca_c.explained_variance_[:r], axis=1)
+print("mayores T²:", list(canciones.id.to_numpy()[np.argsort(-t2_can)[:5]]), "| correlación Q–T²:", round(np.corrcoef(q_can, t2_can)[0, 1], 3))
+q7 = np.sum((z_can - (z_can @ pca_c.components_.T) @ pca_c.components_) ** 2, axis=1)
+print("con r = 7, Q máximo:", float(q7.max()))
+""")
+md("""
+Reproduce la diapositiva 31 y 34: las 5 primeras componentes explican **[[pca.acum.4|4]]** (87.75 %), el corte de Q es **[[pca.umbral|3]]** y marca **10** canciones; las mayores son 133, 65, 109, 148 y **138** (el «38» de la transcripción). Q (con r = 7, prácticamente cero) y **T²** detectan cosas distintas: sus diez mayores no comparten ninguna canción (correlación [[pca.corr_q_t2|2]]). Una canción con instrumentalness extrema suele ser «extrema dentro del plano» (T²), no mal reconstruida (Q).
+
+### ✍️ Ejercicio B1
+Reconstruye con `r = 4` componentes. ¿Cuántas de las 5 mayores Q de `r = 5` siguen en las 5 mayores? ¿Qué te dice sobre elegir `r`?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+c4 = pca_c.components_[:4]
+q4 = np.sum((z_can - (z_can @ c4.T) @ c4) ** 2, axis=1)
+top5_r5 = set(canciones.id[np.argsort(-q_can)[:5]]); top5_r4 = set(canciones.id[np.argsort(-q4)[:5]])
+print("top 5 con r = 5:", sorted(top5_r5), "| con r = 4:", sorted(top5_r4), "| comunes:", sorted(top5_r5 & top5_r4))
+""", "Con r = 4 el top 5 cambia casi por completo (comparten 138, y no los demás): la lista de anómalas depende de r; por eso r se fija antes (aquí, ≥ 80 % de varianza) y se revisa su sensibilidad.")
+
+md("""
+### B2 · Isolation Forest: longitud de camino y puntaje (20 min)
+Cada árbol toma una **submuestra**, y en cada nodo elige una **variable** y un **corte uniforme al azar** en su rango; sigue hasta aislar. Los puntos extremos se aíslan con **pocos cortes**. El puntaje es `s = 2^(−E[h]/c(ψ))`, con `c(ψ)` la longitud media de un camino fallido. En scikit-learn, `score_samples = −s`. Se verifica la fórmula con los árboles de un modelo real.
+""")
+code("""
+m_demo = IsolationForest(n_estimators=100, max_samples=128, random_state=RS, n_jobs=1).fit(z)
+prof = np.zeros(len(z))
+for arbol, cols in zip(m_demo.estimators_, m_demo.estimators_features_):
+    hoja = arbol.apply(z[:, cols])
+    n_hoja = arbol.tree_.n_node_samples[hoja]
+    prof += arbol.decision_path(z[:, cols]).sum(axis=1).A1 - 1 + np.array([c_psi(int(n)) for n in n_hoja])   # profundidad + corrección de hoja
+h_medio = prof / len(m_demo.estimators_)
+s_formula = 2 ** (-h_medio / c_psi(m_demo.max_samples_))
+print("c(128) =", round(c_psi(128), 3), "| máxima diferencia con -score_samples:", float(np.abs(s_formula + m_demo.score_samples(z)).max()))
+orden = np.argsort(-s_formula)[:6]
+print(pd.DataFrame({"id": puntos.id.to_numpy()[orden], "E[h]": h_medio[orden].round(2), "s": s_formula[orden].round(3)}).to_string(index=False))
+print("camino medio de un punto central:", round(float(np.median(h_medio)), 2), "| s mínimo:", round(float(s_formula.min()), 3))
+# ejemplo de la diapositiva 38 (c hipotético = 8)
+print("h = 2, c = 8:", round(2 ** (-2 / 8), 3), "| h = 8, c = 8:", 2 ** (-8 / 8))
+""")
+md("""
+La diferencia con `score_samples` es del orden de 1e-16: **la fórmula es exacta**. Los casos 201, 203, 202 y 205 están entre los de mayor puntaje (caminos cortos), junto con el 95 y el 83. El ejemplo de la diapositiva 38 usa `c = 8` como número **hipotético**: con 256 registros por árbol, `c(256) =` [[iforest.c256|2]] y el mismo `h = 2` da `s =` [[iforest.s_h2_c256|3]]. Ese puntaje **no es una probabilidad**.
+
+### ✍️ Ejercicio B2
+Simula con 20 000 repeticiones los cortes uniformes sobre `[0, 1, 2, 3, 4, 5, 6, 20]`: ¿con qué frecuencia el primer corte aísla al 20? ¿Y al 0? (Bloque 4 del cuaderno en papel.)
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+rng = np.random.default_rng(RS)
+c = rng.uniform(0, 20, 20000)
+print("el 20 queda solo:", np.mean(c > 6).round(3), "(teórico 14/20 = 0.7) | el 0 queda solo:", np.mean(c < 1).round(3), "(teórico 1/20 = 0.05)")
+""", "≈ 0.70 y ≈ 0.05: un extremo lejano se aísla en un corte con alta probabilidad; un punto del borde del grupo, casi nunca. Por eso los extremos acumulan caminos cortos.")
+
+md("""
+### B3 · One-Class SVM (puente con la Clase 37) (10 min)
+El profesor mencionó al cierre que hay métodos con SVM. La **One-Class SVM** (Clase 37) aprende una **frontera** que encierra la región normal con un núcleo gaussiano; el parámetro `ν` es una cota para la fracción de alertas y de vectores soporte. No estaba en el script, pero comparte el flujo: **sin etiquetas**, estandarizar antes.
+""")
+code("""
+for nu in (0.02, 0.05, 0.10):
+    oc = OneClassSVM(nu=nu, gamma="scale").fit(z)
+    pr = oc.predict(z) == -1
+    print(f"ν = {nu}: {int(pr.sum())} alertas ({pr.mean():.1%}) | vectores soporte: {len(oc.support_)} ({len(oc.support_) / len(z):.1%}) | casos 201–206: {pr[200:].astype(int)}")
+""")
+md("""
+Con `ν = 0.05` marca [[ocsvm.por_nu.0.05.n]] puntos (los casos 201–205 y no el 206) y con `ν = 0.10`, [[ocsvm.por_nu.0.1.n]]. `ν` hace de **«contaminación» esperada**: más `ν`, más alertas (para `ν` muy pequeño el número de alertas no baja de ≈ 10, porque hay puntos justo sobre la frontera). La frontera depende de `γ` (aquí `"scale"`): es la misma intuición del núcleo gaussiano de la Clase 37.
+
+### ✍️ Ejercicio B3
+Cambia `gamma` a 0.05 y a 5 con `ν = 0.05`. ¿Qué pasa con la forma de la frontera (más suave o más ajustada) y con el número de alertas?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+for g in (0.05, 0.5, 5):
+    oc = OneClassSVM(nu=0.05, gamma=g).fit(z)
+    print(f"gamma = {g}: alertas = {int((oc.predict(z) == -1).sum())}, vectores soporte = {len(oc.support_)}")
+""", "γ pequeño → frontera suave (casi elíptica): 10 alertas y 11 vectores soporte con γ = 0.05; γ grande → frontera muy ajustada que rodea cada grupo local: 46 alertas y 81 vectores soporte con γ = 5. ν controla la fracción de alertas; γ, la flexibilidad.")
+
+# ================================================================== PARTE C
+md("""
+## Parte C · Cardio: evaluar con etiquetas disponibles
+
+### C1 · Partición y preparación sin fuga (15 min)
+`cardio.csv` tiene 1 831 registros (1 655 normales y 176 anomalías: **9.61 %**), 21 variables `v1`…`v21` y las columnas `id`, `conjunto` y `anomalia`, **que no son predictores**. La partición (70 % / 30 %) ya viene guardada en `conjunto`. Escala, componentes, bosque y corte se obtienen **solo con entrenamiento**; las etiquetas de prueba se consultan al evaluar. Es un benchmark, no una herramienta clínica.
+""")
+code("""
+cardio = pd.read_csv(CARPETA / "cardio.csv")
+variables = [f"v{j}" for j in range(1, 22)]
+entrenamiento = cardio[cardio["conjunto"] == "entrenamiento"]
+prueba = cardio[cardio["conjunto"] == "prueba"]
+assert len(entrenamiento) == 1281 and len(prueba) == 550
+print(pd.crosstab(cardio["conjunto"], cardio["anomalia"], margins=True))
+y_train, y_test = entrenamiento["anomalia"].to_numpy(), prueba["anomalia"].to_numpy()
+print(f"prevalencia: entrenamiento {y_train.mean():.2%} | prueba {y_test.mean():.2%} | todo el archivo {cardio.anomalia.mean():.2%}")
+# escala con entrenamiento (desviación muestral, como el profesor)
+centro, escala = entrenamiento[variables].mean(), entrenamiento[variables].std(ddof=1)
+z_train = ((entrenamiento[variables] - centro) / escala).to_numpy()
+z_test = ((prueba[variables] - centro) / escala).to_numpy()
+print("media de z_train ≈ 0:", float(np.abs(z_train.mean(axis=0)).max()) < 1e-12, "| media de z_test (no es 0, y está bien):", round(float(np.abs(z_test.mean(axis=0)).max()), 3))
+print("Referencia «todo normal»: exactitud =", round(float(np.mean(y_test == 0)), 4), "| sensibilidad = 0")
+""")
+md("""
+En la diapositiva 40 la cifra es **176 anomalías** (en clase se dijo «166»); entrenamiento tiene **1 159 normales y 122 anomalías**; prueba, **496 y 54**. Como el entrenamiento **no se filtra por etiqueta**, el detector se ajusta con un ≈ 9.5 % de anomalías (lo veremos en C6). Marcar todo como normal da **0.9018** de exactitud: esa es la referencia que hay que superar.
+
+### ✍️ Ejercicio C1
+Demuestra que usar la media y la desviación de **todo** el archivo (en vez de solo el entrenamiento) cambia los valores de `z_test`. ¿Por qué eso sería fuga?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+todo = cardio[variables]
+z_test_fuga = ((prueba[variables] - todo.mean()) / todo.std(ddof=1)).to_numpy()
+print("diferencia máxima de z_test:", round(float(np.abs(z_test_fuga - z_test).max()), 4))
+""", "Cambia hasta ≈ 1.1 unidades de z en los casos más extremos: usar el archivo completo mete información de la prueba en la escala. En un monitoreo real los datos nuevos ni siquiera existen al ajustar.")
+
+md("""
+### C2 · PCA con Q en cardio (15 min)
+Se retienen las primeras `r` componentes hasta explicar **al menos 80 %** (en entrenamiento), se reconstruye y `Q` se corta en el **cuantil 95 % de Q de entrenamiento**. Los mismos componentes y corte se aplican, sin cambios, a prueba.
+""")
+code("""
+pca_card = PCA().fit(z_train)
+acumulada = np.cumsum(pca_card.explained_variance_ratio_)
+r_cardio = int(np.argmax(acumulada >= 0.80) + 1)
+P_card = pca_card.components_[:r_cardio]
+q_train = np.sum((z_train - z_train @ P_card.T @ P_card) ** 2, axis=1)
+q_test = np.sum((z_test - z_test @ P_card.T @ P_card) ** 2, axis=1)
+umbral_pca = np.quantile(q_train, 0.95)
+clase_pca = (q_test > umbral_pca).astype(int)
+print("Componentes de cardio:", r_cardio, "| varianza acumulada:", round(float(acumulada[r_cardio - 1]), 4), "| Umbral Q:", round(float(umbral_pca), 4))
+res_pca = metricas(y_test, clase_pca, q_test)
+print({k: (round(v, 4) if isinstance(v, float) else v) for k, v in res_pca.items()})
+# versión con Pipeline: la escala se aprende dentro del ajuste (StandardScaler usa ddof=0: la Q cambia por una constante)
+pipe_pca = make_pipeline(StandardScaler(), PCA(n_components=r_cardio)).fit(entrenamiento[variables])
+def q_pipe(X):
+    Z = pipe_pca[0].transform(X)
+    return np.sum((Z - pipe_pca[1].inverse_transform(pipe_pca[1].transform(Z))) ** 2, axis=1)
+qp_tr, qp_te = q_pipe(entrenamiento[variables]), q_pipe(prueba[variables])
+clase_pipe = (qp_te > np.quantile(qp_tr, 0.95)).astype(int)
+print("Pipeline: mismas clases que el cálculo manual:", bool((clase_pipe == clase_pca).all()), "| AUC:", round(roc_auc_score(y_test, qp_te), 4))
+""")
+md("""
+Reproduce la diapositiva 42: **8 componentes** y `uQ ≈ 11.990`. En prueba: matriz `[[468, 28], [38, 16]]`, **exactitud 0.8800, sensibilidad 0.2963, precisión 0.3636, AUC 0.8503** (diapositiva 47). La exactitud queda **por debajo** de «todo normal» (0.9018). El `Pipeline` con `StandardScaler` (que divide por `n` en vez de `n − 1`) multiplica todas las Q por una constante: el orden y las clases no cambian.
+
+### ✍️ Ejercicio C2
+Calcula el AUC de Q para `r = 3, 5, 8, 12 y 16` componentes. ¿Es una curva monótona en `r`? ¿Qué implica para la regla del 80 %?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+for rr in (3, 5, 8, 12, 16):
+    Pm = pca_card.components_[:rr]
+    print(rr, round(roc_auc_score(y_test, np.sum((z_test - z_test @ Pm.T @ Pm) ** 2, axis=1)), 4))
+""", "Valores: 0.8426, 0.8540, 0.8503, 0.7254, 0.7252: no es monótona; con muchas componentes Q pierde poder (casi todo se reconstruye). El 80 % es una decisión docente fijada antes de mirar la prueba, no un óptimo.")
+
+md("""
+### C3 · Isolation Forest en cardio (15 min)
+`IsolationForest(n_estimators=300, max_samples=256, contamination="auto", random_state=2026)`. Se usa `−score_samples` para que **mayor = más anómalo** y el **cuantil 95 % de entrenamiento** como corte (no el corte de `predict()`). El `Pipeline` con `StandardScaler` aquí es opcional: los cortes aleatorios sobre cada variable no dependen de su escala.
+""")
+code("""
+modelo_if = IsolationForest(n_estimators=300, max_samples=256, contamination="auto", random_state=RS, n_jobs=1).fit(z_train)
+score_train, score_test = -modelo_if.score_samples(z_train), -modelo_if.score_samples(z_test)
+umbral_if = np.quantile(score_train, 0.95)
+clase_if = (score_test > umbral_if).astype(int)
+print("Umbral de Isolation Forest:", round(float(umbral_if), 4))
+res_if = metricas(y_test, clase_if, score_test)
+print({k: (round(v, 4) if isinstance(v, float) else v) for k, v in res_if.items()})
+# ¿importa la escala? el mismo bosque con las variables SIN estandarizar
+m_raw = IsolationForest(n_estimators=300, max_samples=256, random_state=RS, n_jobs=1).fit(entrenamiento[variables].to_numpy())
+print("puntajes idénticos sin estandarizar:", bool(np.allclose(-m_raw.score_samples(prueba[variables].to_numpy()), score_test)))
+# lo que haría predict(): corte automático en puntaje 0.5
+auto = modelo_if.predict(z_test) == -1
+print("predict() marca", int(auto.sum()), "casos de prueba (no 29) | offset_ =", modelo_if.offset_)
+""")
+md("""
+Reproduce la diapositiva 46: matriz `[[483, 13], [38, 16]]`, **exactitud 0.9073, sensibilidad 0.2963, precisión 0.5517, AUC 0.9072**, umbral **0.5291**. Detecta **16 de 54** anomalías (en clase se dijo «16 %»: es 16 casos, 29.6 %), y **13 de sus 29 alertas** son normales. Aunque la exactitud (0.9073) supera a «todo normal» (0.9018), **lo hace por 0.0055**. Y el corte automático de `predict()` marcaría 59 casos (sensibilidad 0.481), no 29.
+
+### ✍️ Ejercicio C3
+Construye el `Pipeline(StandardScaler(), IsolationForest(...))` y comprueba que da las mismas clases en prueba (con `StandardScaler` ajustado solo con entrenamiento).
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+pipe_if = make_pipeline(StandardScaler(), IsolationForest(n_estimators=300, max_samples=256, random_state=RS, n_jobs=1)).fit(entrenamiento[variables])
+s_tr = -pipe_if.score_samples(entrenamiento[variables]); s_te = -pipe_if.score_samples(prueba[variables])
+clase_p = (s_te > np.quantile(s_tr, 0.95)).astype(int)
+print("mismas clases:", bool((clase_p == clase_if).all()), "| AUC:", round(roc_auc_score(y_test, s_te), 4))
+""", "Mismas clases y mismo AUC: el bosque no depende de la escala; el Pipeline es una buena práctica para escalar sin fuga (y obligatoria con PCA, kNN, LOF o One-Class SVM).")
+
+md("""
+### C4 · Evaluación: matriz, ROC y precisión–recall (20 min)
+Con 9.8 % de anomalías, cada métrica cuenta algo distinto: la **exactitud** casi no supera a «todo normal»; la **ROC-AUC** evalúa el **orden** de los puntajes; la **precisión–recall** muestra cuánto cuesta cada nivel de sensibilidad frente a la **prevalencia** (el azar). Los puntajes **no son probabilidades**: no se calculan log loss ni Brier con ellos.
+""")
+code("""
+tabla = pd.DataFrame({"PCA (Q)": res_pca, "Isolation Forest": res_if}).T
+display(tabla.round(4))
+print("exactitud de «todo normal»:", round(float(np.mean(y_test == 0)), 4), "| prevalencia en prueba:", round(float(y_test.mean()), 4))
+fig, axs = plt.subplots(1, 2, figsize=(10, 3.8))
+for sc, nm in [(q_test, "PCA (Q)"), (score_test, "Isolation Forest")]:
+    fpr, tpr, _ = roc_curve(y_test, sc); axs[0].plot(fpr, tpr, label=f"{nm}: AUC {roc_auc_score(y_test, sc):.3f}")
+    pr, rc, _ = precision_recall_curve(y_test, sc); axs[1].plot(rc, pr, label=f"{nm}: AP {average_precision_score(y_test, sc):.3f}")
+axs[0].plot([0, 1], [0, 1], "k:"); axs[0].set(xlabel="tasa de falsos positivos", ylabel="sensibilidad", title="ROC")
+axs[1].axhline(y_test.mean(), color="k", ls=":"); axs[1].set(xlabel="sensibilidad", ylabel="precisión", title="Precisión–recall (línea: prevalencia)")
+axs[0].legend(); axs[1].legend(); plt.tight_layout(); plt.show()
+""")
+md("""
+El Isolation Forest tiene AUC **0.907** frente a **0.850** del PCA y AP **[[cardio.iff.ap|3]]** frente a **[[cardio.pca.ap|3]]** (la prevalencia es 0.098). Con el mismo corte del 95 %, ambos detectan **16** anomalías; el bosque lo hace con **menos falsas alertas** (13 frente a 28). Una AUC alta **no** implica que el cuantil 95 % detecte la mayoría: la sensibilidad de la tabla corresponde a un corte concreto.
+
+### ✍️ Ejercicio C4
+Calcula la **precisión en las 28 alertas con mayor puntaje** (el 5 % de la prueba) para el PCA y para el bosque. ¿Qué detector entrega más anomalías por cada 28 casos revisados?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+k_rev = int(round(0.05 * len(y_test)))
+for nombre, sc in [("PCA (Q)", q_test), ("Isolation Forest", score_test)]:
+    top = np.argsort(-sc)[:k_rev]
+    print(f"{nombre}: de {k_rev} casos revisados, {int(y_test[top].sum())} son anomalías (precisión {y_test[top].mean():.3f})")
+""", "Revisando 28 casos: PCA 12 anomalías (0.429); Isolation Forest 15 (0.536). Con capacidad de revisión fija, el bosque rinde más.")
+
+md("""
+### C5 · Efecto del corte y elección con validación (15 min)
+Un corte más alto da **menos alertas** y (aquí) menos sensibilidad; **el ranking no cambia**, de modo que el AUC tampoco. La tabla de la diapositiva 49 sirve para **ilustrar**; **no** se elige el corte con la prueba. Una forma honesta: **validación cruzada dentro del entrenamiento** (con etiquetas) para escoger el cuantil, y usar la prueba una vez.
+""")
+code("""
+cuantiles = [0.80, 0.85, 0.90, 0.95, 0.99]
+umbrales = np.quantile(score_train, cuantiles)
+filas = []
+for q_, u_ in zip(cuantiles, umbrales):
+    c_ = (score_test > u_).astype(int)
+    filas.append(dict(cuantil=q_, umbral=u_, alertas=int(c_.sum()), VP=int(((y_test == 1) & (c_ == 1)).sum()), sensibilidad=recall_score(y_test, c_), precision=precision_score(y_test, c_), F1=f1_score(y_test, c_)))
+display(pd.DataFrame(filas).round(4))
+# elección del cuantil con validación cruzada en ENTRENAMIENTO (el bosque se reajusta en cada pliegue)
+oof = np.zeros(len(z_train))
+for i, j in StratifiedKFold(5, shuffle=True, random_state=RS).split(z_train, y_train):
+    oof[j] = -IsolationForest(n_estimators=300, max_samples=256, random_state=RS, n_jobs=1).fit(z_train[i]).score_samples(z_train[j])
+f1_cv = {q_: f1_score(y_train, (oof > np.quantile(oof, q_)).astype(int)) for q_ in cuantiles}
+print("F1 por validación cruzada:", {k_: round(v, 3) for k_, v in f1_cv.items()})
+q_elegido = max(f1_cv, key=f1_cv.get)
+clase_elegida = (score_test > np.quantile(score_train, q_elegido)).astype(int)
+print("cuantil elegido:", q_elegido, "->", {k_: (round(v, 4) if isinstance(v, float) else v) for k_, v in metricas(y_test, clase_elegida, score_test).items()})
+""")
+md("""
+Reproduce la diapositiva 49: cuantil 90 % → umbral 0.4994, **59 alertas**, sensibilidad **26/54 = 0.4815** (en clase se dijo «0.815»); 95 % → 29 alertas y 0.2963; 99 % → 10 alertas y 0.1852. Con 5 % de alertas la sensibilidad **no puede superar** ≈ [[cardio.recall_max_5|2]] (28 de 54), porque hay 9.8 % de anomalías. Con validación cruzada (F1) se elige el cuantil **[[cardio.q_elegido|2]]**: en prueba sube la sensibilidad a [[cardio.elegido.recall|3]] a costa de la precisión ([[cardio.elegido.precision|3]]). **No hay un corte «correcto»**: depende de cuántas alertas se pueden revisar y de cuánto cuesta cada error (Clase 38).
+
+### ✍️ Ejercicio C5
+Si solo puedes revisar 30 casos de la prueba, ¿qué cuantil de entrenamiento usarías y qué sensibilidad esperas? ¿Se puede garantizar que habrá exactamente 30 alertas?
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+q_30 = 1 - 30 / len(y_test)
+c30 = (score_test > np.quantile(score_train, q_30)).astype(int)
+print(f"cuantil {q_30:.3f}: alertas reales = {int(c30.sum())}, sensibilidad = {recall_score(y_test, c30):.3f}")
+""", "Cuantil ≈ 0.945: aquí salen 30 alertas y la sensibilidad es 0.296, pero el cuantil de entrenamiento fija una fracción esperada, no un número exacto en prueba: para exactamente 30 se ordenan los puntajes de prueba y se toman los 30 mayores (top-k).")
+
+md("""
+### C6 · Robustez: semillas, componentes y entrenamiento contaminado (20 min)
+Tres comprobaciones que ayudan a **leer** la tabla de la diapositiva 47. (1) El bosque tiene componente aleatorio: ¿cuánto varía el resultado con la semilla? (2) El PCA depende de `r`. (3) El entrenamiento contiene ≈ 9.5 % de anomalías: ¿cuánto cuesta?
+""")
+code("""
+res_s = []
+for s_ in [RS, 0, 1, 2, 3, 4, 5, 6, 7, 8]:
+    m_ = IsolationForest(n_estimators=300, max_samples=256, random_state=s_, n_jobs=1).fit(z_train)
+    a_, b_ = -m_.score_samples(z_train), -m_.score_samples(z_test)
+    c_ = (b_ > np.quantile(a_, 0.95)).astype(int)
+    res_s.append(dict(semilla=s_, AUC=roc_auc_score(y_test, b_), sensibilidad=recall_score(y_test, c_), precision=precision_score(y_test, c_)))
+res_s = pd.DataFrame(res_s)
+display(res_s.round(4))
+print("AUC entre semillas: de", round(res_s.AUC.min(), 4), "a", round(res_s.AUC.max(), 4), "| R (isotree, diap. 47): 0.9220")
+# entrenamiento solo con casos normales (en una aplicación real no se conocen las etiquetas)
+m_norm = IsolationForest(n_estimators=300, max_samples=256, random_state=RS, n_jobs=1).fit(z_train[y_train == 0])
+s_norm = -m_norm.score_samples(z_test)
+print(f"entrenado con anomalías: AUC {roc_auc_score(y_test, score_test):.3f}, AP {average_precision_score(y_test, score_test):.3f} | solo normales: AUC {roc_auc_score(y_test, s_norm):.3f}, AP {average_precision_score(y_test, s_norm):.3f}")
+# T²: el complemento de Q
+t2_test = np.sum((z_test @ P_card.T) ** 2 / pca_card.explained_variance_[:r_cardio], axis=1)
+print("AUC de T²:", round(roc_auc_score(y_test, t2_test), 4), "| AUC de Q:", round(roc_auc_score(y_test, q_test), 4))
+""")
+md("""
+- **Semillas**: el AUC del bosque va de **[[robustez.auc_min|4]]** a **[[robustez.auc_max|4]]** con 10 semillas; el 0.9220 de R cae **dentro** de ese rango, así que la diferencia R–Python (diapositiva 47) no indica que un programa sea mejor. Y la misma semilla no genera los mismos cortes en ambos programas.
+- **Entrenamiento**: con solo casos normales el AUC sube a **[[robustez.auc_norm|3]]** y el AP a **[[robustez.ap_norm|3]]**. En la práctica no conocemos las etiquetas: por eso conviene revisar el entrenamiento y distinguir *detección de anomalías* (los datos de ajuste pueden estar contaminados) de *detección de novedades* (el ajuste solo tiene datos normales).
+- **T²** del PCA alcanza un AUC de **[[cardio.auc_t2|3]]**, mejor que Q ([[cardio.pca.auc|3]]): en cardio las anomalías son más «extremas dentro del plano» que «fuera del plano».
+
+### ✍️ Ejercicio C6
+¿Cambia el AUC si el bosque usa `max_samples=64` o `512` en vez de 256? ¿Y `n_estimators=50` o `1000`? Concluye si «300 y 256» son decisiones críticas.
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+for ne, ms in [(300, 64), (300, 256), (300, 512), (50, 256), (1000, 256)]:
+    m_ = IsolationForest(n_estimators=ne, max_samples=ms, random_state=RS, n_jobs=1).fit(z_train)
+    print(f"n_estimators = {ne:4d}, max_samples = {ms:3d}: AUC = {roc_auc_score(y_test, -m_.score_samples(z_test)):.4f}")
+""", "Los cambios están en la segunda cifra decimal (≈ 0.907–0.921): del mismo orden que la variación por semilla. 300 y 256 son valores razonables, no óptimos demostrados.")
+
+# ================================================================== PARTE D
+md("""
+## Parte D · Alertas y traducción
+
+### D1 · Alertas del material: qué conviene precisar (verificado con código) (15 min)
+
+| Dónde | Qué dice | Qué pasa realmente (verificado) |
+|---|---|---|
+| Clase / diap. 9 | el z no marca el 30 porque el extremo elevó la media y la desviación | Cierto pero incompleto: con n = 8, |z| ≤ 2.47; **no podía** marcarlo (A2). |
+| Clase | «cuartil 11.65 por los empates» y «la media pasa de 12.5 a 14.62» | Q1 = 11.75; la media sin el 30 es 12.43 (A1). |
+| Clase | «seis sigmas = 1 en un millón» | ±6σ deja ≈ 2 por mil millones; 3.4 por millón supone un desplazamiento de 1.5σ (A2). |
+| Clase | Mahalanobis «95 %: 4 bien, 1 mal» | Con 95 % hay 8 alertas (25, 83 y 95 naturales); con 99 %, 5 (A3). |
+| Clase | kNN «umbral ≈ 0.98» | Es 0.972; y el script usa la distancia al vecino k, no la media (A4). |
+| Clase | DBSCAN «método de clasificación» | Es agrupamiento no supervisado; «Bayescan / B-scan» = DBSCAN (A6). |
+| Diap. 13 y 15 | la estandarización antes de Mahalanobis | Es invariante a escala: no cambia D²; la covarianza clásica sí es sensible a extremos (A3, A7). |
+| Diap. 21 | LOF > 1.5 «ilustrativo» | Con k = 10, 10 alertas; con k = 30, 21; el caso 206 pasa a 1.51 (A5). |
+| Diap. 29 | Q no detecta extremos dentro del subespacio | Confirmado: los diez mayores Q y T² no comparten ninguno (B1). |
+| Clase | varianza acumulada «30, 40, 60, 70, 80, 81 %» y «canción 38» | 28.4, 45.9, 60.8, 75.5, 87.8 %; la canción es la 138 (B1). |
+| Clase | «166 anomalías», «sensibilidad de 16 %», «acuracia 0.9 en el PCA», «0.4994 → sensibilidad 0.815» | 176 anomalías; 16 de 54 = 29.6 %; 0.88; 26/54 = 0.4815 (C1–C5). |
+| Diap. 39 | contamination «determina el corte» | Solo fija el corte de `predict()`; «auto» marca 59 casos en prueba (C3). |
+| Diap. 47 | R 0.9220 frente a Python 0.9072 | Dentro de la variación por semilla de scikit-learn (C6). |
+| Diap. 41 | entrenamiento sin filtrar por etiqueta | Con solo normales el AUC sube de 0.907 a 0.943 (C6). |
+| Diap. 52 | «ROC-AUC para el ranking, PR si hay pocas anomalías» | Confirmado: AUC 0.907 pero AP 0.535 frente a 0.098 de línea base (C4). |
+
+**Transcripción con ruido**: «HIC / RIC / ÚRIC» = RIC (rango intercuartílico), «KNN / KNL» = kNN, «loft» = LOF, «Isosation / Presolation Forest» = Isolation Forest, «ESF» = IF, «camins» = K-means, «VWSS» = WSS, «ROCK» = ROC, «B-scan / debes / Bayescan» = DBSCAN. El recreo (1:05:53–1:26:21) quedó marcado en la transcripción.
+""")
+code("""
+# comprobaciones rápidas de la tabla
+print("max |z| con n = 8:", round((8 - 1) / np.sqrt(8), 3))
+print("media del vector sin el 30:", round(valores[:-1].mean(), 3))
+print("alertas Mahalanobis 95 % y 99 %:", int((dist_m > chi2.ppf(0.95, 2)).sum()), int((dist_m > chi2.ppf(0.99, 2)).sum()))
+print("umbral kNN:", round(float(umbral_knn), 3))
+print("varianza acumulada (%):", np.round(np.cumsum(varianza)[:5] * 100, 1))
+print("anomalías en cardio:", int(cardio.anomalia.sum()), "| sensibilidad IF:", round(res_if["sensibilidad"], 4), "| con cuantil 90 %:", round(float(recall_score(y_test, (score_test > np.quantile(score_train, 0.9)).astype(int))), 4))
+""")
+md("""
+### D2 · Tabla de correspondencia R ↔ Python (10 min)
+Los scripts del profesor (`anomalias.R` y `anomalias.py`) siguen el mismo flujo. Esta tabla ayuda a leer uno desde el otro:
+
+| Qué se hace | R | Python |
+|---|---|---|
+| Leer datos | `read.csv("puntos.csv")` | `pd.read_csv("puntos.csv")` |
+| Cuartiles | `quantile(v, c(0.25, 0.75))` | `np.quantile(v, [0.25, 0.75])` (misma interpolación lineal) |
+| RIC | `diff(cuartiles)` | `q3 - q1` |
+| Desviación muestral | `sd(v)` | `v.std(ddof=1)` (en NumPy el valor por defecto es `ddof=0`) |
+| Estandarizar | `scale(x)` | `(x - x.mean()) / x.std(ddof=1)` |
+| Mahalanobis (al cuadrado) | `mahalanobis(z, colMeans(z), cov(z))` | `np.sum((dif @ np.linalg.inv(S)) * dif, axis=1)` |
+| Corte χ² | `qchisq(0.99, df = ncol(z))` | `chi2.ppf(0.99, df=z.shape[1])` |
+| Distancia al vecino k | `dbscan::kNNdist(z, k = k)` | `NearestNeighbors(n_neighbors=k).fit(z).kneighbors()[0][:, -1]` (sin pasar `X`) |
+| LOF | `dbscan::lof(z, minPts = k + 1)` | `LocalOutlierFactor(n_neighbors=k)` y `-negative_outlier_factor_` |
+| DBSCAN | `dbscan(z, eps, minPts)`; ruido = `0` | `DBSCAN(eps, min_samples)`; ruido = `-1` |
+| PCA | `prcomp(z, center = FALSE, scale. = FALSE)` | `PCA().fit(z)` (`components_` son las cargas) |
+| Q | `rowSums((z - rec)^2)` | `np.sum((z - rec) ** 2, axis=1)` |
+| Isolation Forest | `isotree::isolation.forest(z, ndim = 1, ntrees = 300, sample_size = 256)` | `IsolationForest(n_estimators=300, max_samples=256)` |
+| Puntaje (alto = anómalo) | `predict(modelo, z, type = "score")` | `-modelo.score_samples(z)` |
+| Matriz de confusión | `table(Real = y, Predicha = clase)` | `confusion_matrix(y, clase, labels=[0, 1])` |
+| ROC y AUC | `pROC::roc(y, score, direction = "<")` | `roc_curve`, `roc_auc_score(y, score)` |
+| Semilla | `set.seed()` / `seed =` | `random_state=` |
+
+*Diferencias a recordar*: PCA y las distancias coinciden entre lenguajes; los **bosques** no (otra implementación y otra semilla), como muestra C6. En R, `minPts` de `lof` incluye al propio punto; en scikit-learn, `n_neighbors` no.
+
+### ✍️ Ejercicio D2
+Traduce a Python: `limites <- c(q[1] - 1.5 * ric, q[2] + 1.5 * ric); alerta <- v < limites[1] | v > limites[2]`.
+""")
+code("""
+# tu código aquí
+""")
+solution("""
+q = np.quantile(valores, [0.25, 0.75]); ric_ = q[1] - q[0]
+limites = (q[0] - 1.5 * ric_, q[1] + 1.5 * ric_)
+alerta = (valores < limites[0]) | (valores > limites[1])      # el operador | exige paréntesis
+print(limites, alerta)
+""", "En Python `|` y `&` se aplican elemento a elemento (como en R), pero hay que poner **paréntesis** en cada comparación por la precedencia de operadores.")
+
+# ================================================================== CIERRE
+md("""
+## Ejercicio de cierre (35 min, SIN mirar lo anterior)
+
+Eres analista y debes entregar una **lista de casos de cardio para revisar** con capacidad para **28 casos** (≈ 5 % de la prueba). Usa la partición del profesor (`z_train`, `y_train`, `z_test`, `y_test`) y responde con código:
+
+1. **Plan previo**: escribe en un comentario el criterio para comparar detectores y para fijar el corte, **antes** de calcular nada.
+2. **Candidatos**: PCA con Q (r = 8), PCA con T², distancia de Mahalanobis (con `np.linalg.pinv`), One-Class SVM (`ν = 0.05`) e Isolation Forest, todos ajustados con entrenamiento. Para cada uno calcula AUC y AP en prueba.
+3. **Capacidad de revisión**: precisión entre los 28 casos de mayor puntaje de cada detector. ¿Cuál entrega más anomalías?
+4. **Elección y reporte**: elige un detector con una regla fijada en el punto 1 y reporta la matriz de confusión de sus 28 alertas.
+5. **Sin código**: una frase para la dirección. ¿Qué dos advertencias agregarías (benchmark, entrenamiento con anomalías, estabilidad por semilla, la lista exige revisión humana)?
+""")
+code("""
+# tu código aquí
+""")
+md("""
+✍️ **Mi recomendación y mis advertencias:**
+
+""")
+solution("""
+# 1) plan previo: comparar por AP (referencia: prevalencia 0.098) y por precisión en el top 28; elegir el mayor AP; corte = los 28 mayores (capacidad de revisión)
+# 2) candidatos (todos ajustados con entrenamiento)
+q_c = np.sum((z_test - z_test @ P_card.T @ P_card) ** 2, axis=1)
+t2_c = np.sum((z_test @ P_card.T) ** 2 / pca_card.explained_variance_[:r_cardio], axis=1)
+S_inv = np.linalg.pinv(np.cov(z_train, rowvar=False))
+mah_c = np.sum(z_test @ S_inv * z_test, axis=1)
+oc_c = -OneClassSVM(nu=0.05, gamma="scale").fit(z_train).score_samples(z_test)
+cands = {"PCA (Q)": q_c, "PCA (T²)": t2_c, "Mahalanobis": mah_c, "One-Class SVM": oc_c, "Isolation Forest": score_test}
+k_rev = 28
+filas = []
+for nombre, sc in cands.items():
+    top = np.argsort(-sc)[:k_rev]
+    filas.append(dict(detector=nombre, AUC=roc_auc_score(y_test, sc), AP=average_precision_score(y_test, sc), anomalias_en_top28=int(y_test[top].sum()), precision_top28=y_test[top].mean()))
+res_c = pd.DataFrame(filas).round(4)
+display(res_c)
+# 4) elección: mayor AP con empate en el top 28 -> el de mayor AUC
+mejor = res_c.sort_values(["AP", "AUC"], ascending=False).iloc[0].detector
+top = np.argsort(-cands[mejor])[:k_rev]
+clase_top = np.zeros(len(y_test), int); clase_top[top] = 1
+print("elegido:", mejor)
+print(confusion_matrix(y_test, clase_top, labels=[0, 1]))
+""", "Ver «Resultado de referencia» en la celda siguiente.")
+md("""
+**Resultado de referencia**: (2–3) AUC / AP / anomalías en el top 28: PCA (Q) 0.850 / 0.347 / 12; PCA (T²) 0.918 / 0.516 / 15; Mahalanobis 0.890 / 0.476 / 13; One-Class SVM 0.851 / 0.386 / 13; **Isolation Forest 0.907 / 0.535 / 15**. (4) Se elige el Isolation Forest (mayor AP): en sus 28 alertas hay 15 anomalías y 13 casos normales (se pierden 39 de 54). (5) **Recomendación**: «con capacidad de revisar 28 casos, el Isolation Forest entrega unas 15 anomalías de cada 28 (54 % de acierto, 5.5 veces la prevalencia)». Advertencias: es un **benchmark**, no una herramienta clínica, y el ajuste usa un entrenamiento con ≈ 9.5 % de anomalías; la diferencia entre el bosque, T² y Mahalanobis es del orden de la **variación por semilla** y del tamaño de la prueba (54 anomalías), así que no hay evidencia de superioridad estable; cada alerta exige **revisión humana**.
+""")
+
+# ---------------------------------------------------------------- autoevaluación
+md("""
+## Autoevaluación (responde sin mirar)
+
+1. ¿Qué diferencia hay entre una anomalía global, una contextual y una conjunta? Da un ejemplo de cada una.
+2. ¿Por qué el z de 30 no supera 3 en el ejemplo de la clase? ¿Qué n necesitas para poder superar 3?
+3. ¿Qué mide Mahalanobis que no mide la distancia euclidiana? ¿Por qué estandarizar antes no lo cambia?
+4. ¿Qué compara LOF y en qué situación supera a kNN?
+5. ¿Qué son un punto núcleo, uno de borde y uno de ruido en DBSCAN? ¿Qué decide ε?
+6. ¿Qué mide Q en un PCA, qué mide T² y por qué se necesitan ambos?
+7. ¿Por qué un punto extremo se aísla con pocos cortes en un Isolation Forest? ¿Qué significa s = 0.5?
+8. ¿Qué hace `contamination` en scikit-learn y qué corte usamos en la clase?
+9. ¿Por qué la exactitud engaña en cardio y qué comparas con ella?
+10. ¿Por qué no se elige el corte con la prueba y qué alternativas hay?
+11. ¿Qué haces con una alerta antes de eliminar el dato?
+
+<details><summary><b>Respuestas</b></summary>
+
+1. Global: un monto muy alejado de todos; contextual: un consumo normal de día que es inusual de madrugada; conjunta: valores individuales comunes cuya combinación es poco frecuente (temperatura y presión que no corresponden entre sí).
+2. Porque con 8 datos |z| ≤ (n − 1)/√n = 2.47; el extremo infla la media y la desviación. Hace falta n ≥ 11.
+3. La covarianza: pondera por varianzas y correlaciones; un punto contrario a la correlación queda lejos aunque sus coordenadas sean moderadas. Es invariante a escalas (transformaciones lineales).
+4. La densidad de un punto frente a la de sus vecinos (≈ 1 normal; mucho mayor, menos densa que su entorno). Supera a kNN cuando hay zonas con densidades distintas.
+5. Núcleo: al menos minPts puntos (incluido él) en el radio ε; borde: no es núcleo pero está en el radio de un núcleo; ruido: ninguno de los dos. ε define el radio de «cercanía».
+6. Q es el error de reconstrucción (fuera del subespacio retenido); T² es la posición extrema dentro del subespacio (Σ t²/λ). Un punto puede ser extremo con Q = 0 (T² lo ve) o raro con T² pequeño (Q lo ve).
+7. Porque los cortes uniformes al azar lo separan rápido del grupo; s = 2^(−E[h]/c(ψ)) vale 0.5 si el camino medio es c(ψ) (caso típico) y se acerca a 1 con caminos muy cortos. No es una probabilidad.
+8. Solo fija el corte de `predict()` (el cuantil de los puntajes de entrenamiento; «auto» = −0.5). En la clase se usa el cuantil 95 % de los puntajes de entrenamiento.
+9. Porque «todo normal» ya acierta 90.18 %; se compara con esa referencia, con la prevalencia y se mira sensibilidad, precisión y PR.
+10. Porque la prueba debe medir el resultado final sin haber influido en él. Se usa validación cruzada en entrenamiento, costos o la capacidad de revisión.
+11. Verifica unidades, duplicados y faltantes; consulta el contexto; distingue un error corregible de un evento real; compara con y sin el caso; registra la decisión.
+</details>
+
+---
+✍️ **Mis notas de hoy** (qué entendí, qué me costó, qué preguntaría en clase):
+
+-
+
+---
+**Próximas sesiones:** el taller del curso. Revisa `Guias/apuntes/C41_Ejercicios_Cuaderno_Anomalias.pdf` si quedó algo pendiente de practicar a mano.
+""")
+
+nb = {"cells": cells,
+      "metadata": {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"}, "language_info": {"name": "python"}},
+      "nbformat": 4, "nbformat_minor": 5}
+OUT.parent.mkdir(exist_ok=True)
+OUT.write_text(json.dumps(nb, ensure_ascii=False, indent=1), encoding="utf-8")
+print("Notebook:", OUT, "| celdas:", len(cells))

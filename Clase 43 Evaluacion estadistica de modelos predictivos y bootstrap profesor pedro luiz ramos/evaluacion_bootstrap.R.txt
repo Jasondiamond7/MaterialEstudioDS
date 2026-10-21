@@ -1,0 +1,158 @@
+# Evaluacion estadistica y bootstrap - Pedro Luiz Ramos
+# Instalar una vez: install.packages("pROC")
+library(pROC)
+
+# 1. Datos de las clases anteriores --------------------------------------
+datos <- read.csv("D:/Aulas_Diplomado/Aula/wisconsin.csv")
+entrenamiento <- subset(datos, conjunto == "entrenamiento")
+prueba <- subset(datos, conjunto == "prueba")
+print(table(datos$conjunto, datos$maligno))
+
+# La prueba ya fue revisada en clase. Este ejercicio es una demostracion.
+# id, conjunto y fold no son variables del modelo.
+
+# 2. Tres logisticas sin penalizacion: comparar AIC y BIC -----------------
+modelo_simple <- glm(maligno ~ radio + textura,
+                     data = entrenamiento, family = binomial)
+modelo_intermedio <- glm(maligno ~ radio + textura + suavidad,
+                         data = entrenamiento, family = binomial)
+modelo_amplio <- glm(maligno ~ radio + textura + suavidad + concavidad,
+                     data = entrenamiento, family = binomial)
+tabla_aic <- AIC(modelo_simple, modelo_intermedio, modelo_amplio)
+tabla_bic <- BIC(modelo_simple, modelo_intermedio, modelo_amplio)
+criterios <- data.frame(
+  Modelo = c("Simple", "Intermedio", "Amplio"),
+  Parametros = tabla_aic$df,
+  AIC = tabla_aic$AIC,
+  BIC = tabla_bic$BIC
+)
+print(criterios, digits = 6, row.names = FALSE)
+
+# AIC y BIC se calculan con los mismos 398 casos de entrenamiento.
+# BIC cambia la penalizacion 2*p por log(n)*p. En ambos, menor es mejor.
+
+# 3. Predicciones de los modelos simple y amplio -------------------------
+p_simple <- predict(modelo_simple, newdata = prueba, type = "response")
+p_amplio <- predict(modelo_amplio, newdata = prueba, type = "response")
+y <- prueba$maligno
+umbral <- 0.5
+
+calcular_auc <- function(y, p) {
+  curva <- roc(y, p, levels = c(0, 1), direction = "<", quiet = TRUE)
+  as.numeric(auc(curva))
+}
+
+calcular_logloss <- function(y, p) {
+  # Este recorte evita log(0) por redondeo numerico.
+  p <- pmax(pmin(p, 1 - 1e-15), 1e-15)
+  -mean(y * log(p) + (1 - y) * log1p(-p))
+}
+
+comparacion <- data.frame(
+  Modelo = c("Simple", "Amplio"),
+  AUC = c(calcular_auc(y, p_simple), calcular_auc(y, p_amplio)),
+  LogLoss = c(calcular_logloss(y, p_simple), calcular_logloss(y, p_amplio)),
+  Exactitud = c(mean((p_simple >= umbral) == y),
+                mean((p_amplio >= umbral) == y)),
+  Sensibilidad = c(mean(p_simple[y == 1] >= umbral),
+                   mean(p_amplio[y == 1] >= umbral))
+)
+print(comparacion, digits = 4, row.names = FALSE)
+
+# 4. Bootstrap de una media: muestrear con reposicion ---------------------
+valores <- c(2, 4, 5, 7, 8)
+B <- 2000
+set.seed(20261012)
+medias_boot <- numeric(B)
+for (b in 1:B) {
+  muestra <- sample(valores, size = length(valores), replace = TRUE)
+  medias_boot[b] <- mean(muestra)
+}
+cat("Media:", mean(valores), "Error estandar bootstrap:", sd(medias_boot), "\n")
+print(quantile(medias_boot, c(0.025, 0.975)))
+hist(medias_boot, breaks = 20, col = "lightblue",
+     main = "Bootstrap de la media", xlab = "Media de la remuestra")
+abline(v = mean(valores), col = "firebrick", lwd = 2)
+
+# 5. Log loss: remuestrear filas de prueba, sin ajustar de nuevo ----------
+# Las probabilidades de prueba quedan fijas. No repetimos glm() ni predict().
+n <- length(y)
+set.seed(20261013)
+logloss_boot <- matrix(NA_real_, nrow = B, ncol = 2)
+colnames(logloss_boot) <- c("Simple", "Amplio")
+for (b in 1:B) {
+  indices <- sample(1:n, size = n, replace = TRUE)
+  logloss_boot[b, 1] <- calcular_logloss(y[indices], p_simple[indices])
+  logloss_boot[b, 2] <- calcular_logloss(y[indices], p_amplio[indices])
+}
+ic_logloss <- apply(logloss_boot, 2, quantile, probs = c(0.025, 0.975))
+print(ic_logloss)
+hist(logloss_boot[, 2], breaks = 25, col = "lightblue",
+     main = "Log loss: modelo amplio", xlab = "Log loss de la remuestra")
+abline(v = ic_logloss[, 2], col = "firebrick", lty = 2)
+
+# 6. AUC: bootstrap de prueba dentro de cada clase -----------------------
+# Sorteamos 107 benignos y 64 malignos con reposicion; ambos modelos usan los mismos IDs.
+negativos <- which(y == 0)
+positivos <- which(y == 1)
+set.seed(20261017)
+auc_boot <- matrix(NA_real_, nrow = B, ncol = 2)
+colnames(auc_boot) <- c("Simple", "Amplio")
+for (b in 1:B) {
+  i0 <- sample(negativos, length(negativos), replace = TRUE)
+  i1 <- sample(positivos, length(positivos), replace = TRUE)
+  i <- c(i0, i1)
+  auc_boot[b, 1] <- calcular_auc(y[i], p_simple[i])
+  auc_boot[b, 2] <- calcular_auc(y[i], p_amplio[i])
+}
+ic_auc <- apply(auc_boot, 2, quantile, probs = c(0.025, 0.975))
+print(ic_auc)
+hist(auc_boot[, 2], breaks = 25, col = "lightblue",
+     main = "AUC: modelo amplio", xlab = "AUC de la remuestra de prueba")
+abline(v = ic_auc[, 2], col = "firebrick", lty = 2)
+
+# No entrenamos nuevamente. Este IC estudia la evaluacion de los modelos ya ajustados.
+
+# 7. Comparacion pareada: los dos modelos ven los mismos casos -----------
+delta_logloss <- logloss_boot[, 1] - logloss_boot[, 2]
+delta_auc <- auc_boot[, 2] - auc_boot[, 1]
+
+# Positivo favorece al amplio: menor log loss o mayor AUC.
+diferencias <- data.frame(
+  Metrica = c("Log loss simple - amplio", "AUC amplio - simple"),
+  Diferencia = c(comparacion$LogLoss[1] - comparacion$LogLoss[2],
+                 comparacion$AUC[2] - comparacion$AUC[1]),
+  Inferior = c(quantile(delta_logloss, 0.025), quantile(delta_auc, 0.025)),
+  Superior = c(quantile(delta_logloss, 0.975), quantile(delta_auc, 0.975))
+)
+print(diferencias, digits = 4, row.names = FALSE)
+hist(delta_logloss, breaks = 25, col = "lightblue",
+     main = "Diferencia pareada de log loss", xlab = "Log loss simple - amplio")
+abline(v = 0, col = "firebrick", lwd = 2)
+abline(v = quantile(delta_logloss, c(0.025, 0.975)), col = "darkgreen", lty = 2)
+hist(delta_auc, breaks = 25, col = "lightblue",
+     main = "Diferencia pareada de AUC", xlab = "AUC amplio - simple")
+abline(v = 0, col = "firebrick", lwd = 2)
+abline(v = quantile(delta_auc, c(0.025, 0.975)), col = "darkgreen", lty = 2)
+
+# Los intervalos usan modelos ya ajustados. No incluyen la variacion del entrenamiento.
+# No elegimos nuevamente el modelo ni el umbral mirando esta prueba.
+
+# 8. Ejemplo numerico de regresion: MAE y RMSE ---------------------------
+# Predicciones hipoteticas y fijas para cinco casos; no ajustamos otro modelo.
+observado <- c(10, 20, 30, 40, 50)
+predicho <- c(9, 22, 27, 44, 45)
+errores <- observado - predicho
+cat("MAE:", mean(abs(errores)), "RMSE:", sqrt(mean(errores^2)), "\n")
+
+set.seed(20261014)
+regresion_boot <- matrix(NA_real_, nrow = B, ncol = 2)
+colnames(regresion_boot) <- c("MAE", "RMSE")
+for (b in 1:B) {
+  indices <- sample(1:length(observado), length(observado), replace = TRUE)
+  errores_b <- observado[indices] - predicho[indices]
+  regresion_boot[b, 1] <- mean(abs(errores_b))
+  regresion_boot[b, 2] <- sqrt(mean(errores_b^2))
+}
+print(apply(regresion_boot, 2, quantile, probs = c(0.025, 0.975)))
+# Recalculamos la raiz en cada remuestra. Con cinco casos, el IC es ilustrativo.
