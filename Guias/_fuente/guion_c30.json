@@ -1,0 +1,391 @@
+{
+  "clase": "Clase 30",
+  "titulo": "Preparación para Machine Learning",
+  "subtitulo": "Variables, datos y validación",
+  "profesora": "Profesora Laura Sánchez",
+  "pie": "Clase 30 · Diplomado Data Science UC 2026",
+  "voz": "es-MX-DaliaNeural",
+  "rate": "-5%",
+  "capitulos": [
+    {
+      "titulo": "Introducción",
+      "escenas": [
+        {
+          "kind": "title",
+          "title": "Preparación para Machine Learning",
+          "bullets": [
+            "Variables, datos y validación",
+            "Clase 30 · Profesora Laura Sánchez",
+            "Video de estudio resumido"
+          ],
+          "figure": null,
+          "narration": "Hola. Este es un video de estudio de la clase treinta, preparación para Machine Learning: variables, datos y validación. Va en el mismo orden que tu guía y tus apuntes. Te recomiendo verlo con la guía al lado, pausar cuando algo no quede claro, y volver a mirar los ejemplos con números."
+        },
+        {
+          "title": "La gran idea de la clase",
+          "bullets": [
+            "Un modelo se juzga con datos que nunca vio",
+            "Hay reglas del juego antes de cualquier algoritmo",
+            "Pregunta guía: ¿aprendió o solo memorizó?"
+          ],
+          "figure": null,
+          "narration": "Empecemos por la idea central. En Machine Learning, un modelo no se juzga por lo bien que responde a los datos con los que aprendió, sino por cómo se comporta con datos que nunca vio. Piensa en un estudiante que se aprende de memoria las respuestas de un examen de práctica. Si el examen real trae otras preguntas, le va mal, porque memorizó y no aprendió. La pregunta guía de toda la clase es justamente esa: ¿cómo sé que mi modelo aprendió y no solo memorizó? Para poder responderla, hay reglas del juego que se aplican antes de elegir cualquier algoritmo."
+        },
+        {
+          "title": "El camino de los datos",
+          "bullets": [
+            "Variables → calidad e imputación",
+            "Entrenamiento / validación / prueba",
+            "Ridge y Lasso, K-Fold, estratificación",
+            "Métricas y fuga de datos"
+          ],
+          "figure": "Guias/_fuente/img/c30_esquema.png",
+          "narration": "Este esquema es el mapa de la clase. Primero conocemos el tipo de cada variable y revisamos la calidad de los datos. Después los dividimos en entrenamiento, validación y prueba. Luego vemos Ridge y Lasso, que son formas de regularizar un modelo, y por qué hay que estandarizar. Más adelante, la validación cruzada K-Fold y la estratificación. Y cerramos con las métricas y con la fuga de datos, que es el error más común. Los datos de la clase son trescientas viviendas simuladas, con su precio en pesos chilenos, y dos mil casos de fraude simulados, donde cinco por ciento son fraudes."
+        }
+      ]
+    },
+    {
+      "titulo": "Tipos de variables",
+      "escenas": [
+        {
+          "title": "Numéricas y categóricas",
+          "bullets": [
+            "Numérica: se suma y se promedia",
+            "Continua (superficie) o discreta (n.º de hijos)",
+            "Categórica: etiquetas",
+            "Nominal (región) u ordinal (básico, medio, alto)"
+          ],
+          "figure": null,
+          "narration": "Primer paso: saber qué tipo es cada variable, porque de eso depende todo lo demás. Una variable numérica es aquella que se puede sumar y promediar. Si puede tomar cualquier valor, como la superficie de una casa, es continua. Si solo toma valores enteros, como el número de hijos, es discreta. Una variable categórica, en cambio, son etiquetas. Si las etiquetas no tienen orden, como la región, es nominal. Y si tienen un orden natural, como nivel de estudios básico, medio y superior, es ordinal. Para recordar: si tiene sentido promediarla, es numérica; si son nombres o niveles, es categórica."
+        },
+        {
+          "title": "One-hot: categorías a números",
+          "bullets": [
+            "Los modelos solo reciben números",
+            "One-hot: una columna 0/1 por categoría",
+            "region → region_Norte, region_Sur, region_Este",
+            "Cliente del Sur = (0, 1, 0)"
+          ],
+          "figure": null,
+          "narration": "Aquí hay un problema: los modelos solo entienden números, así que no podemos entregarles la palabra Sur. La solución más usada se llama one-hot, que significa una columna por categoría. Con la región, se crean tres columnas: región Norte, región Sur y región Este. Cada una vale uno si el cliente pertenece a esa región y cero si no. Así, un cliente del Sur queda como cero, uno, cero. Es como una fila de interruptores donde solo uno está encendido. En pandas se hace con get dummies. Para recordar: one-hot convierte cada categoría en su propia columna de ceros y unos."
+        }
+      ]
+    },
+    {
+      "titulo": "Calidad de datos e imputación",
+      "escenas": [
+        {
+          "title": "Las cuatro dimensiones de calidad",
+          "bullets": [
+            "Exactitud: ¿refleja la realidad?",
+            "Completitud: ¿faltan datos?",
+            "Coherencia: ¿las fuentes concuerdan?",
+            "Frescura: ¿está vigente?"
+          ],
+          "figure": null,
+          "narration": "Antes de modelar hay que preguntarse si los datos son confiables. La clase propone cuatro dimensiones de calidad. La exactitud pregunta si el dato refleja la realidad. La completitud, si faltan datos. La coherencia, si las distintas fuentes concuerdan entre sí. Y la frescura, si el dato sigue vigente. Pueden fallar varias a la vez. Y hay una idea importante: los sesgos que hay en los datos se convierten en sesgos del modelo. Un buen modelo no repara datos malos. Para recordar: la calidad del modelo no puede superar la calidad de sus datos."
+        },
+        {
+          "title": "Imputar: completar lo que falta",
+          "bullets": [
+            "Simétrica y sin atípicos: media",
+            "Con atípicos o asimetría: mediana",
+            "Categórica: moda",
+            "Si falta un tercio: no se imputa"
+          ],
+          "figure": "Guias/_fuente/img/c30_calidad.png",
+          "narration": "Cuando falta un dato, se puede completar con un estadístico. A eso se le llama imputar. Si la variable es simétrica y sin valores extremos, se usa la media. Si tiene atípicos, que son valores muy alejados del resto, o es asimétrica, se usa la mediana, que es el valor central. Si la variable es categórica, se usa la moda, que es la categoría que más se repite. Y si falta un tercio de los datos, no se imputa: se revisa cómo se recogieron. En las viviendas de la clase, la antigüedad tiene veinte faltantes de trescientas filas, es decir seis coma siete por ciento."
+        },
+        {
+          "title": "Ejemplo: seis clientes, un ingreso faltante",
+          "bullets": [
+            "Ingresos (M CLP): 1.2, 1.4, 1.5, 1.6, 9.0",
+            "Media de los 5 observados = 2.94",
+            "Mediana = 1.5",
+            "Moda de región: Sur (3 de 5)"
+          ],
+          "figure": null,
+          "narration": "Veamos números. Tenemos seis clientes y a uno le falta el ingreso. Los cinco que conocemos ganan, en millones de pesos: uno coma dos, uno coma cuatro, uno coma cinco, uno coma seis y nueve. La media es dos coma noventa y cuatro, pero la mediana, el valor del medio, es uno coma cinco. Fíjate: ese nueve empuja la media a más del doble de lo que gana la mayoría, así que aquí la mediana representa mejor al cliente típico. Para la región, con Norte, Sur, Sur, Este, Sur, la moda es Sur, tres de cinco veces. Dos advertencias: imputar con la media deja la variable menos variable, porque todos los rellenos caen en el mismo valor. Y la media o la mediana se aprenden solo con el entrenamiento; si no, hay fuga de datos, que veremos al final."
+        }
+      ]
+    },
+    {
+      "titulo": "Entrenamiento, validación y prueba",
+      "escenas": [
+        {
+          "title": "Tres conjuntos, tres roles",
+          "bullets": [
+            "Entrenamiento: el modelo aprende",
+            "Validación: tú eliges (alpha, profundidad)",
+            "Prueba: veredicto final, una sola vez"
+          ],
+          "figure": null,
+          "narration": "Ahora, la división de los datos. Se separan en tres conjuntos, y cada uno tiene un papel distinto. El de entrenamiento es donde el modelo aprende sus parámetros. El de validación sirve para que tú compares alternativas, por ejemplo qué valor de alfa usar, qué profundidad darle a un árbol, o qué modelo escoger. Y el de prueba se reserva hasta el final, se mira una sola vez y solo para informar el resultado del modelo ya elegido. Imagina una escuela: el entrenamiento son las clases, la validación son los ensayos que te sirven para decidir cómo estudiar, y la prueba es el examen final. Si miras el examen final antes de decidir cómo estudiar, ya no mide nada."
+        },
+        {
+          "title": "La división de la clase",
+          "bullets": [
+            "300 viviendas",
+            "70 %: 210 para entrenamiento",
+            "30 % restante: 90 → 45 validación y 45 prueba",
+            "Dos llamadas a train_test_split"
+          ],
+          "figure": "Guias/_fuente/img/c30_division.png",
+          "narration": "En la clase se usó una división de setenta, quince y quince por ciento. Con trescientas viviendas, el setenta por ciento son doscientas diez para entrenamiento. Quedan noventa, que se parten a la mitad: cuarenta y cinco para validación y cuarenta y cinco para prueba. Se hace con dos llamadas a la función train test split. Esas proporciones son solo una referencia, y con pocos datos se usa validación cruzada. Si los datos tienen orden en el tiempo, se divide cronológicamente: se entrena con el pasado y se prueba con lo posterior, porque un corte al azar filtraría el futuro."
+        },
+        {
+          "title": "Sobreajuste: la brecha",
+          "bullets": [
+            "Sobreajuste: aprende el ruido del entrenamiento",
+            "Señal: brecha entrenamiento − validación",
+            "Subajuste: modelo demasiado simple, mal en ambos",
+            "El punto bueno está en el medio"
+          ],
+          "figure": "Guias/_fuente/img/c30_division.png",
+          "narration": "Aquí aparece el sobreajuste, en inglés overfitting. Ocurre cuando el modelo aprende hasta el ruido de los datos de entrenamiento: rinde muy bien ahí y peor con datos nuevos. La señal es la brecha, que es la métrica de entrenamiento menos la de validación. Lo contrario es el subajuste: un modelo demasiado simple, que rinde mal en los dos. En el panel derecho se ven árboles de profundidad creciente. El de profundidad doce llega a un R cuadrado de cero coma novecientos noventa y nueve en entrenamiento, pero solo cero coma ochocientos uno en validación. El mejor punto fue la profundidad siete, con cero coma ochocientos cuarenta y siete."
+        },
+        {
+          "title": "Ejemplo: elegir entre dos modelos",
+          "bullets": [
+            "1.000 registros, división 60 / 20 / 20 → 600 · 200 · 200",
+            "Modelo A: 0.99 y 0.70 → brecha 0.29",
+            "Modelo B: 0.86 y 0.82 → brecha 0.04",
+            "Se elige B por su validación"
+          ],
+          "figure": null,
+          "narration": "Un ejemplo con números. Tenemos mil registros divididos en sesenta, veinte y veinte por ciento: seiscientos, doscientos y doscientos. El modelo A tiene un R cuadrado de cero coma noventa y nueve en entrenamiento y cero coma setenta en validación. Su brecha es cero coma veintinueve: sobreajuste. El modelo B tiene cero coma ochenta y seis y cero coma ochenta y dos, con una brecha de solo cero coma cero cuatro: es estable. Elegimos B por su validación, aunque A tenga mejor entrenamiento. Con pocas filas, a veces la validación supera al entrenamiento, y es normal; lo preocupante es una brecha grande a favor del entrenamiento. Para recordar: se elige con la validación, nunca con el entrenamiento."
+        }
+      ]
+    },
+    {
+      "titulo": "Regularización: Ridge, Lasso y estandarizar",
+      "escenas": [
+        {
+          "title": "Regularizar es castigar la complejidad",
+          "bullets": [
+            "Se suma una penalización a los coeficientes",
+            "Ridge (L2): suma de β al cuadrado",
+            "Lasso (L1): suma de |β|",
+            "alpha: cuánto castigo"
+          ],
+          "figure": null,
+          "narration": "Pasemos a la regularización. Regularizar es castigar la complejidad de un modelo: se le suma al error una penalización que depende del tamaño de los coeficientes. Ridge penaliza la suma de los coeficientes al cuadrado: los achica, normalmente sin llegar a cero. Lasso penaliza la suma de los valores absolutos: puede llevar coeficientes exactamente a cero, así que además selecciona variables. Y alfa es el hiperparámetro que controla cuánto castigo se aplica; se elige con validación, nunca con la prueba. Para recordar: Ridge achica, Lasso puede anular."
+        },
+        {
+          "title": "Ridge y Lasso en las viviendas",
+          "bullets": [
+            "Superficie estandarizada: 56.4 sin regularizar",
+            "Ridge: 53.8 · Lasso: 54.3",
+            "Ruido: −0.40, −0.44 y exactamente 0",
+            "Lasso anula primero la variable de ruido"
+          ],
+          "figure": "Guias/_fuente/img/c30_regularizacion.png",
+          "narration": "Veamos qué pasó con las viviendas de la clase. En el panel de la izquierda están los coeficientes del modelo estandarizado. La superficie tiene un coeficiente de cincuenta y seis coma cuatro sin regularizar, cincuenta y tres coma ocho con Ridge y cincuenta y cuatro coma tres con Lasso. Fíjate en la variable de ruido aleatorio, que no tiene relación con el precio: con los dos primeros modelos queda en menos cero coma cuarenta y menos cero coma cuarenta y cuatro, y con Lasso queda exactamente en cero. Lasso la descartó. El panel del centro muestra el camino de Lasso: a medida que sube alfa, los coeficientes se apagan de a uno, y el ruido es el primero, con alfa cerca de cero coma cuatro."
+        },
+        {
+          "title": "Por qué estandarizar",
+          "bullets": [
+            "La penalización mira el tamaño de los coeficientes",
+            "Unidades pequeñas → coeficiente grande → más castigo",
+            "Estandarizar: z = (x − media) / desviación",
+            "Todo queda en una escala comparable"
+          ],
+          "figure": null,
+          "narration": "Ahora, la pregunta clave: ¿por qué estandarizar? Porque la penalización mira el tamaño de los coeficientes, y ese tamaño depende de las unidades. Si una variable está en unidades pequeñas, necesita un coeficiente grande para tener el mismo efecto, y paga más castigo. Estandarizar es restar la media y dividir por la desviación estándar; el resultado se llama puntaje z. Por ejemplo, una casa de ciento veinte metros cuadrados, con media ochenta y desviación veinte, tiene z igual a dos. Y una casa con cuatro coma cinco habitaciones, con media tres y desviación uno coma cinco, tiene z igual a uno."
+        },
+        {
+          "title": "Mismo efecto, castigo diez mil veces mayor",
+          "bullets": [
+            "Efecto de 3 por m² vs 300 por centena de m²",
+            "Penalidad Ridge (α = 1): 9 frente a 90.000",
+            "Castigo 10.000 veces mayor",
+            "Ridge α = 30: R² 0.916 → 0.532"
+          ],
+          "figure": "Guias/_fuente/img/c30_regularizacion.png",
+          "narration": "Veamos cuánto importa. Imagina el mismo efecto expresado en dos unidades: tres por metro cuadrado, o trescientos por cada cien metros cuadrados. Con Ridge y alfa igual a uno, la penalización es tres al cuadrado, nueve, contra trescientos al cuadrado, noventa mil. Es el mismo efecto, castigado diez mil veces más. Con las viviendas de la clase, Ridge con alfa treinta tiene un R cuadrado de cero coma novecientos dieciséis con la superficie en metros cuadrados, pero cae a cero coma quinientos treinta y dos si se mide en centenas de metros cuadrados. Con estandarización queda en cero coma ochocientos ochenta y siete en ambos casos. Para recordar: estandariza siempre antes de Ridge o Lasso."
+        }
+      ]
+    },
+    {
+      "titulo": "Validación cruzada K-Fold",
+      "escenas": [
+        {
+          "title": "El problema de una sola partición",
+          "bullets": [
+            "Una partición puede ser «fácil» o «difícil» por azar",
+            "K-Fold repite la validación K veces",
+            "Se promedian los K resultados",
+            "No reemplaza al conjunto de prueba"
+          ],
+          "figure": null,
+          "narration": "Una sola división de los datos puede resultar fácil o difícil solo por suerte. La solución es la validación cruzada, conocida como K-Fold. Se parten los datos en K pliegues. Cada pliegue actúa una vez como validación, mientras los otros K menos uno entrenan. Al final se promedian los K resultados. Se hace con entrenamiento más validación; la prueba queda fuera. Por ejemplo, con cien filas y cuatro pliegues, cada uno tiene veinticinco filas de validación y setenta y cinco de entrenamiento. Para recordar: K-Fold te da un promedio y una dispersión, en lugar de un solo número de suerte."
+        },
+        {
+          "title": "K-Fold en las viviendas de la clase",
+          "bullets": [
+            "255 viviendas de desarrollo, 5 pliegues",
+            "0.941 · 0.931 · 0.918 · 0.895 · 0.933",
+            "Media 0.924, desviación 0.016",
+            "Una partición simple oscila entre 0.82 y 0.96"
+          ],
+          "figure": "Guias/_fuente/img/c30_kfold.png",
+          "narration": "Ahora con las viviendas de la clase: doscientas cincuenta y cinco viviendas de desarrollo y cinco pliegues. Los R cuadrado fueron cero coma novecientos cuarenta y uno, cero coma novecientos treinta y uno, cero coma novecientos dieciocho, cero coma ochocientos noventa y cinco y cero coma novecientos treinta y tres. La media es cero coma novecientos veinticuatro, con una desviación de cero coma cero dieciséis. Una desviación grande significaría que el resultado depende mucho de la muestra. En el panel derecho, al repetir trescientas particiones simples, el R cuadrado de una sola puede ir desde cero coma ochenta y dos hasta cero coma noventa y seis. Una nota: el cuaderno de la clase hizo el K-Fold con las trescientas filas, que incluyen la prueba. Lo correcto es usar solo entrenamiento más validación."
+        }
+      ]
+    },
+    {
+      "titulo": "Muestreo estratificado",
+      "escenas": [
+        {
+          "title": "Cuando una clase es rara",
+          "bullets": [
+            "Fraude: solo 5 % de los casos",
+            "Un corte al azar puede dejar casi sin fraudes",
+            "Estratificar: misma proporción de clases",
+            "No agrega fraudes, solo los reparte bien"
+          ],
+          "figure": null,
+          "narration": "Hay un problema especial cuando una clase es rara, como el fraude, que aparece en solo cinco por ciento de los casos. Si cortas los datos al azar, la prueba puede quedar con muy pocos fraudes, o con demasiados. La estratificación resuelve esto: al dividir, conserva la proporción de cada clase. Es como repartir caramelos de dos colores entre varios niños, asegurando que cada uno reciba la misma mezcla. No aumenta los fraudes; solo evita que una partición quede casi sin ellos. Por ejemplo, con cuatrocientas filas y cinco por ciento de fraude, una prueba de veinticinco por ciento tiene siempre cinco fraudes si se estratifica; sin estratificar, puede salir dos o puede salir ocho. En Python se usa el argumento stratify igual a y."
+        },
+        {
+          "title": "Estratificación en el fraude de la clase",
+          "bullets": [
+            "2.000 casos con 5.45 % de fraude",
+            "Con stratify: entrenamiento 5.467 %, prueba 5.400 %",
+            "Sin estratificar: la prueba va de 2.8 % a 8.4 %",
+            "Con 200 casos: 2.2 % de veces, cero fraudes"
+          ],
+          "figure": "Guias/_fuente/img/c30_estratificado.png",
+          "narration": "En el notebook de la clase hay dos mil casos, con ciento nueve positivos: cinco coma cuarenta y cinco por ciento de fraude. Al estratificar, el entrenamiento queda con cinco coma cuatrocientos sesenta y siete por ciento, y la prueba, con cinco coma cuatrocientos por ciento: casi idénticos. Sin estratificar, con dos mil casos, el porcentaje de fraude en la prueba varía desde dos coma ocho hasta ocho coma cuatro por ciento. Y con apenas doscientos casos, el panel derecho muestra que en dos coma dos por ciento de las particiones la prueba no recibe ningún fraude. Un modelo evaluado sin ningún fraude no puede decirte nada sobre fraudes."
+        }
+      ]
+    },
+    {
+      "titulo": "Matriz de confusión y métricas",
+      "escenas": [
+        {
+          "title": "La matriz de confusión",
+          "bullets": [
+            "TP: fraude detectado",
+            "FP: falsa alarma",
+            "FN: fraude que se escapó",
+            "TN: no fraude, bien clasificado"
+          ],
+          "figure": null,
+          "narration": "Llegamos a las métricas. Todas salen de cuatro números, que forman la matriz de confusión. Los verdaderos positivos, o TP, son fraudes que el modelo detectó. Los falsos positivos, FP, son falsas alarmas: transacciones buenas marcadas como fraude. Los falsos negativos, FN, son fraudes que se escaparon sin que el modelo los viera. Y los verdaderos negativos, TN, son transacciones buenas que el modelo dejó pasar correctamente. Con estas cuatro cifras se calcula todo lo demás."
+        },
+        {
+          "title": "Accuracy, precision, recall y F1",
+          "bullets": [
+            "Accuracy = (TP + TN) / n",
+            "Precision = TP / (TP + FP)",
+            "Recall = TP / (TP + FN)",
+            "F1: media armónica de precision y recall"
+          ],
+          "figure": null,
+          "narration": "Veamos las fórmulas. La exactitud, o accuracy, es la proporción de aciertos totales: verdaderos positivos más verdaderos negativos, dividido por el total. La precisión responde: de todo lo que marqué como positivo, ¿cuánto realmente lo era? Es verdaderos positivos dividido por verdaderos positivos más falsos positivos. El recall, o exhaustividad, responde: de todos los positivos reales, ¿cuántos detecté? Es verdaderos positivos dividido por verdaderos positivos más falsos negativos. Tienen el mismo numerador y solo cambia el total. El F1 es la media armónica de ambas y resume el equilibrio cuando los dos errores importan."
+        },
+        {
+          "title": "Ejemplo: 1.000 transacciones",
+          "bullets": [
+            "TP = 30 · FP = 10 · FN = 20 · TN = 940",
+            "Accuracy 0.970 · Precision 0.750",
+            "Recall 0.600 · F1 0.667",
+            "«Siempre no fraude»: accuracy 0.950"
+          ],
+          "figure": null,
+          "narration": "Un ejemplo con mil transacciones, de las cuales cincuenta son fraudes. El modelo tiene treinta verdaderos positivos, diez falsos positivos, veinte falsos negativos y novecientos cuarenta verdaderos negativos. La exactitud es treinta más novecientos cuarenta, dividido por mil: cero coma noventa y siete. La precisión es treinta dividido por cuarenta: cero coma setenta y cinco. El recall es treinta dividido por cincuenta: cero coma sesenta. Y el F1 es cero coma seiscientos sesenta y siete. Mira el contraste: un modelo que dijera siempre no fraude tendría una exactitud de cero coma noventa y cinco. El cero coma noventa y siete parece excelente, pero el modelo deja escapar veinte de los cincuenta fraudes."
+        },
+        {
+          "title": "Las métricas en el fraude de la clase",
+          "bullets": [
+            "TN 466 · FP 7 · FN 17 · TP 10",
+            "Accuracy 0.952 · Precision 0.588",
+            "Recall 0.370 · F1 0.455",
+            "«Siempre no fraude»: accuracy 0.946, recall 0"
+          ],
+          "figure": "Guias/_fuente/img/c30_metricas.png",
+          "narration": "En la prueba de la clase, con quinientos casos, la regresión logística obtuvo cuatrocientos sesenta y seis verdaderos negativos, siete falsos positivos, diecisiete falsos negativos y diez verdaderos positivos. La exactitud fue cero coma novecientos cincuenta y dos, la precisión cero coma quinientos ochenta y ocho, el recall cero coma trescientos setenta y el F1 cero coma cuatrocientos cincuenta y cinco. El modelo que siempre dice no fraude logra una exactitud de cero coma novecientos cuarenta y seis, con recall cero: la exactitud casi no distingue entre ambos. Con solo veintisiete fraudes en la prueba, mover el umbral cambia mucho el resultado, así que se elige con la validación."
+        },
+        {
+          "title": "Qué error cuesta más",
+          "bullets": [
+            "Fraude o impago: un falso negativo es costoso → recall",
+            "Si las falsas alarmas cuestan → precision",
+            "Equilibrio entre ambas → F1",
+            "Regresión: MAE, RMSE y R²"
+          ],
+          "figure": null,
+          "narration": "Entonces, ¿qué métrica elegir? Depende del costo de equivocarse. En el caso del banco, con dos por ciento de impago, dejar pasar un mal pagador es muy costoso, así que importa el recall, sin olvidar la precisión. Si lo caro fueran las falsas alarmas, mirarías la precisión. Y si ambos errores pesan, usas el F1. Para regresión, el MAE es el error medio en las unidades del precio, el RMSE castiga más los errores grandes, y el R cuadrado es la proporción de variabilidad explicada. En la prueba de precios de la clase, el MAE fue trece coma nueve millones de pesos, el RMSE dieciséis coma dos, y el R cuadrado cero coma novecientos cuatro."
+        }
+      ]
+    },
+    {
+      "titulo": "Fuga de datos y Pipeline",
+      "escenas": [
+        {
+          "title": "Qué es la fuga de datos",
+          "bullets": [
+            "Usar información de prueba o validación al desarrollar",
+            "Imputar, escalar, seleccionar variables",
+            "fit: aprende · transform: aplica · predict: predice",
+            "Regla: fit solo con entrenamiento"
+          ],
+          "figure": null,
+          "narration": "Llegamos al error que más se rompe en la primera clase de Machine Learning: la fuga de datos, o data leakage. Es usar, directa o indirectamente, información de la prueba o de la validación durante el desarrollo: al imputar, escalar, seleccionar variables o elegir hiperparámetros. Es como estudiar con el examen en la mano. Recuerda los tres verbos de scikit-learn: fit significa aprender de los datos, por ejemplo calcular una media; transform significa aplicar lo aprendido; y predict, predecir con un modelo ya ajustado. Un estandarizador con fit sobre todas las filas conoce la media y la desviación de la prueba. Lo correcto es hacer fit solo con entrenamiento y aplicar transform en el resto."
+        },
+        {
+          "title": "Ejemplo: un atípico escondido",
+          "bullets": [
+            "Entrenamiento: 10, 12, 14 → media 12, desviación 1.633",
+            "Prueba: 30 → z = 11.0 (atípico claro)",
+            "Con fuga: media 16.5, desviación 7.92",
+            "z = 1.70 (parece normal)"
+          ],
+          "figure": null,
+          "narration": "Veamos cómo la fuga esconde un problema. El entrenamiento tiene los valores diez, doce y catorce, con media doce y desviación uno coma seiscientos treinta y tres. En la prueba aparece un treinta. Con los estadísticos del entrenamiento, correcto, su puntaje z es treinta menos doce, dividido por uno coma seiscientos treinta y tres: once. Un atípico clarísimo. Pero si se calculan la media y la desviación con las cuatro filas, que es la fuga, la media sube a dieciséis coma cinco, la desviación a siete coma noventa y dos, y el z baja a uno coma setenta: ¡parece normal! La fuga ocultó el atípico, porque el modelo ya había visto la prueba."
+        },
+        {
+          "title": "El experimento del ruido",
+          "bullets": [
+            "1.000 columnas de puro ruido",
+            "Seleccionar las 10 «mejores» con todas las filas: ≈ 0.79",
+            "Dentro de un Pipeline: ≈ 0.51",
+            "0.51 es azar, y es lo honesto"
+          ],
+          "figure": "Guias/_fuente/img/c30_leakage.png",
+          "narration": "Este experimento lo muestra con claridad. Tomamos datos de puro ruido: mil columnas sin ninguna relación con lo que se quiere predecir. Si seleccionamos las diez mejores columnas usando todas las filas y luego validamos, la exactitud da cerca de cero coma setenta y nueve, como si el modelo supiera algo. Pero si lo hacemos dentro de un Pipeline, da cerca de cero coma cincuenta y uno, que es azar, y es lo honesto. La diferencia entre ambos números es toda la fuga. Se repitió cuarenta veces para confirmarlo."
+        },
+        {
+          "title": "El Pipeline y el checklist",
+          "bullets": [
+            "Pipeline: encadena pasos y hace fit solo con lo que recibe",
+            "ColumnTransformer: un tratamiento por tipo de columna",
+            "Divido primero, uso Pipeline, estratifico si es raro",
+            "Elijo con validación; miro la prueba una sola vez"
+          ],
+          "figure": null,
+          "narration": "La solución práctica se llama Pipeline. Encadena varios pasos, por ejemplo estandarizar y luego modelar, y hace fit de cada paso solo con los datos que recibe. Dentro del K-Fold, repite el proceso completo en cada pliegue. Y con ColumnTransformer, a las columnas numéricas se les imputa y se les escala, y a las categóricas se les pone la moda y se les aplica one-hot. Un checklist: divide primero, antes de imputar o escalar. Usa un Pipeline. Estratifica si hay clases raras. Elige hiperparámetros con validación o K-Fold. Mira la prueba una sola vez. Y reporta varias métricas, porque la exactitud no basta con clases desbalanceadas."
+        }
+      ]
+    },
+    {
+      "titulo": "Repaso final",
+      "escenas": [
+        {
+          "title": "Las seis ideas para llevarte",
+          "bullets": [
+            "Tipos y calidad de datos",
+            "Imputar con criterio, aprendido en entrenamiento",
+            "Tres conjuntos: la prueba, una sola vez",
+            "Ridge y Lasso, con estandarización",
+            "K-Fold y estratificación",
+            "Métricas según el costo; todo en un Pipeline"
+          ],
+          "figure": null,
+          "narration": "Hagamos un repaso. Uno: cada variable es numérica o categórica, y los datos se juzgan por exactitud, completitud, coherencia y frescura. Dos: se imputa con media, mediana o moda según el caso, siempre aprendida con el entrenamiento. Tres: el entrenamiento aprende, la validación elige, y la prueba da el veredicto final una sola vez. Cuatro: Ridge achica y Lasso puede anular, y por eso se estandariza. Cinco: K-Fold entrega un promedio y una dispersión, y la estratificación reparte la clase rara en proporción. Seis: precision, recall y F1 según el costo del error, y todo el preprocesamiento va dentro de un Pipeline. Para pasar a la siguiente clase, deberías poder calcular a mano las métricas de una matriz de confusión, y escribir un Pipeline sin filtrar la prueba. Lee los apuntes, resuelve los bloques del cuaderno, y si te trabas más de diez minutos, mira la solución, entiéndela y vuelve a hacerlo sin mirar. Gracias por ver este video, y mucho éxito con tu estudio."
+        }
+      ]
+    }
+  ]
+}

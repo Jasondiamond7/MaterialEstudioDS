@@ -1,0 +1,6576 @@
+1
+00:00:00,000 --> 00:00:13,160
+Ya, entonces, vamos a comenzar. Entonces, lo que hemos visto hasta ahora son metodologías
+
+2
+00:00:13,160 --> 00:00:20,560
+y problemas bastante específicos. Nosotros vimos cómo clasificar correos, podíamos utilizar,
+
+3
+00:00:20,560 --> 00:00:26,040
+por ejemplo, metodologías de regresión logística, Naive Bayes y otras otras que
+
+4
+00:00:26,040 --> 00:00:32,940
+hemos visto de clasificación en principio, ya, y teníamos distintas formas de representar
+
+5
+00:00:32,940 --> 00:00:38,800
+nuestros datos. Si teníamos un texto, nosotros podíamos definir, por ejemplo, cuántas veces
+
+6
+00:00:38,800 --> 00:00:47,520
+se utilizaba la palabra oferta, o si tenía un link o no. Entonces, si se fijan, tenemos
+
+7
+00:00:47,520 --> 00:00:55,480
+una forma numérica en la que nosotros representamos los datos, cualquiera sea esto. También con
+
+8
+00:00:55,480 --> 00:01:00,440
+Pedro vieron cómo agrupar vinos, ya en términos de clustering y en esencia salió la noción de
+
+9
+00:01:00,440 --> 00:01:07,960
+distancia entre datos y también vimos cómo comparar estos modelos y hacíamos la diferencia
+
+10
+00:01:07,960 --> 00:01:13,000
+cuando queremos que estamos en un problema de clasificación y en un problema de predicción
+
+11
+00:01:13,000 --> 00:01:19,400
+numérica. Entonces en una teníamos la metría de confusión y en otro digamos discrepancia en términos
+
+12
+00:01:19,400 --> 00:01:26,600
+de error cuadrático o la suma cuadrada de error o alguna métrica, digamos por
+
+13
+00:01:26,600 --> 00:01:32,280
+ejemplo la pérdida de la olímpica que nos define cuánto nos estamos equivocando
+
+14
+00:01:32,400 --> 00:01:39,960
+y en el caso de clasificación contábamos cuantas veces
+
+15
+00:01:39,960 --> 00:01:45,400
+predecibamos correctamente y teníamos el concepto de conjunto de entrenamiento,
+
+16
+00:01:45,400 --> 00:01:50,520
+conjunto de evaluación y conjunto de prueba. Entonces ahora queremos expandir eso,
+
+17
+00:01:50,520 --> 00:01:58,660
+queremos no simplemente quedarnos con cosas que son un poco más ad hoc al análisis, que son
+
+18
+00:01:58,660 --> 00:02:06,320
+conjuntos de datos numéricos en un Excel, digamos, o un CSV, o algún otro formato de fuente de datos,
+
+19
+00:02:06,320 --> 00:02:13,440
+sino expandirlo. Por ejemplo, ¿qué pasa si queremos utilizar de cierta manera las metodologías que
+
+20
+00:02:13,440 --> 00:02:17,200
+conocemos, hubo otras que las vamos a
+
+21
+00:02:17,340 --> 00:02:20,340
+especificar a lo largo de las próximas
+
+22
+00:02:20,340 --> 00:02:23,440
+semanas para otro tipo de entradas,
+
+23
+00:02:23,440 --> 00:02:25,440
+ya, déjalo de esa manera, de conjunto,
+
+24
+00:02:25,440 --> 00:02:28,440
+pensando en imágenes, ya, otro tipo de
+
+25
+00:02:28,440 --> 00:02:31,440
+textos, recuerden que nosotros vimos una
+
+26
+00:02:31,440 --> 00:02:38,440
+forma un poco ingenua de caracterizar un
+
+27
+00:02:38,440 --> 00:02:41,440
+correo, ya, por contar simplemente las
+
+28
+00:02:41,440 --> 00:02:48,120
+de las palabras. Pero existe todo un significado detrás de eso, dentro de la
+
+29
+00:02:48,120 --> 00:02:52,120
+proza que se hace en la reacción. Si nosotros utilizamos, por ejemplo, una
+
+30
+00:02:52,120 --> 00:02:57,120
+métrica de simplemente frecuencia, uno puede decir
+
+31
+00:02:58,040 --> 00:03:03,880
+el hombre mordió al perro y si utilizamos una métrica de frecuencia, va a tener el
+
+32
+00:03:03,880 --> 00:03:07,400
+mismo valor numérico de el perro mordió al hombre.
+
+33
+00:03:07,400 --> 00:03:14,400
+Entonces, tenemos en esta representación de pasar el correo, este texto, algo numérico,
+
+34
+00:03:14,400 --> 00:03:15,760
+podemos perder información.
+
+35
+00:03:15,760 --> 00:03:20,920
+Entonces, la representación en cómo van a entrar los datos que tenemos a nuestro modelo
+
+36
+00:03:20,920 --> 00:03:23,760
+toma una importancia.
+
+37
+00:03:23,760 --> 00:03:30,360
+Entonces, por eso queremos expandir esta noción de no simplemente datos estructurados,
+
+38
+00:03:30,360 --> 00:03:36,960
+en el estricto rigor de una base de datos, con toda su fila y columnas bien definidas,
+
+39
+00:03:36,960 --> 00:03:38,880
+porque eso no es la realidad.
+
+40
+00:03:38,880 --> 00:03:43,480
+En la realidad nosotros tenemos paseados incompletas en muchos
+
+41
+00:03:43,480 --> 00:03:47,840
+tipos de formatos.
+
+42
+00:03:47,840 --> 00:03:51,480
+Por ello entonces queremos pasar cómo podríamos trabajar con
+
+43
+00:03:51,480 --> 00:03:55,040
+imágenes o textos que son un poco más complejos.
+
+44
+00:03:55,040 --> 00:03:58,760
+Tenemos que ver una forma de describirlos.
+
+45
+00:03:58,760 --> 00:04:01,040
+Y en general nosotros vamos a querer tener una forma de
+
+46
+00:04:01,040 --> 00:04:02,280
+describirlo numéricamente.
+
+47
+00:04:02,280 --> 00:04:10,240
+Entonces, antes de ver las aplicaciones que vamos a definir como aplicaciones de inteligencia
+
+48
+00:04:10,240 --> 00:04:14,200
+artificial pero luego vamos a particularizar, tenemos que definir bien qué es lo que nosotros
+
+49
+00:04:14,200 --> 00:04:15,200
+queremos hacer.
+
+50
+00:04:15,200 --> 00:04:20,040
+Todas estas cosas que nosotros estamos viendo, todas estas metodologías tienen un fin, un
+
+51
+00:04:20,040 --> 00:04:21,040
+propósito.
+
+52
+00:04:21,040 --> 00:04:27,240
+Queremos, estamos bajo un problema de clasificación, queremos definir una categoría, alguna observación,
+
+53
+00:04:27,240 --> 00:04:33,520
+predecir o anticipar una cantidad, encontrar información o digamos producir
+
+54
+00:04:33,520 --> 00:04:39,720
+y generar algo que sería un algo muy muy predictivo por primera vez. Una vez que
+
+55
+00:04:39,720 --> 00:04:43,200
+nosotros definimos qué es lo que queremos hacer
+
+56
+00:04:43,200 --> 00:04:49,640
+vemos qué datos necesitamos o qué va a recibir digamos lo que nosotros vamos a
+
+57
+00:04:49,640 --> 00:04:55,160
+llamar como sistema, que lo vamos a definir en breve.
+
+58
+00:04:55,160 --> 00:04:58,500
+Una vez que definimos cuál es el propósito de lo que queremos
+
+59
+00:04:58,500 --> 00:05:05,640
+hacer, definimos claramente qué necesita nuestro modelo,
+
+60
+00:05:05,640 --> 00:05:10,360
+que lo vamos a definir de manera un poco etérea,
+
+61
+00:05:10,360 --> 00:05:15,640
+qué va a necesitar nuestro modelo para poder funcionar.
+
+62
+00:05:15,640 --> 00:05:18,560
+Y después, una vez que definimos cómo va a ser nuestra
+
+63
+00:05:18,560 --> 00:05:22,000
+entrada a nuestro modelo vemos cómo lo podemos transformar, cómo lo podemos
+
+64
+00:05:22,000 --> 00:05:27,240
+utilizar y cómo podemos, digamos, completar la tarea que nosotros nos definimos.
+
+65
+00:05:27,240 --> 00:05:32,880
+Entonces lo que tiene que quedar claro siempre es nuestra
+
+66
+00:05:32,880 --> 00:05:41,240
+objetivo está previo a nuestros dados. Si bien en la práctica se sucede mucho
+
+67
+00:05:41,240 --> 00:05:48,320
+que se tienen datos disponibles y se plantea una... el problema inverso es, tengo
+
+68
+00:05:48,320 --> 00:05:50,820
+todos los datos disponibles, ¿qué puedo hacer con estos?
+
+69
+00:05:50,820 --> 00:05:56,820
+En Studio Rigor eso genera muchos problemas porque vamos a tratar de adaptar nuestra metodología
+
+70
+00:05:56,820 --> 00:06:02,820
+para lo que nosotros tenemos independiente del objetivo que realmente podemos resolver
+
+71
+00:06:02,820 --> 00:06:04,820
+y lo que es realmente útil.
+
+72
+00:06:04,820 --> 00:06:10,820
+Entonces, no siempre todos los datos nos van a servir para cosas que efectivamente van a ser
+
+73
+00:06:10,820 --> 00:06:13,320
+digamos utilizables en la realidad.
+
+74
+00:06:13,320 --> 00:06:16,820
+Tenemos que definir bien cuál es nuestro objetivo, cuál es nuestra tarea
+
+75
+00:06:16,820 --> 00:06:21,820
+Y luego de ello vamos a definir cuáles son los datos y qué necesito probablemente tal.
+
+76
+00:06:21,820 --> 00:06:24,820
+Una vez que tengo mi tarea definida,
+
+77
+00:06:24,820 --> 00:06:29,820
+especificé y describí los datos que tengo disponible o que voy a necesitar,
+
+78
+00:06:29,820 --> 00:06:32,820
+voy a tener que analizar cómo lo voy a evaluar.
+
+79
+00:06:32,820 --> 00:06:36,820
+Y tuvimos toda una catra respecto a ello,
+
+80
+00:06:36,820 --> 00:06:39,820
+dependiendo si estamos en un problema de clasificación,
+
+81
+00:06:39,820 --> 00:06:43,820
+si hay una métrica de error que podemos utilizar,
+
+82
+00:06:43,820 --> 00:06:55,820
+¿Cómo puedo pasar eso a una decisión tras, digamos, alguna predicción, algún objetivo, digamos, que tenemos cuantitativo?
+
+83
+00:06:55,820 --> 00:07:01,820
+Entonces, eso es lo que nosotros tenemos que empezar. Tenemos que empezar desde nuestro objetivo y luego definimos los datos.
+
+84
+00:07:01,820 --> 00:07:08,720
+Si lo hago al revés, caigo en el problema de que puede que termine eventualmente
+
+85
+00:07:11,120 --> 00:07:18,720
+tratando de resolver o haciendo cosas que no necesariamente se condicen
+
+86
+00:07:18,720 --> 00:07:23,520
+con el objetivo que yo quiero solucionar.
+
+87
+00:07:23,520 --> 00:07:27,320
+Entonces tenemos que definir claramente cuál es nuestro objetivo
+
+88
+00:07:27,320 --> 00:07:37,800
+previo a realizar, digamos, la metodología de implementar y digamos programar y hacer cosas.
+
+89
+00:07:37,800 --> 00:07:49,920
+Entonces, tenemos que tener eso muy muy claro. Dentro de estos conceptos que estamos hablando,
+
+90
+00:07:49,920 --> 00:07:55,920
+hablamos muy coloquialmente de lo que es inteligencia artificial
+
+91
+00:07:55,920 --> 00:08:04,200
+pero es un poco un poco difuso, digamos, que aquí le llamamos inteligencia
+
+92
+00:08:04,200 --> 00:08:09,000
+artificial. En general, inteligencia artificial se conoce como un concepto
+
+93
+00:08:09,000 --> 00:08:14,440
+muy amplio, muy general, muy paraguas, digamos, porque abarca muchas cosas.
+
+94
+00:08:14,440 --> 00:08:19,040
+Entonces, en este diagrama, que lo podemos, digamos, leer de afuera hacia adentro,
+
+95
+00:08:19,040 --> 00:08:31,120
+vemos que inteligencia artificial es lo que engloba todo, en donde dentro de ello hay distintos tipos
+
+96
+00:08:31,120 --> 00:08:38,480
+de sistemas que pueden estar diseñados para, digamos, reconocer, clasificar, predecir,
+
+97
+00:08:38,480 --> 00:08:47,280
+generar contenido en algún sentido, que tiene una finalidad de proveer soluciones
+
+98
+00:08:47,280 --> 00:08:53,480
+para algo práctico que nosotros planteamos.
+
+99
+00:08:53,480 --> 00:08:58,640
+Entonces, Inteligencia Artificial es algo muy genético, muy amplio, por lo
+
+100
+00:08:58,640 --> 00:09:02,760
+cual necesitamos otros conceptos que lo particularizan. Entonces, dentro de la
+
+101
+00:09:02,760 --> 00:09:07,000
+Inteligencia Artificial, digamos, nace este concepto de aprendizaje automático.
+
+102
+00:09:07,000 --> 00:09:12,200
+Y en esta noción de aprendizaje automático, la idea es
+
+103
+00:09:12,200 --> 00:09:17,720
+como aprender patrones a partir de los
+
+104
+00:09:28,880 --> 00:09:35,000
+regreso logística, neib-bayes, y si bien sigue siendo amplio son herramientas
+
+105
+00:09:35,000 --> 00:09:38,080
+digamos en esa categoría hay herramientas que nosotros sí hemos
+
+106
+00:09:38,080 --> 00:09:43,840
+visto a lo largo de este curso. Y la siguiente región que está dentro del aprendizaje automático
+
+107
+00:09:46,480 --> 00:09:50,640
+habla del aprendizaje profundo, o en inglés el deep learning.
+
+108
+00:09:53,360 --> 00:09:59,080
+Que por ahora, digamos, lo único que necesitamos entender es que, porque lo vamos a profundizar
+
+109
+00:09:59,080 --> 00:10:06,720
+en las siguientes sesiones, es que este tipo de metodologías o conjunto de metodologías,
+
+110
+00:10:06,720 --> 00:10:15,120
+lo que hace es realizar varias transformaciones de los datos consecutivamente o sucesivamente.
+
+111
+00:10:15,120 --> 00:10:20,600
+Se fijan cuando nosotros hicimos en AIPy's, nosotros planteamos una metodología y la
+
+112
+00:10:20,600 --> 00:10:25,400
+implementamos, realizando la identidad es lo mismo. En cambio, en el aprendizaje profundo,
+
+113
+00:10:25,400 --> 00:10:32,240
+yo hago muchas transformaciones, muchas, muchas funciones en principio, en sentido matemático,
+
+114
+00:10:32,240 --> 00:10:37,040
+que son transformaciones de los datos, tal de que yo pueda aprender y por eso
+
+115
+00:10:37,040 --> 00:10:42,240
+está dentro de aprendizaje automático, patrones dentro ya no sólo de los datos
+
+116
+00:10:42,240 --> 00:10:46,960
+sino dentro de las transformaciones de los datos per se. Entonces puede buscar
+
+117
+00:10:46,960 --> 00:10:52,720
+patrones en espacios, en términos matemáticos, de transformaciones de los
+
+118
+00:10:52,720 --> 00:10:58,440
+datos que no son visibles a simple vista ni con modelos digamos más
+
+119
+00:10:58,440 --> 00:11:04,760
+superficiales, por eso el concepto de profundo. Entonces estas son una relación
+
+120
+00:11:04,760 --> 00:11:08,840
+de inclusión. Aprendizaje profundo es aprendizaje automático y aprendizaje
+
+121
+00:11:08,840 --> 00:11:16,920
+automático es en principio inteligencia artificial. Ahora, pueden haber cosas que no sean
+
+122
+00:11:16,920 --> 00:11:19,760
+aprendizaje automático que están en inteligencia artificial y aquí podemos jugar
+
+123
+00:11:19,760 --> 00:11:24,920
+digamos con esta con este diagrama al principio.
+
+124
+00:11:24,920 --> 00:11:28,840
+una inteligencia, pueden haber herramientas entonces que de inteligencia artificial que no
+
+125
+00:11:28,840 --> 00:11:33,300
+utilizan ninguna de las metodologías de aprendizaje automático que hemos visto
+
+126
+00:11:33,300 --> 00:11:39,300
+en el largo del curso. Entonces por eso tiende a ser un concepto bastante amplio que es en
+
+127
+00:11:39,300 --> 00:11:45,820
+principio cuando se habla en términos un poco más técnicos tratar de evitar, puesto que puede
+
+128
+00:11:45,820 --> 00:11:52,580
+significar muchas cosas. Entonces por eso tratamos y introducimos estos conceptos un poco más
+
+129
+00:11:52,580 --> 00:11:59,580
+concretos. Entonces...
+
+130
+00:12:02,580 --> 00:12:07,580
+Ahora, planteamos cuatro tareas, que es lo que yo les comentaba que era nuestro
+
+131
+00:12:07,580 --> 00:12:13,380
+objetivo, que tenemos que definirlo de antemano. Por ejemplo, el clasificar
+
+132
+00:12:13,380 --> 00:12:19,580
+nosotros lo hemos hecho. Tengo que elegir una categoría y tengo
+
+133
+00:12:19,580 --> 00:12:26,420
+médicas para definir si la categoría que yo escogí era correcta o no. En este mismo ejemplo,
+
+134
+00:12:26,420 --> 00:12:34,660
+la salida dice si es que algún un base presenta daño en un ejemplo digamos hipotético. Entonces,
+
+135
+00:12:34,660 --> 00:12:40,620
+eso podría ser la salida de una problemática en donde nuestro objetivo, nuestra tarea sea
+
+136
+00:12:40,620 --> 00:12:47,420
+clasificar, presenta daño o no. Y podemos comparar esto con una infección de un dato
+
+137
+00:12:47,420 --> 00:12:52,860
+donde se sabe si es que un envase en particular sí tenía daño o no.
+
+138
+00:12:52,860 --> 00:12:56,220
+Entonces tengo una etiqueta, estamos trabajando dentro de una metodología
+
+139
+00:12:56,220 --> 00:13:02,140
+supervisada. Prolosticar significa en esencia anticipar
+
+140
+00:13:02,140 --> 00:13:08,380
+una cantidad futura. En este ejemplo la salida se venderán 120 unidades
+
+141
+00:13:08,380 --> 00:13:13,460
+mañana y yo puedo comprobar si es que tan bueno era esa
+
+142
+00:13:13,460 --> 00:13:18,180
+cantidad futura con algún tipo de error, alguna métrica.
+
+143
+00:13:18,180 --> 00:13:22,980
+Y el rumbo cuadrado de error, el rumbo cuadrado de medio, muchas otras métricas que nosotros vimos.
+
+144
+00:13:22,980 --> 00:13:24,980
+Por ejemplo,
+
+145
+00:13:26,980 --> 00:13:32,340
+si yo digo, mañana se venderán 120 unidades y mañana se venden 100,
+
+146
+00:13:32,340 --> 00:13:37,940
+entonces sé cuánto me equivoqué y puedo utilizar eso para mejorar mi modelo en el futuro.
+
+147
+00:13:37,940 --> 00:13:42,580
+Entonces, fíjense ahí, pasé de clasificar a algo cuantitativo,
+
+148
+00:13:42,580 --> 00:13:45,140
+algo categórico, algo cuantitativo
+
+149
+00:13:45,140 --> 00:13:46,500
+recuperar
+
+150
+00:13:46,500 --> 00:13:51,180
+en particular recuperar información que es una siguiente tarea
+
+151
+00:13:51,180 --> 00:13:53,660
+significa digamos encontrar
+
+152
+00:13:53,660 --> 00:13:54,980
+y ordenar
+
+153
+00:13:54,980 --> 00:13:57,220
+fuentes
+
+154
+00:13:57,220 --> 00:13:59,780
+que podrían responder a alguna consulta
+
+155
+00:13:59,780 --> 00:14:04,940
+entonces un ejemplo de salida de una tarea de recuperación
+
+156
+00:14:04,940 --> 00:14:06,180
+son si estos
+
+157
+00:14:06,180 --> 00:14:09,820
+documentos en particular responden a alguna consulta
+
+158
+00:14:09,820 --> 00:14:11,380
+en específico
+
+159
+00:14:11,380 --> 00:14:16,580
+Entonces, ahí cómo voy a comprobar si lo que hice o el sistema, que lo vamos a definir,
+
+160
+00:14:16,580 --> 00:14:21,980
+es correcto o no, voy a ver si lo que se recuperó tenía relevancia
+
+161
+00:14:21,980 --> 00:14:28,380
+y era actual en términos de las fuentes de información que se están utilizando.
+
+162
+00:14:28,380 --> 00:14:34,580
+Y finalmente, una tarea que es la más clásica que se ocupa hoy en día, que es generar,
+
+163
+00:14:34,580 --> 00:14:39,380
+que es producir contenido. Sin definir a priori qué es el contenido,
+
+164
+00:14:39,380 --> 00:14:45,180
+puede ser una respuesta escrita, como borrador de una respuesta, o un correo por
+
+165
+00:14:45,180 --> 00:14:50,180
+ejemplo, o una imagen, si uno quiere generar una imagen como está de modo
+
+166
+00:14:50,180 --> 00:14:57,460
+hoy en día. Y ahí necesitamos comprobar que
+
+167
+00:14:57,460 --> 00:15:03,740
+es coherente con lo que se le pidió. Si sigo las instrucciones y efectivamente si
+
+168
+00:15:03,740 --> 00:15:08,100
+a la larga tiene una utilidad, yo puedo generar una imagen y no era la imagen que yo
+
+169
+00:15:08,100 --> 00:15:15,020
+entonces no me es útil, entonces tengo una forma un poco más ambigua de...
+
+170
+00:15:15,020 --> 00:15:21,220
+un poco más subjetiva de comprobar que la salida de ese tipo de sistema, que
+
+171
+00:15:21,220 --> 00:15:24,260
+otro es el concepto que les estoy mencionando,
+
+172
+00:15:24,260 --> 00:15:31,500
+es válido no. Fíjense que en todas estas problemáticas,
+
+173
+00:15:31,500 --> 00:15:35,100
+estas aplicaciones que pueden ser por los distintos objetivos y tareas que se
+
+174
+00:15:35,100 --> 00:15:40,380
+puedes tener pueden recibir tipos de datos parecidos.
+
+175
+00:15:41,380 --> 00:15:47,380
+Una fotografía puede clasificarse, ¿cierto? y estaríamos en la tarea de acá.
+
+176
+00:15:47,380 --> 00:15:51,980
+Puede utilizarse para buscar imágenes similares, entonces estaría terminado de
+
+177
+00:15:51,980 --> 00:15:58,140
+recuperación. O puede ocupar la imagen para generar, por ejemplo, pasa una
+
+178
+00:15:58,140 --> 00:16:03,820
+imagen de ejemplo quiero hacer una modificación sobre eso. Entonces
+
+179
+00:16:04,660 --> 00:16:09,680
+todas estas tareas pueden tener distinto insumo, distintas entradas y esas
+
+180
+00:16:09,680 --> 00:16:13,700
+entradas van a entrar a algo que nosotros lo vamos a definir como un
+
+181
+00:16:13,700 --> 00:16:22,420
+sistema. ¿Qué es lo que es un sistema? Porque un sistema es en esencia
+
+182
+00:16:22,420 --> 00:16:29,140
+un conjunto de tareas, definámoslo de esa manera, que resuelven o están
+
+183
+00:16:29,140 --> 00:16:33,900
+construidos para resolver algo. Porque una tarea puede ser lo
+
+184
+00:16:33,900 --> 00:16:39,060
+suficientemente compleja, que puede ser desglosada en distintas tareas, que
+
+185
+00:16:39,060 --> 00:16:44,220
+pueden ser una tarea de clasificación, una tarea de pronóstico, una tarea
+
+186
+00:16:44,220 --> 00:16:47,980
+de generación.
+
+187
+00:16:47,980 --> 00:16:58,780
+Entonces, si tengo un objetivo en particular, digamos un encargo que tengo que hacer, conviene
+
+188
+00:16:58,780 --> 00:17:00,900
+digamos completar una frase.
+
+189
+00:17:00,900 --> 00:17:07,500
+Entonces, recibo estos datos, que si se fijan pueden ser de distintos formatos, y entrego
+
+190
+00:17:07,500 --> 00:17:09,900
+un resultado.
+
+191
+00:17:09,900 --> 00:17:15,220
+Y lo considero útil si es que cumple estas condiciones.
+
+192
+00:17:15,220 --> 00:17:18,820
+es cuando yo tengo una tarea compleja tengo que definir bien qué es lo que yo
+
+193
+00:17:18,820 --> 00:17:24,420
+voy a tener como insumo, ya, qué voy a entregar o qué va a entregar mi sistema
+
+194
+00:17:24,420 --> 00:17:31,300
+como resultado y cómo voy a decidir si ese resultado me es útil para ese
+
+195
+00:17:31,300 --> 00:17:37,420
+encargo que yo definí. Si yo no puedo definir y responder a esa pregunta o
+
+196
+00:17:37,420 --> 00:17:43,300
+completar la frase, digamos, necesitamos precisar la tarea, necesitamos
+
+197
+00:17:43,300 --> 00:17:47,300
+precisar cuál es el conjunto de datos y cuál es nuestro objetivo en general.
+
+198
+00:17:47,300 --> 00:17:50,300
+Si no podemos responder a eso,
+
+199
+00:17:50,300 --> 00:17:54,300
+vamos a caer en un bucle, digamos, de ir probando herramientas
+
+200
+00:17:54,300 --> 00:17:59,300
+que pueden no servirnos para lo que nosotros queremos hacer.
+
+201
+00:17:59,300 --> 00:18:01,300
+Entonces,
+
+202
+00:18:01,300 --> 00:18:04,300
+tenemos que poder definir cuál es nuestra tarea,
+
+203
+00:18:04,300 --> 00:18:07,300
+qué es lo que nosotros vamos a tener como insumo,
+
+204
+00:18:07,300 --> 00:18:09,300
+cuál va a ser nuestra salida de nuestro modelo,
+
+205
+00:18:09,300 --> 00:18:14,740
+modelo que nosotros vamos a ir definiendo durante las próximas semanas
+
+206
+00:18:14,740 --> 00:18:22,180
+y cómo voy a definir si eso es efectivamente ese resultado, eso que me entrega este sistema
+
+207
+00:18:22,180 --> 00:18:28,900
+que este conjunto de tareas con un propósito me es útil o no.
+
+208
+00:18:28,900 --> 00:18:32,340
+Entonces, veamos un ejemplo.
+
+209
+00:18:32,340 --> 00:18:35,940
+Pensemos que tengo un cargo o una consulta que me dice
+
+210
+00:18:35,940 --> 00:18:38,580
+ven un correo
+
+211
+00:18:38,580 --> 00:18:40,860
+y tengo que clasificar ese correo
+
+212
+00:18:40,860 --> 00:18:42,460
+y redactar una respuesta
+
+213
+00:18:42,460 --> 00:18:44,340
+si se fijan
+
+214
+00:18:44,340 --> 00:18:46,700
+la primera parte es clasificar
+
+215
+00:18:46,700 --> 00:18:48,740
+y la segunda es generar
+
+216
+00:18:48,740 --> 00:18:52,300
+entonces mi consulta es cuando ven el correo dice
+
+217
+00:18:52,300 --> 00:18:56,100
+me cobraron dos veces y necesito el compradante
+
+218
+00:18:56,100 --> 00:18:57,740
+entonces son
+
+219
+00:18:57,740 --> 00:18:59,720
+dos encargos distintos
+
+220
+00:18:59,720 --> 00:19:00,740
+en el primero
+
+221
+00:19:00,740 --> 00:19:03,820
+podemos clasificar la consulta
+
+222
+00:19:03,820 --> 00:19:05,540
+eeeem
+
+223
+00:19:05,540 --> 00:19:07,220
+y en el segundo podemos redactar
+
+224
+00:19:07,220 --> 00:19:14,700
+Entonces una posible salida para el primer encargo es que hay que consultar los cobros.
+
+225
+00:19:14,700 --> 00:19:22,740
+Pero además tengo que comprobar que esa salida es válida, es útil, es decir, tengo que
+
+226
+00:19:22,740 --> 00:19:29,420
+compararlo con la categoría correcta para ver si efectivamente está bien clasificado.
+
+227
+00:19:29,420 --> 00:19:36,820
+Y en el segundo cargo pedimos redactar una explicación del procedimiento, que sería
+
+228
+00:19:36,820 --> 00:19:40,060
+una posible salida como respuesta al me
+
+229
+00:19:40,060 --> 00:19:41,740
+cobraron dos veces y necesito comprobarlo.
+
+230
+00:19:41,740 --> 00:19:44,740
+Entonces,
+
+231
+00:19:45,540 --> 00:19:49,980
+podría por ejemplo necesitar hablar de
+
+232
+00:19:49,980 --> 00:19:51,700
+los documentos necesarios para hacer esa
+
+233
+00:19:51,700 --> 00:19:56,620
+esa gestión, plazo de revisión,
+
+234
+00:19:56,620 --> 00:19:58,980
+instructivos que puede seguir, digamos, la
+
+235
+00:19:58,980 --> 00:20:01,420
+persona que hace la solicitud. Entonces se
+
+236
+00:20:01,420 --> 00:20:03,780
+necesita una comprobación. Entonces, si se
+
+237
+00:20:03,780 --> 00:20:05,460
+fijan cuando estoy haciendo esta
+
+238
+00:20:05,460 --> 00:20:08,060
+la tabla, lo que estoy diciendo es, esto es
+
+239
+00:20:08,060 --> 00:20:10,020
+haciendo responder a las preguntas que yo les he comentado.
+
+240
+00:20:10,020 --> 00:20:13,940
+¿Qué es lo que yo tengo que hacer? Nuestro objetivo, nuestra tarea. ¿Cuál es
+
+241
+00:20:13,940 --> 00:20:19,700
+una salida posible? y por consecuencia voy a saber cuál es mi entraba
+
+242
+00:20:19,700 --> 00:20:25,260
+y cómo voy a comprobar si eso es útil o no. Porque si no puedo entregar
+
+243
+00:20:25,260 --> 00:20:29,020
+imagínense que este sistema está mal calibrado, no es muy bueno y empieza a
+
+244
+00:20:29,020 --> 00:20:33,180
+decir, la gestión está completa,
+
+245
+00:20:33,180 --> 00:20:37,820
+ya se gestionó el comprobante y no se comprobó que ese comprobante
+
+246
+00:20:37,820 --> 00:20:40,620
+efectivamente
+
+247
+00:20:40,620 --> 00:20:44,940
+es sucedido.
+
+248
+00:20:44,940 --> 00:20:49,180
+También puedo ver, por ejemplo, la fluidez del texto, si se lee de manera
+
+249
+00:20:49,180 --> 00:20:57,980
+natural, y tengo que responder a estas tres
+
+250
+00:20:57,980 --> 00:21:03,180
+interrogantes con, en este ejemplo particular, digamos, pero en todas las
+
+251
+00:21:03,180 --> 00:21:10,600
+problemáticas, en todas estas aplicaciones, voy a necesitar una comprobación y esa
+
+252
+00:21:10,600 --> 00:21:14,700
+comprobación puede ser otro sistema, puede estar dentro del sistema. Entonces, no
+
+253
+00:21:14,700 --> 00:21:20,700
+basta simplemente con clasificar bien, que podría ser una de las herramientas
+
+254
+00:21:20,700 --> 00:21:25,540
+metodológicas que nosotros hicimos, que llevamos de las sesiones pasadas, vimos cómo
+
+255
+00:21:25,540 --> 00:21:30,220
+clasificar correos con distintas metodologías para
+
+256
+00:21:30,220 --> 00:21:35,380
+para que todo el encargo, todo nuestro objetivo sea realizado correctamente
+
+257
+00:21:35,380 --> 00:21:43,180
+entonces yo puedo desagregar mis objetivos en distintos subtareas y cada
+
+258
+00:21:43,180 --> 00:21:48,660
+tarea tendrá su metodología en particular
+
+259
+00:21:48,660 --> 00:21:53,220
+que puede hacer más útil en ese caso. Nosotros sabemos cómo clasificar y podemos
+
+260
+00:21:53,220 --> 00:21:59,780
+ver cómo redactarlo. Lo voy a ver un poquito más adelante.
+
+261
+00:21:59,780 --> 00:22:02,300
+Ahora,
+
+262
+00:22:03,380 --> 00:22:08,700
+dentro de estas, estos sistemas, una de las herramientas que más se utiliza, que
+
+263
+00:22:08,700 --> 00:22:13,820
+lo vamos a introducir hoy y lo vamos a ver el próximo martes en mucho más
+
+264
+00:22:13,820 --> 00:22:21,780
+detalle, es una red de numeral que simplemente es un modelo que recibe datos
+
+265
+00:22:21,780 --> 00:22:29,220
+numéricos y recalco el datos numéricos, numérico siendo la palabra clave y los
+
+266
+00:22:29,220 --> 00:22:34,380
+transforma para producir una salida. No estoy diciendo cómo, eso lo vamos a ver
+
+267
+00:22:34,380 --> 00:22:38,500
+más en detalle porque hay muchas formas de hacerlo.
+
+268
+00:22:38,500 --> 00:22:44,820
+Y esas operaciones que realiza esta renda oral ya tiene valores ya entre medio
+
+269
+00:22:44,820 --> 00:22:51,220
+que pueden ser ajustados y que esos valores se aprenden a partir de
+
+270
+00:22:51,220 --> 00:22:55,540
+ejemplos, a partir de datos pasados.
+
+271
+00:22:55,540 --> 00:23:04,020
+Entonces, vamos a definir tres partes. Primero, la entrada. Veamos el ejemplo
+
+272
+00:23:04,020 --> 00:23:09,860
+que nosotros vimos de una imagen que nosotros podemos ver
+
+273
+00:23:09,860 --> 00:23:19,140
+lo vamos a particularizar en un número, en esencia una imagen de un número escrito a mano
+
+274
+00:23:19,140 --> 00:23:24,620
+y vamos a ver cómo lo utilizamos. Segundo, nosotros vamos a ver ese ejemplo de los números
+
+275
+00:23:24,620 --> 00:23:29,340
+escrito a mano, segundo el tipo de transformaciones que se hacen, ya que en esencia es la red de la
+
+276
+00:23:29,340 --> 00:23:35,020
+neurona, que se hace con ese dato que yo le estoy diciendo que es una imagen, cómo la transformo,
+
+277
+00:23:35,020 --> 00:23:41,380
+porque un imagen en principio, si se fijan yo les mencioné y les recalqué que
+
+278
+00:23:41,380 --> 00:23:46,140
+el arredondolonal transforma datos numéricos. Un imagen tiene que tener una
+
+279
+00:23:46,140 --> 00:23:50,740
+representación numérica, pero esa representación puede ser variada.
+
+280
+00:23:50,740 --> 00:23:54,900
+Entonces, tenemos que ver qué tan susceptible es nuestro modelo a las
+
+281
+00:23:54,900 --> 00:23:59,780
+distintas representaciones numéricas. Vamos a entrar en detalle la
+
+282
+00:23:59,780 --> 00:24:04,420
+semana de cómo construir y cómo se hacen estas transformaciones
+
+283
+00:24:04,420 --> 00:24:11,100
+mucho más en detalle la próxima semana y la tercera parte, la tercera
+
+284
+00:24:11,100 --> 00:24:15,980
+categoría dentro de esta Renda Rural es la salida, entonces siempre lo he estado viendo
+
+285
+00:24:15,980 --> 00:24:20,100
+como un sistema, algo que entra, algo que se hace dentro de este sistema de
+
+286
+00:24:20,100 --> 00:24:25,100
+Renda Rural y una salida. Ahora, vamos a tener detalles de cómo se
+
+287
+00:24:25,100 --> 00:24:29,540
+hace esto pero tenemos que primero, en primera instancia, definir cómo va a ser la
+
+288
+00:24:29,540 --> 00:24:36,500
+entrada. ¿Cómo pasó un imagen, por ejemplo, a algo que yo estoy
+
+289
+00:24:36,500 --> 00:24:40,420
+definiendo para que pueda ser utilizado o pueda ser transformado
+
+290
+00:24:40,420 --> 00:24:48,340
+en una salida con una red donora? Entonces, tenemos que transformar esa
+
+291
+00:24:48,340 --> 00:24:52,340
+imagen a algo numérico y ahí tenemos distintas representaciones.
+
+292
+00:24:52,340 --> 00:24:56,100
+Esto está intrínsecamente relacionado con lo que nosotros definimos como
+
+293
+00:24:56,100 --> 00:25:03,100
+aprendizaje profundo, porque el aprendizaje profundo en este contexto
+
+294
+00:25:03,100 --> 00:25:08,380
+es cuando nosotros vamos a estar modificando estos valores
+
+295
+00:25:08,380 --> 00:25:14,740
+ajustables que se definen dentro del sistema de red neuronal
+
+296
+00:25:14,740 --> 00:25:23,620
+muchas veces y con metodología un poquito más
+
+297
+00:25:23,620 --> 00:25:28,060
+sofisticada, más computacionalmente intensiva,
+
+298
+00:25:28,060 --> 00:25:33,900
+en donde tratamos de aprender no sólo de los datos sino de sus transformaciones y
+
+299
+00:25:33,900 --> 00:25:39,100
+hacemos muchas transformaciones de ésta para entender
+
+300
+00:25:40,700 --> 00:25:46,780
+para entender, digamos, las distintas relaciones unilaterales. Claudia Cuña
+
+301
+00:25:46,780 --> 00:25:52,700
+pregunta si es renal jazz deep learning? No, de hecho Josefalo lo respondió
+
+302
+00:25:52,700 --> 00:26:00,080
+bastante bien porque va a depender mucho de la complejidad de la red neuronal al
+
+303
+00:26:00,080 --> 00:26:05,520
+igual red neuronal sigue siendo un concepto muy amplio si por ejemplo yo hago
+
+304
+00:26:05,520 --> 00:26:11,240
+una red neuronal que lo vamos a profundizar la próxima semana una
+
+305
+00:26:11,240 --> 00:26:15,420
+red neuronal con una neurona y una capa estoy casi al mismo nivel de hacer una
+
+306
+00:26:15,420 --> 00:26:22,080
+regresión entonces necesitamos muchas capas que lo vamos a digamos definir la
+
+307
+00:26:22,080 --> 00:26:30,680
+próxima semana pero para que lo consideremos, digamos, algo como
+
+308
+00:26:30,680 --> 00:26:35,600
+sin ambigüedad profundo o deep learning
+
+309
+00:26:35,600 --> 00:26:39,720
+por eso lo vamos a particularizar y lo vamos a profundizar la próxima semana
+
+310
+00:26:39,720 --> 00:26:44,160
+por ahora quedémonos en este concepto de red neural que tiene una entrada
+
+311
+00:26:44,160 --> 00:26:48,920
+tiene operaciones, transformaciones de las cuales yo aprendo de mis datos y de
+
+312
+00:26:48,920 --> 00:26:54,800
+las transformaciones de mis dados y tengo una salida. Pero lo que quiero profundizar ahora es
+
+313
+00:26:54,800 --> 00:27:05,720
+cómo pasó esto de un imagen, por ejemplo, a algo que tiene que ser numérico, porque dijimos que la
+
+314
+00:27:05,720 --> 00:27:16,600
+arrendanol oral tiene entradas numéricas. Entonces, antes de pasar a ello, vamos a
+
+315
+00:27:16,600 --> 00:27:23,900
+un pequeño recuerdo de cómo hago este aprendizaje.
+
+316
+00:27:23,900 --> 00:27:27,800
+Primero, nosotros separamos en un conjunto de entrenamiento o también se
+
+317
+00:27:27,800 --> 00:27:33,080
+llama de desarrollo, si pongo validación.
+
+318
+00:27:33,080 --> 00:27:40,280
+Y con este conjunto, el conjunto de entrenamiento, yo ajusto mi modelo,
+
+319
+00:27:40,280 --> 00:27:45,280
+obtengo estos parámetros, estos valores ajustados que les mencionaba,
+
+320
+00:27:45,280 --> 00:27:53,800
+y necesito ejemplos claros. Por ejemplo, datos que tengan
+
+321
+00:27:53,800 --> 00:27:58,440
+números escrito a mano,
+
+322
+00:27:58,440 --> 00:28:02,520
+tengo que saber qué número efectivamente era el que estaba escrito
+
+323
+00:28:02,520 --> 00:28:08,280
+para poder aprender porque si no yo tengo imágenes a secas y no voy a saber
+
+324
+00:28:08,280 --> 00:28:13,800
+cuál era la respuesta correcta, entonces necesito saber eso.
+
+325
+00:28:13,800 --> 00:28:18,580
+Y voy a tener otro conjunto que va a ser el de uso de predicción en donde yo
+
+326
+00:28:18,580 --> 00:28:28,100
+ocupo el modelo que obtuve con el modelo, con el conjunto de entrenamiento y voy a recibir digamos
+
+327
+00:28:28,100 --> 00:28:34,700
+probabilidades de clasificación en este caso de quién número era. Entonces se fijan en el
+
+328
+00:28:34,700 --> 00:28:41,740
+entrenamiento yo tengo la información clasificada, es decir, tengo imágenes que tienen un número
+
+329
+00:28:41,740 --> 00:28:49,000
+asignado o una etiqueta y en la prueba o el conjunto de uso de predicción o de
+
+330
+00:28:49,000 --> 00:28:55,120
+prueba también se llama no tengo esa etiqueta y si es que la
+
+331
+00:28:55,120 --> 00:28:59,680
+tengo el oculto para ver si efectivamente mi modelo está clasificando
+
+332
+00:28:59,680 --> 00:29:04,680
+correctamente. Ahora
+
+333
+00:29:04,680 --> 00:29:11,120
+nosotros hacemos eso para tratar de simular qué tan robusto es mi sistema
+
+334
+00:29:11,120 --> 00:29:16,640
+mi modelo con imágenes que no conocen. Porque dijimos que estas rebanonales aprenden de un
+
+335
+00:29:16,640 --> 00:29:25,240
+conjunto representado de manera numérica, ¿ya? Pero va a aprender de ese conjunto. Entonces,
+
+336
+00:29:25,240 --> 00:29:30,520
+nosotros queremos ocupar ese modelo para otros nuevos datos, porque los que nosotros utilizamos
+
+337
+00:29:30,520 --> 00:29:34,960
+en el entrenamiento ya los conocemos. Entonces, queremos ocupar los nuevos datos y para ocupar
+
+338
+00:29:34,960 --> 00:29:40,280
+los nuevos datos tenemos que ponernos el caso más real, que es no saber efectivamente cuál era el
+
+339
+00:29:40,280 --> 00:29:47,320
+número. Entonces por eso lo ocultamos o en principio no lo tenemos.
+
+340
+00:29:47,480 --> 00:29:53,200
+Entonces, veamos qué significa entonces representar los datos. Nosotros vimos un
+
+341
+00:29:53,200 --> 00:29:58,160
+ejemplo de cómo represento cosas no numéricas como numéricas y tengo en
+
+342
+00:29:58,160 --> 00:30:05,520
+esencia infinitas representaciones. Pensemos entonces en el caso de un correo.
+
+343
+00:30:05,520 --> 00:30:09,960
+Yo puedo contar las palabras, palabras clave por ejemplo, puedo contar las
+
+344
+00:30:09,960 --> 00:30:15,240
+palabra crédito y en este ejemplo tengo el correo apotético digamos crédito
+
+345
+00:30:15,240 --> 00:30:21,960
+gratis crédito entonces crédito cuenta dos veces gratis 1 urgente 0
+
+346
+00:30:21,960 --> 00:30:26,560
+entonces dado que quiero muchos los modelos que nosotros queremos hacer son
+
+347
+00:30:26,560 --> 00:30:33,240
+inherentemente numéricos matemáticos hay número por debajo necesitamos pasar
+
+348
+00:30:33,240 --> 00:30:38,780
+nuestra entrada que puede no ser un dato estructurado o estructurado y no
+
+349
+00:30:38,780 --> 00:30:44,260
+numérico a algo numérico y tenemos que tener formas de hacer eso entonces por
+
+350
+00:30:44,260 --> 00:30:47,540
+ejemplo texto podemos contar las palabras pero tal como yo cuento las
+
+351
+00:30:47,540 --> 00:30:57,260
+palabras predefinidas diga ese paso yo podría contar las vocales o las
+
+352
+00:30:57,260 --> 00:31:04,540
+consonantes o el número de palabras entonces se fijan yo puedo asignar
+
+353
+00:31:04,540 --> 00:31:14,060
+una representación al mismo correo de distintas maneras. Puedo contar aquí, por ejemplo,
+
+354
+00:31:14,060 --> 00:31:21,880
+las palabras de crédito y gratis, entonces estoy pasando esta, estos correos van a pasar a ser un
+
+355
+00:31:21,880 --> 00:31:27,620
+vector de tres dimensiones, pero tal como están estas, yo puedo ver otras palabras, ¿ya?
+
+356
+00:31:27,620 --> 00:31:33,980
+hubo otra representación, por ejemplo puedo hacerlo simplemente con simplemente la longitud
+
+357
+00:31:33,980 --> 00:31:39,540
+del correo. Esto va a pasar a ser el número 3 porque son tres palabras. Listo. Entonces tengo
+
+358
+00:31:39,540 --> 00:31:46,420
+que tener de cierta manera alguna metodología, ya que no hay una forma general o hay una forma
+
+359
+00:31:46,420 --> 00:31:52,940
+que solucione todo, de pasar cosas no numéricas a algo numérico. Entonces tengo que diseñarlo,
+
+360
+00:31:52,940 --> 00:31:59,620
+por conveniencia, por lo que es el bio, digamos, por la utilidad propia de la tarea.
+
+361
+00:32:01,620 --> 00:32:11,500
+Ahora, en el caso de la imagen, nosotros podemos decir, bueno, la imagen en estricto rigor es una
+
+362
+00:32:11,500 --> 00:32:19,500
+matriz, porque dentro de una imagen las imágenes tienen píxeles y dentro de los píxeles se puede
+
+363
+00:32:19,500 --> 00:32:25,200
+representar con un número que nosotros le vamos a llamar la intensidad, que para
+
+364
+00:32:25,200 --> 00:32:32,840
+nuestro ejemplo va a describir el tono de esa celda, ese
+
+365
+00:32:32,840 --> 00:32:35,520
+píxel
+
+366
+00:32:36,360 --> 00:32:42,000
+entonces yo siempre voy a tener alguna forma de representar algo no numérico
+
+367
+00:32:42,000 --> 00:32:49,000
+como numérico, ahora que sea de utilidad
+
+368
+00:32:49,000 --> 00:32:54,000
+en otro tema. Entonces yo voy a tener en
+
+369
+00:32:54,000 --> 00:33:01,000
+esencia la noción de pasar los pixeles a un número, pero qué número, esa es otra
+
+370
+00:33:01,000 --> 00:33:06,000
+interlocuente, entonces las representaciones que yo tengo de pasar
+
+371
+00:33:06,000 --> 00:33:11,000
+imágenes que yo estoy mencionando que son una matriz porque si se fijan acá
+
+372
+00:33:11,000 --> 00:33:17,560
+esto tiene distintas píxeles
+
+373
+00:33:18,120 --> 00:33:22,360
+es como un pantón de colores
+
+374
+00:33:24,160 --> 00:33:29,160
+es algo así, pero aquí lo estamos viendo porque iba a eso digamos porque
+
+375
+00:33:29,160 --> 00:33:32,920
+estaba hablando de colores y aquí estoy hablando de la intensidad que describe
+
+376
+00:33:32,920 --> 00:33:37,640
+el tono de cada celda, entonces yo estoy haciendo simplemente un degradé entre
+
+377
+00:33:37,640 --> 00:33:44,600
+blanco y negro y por eso lo puedo definir sólo con un número yo quiero hacerlo
+
+378
+00:33:44,600 --> 00:33:50,080
+como colores tengo que entrar en más dimensiones que lo va a mencionar el tiro
+
+379
+00:33:50,080 --> 00:33:56,200
+si se fijan acá el dígito 0 estos son imágenes
+
+380
+00:33:58,000 --> 00:34:03,800
+8x8 pixeles o sea hay 8 cuadraditos para la derecha 8 cuadraditos para abajo y si
+
+381
+00:34:03,800 --> 00:34:10,880
+si se fijan cada cada celda puede ser visto como la entrada de una matriz ya y
+
+382
+00:34:10,880 --> 00:34:19,840
+si yo defino por ejemplo 0 como blanco y 9 como el negro más oscuro puedo
+
+383
+00:34:19,840 --> 00:34:26,720
+definir el resto de tonos ya con otro número pero eso sólo dentro de un mismo
+
+384
+00:34:26,720 --> 00:34:31,440
+de grado a blanco negro qué pasa si yo quiero definir la hora en términos de
+
+385
+00:34:31,440 --> 00:34:36,740
+colores, que es lo que hacen lo que hacían más bien las televisores antiguos, que son
+
+386
+00:34:36,740 --> 00:34:47,060
+el RG. Yo puedo descomponer todos los colores en una componente roja, verde y azul, y ahí
+
+387
+00:34:47,060 --> 00:34:54,820
+cada celda ya no sería un número, sino que sería un vector de dimensión 3. Entonces
+
+388
+00:34:54,820 --> 00:35:00,420
+tendría algo que después vamos a llamar que es como una matriz de vectores, que uno
+
+389
+00:35:00,420 --> 00:35:05,420
+puede hacer el paralelismo con los tensores.
+
+390
+00:35:05,420 --> 00:35:09,660
+Volvamos al ejemplo. Tenemos el ejemplo de las imágenes que son 8x8 y son
+
+391
+00:35:09,660 --> 00:35:19,140
+1797 imágenes. Imágenes en blanco y negro, 8x8 en donde sabemos y las
+
+392
+00:35:19,140 --> 00:35:23,160
+podemos ver y además sabemos cuál es la etiqueta. Entonces yo sé que esto es un
+
+393
+00:35:23,160 --> 00:35:28,780
+cero y lo tengo tabulado porque si no tendríamos que revisar cada imagen
+
+394
+00:35:28,780 --> 00:35:35,460
+una por una y ver manualmente. Y a veces uno podría equivocarse, o sea, el 7 y el 1 siempre se equivocan,
+
+395
+00:35:35,460 --> 00:35:41,860
+este pareciera un 5, pero uno podría decir bueno quizás como un 2. Vamos a ver ejemplos, digamos,
+
+396
+00:35:41,860 --> 00:35:50,220
+los cuales son un poco más ambiguos. Entonces nuestra tarea, en este caso hipotético, es reconocer
+
+397
+00:35:50,220 --> 00:35:57,020
+ya el dígito que está en la imagen entonces se tiene un sinfín de
+
+398
+00:36:00,380 --> 00:36:08,620
+una un sinfín de aplicaciones ya sino cuando ustedes por ejemplo ven y hacen
+
+399
+00:36:08,620 --> 00:36:15,500
+quieren pagar estacionamiento y le identifica digamos QR es algo muy similar está identificando
+
+400
+00:36:15,500 --> 00:36:20,940
+un patrón. Gonzalo pregunta, ¿este proceso sería el mismo si se usara una base de datos
+
+401
+00:36:20,940 --> 00:36:33,980
+vectorial? No exactamente, pero voy para allá. Voy a definir cómo se podría utilizar una base de datos vectorial.
+
+402
+00:36:33,980 --> 00:36:42,060
+Lo voy a enseñar un poquito, aguantame un ratito. Ya, entonces, esta es nuestra tarea. Tengo imágenes,
+
+403
+00:36:42,060 --> 00:36:47,740
+números y los números tan etiquetados. ¿Qué puedo hacer? Si se fijan, en esta
+
+404
+00:36:47,740 --> 00:36:55,420
+entrada ya no son números como probablemente tal, sino que es una imagen
+
+405
+00:36:55,420 --> 00:37:00,460
+que yo le represento como un conjunto de números
+
+406
+00:37:00,900 --> 00:37:04,420
+y que además lo tengo marcado. Entonces yo podría definirlo en términos de un
+
+407
+00:37:04,420 --> 00:37:10,420
+vector que va a ser de 8 para la izquierda, 8 de izquierda a
+
+408
+00:37:10,420 --> 00:37:15,420
+derecha y después 8 de izquierda a derecha así pegados uno al lado del otro
+
+409
+00:37:15,420 --> 00:37:19,780
+o lo puedo ver como matriz también. Ahí tengo distintas formas de representar el
+
+410
+00:37:19,780 --> 00:37:26,420
+valor. Entonces, veámoslo acá. Tengo entonces
+
+411
+00:37:26,420 --> 00:37:36,820
+una imagen en particular. Entonces 8x8, 64, tengo 64 píxeles, una matriz de números.
+
+412
+00:37:36,820 --> 00:37:46,980
+Y ahora voy a hablar de una intensidad, no una intensidad, perdón, de intensidad entre 0 y 16,
+
+413
+00:37:46,980 --> 00:37:53,780
+esta acá entre 0 y 9, eran los números que efectivamente podían ser, con los cuales podemos
+
+414
+00:37:53,780 --> 00:37:59,860
+reconstruir números adicionales. Entonces aquí tengo una matriz, que es la disección de una imagen,
+
+415
+00:37:59,860 --> 00:38:09,500
+en donde si se fijan acá este es ese número este 8 que está aquí este cuarto
+
+416
+00:38:11,500 --> 00:38:17,500
+esta cuarta celda que es la que está ahí, es bien nevita entonces mientras más se acerca a 16
+
+417
+00:38:18,420 --> 00:38:26,980
+más cercano al negro puro es ya entonces yo puedo representar la imagen como esta matriz
+
+418
+00:38:26,980 --> 00:38:36,700
+y la matriz la puedo escribir como un vector, entonces si se fijan yo puedo hacer esto,
+
+419
+00:38:36,700 --> 00:38:41,100
+el primer número del vector, el segundo número del vector, tercer número del vector, cuarto
+
+420
+00:38:41,100 --> 00:38:49,380
+número del vector, 5, 6, 7, 8 y después sigo con la segunda fila, por convención, yo lo
+
+421
+00:38:49,380 --> 00:38:55,060
+estoy haciendo, pero también podría ir para abajo y hacer 8 ceros, después 5 ceros y
+
+422
+00:38:55,060 --> 00:38:58,060
+y luego un 3. Lo estoy representando como un vector.
+
+423
+00:39:01,060 --> 00:39:04,060
+Ahora, como yo sé que esa intensidad va entre 0 y 16,
+
+424
+00:39:04,060 --> 00:39:09,060
+yo puedo dividirlo de 16 y lo estandarizo entre 0 y 1.
+
+425
+00:39:09,060 --> 00:39:14,060
+Entonces, un 8 va a ser un 0,5 y así sucesivamente.
+
+426
+00:39:14,060 --> 00:39:18,060
+Entonces, lo tengo una interpretación un poquito más clara en vez de ser el 16.
+
+427
+00:39:18,060 --> 00:39:27,020
+entonces esto es un 8 y además sabemos que está clasificado como un 8 porque sabemos que es el
+
+428
+00:39:27,020 --> 00:39:32,460
+dígito 8, lo tenemos etiquetado previamente porque nuestro conjunto de datos de entrenamiento
+
+429
+00:39:34,460 --> 00:39:35,120
+ahora
+
+430
+00:39:39,100 --> 00:39:44,860
+cada uno de estas imágenes las voy a guardar como este gran vector
+
+431
+00:39:44,860 --> 00:39:57,420
+Y yo podría poner, por ejemplo, la etiqueta como la 65 aba columna o dimensión de este
+
+432
+00:39:57,420 --> 00:40:04,220
+vector para saber cuál es el número en términos de la imagen y cuál es su etiqueta.
+
+433
+00:40:04,220 --> 00:40:08,980
+Pero lo tengo que guardar, tengo que saberlo.
+
+434
+00:40:08,980 --> 00:40:22,460
+Esto, si se fijan, es una de las representaciones que yo tengo de pasar una imagen a un número.
+
+435
+00:40:22,460 --> 00:40:27,220
+Pero yo podría tener otro tipo de imagen, podría tener otro tipo de representación,
+
+436
+00:40:27,220 --> 00:40:32,120
+podría no ser 8x8. Si se fijan aquí estamos en una imagen estructurada. Todas las imágenes
+
+437
+00:40:32,120 --> 00:40:36,760
+son 8 pixeles por 8 pixeles.
+
+438
+00:40:36,760 --> 00:40:40,500
+Entonces, la representación numérica no es necesariamente
+
+439
+00:40:40,500 --> 00:40:41,520
+trivial.
+
+440
+00:40:41,520 --> 00:40:44,360
+No es simplemente pasar una imagen a un número,
+
+441
+00:40:44,360 --> 00:40:47,440
+sino que pasa si la imagen tiene muchos más pixeles de
+
+442
+00:40:47,440 --> 00:40:48,520
+distinto dimensiones.
+
+443
+00:40:48,520 --> 00:40:50,920
+Entonces, tengo que tener distintas metodologías para
+
+444
+00:40:50,920 --> 00:40:55,840
+poder representar las distintas entradas de nuestra información,
+
+445
+00:40:55,840 --> 00:40:58,760
+nuestros datos que tenemos en los distintos fórmata a algo
+
+446
+00:40:58,760 --> 00:41:00,360
+numérico.
+
+447
+00:41:00,360 --> 00:41:12,840
+y eso puede ser una tarea en sí misma. Entonces, para cada imagen que tengo yo, el clasificador
+
+448
+00:41:12,840 --> 00:41:23,000
+que nosotros vamos a utilizar como ejemplo en la red neuronal, va a entregar 10 probabilidades,
+
+449
+00:41:23,000 --> 00:41:29,720
+cada una correspondiente a todos los dígitos posibles, de 0 a 9, ahí tengo 10.
+
+450
+00:41:29,720 --> 00:41:39,320
+Entonces, esperamos que esa probabilidad sea lo más cercana a la etiqueta posible.
+
+451
+00:41:39,320 --> 00:41:46,920
+En términos de si este número que está acá,
+
+452
+00:41:46,920 --> 00:41:53,320
+me entrega una, me, esperaríamos que me entregase una probabilidad alta que sea un 8.
+
+453
+00:41:53,320 --> 00:41:56,520
+Entonces, estamos clasificando precisamente tal,
+
+454
+00:41:56,520 --> 00:42:02,240
+pero estamos clasificando ahora cosas un poco más no estructuradas, que son imagenes
+
+455
+00:42:02,240 --> 00:42:11,840
+pero estamos pasando un filtro, es decir, estamos pasando algo no numérico a algo numérico
+
+456
+00:42:11,840 --> 00:42:19,160
+de manera arbitraria que lo estamos haciendo, porque tenemos infinitas representaciones, digamos
+
+457
+00:42:19,160 --> 00:42:24,080
+entonces, veamos un ejemplo hipotético, si tengo un dígito 3
+
+458
+00:42:24,080 --> 00:42:29,800
+voy a tener una probabilidad de 06, si tengo un dígito 8, una probabilidad de 026
+
+459
+00:42:29,800 --> 00:42:35,880
+y las otras 8 clases en conjunto suman 015 para una imagen en particular
+
+460
+00:42:35,880 --> 00:42:38,680
+entonces, lo que usualmente se hace es
+
+461
+00:42:38,680 --> 00:42:42,040
+la clase que tiene más probabilidad
+
+462
+00:42:42,040 --> 00:42:46,080
+es la que yo la clasifico, es decir
+
+463
+00:42:46,080 --> 00:42:51,680
+si la probabilidad de que sea la 3 es la mayor, entonces pueda predecir o clasificar
+
+464
+00:42:51,680 --> 00:42:54,760
+esa imagen como ese dígito
+
+465
+00:42:54,760 --> 00:42:58,480
+entonces el modelo que estamos haciendo, el modelo clasificador que estamos
+
+466
+00:42:58,480 --> 00:43:00,600
+utilizando con la reina oral
+
+467
+00:43:00,600 --> 00:43:04,040
+va a predecir el 3
+
+468
+00:43:04,040 --> 00:43:06,800
+si efectivamente un 8 porque el 3 y el 8
+
+469
+00:43:06,800 --> 00:43:08,840
+para ciertas personas que hacen lo mismo
+
+470
+00:43:08,840 --> 00:43:12,680
+entonces me equivoqué
+
+471
+00:43:12,680 --> 00:43:25,680
+A pesar de que yo igual le di una probabilidad no menor, ya, de dígito 8 a esa imagen, ya, en ese caso se pierde esa predicción.
+
+472
+00:43:27,680 --> 00:43:34,680
+Entonces, lo que yo escojo y la probabilidad son cosas distintas. Tengo que obtener es un break y la regla de decisión.
+
+473
+00:43:35,680 --> 00:43:37,680
+Sigamos entonces.
+
+474
+00:43:37,680 --> 00:43:51,660
+Ahora, en el entrenamiento, en este ejemplo que hemos dicho de 7000, o sea de 1797 imágenes,
+
+475
+00:43:51,660 --> 00:43:59,760
+yo voy a dejar 1077 para entrenamiento, 360 para evaluación y 360 para prueba.
+
+476
+00:43:59,760 --> 00:44:06,360
+esta 1077 imágenes de números etiquetados voy a ajustar los distintos
+
+477
+00:44:06,360 --> 00:44:12,440
+modelos que yo voy a predefinir. Podríamos ocupar regresos logísticos,
+
+478
+00:44:12,440 --> 00:44:15,960
+podríamos ocupar naïvayas, podríamos ocupar reanonales y aquí es donde uno
+
+479
+00:44:15,960 --> 00:44:21,480
+empieza a buscar las distintas herramientas que se sabe para este que
+
+480
+00:44:21,480 --> 00:44:25,380
+pueden servir para esta tarea en particular. Por eso es importante saber
+
+481
+00:44:25,380 --> 00:44:29,520
+cuál es tu objetivo porque tu objetivo y en conjunto con el tipo de datos que
+
+482
+00:44:29,520 --> 00:44:35,760
+tienes a disposición o necesitas obtener te va a sugerir claramente qué
+
+483
+00:44:35,760 --> 00:44:41,160
+tipo de metodología es la que tú puedes utilizar para resolver esa tarea.
+
+484
+00:44:41,160 --> 00:44:45,240
+Si no tengo claro el objetivo, no sé bien qué es lo que quiero hacer, entonces se va a
+
+485
+00:44:45,240 --> 00:44:48,280
+empezar a hacer puras cosas y nunca se va a llegar algo y si es que si llega
+
+486
+00:44:48,280 --> 00:44:53,080
+algo no va a ser algo que tú te definiste en un principio y quizás por
+
+487
+00:44:53,080 --> 00:44:57,520
+suerte te sirva pero no va a ser reproducible en estricto rigor.
+
+488
+00:44:57,520 --> 00:45:03,360
+Entonces con el entrenamiento ajusto el
+
+489
+00:45:14,080 --> 00:45:17,080
+Entonces yo voy a
+
+490
+00:45:18,760 --> 00:45:21,960
+entrenar con este modelo, con la
+
+491
+00:45:22,040 --> 00:45:25,080
+valiación voy a escoger, una vez que
+
+492
+00:45:25,080 --> 00:45:34,120
+el modelo con estas dos cantidades con los 1077 más 360 datos que son el conjunto de desarrollo
+
+493
+00:45:34,120 --> 00:45:40,520
+en principio y cuando ese lo entrebe voy a probarlo en el conjunto de prego. Entonces,
+
+494
+00:45:40,520 --> 00:45:46,520
+nosotros ya tenemos una forma de clasificar que es la regulación logística. Si bien la regulación
+
+495
+00:45:46,520 --> 00:45:52,400
+logística se usa principalmente para clasificación binaria, también se puede extender para clasificación
+
+496
+00:45:52,400 --> 00:45:58,760
+en k-clases. Entonces,
+
+497
+00:45:59,040 --> 00:46:04,640
+en la regresión logística voy a ocupar los 64 píxeles de la
+
+498
+00:46:04,640 --> 00:46:11,480
+imágenes 8x8 para calcular alguna de las 10 clases, ya los
+
+499
+00:46:11,480 --> 00:46:19,200
+números 3 0 y 9. Y en general la regresión logística tiende a ser el
+
+500
+00:46:19,200 --> 00:46:25,120
+el modelo base para clasificación.
+
+501
+00:46:25,120 --> 00:46:27,640
+Es decir, hacemos siempre revisión logística,
+
+502
+00:46:27,640 --> 00:46:30,600
+pero a sabiendas que no necesariamente va a ser el mejor
+
+503
+00:46:30,600 --> 00:46:32,480
+modelo de clasificación que podemos hacer,
+
+504
+00:46:32,480 --> 00:46:35,520
+pero sabemos que es barato, sabemos que es fácil de
+
+505
+00:46:35,520 --> 00:46:38,280
+implementar, e interpretable, etcétera.
+
+506
+00:46:38,280 --> 00:46:44,440
+Entonces, lo ocupo como base y lo ocupo como modelo a vencer.
+
+507
+00:46:44,440 --> 00:46:47,960
+En cambio, la revisión logística no va a ocupar
+
+508
+00:46:47,960 --> 00:46:53,880
+directamente los 64 pixeles, sino que va a tener eso como entrada,
+
+509
+00:46:53,880 --> 00:46:56,720
+pero va a transformarlos de alguna manera que lo vamos
+
+510
+00:46:56,720 --> 00:47:00,960
+a especificar en la próxima sesión para producir las
+
+511
+00:47:00,960 --> 00:47:03,320
+distintas probabilidades.
+
+512
+00:47:03,320 --> 00:47:07,280
+Para cada imagen va a definir probabilidades para cada clase.
+
+513
+00:47:07,280 --> 00:47:08,280
+¿Ya?
+
+514
+00:47:10,040 --> 00:47:11,040
+Ahora
+
+515
+00:47:16,680 --> 00:47:17,680
+Siguiendo
+
+516
+00:47:18,120 --> 00:47:19,620
+¿Cómo voy a medir?
+
+517
+00:47:19,800 --> 00:47:22,800
+Esta es probabilidad, ¿sabes?
+
+518
+00:47:22,800 --> 00:47:24,800
+Voy a tener cada observación, cada imagen
+
+519
+00:47:25,180 --> 00:47:28,180
+va a entregar una probabilidad
+
+520
+00:47:28,180 --> 00:47:30,600
+de que pertenezca a una clase
+
+521
+00:47:30,600 --> 00:47:33,580
+en el ejemplo que nosotros estamos utilizando son las clases entre
+
+522
+00:47:33,580 --> 00:47:36,760
+que el número sea 0, 1, 2, 3 hasta 9
+
+523
+00:47:36,760 --> 00:47:48,760
+Pero la probabilidad per se no es todo, nosotros vamos a definirlo, y lo habíamos mencionado en clase anterior, cuando vimos las evaluaciones, es la pérdida logarítmica.
+
+524
+00:47:48,760 --> 00:47:57,760
+Entonces, porque no es lo mismo equivocarse y estar muy confiado de esa respuesta que equivocarse y no haberlo estado.
+
+525
+00:47:57,760 --> 00:48:01,760
+Entonces, la probabilidad per se puede esconder muchas cosas.
+
+526
+00:48:01,760 --> 00:48:08,760
+Entonces vamos a definir este concepto de pérdida, y en particular nosotros vamos a definir la pérdida logarítmica, o LOC-LOS.
+
+527
+00:48:08,760 --> 00:48:18,760
+Y lo que hacemos es sacar el menos logaritmo natural de la probabilidad.
+
+528
+00:48:18,760 --> 00:48:27,760
+Y esto es lo que nosotros evaluamos para definir y escoger la clase en la cual yo voy a escoger y voy a clasificar.
+
+529
+00:48:27,760 --> 00:48:35,400
+en vez de directamente la probabilidad como se hace por ejemplo en la regresión logística binaria
+
+530
+00:48:35,400 --> 00:48:40,280
+que me pongo numbral y si supere esa probabilidad entonces un sí y si es que no la supera entonces un no
+
+531
+00:48:40,280 --> 00:48:53,240
+aquí voy a utilizar la perdida logri como una métrica un poco más sofisticada de escoger cuál
+
+532
+00:48:53,240 --> 00:48:59,040
+es efectivamente lo que voy a utilizar, voy a predecir.
+
+533
+00:49:01,040 --> 00:49:06,940
+Entonces, como métrica, cuando lo pruebe en el conjunto de prueba
+
+534
+00:49:06,940 --> 00:49:09,640
+o alguna redundancia, vamos a utilizar la exactitud,
+
+535
+00:49:09,640 --> 00:49:14,840
+que es simplemente la proporción de imágenes que fue clasificada correctamente.
+
+536
+00:49:14,840 --> 00:49:18,140
+Entonces, cuando lo hacemos con los datos,
+
+537
+00:49:18,140 --> 00:49:29,140
+En este caso la logística acertó 353 veces de las 360 en el conjunto de prueba
+
+538
+00:49:29,140 --> 00:49:38,140
+lo que me da una exactitud del 98.06% y una pérdida logarítmica de 0.3353
+
+539
+00:49:38,140 --> 00:49:42,140
+En el caso de la reina neuronal, ya en este ejemplo con los datos que les menciono
+
+540
+00:49:42,140 --> 00:49:52,140
+la regresión, es decir, la reno renal va a acercar una vez una cantidad más, es decir, 354 de 360,
+
+541
+00:49:52,140 --> 00:49:57,140
+entonces tenemos predicciones bien buenas y viene una exactitud de 98.33.
+
+542
+00:49:57,140 --> 00:50:01,140
+Pues si se fijan cuando veo en términos de la exactitud, que es una de las métricas que podemos
+
+543
+00:50:01,140 --> 00:50:04,140
+calcular a través de la tabla de confusión, o de la matriz de confusión, perdón,
+
+544
+00:50:04,140 --> 00:50:11,140
+aquí hay una pequeña diferencia, pero cuando lo veo en la pérdida logarítmica
+
+545
+00:50:11,140 --> 00:50:19,420
+se acrecenta bastante. Entonces, esa pequeña diferencia que tenemos
+
+546
+00:50:19,420 --> 00:50:28,060
+claramente hace referencia a clasificar una imagen adicional, porque aquí son
+
+547
+00:50:28,060 --> 00:50:36,340
+350 trillecas, 354. Ahora, en esta última columna, si se fijan, tenemos 0.1353
+
+548
+00:50:36,340 --> 00:50:46,980
+0.0657 tenemos los números y la diferencia ya es
+
+549
+00:50:46,980 --> 00:50:49,900
+no tan cercana en términos de actitud es
+
+550
+00:50:49,900 --> 00:50:54,180
+creciente más y aquí estamos haciendo el caso contrario en la actitud nosotros
+
+551
+00:50:54,180 --> 00:50:57,140
+queremos el número más alto y en la periáloga arimigia nosotros queremos
+
+552
+00:50:57,140 --> 00:51:02,660
+número más bajo entonces cuando queremos hacerlo en este tipo de
+
+553
+00:51:02,660 --> 00:51:05,860
+metodología de clasificación utilizando la red neuronal lo vamos a
+
+554
+00:51:05,860 --> 00:51:10,400
+utilizar directamente las métricas de tabla de confusión, sino que vamos a ver
+
+555
+00:51:10,400 --> 00:51:16,600
+la pérdida logarítmica. Y aquí vamos a escoger el número más bajo que
+
+556
+00:51:16,600 --> 00:51:19,800
+podamos tener.
+
+557
+00:51:19,920 --> 00:51:24,840
+Porque yo puedo tener distintos números de acierto para distintas categorías y
+
+558
+00:51:24,840 --> 00:51:29,360
+puedo estar escondiendo cómo me estoy equivocando.
+
+559
+00:51:29,360 --> 00:51:35,920
+no cuando sólo veo el número de aciertos digamos
+
+560
+00:51:36,640 --> 00:51:42,600
+no veo toda la problemática de lo que está pasando
+
+561
+00:51:42,600 --> 00:51:47,120
+la pérdida que estamos viendo digamos utiliza esas probabilidades de las
+
+562
+00:51:47,120 --> 00:51:52,480
+clases reales como en los casos correctos y en los casos incorrectos
+
+563
+00:51:52,480 --> 00:51:59,320
+también la exactitud se esconde porque son los casos que sí la junté porque
+
+564
+00:51:59,320 --> 00:52:03,120
+recuerden la efectu proporción de imágenes clasificadas correctamente
+
+565
+00:52:03,120 --> 00:52:06,120
+entonces
+
+566
+00:52:06,640 --> 00:52:12,520
+también está considerando cuando dije que no era y efectivamente no lo era
+
+567
+00:52:12,520 --> 00:52:18,720
+entonces en el caso digamos de distintos tipos de clasificación entonces
+
+568
+00:52:18,720 --> 00:52:22,200
+por eso una de las razones por la que nosotros utilizamos la pérdida
+
+569
+00:52:22,200 --> 00:52:26,680
+logarítmica es que un poco más certera ya en vez de utilizar directamente la
+
+570
+00:52:26,680 --> 00:52:29,680
+probabilidad
+
+571
+00:52:30,320 --> 00:52:37,900
+así entonces vemos casos particulares si fijan acá tengo una imagen nuevamente
+
+572
+00:52:37,900 --> 00:52:47,560
+8x8 son seis imágenes que la red clasificó incorrectamente si se fijan
+
+573
+00:52:47,560 --> 00:52:56,680
+el primero es un 9 y la red lo clasificó con un 8
+
+574
+00:52:56,840 --> 00:53:03,240
+con la probabilidad de que sea asignado a un 8 le puso un 0.85 entonces se fijan
+
+575
+00:53:03,240 --> 00:53:09,440
+se equivocó pero estaba muy seguro de que era un 8, un 85%
+
+576
+00:53:09,440 --> 00:53:14,880
+de probabilidad de que fuese un 8 entonces se equivocó y se equivocó con
+
+577
+00:53:14,880 --> 00:53:23,120
+ganas, digamos, porque fue muy muy... estaba muy seguro y se equivocó. Y aquí tenemos otra
+
+578
+00:53:23,120 --> 00:53:31,200
+otra otra ejemplo. Era real, era 3, predijo 2 y predijo 2 con mucha confianza.
+
+579
+00:53:31,200 --> 00:53:37,040
+Y esto pasa en lo mismo con estos 6 números.
+
+580
+00:53:37,040 --> 00:53:40,560
+Entonces,
+
+581
+00:53:40,560 --> 00:53:45,440
+todos estos son ejemplos de respuestas que son equivocadas pero que además
+
+582
+00:53:45,440 --> 00:53:50,160
+están acompañadas de probabilidades muy altas entonces los modelos están muy
+
+583
+00:53:50,160 --> 00:53:55,560
+seguros de algo y ese algo es muy equivocado
+
+584
+00:53:55,560 --> 00:54:00,120
+y juan bilch pregunta para este y otros ejemplos se puede penalizar más o menos
+
+585
+00:54:00,120 --> 00:54:06,840
+basándose en la similitud de números o caracteres se puede penalizar más o
+
+586
+00:54:06,840 --> 00:54:12,560
+menos ahí no te entiendo bien la pregunta que a qué te refieres con penalizar. Me refiero a que
+
+587
+00:54:12,560 --> 00:54:19,720
+hola buenas tardes, si mira me refiero a que el más que penalizarte por la probabilidad de decir
+
+588
+00:54:19,720 --> 00:54:24,680
+la seguridad tu aseveración si no considerar que pucha confundirse entre 9 y 8 no es lo mismo que
+
+589
+00:54:24,680 --> 00:54:29,760
+confundirse entre 9 y 1 en términos de la semejanza del carácter, o sea en el fondo que el criterio
+
+590
+00:54:29,760 --> 00:54:36,000
+para penalizar sea partiendo de la base que hay números que son muy distintos. Claro,
+
+591
+00:54:36,000 --> 00:54:41,700
+eso es algo que pasa dentro de la dinámica pero eso es en este ejemplo en
+
+592
+00:54:41,700 --> 00:54:47,660
+particular yo sé que tengo una similitud entre el 3 y el 2 por ejemplo y
+
+593
+00:54:47,660 --> 00:54:53,260
+esperaría que hayan probabilidades similares en ciertos casos pero hay
+
+594
+00:54:53,260 --> 00:54:57,220
+clases en las cuales no puedo hacer esa similitud porque a priori yo no lo sé si
+
+595
+00:54:57,220 --> 00:55:01,020
+no estoy imponiendo cosas la idea es que acá el modelo aprenda por sí solo si yo
+
+596
+00:55:01,020 --> 00:55:08,400
+pongo algo, ese criterio exógeno, porque eso sería un criterio exógeno, la
+
+597
+00:55:08,400 --> 00:55:11,600
+penalización va
+
+598
+00:55:12,000 --> 00:55:15,600
+va a influir directamente dentro de la red, a menos que yo lo pueda cuantificar
+
+599
+00:55:15,600 --> 00:55:21,400
+dentro de una transformación. Por eso, cuando para este tipo de problemáticas,
+
+600
+00:55:21,400 --> 00:55:27,000
+la red normal funciona, pero tiende a sobreestimar ciertas cosas,
+
+601
+00:55:27,000 --> 00:55:31,840
+estas probabilidades de clasificación y por eso vamos a hablar después un poco
+
+602
+00:55:31,840 --> 00:55:36,120
+lo que son la raíz profunda que son o las raíz convolucionarias también que
+
+603
+00:55:36,120 --> 00:55:42,240
+sirven para datos que son estructurados como este imagen 8x8
+
+604
+00:55:42,240 --> 00:55:48,640
+entonces si bien uno puede decir ya hay categorías que sí se parecen
+
+605
+00:55:49,960 --> 00:55:55,280
+tenemos que tener cuidado con imponer esa creencia porque aquí la idea es que
+
+606
+00:55:55,280 --> 00:55:59,160
+nosotros le pasamos la imagen y lo debiese clasificar correctamente, o sea,
+
+607
+00:55:59,160 --> 00:56:05,320
+debísemos pasarle las suficientes imágenes, ya, y tener el modelo lo
+
+608
+00:56:05,320 --> 00:56:12,040
+suficientemente bueno, tal que aprenda que esos dos números se parecen, que es lo
+
+609
+00:56:12,040 --> 00:56:17,320
+que tú mencionas, pues si le paso muchos números que son 3 y 2 que son más o menos
+
+610
+00:56:17,320 --> 00:56:21,520
+parecidos, pero los tengo bien clasificado, eventualmente, si el
+
+611
+00:56:21,520 --> 00:56:25,600
+sistema, el modelo es bueno, va a aprender o se va a equivocar muy poco.
+
+612
+00:56:25,600 --> 00:56:30,240
+También estamos sujetos a cuántos ejemplos le estamos dando.
+
+613
+00:56:30,240 --> 00:56:35,320
+Entonces penalizarlo es un poco más difícil porque ¿qué penalizo? ¿Cómo puedo
+
+614
+00:56:35,320 --> 00:56:40,960
+saber a priori cuál era la categoría? Esa es en esencia lo que está
+
+615
+00:56:40,960 --> 00:56:45,280
+haciendo el modelo, aprender de esas pequeñas discrepancias.
+
+616
+00:56:45,280 --> 00:56:49,960
+No sé si te respondo un poco tu pregunta.
+
+617
+00:56:49,960 --> 00:56:58,820
+Entonces, si se fijan, en el último se equivocó y se equivocó con la nación.
+
+618
+00:56:58,820 --> 00:57:02,780
+Entonces, yo voy a definir un umbral de corte.
+
+619
+00:57:02,780 --> 00:57:16,880
+Por ejemplo, yo puedo decir que una aplicación, ya estamos en la columna de comprobar, supongamos
+
+620
+00:57:16,880 --> 00:57:21,520
+que en esta una aplicación se decide aceptar automáticamente cualquier
+
+621
+00:57:21,520 --> 00:57:28,520
+predicción en la que la probabilidad supere 0,9
+
+622
+00:57:28,520 --> 00:57:31,040
+es decir
+
+623
+00:57:31,040 --> 00:57:35,160
+todas las probabilidades que son muy seguras
+
+624
+00:57:36,440 --> 00:57:41,840
+que vendría siendo un numeral, todo lo que se prehíse con un 90 o más por ciento de
+
+625
+00:57:41,840 --> 00:57:46,280
+probabilidad se acepta automáticamente, ya?
+
+626
+00:57:46,280 --> 00:57:53,120
+y en ese caso voy a estar aceptando de cierta manera predicciones muy erróneas
+
+627
+00:57:53,120 --> 00:57:59,960
+ya? ahora, eso no significa que todos los casos que tengan una probabilidad de
+
+628
+00:57:59,960 --> 00:58:04,800
+predicción muy alta estén mal, ya? lo único que me está diciendo es que
+
+629
+00:58:04,800 --> 00:58:09,600
+una probabilidad muy alta de clasificación
+
+630
+00:58:09,800 --> 00:58:17,960
+no implica ya o no me da una garantía del acierto y del acierto individual en
+
+631
+00:58:17,960 --> 00:58:23,160
+esa en esa imagen entonces usualmente tenemos que definir ciertas reglas no
+
+632
+00:58:23,160 --> 00:58:26,760
+necesariamente la probabilidad por si sola me va a estar dando una buena
+
+633
+00:58:26,760 --> 00:58:30,880
+garantía de que estoy haciendo las cosas bien
+
+634
+00:58:30,880 --> 00:58:33,880
+y la semana pasada.
+
+635
+00:58:33,880 --> 00:58:42,400
+Entonces, si se fijan en su umbral, también es una regla que no necesariamente es definida
+
+636
+00:58:42,400 --> 00:58:46,600
+del modelo, yo lo puedo definir de manera jurística.
+
+637
+00:58:46,600 --> 00:58:54,160
+Entonces, ¿qué podemos concluir de un ejemplo así?
+
+638
+00:58:54,160 --> 00:59:02,640
+tenemos, digamos, que la evidencia que tenemos son 300 imágenes que están reservadas, fueron
+
+639
+00:59:02,640 --> 00:59:15,720
+dejadas a parte del conjunto de entrenamiento, no participaron en generar el modelo. Y vemos
+
+640
+00:59:15,720 --> 00:59:24,660
+que hay observaciones que están muy errores. Eso habla mucho de la red que nosotros estamos
+
+641
+00:59:24,660 --> 00:59:31,680
+utilizando, que nosotros estamos utilizando cierta configuración de una red bien particular,
+
+642
+00:59:31,680 --> 00:59:42,600
+pero da relativamente mejores resultados con una regreso logístico. Son dos alternativas
+
+643
+00:59:42,600 --> 00:59:48,240
+que nosotros tenemos, hay más metodologías de clasificación, dentro de una misma red yo puedo
+
+644
+00:59:48,240 --> 00:59:57,080
+utilizar diferentes configuraciones para la propia problemática y tampoco sé la robustez que va a
+
+645
+00:59:57,080 --> 01:00:07,640
+tener este modelo con nuevas imágenes, por ejemplo, qué pasa si los números están corridos un poquito,
+
+646
+01:00:07,640 --> 01:00:14,360
+que lo vamos a ver como ejemplo. Imagínense que tengo el número y ahora todo lo muevo un
+
+647
+01:00:14,360 --> 01:00:25,760
+píxel para el lado. ¿Funcionará bien? Es súper, digamos, natural pensar que es algo bien fácil
+
+648
+01:00:29,160 --> 01:00:34,880
+que suceda. Cuando se dice escritores se refiere a nuevas personas que escriben el número.
+
+649
+01:00:34,880 --> 01:00:43,320
+a eso se refiere porque si se fijan también el conjunto de datos está sujeto a las personas que
+
+650
+01:00:43,320 --> 01:00:48,120
+escribieron ese número porque tienen cierta forma de escribir los números eso tampoco me
+
+651
+01:00:48,120 --> 01:00:56,000
+robustece a nuevas personas que van a escribir de la misma manera algunos el típico ejemplo que
+
+652
+01:00:56,000 --> 01:01:03,160
+es que es el por ejemplo el 4 uno hace hay dos formas de hacer 4 o el 7 y el 7 y a veces le hacen
+
+653
+01:01:03,160 --> 01:01:07,560
+como la línea del medio o no. Entonces hay distintas formas de escribirlo y nada de esto
+
+654
+01:01:07,560 --> 01:01:12,560
+me asegura que me va a servir con esos nuevos escritorios, nuevas formas de escribir el número.
+
+655
+01:01:13,760 --> 01:01:17,800
+Entonces, tengo que tener cuidado con eso. Por eso, si tienen un conjunto de entrenamiento muy
+
+656
+01:01:17,800 --> 01:01:24,080
+amplio y muy diverso, es súper rico en el sentido de que podemos abarcar muchos casos.
+
+657
+01:01:24,080 --> 01:01:26,080
+sí?
+
+658
+01:01:26,080 --> 01:01:28,080
+ya
+
+659
+01:01:28,080 --> 01:01:30,080
+entonces
+
+660
+01:01:30,080 --> 01:01:32,080
+tenemos
+
+661
+01:01:32,080 --> 01:01:34,080
+si tengo una imagen
+
+662
+01:01:34,080 --> 01:01:36,080
+identificada
+
+663
+01:01:36,080 --> 01:01:38,080
+como 4, vamos a leer esta
+
+664
+01:01:38,080 --> 01:01:40,080
+una predicción paso a paso, si fijan en la logística
+
+665
+01:01:40,080 --> 01:01:42,080
+el dígito real
+
+666
+01:01:42,080 --> 01:01:44,080
+era un 3
+
+667
+01:01:44,080 --> 01:01:46,080
+vamos a poner este caso hipotético, y en la red también
+
+668
+01:01:46,080 --> 01:01:48,080
+era el mismo, la región
+
+669
+01:01:48,080 --> 01:01:50,080
+la red de la logística me predijo
+
+670
+01:01:50,080 --> 01:01:52,080
+un 3 y la red un 3
+
+671
+01:01:52,080 --> 01:02:01,580
+y la probabilidad que le asignó la regresión logística fue un 98.3 y el otro 99.9 que son los ejemplos que estábamos viendo acá
+
+672
+01:02:04,300 --> 01:02:11,340
+y ahora cuando veo la sola probabilidad esta diferencia es muy pequeña entonces yo podría decir
+
+673
+01:02:11,340 --> 01:02:14,740
+bueno los dos modelos son casi iguales porque predicen casi las mismas probabilidades pero
+
+674
+01:02:14,740 --> 01:02:19,380
+cuando veo la pérdida de la imagen y veo la pérdida logarítmica discrepan bastante o sea la imagen la
+
+675
+01:02:19,380 --> 01:02:26,360
+la pérdida de la red es mucho más pequeña, por consecuencia, y en general sucede que la
+
+676
+01:02:26,360 --> 01:02:33,040
+red neuronales en términos de predictivo le ganan a los modelos lineales, ya, en la mayoría de los
+
+677
+01:02:33,040 --> 01:02:39,520
+casos. No obstante eso tiene un costo. En la red, los modelos lineales y los modelos logísticos son
+
+678
+01:02:39,520 --> 01:02:44,280
+interpretables sabemos y sabemos cuantificar cuánto es el
+
+679
+01:02:44,280 --> 01:02:51,280
+cuánto es la el efecto que tiene los distintos cambios de los predictores es
+
+680
+01:02:51,280 --> 01:02:55,680
+la variable de respuesta en la red norahel dado que quiso en todo la red es profunda
+
+681
+01:02:55,680 --> 01:02:59,200
+es súper difícil cuantificar eso porque tenemos transformaciones de
+
+682
+01:02:59,200 --> 01:03:03,640
+transformaciones de transformaciones con muchas digamos relaciones no lineales
+
+683
+01:03:03,640 --> 01:03:05,720
+Entonces, cuantificarlo se vuelve muy difícil.
+
+684
+01:03:08,200 --> 01:03:17,640
+Ahora, estas redes que nosotros tenemos lo vamos a ver por
+
+685
+01:03:17,640 --> 01:03:19,120
+ahora como un sistema.
+
+686
+01:03:19,120 --> 01:03:25,160
+Lo vamos a formalizar la próxima semana para ver cómo
+
+687
+01:03:25,160 --> 01:03:30,120
+efectivamente hacemos esta red, cómo la programamos,
+
+688
+01:03:30,120 --> 01:03:33,320
+cómo la hacemos, por ejemplo, en Python, cómo la hacemos en R.
+
+689
+01:03:33,320 --> 01:03:47,320
+Pero tenemos que tener claro que al usar estas redes, ya, nuevamente estamos dentro de el concepto de aprendizaje profundo, aprendizaje automático, estamos en ese paso, ya, porque las redes que estamos ocupando no son tan sofisticadas, no son tan profundas.
+
+690
+01:03:47,320 --> 01:03:55,320
+Entonces estamos pasando del aprendizaje automático al aprendizaje profundo, que está dentro del inteligencia artificial, como una subclase.
+
+691
+01:03:55,320 --> 01:04:04,160
+tenemos que por ahora lo vamos a ver como un sistema, algo que entra, hace cosas y
+
+692
+01:04:04,160 --> 01:04:08,640
+mentira cosas, eso usualmente le gana los modelos lineales pero con un costo, son
+
+693
+01:04:08,640 --> 01:04:13,340
+con otro nombre conocidos como modelos de caja negra, son tantas las
+
+694
+01:04:13,340 --> 01:04:17,280
+operaciones que se hacen dentro de ese modelo que se pierde un poco la
+
+695
+01:04:17,280 --> 01:04:20,960
+trazabilidad de dónde de cómo fue transformado el dato, si bien yo puedo
+
+696
+01:04:20,960 --> 01:04:29,000
+hacer la conexión y ver qué fue lo que se hizo, digamos, con redes que son de
+
+697
+01:04:29,000 --> 01:04:32,480
+mayor complejidad, con mucha transformación en matemáticas, se
+
+698
+01:04:32,480 --> 01:04:35,920
+pierde un poco la cuantificación y la trazabilidad de cómo fue transformado el
+
+699
+01:04:35,920 --> 01:04:40,520
+dato. No así en los modelos uniales o los modelos de la generalización logística, etcétera,
+
+700
+01:04:40,520 --> 01:04:45,240
+que yo sí sé exactamente qué se hizo, cuánto se hizo, cuál es el efecto de
+
+701
+01:04:45,240 --> 01:04:49,160
+esa variable dentro de la variable dependiente y así. Entonces, estamos
+
+702
+01:04:49,160 --> 01:04:53,800
+sacrificando interpretabilidad por nivel predictivo, que en esencia es la
+
+703
+01:04:53,800 --> 01:04:59,640
+gran discrepancia entre los modelos de estadística clásica y los modelos de ciencia a datos.
+
+704
+01:04:59,640 --> 01:05:13,440
+Entonces, vamos a ver ahora lo que es un poco el Bustram. El Bustram ustedes lo vieron un poco en sesiones anteriores
+
+705
+01:05:13,440 --> 01:05:19,440
+y vamos preguntando ¿por qué vamos a ocupar el puestro acá?
+
+706
+01:05:19,440 --> 01:05:26,400
+Entonces la red tuvo la menor pérdida logarítmica y vamos a querer estudiar
+
+707
+01:05:26,400 --> 01:05:34,080
+cuánto podría variar esa ventaja que tuvo la red por sobre la regresión logística
+
+708
+01:05:35,440 --> 01:05:41,640
+por haberse evaluado en esos casos, que son los casos de prueba, y no otros,
+
+709
+01:05:41,640 --> 01:05:48,540
+porque recuerden que yo dejé 360 conjuntos de datos y imágenes en la prueba
+
+710
+01:05:48,540 --> 01:05:55,860
+¿qué pasa si esos 360 imágenes favorecieron a la red y quizás con
+
+711
+01:05:55,860 --> 01:05:58,860
+otros 360 hubiese ganado el regreso legítimo?
+
+712
+01:05:58,860 --> 01:06:02,100
+entonces primero vamos a fijar la comparación
+
+713
+01:06:02,100 --> 01:06:08,300
+entonces vamos a restar la pérdida de la red a la pérdida de la regresión
+
+714
+01:06:08,300 --> 01:06:15,620
+tenemos acá tenemos 0.06 0.06 0.7 case
+
+715
+01:06:16,820 --> 01:06:21,340
+entonces si es un valor positivo entonces está a favorización de la red porque
+
+716
+01:06:21,340 --> 01:06:26,820
+supervía menor voy a utilizar el busstrap más bien la
+
+717
+01:06:26,820 --> 01:06:32,980
+metodología va a reutilizar los casos que estuvieron en la prueba
+
+718
+01:06:32,980 --> 01:06:42,340
+para estimar la incertidumbre de esa diferencia que está acá.
+
+719
+01:06:42,340 --> 01:06:48,580
+Y en esencia es otra forma de reescribir cuántos la discrepancia
+
+720
+01:06:48,580 --> 01:06:53,620
+de esta diferencia si yo hubiese tenido otra muestra.
+
+721
+01:06:53,620 --> 01:07:01,540
+No la de las 360 o no particularmente las 360 imágenes que tengo en el conjunto
+
+722
+01:07:01,540 --> 01:07:07,480
+de prea. Se fijan cuando utilizo el
+
+723
+01:07:07,480 --> 01:07:12,740
+boost trap que en esencia es un remuestreo con
+
+724
+01:07:12,740 --> 01:07:18,240
+reemplazo, yo puedo estimar, digamos, esta cantidad y puedo hacer un intervalo de
+
+725
+01:07:18,240 --> 01:07:24,500
+confianza. Se puede ver que esta cantidad
+
+726
+01:07:24,500 --> 01:07:29,460
+tiene una diferencia positiva, porque se fijan el 0 no está
+
+727
+01:07:29,460 --> 01:07:35,820
+contenido acá, si el 0 tuviese contenido acá, entonces podría yo concluir que no hay una diferencia
+
+728
+01:07:35,820 --> 01:07:42,440
+sustancial o una ganancia sustancial de la red por sobre la regresión logística.
+
+729
+01:07:42,440 --> 01:07:49,860
+Entonces hay una evidencia clara de que los resultados obtenidos no dependen solo de la
+
+730
+01:07:49,860 --> 01:07:57,100
+muestra, sino que están dando resultados mejores propiamente tal, a pesar de que las probabilidades
+
+731
+01:07:57,100 --> 01:08:04,800
+que tenemos o las exactitudes son muy similares. Entonces, si solo veo las probabilidades de
+
+732
+01:08:04,800 --> 01:08:15,560
+clasificación, voy a quedar muy cercado en cuanto a el rendimiento del modelo. Nosotros hablamos
+
+733
+01:08:15,560 --> 01:08:23,100
+recién de que esta metodología que nosotros hicimos, que llamamos renal-renonal y un sistema,
+
+734
+01:08:23,100 --> 01:08:28,360
+pero aún no hemos entrado en cómo se hace, por lo menos tenemos que ver qué es lo que entra,
+
+735
+01:08:28,360 --> 01:08:31,420
+qué es lo que sale, qué es lo que hace, cuáles son sus restricciones.
+
+736
+01:08:33,420 --> 01:08:38,780
+Dijimos que no es robusto en el sentido a nuevos escritores, nuevas imágenes que hay escrito otra
+
+737
+01:08:38,780 --> 01:08:44,540
+persona, o no nuevos números, digamos, que están en imágenes escritas por otra persona,
+
+738
+01:08:44,540 --> 01:08:50,100
+porque pueden tener otro tipo de caligrafía, etcétera. Pero incluso cambiando cosas tan leves
+
+739
+01:08:50,100 --> 01:08:56,500
+es como que las distintas imágenes son simplemente desplazadas un pixel hacia la
+
+740
+01:08:56,500 --> 01:09:01,740
+derecha si se fijan acá entre la original y la desplazada sólo fue
+
+741
+01:09:01,740 --> 01:09:08,300
+desplazado el 3 un pixel a la derecha no hay mucha diferencia sigue siendo en
+
+742
+01:09:08,300 --> 01:09:13,620
+esencia casi el mismo número entonces se movió todo una posición a la derecha
+
+743
+01:09:13,620 --> 01:09:17,420
+lo mismo con este de acá, este de acá, este de acá y si se fijan nosotros
+
+744
+01:09:17,420 --> 01:09:24,060
+esperaríamos si el modelo fuese lo suficientemente robusto que siguese dando
+
+745
+01:09:24,060 --> 01:09:29,220
+resultados relativamente buenos porque así significaría que podamos ocuparlo
+
+746
+01:09:29,220 --> 01:09:38,940
+con nuevos datos porque es susceptible digamos y reconoce cambios en las
+
+747
+01:09:38,940 --> 01:09:41,620
+entradas
+
+748
+01:09:41,620 --> 01:09:49,980
+Si se fijan acá, aquí tengo los resultados originales, cuando tenía las imágenes originales
+
+749
+01:09:49,980 --> 01:09:51,380
+y ahora cuando las desplace.
+
+750
+01:09:51,380 --> 01:09:58,100
+Y si se fijan, la exactitud en ambos cambiaron sustancialmente.
+
+751
+01:09:58,100 --> 01:10:07,380
+Ahora, estas imágenes fueron cambiadas solo en la prueba.
+
+752
+01:10:07,380 --> 01:10:14,660
+los 360 imágenes que dejé para evaluar el modelo, no para el entrenamiento. Para
+
+753
+01:10:14,660 --> 01:10:21,380
+las 360 imágenes que dejé fuera y las probé, ahora clasificó muy mal
+
+754
+01:10:21,380 --> 01:10:28,980
+y la pérdida ahora en término logarítmico, la menor es la logística, ya.
+
+755
+01:10:28,980 --> 01:10:36,300
+No así la renunera. Entonces si fijan, ninguno de estos modelos está siendo muy
+
+756
+01:10:36,300 --> 01:10:41,940
+robusto a pequeños cambios como es cambiar simplemente un pixel de imagen
+
+757
+01:10:41,940 --> 01:10:47,180
+lo cual para ello necesitamos tratar de mejorar esta metodología que lo que
+
+758
+01:10:47,180 --> 01:10:50,380
+vamos a hacer durante estas próximas semanas
+
+759
+01:10:50,380 --> 01:10:55,740
+sobre todo con redes convocionales más profundas
+
+760
+01:10:55,740 --> 01:11:00,820
+entonces que tenga un buen resultado original no me va a garantizar
+
+761
+01:11:00,820 --> 01:11:05,920
+digamos que si pongo un dato muy distinto a lo que yo utilicé para
+
+762
+01:11:05,920 --> 01:11:13,640
+entrenar el modelo, tenga buenos resultados. En general, voy a tener muy
+
+763
+01:11:13,640 --> 01:11:17,520
+malos resultados, por eso yo quiero tener una diversidad muy muy grande dentro de mi
+
+764
+01:11:17,520 --> 01:11:21,440
+conjunto de entrenamiento. En los modelos estadísticos pasa lo mismo, en el final el
+
+765
+01:11:21,440 --> 01:11:27,440
+modelo no aprende de cosas que no conoce. Y ese que no conoce, en la imagen
+
+766
+01:11:27,440 --> 01:11:31,360
+para nosotros como humanos esto es prácticamente lo mismo pero cuando uno
+
+767
+01:11:31,360 --> 01:11:36,720
+hace la representación numérica son muy distintos en términos numéricos
+
+768
+01:11:36,720 --> 01:11:41,200
+entonces ese pequeño cambio que para nosotros superlede en términos numéricos
+
+769
+01:11:41,200 --> 01:11:45,520
+super sustancial y esa pequeña discrepancia que es para
+
+770
+01:11:45,520 --> 01:11:50,040
+nosotros numéricamente mucho y por consecuencia esa discrepancia se ve
+
+771
+01:11:50,040 --> 01:11:54,320
+reflejada en el nivel de exactitud y la pérdida logarítmica de ambos modelos
+
+772
+01:11:54,320 --> 01:12:04,320
+Si se fijan, ninguno de los modelos mantuvo su rendimiento, pero sí vimos que la logística fue un poco más robusta.
+
+773
+01:12:04,320 --> 01:12:16,320
+Ahora con la imagen desplazada, la logística le ganó la renda oral en el conjunto de prueba.
+
+774
+01:12:16,320 --> 01:12:24,840
+Entonces, ahora creo que podemos ir a un pequeño break y vamos a seguir con, digamos, otras
+
+775
+01:12:24,840 --> 01:12:29,700
+aplicaciones que tenemos que ver. Luego, esto es una pequeña introducción a lo que vamos a ver
+
+776
+01:12:29,700 --> 01:12:34,880
+las próximas semanas porque tenemos que primero definir ciertos conceptos, que es lo que tenemos
+
+777
+01:12:34,880 --> 01:12:40,320
+de estos distintos sistemas, y luego de ello vamos a ir particularizando cada uno de estos.
+
+778
+01:12:40,320 --> 01:12:47,260
+¿Volvemos en unos 15 minutos, les parece?
+
+779
+01:12:47,260 --> 01:12:54,040
+Le pausco el video.
+
+780
+01:12:54,040 --> 01:13:01,040
+No eran tan robustos a pequeños cambios.
+
+781
+01:13:01,040 --> 01:13:07,160
+Vamos a seguir explorando otro ejemplo, por ejemplo una
+
+782
+01:13:07,160 --> 01:13:14,080
+inspección visual. Entonces imaginemos que tenemos una línea de producción de
+
+783
+01:13:14,080 --> 01:13:19,280
+fotografía, una línea de producción que saca fotografía de empases y trata de
+
+784
+01:13:19,280 --> 01:13:25,360
+detectar si hay algún daño visible. Entonces la tarea que nosotros tenemos
+
+785
+01:13:25,360 --> 01:13:32,120
+es o se puede formular como una tarea o un objetivo de clasificación. Entonces a
+
+786
+01:13:32,120 --> 01:13:38,120
+a partir de una fotografía quiero producir una categoría de alerta o no, ya.
+
+787
+01:13:40,120 --> 01:13:41,620
+Si es que hay una alerta de daño o no.
+
+788
+01:13:41,620 --> 01:13:45,120
+Entonces, para preparar y evaluar, digamos, este sistema,
+
+789
+01:13:45,120 --> 01:13:48,120
+que después nosotros vamos a ir cambiando el que es este sistema,
+
+790
+01:13:48,120 --> 01:13:51,120
+necesitamos ejemplos representativos, ya, y con su etiqueta,
+
+791
+01:13:51,120 --> 01:13:57,120
+es decir, necesitamos fotos, ya, que tengan la etiqueta si es que tenía daño o no, ya.
+
+792
+01:13:57,120 --> 01:14:00,120
+Y eso, si se fijan cuando dices a la gente fotos,
+
+793
+01:14:00,120 --> 01:14:06,200
+un poco más complicado porque va a depender de la cámara que se utilizó, la iluminación que está
+
+794
+01:14:06,200 --> 01:14:12,600
+disponible, la posición y así sumisigue y puede ser muy muy susceptible a pequeños cambios como
+
+795
+01:14:12,600 --> 01:14:22,840
+camoder. Entonces, tenemos que tener cuidado con eso y por eso se requiere tener esta misma estructura
+
+796
+01:14:22,840 --> 01:14:27,400
+que les mencionaba de cuál es el objetivo, cuál es la entrada, cuáles son los datos, cuál es la utilidad,
+
+797
+01:14:27,400 --> 01:14:33,100
+o una evaluación para ver si está bien. Entonces, terminando la evaluación, debe
+
+798
+01:14:33,100 --> 01:14:43,240
+distinguir al menos dos tipos de errores. Uno es dejar pasar un envase con daño
+
+799
+01:14:43,240 --> 01:14:49,300
+y el otro señalar como sospechoso un envase san, que son los dos tipos de
+
+800
+01:14:49,300 --> 01:14:56,200
+errores, que le llamamos una alarma falsa, digamos, o un falso positivo.
+
+801
+01:14:56,200 --> 01:15:00,400
+ambos tipos de errores importan, pero las consecuencias pueden ser distintas y
+
+802
+01:15:00,400 --> 01:15:03,000
+nosotros tuvimos la forma de evaluación que pudiéramos poner una función de costo
+
+803
+01:15:03,000 --> 01:15:10,360
+digamos. Entonces supongamos que esa alerta se envía a una persona, entonces
+
+804
+01:15:10,360 --> 01:15:14,560
+también importa cuántas alertas produce el sistema porque también tenemos el
+
+805
+01:15:14,560 --> 01:15:20,120
+ejemplo de que si no solo hacíamos ninguna falla o todas fallan también
+
+806
+01:15:20,120 --> 01:15:24,960
+pueden dar métricas en términos de la matriz de convulsión buenas pero la
+
+807
+01:15:24,960 --> 01:15:30,160
+prácticas no tienen mayor utilidad. Entonces, una herramienta, un sistema que me entrega
+
+808
+01:15:30,160 --> 01:15:35,400
+mucha alerta y por consecuencia va a generar demasiado trabajo, no se va a incorporar,
+
+809
+01:15:35,400 --> 01:15:44,440
+digamos, en la línea de trabajo, en la línea de producción, digamos, todo lo que se hace dentro
+
+810
+01:15:44,440 --> 01:15:50,400
+de la empresa. Incluso si los detecta también los defectos, digamos, pero si genera mucho trabajo,
+
+811
+01:15:50,400 --> 01:15:57,840
+porque le puedes definir una función de costo, puede variar mucho. Entonces,
+
+812
+01:15:57,840 --> 01:16:04,360
+el ejemplo de los dígitos nos daba este caso en donde si cambia
+
+813
+01:16:04,360 --> 01:16:09,840
+muy poco la entrada, que en este caso sería si cambiamos la cámara, la
+
+814
+01:16:09,840 --> 01:16:18,240
+posición del envase, puede tener mucha repercusión en las probabilidades de
+
+815
+01:16:18,240 --> 01:16:26,400
+categorización. Entonces, tenemos que tener especial cuidado en la configuración en la
+
+816
+01:16:26,400 --> 01:16:33,960
+cual nosotros estamos diseñando nuestra implementación, digamos, de inteligencia
+
+817
+01:16:33,960 --> 01:16:38,520
+artificial, pero sabemos que dentro de inteligencia artificial tenemos estas metodologías de
+
+818
+01:16:38,520 --> 01:16:47,440
+aprendizaje automático y aprendizaje profundo. Entonces, otro tipo de ejemplo que en el caso
+
+819
+01:16:47,440 --> 01:16:55,400
+anterior era un caso de clasificación, de clasificación, por ejemplo, el caso minario.
+
+820
+01:16:55,400 --> 01:17:00,680
+O de tres clases, si uno lo quiere ver, no daño, pero alerta de daño y daño sí o sí.
+
+821
+01:17:00,680 --> 01:17:06,000
+El caso de un pronóstico de una demanda, nosotros podríamos tener que al terminar
+
+822
+01:17:06,000 --> 01:17:11,600
+el día 7 queremos participar la venta el día 8, pero participar la venta el día siguiente,
+
+823
+01:17:11,600 --> 01:17:18,260
+lo habíamos mencionado anteriormente. Entonces, la entrada van a ser las ventas
+
+824
+01:17:18,260 --> 01:17:23,080
+de los últimos siete días corridos, quizás otros datos que podamos tener a
+
+825
+01:17:23,080 --> 01:17:30,260
+disposición dentro del contexto. Y la salida que nosotros vamos a tener de nuestro
+
+826
+01:17:30,260 --> 01:17:35,260
+sistema, por ejemplo puede ser la renal oral u otra metodología puede predecir
+
+827
+01:17:35,260 --> 01:17:45,540
+digamos 120 unidades. Ahora, nosotros podemos tener como referencia
+
+828
+01:17:45,540 --> 01:17:50,380
+simplemente repetir la venta de un día anterior pensando que las ventas son
+
+829
+01:17:50,380 --> 01:17:56,860
+cíclicas. Por ejemplo, si el día 1 de la semana anterior, ya aquí me estoy haciendo
+
+830
+01:17:56,860 --> 01:18:02,500
+esta de acá, este punto de aquí, se vendió 80, entonces yo voy a predecir 80 y es
+
+831
+01:18:02,500 --> 01:18:12,220
+una regla, pero una regla digamos heurística. Entonces la idea que nosotros tenemos que tener
+
+832
+01:18:12,220 --> 01:18:20,020
+claro acá es, nuestro objetivo es predecir el octavo día. Tenemos líneas bases como referencia,
+
+833
+01:18:20,020 --> 01:18:24,700
+por ejemplo aquí en vez de utilizar una logística, porque no estamos haciendo clasificación, voy a
+
+834
+01:18:24,700 --> 01:18:31,100
+utilizar como referencia el utilizar el primer día de esa semana, pensando que se va a repetir para
+
+835
+01:18:31,100 --> 01:18:35,620
+la semana siguiente y yo voy a querer vencer con estos sistemas que yo les propongo y los
+
+836
+01:18:35,620 --> 01:18:41,420
+vamos a estudiar más en profundidad, si es que son mejores o no que la referencia. Se entiende que
+
+837
+01:18:41,420 --> 01:18:46,860
+la referencia siempre tiende a ser algo más simple, es decir, por ejemplo acá, repetir lo
+
+838
+01:18:46,860 --> 01:18:52,980
+que lo último que vendí el primer día de la semana, ya estoy en un domingo y veo cuánto vendí
+
+839
+01:18:52,980 --> 01:19:01,380
+lunes para digamos poner como pronóstico de demanda el día siguiente. Si se fijan
+
+840
+01:19:01,380 --> 01:19:06,780
+una regla sencilla no requiere ningún tipo de mecanismo cuantitativo
+
+841
+01:19:06,780 --> 01:19:13,380
+simplemente repetir un dato que yo ya observe y esperamos que estos sistemas
+
+842
+01:19:13,380 --> 01:19:18,140
+tengan mejor rendimiento y esa forma de rendimiento nosotros en este caso lo
+
+843
+01:19:18,140 --> 01:19:21,700
+vamos a ver como términos del error absoluto del pronóstico, si se fijan en el valor
+
+844
+01:19:21,700 --> 01:19:28,820
+absoluto de 120 que puede tener distintos costos ya por ejemplo poner menos
+
+845
+01:19:28,820 --> 01:19:32,980
+productos, empecemos en vitrina, de los que se vende
+
+846
+01:19:32,980 --> 01:19:39,300
+puede ser tener un costo menor que poner más de los que se venden, o viseers
+
+847
+01:19:39,300 --> 01:19:44,020
+entonces va a depender mucho el contexto cómo cuantificamos ese error y la
+
+848
+01:19:44,020 --> 01:19:50,140
+pertinencia de la métrica de evaluación para definir si es que esa métrica de
+
+849
+01:19:50,140 --> 01:19:56,740
+error de rendimiento del modelo es, digamos, atingente o coherente con el
+
+850
+01:19:56,740 --> 01:20:02,260
+contexto del problema. Entonces, ¿qué tenemos que hacer?
+
+851
+01:20:02,260 --> 01:20:06,500
+definir siempre una tarea principal. ¿Cuál es nuestro objetivo? Y ese
+
+852
+01:20:06,500 --> 01:20:14,020
+objetivo puede ser desagregado en distintas
+
+853
+01:20:14,020 --> 01:20:19,220
+subtareas. Clasificación, recupilación, predicción, etcétera. Tenemos que
+
+854
+01:20:19,220 --> 01:20:24,620
+describir la entrada, que va a ser nuestro input, nuestro conjunto de datos, cómo los vamos a
+
+855
+01:20:24,620 --> 01:20:30,620
+representar numéricamente para hacerlo, para trabajarlo con esta metodología de, digamos,
+
+856
+01:20:30,620 --> 01:20:35,180
+de inteligencia artificial, pero en particular de aprendizaje automático. Y tenemos que definir
+
+857
+01:20:35,180 --> 01:20:40,060
+una regla útil de cómo vamos a evaluar y cómo vamos a comprobar que efectivamente las salidas
+
+858
+01:20:40,060 --> 01:20:48,100
+de nuestro sistema están dando buenos resultados. Y por último tenemos que especificar bien,
+
+859
+01:20:48,100 --> 01:20:54,220
+es decir, este modelo que nosotros vamos a hacer va a funcionar en cierta configuración, por ejemplo,
+
+860
+01:20:54,220 --> 01:21:01,980
+en el caso del envase si tiene daño o no, con este tipo de cámara, con este tipo de configuración
+
+861
+01:21:01,980 --> 01:21:07,460
+de iluminación, etcétera, para que puedan ser homologables y puedan ser utilizadas en nuevos
+
+862
+01:21:07,460 --> 01:21:11,380
+datos posteriores. Si los nuevos datos posteriores no siguen esa configuración, nosotros no tenemos
+
+863
+01:21:11,380 --> 01:21:20,060
+ninguna forma de asegurar que voy a tener un resultado relativamente bueno.
+
+864
+01:21:20,060 --> 01:21:25,020
+Ahora, en caso de aplicaciones que trabajan con texto, que nosotros ya lo
+
+865
+01:21:25,020 --> 01:21:31,060
+hemos trabajado, por ejemplo la forma de representación en términos de
+
+866
+01:21:31,060 --> 01:21:34,500
+contar las palabras,
+
+867
+01:21:34,500 --> 01:21:45,500
+tenemos otra forma de cuantificarlo. Y el texto en principio podemos utilizarlo en los distintos tipos de tareas.
+
+868
+01:21:45,500 --> 01:21:50,500
+Nosotros vimos las cuatro tareas de redactar, generar, resumir, recuperar, clasificarlo.
+
+869
+01:21:50,500 --> 01:21:55,500
+Entonces el texto, yo podría tener una entrada de una consulta a un cliente en términos de correo
+
+870
+01:21:55,500 --> 01:22:00,500
+y puedo clasificarlo, por ejemplo, en términos de urgencia, conforme el texto.
+
+871
+01:22:00,500 --> 01:22:06,580
+dado que tengo una representación numérica para ese texto, acorde al
+
+872
+01:22:06,580 --> 01:22:10,100
+problema. Puedo recuperar, consultar archivos de
+
+873
+01:22:10,100 --> 01:22:15,220
+documentos, puedo resumir distintos documentos extensos y puedo dar
+
+874
+01:22:15,220 --> 01:22:18,820
+instrucciones para hacer un pequeño borrador.
+
+875
+01:22:18,820 --> 01:22:25,260
+Ahora, según, si se fijan según la entrada, yo en general voy a tener
+
+876
+01:22:25,260 --> 01:22:32,140
+distintas tareas que son posibles, pero voy a estar muy sujeto a, primero, la
+
+877
+01:22:32,140 --> 01:22:35,620
+representación numerica que voy a estar haciendo y, segundo, la comprobación de
+
+878
+01:22:35,620 --> 01:22:42,240
+que efectivamente lo que me está entregando este sistema es coherente con
+
+879
+01:22:42,240 --> 01:22:48,800
+la tarea y objetivo que yo definí en un principio. Entonces, nace esta noción de
+
+880
+01:22:48,800 --> 01:22:59,220
+embeddings, ya, porque no todas las cosas son, digamos, tan fáciles o tan naturales de
+
+881
+01:22:59,220 --> 01:23:05,120
+matematizar, digámoslo así, o cuantificar o representar, que eso es lo que me
+
+882
+01:23:05,120 --> 01:23:11,040
+refiero, porque nosotros, por ejemplo, cuando representamos la imagen 8x8
+
+883
+01:23:11,040 --> 01:23:15,720
+sabemos que hay pixel y podemos hacer un paralelismo con una matriz, ya, hay una
+
+884
+01:23:15,720 --> 01:23:21,400
+un matriz de números o una matriz de vectores, pero tengo esa noción.
+
+885
+01:23:21,400 --> 01:23:25,080
+En cambio, ¿qué pasa si son cosas un poquito más abstractas? Son objetos.
+
+886
+01:23:25,080 --> 01:23:30,520
+Entonces, aquí tenemos otras ideas y el concepto que nosotros vamos a utilizar,
+
+887
+01:23:30,520 --> 01:23:36,440
+lo que lo vamos a mezclar con el concepto de representación, es el embedding.
+
+888
+01:23:36,440 --> 01:23:41,560
+Yo voy a ocupar números para comparar objetos que no necesariamente son números,
+
+889
+01:23:41,560 --> 01:23:44,400
+porque si no, los compararía directamente.
+
+890
+01:23:44,400 --> 01:23:47,060
+Entonces, como recuerden, nosotros sabemos que un vector
+
+891
+01:23:47,060 --> 01:23:50,160
+simplemente es una lista ordenada de números.
+
+892
+01:23:50,160 --> 01:23:57,520
+Y el embedding es una representación o representa un
+
+893
+01:23:57,520 --> 01:24:02,720
+objeto mediante un vector para poder compararlo con otros.
+
+894
+01:24:02,720 --> 01:24:05,760
+Entonces, si te fijan, algo que yo defino con un objeto,
+
+895
+01:24:05,760 --> 01:24:07,240
+lo defino con un vector.
+
+896
+01:24:07,240 --> 01:24:09,580
+Si se fijan, cuando decimos la representación de la imagen,
+
+897
+01:24:09,580 --> 01:24:10,600
+eso fue un embedding.
+
+898
+01:24:10,600 --> 01:24:13,800
+Porque nosotros pasamos la imagen a un vector.
+
+899
+01:24:13,800 --> 01:24:17,300
+eso fue lo que hicimos, pero tenemos múltiples formas de representar esa imagen en vectores.
+
+900
+01:24:17,300 --> 01:24:31,800
+Y aquí está la conexión que había preguntado Gonzalo Penigli, que es la noción de bases
+
+901
+01:24:31,800 --> 01:24:38,200
+de datos vectoriales. Hay muchos tipos de bases de datos, entre ellas, las que más son
+
+902
+01:24:38,200 --> 01:24:42,480
+útiles para este tipo de metodologías son las bases de datos vectoriales, que en esencia
+
+903
+01:24:42,480 --> 01:24:50,480
+representa los datos como un punto en el espacio y guarda los datos como los
+
+904
+01:24:50,480 --> 01:24:55,680
+datos más cercanos lo guardan más el mismo
+
+905
+01:24:55,680 --> 01:25:01,240
+dado que tengo datos los representa en un punto en el espacio y esos puntos que
+
+906
+01:25:01,240 --> 01:25:06,000
+están más cercanos los guardo de una manera más local en el sentido que
+
+907
+01:25:06,000 --> 01:25:10,040
+tienen acceso más directamente al cojo a ese mismo tipo de datos ahora que
+
+908
+01:25:10,040 --> 01:25:14,260
+quiere decir eso? pensémoslo así. Tengo un número inventado, por ejemplo tengo un
+
+909
+01:25:14,260 --> 01:25:20,520
+texto, cobro duplicado y yo de alguna manera con una representación a definir
+
+910
+01:25:20,520 --> 01:25:27,240
+voy a asignarle a cobro duplicado el vector 0208, a reembolso le voy a poner
+
+911
+01:25:27,240 --> 01:25:34,560
+el vector 0307 y a envíos en el texto le voy a poner 0802 y se fijan eso me va a
+
+912
+01:25:34,560 --> 01:25:40,560
+representar todos los datos en un diagrama de dos dimensiones. Yo podría hacerlo con más
+
+913
+01:25:40,560 --> 01:25:47,080
+dimensiones claramente, pero se entiende que estos números cuando son parecidos en algún sentido
+
+914
+01:25:47,080 --> 01:25:54,160
+van a estar más cercanos en este diagrama y lo que hacen las bases de datos vectoriales es guardar
+
+915
+01:25:54,160 --> 01:26:00,280
+estos datos los más cercanos entre sí y ¿por qué quiero hacer eso? porque los datos parecidos tienden
+
+916
+01:26:00,280 --> 01:26:05,680
+hacer consultado y utilizado conjuntamente. Si quiero sacar datos que están en un mismo,
+
+917
+01:26:05,680 --> 01:26:12,520
+por ejemplo, estrato, es mejor que estén en un mismo archivo, pensemoslo así, porque cuando
+
+918
+01:26:12,520 --> 01:26:17,960
+quiero trabajar con uno, usualmente quiero trabajar con todos los otros datos que son similares.
+
+919
+01:26:18,960 --> 01:26:30,160
+Entonces, en esta ignosión de embedding, yo podría beneficiar bastante de una base de
+
+920
+01:26:30,160 --> 01:26:37,840
+vectorial. No obstante, lo que mencionaba, que preguntaba Gonzalo, si ese proceso que
+
+921
+01:26:37,840 --> 01:26:42,160
+está hablando de la red neural sería lo mismo si se usara una base de datos vectorial,
+
+922
+01:26:42,160 --> 01:26:46,760
+no necesariamente. La base de datos vectorial hace referencia no a la metodología,
+
+923
+01:26:46,760 --> 01:26:53,280
+sino que hace referencia a la forma de guardar los datos. Lo que hace es guardar datos parecidos
+
+924
+01:26:53,280 --> 01:27:00,520
+más cerca entre sí, entonces puede tener acceso a ello más fácilmente. Pero todas
+
+925
+01:27:00,520 --> 01:27:05,520
+estas metodologías podrían ser implementadas con distintos tipos de datos. Entonces, lo que
+
+926
+01:27:05,520 --> 01:27:10,600
+hace el embedding es, de alguna manera, si se fijan, no la hemos definido, pasar objetos, que en este
+
+927
+01:27:10,600 --> 01:27:15,640
+caso es un texto, a un vector, a un punto en el espacio. Y ahora, dado que tengo puntos en el
+
+928
+01:27:15,640 --> 01:27:21,440
+espacio, puedo definir cuáles se parecen. Entonces, si se fijan, cuando los pongo en el diagrama,
+
+929
+01:27:21,440 --> 01:27:26,760
+el punto Q que es cobro duplicado y reembolso están más cercanos que en
+
+930
+01:27:26,760 --> 01:27:35,680
+bios. Entonces yo voy a decir el dato A se parece mucho al dato Q, o está
+
+931
+01:27:35,680 --> 01:27:43,160
+más cerca que B. Ahora, de dónde salen? Esos números que es una forma particular
+
+932
+01:27:43,160 --> 01:27:51,160
+de representarlo, numéricamente objetos, se aprenden desde el conjunto
+
+933
+01:27:51,160 --> 01:27:59,080
+entrenamiento de mis datos iniciales, ya, con distintas reglas, ya. Esa regla tiene que ser
+
+934
+01:27:59,080 --> 01:28:05,240
+consistente a lo largo de todos los datos y toda la representación del embedding porque si no
+
+935
+01:28:05,240 --> 01:28:09,640
+tengo una discrepancia, digamos, no es coherente o no es consistente en la forma en que estoy
+
+936
+01:28:09,640 --> 01:28:16,240
+representando los objetos dentro del espacio, ya. Se puede aprender de distinta manera y lo voy a
+
+937
+01:28:16,240 --> 01:28:20,200
+mover un poquito más adelante. Nuevamente le he comentado que esta es como la clase instructoria,
+
+938
+01:28:20,200 --> 01:28:23,560
+las siguientes clases porque ahí lo vamos a ir profundizando. Entonces vamos a ver cómo podemos,
+
+939
+01:28:23,560 --> 01:28:29,760
+de cierta manera, representar vectores, o sea, representar objetos dentro de algún espacio.
+
+940
+01:28:29,760 --> 01:28:34,720
+Y eso nos va a dar una noción de cercanía. Porque nada nos dice en un principio que cobro
+
+941
+01:28:34,720 --> 01:28:40,160
+duplicado es más cercano a reembolso. Uno podría decirlo de alguna manera, bueno, más cercano cobro
+
+942
+01:28:40,160 --> 01:28:46,480
+duplicado a reembolso que envío. Pero es muy etéreo, muy, muy, muy ambigüe. Y aquí cuando lo pasamos
+
+943
+01:28:46,480 --> 01:28:50,040
+vector sabemos y podemos cuatificar cuánto es la distancia entre esas dos
+
+944
+01:28:50,040 --> 01:28:53,800
+cosas vamos a ver qué significa eso
+
+945
+01:28:53,800 --> 01:28:57,800
+cómo llegué a ese número ya cuáles son las distintas formas de llegar a ese
+
+946
+01:28:57,800 --> 01:29:01,220
+número que cuáles son los pro cuáles son los contra que tenemos al hacer esta
+
+947
+01:29:01,220 --> 01:29:09,160
+noción de embed que en esencia es asignar número a cosas que en
+
+948
+01:29:09,160 --> 01:29:14,160
+principio no son numéricas entonces cuando lo volvemos al caso cómo
+
+949
+01:29:14,160 --> 01:29:23,160
+recupera un cobro duplicado? Una forma, digamos, de buscar consiste, digamos, en
+
+950
+01:29:23,160 --> 01:29:30,520
+comparar palabras de la consulta con palabras de los documentos.
+
+951
+01:29:30,520 --> 01:29:36,760
+Eso, en esencia, es una referencia bastante natural y puede ser, digamos, útil
+
+952
+01:29:36,760 --> 01:29:43,480
+cuando términos coinciden, pero si yo ocupo sinónimos no me va a servir mucho.
+
+953
+01:29:43,480 --> 01:29:52,780
+¿Qué pasa si a una consulta y busco la palabra reembolso? Pero en mis documentos no hablo
+
+954
+01:29:52,780 --> 01:30:00,140
+de reembolso. Entonces estoy tratando de hablar o hacer una búsqueda de una coincidencia
+
+955
+01:30:00,140 --> 01:30:08,980
+exacta. En cambio, el embedding lo que hace es poner cosas no exactas pero parecidas en
+
+956
+01:30:08,980 --> 01:30:13,420
+un punto en el espacio. Entonces me da esta noción de que yo puedo
+
+957
+01:30:14,060 --> 01:30:16,700
+digamos
+
+958
+01:30:16,860 --> 01:30:22,380
+ver cercanía sin necesariamente ser iguales en cosas que en principio no son
+
+959
+01:30:22,380 --> 01:30:27,700
+lo mismo. Ahora otra forma de buscar en términos de las distintas aplicaciones
+
+960
+01:30:27,700 --> 01:30:32,300
+que tenemos con esta metodología es por significado.
+
+961
+01:30:32,300 --> 01:30:37,300
+Ahora, ¿qué es lo que hace ahí? Eso es comparar representaciones numéricas de la
+
+962
+01:30:37,300 --> 01:30:44,720
+consulta y los documentos. Lo que hace es utilizar una idea como lo que acabamos de ver que es
+
+963
+01:30:44,720 --> 01:30:53,840
+esencial el embedding. Textos que están relacionados pueden quedar cercanos a una
+
+964
+01:30:53,840 --> 01:30:59,560
+representación en particular aunque no sean exactamente o no utilicen exactamente las mismas
+
+965
+01:30:59,560 --> 01:31:05,760
+palabras. Entonces esta noción de embedding correctamente hecha me permite bypassar esa noción
+
+966
+01:31:05,760 --> 01:31:14,240
+de coincidencia exacta, pero que cosas sean cercanas en este sentido de embedding no significa
+
+967
+01:31:14,240 --> 01:31:21,320
+que me va a dar una respuesta correcta, porque por ejemplo un documento que habla sobre el
+
+968
+01:31:21,320 --> 01:31:27,720
+reembolso y otro o un reembolso de un servicio puede estar muy relacionado en términos de
+
+969
+01:31:27,720 --> 01:31:36,440
+el punto del espacio con documentación de algún procedimiento porque ocupa la misma
+
+970
+01:31:36,440 --> 01:31:44,800
+terminología pero no servir para la consulta que estoy realizando o el objetivo que tengo.
+
+971
+01:31:44,800 --> 01:31:52,860
+Entonces esta noción de embedding que tengo puede, me ayudan en ciertos casos pero no
+
+972
+01:31:52,860 --> 01:31:57,780
+no me asegura que las cosas que estoy poniendo, que son cerca, son efectivamente cerca.
+
+973
+01:31:57,780 --> 01:32:01,460
+Entonces tengo que tener alto cuidado para tener, para tener que, vamos a necesitar bastante
+
+974
+01:32:01,460 --> 01:32:07,100
+entrenamiento y bastante conjunto de datos e insumos auxiliares para definir qué cosas
+
+975
+01:32:07,100 --> 01:32:12,140
+se parecen entre sí. Y en ese sentido las pasas de datos vectoriales son una buena ayuda
+
+976
+01:32:12,140 --> 01:32:17,580
+para representar, digamos, datos como puntos en el espacio, que tienen una aplicación
+
+977
+01:32:17,580 --> 01:32:24,840
+bastante útil por la aceleración de
+
+978
+01:32:24,840 --> 01:32:29,040
+tengo otros tipos de datos y quiero relacionar imágenes y descripciones, ya.
+
+979
+01:32:29,040 --> 01:32:34,760
+Entonces acá tengo algo que le llamar CLIP, que es en esencia un modelo que
+
+980
+01:32:34,760 --> 01:32:43,240
+aprende con pares de imágenes y texto, ya, pares de imagen, imagen, texto
+
+981
+01:32:43,240 --> 01:32:47,640
+y aprende, digamos, a producir representaciones comparables, ya. Entonces
+
+982
+01:32:47,640 --> 01:32:53,600
+convierte la imagen y cada descripción en vectores y compara una nota, en términos
+
+983
+01:32:53,600 --> 01:32:58,820
+de una similitud y da una métrica de similitud en términos de que se parece.
+
+984
+01:32:58,820 --> 01:33:04,140
+Por ejemplo, a la izquierda tenemos imagen de la caja de un cartón con un
+
+985
+01:33:04,140 --> 01:33:09,560
+daño, digamos, visible. Y a la derecha aparecen tres descriptores, una caja de
+
+986
+01:33:09,560 --> 01:33:14,780
+cartón dañada, una caja de cartón intacta, una botella de vídeo. Y lo que hace
+
+987
+01:33:14,780 --> 01:33:22,660
+esta metodología de clip, la vamos a ver un poquito más antes, en esencia es definir una métrica de similitud,
+
+988
+01:33:22,660 --> 01:33:27,520
+no necesariamente probabilidad, de similitud. Entonces lo que hace esto es
+
+989
+01:33:27,520 --> 01:33:33,720
+convierte la imagen en un vector y convierte cada descriptor en otro vector
+
+990
+01:33:33,720 --> 01:33:39,080
+y ahora tengo dos números y veo la similitud. Entonces si se fijan estoy comparando
+
+991
+01:33:39,080 --> 01:33:44,860
+algo imagen que puede ser visto con homérico y un descriptor que también
+
+992
+01:33:44,860 --> 01:33:49,920
+puede ser visto con homérico. Entonces si se fijan siempre de alguna manera estamos
+
+993
+01:33:49,920 --> 01:33:55,020
+viendo que algo que en esto rigor se llama una proyección, que es una
+
+994
+01:33:55,020 --> 01:34:01,100
+representación. Yo paso algo que es una imagen a una proyección, a un espacio
+
+995
+01:34:01,100 --> 01:34:07,100
+numérico, yo lo llame como un vector y ese texto, una proyección a otro
+
+996
+01:34:07,100 --> 01:34:10,440
+espacio que también es un vector y ahora dado que tengo cosas numéricas puedo
+
+997
+01:34:10,440 --> 01:34:13,280
+ocupar la matemática usual.
+
+998
+01:34:13,280 --> 01:34:35,280
+Obviamente hay una metodología que podemos utilizar, digamos, para definir más formalmente cómo hago esa proyección, esa representación numérica en ese espacio vectorial, para poder utilizar las herramientas clásicas de matemática en términos de distancia y de métrica de similitud.
+
+999
+01:34:35,280 --> 01:34:46,240
+Acabamos con otro ejemplo, recomendación de contenidos. Nuevamente todos estos ejemplos
+
+1000
+01:34:46,240 --> 01:34:50,800
+nos vemos como el fin, estamos haciendo el resto, aquí queremos llegar y en las próximas
+
+1001
+01:34:50,800 --> 01:34:54,280
+sesiones vamos a ir viendo y replicando este mismo tipo de ejemplo con metodología un
+
+1002
+01:34:54,280 --> 01:35:00,600
+poco más exacta, de algún nombre, apellido, cómo lo vamos a programar, etcétera, pero
+
+1003
+01:35:00,600 --> 01:35:04,560
+queremos ver a cómo llegamos, a qué es lo que tenemos que llegar, porque lo principal
+
+1004
+01:35:04,560 --> 01:35:11,560
+Y en general, de todas estas metodologías no es tanto el cómo lo hacemos, que si bien tiene una teoría no menor,
+
+1005
+01:35:11,560 --> 01:35:17,560
+porque las herramientas que tenemos disponibles hoy en día en términos computacionales son bien vastas,
+
+1006
+01:35:17,560 --> 01:35:23,560
+y la programación con las mismas herramientas inteligentes de revisar son bastante útiles,
+
+1007
+01:35:23,560 --> 01:35:30,560
+pero tenemos que definir bien el escenario, el contexto en el cual estamos trabajando,
+
+1008
+01:35:30,560 --> 01:35:35,320
+de que tenemos que definir bien cuál es la tarea,
+
+1009
+01:35:35,320 --> 01:35:38,560
+subdesagregarla y saber cuáles son los datos que tenemos a
+
+1010
+01:35:38,560 --> 01:35:40,720
+disposición y cómo vamos a evaluar.
+
+1011
+01:35:40,720 --> 01:35:43,280
+Entonces, tenemos que tener eso un poco más claro y eso lo
+
+1012
+01:35:43,280 --> 01:35:45,360
+podemos ver ejemplificado, digamos,
+
+1013
+01:35:45,360 --> 01:35:47,240
+en todos estos tipos de aplicaciones que hemos visto y
+
+1014
+01:35:47,240 --> 01:35:49,720
+hacen de clasificación, predicción, resumen,
+
+1015
+01:35:49,720 --> 01:35:51,800
+todo lo que hemos visto.
+
+1016
+01:35:51,800 --> 01:35:54,120
+En este ejemplo de protético, un portal, digamos,
+
+1017
+01:35:54,120 --> 01:35:56,880
+quiere ordenar cursos que podrían interesar a una
+
+1018
+01:35:56,880 --> 01:35:58,640
+persona.
+
+1019
+01:35:58,640 --> 01:36:07,520
+Pues si se fijan acá, es una matriz, de preferencia en principio, que habla de los...
+
+1020
+01:36:07,520 --> 01:36:10,040
+si es que hay click registrado en el curso.
+
+1021
+01:36:10,040 --> 01:36:15,520
+Entonces, Ana está interesada con ella o hizo un click en un curso de R, un curso de Python,
+
+1022
+01:36:15,520 --> 01:36:17,040
+y no quiere gráficos.
+
+1023
+01:36:17,040 --> 01:36:23,680
+Y así con el resto de personas. Ana, Bruno, Carla.
+
+1024
+01:36:23,680 --> 01:36:30,960
+Ahora, yo voy a querer pasar esto a una cosa numérica, que al principio ya lo matematicé,
+
+1025
+01:36:30,960 --> 01:36:31,960
+¿ya?
+
+1026
+01:36:31,960 --> 01:36:35,240
+Pero tenemos que definir bien, ¿cuál es el objetivo?
+
+1027
+01:36:35,240 --> 01:36:37,720
+El objetivo es que haya más click, ¿ya?
+
+1028
+01:36:37,720 --> 01:36:41,440
+Vamos a medir, si queremos que haya más click, vamos a medir otra cosa.
+
+1029
+01:36:41,440 --> 01:36:49,240
+Vamos a tener unas métricas y una función, un objetivo general distinto, ¿ya?
+
+1030
+01:36:49,240 --> 01:36:57,200
+no necesariamente significa un 3, si tengo mucho o una inscripción en el curso
+
+1031
+01:36:57,200 --> 01:37:03,480
+propiamente tal, entonces tenemos que tener claro el cómo pasamos lo que
+
+1032
+01:37:03,480 --> 01:37:10,080
+nosotros medimos a algo que es nuestro objetivo en particular, porque si
+
+1033
+01:37:10,080 --> 01:37:18,080
+nosotros tenemos este número de clic y luego lo clasificamos o lo etiquetamos
+
+1034
+01:37:18,080 --> 01:37:23,340
+con Ana tiene interés en R y en cursos de R y Ana tiene interés en Python o
+
+1035
+01:37:23,340 --> 01:37:27,460
+cursos de Python eso no necesariamente me va a responder a la pregunta que yo
+
+1036
+01:37:27,460 --> 01:37:32,920
+quiero que es que el portal quiere tener cursos que podrían interesar a una
+
+1037
+01:37:32,920 --> 01:37:38,000
+persona, no está interesando un supuesto bastante amplio de si hace click
+
+1038
+01:37:38,000 --> 01:37:42,920
+entonces está interesado y no necesariamente así porque puede indicar
+
+1039
+01:37:42,920 --> 01:37:49,280
+el interés. En principio, curiosidad o simplemente el hizo clic por error. Entonces tenemos que tener
+
+1040
+01:37:49,280 --> 01:37:56,000
+cuidado con cómo representamos las cosas y cómo conversa eso con el objetivo que nosotros queremos
+
+1041
+01:37:56,000 --> 01:38:04,560
+realizar. Ahora, para hablar digamos de generación de texto, que es la otra tarea que hemos visto ya
+
+1042
+01:38:04,560 --> 01:38:10,080
+ahora de clasificación, predicción, de resumen un poco, primero hay que definir dos elementos,
+
+1043
+01:38:10,080 --> 01:38:19,640
+que es la instrucción que indica qué resultado queremos, por ejemplo resumir un procedimiento
+
+1044
+01:38:19,640 --> 01:38:30,360
+en cinco líneas, el contexto que en esencia es el texto disponible para producir esa salida,
+
+1045
+01:38:30,360 --> 01:38:36,000
+que vendría siendo el input, los datos que nosotros tenemos, incluido entre sedentes adicionales y lo
+
+1046
+01:38:36,000 --> 01:38:40,920
+que ya se ha escrito, digamos, todo lo podemos ocupar como insumo.
+
+1047
+01:38:40,920 --> 01:38:46,800
+Y lo que hace un modelo del lenguaje, que en esa se llama genera texto, lo que
+
+1048
+01:38:46,800 --> 01:38:52,200
+hace es aprender regularidades en el orden de las palabras conforme, bueno, y
+
+1049
+01:38:52,200 --> 01:38:57,840
+considerando también sus partes. Entonces genera una respuesta, va añadiendo
+
+1050
+01:38:57,840 --> 01:39:01,400
+esas unidades sucesivamente. Por eso cuando ustedes ven y ponen
+
+1051
+01:39:01,400 --> 01:39:09,280
+GPT va agregando poco a poco porque va, digamos, agregando sucesivamente palabras a esa generación
+
+1052
+01:39:09,280 --> 01:39:14,960
+de texto, pero utilizando el contexto. Esa es la idea que nosotros necesitamos hoy en día. Los
+
+1053
+01:39:14,960 --> 01:39:20,120
+mecanismos los vamos a ver un poquito más adelante, pero va generando secuencialmente. Entonces,
+
+1054
+01:39:21,440 --> 01:39:26,760
+por ejemplo, la primera solicitud en esta tabla, que es resumir un procedimiento de cinco líneas,
+
+1055
+01:39:26,760 --> 01:39:32,880
+la podemos comprobar si conserva, digamos, los requisitos y las excepciones que yo dije en mi
+
+1056
+01:39:32,880 --> 01:39:37,800
+instructivo. Y la segunda solicitud, que reacta a una respuesta usando ese procedimiento,
+
+1057
+01:39:39,520 --> 01:39:44,280
+podemos verificar, digamos, si cada firmación tiene un respaldo en términos de la fuente y si el
+
+1058
+01:39:44,280 --> 01:39:53,680
+borrador, digamos, reconoce información que falta. Entonces, se fijan nuevamente completando esta
+
+1059
+01:39:53,680 --> 01:40:00,240
+estructura general de cuál es mi tarea, qué datos tengo, qué va a salir, también
+
+1060
+01:40:00,240 --> 01:40:03,960
+que espero que sale y cómo voy a comprobarse efectivamente lo que me está
+
+1061
+01:40:03,960 --> 01:40:09,920
+dando tiene coherencia con la tarea y el objetivo principal.
+
+1062
+01:40:11,320 --> 01:40:15,160
+Otras de las aplicaciones que vamos a profundizar un poco más adelante que
+
+1063
+01:40:15,160 --> 01:40:22,480
+son la generación de imágenes. Acá estamos viendo generación de texto. Ahora vamos a ver
+
+1064
+01:40:22,480 --> 01:40:26,360
+generación de imagen y entre ellas por ejemplo tengo una descripción de una
+
+1065
+01:40:26,360 --> 01:40:31,000
+entrada que es una caja azul sobre una mesa blanca
+
+1066
+01:40:31,000 --> 01:40:37,120
+se nos pide un objeto un color y una relación espacial
+
+1067
+01:40:37,880 --> 01:40:42,320
+el resultado que nosotros creemos con esa instrucción o que nosotros
+
+1068
+01:40:42,320 --> 01:40:47,800
+buscamos es una imagen que tenga esas características cumpla esas
+
+1069
+01:40:47,800 --> 01:40:55,700
+condiciones. Entonces, si se fijan en esta figura, esto ilustra una
+
+1070
+01:40:55,700 --> 01:40:59,800
+metodología o una familia de métodos, la verdad, porque son bastante más, que le
+
+1071
+01:40:59,800 --> 01:41:03,160
+llamamos difusión. Quizás no lo escuchaban, que son los difusión modelos,
+
+1072
+01:41:03,160 --> 01:41:10,560
+que son los modelos de difusión, que parten, todos parten de un ruido.
+
+1073
+01:41:10,560 --> 01:41:16,660
+Parte un ruido que no tiene una noción clara de lo que nosotros queremos, un
+
+1074
+01:41:16,660 --> 01:41:27,380
+un ruido visual, hay una figura reconocible y después poco a poco va generando la imagen
+
+1075
+01:41:27,380 --> 01:41:35,180
+final. Entonces parte de un ruido y poco a poco le da forma y va eliminando el ruido
+
+1076
+01:41:35,180 --> 01:41:45,220
+hasta llegar a la imagen que nosotros, o que es coherente con el instructivo que nosotros
+
+1077
+01:41:45,220 --> 01:41:51,220
+dimos en un principio. Esto no quiere decir que esta imagen final estaba digamos escondida en el
+
+1078
+01:41:51,220 --> 01:42:00,100
+ruido, sino que se va construyendo conforme le doy la descripción. Entonces, ¿cómo evaluamos
+
+1079
+01:42:00,100 --> 01:42:07,840
+en ese sentido la salida? Es efectivamente la imagen final que cumple las condiciones de
+
+1080
+01:42:07,840 --> 01:42:15,040
+nuestro instructivo. Entonces, vamos a ver de cierta manera, vamos a describir un poco más
+
+1081
+01:42:15,040 --> 01:42:24,040
+cómo funciona, digamos, este mecanismo de pasar un ruido, algo relativamente aleatorio,
+
+1082
+01:42:24,040 --> 01:42:30,600
+que es lo que nosotros definimos, a algo que es lo que nosotros queremos. Digamos que en este
+
+1083
+01:42:30,600 --> 01:42:35,760
+caso es una caja azul y sólo una mesa blanca. Entonces, son otras de las metodologías que tenemos
+
+1084
+01:42:35,760 --> 01:42:40,720
+dentro de inteligencia artificial y en esencia, si se fijan, al igual que en la generación de texto,
+
+1085
+01:42:40,720 --> 01:42:47,360
+que nosotros dijimos que iba agregando palabras de manera secuencial, en el caso de las imágenes,
+
+1086
+01:42:47,360 --> 01:42:54,960
+va agregando forma de manera secuencial. En este caso, digamos, con estas cuatro imágenes,
+
+1087
+01:42:54,960 --> 01:42:59,840
+yo las estoy particularizando en cuatro tiempos distintos, pero esto tiene muchas etapas, es decir,
+
+1088
+01:42:59,840 --> 01:43:04,640
+tiene el ruido puro y luego hace una primera iteración, una segunda iteración y luego de
+
+1089
+01:43:04,640 --> 01:43:09,080
+muchos pasos llega la imagen final, no es una ejecución digamos continua en
+
+1090
+01:43:09,080 --> 01:43:14,480
+principio, tiene muchos pasos por eso este proceso secuencial que parte un
+
+1091
+01:43:14,480 --> 01:43:18,240
+ruido y quiere terminar en lo que nosotros le tenemos la la la
+
+1092
+01:43:18,240 --> 01:43:21,280
+instructivo que nosotros y las condiciones que le dimos en un principio
+
+1093
+01:43:21,280 --> 01:43:27,400
+entonces al igual que la generación de texto son sucesivos ya al igual que la
+
+1094
+01:43:27,400 --> 01:43:30,800
+generación de texto solamente aquí estamos ampliando lo que es texto ahora
+
+1095
+01:43:30,800 --> 01:43:34,440
+es una imagen y la imagen también es un número y a su vez también el texto
+
+1096
+01:43:34,440 --> 01:43:38,800
+también lo puedo representar como un número. Entonces siempre todas estas cosas por debajo
+
+1097
+01:43:38,800 --> 01:43:45,120
+son predicciones de números, que después las represento como un objeto distinto, ya sea texto
+
+1098
+01:43:45,120 --> 01:43:54,120
+o ya sea imagen. Entonces, ¿de dónde viene esa señal para aprender? Nosotros hasta ahora hemos visto
+
+1099
+01:43:54,120 --> 01:43:59,760
+ejemplos con una respuesta conocida. Tenemos una etiqueta, sabemos de dónde viene, por ejemplo,
+
+1100
+01:43:59,760 --> 01:44:04,160
+la imagen que está, la imagen del número que viene acompañada de la etiqueta, cuál es el número
+
+1101
+01:44:04,160 --> 01:44:08,320
+correcto que en esencia es aprendizaje supervisado de una manera un poquito más
+
+1102
+01:44:08,320 --> 01:44:11,200
+sofisticada pero es un aprendizaje supervisado porque sé cuál es la
+
+1103
+01:44:11,200 --> 01:44:15,440
+respuesta. Recuerden que el aprendizaje supervisado es cuando tengo mis X que son mis
+
+1104
+01:44:15,440 --> 01:44:19,720
+predictores que en este caso en la imagen son los números dentro de la imagen
+
+1105
+01:44:19,720 --> 01:44:24,080
+tengo el I vendría siendo la clase que la conozco. Entonces el aprendizaje
+
+1106
+01:44:24,080 --> 01:44:31,240
+supervisado esa respuesta sirve como una referencia externa para comparar lo que
+
+1107
+01:44:31,240 --> 01:44:35,200
+es el modelo entonces puedo tener el conjunto de prueba y puedo ver qué tan
+
+1108
+01:44:35,200 --> 01:44:40,120
+bueno me está dando mi modelo. Pero yo tengo otra noción que es el aprendizaje
+
+1109
+01:44:40,120 --> 01:44:46,000
+autosupervisado, que es cuando construimos una tarea cuya respuesta
+
+1110
+01:44:46,000 --> 01:44:52,880
+obtiene de los propios datos. Entonces veamos un caso que estamos viendo acá
+
+1111
+01:44:52,880 --> 01:44:58,720
+en ejemplo, la frase original dice el banco probó el crédito y lo que
+
+1112
+01:44:58,720 --> 01:45:04,560
+nosotros vamos a hacer es ocultar la palabra crédito y presentamos el banco
+
+1113
+01:45:04,560 --> 01:45:12,320
+probó él y nada más, con el oculto. Entonces la palabra original se
+
+1114
+01:45:12,320 --> 01:45:17,600
+conserva, porque sabemos, la tenemos desde el inicio, para comparar la respuesta. Entonces se fija en que
+
+1115
+01:45:17,600 --> 01:45:23,440
+estoy como, estoy supervisando el problema. Entonces en el sentido de aprendizaje
+
+1116
+01:45:23,440 --> 01:45:28,560
+supervisado. Entonces podemos producir un ejemplo de aprendizaje supervisado, un
+
+1117
+01:45:28,560 --> 01:45:33,700
+dato para aprendizaje supervisado a partir de este texto disponible porque yo
+
+1118
+01:45:33,700 --> 01:45:41,000
+sé, si fija yo tengo esto en mi dato y yo voy a ocupar esto como el X y el crédito
+
+1119
+01:45:41,000 --> 01:45:48,280
+como el Y, entonces datos que no tenían una etiqueta yo les puse esa etiqueta
+
+1120
+01:45:48,780 --> 01:45:56,940
+y no tuve que yo inspeccionarlo manualmente que era el caso de por ejemplo
+
+1121
+01:45:56,940 --> 01:46:00,980
+números que verán escrito a mano, esos datos, alguien los vio y dijo
+
+1122
+01:46:00,980 --> 01:46:05,820
+a estos son tres y puso y lo etiquetó como un tres. En el caso autosupervisado
+
+1123
+01:46:05,820 --> 01:46:12,020
+yo ocupo un sistema, nuevamente un sistema, que me los etiqueta automáticamente.
+
+1124
+01:46:12,020 --> 01:46:17,300
+Por ejemplo, una metodología autosupervisada
+
+1125
+01:46:17,300 --> 01:46:20,460
+es
+
+1126
+01:46:21,460 --> 01:46:25,820
+digamos, predicción supervisada en donde en primer plazo paso es la
+
+1127
+01:46:25,820 --> 01:46:30,140
+clasificación. Yo clasifico por ejemplo con clustering, le defino una etiqueta,
+
+1128
+01:46:30,140 --> 01:46:34,780
+una clase y luego esa clase lo ocupo como la verdad, como si fuese lo que yo
+
+1129
+01:46:34,780 --> 01:46:39,400
+inspeccioné realmente. No obstante eso tiene distintas problemáticas porque
+
+1130
+01:46:39,400 --> 01:46:44,940
+tengo que estar seguro de que esa categorización, ese clasterizado,
+
+1131
+01:46:44,940 --> 01:46:48,020
+ese clasthering me está dando respuestas correctas, estoy confiando mucho en esa
+
+1132
+01:46:48,020 --> 01:46:53,440
+metodología. Tienen sus propios contra los metodos supervisados. En general no
+
+1133
+01:46:53,440 --> 01:46:59,480
+superan a los modelos supervisados cuando yo sé la etiqueta y tengo 100% de certeza de que esa
+
+1134
+01:46:59,480 --> 01:47:09,240
+etiqueta está bien categorizada. Ahora, ¿qué pasa si yo tengo modelos? Yo hice un modelo de
+
+1135
+01:47:09,240 --> 01:47:17,860
+reino oral o tengo otras personas que han hecho modelos. Yo puedo hablar entonces de un modelo
+
+1136
+01:47:17,860 --> 01:47:24,420
+pre entrenado es decir que yo lo algo alguien más lo hizo y me lo puso a
+
+1137
+01:47:24,420 --> 01:47:27,540
+disposición pero yo no tengo necesariamente acceso al conjunto
+
+1138
+01:47:27,540 --> 01:47:32,420
+de entrenamiento con el cual se realizó ese modelo entonces ya hay un modelo que
+
+1139
+01:47:32,420 --> 01:47:36,260
+aprendió con otros datos antes de llegar a lo que nosotros queremos hacer
+
+1140
+01:47:36,260 --> 01:47:40,420
+entonces podemos aprovechar parte de lo que se aprendió en ese modelo con un
+
+1141
+01:47:40,420 --> 01:47:47,320
+punto de partida y luego re entrenarlo ajustarlo a lo que
+
+1142
+01:47:47,320 --> 01:47:53,880
+nosotros queremos a los datos locales. Hay muchos ejemplos de distintos modelos
+
+1143
+01:47:53,880 --> 01:47:59,520
+pre-entrenados, que tienen distintos objetivos. Por ejemplo, muchos de las
+
+1144
+01:47:59,520 --> 01:48:06,180
+herramientas que tenemos, TGPT o Cloud, que son los sumóvulos, tienen ese
+
+1145
+01:48:06,180 --> 01:48:11,480
+modelo pre-entrenado, que fue entrenado para la redundancia para cierta
+
+1146
+01:48:11,480 --> 01:48:15,480
+tarea en particular. Entonces, cuando se utiliza para otra tarea muy similar, tiende
+
+1147
+01:48:15,480 --> 01:48:23,080
+ser bueno. Los modelos de pesos libres también funcionan. Antiguamente
+
+1148
+01:48:23,080 --> 01:48:27,280
+habían bastantes redes, por ejemplo, convolucionales que estaban pre-entrenadas
+
+1149
+01:48:27,280 --> 01:48:32,520
+en millones de datos antes que saliera, digamos, la LLM y cosas de ese
+
+1150
+01:48:32,520 --> 01:48:38,280
+estilo. Redes convolucionales, redes neuronales muy profundas, entrenadas
+
+1151
+01:48:38,280 --> 01:48:41,480
+con muchos datos que se ponían a disposición para, por ejemplo, reconocer
+
+1152
+01:48:41,480 --> 01:48:48,600
+objetos y un sinfín de otras cosas que quedaron de cierta manera obsoletas pero
+
+1153
+01:48:48,600 --> 01:48:55,720
+hace 15 años eran una maravilla digamos términos de la clasificación y la
+
+1154
+01:48:55,720 --> 01:49:00,600
+precisión que podían tener con muy poco
+
+1155
+01:49:00,600 --> 01:49:05,360
+o nada prácticamente de cómputo de entrenamiento porque ya está un preentenado
+
+1156
+01:49:05,360 --> 01:49:09,460
+alguien se dio el tiempo a hacerlo entonces la primera ventaja de utilizar
+
+1157
+01:49:09,460 --> 01:49:16,580
+modelos preentrenados es aprovechar información de otros datos porque esos modelos vienen con
+
+1158
+01:49:16,580 --> 01:49:24,140
+un aprendizaje que fue realizado o obtuvo a través de otros datos pero debemos comprobar
+
+1159
+01:49:24,140 --> 01:49:30,340
+digamos que eso es transferible a lo que nosotros queremos hacer. Tenemos un modelo preentrenado con
+
+1160
+01:49:30,340 --> 01:49:35,340
+con, por ejemplo, reconocimiento de fauna.
+
+1161
+01:49:36,340 --> 01:49:44,340
+Y fue entrenado en otro continente, no es la misma fauna, entonces cuando lo aplique en el contexto chileno no va a ser viable.
+
+1162
+01:49:45,340 --> 01:49:51,340
+Entonces se podría parecer, digamos, pero no va a ser uno a uno la aplicación.
+
+1163
+01:49:52,340 --> 01:49:58,340
+Entonces tengo que verificar bien las condiciones, las cuales o cuál fue el conjunto de datos que se utilizó para hacer ese modelo.
+
+1164
+01:49:58,340 --> 01:50:07,740
+Otra de las posibles ventajas, digamos, es reducir el ajuste que debemos hacer, ya, porque no va a partir de cero.
+
+1165
+01:50:07,740 --> 01:50:13,540
+Entonces, puedo incluso aplicar el modelo sin necesitar yo datos.
+
+1166
+01:50:13,540 --> 01:50:20,540
+Entonces puedo utilizarlo con nuevos datos, ya como predicción directamente, sin preentredarlo.
+
+1167
+01:50:20,540 --> 01:50:25,540
+Y la tercera posibilidad es reutilizar una representación.
+
+1168
+01:50:25,540 --> 01:50:36,940
+Por ejemplo, podemos obtener, digamos, números que describen una imagen y usarlos como entrada de un clasificador para nuestra tarea.
+
+1169
+01:50:36,940 --> 01:50:42,140
+Entonces, estoy reutilizando un modelo con un nuevo dato.
+
+1170
+01:50:42,140 --> 01:50:48,140
+Y en esencia, esta representación es una herramienta.
+
+1171
+01:50:48,140 --> 01:50:51,940
+¿Y cómo lo voy a comprobar?
+
+1172
+01:50:51,940 --> 01:50:54,740
+En función al contexto del problema.
+
+1173
+01:50:54,740 --> 01:50:59,180
+tengo que comprobarlo en el mérito de la tarea que yo lo estoy implementando.
+
+1174
+01:50:59,180 --> 01:51:02,620
+Entonces el aprendizaje previa tiende a ser bastante útil, en general con todas
+
+1175
+01:51:02,620 --> 01:51:05,620
+las
+
+1176
+01:51:05,620 --> 01:51:12,740
+las redes neuronales y de distintos tipos que están disponibles en día. Partir de
+
+1177
+01:51:12,740 --> 01:51:18,920
+cero no es algo del todo en términos prácticos, cuando alguien
+
+1178
+01:51:18,920 --> 01:51:23,180
+quiere hacer algo un poco más sofisticado, partir de cero no tiene mucho sentido a
+
+1179
+01:51:23,180 --> 01:51:29,160
+menos que queda que la solución sea muy particular a lo que yo estoy haciendo o
+
+1180
+01:51:29,160 --> 01:51:33,800
+mi objetivo en particular o mi objetivo es muy particular que no hay una
+
+1181
+01:51:33,800 --> 01:51:38,200
+red entrenada para lo mismo que puede ser el caso por ejemplo si se quiere
+
+1182
+01:51:38,200 --> 01:51:45,840
+entrenar en plora silvestre del sur muy particular endógena de Chile
+
+1183
+01:51:45,840 --> 01:51:50,000
+no va a haber alguien que hay entrenado con ese mismo conjunto
+
+1184
+01:51:50,000 --> 01:51:57,320
+porque no está solo en Chile, digamos, no está en otro país. Entonces en ese sentido, en esos casos
+
+1185
+01:51:57,320 --> 01:52:03,360
+sí se puede utilizar Red de Cero y construirla desde cero. Hoy en día se ponen mucho a disposición
+
+1186
+01:52:03,360 --> 01:52:12,320
+todo ese tipo de modelos, hay páginas que nos tienen a disposición. Ahora, ¿cómo puedo adaptar
+
+1187
+01:52:12,320 --> 01:52:20,520
+esa solución. Primero, yo puedo adaptar el uso, puedo adaptar el modelo. Puedo ocupar un modelo que
+
+1188
+01:52:20,520 --> 01:52:26,360
+fue utilizado para una cosa y adaptarlo a lo que quiero hacer. O puedo cambiar el mismo objetivo,
+
+1189
+01:52:26,360 --> 01:52:30,960
+pero puedo cambiar un poco el modelo. Entonces, hay tres formas acá en esta tabla de adaptar
+
+1190
+01:52:30,960 --> 01:52:36,720
+una solución. Entonces, la primera consiste en cambiar las instrucciones y el contexto. Lo que
+
+1191
+01:52:36,720 --> 01:52:42,500
+cambia es la información de entrada. Por ejemplo, si tengo un modelo que
+
+1192
+01:52:42,500 --> 01:52:48,080
+reconoce imágenes, o reconoce, no sé,
+
+1193
+01:52:48,440 --> 01:52:56,200
+empecemos en el número de nuevo, el escrito a mano, yo pasarle, no en números.
+
+1194
+01:52:56,560 --> 01:53:01,400
+O, en el caso de generación de texto, podría ser aportar un procedimiento para
+
+1195
+01:53:01,400 --> 01:53:05,960
+reácter una respuesta y va a utilizar el modelo ya implementado.
+
+1196
+01:53:05,960 --> 01:53:13,560
+Entonces en ese cambio cambia la información de entrada, el input, los datos que se tienen disponibles para la
+
+1197
+01:53:13,560 --> 01:53:19,160
+implementación del modelo. En la esencia lo que estoy haciendo es que mi conjunto de prueba va a ir
+
+1198
+01:53:19,160 --> 01:53:25,480
+cambiando porque es donde lo voy a utilizar. La segunda alternativa es reutilizar las representaciones.
+
+1199
+01:53:25,480 --> 01:53:34,560
+podemos obtener vectores con un modelo ya disponible, es la representación de algo no numérico a numérico
+
+1200
+01:53:34,560 --> 01:53:41,940
+entonces puedo ocupar esos modelos para hacer esa representación y ajustar un clasificador para algo
+
+1201
+01:53:41,940 --> 01:53:47,720
+particular que yo quiero. Entonces se fijan ahí estoy jugando un modelo para hacer esta proyección de objeto a
+
+1202
+01:53:47,720 --> 01:53:52,920
+número, ya la representación numérica de las cosas, que es muy importante dentro de todas estas cosas
+
+1203
+01:53:52,920 --> 01:53:59,240
+como yo represento de manera numérica mis entradas, mis documentos, todo lo que yo quiero incorporar
+
+1204
+01:54:01,240 --> 01:54:11,740
+y la tercera es un ajuste fino, que en esencia se modifica el modelo mediante datos para la
+
+1205
+01:54:11,740 --> 01:54:20,160
+tarea particular que yo tengo en mente pero con nuevos conjuntos de datos, por ejemplo,
+
+1206
+01:54:20,160 --> 01:54:29,040
+qué pasa si yo tengo un clasificador, un modelo que reconoce distintas especies de peces
+
+1207
+01:54:29,040 --> 01:54:36,320
+y hay especies que no están incorporadas o no fueron utilizadas en el entrenamiento del modelo
+
+1208
+01:54:36,320 --> 01:54:42,000
+entonces yo le incorporo dentro del modelo y lo trato de reentrenar entonces no parto de nada,
+
+1209
+01:54:42,000 --> 01:54:48,800
+parto de una base que reconoce especies comunes pero le quiero agregar, además que reconozca
+
+1210
+01:54:48,800 --> 01:54:52,200
+esta nueva especie que el modelo no lo conocía en un inicio
+
+1211
+01:54:52,200 --> 01:54:55,880
+porque no fue entrenado con ese conjunto de datos.
+
+1212
+01:54:55,880 --> 01:54:59,280
+Entonces tengo distintas formas de utilizar estos modelos.
+
+1213
+01:54:59,280 --> 01:55:01,640
+Ahora, hay muchos que están disponibles.
+
+1214
+01:55:01,640 --> 01:55:09,240
+Por ejemplo, está el FOD3, que es para aplicaciones, digamos,
+
+1215
+01:55:09,240 --> 01:55:12,600
+biológicas.
+
+1216
+01:55:12,600 --> 01:55:17,120
+Entonces, en esencia, es para distintos tipos de moléculas,
+
+1217
+01:55:17,120 --> 01:55:21,120
+que interactúan, las proteínas, ADN, etc.
+
+1218
+01:55:21,120 --> 01:55:24,720
+Y este modelo de AlphaFold 3, que es un modelo preentrenado,
+
+1219
+01:55:24,720 --> 01:55:27,680
+predice cómo podrían disponerse sus componentes,
+
+1220
+01:55:27,680 --> 01:55:29,760
+digamos, en el espacio, cuál va a ser la configuración.
+
+1221
+01:55:29,760 --> 01:55:32,000
+Entonces, este modelo que recibe,
+
+1222
+01:55:32,000 --> 01:55:39,600
+la información sobre los distintos componentes del complejo biomolecular,
+
+1223
+01:55:39,600 --> 01:55:45,520
+que produce una propuesta de cómo se van a organizar espacialmente.
+
+1224
+01:55:45,520 --> 01:55:50,320
+Como lo compruebo, digamos, comparando la disposición que me entrega el modelo
+
+1225
+01:55:50,320 --> 01:55:52,880
+con los resultados experimentales.
+
+1226
+01:55:52,880 --> 01:55:57,000
+Entonces, se fijan ahí, hay modelos que están hechos con un objetivo en particular
+
+1227
+01:55:57,000 --> 01:56:00,160
+listo para llegar y ser usado.
+
+1228
+01:56:00,160 --> 01:56:03,400
+Entonces, hay muchas páginas que ponen a disposición distintas herramientas para esto,
+
+1229
+01:56:03,400 --> 01:56:07,280
+pero tenemos que tener cuidado porque hay que ver bien cuál fue el conjunto de datos,
+
+1230
+01:56:07,280 --> 01:56:09,000
+es aplicable para nuestra tarea, etcétera.
+
+1231
+01:56:09,000 --> 01:56:14,400
+En general, la mayoría de las aplicaciones, digamos, empresariales, organizacionales
+
+1232
+01:56:14,400 --> 01:56:19,280
+que se tiene hoy en día, alguien ya tuvo el mismo problema y es bueno, digamos,
+
+1233
+01:56:19,280 --> 01:56:25,560
+buscar esas alternativas para no partir de cero y no agarramos
+
+1234
+01:56:25,560 --> 01:56:31,360
+bastante nivel de cómputo. Hoy en día, todas estas metodologías de los
+
+1235
+01:56:31,360 --> 01:56:38,040
+distintos modelos son, digamos, medidas con distintos rankings.
+
+1236
+01:56:38,040 --> 01:56:41,040
+En el editor no hemos visto que cada cierto tiempo sale un nuevo modelo.
+
+1237
+01:56:42,840 --> 01:56:46,720
+Se trata de rankear, digamos, los distintos modelos,
+
+1238
+01:56:46,720 --> 01:56:49,920
+dependiendo de su desempeño, cuántos han sido utilizados,
+
+1239
+01:56:50,640 --> 01:56:53,360
+cuáles son las distintas aplicaciones, sobre todo el contexto.
+
+1240
+01:56:53,360 --> 01:56:57,120
+Por ejemplo, hace un par de semanas, digamos,
+
+1241
+01:56:57,120 --> 01:57:03,080
+se sabe, digamos, que en el contexto matemático han habido muchos avances
+
+1242
+01:57:03,080 --> 01:57:09,160
+en términos de demostraciones, digamos, de programa bien importante.
+
+1243
+01:57:09,160 --> 01:57:14,000
+Entonces, todo un tema en general se categoriza dependiendo de alguna tarea en particular.
+
+1244
+01:57:14,000 --> 01:57:19,360
+Y por eso hacíamos bastante énfasis en cuál es el objetivo de lo que nosotros estamos haciendo
+
+1245
+01:57:19,360 --> 01:57:22,320
+en términos del sistema que estamos planteando.
+
+1246
+01:57:22,320 --> 01:57:27,120
+Entonces, cuando hacemos estos benchmarks, digamos, que le llamamos,
+
+1247
+01:57:27,120 --> 01:57:31,280
+o la forma en que se arranquean, todo este tipo de modelo, siempre funciona la tarea.
+
+1248
+01:57:31,280 --> 01:57:37,520
+por ejemplo, cuál es el benchmark, digamos, el rendimiento en problemáticas o tareas u objetivos
+
+1249
+01:57:37,520 --> 01:57:42,280
+de tono matemático, digamos, o de reacción, o lenguaje, o derecho, o así, sumisigues,
+
+1250
+01:57:42,280 --> 01:57:46,520
+entonces se tienen que ir clasificando porque ningún modelo es específico y gana todo,
+
+1251
+01:57:46,520 --> 01:57:52,760
+gana en todos los modelos. Cuando uno da una pregunta, digamos, en un modelo de inteligencia artificial
+
+1252
+01:57:52,760 --> 01:57:59,560
+de los actuales, reconoce a qué tipo de preguntas está haciendo y lo pasa a un sub-submodelo
+
+1253
+01:57:59,560 --> 01:58:05,560
+que están más entrenados para responder ese tipo de preguntas conforme a las distintas tareas que yo le estoy dando.
+
+1254
+01:58:05,560 --> 01:58:16,560
+Entonces, se van a evaluar siempre con distintas tareas, los distintos datos y con distintas reglas, digamos, de métrica de evaluación, digamos.
+
+1255
+01:58:16,560 --> 01:58:22,560
+Entonces, siempre vamos a preguntarnos qué tareas se evaluó y en qué condiciones, ¿ya?
+
+1256
+01:58:22,560 --> 01:58:28,560
+Un mismo modelo que tuvo mucho más datos disponibles no es lo mismo con un modelo que funcionó igual de bien con tenos de datos.
+
+1257
+01:58:28,560 --> 01:58:37,080
+y cuando quiero reentrenarlo para una aplicación en particular siempre me va a preguntar si lo que
+
+1258
+01:58:37,080 --> 01:58:42,720
+yo voy a con los datos que yo tengo disponibles en los cuales yo quiero utilizar mi modelo es
+
+1259
+01:58:42,720 --> 01:58:48,440
+comparable o es coherente con el modelo que yo estoy utilizando es decir se parecen efectivamente
+
+1260
+01:58:48,440 --> 01:58:56,640
+puedo utilizar el modelo que tengo pre entrenado para mi objetivo en particular entonces hoy en día
+
+1261
+01:58:56,640 --> 01:59:01,560
+ya no es un gran modelo que gana a todos, sino que tenemos muchas particularidades,
+
+1262
+01:59:01,560 --> 01:59:06,860
+tenemos muchos distintos modelos que sirven para distintas cosas en particular. Por eso les
+
+1263
+01:59:06,860 --> 01:59:12,200
+preguntaba si ustedes quieren, ya que comentaba, digamos, si es que tienen una aplicación en mente
+
+1264
+01:59:12,200 --> 01:59:18,320
+la cual necesita alguna clasificación, alguna generación de texto, etcétera. Alguien ya lo hizo,
+
+1265
+01:59:18,320 --> 01:59:22,800
+ya alguien ya lo hizo, alguien tuvo el mismo problema y general partido desde ese modelo tiene
+
+1266
+01:59:22,800 --> 01:59:30,540
+mucha más, digamos, tasa de llegar a un puerto de que se pueda hacer efectivamente el modelo,
+
+1267
+01:59:30,540 --> 01:59:38,460
+si es que yo parto algo que ya está entrenado en cosas muy similares y yo lo reentreno con datos
+
+1268
+01:59:38,460 --> 01:59:47,300
+locales, pero tengo que tener claro de que el uso que le voy a estar dando a ese modelo es comparable,
+
+1269
+01:59:47,300 --> 01:59:56,500
+De decir, no puedo ocupar un modelo que clasifica tipos de comida para clasificar, digamos,
+
+1270
+01:59:56,500 --> 02:00:00,220
+marcas de acto, tiene cosas muy distintas, tienen que ser comparables.
+
+1271
+02:00:00,220 --> 02:00:06,220
+Porque mientras más encajo la problemática, los poes distintos modelos aprenden mejor,
+
+1272
+02:00:06,220 --> 02:00:11,200
+porque tienen menos de dónde aprender, porque si puede ser cualquier cosa, pueden clasificar
+
+1273
+02:00:11,200 --> 02:00:12,200
+muchas cosas.
+
+1274
+02:00:12,200 --> 02:00:15,840
+Entonces, mientras tengo menos categorías las cuales puedo clasificar, el rendimiento
+
+1275
+02:00:15,840 --> 02:00:19,120
+tiende a ser bastante superior.
+
+1276
+02:00:19,680 --> 02:00:24,520
+Ahora, cuando yo quiero hacer una aplicación real,
+
+1277
+02:00:24,520 --> 02:00:31,960
+esto va a tener bastantes componentes. El primero, digamos, va a aportar datos y
+
+1278
+02:00:31,960 --> 02:00:35,640
+contexto, ya, de un componente de qué es lo que tengo a disposición, en qué
+
+1279
+02:00:35,640 --> 02:00:40,920
+contexto quiero realizar esto. Por ejemplo, documentos que tengo disponibles,
+
+1280
+02:00:40,920 --> 02:00:45,920
+registros que voy a utilizar para responder
+
+1281
+02:00:45,920 --> 02:00:50,960
+y que va a depender mucho digamos que datos tengo para realizar digamos la
+
+1282
+02:00:50,960 --> 02:00:55,120
+consulta o la aplicación en particular. El otro componente que tengo
+
+1283
+02:00:55,120 --> 02:00:59,760
+es el modelo mismo, el modelo mismo que yo entreno y que lo voy a mover más en
+
+1284
+02:00:59,760 --> 02:01:04,320
+detalle en la próxima semana con todas sus herramientas, sus limitantes que yo
+
+1285
+02:01:04,320 --> 02:01:08,160
+puedo y su objetivo en particular porque también lo puedo ocupar no solo para
+
+1286
+02:01:08,160 --> 02:01:10,920
+predicción cuatitatilla sino para clasificar entonces tengo que definir
+
+1287
+02:01:10,920 --> 02:01:15,220
+bien cuál es esa tarea desde un principio ya se puede servir para
+
+1288
+02:01:15,220 --> 02:01:21,800
+predecir, reactar, consultar, calcular, clasificar, etcétera
+
+1289
+02:01:21,800 --> 02:01:26,760
+entonces si yo defino mal ese modelo también voy a tener una una componente
+
+1290
+02:01:26,760 --> 02:01:30,480
+dentro de la aplicación que estoy haciendo que va a estar me va a estar
+
+1291
+02:01:30,480 --> 02:01:35,200
+digamos mermando el objetivo o cumplir el objetivo que tengo en un principio
+
+1292
+02:01:35,200 --> 02:01:40,160
+El tercer componente es verificar las condiciones en las cuales voy a evaluar y voy a implementar el
+
+1293
+02:01:40,160 --> 02:01:45,360
+nuevo. Tengo que comprobar que el resultado tenga, digamos, un respaldo y cumpla con las
+
+1294
+02:01:45,360 --> 02:01:51,080
+reglas necesarias, por ejemplo, en el ejemplo de la predicción de los números con mucha probabilidad,
+
+1295
+02:01:53,000 --> 02:01:58,600
+porque luego de eso, con estos componentes de una aplicación, pasa alguna decisión. Entonces,
+
+1296
+02:01:58,600 --> 02:02:03,560
+tengo... siempre hay una decisión después de esto y tengo que ver las consecuencias de estos
+
+1297
+02:02:03,560 --> 02:02:06,440
+o sea, si tengo un móvel que me clasifica todo,
+
+1298
+02:02:06,440 --> 02:02:08,440
+si lo pongo en el ejemplo del envase,
+
+1299
+02:02:08,440 --> 02:02:09,880
+si tiene daño o no,
+
+1300
+02:02:09,880 --> 02:02:11,160
+todo no tiene envase,
+
+1301
+02:02:11,160 --> 02:02:13,440
+quizás en términos de métrica puede tener
+
+1302
+02:02:13,440 --> 02:02:16,960
+una buena exactitud porque predice bien,
+
+1303
+02:02:16,960 --> 02:02:19,800
+pero se predice siempre que no hay envase,
+
+1304
+02:02:19,800 --> 02:02:21,400
+entonces en términos de métrica,
+
+1305
+02:02:21,400 --> 02:02:24,200
+de exactitud puede ser bueno,
+
+1306
+02:02:24,200 --> 02:02:26,440
+pero las repercusiones de eso puede ser bastante mal.
+
+1307
+02:02:26,440 --> 02:02:30,560
+Entonces, tengo que evaluarlo dentro del contexto.
+
+1308
+02:02:30,560 --> 02:02:31,560
+Ya.
+
+1309
+02:02:32,120 --> 02:02:34,560
+Entonces, las aplicaciones van a tener distintos adictos
+
+1310
+02:02:34,560 --> 02:02:36,120
+de las cuales pueden fallar
+
+1311
+02:02:36,120 --> 02:02:38,920
+y voy a tener que ir viendo caso a caso.
+
+1312
+02:02:38,920 --> 02:02:42,440
+Por eso, nuevamente, el plantear el objetivo general,
+
+1313
+02:02:43,480 --> 02:02:45,760
+el objetivo, la tarea que yo quiero cumplir
+
+1314
+02:02:45,760 --> 02:02:49,440
+me permite, digamos, desagregar en subcomponentes,
+
+1315
+02:02:49,440 --> 02:02:52,200
+es decir, ¿qué es lo que quiero hacer?
+
+1316
+02:02:52,200 --> 02:02:53,680
+Esto es lo que va a necesitar de datos.
+
+1317
+02:02:53,680 --> 02:02:56,880
+Y ahora, la pregunta natural es, ¿cómo represento estos datos,
+
+1318
+02:02:56,880 --> 02:02:59,080
+de manera tèctica? No estoy pensando en un Excel.
+
+1319
+02:02:59,080 --> 02:03:05,280
+en de una forma numérica coherente con la tarea que yo estoy haciendo.
+
+1320
+02:03:05,280 --> 02:03:10,280
+Ya vimos en el ejemplo de las imágenes que yo puedo representar esa imagen de distinta manera.
+
+1321
+02:03:10,280 --> 02:03:18,040
+Puedes verlo en cada celda como 3.016, 2.56, como en RGD,
+
+1322
+02:03:18,040 --> 02:03:20,760
+lo puedo definir como una matriz de detectores.
+
+1323
+02:03:20,760 --> 02:03:24,280
+Entonces, todas esas formas tengo que dejarlas claras de antemano
+
+1324
+02:03:24,280 --> 02:03:27,080
+para poder implementar nuevamente.
+
+1325
+02:03:27,080 --> 02:03:33,640
+Entonces, si por ejemplo yo veo modelos preentrenados de imágenes y ocupan solo imágenes en blanco y negro,
+
+1326
+02:03:33,640 --> 02:03:40,840
+si lo quiero implementar con una, lo quiero utilizar, digamos, con imágenes de otra dimensión,
+
+1327
+02:03:40,840 --> 02:03:45,880
+en colores, no va a tener buen resultado.
+
+1328
+02:03:45,880 --> 02:03:51,880
+Entonces tengo que ver todas estas componentes que describo acá para ver si estos modelos preentrenados
+
+1329
+02:03:51,880 --> 02:03:59,880
+son aplicables dentro de una aplicación que yo quiero usar, son aplicables dentro de una problemática que yo quiero solucionar.
+
+1330
+02:03:59,880 --> 02:04:09,880
+Entonces tengo que tener todas esas, digamos, esos detalles que tengo que asegurarme antes de implementarlo.
+
+1331
+02:04:09,880 --> 02:04:18,880
+Porque si yo empiezo a reentrenar un modelo o utilizarlo y no me di cuenta que eso no era utilizable
+
+1332
+02:04:18,880 --> 02:04:25,280
+porque alguno de estos componentes no era simple, no era coherente con la aplicación que tengo,
+
+1333
+02:04:25,280 --> 02:04:31,820
+que quiero realizar. Entonces, voy a perder un tiempo no menor porque todos estos tiempos ya
+
+1334
+02:04:31,820 --> 02:04:39,160
+conforme vamos avanzando y hablamos por ejemplo de reneuronales profundas o aprendizaje profundo,
+
+1335
+02:04:39,160 --> 02:04:46,640
+los tiempos de cómputo empiezan a subir bastante, ya no es de manera lineal y sobre todo suben mucho
+
+1336
+02:04:46,640 --> 02:04:51,480
+con el conjunto de datos que tengo, la complejidad de los datos que tengo, por ejemplo, trabajar
+
+1337
+02:04:51,480 --> 02:04:58,040
+imágenes con mucha resolución tiende a ser bastante, bastante costoso. Entonces, muchas
+
+1338
+02:04:58,040 --> 02:05:02,160
+de las metodologías que se ocupan cuando quiero trabajar con imágenes y redes lunares
+
+1339
+02:05:02,160 --> 02:05:07,920
+computacionales, por ejemplo, es hacer bajarle la resolución, pero a un punto donde siga
+
+1340
+02:05:07,920 --> 02:05:14,600
+reconociendo la imagen, para poder bajar el costo computacional que requiere entrenar
+
+1341
+02:05:14,600 --> 02:05:20,040
+una red. Entonces, en general, entrenar a un red neuronal o a algún otro tipo o a algún sistema
+
+1342
+02:05:20,040 --> 02:05:28,680
+tiene un costo computacional bastante alto. Entonces, por eso todas estas cosas requieren,
+
+1343
+02:05:28,680 --> 02:05:35,080
+digamos, una máquina bien potente para hacerlo o mucho tiempo, digamos. Mira, el otro, pero puede
+
+1344
+02:05:35,080 --> 02:05:43,640
+escaparse el tiempo computacional bastante rápido si uno no lo configura y no sabe qué está haciendo
+
+1345
+02:05:43,640 --> 02:05:48,660
+compartimentarse. Por eso pongo harto énfasis en antes de empezar a hacer cosas, que es lo que vamos a hacer las semanas
+
+1346
+02:05:48,660 --> 02:05:53,600
+subsidentes, definir bien qué es lo que queremos hacer, cómo lo vamos a hacer y cómo vamos a evaluar que lo que estamos haciendo
+
+1347
+02:05:54,240 --> 02:05:56,240
+está correctamente definido.
+
+1348
+02:05:57,880 --> 02:05:59,520
+Entonces,
+
+1349
+02:05:59,520 --> 02:06:06,380
+volvamos a esta consulta, a este ejemplo de me cobraron dos veces y necesito el confronto y lo vimos en un inicio.
+
+1350
+02:06:07,160 --> 02:06:11,000
+Entonces, en el primer paso nosotros podemos clasificarla,
+
+1351
+02:06:11,000 --> 02:06:18,920
+que se vea como una consulta sobre costos y asignar una cierta prioridad, digamos,
+
+1352
+02:06:18,920 --> 02:06:23,040
+según la regla de algún servicio que se tiene a disposición, un reglamento.
+
+1353
+02:06:23,040 --> 02:06:30,960
+En el segundo paso, podemos consultar los registros, digamos, y recuperamos el procedimiento pertinente,
+
+1354
+02:06:30,960 --> 02:06:37,280
+¿ya? Que si se fijan son dos fuentes de información con funciones distintas.
+
+1355
+02:06:37,280 --> 02:06:43,160
+tengo distintos pasos, si fijan esto una aplicación que tiene distintos objetivos,
+
+1356
+02:06:43,160 --> 02:06:49,440
+que son distintas tareas como lo definimos en un principio. Estos registros en el segundo
+
+1357
+02:06:49,440 --> 02:06:58,280
+paso permiten estudiar qué fue lo que sucedió, en este caso en particular, y el procedimiento va a
+
+1358
+02:06:58,280 --> 02:07:04,140
+digamos, explicar cómo debe tramitarse, ya que estamos acá en consultar y recuperar.
+
+1359
+02:07:04,140 --> 02:07:10,280
+Y en el tercer paso, reactamos, digamos, un borrador
+
+1360
+02:07:10,280 --> 02:07:15,060
+de algún correo, por ejemplo, alguna respuesta, y ese texto, digamos, debería
+
+1361
+02:07:15,060 --> 02:07:20,000
+distinguir lo que está verificado de lo que todavía no conocemos, que estamos
+
+1362
+02:07:20,000 --> 02:07:24,200
+seguros porque está documentado o no. Entonces, puede explicar el procedimiento y
+
+1363
+02:07:24,200 --> 02:07:28,560
+información faltante sin atribuirle al caso un resultado que no está
+
+1364
+02:07:28,560 --> 02:07:33,600
+necesariamente respaldado en el segundo paso. Entonces, si se fijan acá, la tarea
+
+1365
+02:07:33,600 --> 02:07:38,080
+que nosotros estamos haciendo, que es esta consulta de me cobraron dos veces
+
+1366
+02:07:38,080 --> 02:07:41,560
+y necesito el comprobante, puede ser desagregada en pequeñas tareas y
+
+1367
+02:07:41,560 --> 02:07:49,680
+nosotros podemos tener distintos modelos que pueden ser conectados en un
+
+1368
+02:07:49,680 --> 02:07:54,120
+gran sistema, por eso definí el sistema como una concatenación de actividad de
+
+1369
+02:07:54,120 --> 02:07:58,520
+es donde pequeñas tareas que permiten resolver este objetivo general, este
+
+1370
+02:07:58,520 --> 02:08:02,240
+objetivo principal que es mejorando veces necesito entonces necesito comprobar
+
+1371
+02:08:02,240 --> 02:08:09,360
+primero clasifico clasifico si es la prioridad del cobro o si lo clasifico
+
+1372
+02:08:09,360 --> 02:08:14,200
+como cobro en principio consulto para el procedimiento y luego reacto
+
+1373
+02:08:14,200 --> 02:08:18,120
+entonces eso es lo que nosotros tenemos que hacer cuando planteamos una
+
+1374
+02:08:18,120 --> 02:08:23,640
+aplicación tenemos que definir la separación de cosas esto lo puedo hacer
+
+1375
+02:08:23,640 --> 02:08:29,360
+por ejemplo con una regliorada. Esto lo puedo hacer con un cláster, esto lo puedo hacer con un modelo
+
+1376
+02:08:29,360 --> 02:08:36,040
+pre-entrenado que ya sé que sirve. Entonces tenemos que ir desfragmentando porque conforme más puedo
+
+1377
+02:08:36,040 --> 02:08:42,000
+segmentar eso y más puedo describir cada etapa dentro de la tarea principal, voy a tener herramientas
+
+1378
+02:08:42,000 --> 02:08:47,240
+más específicas para resolver cada una de esas problemáticas. Entonces si mi problema es netamente
+
+1379
+02:08:47,240 --> 02:08:52,960
+de clasificación, no quiero ser un modelo que haga todas las clasificaciones posibles. Entonces si lo
+
+1380
+02:08:52,960 --> 02:09:03,180
+a coto, a clasificar el correo, digamos, o el mensaje en alguna prioridad, entonces
+
+1381
+02:09:03,180 --> 02:09:12,000
+los modelos van a tener, digamos, una fiabilidad, digamos, una confianza, o nosotros vamos a
+
+1382
+02:09:12,000 --> 02:09:16,160
+estar más seguros de que ese modelo va a funcionar un poco mejor que simplemente se abarquemos
+
+1383
+02:09:16,160 --> 02:09:21,760
+algo muy, muy grande de resolver. Entonces tenemos que hacer ese análisis antes de llevar a cabo
+
+1384
+02:09:21,760 --> 02:09:29,760
+a cabo, qué es implementar herramientas que a veces no necesariamente necesitan metodologías
+
+1385
+02:09:29,760 --> 02:09:36,440
+tan complejas o costosas computacionalmente. En muchos casos una regresión logística
+
+1386
+02:09:36,440 --> 02:09:41,440
+tiende a ser suficiente para el uso y la verificación que nosotros estamos haciendo,
+
+1387
+02:09:41,440 --> 02:09:47,680
+cuál es nuestro objetivo. No tenemos que complejizar las metodologías porque sí.
+
+1388
+02:09:47,680 --> 02:09:52,000
+que ver separar cada uno de los herramientas. Quizás ciertos pasos pueden ser o
+
+1389
+02:09:52,000 --> 02:09:56,640
+deben ser resueltos, ciertas etapas deben ser resueltos con metodología un poco
+
+1390
+02:09:56,640 --> 02:10:00,640
+más avanzada, por ejemplo de aprendizaje profundo, pero muchas de las herramientas
+
+1391
+02:10:00,640 --> 02:10:07,320
+podrían simplemente ser mueblos clásicos o reglas jurísticas.
+
+1392
+02:10:07,320 --> 02:10:15,240
+Entonces, pensemos en esta fuente, digamos. La revisión del cobro puede
+
+1393
+02:10:15,240 --> 02:10:18,920
+tardar hasta cinco días a días y el borrador que me entrega este sistema
+
+1394
+02:10:18,920 --> 02:10:23,120
+dice su devolución está aprobada y llegará mañana
+
+1395
+02:10:23,120 --> 02:10:28,720
+entonces vamos a separar el borrador en dos afirmaciones y buscar el respaldo
+
+1396
+02:10:28,720 --> 02:10:31,640
+en cada uno porque estamos haciendo la verificación de esto
+
+1397
+02:10:31,640 --> 02:10:36,960
+entonces la primera afirmación dice la devolución está aprobada
+
+1398
+02:10:36,960 --> 02:10:43,360
+y la fuente no informa una decisión sobre ese caso y solamente lo que hace
+
+1399
+02:10:43,360 --> 02:10:47,800
+describir un plazo de revisión.
+
+1400
+02:10:47,800 --> 02:10:53,240
+Por lo tanto, digamos, no se respalda esa aprobación. Y la segunda afirmación, que
+
+1401
+02:10:53,240 --> 02:10:58,360
+es que el abono llegará mañana, tampoco está respaldando. La fuente habla de
+
+1402
+02:10:58,360 --> 02:11:02,600
+la revisión, no de la fecha en que será el abono.
+
+1403
+02:11:02,600 --> 02:11:08,280
+Entonces tenemos que corregir eso si se fijan. Esa respuesta no es compatible
+
+1404
+02:11:08,280 --> 02:11:12,360
+con el objetivo que nosotros queremos. Entonces, una respuesta compatible con lo
+
+1405
+02:11:12,360 --> 02:11:17,940
+que nosotros conocemos es la que aparece abajo. El procedimiento indica hasta 5
+
+1406
+02:11:17,940 --> 02:11:21,540
+días hábiles de revisión. Con esta información no puedo confirmar una
+
+1407
+02:11:21,540 --> 02:11:27,800
+aprobación ni una fecha abona. Si se fijan, todos estos sistemas tienen que tener
+
+1408
+02:11:27,800 --> 02:11:36,300
+una verificación sustancial. Porque si no, digamos, puede tener cada una de
+
+1409
+02:11:36,300 --> 02:11:42,080
+estos pasos, basta que uno de estos pasos falle sustancialmente para que tengamos
+
+1410
+02:11:42,080 --> 02:11:47,480
+resultados o los outputs y decisiones que tomemos, que las tratamos de automatizar,
+
+1411
+02:11:47,480 --> 02:11:51,360
+sean bastante erróneas.
+
+1412
+02:11:52,040 --> 02:11:57,200
+Siguiendo entonces, entonces veamos en este ejemplo otro ejemplo hipotético,
+
+1413
+02:11:57,200 --> 02:12:00,800
+tenemos el costo de los errores y la carga de revisión.
+
+1414
+02:12:00,800 --> 02:12:07,640
+Entonces pensemos que tenemos mil piezas de las cuales 20 tienen defectos.
+
+1415
+02:12:07,640 --> 02:12:13,960
+el sistema que nuevamente lo ocupo como un termino, un concepto un poco más
+
+1416
+02:12:13,960 --> 02:12:18,520
+amplio porque nuevamente este concepto de sistema de luego lo vamos a ir
+
+1417
+02:12:18,520 --> 02:12:23,440
+particularizando en herramientas con nombre y abillio para
+
+1418
+02:12:23,440 --> 02:12:29,620
+distintos objetivos. Entonces el sistema deja pasar cuatro defectos y envía 30
+
+1419
+02:12:29,620 --> 02:12:39,440
+piezas sanas, digamos, a revisión. Asignamos un costo de 50 unidades, puede ser
+
+1420
+02:12:39,440 --> 02:12:44,780
+miles de pesos, etcétera, a cada defecto mítido y una anidad a cada falsa alarma.
+
+1421
+02:12:44,780 --> 02:12:48,660
+Si se fijan esto, los falsos positivos y los falsos negativos caen modistuantes,
+
+1422
+02:12:48,660 --> 02:12:56,860
+en la mantida de confusión. Entonces, el costo de esos errores es 4 por 50
+
+1423
+02:12:56,860 --> 02:13:00,820
+más 30 por 1 porque en esencia es
+
+1424
+02:13:00,820 --> 02:13:03,900
+cuanto me equivoqué? 230
+
+1425
+02:13:03,900 --> 02:13:06,540
+entonces omitir un defecto cuesta más
+
+1426
+02:13:06,540 --> 02:13:10,380
+que producir una alarma, por el costo asociado
+
+1427
+02:13:10,380 --> 02:13:15,680
+ahora vamos a calcular el trabajo de
+
+1428
+02:13:15,680 --> 02:13:19,900
+revisión entonces de los 20 defectos
+
+1429
+02:13:19,900 --> 02:13:23,900
+se detectaron 16
+
+1430
+02:13:23,900 --> 02:13:30,340
+entonces porque a 4 digamos quedaron sin detectar porque son el defecto no
+
+1431
+02:13:30,340 --> 02:13:36,680
+detectado si se revisaran o sea si se revisan todas las alertas digamos
+
+1432
+02:13:36,680 --> 02:13:42,060
+llegarán digamos esos 16 casos y los 3 y las 30 falsas alarma entonces en total son
+
+1433
+02:13:42,060 --> 02:13:45,220
+46 revisiones
+
+1434
+02:13:45,220 --> 02:13:53,180
+ahora si la capacidad disponible es de 20 revisiones va a alcanzar
+
+1435
+02:13:53,180 --> 02:13:59,460
+no va a alcanzar, cierto, porque detectar defectos es útil pero necesitamos digamos
+
+1436
+02:13:59,460 --> 02:14:04,820
+un procedimiento que también pueda ejecutarse con los recursos disponibles.
+
+1437
+02:14:04,820 --> 02:14:11,000
+Entonces tenemos una limitante, una limitante de costo, una limitante que no
+
+1438
+02:14:11,000 --> 02:14:15,140
+sé, por ejemplo, después nosotros lo vamos a particularizar en las redes
+
+1439
+02:14:15,140 --> 02:14:21,500
+neuronales como el número de épocas, ya, que vamos a tener máximas para poder
+
+1440
+02:14:21,500 --> 02:14:26,700
+entrenar nuestro modelo. Entonces, siempre vamos a tener restricciones adicionales a lo que nosotros
+
+1441
+02:14:26,700 --> 02:14:31,740
+podemos plantear como el programa puede ser funcional de restricciones de tiempo, de costo
+
+1442
+02:14:31,740 --> 02:14:38,380
+computacional, de costo financiero. Entonces, necesitamos incorporar todas estas cosas dentro
+
+1443
+02:14:38,380 --> 02:14:48,820
+de la creación y entrenamiento del sistema. Entonces, para ella, un poco más finalizando,
+
+1444
+02:14:48,820 --> 02:14:52,980
+siempre nosotros tenemos que ir pensando en la tarea, la tarea, cuáles son
+
+1445
+02:14:52,980 --> 02:14:56,700
+nuestro conjuntuado, el sistema que lo vamos a particularizar, la salida y cómo vamos a
+
+1446
+02:14:56,700 --> 02:15:02,540
+comprobar lo que vamos a hacer. Y otro que nos queda es dónde vamos a
+
+1447
+02:15:02,540 --> 02:15:06,580
+ocupar el conjuntuado, que en esencia es definir bien dónde voy a ocupar
+
+1448
+02:15:06,580 --> 02:15:12,060
+el modelo, que en esencia es definir bien la tarea en particular. Entonces, si yo
+
+1449
+02:15:12,060 --> 02:15:18,540
+tengo un uso previsto para nuevas personas de un modelo, entonces tengo que
+
+1450
+02:15:18,540 --> 02:15:21,660
+para el diseño que voy a tener que realizar es mantener todas las
+
+1451
+02:15:21,660 --> 02:15:25,980
+observaciones de una persona en el mismo conjunto, es decir, no puedo separar una
+
+1452
+02:15:25,980 --> 02:15:30,100
+parte de observaciones de la persona, mediciones de la persona en el
+
+1453
+02:15:30,100 --> 02:15:33,340
+conjunto de plenamiento y el conjunto de pruebas.
+
+1454
+02:15:33,340 --> 02:15:38,060
+Si ocupa otra cámara o línea tengo que mantener y ser consistente con ocupar
+
+1455
+02:15:38,060 --> 02:15:45,480
+la misma cámara, la misma línea, ya. Si hago predicciones a futuro no puedo
+
+1456
+02:15:45,480 --> 02:15:53,700
+separar aleatoriamente mis datos que son en el tiempo, es decir, no puede quedar en
+
+1457
+02:15:53,700 --> 02:16:01,900
+conjunto entrenamiento datos que son del futuro. Entonces tengo que hacer ventanas
+
+1458
+02:16:01,900 --> 02:16:07,700
+movibles, ya, o crecientes para hacer mi conjunto de entrenamiento, ya.
+
+1459
+02:16:07,700 --> 02:16:13,620
+Tengo que tener todas esas particularidades para poder entrenar bien el modelo, porque nuevamente aquí estamos el componente
+
+1460
+02:16:14,260 --> 02:16:19,420
+de los datos y contexto, es una mezcla entre los datos y el contexto y la configuración propia
+
+1461
+02:16:20,180 --> 02:16:21,980
+del modelo
+
+1462
+02:16:21,980 --> 02:16:27,660
+dentro del conjunto entrenamiento, el conjunto de alineación y el conjunto de operación. Tengo que tener las particularidades propias del conjunto de datos
+
+1463
+02:16:27,900 --> 02:16:34,580
+que van a repercutir o van a tener una repercusión en cómo voy a configurar el entrenamiento de mi modelo.
+
+1464
+02:16:35,060 --> 02:16:37,460
+Tengo restricciones, por ejemplo
+
+1465
+02:16:37,700 --> 02:16:42,180
+de tiempo, de costo, datos, mantenimiento.
+
+1466
+02:16:42,180 --> 02:16:49,340
+Tengo que tener todo ese cúmulo de restricciones que no
+
+1467
+02:16:49,340 --> 02:16:52,540
+necesariamente vienen del problema mismo,
+
+1468
+02:16:52,540 --> 02:16:56,220
+sino del contexto o no vienen del objetivo.
+
+1469
+02:16:56,220 --> 02:17:01,140
+Porque muchos de los problemas no se pueden resolver porque no
+
+1470
+02:17:01,140 --> 02:17:02,660
+tengo el costo computacional, por ejemplo,
+
+1471
+02:17:02,660 --> 02:17:06,660
+o no tengo los datos disponibles.
+
+1472
+02:17:06,660 --> 02:17:12,840
+hacerlo cuesta mucho mucho mucho dinero. Entonces tengo costos adicionales que necesito
+
+1473
+02:17:14,840 --> 02:17:22,120
+definir ya y estimar antes de hacer una aplicación. Entonces esta parte es como la más famosa de
+
+1474
+02:17:22,120 --> 02:17:27,040
+toda esta parte porque de todo este aprendizaje automático porque toda la enseñanza de esto es
+
+1475
+02:17:27,040 --> 02:17:33,280
+no queremos hacer cosas que que no estamos seguros de que van a funcionar o de que son coherentes
+
+1476
+02:17:33,280 --> 02:17:38,360
+hacerla porque todas estas metodologías son costosas en algún sentido
+
+1477
+02:17:38,360 --> 02:17:45,240
+computacional, de tiempo, dinero, bla bla bla, entonces tenemos que definir bien
+
+1478
+02:17:45,240 --> 02:17:49,640
+qué vamos a hacer, cómo lo vamos a hacer, cómo vamos a comprobar que funciona, cómo se va a
+
+1479
+02:17:49,640 --> 02:17:54,040
+ocupar, todo eso antes de poder hacerlo porque
+
+1480
+02:17:54,040 --> 02:17:59,440
+cuando uno ya empieza a hacerlo ya los costos subieron y estas cosas no se
+
+1481
+02:17:59,440 --> 02:18:05,040
+demora un poco. Entrenar una red real, digamos, son un par de días hoy en día.
+
+1482
+02:18:05,040 --> 02:18:11,520
+Entonces, no, no, a lo menos. Y si uno quiere hacer cosas de verdad viables,
+
+1483
+02:18:11,520 --> 02:18:16,620
+va a necesitar mucho dato. Y a tener mucho dato, ya estoy hablando de un corto
+
+1484
+02:18:16,620 --> 02:18:21,360
+de competición muy alto o un tiempo, digamos, prolongado. Y hay, digamos,
+
+1485
+02:18:21,360 --> 02:18:26,160
+problemáticas que tienen restricciones de tiempo. Por ejemplo, si yo estoy en una
+
+1486
+02:18:26,160 --> 02:18:36,320
+líneas de producción, digamos, de envíos, quiero organizar cómo voy a hacer los envíos
+
+1487
+02:18:36,320 --> 02:18:40,980
+para mañana. Entonces, no puedo demorarme más de 24 horas en implementar el modelo porque ya
+
+1488
+02:18:40,980 --> 02:18:45,280
+pasa el día de mañana. Entonces, todas esas restricciones que tienen cada una de las aplicaciones
+
+1489
+02:18:45,280 --> 02:18:56,040
+que podemos realizar, tienen que ser consideradas dentro del planteamiento del problema. Y una
+
+1490
+02:18:56,040 --> 02:19:00,800
+que lo planteamos bien, podemos empezar a jugar con qué herramienta funciona mejor en qué caso
+
+1491
+02:19:02,800 --> 02:19:14,240
+y cuándo son ciertas recomendaciones más útiles que otras. Ahora, en ese sentido, siguiendo con estas
+
+1492
+02:19:16,600 --> 02:19:23,840
+restricciones, una de las primeras cosas que uno hace cuando tiene un problema o una tarea un poco
+
+1493
+02:19:23,840 --> 02:19:28,520
+más complicada es empezar por algo sencillo.
+
+1494
+02:19:28,520 --> 02:19:32,600
+En esencia siempre nosotros queríamos tener un modelo sencillo para comparar
+
+1495
+02:19:32,600 --> 02:19:36,440
+porque si hacemos modelos complicados y no le ganamos modelos sencillos
+
+1496
+02:19:36,440 --> 02:19:42,480
+estamos haciendo cosas sin la necesidad de hacerlo. Entonces hacer regresiones, árboles de
+
+1497
+02:19:42,480 --> 02:19:49,600
+decisión, representaciones heurísticas también, predicciones digamos pasadas
+
+1498
+02:19:49,600 --> 02:19:54,960
+simplemente en el historial, como el ejemplo de la predicción de una empresa, en vez de
+
+1499
+02:19:54,960 --> 02:19:59,280
+decir para mañana cuánto va a ser la demanda, en vez de predecirla, voy a ocuparla del
+
+1500
+02:19:59,280 --> 02:20:01,480
+lunes de esa semana.
+
+1501
+02:20:01,480 --> 02:20:07,160
+Esos tipos de jurística, ese tipo de reglas pueden ser lo suficientemente buenas si es
+
+1502
+02:20:07,160 --> 02:20:11,880
+que mis restricciones son muy altas.
+
+1503
+02:20:11,880 --> 02:20:16,320
+Dentro del contexto uno tiene que hacer lo que mejor se puede hacer dentro de todas las
+
+1504
+02:20:16,320 --> 02:20:19,680
+restricciones y a veces tengo muchas restricciones que no puedo implementar
+
+1505
+02:20:19,680 --> 02:20:25,720
+toda esta metodología porque son muy costosas, tienen mucho tiempo, es un sin
+
+1506
+02:20:25,720 --> 02:20:31,380
+fin de delimitantes que tengo. Siempre tengo que tener un candidato fácil de
+
+1507
+02:20:31,380 --> 02:20:37,080
+implementar con el cual comparar estas propuestas de modelos, propuestas de
+
+1508
+02:20:37,080 --> 02:20:44,160
+sistema. Entonces, voy a querer, digamos, cuando
+
+1509
+02:20:44,160 --> 02:20:48,540
+tengo ya definido un sistema, tratar de automatizar ciertas partes de este
+
+1510
+02:20:48,540 --> 02:20:51,780
+sistema porque yo definí el sistema como una concatenación de procesos porque
+
+1511
+02:20:51,780 --> 02:20:54,900
+tengo una tarea grande que la puedo ir separando en distintas tareas pequeñas
+
+1512
+02:20:54,900 --> 02:20:57,540
+estas tareas pequeñas las puedo abarcar con distintos modelos de clasificación,
+
+1513
+02:20:57,540 --> 02:21:01,580
+cuarenta tipo eurística incluso, pero yo al final voy a querer tratar de
+
+1514
+02:21:01,580 --> 02:21:04,860
+tratar de automatizarlo lo más posible, no es recomendable automatizar todo,
+
+1515
+02:21:04,860 --> 02:21:08,260
+va a depender mucho del contexto sobre todas las repercusiones que se tienen eso, pero por ejemplo
+
+1516
+02:21:08,260 --> 02:21:13,020
+si quiero proponer un borrador de correo, el borrador implica que
+
+1517
+02:21:13,020 --> 02:21:18,100
+alguien por luego a revisar el envío. Si quiero revisar casos, ya voy a tener alguien que vaya a
+
+1518
+02:21:18,100 --> 02:21:21,200
+revisar, donde lo revise, que los casos que están siendo clasificados como menos
+
+1519
+02:21:21,200 --> 02:21:23,660
+prioritarios, efectivamente son menos prioritarios. Entonces, tengo que tener una
+
+1520
+02:21:23,660 --> 02:21:30,420
+evaluación, digamos, constante y, digamos, una vigilancia, digamos, permanente de el
+
+1521
+02:21:30,420 --> 02:21:33,220
+rendimiento de este modelo, porque tampoco nada más asegura que va a seguir, incluso si el
+
+1522
+02:21:33,220 --> 02:21:36,540
+modelo funciona muy bien, va a seguir funcionando bien, para siempre. Entonces, pueden
+
+1523
+02:21:36,540 --> 02:21:41,420
+cambiar la dinámica también. Ahora, veamos un último caso.
+
+1524
+02:21:41,420 --> 02:21:45,320
+Pensemos que tenemos una empresa, en este momento es una empresa, dispone de 6.000
+
+1525
+02:21:45,320 --> 02:21:50,420
+fotografías de 1.200 envases. Cada envase tiene 5 vistas y una etiqueta de daño
+
+1526
+02:21:50,420 --> 02:21:55,100
+visible. Entonces tienen como 5 fotos y yo tengo una etiqueta, si hay daño visible o no.
+
+1527
+02:21:55,100 --> 02:21:59,940
+Entonces la decisión final es enviar el envase a revisión. Entonces el próximo
+
+1528
+02:21:59,940 --> 02:22:04,140
+mes se usará una cámara nueva en otra línea y los datos actuales proceden con
+
+1529
+02:22:04,140 --> 02:22:07,540
+las condiciones anteriores. Entonces la pregunta es ¿qué fotografías deben
+
+1530
+02:22:07,540 --> 02:22:11,540
+permanecer juntas al separar los datos, qué información falta para evaluar el
+
+1531
+02:22:11,540 --> 02:22:14,700
+uso del próximo mes y con qué referencia compararíamos y qué errores o
+
+1532
+02:22:14,700 --> 02:22:18,340
+costos mediríamos. Entonces primero tenemos que identificar la unidad de decisión.
+
+1533
+02:22:18,340 --> 02:22:23,380
+Tenemos 6.000 fotografías pero decidimos sobre 1.200 envases.
+
+1534
+02:22:23,380 --> 02:22:27,140
+Entonces las cinco vistas de un mismo envase están relacionadas. Describen el
+
+1535
+02:22:27,140 --> 02:22:30,860
+mismo objeto que el envase, solo que de distintas posiciones para tener mayor
+
+1536
+02:22:30,860 --> 02:22:36,780
+grado de expresión. Entonces, pesemos las tres preguntas que están acá.
+
+1537
+02:22:36,780 --> 02:22:40,020
+¿Cómo respondería a esto?
+
+1538
+02:22:40,020 --> 02:22:42,900
+Pensemos, una pequeña propuesta.
+
+1539
+02:22:42,900 --> 02:22:47,260
+Para los 1200 envases, con 5 fotografías de cada uno, la decisión y la evaluación se
+
+1540
+02:22:47,260 --> 02:22:52,940
+realizan por envase, porque cada envase se define si es que va a enviar a revisión.
+
+1541
+02:22:52,940 --> 02:22:58,980
+Entonces el uso previsto incorpora una cámara en particular y líneas nuevas, porque se
+
+1542
+02:22:58,980 --> 02:22:59,980
+define en enunciado.
+
+1543
+02:22:59,980 --> 02:23:01,580
+Cámara nueva en otra línea.
+
+1544
+02:23:01,580 --> 02:23:03,580
+Entonces se quiere exportar, digamos, ese sistema.
+
+1545
+02:23:03,580 --> 02:23:04,580
+Entonces, debe ser una separación.
+
+1546
+02:23:04,580 --> 02:23:07,460
+todas las vistas de un envase quedan en un conjunto, no lo puedo separar
+
+1547
+02:23:07,460 --> 02:23:09,100
+cinco o cuatro imágenes del envase
+
+1548
+02:23:09,100 --> 02:23:13,220
+en el entrenamiento y la otra en prueba, porque si no estoy haciendo trampa al principio
+
+1549
+02:23:13,220 --> 02:23:17,740
+el en el sencillo, el conjunto de prueba va a conocer los datos que están en el conjunto de entrenamiento
+
+1550
+02:23:17,740 --> 02:23:21,220
+¿Cuál va a ser el destino? voy a tener que reunir datos de la nueva cámara y la línea
+
+1551
+02:23:21,220 --> 02:23:25,140
+y voy a tener que reservar envases que no participen en adaptación ni selección
+
+1552
+02:23:25,140 --> 02:23:28,140
+¿Qué quiere decir eso? que tengo que separar todo lo que es de una cámara, tengo que
+
+1553
+02:23:28,140 --> 02:23:32,420
+de cierta manera, tengo que repartirlo entre entrenamiento y prueba, porque quiero generalizar digamos
+
+1554
+02:23:32,420 --> 02:23:36,260
+el propósito y la salida de este sistema.
+
+1555
+02:23:36,260 --> 02:23:39,660
+Tengo que hacer una comparación, te voy a contestar una referencia con un candidato con un modelo a elegir,
+
+1556
+02:23:39,660 --> 02:23:41,220
+puede ser sencillo o no,
+
+1557
+02:23:41,220 --> 02:23:44,020
+pero yo voy a ocupar el conjunto de validación para definir cuál es el modelo
+
+1558
+02:23:44,020 --> 02:23:46,460
+que efectivamente voy a ocupar para el conjunto de prueba y que después va a ser el uso,
+
+1559
+02:23:46,460 --> 02:23:48,420
+va a ser usado, digamos, en la nueva imagen.
+
+1560
+02:23:48,420 --> 02:23:52,060
+En el resultado voy a tener que contar los defectos omitidos, las falsas alarmas y revisiones por envase
+
+1561
+02:23:52,060 --> 02:23:54,540
+porque en esencial es un problema de clasificación, inherentemente, entonces
+
+1562
+02:23:54,540 --> 02:23:55,900
+voy a ver si me equivoqueo,
+
+1563
+02:23:55,900 --> 02:23:56,860
+y voy a tener que
+
+1564
+02:23:56,860 --> 02:23:59,940
+cuantificar de cierta manera la insectividad con busstrap o remastreo
+
+1565
+02:23:59,940 --> 02:24:01,820
+para los envases completos,
+
+1566
+02:24:01,820 --> 02:24:04,260
+para conservar juntas sus vistas.
+
+1567
+02:24:04,260 --> 02:24:06,260
+Es decir, no puedo separar esas cinco imágenes en conjunto.
+
+1568
+02:24:06,260 --> 02:24:08,360
+Las tengo que mantener alumeradas, digamos,
+
+1569
+02:24:08,360 --> 02:24:10,600
+o alubadas, puesto que representan el mismo objeto,
+
+1570
+02:24:10,600 --> 02:24:12,300
+ya que en esencia es la unidad de entrego.
+
+1571
+02:24:12,300 --> 02:24:14,640
+Entonces, cambiar el procedimiento después de mirar la prueba,
+
+1572
+02:24:14,640 --> 02:24:17,140
+es decir, yo generé mi modelo con el conjunto de entrenamiento
+
+1573
+02:24:17,140 --> 02:24:18,940
+o mis modelos con el conjunto de evaluaciones,
+
+1574
+02:24:18,940 --> 02:24:20,680
+cogí el modelo y luego lo probé en la prueba.
+
+1575
+02:24:20,680 --> 02:24:22,680
+Y luego de ver en la prueba, como que entre todos
+
+1576
+02:24:22,680 --> 02:24:25,240
+escogieron un nuevo modelo, eso es metodológicamente erróneo,
+
+1577
+02:24:25,240 --> 02:24:26,980
+porque voy a tener que hacer una nueva evaluación independiente
+
+1578
+02:24:26,980 --> 02:24:28,580
+con otros datos posibles.
+
+1579
+02:24:28,580 --> 02:24:31,180
+Porque la prueba es el último, digamos,
+
+1580
+02:24:31,180 --> 02:24:33,220
+la última métrica de evaluación, que es un poco más pura,
+
+1581
+02:24:33,220 --> 02:24:35,420
+porque no conoce, digamos, los conjuntos con el cual fue
+
+1582
+02:24:35,420 --> 02:24:37,100
+entrenado el modelo original.
+
+1583
+02:24:37,100 --> 02:24:39,100
+Entonces, siempre vamos a estar limitados, digamos,
+
+1584
+02:24:39,100 --> 02:24:43,180
+al contexto o la configuración en la cual nosotros entrenamos
+
+1585
+02:24:43,180 --> 02:24:44,020
+nuestro modelo.
+
+1586
+02:24:44,020 --> 02:24:47,060
+En lo que sigue de las siguientes sesiones,
+
+1587
+02:24:47,060 --> 02:24:48,640
+las próximas semanas, digamos, nosotros vamos a ir
+
+1588
+02:24:48,640 --> 02:24:49,620
+particularizando esto.
+
+1589
+02:24:49,620 --> 02:24:51,540
+Con las distintas aplicaciones que hemos visto,
+
+1590
+02:24:51,540 --> 02:24:53,980
+que mencionamos, el embedding, la red profunda, etcétera,
+
+1591
+02:24:53,980 --> 02:24:55,220
+la vamos a ir particularizando.
+
+1592
+02:24:55,220 --> 02:24:57,420
+Por eso mencioné mucho lo que es el sistema,
+
+1593
+02:24:57,420 --> 02:25:00,240
+porque lo ocupé como din, digamos,
+
+1594
+02:25:00,240 --> 02:25:04,240
+Porque en lo que sigue, vamos a ir viendo esta metodología que
+
+1595
+02:25:04,240 --> 02:25:06,160
+tienen distintas aplicaciones.
+
+1596
+02:25:06,160 --> 02:25:09,360
+Y son un poco más flexibles que las que hemos visto antes.
+
+1597
+02:25:09,360 --> 02:25:14,960
+Ahora, vamos a empezar por la red neural, el próximo martes,
+
+1598
+02:25:14,960 --> 02:25:17,240
+definiendo qué es, qué es una capa, qué son las neuronas,
+
+1599
+02:25:17,240 --> 02:25:18,640
+qué significa que sea profundo, qué son las funciones de
+
+1600
+02:25:18,640 --> 02:25:19,360
+activación.
+
+1601
+02:25:19,360 --> 02:25:20,840
+Y lo vamos a formalizar.
+
+1602
+02:25:20,840 --> 02:25:26,720
+Esta a mi cuisa es un poco la clase un poco más subjetiva,
+
+1603
+02:25:26,720 --> 02:25:29,360
+porque es previo a hacer lo que nosotros queremos que aprende la
+
+1604
+02:25:29,360 --> 02:25:30,720
+que es como más entretenido.
+
+1605
+02:25:30,720 --> 02:25:32,280
+Pero a mi juicio es más importante,
+
+1606
+02:25:32,280 --> 02:25:34,640
+porque si yo pierdo tiempo en hacer algo que a priori podría
+
+1607
+02:25:34,640 --> 02:25:37,720
+haber evitado, eso en términos de costo, digamos,
+
+1608
+02:25:37,720 --> 02:25:39,520
+en cierto sentido, es mucho más valioso.
+
+1609
+02:25:39,520 --> 02:25:40,960
+Si yo defino bien qué es lo que quiero hacer,
+
+1610
+02:25:40,960 --> 02:25:42,480
+defino bien cuál es la habilidad, cuál es la hipnopósita,
+
+1611
+02:25:42,480 --> 02:25:44,480
+cuál es lo que le voy a hacer, cuáles son las distintas
+
+1612
+02:25:44,480 --> 02:25:46,120
+tareas, qué es mi sistema al principio,
+
+1613
+02:25:46,120 --> 02:25:48,840
+cómo voy a comprobar y evaluarse efectivamente los resultados
+
+1614
+02:25:48,840 --> 02:25:51,000
+que estoy obteniendo son coherentes con lo que yo quise
+
+1615
+02:25:51,000 --> 02:25:53,120
+en principio solucionar en distintos contextos de
+
+1616
+02:25:53,120 --> 02:25:54,160
+aplicaciones.
+
+1617
+02:25:54,160 --> 02:25:55,800
+Una, si yo defino eso correctamente,
+
+1618
+02:25:55,800 --> 02:25:58,320
+el resto es un poco más operativo.
+
+1619
+02:25:58,320 --> 02:25:59,720
+Sé cómo hacerlo.
+
+1620
+02:25:59,720 --> 02:26:02,280
+Lo primero requiere saber del contexto del problema,
+
+1621
+02:26:02,280 --> 02:26:04,920
+darse un pequeño tiempo de entender el contexto en el
+
+1622
+02:26:04,920 --> 02:26:06,440
+cual estoy realizando mi aplicación.
+
+1623
+02:26:06,440 --> 02:26:08,320
+Entonces, es un poco más fómel en el sentido de que no es
+
+1624
+02:26:08,320 --> 02:26:10,080
+tanto número, no es tanta matemática,
+
+1625
+02:26:10,080 --> 02:26:11,320
+o está de digital o programación,
+
+1626
+02:26:11,320 --> 02:26:13,600
+pero tiene mayor repercusión en la práctica.
+
+1627
+02:26:13,600 --> 02:26:15,840
+Cuando uno va afinando un poco más el ojo, digamos,
+
+1628
+02:26:15,840 --> 02:26:17,960
+uno sabe cuándo se puede implementar ciertas
+
+1629
+02:26:17,960 --> 02:26:20,680
+metodologías, cuándo se puede solucionar, cuándo no.
+
+1630
+02:26:20,680 --> 02:26:23,160
+Y una vez cuando ya está un poco más seguro y bien definido,
+
+1631
+02:26:23,160 --> 02:26:24,280
+uno implementa.
+
+1632
+02:26:24,280 --> 02:26:25,920
+Esto es lo que tratamos de, digamos,
+
+1633
+02:26:25,920 --> 02:26:26,960
+afinar con esta sesión.
+
+1634
+02:26:26,960 --> 02:26:30,240
+tratar de tener un poco el tino de cuándo vale la pena hacer un,
+
+1635
+02:26:30,240 --> 02:26:33,080
+a estar todo este tiempo, todo este costo en hacer una
+
+1636
+02:26:33,080 --> 02:26:35,960
+implementación con estos modelos, con estos sistemas que les menciono,
+
+1637
+02:26:35,960 --> 02:26:39,680
+que son bastante más costosos, computationalmente menos interpretables
+
+1638
+02:26:39,680 --> 02:26:42,600
+y más difíciles, digamos, de implementar que, por ejemplo,
+
+1639
+02:26:42,600 --> 02:26:44,560
+reinaurística o regresiones clásicas.
+
+1640
+02:26:44,560 --> 02:26:47,040
+Entonces, tenemos que tener alto cuidado con cuando empezamos a hacer esto
+
+1641
+02:26:47,040 --> 02:26:49,600
+y tenemos que estar bien seguros de que efectivamente vale la pena hacerlo.
+
+1642
+02:26:49,600 --> 02:26:51,920
+Entonces, la próxima semana vamos a empezar con reinauralidad
+
+1643
+02:26:51,920 --> 02:26:55,280
+y volvemos a las cosas un poco más teóricas, más aplicadas,
+
+1644
+02:26:55,280 --> 02:26:59,780
+formal, más bien, en la esencia que vamos a definir formalidad, vamos a programar y vamos a hacer, digamos, cosas más concretas.
+

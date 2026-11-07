@@ -1,0 +1,371 @@
+1
+00:00:00,250 --> 00:00:02,240
+Tercera parada: AdaBoost.
+
+2
+00:00:02,360 --> 00:00:05,426
+Vas a hacer a mano una ronda completa: el error,
+
+3
+00:00:05,426 --> 00:00:07,790
+el peso del árbol y los nuevos pesos.
+
+4
+00:00:07,910 --> 00:00:11,340
+En boosting, cada árbol tiene que decirle algo al siguiente.
+
+5
+00:00:11,460 --> 00:00:14,669
+En AdaBoost, ese mensaje es muy concreto: fíjate
+
+6
+00:00:14,669 --> 00:00:17,210
+en estos casos, que yo clasifiqué mal.
+
+7
+00:00:17,330 --> 00:00:19,270
+¿Cómo se transmite ese mensaje?
+
+8
+00:00:19,390 --> 00:00:20,320
+Con pesos.
+
+9
+00:00:20,440 --> 00:00:23,410
+Piensa en un profesor que prepara ensayos para una prueba.
+
+10
+00:00:23,530 --> 00:00:26,750
+En el primer ensayo, todas las preguntas valen lo mismo.
+
+11
+00:00:26,870 --> 00:00:29,260
+Corrige, y ve en qué temas fallaste.
+
+12
+00:00:29,380 --> 00:00:32,960
+El siguiente ensayo trae más preguntas justo de esos temas.
+
+13
+00:00:33,080 --> 00:00:36,780
+No te hace estudiar todo de nuevo: te hace estudiar lo que te costó.
+
+14
+00:00:36,900 --> 00:00:39,790
+La diapositiva seis muestra el ciclo de AdaBoost.
+
+15
+00:00:39,910 --> 00:00:43,020
+Al inicio, todos los casos tienen el mismo peso.
+
+16
+00:00:43,140 --> 00:00:46,340
+El árbol uno falla, digamos, en tres casos.
+
+17
+00:00:46,460 --> 00:00:49,100
+Se reponderan: esos casos pesan más.
+
+18
+00:00:49,220 --> 00:00:51,330
+El árbol dos se concentra en ellos.
+
+19
+00:00:51,450 --> 00:00:55,470
+Y al final, un voto, donde cada árbol pesa según su calidad.
+
+20
+00:00:55,590 --> 00:00:57,290
+¿Qué árboles usa AdaBoost?
+
+21
+00:00:57,410 --> 00:01:02,290
+Normalmente, árboles de un solo corte, que se llaman stumps, tocones.
+
+22
+00:01:02,410 --> 00:01:05,430
+Por ejemplo: ¿la edad es menor que 55?
+
+23
+00:01:05,550 --> 00:01:08,150
+Sí, a un lado; no, al otro.
+
+24
+00:01:08,270 --> 00:01:10,680
+Un stump solo es un aprendiz muy débil.
+
+25
+00:01:10,800 --> 00:01:14,401
+Y en scikit-learn, el modelo base por defecto de AdaBoost
+
+26
+00:01:14,401 --> 00:01:17,370
+es justamente eso: un árbol de profundidad uno.
+
+27
+00:01:17,490 --> 00:01:21,170
+Primer ingrediente: el error del árbol, la letra épsilon.
+
+28
+00:01:21,290 --> 00:01:25,503
+No es la fracción de casos mal clasificados: es la suma de los pesos
+
+29
+00:01:25,503 --> 00:01:28,910
+de esos casos, dividida por la suma de todos los pesos.
+
+30
+00:01:29,030 --> 00:01:31,645
+Es un número entre cero y uno: cero si no se
+
+31
+00:01:31,645 --> 00:01:34,200
+equivoca nunca, uno si se equivoca en todo.
+
+32
+00:01:34,320 --> 00:01:38,880
+Segundo ingrediente: el peso del árbol en el voto final, la letra alfa.
+
+33
+00:01:39,000 --> 00:01:44,010
+Se calcula como un medio del logaritmo natural de uno menos épsilon, sobre épsilon.
+
+34
+00:01:44,130 --> 00:01:47,480
+Mira la curva: con error chico, alfa es grande.
+
+35
+00:01:47,600 --> 00:01:51,160
+Con error 0.5, el azar, alfa vale cero.
+
+36
+00:01:51,280 --> 00:01:54,790
+Y con error mayor que 0.5, alfa es negativo.
+
+37
+00:01:54,910 --> 00:02:00,880
+Algunos valores, para tener la escala: con error 0.1, alfa vale 1.10.
+
+38
+00:02:01,000 --> 00:02:04,240
+Con 0.3, vale 0.42.
+
+39
+00:02:04,360 --> 00:02:06,300
+Con 0.5, cero.
+
+40
+00:02:06,420 --> 00:02:11,310
+La diapositiva lo resume en una frase: mayor error del árbol, menor influencia.
+
+41
+00:02:11,430 --> 00:02:14,230
+Tercer ingrediente: actualizar los pesos.
+
+42
+00:02:14,350 --> 00:02:19,050
+Los casos mal clasificados multiplican su peso por e elevado a alfa: suben.
+
+43
+00:02:19,170 --> 00:02:23,210
+Los bien clasificados, por e elevado a menos alfa: bajan.
+
+44
+00:02:23,330 --> 00:02:27,380
+Y al final se normaliza, para que todos los pesos vuelvan a sumar uno.
+
+45
+00:02:27,500 --> 00:02:31,330
+Ahora, una ronda completa a mano, con el ejemplo del apunte.
+
+46
+00:02:31,450 --> 00:02:34,890
+Diez observaciones, todas con peso 0.1.
+
+47
+00:02:35,010 --> 00:02:37,100
+El stump falla en dos de ellas.
+
+48
+00:02:37,220 --> 00:02:43,970
+Paso uno, el error: los dos errores pesan 0.1 cada uno, así que épsilon es 0.2.
+
+49
+00:02:44,090 --> 00:02:48,064
+Paso dos, alfa: un medio del logaritmo de 0.8 sobre
+
+50
+00:02:48,064 --> 00:02:51,570
+0.2, o sea, un medio del logaritmo de cuatro.
+
+51
+00:02:51,690 --> 00:02:57,280
+El logaritmo de cuatro es 1.386, y la mitad: 0.693.
+
+52
+00:02:57,400 --> 00:02:59,290
+Paso tres, los factores.
+
+53
+00:02:59,410 --> 00:03:06,450
+e elevado a 0.693 es 2: los errores duplican su peso, de 0.1 a 0.2.
+
+54
+00:03:06,570 --> 00:03:14,860
+e elevado a menos 0.693 es 0.5: los aciertos lo reducen a la mitad, de 0.1 a 0.05.
+
+55
+00:03:14,980 --> 00:03:17,050
+Pero ahora los pesos ya no suman uno.
+
+56
+00:03:17,170 --> 00:03:24,870
+Suman dos por 0.2, más ocho por 0.05: 0.4 más 0.4, igual a 0.8.
+
+57
+00:03:24,990 --> 00:03:29,040
+Paso cuatro, normalizar: dividimos todo por 0.8.
+
+58
+00:03:29,160 --> 00:03:34,160
+Los errores quedan en 0.2 sobre 0.8, igual a 0.25.
+
+59
+00:03:34,280 --> 00:03:40,600
+Y los aciertos, en 0.05 sobre 0.8, igual a 0.0625.
+
+60
+00:03:40,720 --> 00:03:43,130
+Y ahora, el detalle más elegante.
+
+61
+00:03:43,250 --> 00:03:49,810
+Suma el peso de los dos errores: 0.25 más 0.25, igual a 0.5.
+
+62
+00:03:49,930 --> 00:03:53,230
+La mitad de todo el peso quedó en los casos que el árbol falló.
+
+63
+00:03:53,350 --> 00:03:57,459
+Esto pasa siempre, con cualquier épsilon: con los nuevos pesos,
+
+64
+00:03:57,459 --> 00:04:00,850
+el árbol anterior tiene exactamente un error de 0.5.
+
+65
+00:04:00,970 --> 00:04:02,840
+Es decir, es como el azar.
+
+66
+00:04:02,960 --> 00:04:04,120
+¿Para qué sirve eso?
+
+67
+00:04:04,240 --> 00:04:07,150
+Obliga al siguiente árbol a aprender algo distinto.
+
+68
+00:04:07,270 --> 00:04:10,200
+Si repitiera el mismo corte, no ganaría nada.
+
+69
+00:04:10,320 --> 00:04:13,210
+Por eso cada stump mira el problema desde otro ángulo.
+
+70
+00:04:13,330 --> 00:04:18,150
+El error típico: calcular épsilon contando casos, en vez de sumar pesos.
+
+71
+00:04:18,270 --> 00:04:19,950
+En la segunda ronda se nota.
+
+72
+00:04:20,070 --> 00:04:25,568
+Supón que el nuevo stump falla en uno de los dos casos difíciles, que
+
+73
+00:04:25,568 --> 00:04:29,870
+pesa 0.25, y en dos casos fáciles, de 0.0625 cada uno.
+
+74
+00:04:29,990 --> 00:04:33,720
+Contando casos, serían tres de diez: 0.3.
+
+75
+00:04:33,840 --> 00:04:39,740
+Pero el error ponderado es 0.25 más 0.125: 0.375.
+
+76
+00:04:39,860 --> 00:04:47,660
+Y con ese épsilon, alfa es un medio del logaritmo de 0.625 sobre 0.375, un medio
+
+77
+00:04:47,660 --> 00:04:53,900
+del logaritmo de 1.667, un medio de 0.511: aproximadamente 0.26.
+
+78
+00:04:54,020 --> 00:04:56,610
+Un árbol mucho menos influyente que el primero.
+
+79
+00:04:56,730 --> 00:04:57,950
+Piensa un segundo.
+
+80
+00:04:58,070 --> 00:05:00,970
+¿Qué alfa recibe un stump con error 0.5?
+
+81
+00:05:01,090 --> 00:05:03,000
+¿Y uno con error 0.8?
+
+82
+00:05:03,720 --> 00:05:07,860
+Con error 0.5: un medio del logaritmo de uno, cero.
+
+83
+00:05:07,980 --> 00:05:10,100
+El árbol no aporta nada al voto.
+
+84
+00:05:10,220 --> 00:05:15,748
+Con error 0.8: un medio del logaritmo de 0.2 sobre 0.8,
+
+85
+00:05:15,748 --> 00:05:20,170
+un medio del logaritmo de 0.25, menos 0.693.
+
+86
+00:05:20,290 --> 00:05:25,190
+Es peor que el azar, y su voto se invierte: equivale a predecir lo contrario.
+
+87
+00:05:25,310 --> 00:05:28,920
+Para llevarte: épsilon es la suma de los pesos de los errores.
+
+88
+00:05:29,040 --> 00:05:32,138
+Alfa, un medio del logaritmo de uno menos épsilon
+
+89
+00:05:32,138 --> 00:05:35,110
+sobre épsilon: menos error, más voz en el voto.
+
+90
+00:05:35,230 --> 00:05:37,986
+Y los errores multiplican su peso por e elevado a
+
+91
+00:05:37,986 --> 00:05:40,630
+alfa, hasta quedar con la mitad del peso total.
+
+92
+00:05:40,750 --> 00:05:43,559
+Siguiente parada: el voto final de AdaBoost, y
+
+93
+00:05:43,559 --> 00:05:45,940
+tres rondas con los pacientes de Heart.

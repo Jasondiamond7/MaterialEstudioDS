@@ -1,0 +1,415 @@
+1
+00:00:00,250 --> 00:00:04,230
+Novena parada: un bosque de trescientos árboles no se puede dibujar.
+
+2
+00:00:04,350 --> 00:00:07,568
+Vas a ver cómo medir qué variables usa, por qué una de
+
+3
+00:00:07,568 --> 00:00:10,250
+las medidas engaña, y cuáles son sus límites.
+
+4
+00:00:10,370 --> 00:00:13,220
+Un árbol de profundidad tres cabe en una lámina.
+
+5
+00:00:13,340 --> 00:00:16,160
+Un bosque de trescientos árboles no se puede dibujar.
+
+6
+00:00:16,280 --> 00:00:19,920
+Entonces, ¿cómo le explicas a alguien qué aprendió el modelo?
+
+7
+00:00:20,040 --> 00:00:22,890
+La respuesta habitual es la importancia de las variables.
+
+8
+00:00:23,010 --> 00:00:26,510
+Pero cuidado: hay dos formas de medirla, y una engaña.
+
+9
+00:00:26,630 --> 00:00:28,360
+Piensa en un equipo de fútbol.
+
+10
+00:00:28,480 --> 00:00:32,250
+Una forma de medir a un jugador es contar cuántas veces tocó la pelota.
+
+11
+00:00:32,370 --> 00:00:35,800
+Otra es sacarlo de la cancha, y ver cuánto empeora el equipo.
+
+12
+00:00:35,920 --> 00:00:38,862
+La primera premia al que corre mucho aunque no aporte;
+
+13
+00:00:38,862 --> 00:00:41,260
+la segunda mide lo que de verdad hace falta.
+
+14
+00:00:41,380 --> 00:00:44,970
+La primera medida es la importancia por impureza, MDI.
+
+15
+00:00:45,090 --> 00:00:48,870
+Suma, para cada variable, cuánto bajó el Gini en los cortes que
+
+16
+00:00:48,870 --> 00:00:52,410
+hizo, pesado por la fracción de datos que llegó a ese nodo.
+
+17
+00:00:52,530 --> 00:00:56,930
+Hagamos un ejemplo del apunte: ochenta casos, cuarenta de cada clase.
+
+18
+00:00:57,050 --> 00:00:59,390
+El Gini de la raíz es 0.5.
+
+19
+00:00:59,510 --> 00:01:01,630
+La raíz se corta con la variable A.
+
+20
+00:01:01,750 --> 00:01:07,030
+A la izquierda quedan treinta casos, veintisiete contra tres: Gini 0.18.
+
+21
+00:01:07,150 --> 00:01:13,360
+A la derecha, cincuenta casos, trece contra treinta y siete: Gini 0.3848.
+
+22
+00:01:13,480 --> 00:01:21,960
+El Gini ponderado es 0.308, y la bajada por A es 0.5 menos 0.308: 0.192.
+
+23
+00:01:22,080 --> 00:01:26,765
+El nodo derecho se corta con la variable B, en veinte
+
+24
+00:01:26,765 --> 00:01:30,390
+y treinta casos, con Gini 0.495 y 0.1244.
+
+25
+00:01:30,510 --> 00:01:37,500
+La bajada en ese nodo es 0.3848 menos 0.2726: 0.1122.
+
+26
+00:01:37,620 --> 00:01:41,672
+Pero a ese nodo llegó solo cincuenta de ochenta
+
+27
+00:01:41,672 --> 00:01:45,810
+casos, así que se pesa por 0.625: aporta 0.0701.
+
+28
+00:01:45,930 --> 00:01:52,390
+Total: 0.192 más 0.0701, igual a 0.2621.
+
+29
+00:01:52,510 --> 00:01:57,870
+Normalizando, A vale 0.733, y B vale 0.267.
+
+30
+00:01:57,990 --> 00:02:00,833
+La variable que cortó primero, con más datos, se
+
+31
+00:02:00,833 --> 00:02:03,320
+lleva casi tres cuartos de la importancia.
+
+32
+00:02:03,440 --> 00:02:04,720
+¿Dónde está la trampa?
+
+33
+00:02:04,840 --> 00:02:08,613
+Agregamos a Heart dos columnas de ruido puro, números al azar sin
+
+34
+00:02:08,613 --> 00:02:12,270
+ninguna relación con la enfermedad: una continua y una binaria.
+
+35
+00:02:12,390 --> 00:02:15,030
+Y entrenamos un bosque de quinientos árboles.
+
+36
+00:02:15,150 --> 00:02:18,811
+Por impureza, el ruido continuo queda en el puesto siete de
+
+37
+00:02:18,811 --> 00:02:22,721
+quince, con un 6.9 % de la importancia: por encima de variables
+
+38
+00:02:22,721 --> 00:02:25,700
+clínicas reales como el colesterol o la presión.
+
+39
+00:02:25,820 --> 00:02:26,440
+¿Por qué?
+
+40
+00:02:26,560 --> 00:02:31,711
+La impureza se calcula con los datos de entrenamiento, y una variable continua tiene cientos
+
+41
+00:02:31,711 --> 00:02:35,910
+de cortes posibles: siempre encuentra alguno que, por azar, separa un poco.
+
+42
+00:02:36,030 --> 00:02:39,855
+La segunda medida, la de permutación, desordena una variable en
+
+43
+00:02:39,855 --> 00:02:42,890
+datos que el modelo no vio, y mide cuánto empeora.
+
+44
+00:02:43,010 --> 00:02:48,030
+El ruido continuo: apenas 0.001 de AUC.
+
+45
+00:02:48,150 --> 00:02:50,610
+Prácticamente cero, como corresponde.
+
+46
+00:02:50,730 --> 00:02:53,270
+En Ames las dos medidas tampoco coinciden.
+
+47
+00:02:53,390 --> 00:02:59,342
+Por permutación, la variable más importante es el área habitable, con un 22.5
+
+48
+00:02:59,342 --> 00:03:03,980
+% del total: si la desordenas, el error sube 11 900 dólares.
+
+49
+00:03:04,100 --> 00:03:08,435
+Por impureza, el área habitable vale solo un 12.2 %, y el primer lugar
+
+50
+00:03:08,435 --> 00:03:11,780
+se lo lleva el número de autos que caben en el garaje.
+
+51
+00:03:11,900 --> 00:03:13,290
+Ahora los límites.
+
+52
+00:03:13,410 --> 00:03:16,380
+El primero: un bosque de regresión no extrapola.
+
+53
+00:03:16,500 --> 00:03:21,890
+Lo probamos: entrenamos un bosque solo con casas de menos de 1 800 pies cuadrados.
+
+54
+00:03:22,010 --> 00:03:25,850
+La casa más cara que vio costaba 392 000 dólares.
+
+55
+00:03:25,970 --> 00:03:31,810
+Y le pedimos predecir 133 casas grandes, de más de 2 400 pies cuadrados.
+
+56
+00:03:31,930 --> 00:03:37,160
+El precio real promedio de esas casas grandes es 316 700 dólares.
+
+57
+00:03:37,280 --> 00:03:43,900
+El bosque predice, en promedio, 222 900: unos 94 000 dólares menos.
+
+58
+00:03:44,020 --> 00:03:44,640
+¿Por qué?
+
+59
+00:03:44,760 --> 00:03:46,750
+Cada hoja promedia precios que vio.
+
+60
+00:03:46,870 --> 00:03:50,586
+Ninguna predicción puede superar el precio más alto
+
+61
+00:03:50,586 --> 00:03:53,500
+del entrenamiento: la mayor fue 337 500.
+
+62
+00:03:53,620 --> 00:03:55,970
+El segundo límite aparece con imágenes.
+
+63
+00:03:56,090 --> 00:04:01,250
+El notebook del profesor usa CIFAR-10, que requiere descargar unos 170 megas.
+
+64
+00:04:01,370 --> 00:04:05,234
+Aquí usamos un reemplazo liviano: los dígitos escritos a mano de
+
+65
+00:04:05,234 --> 00:04:09,580
+scikit-learn, imágenes de ocho por ocho píxeles, una variable por píxel.
+
+66
+00:04:09,700 --> 00:04:13,190
+El bosque acierta el 96.9 % en el test.
+
+67
+00:04:13,310 --> 00:04:14,350
+Impresionante.
+
+68
+00:04:14,470 --> 00:04:16,200
+Ahora dos experimentos.
+
+69
+00:04:16,320 --> 00:04:21,491
+Primero, desordenamos los píxeles de todas las imágenes, siempre con la
+
+70
+00:04:21,491 --> 00:04:25,860
+misma permutación, y reentrenamos: el bosque acierta 97.3 %.
+
+71
+00:04:25,980 --> 00:04:29,210
+Igual que antes, con imágenes que para ti son ruido.
+
+72
+00:04:29,330 --> 00:04:33,768
+Segundo, al modelo original le mostramos las imágenes de prueba
+
+73
+00:04:33,768 --> 00:04:37,290
+corridas un solo píxel a la derecha: cae a 50.4 %.
+
+74
+00:04:37,410 --> 00:04:41,350
+La conclusión: el bosque no sabe qué píxel está al lado de cuál.
+
+75
+00:04:41,470 --> 00:04:44,200
+Para él, cada píxel es una columna más.
+
+76
+00:04:44,320 --> 00:04:48,519
+Por eso la diapositiva dieciséis dice que en imágenes, texto o series
+
+77
+00:04:48,519 --> 00:04:52,170
+largas, los modelos especializados suelen ser más adecuados.
+
+78
+00:04:52,290 --> 00:04:54,900
+Donde el bosque brilla es en datos tabulares.
+
+79
+00:04:55,020 --> 00:04:57,030
+La diapositiva quince lo resume.
+
+80
+00:04:57,150 --> 00:05:01,580
+Ventajas: buen desempeño sin suponer relaciones lineales, menos
+
+81
+00:05:01,580 --> 00:05:06,152
+varianza que un árbol, interacciones y umbrales automáticos, poco
+
+82
+00:05:06,152 --> 00:05:10,160
+sensible a la escala de las variables, y el OOB incluido.
+
+83
+00:05:10,280 --> 00:05:14,707
+Limitaciones: menos interpretable, más memoria y tiempo de predicción, la
+
+84
+00:05:14,707 --> 00:05:18,830
+importancia por impureza puede engañar, y no extrapola en regresión.
+
+85
+00:05:18,950 --> 00:05:22,207
+El error típico, también en la diapositiva diecisiete:
+
+86
+00:05:22,207 --> 00:05:24,800
+interpretar la importancia como causalidad.
+
+87
+00:05:24,920 --> 00:05:27,902
+Que el bosque use mucho una variable para predecir no
+
+88
+00:05:27,902 --> 00:05:30,490
+significa que esa variable cause el resultado.
+
+89
+00:05:30,610 --> 00:05:33,470
+La importancia describe al modelo, no al mundo.
+
+90
+00:05:33,590 --> 00:05:34,810
+Piensa un segundo.
+
+91
+00:05:34,930 --> 00:05:38,772
+Si desordenaste los píxeles y el bosque acertó igual,
+
+92
+00:05:38,772 --> 00:05:42,180
+97.3 %, ¿qué te dice eso sobre lo que aprendió?
+
+93
+00:05:42,900 --> 00:05:46,774
+Que aprendió qué píxeles concretos suelen estar encendidos para cada
+
+94
+00:05:46,774 --> 00:05:49,850
+dígito, como una lista de casillas, no como una forma.
+
+95
+00:05:49,970 --> 00:05:54,019
+Por eso un corrimiento de un píxel lo desarma: las casillas encendidas ya
+
+96
+00:05:54,019 --> 00:05:57,180
+no son las mismas, aunque para ti el dígito sea idéntico.
+
+97
+00:05:57,300 --> 00:06:00,689
+Para llevarte: la importancia por impureza se calcula en el
+
+98
+00:06:00,689 --> 00:06:04,480
+entrenamiento y premia variables con muchos cortes, incluso ruido.
+
+99
+00:06:04,600 --> 00:06:07,804
+Para explicar, usa la de permutación, sobre datos
+
+100
+00:06:07,804 --> 00:06:10,420
+no vistos, y no la leas como causalidad.
+
+101
+00:06:10,540 --> 00:06:14,980
+Y conoce los límites: no extrapola, y en imágenes no ve la estructura.
+
+102
+00:06:15,100 --> 00:06:17,986
+Siguiente parada: la comparación final entre
+
+103
+00:06:17,986 --> 00:06:20,740
+árbol, logística, bagging y Random Forest.
+
+104
+00:06:20,860 --> 00:06:21,720
+¿Quién gana?

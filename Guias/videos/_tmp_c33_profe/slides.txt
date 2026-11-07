@@ -1,0 +1,1116 @@
+######## Clase 33 Selección de variables.pptx
+=== slide 1
+Diplomado en Data Science  ·  Sesión 33
+Feature Engineering
+Metodología de selección de variables
+Caso: fuga de clientes en una telco · 3 horas
+Eduardo Rodríguez Faúndez
+Doctor en Estadística UC · Máster en Big Data & Data Science, MBIT · Matemático
+[notas] Continuidad: mismo dataset de churn de las sesiones 30 a 32.
+=== slide 2
+Dónde estamos en el diplomado
+Cada sesión responde una pregunta distinta sobre los mismos datos
+30
+Calidad de datos
+¿Son datos confiables?
+✓
+31
+Aprendizaje
+¿Cómo aprende un modelo?
+✓
+32
+Representación y reducción
+¿En qué forma se los entrego?
+✓
+33
+Feature Engineering: selección de variables
+¿Cuáles me quedo?
+34
+Árboles de decisión
+¿Cómo lo explico?
+—
+Repaso / Taller con datos reales
+Hacerlo de punta a punta
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+1
+=== slide 3
+La Sesión 32 dejó dos caminos abiertos
+Vimos uno a fondo. Hoy tomamos el otro.
+Extracción / creación
+Combinamos variables en nuevas representaciones que resumen la información original.
+PCA y t-SNE
+Sesión 32
+Selección de variables
+Eliminamos columnas redundantes o poco informativas y conservamos variables originales.
+Filter, wrapper, embedded
+Sesiones 33 y 34
+La actividad de repaso de la Sesión 32 terminaba con esta pregunta: «Si tuviera que quedarse con la mitad de sus variables, ¿las eliminaría o las resumiría con PCA?». Hoy respondemos la primera mitad — y en la 34 vamos a ver que eliminar bien es más difícil de lo que parece.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+2
+=== slide 4
+Estructura de la sesión
+3 horas · 7 bloques · 2 descansos
+0
+Puente con la Sesión 32 y encuadre
+15 min
+1
+Higiene: limpiar antes de seleccionar
+15 min
+2
+De 12 a 50 variables: fabricar el problema
+20 min
+3
+Irrelevante, redundante y relevante en conjunto
+28 min
+4
+Taxonomía y métodos de filtro
+30 min
+5
+Wrapper y embedded
+22 min
+6
+La trampa: dónde vive la selección
+30 min
+El bloque 6 es el que deja la marca y no se recorta. Si vamos atrasados, se acorta el 5.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+3
+=== slide 5
+Al terminar esta sesión vas a poder…
+Distinguir
+una variable irrelevante de una redundante y de una relevante solo en conjunto
+Construir
+variables derivadas a partir de las columnas crudas, y reconocer la redundancia que eso genera
+Ubicar
+cualquier técnica dentro de la taxonomía filter / wrapper / embedded
+Aplicar
+filtros univariados, RFE y Lasso en Python y en R
+Explicar
+por qué un ranking univariado puede elegir un conjunto malo de variables
+Construir
+un pipeline donde la selección se recalcula dentro de cada fold de validación
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+4
+=== slide 6
+BLOQUE 1
+Higiene: limpiar antes de seleccionar
+Ninguna técnica de selección arregla un dato imposible
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+5
+=== slide 7
+El dataset de la Sesión 32, revisado
+Base de churn · 3.150 clientes · 13 columnas
+3.150
+clientes
+12
+predictoras
+15,7 %
+tasa de fuga
+43
+valores imposibles
+Los errores que dejó la Sesión 30
+Variable | Problema | Casos | Valor extremo
+segundos | Valores negativos | 18 | −14.645
+frec_llamadas | Valores negativos | 12 | −176
+antiguedad | Valores negativos | 9 | −40
+edad | Negativo y mayores de 100 | 3 | 233 años
+frec_sms | Valor negativo | 1 | −9
+varias | Nulos dispersos | 83 | 1,3 % en segundos
+Eliminar una fila con edad 233 no es selección de variables: es calidad de datos, y va antes. Confundir las dos cosas hace que se descarten variables buenas por estar sucias.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+6
+=== slide 8
+Higiene del dataset
+Reglas de negocio, no reglas estadísticas
+Python
+import pandas as pd, numpy as np
+
+df = pd.read_excel("churn.xlsx")
+
+# Un negativo acá es imposible por definición
+for c in ["segundos","frec_llamadas","frec_sms",
+          "antiguedad","n_contactos"]:
+    df.loc[df[c] < 0, c] = np.nan
+
+# Rango admisible por negocio
+df.loc[(df.edad < 15) | (df.edad > 100),
+       "edad"] = np.nan
+
+# Imputación simple por mediana
+for c in df.columns:
+    if df[c].isna().any():
+        df[c] = df[c].fillna(df[c].median())
+
+print(df.shape, round(df.fuga.mean(), 3))
+# (3150, 13)  0.157
+R
+library(data.table)
+
+dt <- as.data.table(
+        readxl::read_excel("churn.xlsx"))
+
+# Un negativo acá es imposible por definición
+neg <- c("segundos","frec_llamadas","frec_sms",
+         "antiguedad","n_contactos")
+for (c in neg)
+  dt[get(c) < 0, (c) := NA]
+
+# Rango admisible por negocio
+dt[edad < 15 | edad > 100, edad := NA]
+
+# Imputación simple por mediana
+for (c in names(dt))
+  dt[is.na(get(c)),
+     (c) := median(dt[[c]], na.rm = TRUE)]
+
+dim(dt); round(mean(dt$fuga), 3)
+El umbral de edad entre 15 y 100 no sale de los datos: sale de saber que una telco no contrata a un cliente de 233 años.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+7
+=== slide 9
+BLOQUE 2
+De 12 a 50 variables:
+fabricar el problema
+En la Sesión 32 aprendieron a crear variables. Ahora en serio.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+8
+=== slide 10
+Con 12 columnas no hay nada que seleccionar
+Primero hay que generar candidatas
+Seleccionar entre 12 variables es un ejercicio de juguete. El problema real aparece cuando hay 50, 200 o 2.000 candidatas y hay que justificar cada descarte.
+Las tres que construyeron en la Sesión 32
+Variable | Construcción
+duracion_prom_llamada | segundos ÷ frec_llamadas
+sms_por_antiguedad | frec_sms ÷ antiguedad
+intensidad_contacto | n_contactos ÷ frec_llamadas
+Hoy aplicamos la misma lógica de forma sistemática
+Familia | Ejemplo | N.º
+Originales que se conservan | reclamos, segundos | 10
+Ratios de uso | clv_por_antiguedad | 13
+Interacciones | reclamo_x_antig | 3
+Transformaciones log | log_segundos | 5
+Indicadores binarios | tiene_reclamo | 5
+Discretización en cuartiles | edad_q1 … edad_q4 | 12
+One-hot de categóricas | plan_2, estado_2 | 2
+Total de candidatas |  | 50
+12 columnas originales  →  50 candidatas
+Recién ahora tenemos un problema de selección de verdad: hay que justificar 38 descartes, no 6.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+9
+=== slide 11
+Construcción de variables · 1 de 2
+Ratios e interacciones: 16 de las 38 que vamos a crear
+Python
+e = 1e-6
+d = df.copy()
+
+# Ratios: normalizan una magnitud por su exposición
+pares = [
+  ("duracion_prom_llamada","segundos","frec_llamadas"),
+  ("sms_por_llamada",      "frec_sms","frec_llamadas"),
+  ("intensidad_contacto",  "n_contactos","frec_llamadas"),
+  ("segundos_por_contacto","segundos","n_contactos"),
+  ("monto_por_llamada",    "monto","frec_llamadas"),
+  ("clv_por_llamada",      "clv","frec_llamadas"),
+  ("clv_por_segundo",      "clv","segundos"),
+  ("sms_por_antiguedad",   "frec_sms","antiguedad"),
+  ("clv_por_antiguedad",   "clv","antiguedad"),
+  ("llamadas_por_mes",     "frec_llamadas","antiguedad"),
+  ("contactos_por_mes",    "n_contactos","antiguedad"),
+  ("fallas_por_antiguedad","numero_fallas","antiguedad"),
+  ("antiguedad_rel_edad",  "antiguedad","edad"),
+]
+for nom, a, b in pares:
+    d[nom] = d[a] / (d[b] + e)
+
+# Interacciones: efectos que solo existen combinados
+d["reclamo_x_fallas"]   = d.reclamos * d.numero_fallas
+d["reclamo_x_antig"]    = d.reclamos * d.antiguedad
+d["fallas_x_contactos"] = d.numero_fallas * d.n_contactos
+R
+e <- 1e-6
+
+# Ratios: normalizan una magnitud por su exposición
+pares <- list(
+  c("duracion_prom_llamada","segundos","frec_llamadas"),
+  c("sms_por_llamada",      "frec_sms","frec_llamadas"),
+  c("intensidad_contacto",  "n_contactos","frec_llamadas"),
+  c("segundos_por_contacto","segundos","n_contactos"),
+  c("monto_por_llamada",    "monto","frec_llamadas"),
+  c("clv_por_llamada",      "clv","frec_llamadas"),
+  c("clv_por_segundo",      "clv","segundos"),
+  c("sms_por_antiguedad",   "frec_sms","antiguedad"),
+  c("clv_por_antiguedad",   "clv","antiguedad"),
+  c("llamadas_por_mes",     "frec_llamadas","antiguedad"),
+  c("contactos_por_mes",    "n_contactos","antiguedad"),
+  c("fallas_por_antiguedad","numero_fallas","antiguedad"),
+  c("antiguedad_rel_edad",  "antiguedad","edad")
+)
+for (p in pares)
+  dt[, (p[1]) := get(p[2]) / (get(p[3]) + e)]
+
+# Interacciones: efectos que solo existen combinados
+dt[, reclamo_x_fallas   := reclamos * numero_fallas]
+dt[, reclamo_x_antig    := reclamos * antiguedad]
+dt[, fallas_x_contactos := numero_fallas * n_contactos]
+El épsilon en los denominadores evita dividir por cero. Un solo infinito rompe todo el pipeline de selección que viene después.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+10
+=== slide 12
+Construcción de variables · 2 de 2
+Logaritmos, indicadores y discretización: las 22 restantes
+Python
+# Log: comprime colas largas
+for c in ["segundos","clv","frec_sms",
+          "frec_llamadas","n_contactos"]:
+    d[f"log_{c}"] = np.log1p(d[c].clip(lower=0))
+
+# Indicadores binarios
+med = d.segundos.median()
+p75 = d.clv.quantile(0.75)
+d["tiene_reclamo"] = (d.reclamos > 0).astype(int)
+d["sin_sms"]       = (d.frec_sms == 0).astype(int)
+d["uso_alto"]      = (d.segundos > med).astype(int)
+d["clv_alto"]      = (d.clv > p75).astype(int)
+d["cliente_nuevo"] = (d.antiguedad < 12).astype(int)
+
+# Discretización en cuartiles
+for col in ["edad", "antiguedad", "clv"]:
+    q = pd.qcut(d[col], 4, labels=False,
+                duplicates="drop")
+    for k in sorted(q.dropna().unique()):
+        d[f"{col}_q{int(k)+1}"] = (q == k).astype(int)
+
+# One-hot: las originales categóricas se van
+d["plan_2"]   = (d.tipo_plan == 2).astype(int)
+d["estado_2"] = (d.estado == 2).astype(int)
+d = d.drop(columns=["tipo_plan", "estado"])
+
+X = d.drop(columns="fuga"); y = d["fuga"]
+print(X.shape)      # (3150, 50)
+R
+# Log: comprime colas largas
+for (c in c("segundos","clv","frec_sms",
+            "frec_llamadas","n_contactos"))
+  dt[, paste0("log_", c) := log1p(pmax(get(c), 0))]
+
+# Indicadores binarios
+med <- median(dt$segundos)
+p75 <- quantile(dt$clv, 0.75)
+dt[, tiene_reclamo := as.integer(reclamos > 0)]
+dt[, sin_sms       := as.integer(frec_sms == 0)]
+dt[, uso_alto      := as.integer(segundos > med)]
+dt[, clv_alto      := as.integer(clv > p75)]
+dt[, cliente_nuevo := as.integer(antiguedad < 12)]
+
+# Discretización en cuartiles
+for (col in c("edad","antiguedad","clv")) {
+  q <- cut(dt[[col]], quantile(dt[[col]], 0:4/4),
+           labels = FALSE, include.lowest = TRUE)
+  for (k in sort(unique(q)))
+    dt[, paste0(col,"_q",k) := as.integer(q == k)]
+}
+
+# One-hot: las originales categóricas se van
+dt[, plan_2   := as.integer(tipo_plan == 2)]
+dt[, estado_2 := as.integer(estado == 2)]
+dt[, c("tipo_plan","estado") := NULL]
+
+dim(dt)             # 3150 x 51  (50 + fuga)
+Fijate que tipo_plan y estado desaparecen al reemplazarlas por sus indicadores: por eso quedan 50 y no 52.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+11
+=== slide 13
+BLOQUE 3
+Irrelevante, redundante
+y relevante solo en conjunto
+Las tres razones por las que una variable puede sobrar — o parecer que sobra
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+12
+=== slide 14
+Tres motivos distintos, tres decisiones distintas
+Irrelevante
+No aporta información sobre el target, ni sola ni acompañada.
+Se descarta.
+En nuestro dataset:  numero_fallas, edad
+Redundante
+Aporta, pero su información ya está contenida en otra variable.
+Se conserva una de las dos.
+En nuestro dataset:  frec_sms ↔ clv
+Relevante en conjunto
+Sola parece ruido. Combinada con otra, aporta señal real.
+Los filtros univariados la matan.
+En nuestro dataset:  el caso XOR
+La distinción importa porque la decisión es distinta. A la irrelevante la borrás sin culpa. Con la redundante elegís cuál se queda, y es una decisión de negocio, no estadística. Y a la relevante-en-conjunto la vas a perder si te quedás solo con un ranking univariado — que es exactamente lo que casi todos hacen.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+13
+=== slide 15
+Las irrelevantes de nuestro dataset
+Correlación con fuga e información mutua, calculadas sobre las 3.150 filas
+Variable | Corr. con fuga | Info. mutua | F de ANOVA | p-valor | Lectura
+numero_fallas | −0,009 | 0,0000 | 0,27 | 0,602 | Sin señal individual
+edad | −0,019 | 0,0000 | 1,09 | 0,297 | Sin señal individual
+antiguedad | −0,020 | 0,0240 | 3,25 | 0,071 | Señal marginal
+reclamos | 0,512 | 0,1023 | 1.115,08 | 0,000 | Señal fuerte, para comparar
+Por qué miramos las dos métricas
+Correlación de Pearson
+Solo captura relación lineal. Una U perfecta da correlación cero.
+Información mutua
+Captura cualquier dependencia, también no lineal. Si ambas dan cero, la evidencia es más sólida.
+Y aun así, en un minuto vamos a ver que numero_fallas no era descartable.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+14
+=== slide 16
+El caso numero_fallas
+Inútil sola. Útil acompañada. Y está en nuestros datos, no en un ejemplo de libro.
+Solo numero_fallas
+0,526
+Prácticamente azar
+Base de 5 variables
+0,9069
+Sin numero_fallas
+Base + numero_fallas
+0,9102
+Aporta
+Base + numero_fallas + monto
+0,9171
+Aporta más
+Qué aprendemos
+Un p-valor de 0,60 no significa «esta variable no sirve». Significa «esta variable no sirve sola».
+Es el argumento central a favor de los métodos multivariados, y la razón por la que un ranking univariado nunca debería ser la última palabra.
+AUC medido con validación cruzada de 5 folds sobre las 3.150 observaciones.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+15
+[notas] Ejecutar en vivo si da el tiempo. El contraste entre 0,526 sola y su aporte al conjunto es el momento que fija el concepto.
+=== slide 17
+La redundancia que ya estaba y la que creamos
+11 pares con correlación sobre 0,90 entre las 50 candidatas
+Redundancia original del dataset
+Par | |corr|
+frec_sms ↔ clv | 0,925
+segundos ↔ frec_llamadas | 0,907
+frec_llamadas ↔ n_contactos | 0,728
+Redundancia que fabricamos nosotros
+Par | |corr|
+reclamos ↔ tiene_reclamo | 1,000
+clv_alto ↔ clv_q4 | 1,000
+sms_por_llamada ↔ clv_por_llamada | 0,974
+El feature engineering genera redundancia por construcción. tiene_reclamo correlaciona 1,000 con reclamos porque es la misma información con otra forma. Crear variables sin después seleccionar no mejora el modelo: lo infla.
+Cómo se desempata un par redundante
+Se queda la de mayor información mutua con el target
+A igualdad de señal, se queda la más simple de explicar y de mantener en producción
+Nunca se queda «la primera de la lista»: ese criterio es el orden alfabético disfrazado de método
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+16
+=== slide 18
+BLOQUE 4
+Taxonomía: filter, wrapper, embedded
+Tres formas de decidir, con tres costos distintos
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+17
+=== slide 19
+Las tres familias de métodos
+Familia | Cómo decide | Costo | ¿Ve interacciones? | Ejemplos
+Filter | Con una métrica estadística, sin entrenar el modelo | Bajo | No, si es univariado | Varianza, correlación, información mutua, ANOVA F
+Wrapper | Entrena el modelo con distintos subconjuntos y compara | Alto | Sí | RFE, forward y backward selection
+Embedded | La selección ocurre dentro del entrenamiento | Medio | Sí | Lasso, importancia de árboles
+Ya conocen un método embedded
+La Sesión 31 explicó que «Lasso (L1) puede llevar coeficientes a cero y, en la práctica, apagar variables poco útiles». Eso es exactamente un método embedded: la selección ocurre mientras el modelo se entrena.
+Regla práctica de secuencia
+No son alternativas entre sí: son etapas del mismo embudo. Filtro para bajar de 5.000 a 200, embedded para bajar de 200 a 30, wrapper solo si sobra cómputo.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+18
+=== slide 20
+BLOQUE 5
+Métodos de filtro
+Rápidos, escalables y con un punto ciego importante
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+19
+=== slide 21
+Filtros univariados sobre las 50 candidatas
+Python
+from sklearn.feature_selection import (
+    mutual_info_classif, f_classif, VarianceThreshold)
+
+# 1. Varianza casi nula
+vt = VarianceThreshold(threshold=0.01).fit(X)
+constantes = X.columns[~vt.get_support()]
+
+# 2. Información mutua (captura no linealidad)
+mi = pd.Series(
+    mutual_info_classif(X, y, random_state=0),
+    index=X.columns)
+
+# 3. ANOVA F (solo relación lineal)
+F, p = f_classif(X, y)
+
+rank = pd.DataFrame({"MI": mi, "F": F, "p": p})
+print(rank.sort_values("MI", ascending=False).head(12))
+
+# 4. Redundancia entre candidatas
+corr = X.corr().abs()
+sup = corr.where(
+    np.triu(np.ones(corr.shape), 1).astype(bool))
+pares = sup.stack().sort_values(ascending=False)
+print(pares[pares > 0.90])
+R
+library(caret); library(FSelectorRcpp)
+
+# 1. Varianza casi nula
+constantes <- nearZeroVar(X, names = TRUE)
+
+# 2. Ganancia de información
+ig <- information_gain(fuga ~ ., data = dt)
+ig <- ig[order(-ig$importance), ]
+head(ig, 12)
+
+# 3. ANOVA F por variable
+f_val <- sapply(X, function(v)
+  summary(aov(v ~ factor(y)))[[1]][["F value"]][1])
+sort(f_val, decreasing = TRUE)[1:12]
+
+# 4. Redundancia entre candidatas
+M <- cor(X)
+red <- findCorrelation(M, cutoff = 0.90,
+                       names = TRUE)
+print(red)
+Información mutua y ANOVA F no dan el mismo orden. Cuando difieren mucho, la relación no es lineal — y eso ya es información útil.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+20
+=== slide 22
+El ranking que sale
+Top 12 de 50, ordenado por información mutua
+1
+segundos
+0,1315
+297,18
+2
+log_segundos
+0,1285
+419,05
+3
+contactos_por_mes
+0,1065
+176,80
+4
+log_clv
+0,1052
+496,02
+5
+clv_por_antiguedad
+0,1048
+150,01
+6
+llamadas_por_mes
+0,1023
+187,95
+7
+tiene_reclamo
+0,1023
+1.115,08
+8
+clv
+0,1018
+287,20
+9
+reclamo_x_antig
+0,0962
+872,38
+10
+intensidad_contacto
+0,0946
+5,88
+11
+frec_llamadas
+0,0911
+301,31
+12
+log_frec_llamadas
+0,0897
+445,52
+Columnas: posición · variable · información mutua · F de ANOVA
+Miren el top 6 y hagan la pregunta incómoda: segundos y log_segundos son la misma variable. log_clv y clv_por_antiguedad comparten casi toda su información. ¿Qué pasa si nos quedamos con estas seis?
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+21
+=== slide 23
+Seis variables contra seis variables
+El mismo modelo, el mismo dataset, la misma cantidad de variables. Solo cambia el criterio de elección.
+Top 6 del ranking univariado
+0,8105
+AUC
+0,50
+correlación media
+entre las seis
+segundos  ·  log_segundos  ·  contactos_por_mes  ·  log_clv  ·  clv_por_antiguedad  ·  llamadas_por_mes
+6 elegidas evitando redundancia
+0,9041
+AUC
+0,33
+correlación media
+entre las seis
+reclamos  ·  segundos  ·  frec_llamadas  ·  estado_2  ·  numero_fallas  ·  monto
+Nueve puntos de AUC de diferencia, con la misma cantidad de variables. El ranking univariado eligió seis formas distintas de medir lo mismo.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+22
+[notas] Este es el clímax de la sesión 33. Dejar que la clase mire el top-6 y descubra sola que segundos y log_segundos son la misma variable antes de revelar el AUC.
+=== slide 24
+BLOQUE 6
+Wrapper y embedded
+Métodos que sí ven el conjunto
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+23
+=== slide 25
+RFE y Lasso sobre las 50 candidatas
+Wrapper y embedded, uno al lado del otro
+Python
+from sklearn.feature_selection import RFECV
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+
+# WRAPPER: elimina de a una y mide
+rfe = RFECV(
+    estimator = LogisticRegression(max_iter=3000),
+    step = 1, cv = 5, scoring = "roc_auc",
+    min_features_to_select = 4,
+).fit(StandardScaler().fit_transform(X), y)
+print(rfe.n_features_, X.columns[rfe.support_])
+
+# EMBEDDED: Lasso apaga coeficientes
+lasso = Pipeline([
+    ("sc", StandardScaler()),
+    ("clf", LogisticRegression(penalty="l1",
+        solver="liblinear", C=0.05, max_iter=3000)),
+]).fit(X, y)
+coef = pd.Series(lasso[-1].coef_[0], index=X.columns)
+print(f"{(coef != 0).sum()} de {len(coef)} sobreviven")
+# 25 de 50 sobreviven
+R
+library(caret); library(glmnet)
+
+# WRAPPER: rfe con validación cruzada
+ctrl <- rfeControl(functions = lrFuncs,
+                   method = "cv", number = 5)
+res <- rfe(X, factor(y),
+           sizes = c(4, 6, 10, 15, 25),
+           rfeControl = ctrl)
+predictors(res)
+plot(res, type = c("g", "o"))
+
+# EMBEDDED: Lasso apaga coeficientes
+Xm <- scale(as.matrix(X))
+cvf <- cv.glmnet(Xm, y, family = "binomial",
+                 alpha = 1, type.measure = "auc",
+                 nfolds = 5)
+
+co <- coef(cvf, s = "lambda.1se")
+sum(co[, 1] != 0)
+rownames(co)[co[, 1] != 0]
+Lasso dejó 25 de 50. En la Sesión 34 vamos a preguntarnos si esas 25 son siempre las mismas — y la respuesta va a incomodar.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+24
+=== slide 26
+Qué logramos con cada estrategia
+AUC con validación cruzada de 5 folds sobre las 3.150 observaciones
+Tres lecturas
+Construir variables sirvió: de 0,920 a 0,941.
+Lasso conserva casi todo el desempeño con la mitad de las variables: 0,938 con 25.
+Y seis variables bien elegidas rinden más que 6 mal elegidas, aunque el ranking dijera lo contrario.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+25
+=== slide 27
+BLOQUE 6
+La trampa:
+dónde vive la selección
+Todo lo que hicimos hoy tiene un problema. Vamos a medirlo.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+26
+=== slide 28
+La Sesión 32 dejó escrita esta regla
+«El escalador se ajusta (fit) únicamente con entrenamiento y luego se aplica (transform) a test. Ajustarlo con todos los datos produciría Data Leakage.»
+Si eso vale para el escalador…
+¿por qué no valdría para la selección de variables?
+Toda esta clase seleccionamos variables mirando las 3.150 filas: el filtro por información mutua, la elección del par redundante, el RFE y el Lasso. Después medimos el desempeño sobre esas mismas 3.150 filas.
+Todos los AUC que vimos hoy están inflados. La pregunta es cuánto.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+27
+=== slide 29
+El experimento del ruido puro
+Ejecutar en vivo, sin anticipar el resultado
+100 observaciones  ·  1.000 variables generadas al azar  ·  target lanzado a cara o sello
+No hay ninguna señal en estos datos. Por construcción, cualquier medición honesta tiene que dar AUC ≈ 0,50.
+El procedimiento que casi todos escriben
+Calcular el estadístico F de las 1.000 variables contra el target
+Quedarse con las 20 mejores
+Correr validación cruzada de 5 folds sobre esas 20
+Las 20 elegidas ya vieron el target de los 100 casos. En cada fold, el modelo evalúa variables que fueron seleccionadas usando los datos de ese mismo fold.
+El procedimiento correcto
+Armar un Pipeline que encadene selección y modelo
+Pasar el pipeline completo a cross_val_score
+La selección se recalcula desde cero en cada fold
+En cada iteración las 20 variables se eligen usando solo los 80 casos de entrenamiento. Los 20 de validación no participaron de la elección.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+28
+=== slide 30
+El experimento, en código
+Mismo dato, mismo modelo, misma validación. Solo cambia dónde vive la selección.
+Python
+import numpy as np
+from sklearn.feature_selection import SelectKBest, f_classif
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_val_score
+from sklearn.pipeline import Pipeline
+
+rng = np.random.default_rng(42)
+Xr = rng.normal(size=(100, 1000))
+yr = rng.integers(0, 2, size=100)
+
+# MAL: seleccionar con TODOS los datos
+Xs = SelectKBest(f_classif, k=20).fit_transform(Xr, yr)
+print(cross_val_score(LogisticRegression(max_iter=2000),
+      Xs, yr, cv=5, scoring="roc_auc").mean())
+# 0.882
+
+# BIEN: la selección vive dentro del pipeline
+pipe = Pipeline([
+    ("sel", SelectKBest(f_classif, k=20)),
+    ("clf", LogisticRegression(max_iter=2000)),
+])
+print(cross_val_score(pipe, Xr, yr, cv=5,
+      scoring="roc_auc").mean())
+# 0.514
+R
+library(caret)
+set.seed(42)
+Xr <- matrix(rnorm(100 * 1000), nrow = 100)
+colnames(Xr) <- paste0("v", 1:1000)
+yr <- factor(sample(c("bueno","malo"), 100,
+                    replace = TRUE))
+
+ctrl <- trainControl(method = "cv", number = 5,
+         classProbs = TRUE,
+         summaryFunction = twoClassSummary)
+
+# MAL: seleccionar con TODOS los datos
+p   <- apply(Xr, 2, function(v) t.test(v ~ yr)$p.value)
+top <- order(p)[1:20]
+train(Xr[, top], yr, method = "glm",
+      family = "binomial",
+      trControl = ctrl, metric = "ROC")
+# ~ 0.88
+
+# BIEN: sbf() re-selecciona en cada fold
+sbf(Xr, yr, sbfControl = sbfControl(
+      functions = caretSBF,
+      method = "cv", number = 5))
+# ~ 0.51
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+29
+=== slide 31
+El resultado, sobre datos sin ninguna señal
+La regla de oro
+Toda decisión que mire el target debe ocurrir dentro de cada fold de validación.
+No solo el escalado. También el filtro por información mutua, la elección del par redundante, el RFE y el Lasso: todo lo que hicimos hoy mirando el dataset completo.
+38 puntos de AUC inventados a partir de datos que no contienen absolutamente nada.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+30
+=== slide 32
+Qué va dentro de cada fold
+La regla: si la decisión mira el target, va adentro
+Paso del pipeline | ¿Mira el target? | ¿Dónde va?
+Eliminar filas con edad 233 | No | Puede ir antes
+Construir ratios y logaritmos | No | Puede ir antes
+One-hot de categóricas | No | Puede ir antes
+Escalar (StandardScaler) | No, pero usa la media | DENTRO del fold
+Imputar por mediana | No, pero usa la mediana | DENTRO del fold
+Filtrar por información mutua | Sí | DENTRO del fold
+Elegir el par redundante | Sí | DENTRO del fold
+RFE y Lasso | Sí | DENTRO del fold
+El escalado y la imputación no miran el target, pero sí usan información del conjunto completo: la media, la mediana. Por eso van adentro igual — es exactamente lo que decía la Sesión 32.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+31
+=== slide 33
+Rehacer la clase entera, esta vez bien
+El mismo pipeline de churn, validado de forma honesta
+Python
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler
+from sklearn.feature_selection import (
+    SelectKBest, mutual_info_classif)
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import (
+    cross_val_score, StratifiedKFold)
+
+pipe = Pipeline([
+    ("imp", SimpleImputer(strategy="median")),
+    ("sc",  StandardScaler()),
+    ("sel", SelectKBest(mutual_info_classif, k=12)),
+    ("clf", LogisticRegression(max_iter=3000)),
+])
+
+cv = StratifiedKFold(5, shuffle=True, random_state=1)
+auc = cross_val_score(pipe, X, y, cv=cv,
+                      scoring="roc_auc")
+print(auc.round(4), auc.mean().round(4))
+R
+library(caret)
+
+# sbf() = selection by filter.
+# Re-ejecuta el filtro dentro de cada fold
+ctrl <- sbfControl(
+  functions = caretSBF,
+  method    = "cv",
+  number    = 5
+)
+
+set.seed(1)
+res <- sbf(X, factor(y), sbfControl = ctrl)
+
+print(res)
+res$optVariables
+
+# Para wrapper dentro del fold:
+ctrl2 <- rfeControl(functions = lrFuncs,
+                    method = "cv", number = 5)
+rfe(X, factor(y), sizes = c(6, 12, 20),
+    rfeControl = ctrl2)
+El orden importa: imputar, escalar, seleccionar, modelar. Y todo dentro del mismo objeto, para que la validación cruzada lo repita entero en cada fold.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+32
+=== slide 34
+Checklist metodológico
+El entregable conceptual de la sesión
+1
+Limpiar con criterio de negocio, no estadístico
+2
+Separar test antes de tocar cualquier otra cosa
+3
+Construir variables candidatas de forma sistemática
+4
+Filtro base: varianza casi nula, cardinalidad, señal mínima
+5
+Detectar redundancia y desempatar con criterio de negocio
+6
+No descartar por p-valor sin probar la variable en conjunto
+7
+Método multivariado: RFE o Lasso sobre lo que quedó
+8
+Todo lo anterior DENTRO de un pipeline validado por CV
+9
+Medir estabilidad ante cambios de partición y de semilla
+10
+Documentar por qué quedó cada variable y qué cuesta mantenerla
+Los pasos 1, 2 y 10 no son estadísticos. Son los que más modelos salvan.
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+33
+=== slide 35
+Lo que nos llevamos
+Limpiar es un paso previo, no parte de la selección
+Sin variables construidas no hay problema de selección real
+Irrelevante, redundante y relevante-en-conjunto piden decisiones distintas
+Un p-valor alto no basta para descartar: numero_fallas lo demostró
+Filter, wrapper y embedded son etapas de un embudo, no alternativas
+Y todo eso vale nada si la selección vive fuera de la validación
+SESIÓN 34
+Árboles de decisión
+Un modelo que hace su propia selección de variables mientras se entrena, elige los cortes con el mismo criterio de ganancia de información que usamos hoy como filtro, y además se puede dibujar.
+Vamos a ver por qué reclamos siempre queda arriba de todo.
+Para pensar antes de la Sesión 34:  si tuvieras que explicarle a un gerente comercial por qué se fuga un cliente, ¿le mostrarías 12 coeficientes o preferirías otra cosa?
+Sesión 33 · Feature Engineering: metodología de selección de variables · Diplomado en Data Science UC
+34
+######## Feature_Engineering_Seleccion_Variables.pptx
+=== slide 1
+DIPLOMADO EN DATA SCIENCE  ·  MACHINE LEARNING
+Feature Engineering
+Metodología de Selección de Variables para Modelos de ML
+Filter · Wrapper · Embedded — de la teoría a la práctica con datos reales
+Material de estudio  ·  Preparado por Jason
+=== slide 2
+AGENDA
+Qué vamos a estudiar
+Fundamentos
+Qué es el Feature Engineering y su rol en el pipeline de ML
+¿Por qué seleccionar variables?
+Curse of dimensionality, overfitting y costo computacional
+Taxonomía de métodos
+Filter, Wrapper y Embedded — lógica, ejemplos y comparación
+Multicolinealidad
+Correlación, VIF y su impacto en la selección
+Preprocesamiento asociado
+Codificación de categóricas y escalado de variables
+Caso aplicado
+Selección de variables en el proyecto Kiwi Hayward (CRISP-DM/ML(Q))
+Feature Engineering — Diplomado Data Science
+2
+=== slide 3
+FUNDAMENTOS
+¿Qué es el Feature Engineering?
+Definición
+Proceso de usar conocimiento del dominio y técnicas estadísticas para crear, transformar y seleccionar variables (features) que maximicen el poder predictivo de un modelo de Machine Learning.
+“Los datos y las features que usas importan más que el algoritmo que eliges.”
+— principio ampliamente citado en la práctica de ML aplicado
+Feature Creation & Transformation
+Crear nuevas variables, codificar categóricas, escalar, discretizar (binning), tratar outliers y valores faltantes.
+Feature Selection
+Elegir el subconjunto de variables más relevante, descartando ruido y redundancia. Es el foco de esta sesión.
+Feature Engineering — Diplomado Data Science
+3
+=== slide 4
+FUNDAMENTOS
+Ubicación en el pipeline de Machine Learning
+Datos crudos
+Recolección e integración
+1
+Limpieza
+Missing values, outliers
+2
+Feature Eng.
+Creación y transformación
+3
+Selección
+Filter / Wrapper / Embedded
+4
+Modelado
+Entrenamiento del algoritmo
+5
+Evaluación
+Validación y métricas
+6
+La selección de variables ocurre después de crear/transformar features y antes de entrenar el modelo final — nunca usando datos de test.
+Feature Engineering — Diplomado Data Science
+4
+=== slide 5
+MOTIVACIÓN
+¿Por qué seleccionar variables?
+Curse of dimensionality
+A mayor número de variables, se requieren exponencialmente más datos para generalizar bien.
+Overfitting
+Variables irrelevantes o ruidosas hacen que el modelo memorice en vez de aprender patrones reales.
+Multicolinealidad
+Variables redundantes distorsionan coeficientes e interpretabilidad, especialmente en modelos lineales.
+Costo computacional
+Menos variables → entrenamiento e inferencia más rápidos y económicos en producción.
+Interpretabilidad
+Un modelo con menos variables es más fácil de explicar a stakeholders del negocio.
+Mejor desempeño
+Eliminar ruido puede mejorar métricas de validación, no solo simplificar el modelo.
+Feature Engineering — Diplomado Data Science
+5
+=== slide 6
+METODOLOGÍA
+Taxonomía de métodos de selección de variables
+Filter
+Evalúan cada variable de forma independiente del modelo, usando medidas estadísticas.
+Rápido · escalable
+Wrapper
+Evalúan subconjuntos de variables entrenando el modelo real y midiendo su desempeño.
+Preciso · costoso
+Embedded
+La selección ocurre dentro del propio algoritmo de entrenamiento (regularización, importancia).
+Balance costo/precisión
+Feature Engineering — Diplomado Data Science
+6
+=== slide 7
+MÉTODOS
+Métodos Filter
+Variance Threshold
+Elimina variables con varianza casi nula (aportan poca información discriminante).
+Correlación de Pearson
+Mide relación lineal entre variable numérica y target; útil para descartar redundancia.
+Chi-cuadrado (χ²)
+Evalúa independencia entre variables categóricas y el target categórico.
+ANOVA F-test
+Compara medias del target continuo entre categorías de una variable predictora.
+Información Mutua
+Captura relaciones no lineales entre variable y target, a diferencia de Pearson.
+Ventaja: muy rápidos y agnósticos al modelo.   Limitación: ignoran interacciones entre variables.
+Feature Engineering — Diplomado Data Science
+7
+=== slide 8
+MÉTODOS
+Métodos Wrapper
+RFE (Recursive Feature Elimination)
+Entrena el modelo, elimina la variable menos importante, y repite iterativamente.
+Forward Selection
+Parte de cero variables y agrega, en cada paso, la que más mejora el desempeño.
+Backward Elimination
+Parte del set completo y elimina, en cada paso, la variable menos útil.
+Exhaustive Search
+Evalúa todas las combinaciones posibles de variables — óptimo pero muy costoso.
+Ventaja: considera interacciones y desempeño real del modelo.   Limitación: computacionalmente costoso en datasets grandes.
+Feature Engineering — Diplomado Data Science
+8
+=== slide 9
+MÉTODOS
+Métodos Embedded
+Lasso (Regularización L1)
+Reduce a cero los coeficientes de variables irrelevantes durante el propio ajuste.
+Ridge / Elastic Net
+Penaliza coeficientes grandes; Elastic Net combina L1 y L2 para grupos correlacionados.
+Feature Importance (árboles)
+Random Forest / Gradient Boosting rankean variables por reducción de impureza.
+SHAP Values
+Cuantifican la contribución marginal de cada variable a las predicciones del modelo.
+Ventaja: buen balance costo/precisión, integrado al entrenamiento.   Limitación: depende del algoritmo elegido.
+Feature Engineering — Diplomado Data Science
+9
+=== slide 10
+SÍNTESIS
+Filter vs. Wrapper vs. Embedded
+Criterio
+Filter
+Wrapper
+Embedded
+Costo computacional
+Bajo
+Alto
+Medio
+Considera interacciones
+No
+Sí
+Parcial
+Dependencia del modelo
+Ninguna
+Alta
+Alta
+Riesgo de overfitting
+Bajo
+Medio-Alto
+Bajo-Medio
+Escalabilidad (muchas variables)
+Alta
+Baja
+Media-Alta
+Ejemplos
+Correlación, χ², ANOVA
+RFE, Forward/Backward
+Lasso, Random Forest
+Feature Engineering — Diplomado Data Science
+10
+=== slide 11
+DIAGNÓSTICO
+Multicolinealidad y el Factor de Inflación de Varianza (VIF)
+El VIF mide cuánto se infla la varianza de un coeficiente por su correlación con otras variables predictoras:
+VIFᵢ = 1 / (1 − R²ᵢ)
+VIF = 1
+Sin correlación con otras variables
+VIF 1–5
+Correlación moderada, generalmente aceptable
+VIF > 5–10
+Multicolinealidad alta — evaluar exclusión
+Umbral de referencia ≈ 5
+Feature Engineering — Diplomado Data Science
+11
+=== slide 12
+PREPROCESAMIENTO
+Codificación de variables categóricas
+One-Hot Encoding
+Crea una columna binaria por categoría. Ideal para categorías nominales sin orden y baja cardinalidad.
+Ordinal Encoding
+Asigna enteros respetando un orden natural (ej. bajo/medio/alto).
+Target / Mean Encoding
+Reemplaza cada categoría por el promedio del target — útil en alta cardinalidad, con riesgo de leakage.
+Frequency Encoding
+Sustituye la categoría por su frecuencia relativa en el dataset.
+Feature Engineering — Diplomado Data Science
+12
+=== slide 13
+PREPROCESAMIENTO
+Escalado de variables numéricas
+Técnica
+Fórmula / Idea
+Cuándo usar
+Standardization (Z-score)
+(x − μ) / σ  →  media 0, desv. 1
+Modelos que asumen distribución normal: regresión, SVM, PCA
+Min-Max Normalization
+(x − min) / (max − min)  →  rango [0,1]
+Redes neuronales, algoritmos basados en distancia (KNN)
+Robust Scaler
+(x − mediana) / IQR
+Datos con outliers significativos
+Nota: el escalado no selecciona variables, pero suele aplicarse antes de métodos Wrapper/Embedded sensibles a la escala (Lasso, SVM, KNN).
+Feature Engineering — Diplomado Data Science
+13
+=== slide 14
+COMPLEMENTO
+Reducción de dimensionalidad: ¿selección o transformación?
+Selección de variables
+Conserva variables originales (interpretables)
+Filter, Wrapper, Embedded
+Reduce el número de columnas
+Reducción de dimensionalidad
+Crea nuevas combinaciones (componentes)
+PCA (lineal), t-SNE / UMAP (visualización)
+Pierde interpretabilidad directa de las variables
+Feature Engineering — Diplomado Data Science
+14
+=== slide 15
+HERRAMIENTAS
+Librerías para implementar selección de variables
+scikit-learn
+SelectKBest, RFE, RFECV, SelectFromModel, VarianceThreshold
+feature-engine
+Transformadores compatibles con sklearn Pipeline para FE completo
+Boruta / BorutaPy
+Wrapper basado en Random Forest con prueba de significancia estadística
+SHAP
+Interpretabilidad y ranking de importancia post-entrenamiento
+mlxtend
+Sequential Feature Selector (forward/backward) flexible
+statsmodels
+VIF, ANOVA, pruebas estadísticas clásicas para el análisis exploratorio
+Feature Engineering — Diplomado Data Science
+15
+=== slide 16
+CASO APLICADO
+Selección de variables en el proyecto Kiwi Hayward
+Predicción de rendimiento (yield) con datos reales de huerto, bajo metodología CRISP-DM / CRISP-ML(Q)
+Variables candidatas
+Agronómicas (poda, riego, suelo) y climáticas (temperatura, precipitación, radiación, humedad).
+Filtro inicial
+Variance Threshold + correlación de Pearson para descartar variables sin relación con el yield.
+Diagnóstico VIF
+Revisión de multicolinealidad entre variables climáticas altamente correlacionadas.
+Embedded / Wrapper
+Lasso y feature importance de Random Forest para el ranking final; RFECV para validar el subconjunto óptimo.
+Feature Engineering — Diplomado Data Science
+16
+=== slide 17
+BUENAS PRÁCTICAS
+Buenas prácticas y errores comunes
+Hacer
+Hacer train/test split ANTES de seleccionar variables
+Validar con cross-validation, no con una sola partición
+Combinar métodos (ej. filter + embedded) para robustez
+Documentar el criterio y umbral usado en cada método
+Evitar
+Seleccionar variables usando el set de test (data leakage)
+Aplicar Target Encoding sin fold-based validation
+Ignorar el conocimiento del dominio por depender solo de estadística
+Eliminar variables correlacionadas sin evaluar su valor predictivo real
+Feature Engineering — Diplomado Data Science
+17
+=== slide 18
+RESUMEN
+Puntos clave para recordar
+Feature Selection reduce dimensionalidad, overfitting y costo, y mejora interpretabilidad.
+Tres familias de métodos: Filter (rápido), Wrapper (preciso), Embedded (balance).
+El VIF y la correlación son claves para detectar multicolinealidad antes de modelar.
+Selecciona SIEMPRE dentro de la validación cruzada, nunca con el set de test.
+En proyectos reales (ej. Kiwi Hayward), combinar métodos da resultados más robustos.
+Feature Engineering — Diplomado Data Science
+18
+=== slide 19
+REFERENCIAS
+Recursos para profundizar
+Guyon & Elisseeff (2003)
+"An Introduction to Variable and Feature Selection" — Journal of Machine Learning Research
+Kuhn & Johnson
+"Feature Engineering and Selection: A Practical Approach for Predictive Models"
+Documentación scikit-learn
+Módulo sklearn.feature_selection — guía oficial y ejemplos
+Lundberg & Lee (2017)
+"A Unified Approach to Interpreting Model Predictions" (paper de SHAP)
+Feature Engineering — Diplomado Data Science
+19

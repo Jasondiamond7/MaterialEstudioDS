@@ -1,0 +1,359 @@
+1
+00:00:00,250 --> 00:00:02,400
+Novena parada: early stopping.
+
+2
+00:00:02,520 --> 00:00:05,500
+Y los hiperparámetros que de verdad mueven el resultado.
+
+3
+00:00:05,620 --> 00:00:08,220
+¿Cuántos árboles necesita un modelo de boosting?
+
+4
+00:00:08,340 --> 00:00:08,920
+¿Cien?
+
+5
+00:00:09,040 --> 00:00:09,520
+¿Mil?
+
+6
+00:00:09,640 --> 00:00:12,412
+Ya viste que demasiados pueden empezar a ajustar
+
+7
+00:00:12,412 --> 00:00:14,780
+ruido, y muy pocos dejan el modelo corto.
+
+8
+00:00:14,900 --> 00:00:19,520
+La respuesta práctica es: que lo decida la validación, mientras entrenas.
+
+9
+00:00:19,640 --> 00:00:21,430
+Piensa en un queque en el horno.
+
+10
+00:00:21,550 --> 00:00:25,750
+No pones un temporizador a ciegas: lo revisas cada pocos minutos.
+
+11
+00:00:25,870 --> 00:00:27,780
+Mientras mejora, lo dejas.
+
+12
+00:00:27,900 --> 00:00:30,736
+Y si en dos revisiones seguidas ya no mejora, lo
+
+13
+00:00:30,736 --> 00:00:33,100
+sacas, y te quedas con el mejor momento.
+
+14
+00:00:33,220 --> 00:00:36,480
+Eso es early stopping, en español, parada temprana.
+
+15
+00:00:36,600 --> 00:00:39,990
+Separas un conjunto de validación, distinto del test.
+
+16
+00:00:40,110 --> 00:00:43,360
+Después de cada árbol, mides el error en validación.
+
+17
+00:00:43,480 --> 00:00:47,088
+Y si no mejora durante varias rondas seguidas, la paciencia, el
+
+18
+00:00:47,088 --> 00:00:50,180
+entrenamiento se detiene y se conserva la mejor ronda.
+
+19
+00:00:50,300 --> 00:00:53,020
+Un ejemplo del apunte, con paciencia dos.
+
+20
+00:00:53,140 --> 00:00:59,090
+El error de validación, ronda por ronda: 30, 25, 22, 21.
+
+21
+00:00:59,210 --> 00:01:03,640
+Luego 21.4, 21.9 y 22.5.
+
+22
+00:01:03,760 --> 00:01:06,390
+El mínimo es 21, en la ronda cuatro.
+
+23
+00:01:06,510 --> 00:01:08,960
+La ronda cinco no mejora: van una.
+
+24
+00:01:09,080 --> 00:01:11,490
+La ronda seis tampoco: van dos.
+
+25
+00:01:11,610 --> 00:01:15,040
+Con paciencia dos, se detiene después de la ronda seis.
+
+26
+00:01:15,160 --> 00:01:18,220
+Y el modelo final es el de la ronda cuatro, la mejor.
+
+27
+00:01:18,340 --> 00:01:20,280
+La ronda siete nunca se entrena.
+
+28
+00:01:20,400 --> 00:01:21,700
+Con datos reales.
+
+29
+00:01:21,820 --> 00:01:26,081
+XGBoost en Ames, con eta 0.05, profundidad tres, hasta
+
+30
+00:01:26,081 --> 00:01:29,710
+mil quinientos árboles, y paciencia cincuenta.
+
+31
+00:01:29,830 --> 00:01:32,050
+El error de entrenamiento baja y baja.
+
+32
+00:01:32,170 --> 00:01:35,810
+El de validación baja rápido al principio, y después se aplana.
+
+33
+00:01:35,930 --> 00:01:41,560
+XGBoost reporta su mejor iteración: la 754, contando desde cero.
+
+34
+00:01:41,680 --> 00:01:45,140
+Como espera cincuenta rondas sin mejora, se detiene al
+
+35
+00:01:45,140 --> 00:01:48,600
+completar 805 árboles, de los mil quinientos posibles.
+
+36
+00:01:48,720 --> 00:01:52,537
+En esa mejor ronda, el error de validación es de 21
+
+37
+00:01:52,537 --> 00:01:55,680
+000 dólares, y el de entrenamiento, 9 400.
+
+38
+00:01:55,800 --> 00:01:59,370
+Ahorró casi setecientos árboles, y eligió el número sola.
+
+39
+00:01:59,490 --> 00:02:02,639
+Fíjate en la brecha: el entrenamiento sigue mejorando,
+
+40
+00:02:02,639 --> 00:02:05,380
+pero eso ya no sirve fuera de los datos vistos.
+
+41
+00:02:05,500 --> 00:02:07,951
+Una regla que no se negocia: el conjunto de
+
+42
+00:02:07,951 --> 00:02:10,630
+validación del early stopping nunca es el test.
+
+43
+00:02:10,750 --> 00:02:14,506
+Si usas el test para decidir cuándo parar, el test participó en el
+
+44
+00:02:14,506 --> 00:02:17,750
+entrenamiento, y tu estimación final deja de ser honesta.
+
+45
+00:02:17,870 --> 00:02:22,670
+En estos datos, la validación sale del entrenamiento, y el test queda intacto.
+
+46
+00:02:22,790 --> 00:02:26,535
+Y un detalle de scikit-learn: su Gradient Boosting entrena todos los
+
+47
+00:02:26,535 --> 00:02:30,170
+árboles que le pidas, salvo que actives su propia parada temprana.
+
+48
+00:02:30,290 --> 00:02:34,980
+Por defecto ese parámetro está apagado, así que no hay parada temprana automática.
+
+49
+00:02:35,100 --> 00:02:39,550
+La diapositiva quince resume los hiperparámetros que realmente mueven el resultado.
+
+50
+00:02:39,670 --> 00:02:42,010
+Capacidad: el número de árboles.
+
+51
+00:02:42,130 --> 00:02:43,750
+Paso: el learning_rate.
+
+52
+00:02:43,870 --> 00:02:46,640
+Árbol: la profundidad o el número de hojas.
+
+53
+00:02:46,760 --> 00:02:50,500
+Regularización: mínimos por hoja y la penalización L2.
+
+54
+00:02:50,620 --> 00:02:54,120
+Y aleatoriedad: submuestreo de filas y de columnas.
+
+55
+00:02:54,240 --> 00:02:57,505
+Y su consejo: ajusta con validación cruzada o con early
+
+56
+00:02:57,505 --> 00:03:00,710
+stopping, y conserva el test para la evaluación final.
+
+57
+00:03:00,830 --> 00:03:03,800
+El notebook de la clase ajusta con dos estrategias.
+
+58
+00:03:03,920 --> 00:03:09,172
+GridSearchCV, que prueba todas las combinaciones de una grilla: para AdaBoost,
+
+59
+00:03:09,172 --> 00:03:13,280
+dos valores de árboles por dos de tasa, cuatro combinaciones.
+
+60
+00:03:13,400 --> 00:03:17,910
+Y RandomizedSearchCV, que sortea combinaciones:
+
+61
+00:03:17,910 --> 00:03:21,460
+para XGBoost, seis de 1 728 posibles.
+
+62
+00:03:21,580 --> 00:03:25,320
+Las dos búsquedas usan solo el entrenamiento, con tres pliegues.
+
+63
+00:03:25,440 --> 00:03:26,770
+¿Y mejoraron en test?
+
+64
+00:03:26,890 --> 00:03:28,330
+Replicamos el notebook.
+
+65
+00:03:28,450 --> 00:03:35,600
+AdaBoost: AUC de 0.930 sin ajustar, 0.929 ajustado.
+
+66
+00:03:35,720 --> 00:03:41,400
+XGBoost: 0.937 sin ajustar, 0.929 ajustado.
+
+67
+00:03:41,520 --> 00:03:41,990
+Peor.
+
+68
+00:03:42,110 --> 00:03:46,411
+Con 227 pacientes y tres pliegues, las diferencias de la validación
+
+69
+00:03:46,411 --> 00:03:50,520
+cruzada son casi puro ruido: ajustar no garantiza ganar en test.
+
+70
+00:03:50,640 --> 00:03:55,784
+En Ames, en cambio, ajustar sí ayudó al Gradient Boosting: de 29 200
+
+71
+00:03:55,784 --> 00:04:00,550
+dólares a 23 900, porque la configuración de partida era débil.
+
+72
+00:04:00,670 --> 00:04:06,580
+Y a LightGBM casi no le cambió nada: de 25 800 a 25 900.
+
+73
+00:04:06,700 --> 00:04:11,980
+El error típico: elegir los hiperparámetros, o el momento de parar, mirando el test.
+
+74
+00:04:12,100 --> 00:04:16,810
+Parece inofensivo, pero cada decisión que tomas con el test lo contamina un poco.
+
+75
+00:04:16,930 --> 00:04:19,520
+El test se mira una sola vez, al final.
+
+76
+00:04:19,640 --> 00:04:20,860
+Piensa un segundo.
+
+77
+00:04:20,980 --> 00:04:29,350
+Paciencia dos, y la serie: 30, 25, 22, 21, 21.4, y luego 20.9.
+
+78
+00:04:29,470 --> 00:04:31,180
+¿Se detiene en la ronda seis?
+
+79
+00:04:31,900 --> 00:04:32,320
+No.
+
+80
+00:04:32,440 --> 00:04:34,890
+La ronda cinco no mejora: van una.
+
+81
+00:04:35,010 --> 00:04:38,670
+Pero la ronda seis baja a 20.9, un nuevo mínimo.
+
+82
+00:04:38,790 --> 00:04:41,960
+El contador vuelve a cero, y el entrenamiento sigue.
+
+83
+00:04:42,080 --> 00:04:44,670
+La paciencia cuenta rondas seguidas sin mejorar.
+
+84
+00:04:44,790 --> 00:04:48,380
+Para llevarte: early stopping mide la validación tras cada árbol y
+
+85
+00:04:48,380 --> 00:04:51,590
+para cuando deja de mejorar durante varias rondas seguidas.
+
+86
+00:04:51,710 --> 00:04:54,890
+La validación sale del entrenamiento, nunca del test.
+
+87
+00:04:55,010 --> 00:04:58,364
+Y ajustar hiperparámetros no garantiza ganar en test: con
+
+88
+00:04:58,364 --> 00:05:01,070
+pocos datos, las diferencias pueden ser ruido.
+
+89
+00:05:01,190 --> 00:05:03,834
+Siguiente parada: la comparación de los modelos
+
+90
+00:05:03,834 --> 00:05:06,140
+con los datos de la clase, y cómo elegir.

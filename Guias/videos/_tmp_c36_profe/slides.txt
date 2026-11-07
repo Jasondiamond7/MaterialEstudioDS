@@ -1,0 +1,349 @@
+######## Clase Boosting.pptx
+=== slide 1
+MODELOS DE
+BOOSTING
+De aprendices débiles a predicciones potentes
+Bastian Galasso Díaz
+=== slide 2
+Objetivos y ruta de la clase
+02
+Modelos de Boosting
+2/20
+Al terminar, podrás explicar cómo aprende cada familia y elegir una alternativa razonable.
+1
+Intuición
+Aprender de errores
+2
+Fundamentos
+AdaBoost y gradientes
+3
+Implementaciones
+XGBoost, LightGBM, CatBoost
+4
+Decisión
+Comparar y ajustar
+Pregunta guía
+¿Cómo equilibramos capacidad predictiva, velocidad, datos categóricos e interpretabilidad?
+=== slide 3
+La intuición de boosting
+03
+Modelos de Boosting
+3/20
+Muchos modelos simples se entrenan en secuencia y se suman para formar un predictor fuerte.
+Datos
+Árbol 1
+Errores 1
+Árbol 2
+Errores 2
+Árbol M
+F(x) = f₁(x) + ηf₂(x) + ··· + ηfₘ(x)
+η controla cuánto aporta cada nuevo modelo.
+=== slide 4
+Bagging y boosting resuelven problemas distintos
+04
+Modelos de Boosting
+4/20
+BAGGING
+Modelos en paralelo
+Cada modelo ve una muestra distinta
+Las predicciones se promedian o votan
+Objetivo típico: reducir varianza
+BOOSTING
+Modelos en secuencia
+Cada etapa usa el error acumulado
+Las contribuciones se suman
+Objetivo típico: reducir sesgo y error
+La secuencia hace a boosting más sensible a hiperparámetros, ruido y filtración de información.
+=== slide 5
+El ciclo general de boosting
+05
+Modelos de Boosting
+5/20
+1
+Inicializar
+Una predicción base
+2
+Medir error
+Pérdida o casos difíciles
+3
+Ajustar
+Un nuevo aprendiz
+4
+Actualizar
+Sumar su contribución
+5
+Detener
+M etapas o validación
+Repetir mientras la validación mejora
+La definición exacta de “error” separa AdaBoost de Gradient Boosting.
+=== slide 6
+AdaBoost: enfocar los casos difíciles
+06
+Modelos de Boosting
+6/20
+AdaBoost aumenta el peso de observaciones mal clasificadas y combina aprendices según su desempeño.
+Inicio
+Pesos iguales
+Árbol 1
+Falla en 3 casos
+Reponderar
+Esos casos pesan más
+Árbol 2
+Se concentra en ellos
+Voto final
+Peso según calidad
+Mayor error del árbol → menor influencia. Caso mal clasificado → mayor peso siguiente.
+Peso del modelo
+Error del modelo
+Actualización de pesos
+Modelo final
+=== slide 7
+=== slide 8
+AdaBoost: ventajas y limitaciones
+08
+Modelos de Boosting
+8/20
+VENTAJAS
+Intuición clara y pocos hiperparámetros
+Buen desempeño con aprendices muy simples
+No exige escalar variables para árboles
+Clasificación y regresión disponibles
+LIMITACIONES
+Sensible a ruido y etiquetas incorrectas
+Entrenamiento secuencial
+Menor flexibilidad que variantes modernas
+Úsalo como línea base fuerte cuando los datos están relativamente limpios.
+=== slide 9
+Gradient Boosting: optimizar una pérdida
+09
+Modelos de Boosting
+9/20
+Cada árbol aproxima la dirección que más reduce la función de pérdida actual.
+Fₘ(x) = Fₘ₋₁(x) + η · hₘ(x)
+Pérdida
+L(y, F)
+Gradiente negativo
+−∂L/∂F
+Nuevo árbol
+hₘ(x)
+Modelo
+actualizado
+Con error cuadrático, el gradiente negativo coincide con los residuos.
+=== slide 10
+Ejemplo: corregir residuos en regresión
+10
+Modelos de Boosting
+10/20
+Caso didáctico con pérdida cuadrática
+Obs.
+y
+F₀
+r₁ = y − F₀
+A
+12
+10
++2
+B
+7
+10
+−3
+C
+11
+10
++1
+D
+10
+10
+0
+Árbol 1
+Predice r₁
+η × corrección
+Nueva predicción
+F₁(x) = 10 + η · h₁(x)
+El siguiente árbol vuelve a estudiar lo que aún falta por explicar.
+=== slide 11
+Las tres perillas fundamentales
+11
+Modelos de Boosting
+11/20
+PÉRDIDA
+Define qué significa equivocarse
+Cuadrática, logística, absoluta
+TASA η
+Controla el tamaño de cada paso
+Menor η suele requerir más árboles
+COMPLEJIDAD
+Limita lo que aprende cada árbol
+Profundidad, hojas, muestras mínimas
+Más árboles + menor tasa de aprendizaje suele ser una combinación estable, pero aumenta el costo.
+=== slide 12
+XGBoost: boosting regularizado y escalable
+12
+Modelos de Boosting
+12/20
+XGBoost convierte Gradient Boosting en un sistema optimizado para datos tabulares y producción.
+XGBOOST
+Objetivo regularizado
+Gradientes de 1.er y 2.º orden
+Submuestreo de filas y columnas
+Tratamiento eficiente de dispersión
+Objetivo = pérdida de entrenamiento + penalización por complejidad
+=== slide 13
+LightGBM: eficiencia con histogramas
+13
+Modelos de Boosting
+13/20
+LightGBM busca entrenar rápido y escalar a muchas filas y variables.
+Valores continuos
+Bins del histograma
+Buscar cortes
+Árbol leaf-wise
+Histogramas
+Reducen memoria y costo de búsqueda
+Leaf-wise
+Expande la hoja con mayor ganancia
+GOSS
+Conserva gradientes grandes y muestrea pequeños
+EFB
+Agrupa variables dispersas casi excluyentes
+Riesgo: el crecimiento leaf-wise puede sobreajustar datos pequeños si no se limita.
+=== slide 14
+Cómo crecen los árboles
+15
+Modelos de Boosting
+15/20
+NIVEL POR NIVEL
+Expande un nivel completo
+Raíz
+L
+R
+LL
+LR
+RL
+RR
+HOJA POR HOJA
+Expande la hoja con mayor ganancia
+Raíz
+L
+R
+RL
+RR
+XGBoost suele crecer por nivel · LightGBM por hoja
+=== slide 15
+Hiperparámetros que realmente mueven el resultado
+16
+Modelos de Boosting
+16/20
+FUNCIÓN
+PARÁMETROS
+EFECTO
+Capacidad
+n_estimators / iterations
+Cantidad de etapas
+Paso
+learning_rate
+Aporte de cada etapa
+Árbol
+max_depth / num_leaves
+Complejidad e interacciones
+Regularización
+min_child_weight, min_data_in_leaf, l2
+Evitar hojas frágiles
+Aleatoriedad
+subsample, colsample
+Diversidad y menor sobreajuste
+Ajusta con validación cruzada o early stopping. Conserva el test para la evaluación final.
+=== slide 16
+Comparación de los cinco modelos
+17
+Modelos de Boosting
+17/20
+Modelo
+Sello distintivo
+Categorías
+Velocidad
+Riesgo principal
+AdaBoost
+Pondera casos difíciles
+Codificar
+Media
+Ruido y outliers
+Gradient Boosting
+Gradiente de una pérdida
+Codificar
+Media-baja
+Ajuste sensible
+XGBoost
+Regularización y sistema escalable
+Depende de implementación
+Alta
+Complejidad de tuning
+LightGBM
+Histogramas y leaf-wise
+Nativas
+Muy alta
+Overfit en datos pequeños
+La mejor opción depende del tamaño, las categorías, el presupuesto de cómputo y la validación.
+=== slide 17
+Aplicaciones en datos tabulares
+18
+Modelos de Boosting
+18/20
+1
+RIESGO
+Incumplimiento, fraude, churn
+2
+DEMANDA
+Ventas, energía, inventario
+3
+SALUD
+Riesgo clínico y priorización
+4
+MARKETING
+Propensión y respuesta
+5
+OPERACIONES
+Fallas y mantenimiento
+6
+PRECIOS
+Valoración y revenue
+Boosting destaca cuando hay relaciones no lineales, interacciones y datos estructurados heterogéneos.
+=== slide 18
+Guía práctica de elección
+19
+Modelos de Boosting
+19/20
+¿Qué domina
+tu problema?
+Línea base simple
+AdaBoost
+Control didáctico
+Gradient Boosting
+Rendimiento general
+XGBoost
+Gran escala
+LightGBM
+Muchas categorías
+CatBoost
+Valida la hipótesis
+Misma partición
+Métrica adecuada
+Tiempo y memoria
+Estabilidad
+=== slide 19
+Síntesis y comprobación
+20
+Modelos de Boosting
+20/20
+Tres ideas para llevar
+1
+Boosting aprende de forma secuencial.
+2
+La pérdida define qué corrige cada etapa.
+3
+Cada biblioteca prioriza un problema distinto.
+Preguntas de repaso
+¿Qué cambia entre AdaBoost y Gradient Boosting?
+¿Por qué learning_rate y número de árboles interactúan?
+¿Cuándo priorizarías LightGBM?
+Siguiente paso: comparar los cinco modelos bajo el mismo pipeline, validación y presupuesto.

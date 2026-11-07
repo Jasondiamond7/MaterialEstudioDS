@@ -1,0 +1,347 @@
+1
+00:00:00,250 --> 00:00:02,670
+Sexta parada: el Random Forest.
+
+2
+00:00:02,790 --> 00:00:05,781
+Es un bagging con una sola idea extra, y esa idea es
+
+3
+00:00:05,781 --> 00:00:08,370
+la que baja la correlación entre los árboles.
+
+4
+00:00:08,490 --> 00:00:11,598
+Recuerda lo que vimos en Heart: en casi la mitad de los
+
+5
+00:00:11,598 --> 00:00:14,310
+árboles bootstrap, la primera pregunta era Thal.
+
+6
+00:00:14,430 --> 00:00:17,955
+Cuando una variable es tan fuerte, casi todos los árboles del
+
+7
+00:00:17,955 --> 00:00:21,480
+bagging empiezan igual, se parecen, y su correlación ro sube.
+
+8
+00:00:21,600 --> 00:00:23,130
+Justo lo que no queremos.
+
+9
+00:00:23,250 --> 00:00:25,750
+Piensa en un equipo de fútbol con una estrella.
+
+10
+00:00:25,870 --> 00:00:28,558
+Si la estrella juega siempre, todas las jugadas
+
+11
+00:00:28,558 --> 00:00:30,960
+pasan por ella, y el equipo es predecible.
+
+12
+00:00:31,080 --> 00:00:34,336
+Ahora el técnico, en cada jugada, sienta al azar a
+
+13
+00:00:34,336 --> 00:00:36,940
+varios jugadores, a veces a la estrella.
+
+14
+00:00:37,060 --> 00:00:41,620
+Los demás tienen que inventar otras jugadas, y el equipo aprende caminos distintos.
+
+15
+00:00:41,740 --> 00:00:45,444
+La definición de la diapositiva diez: Random Forest es igual a
+
+16
+00:00:45,444 --> 00:00:48,850
+bagging de árboles, más selección aleatoria de variables.
+
+17
+00:00:48,970 --> 00:00:53,430
+Filas: cada árbol recibe una muestra bootstrap, igual que en bagging.
+
+18
+00:00:53,550 --> 00:00:57,750
+Variables: cada división evalúa solo un subconjunto aleatorio.
+
+19
+00:00:57,870 --> 00:01:01,000
+Resultado: los árboles se parecen menos entre sí.
+
+20
+00:01:01,120 --> 00:01:04,030
+Veámoslo en un nodo, con la diapositiva once.
+
+21
+00:01:04,150 --> 00:01:07,835
+Hay ocho variables disponibles: edad, ingreso,
+
+22
+00:01:07,835 --> 00:01:11,280
+zona, canal, saldo, uso, antigüedad y mora.
+
+23
+00:01:11,400 --> 00:01:14,869
+Con mtry igual a tres, en este nodo se sortean
+
+24
+00:01:14,869 --> 00:01:17,810
+solo tres: ingreso, saldo y antigüedad.
+
+25
+00:01:17,930 --> 00:01:23,660
+El mejor corte se busca solo dentro de esas tres: y resulta saldo menor que 420.
+
+26
+00:01:23,780 --> 00:01:27,363
+Aunque otra variable excluida, digamos edad, hubiera dado un
+
+27
+00:01:27,363 --> 00:01:30,290
+corte mejor en este nodo, aquí no puede competir.
+
+28
+00:01:30,410 --> 00:01:33,660
+Y en el siguiente nodo se sortean otras tres, de nuevo.
+
+29
+00:01:33,780 --> 00:01:38,008
+Ese detalle es clave, y la nota de la diapositiva diez lo subraya: la
+
+30
+00:01:38,008 --> 00:01:41,500
+selección ocurre en cada nodo, no una sola vez por árbol.
+
+31
+00:01:41,620 --> 00:01:45,065
+Si sortearas las variables una vez por árbol, un árbol al que le
+
+32
+00:01:45,065 --> 00:01:48,080
+tocaron variables malas sería malo en todo su recorrido.
+
+33
+00:01:48,200 --> 00:01:50,610
+Eso se llama random subspace.
+
+34
+00:01:50,730 --> 00:01:55,852
+En Ames, con el 10 % de las columnas, sortear por árbol da un
+
+35
+00:01:55,852 --> 00:02:00,050
+error de 27 100 dólares; sortear por nodo, 22 500.
+
+36
+00:02:00,170 --> 00:02:03,170
+Un cálculo a mano para sentir el efecto, del apunte.
+
+37
+00:02:03,290 --> 00:02:06,200
+Diez variables, y cuatro candidatas por nodo.
+
+38
+00:02:06,320 --> 00:02:09,947
+La probabilidad de que la variable dominante esté entre las
+
+39
+00:02:09,947 --> 00:02:12,960
+candidatas de un nodo es cuatro sobre diez: 0.40.
+
+40
+00:02:13,080 --> 00:02:17,410
+O sea, en el 60 % de los nodos ni siquiera puede competir.
+
+41
+00:02:17,530 --> 00:02:20,000
+¿Y que falte en la raíz de varios árboles?
+
+42
+00:02:20,120 --> 00:02:25,020
+En tres árboles seguidos: 0.6 al cubo, 0.216.
+
+43
+00:02:25,140 --> 00:02:30,510
+En diez árboles seguidos: 0.6 elevado a diez, 0.006.
+
+44
+00:02:30,630 --> 00:02:34,896
+La dominante sigue mandando en muchos árboles, pero ya no en todos: los
+
+45
+00:02:34,896 --> 00:02:38,380
+demás aprenden de otras variables, y se vuelven distintos.
+
+46
+00:02:38,500 --> 00:02:40,150
+¿Cuántas candidatas se usan?
+
+47
+00:02:40,270 --> 00:02:43,000
+En scikit-learn se controla con max_features.
+
+48
+00:02:43,120 --> 00:02:47,820
+Para clasificar, el valor de partida es la raíz cuadrada del número de variables.
+
+49
+00:02:47,940 --> 00:02:51,109
+Ojo con un detalle: en Heart hay 13 variables,
+
+50
+00:02:51,109 --> 00:02:54,140
+pero después del one-hot quedan 18 columnas.
+
+51
+00:02:54,260 --> 00:02:58,338
+La raíz de 18 es 4.24, y scikit-learn redondea hacia
+
+52
+00:02:58,338 --> 00:03:01,710
+abajo: cuatro candidatas por nodo, no tres.
+
+53
+00:03:01,830 --> 00:03:07,195
+Y si max_features vale el total de variables, todas las variables compiten en todos
+
+54
+00:03:07,195 --> 00:03:11,590
+los nodos: ese Random Forest es, exactamente, un bagging de árboles.
+
+55
+00:03:11,710 --> 00:03:13,880
+Guarda este dato para el próximo video.
+
+56
+00:03:14,000 --> 00:03:16,650
+La diapositiva doce lo resume en una tabla.
+
+57
+00:03:16,770 --> 00:03:19,570
+Muestreo de filas: bootstrap en los dos.
+
+58
+00:03:19,690 --> 00:03:22,430
+Agregación: voto o promedio en los dos.
+
+59
+00:03:22,550 --> 00:03:25,570
+OOB: disponible en ambos.
+
+60
+00:03:25,690 --> 00:03:29,141
+La única diferencia está en las variables por nodo: todas en
+
+61
+00:03:29,141 --> 00:03:31,960
+bagging, un subconjunto al azar en Random Forest.
+
+62
+00:03:32,080 --> 00:03:35,312
+Y por eso la correlación entre árboles: puede mantenerse
+
+63
+00:03:35,312 --> 00:03:38,140
+alta en bagging, tiende a bajar en Random Forest.
+
+64
+00:03:38,260 --> 00:03:39,120
+¿Tiene costo?
+
+65
+00:03:39,240 --> 00:03:44,040
+Sí: cada árbol es un poco peor, porque a veces no puede usar la mejor variable.
+
+66
+00:03:44,160 --> 00:03:49,560
+En Ames, sigma sube de 36 600 a 37 900 dólares.
+
+67
+00:03:49,680 --> 00:03:55,730
+Pero ro baja de 0.049 a 0.024, y como vimos, el promedio gana.
+
+68
+00:03:55,850 --> 00:03:59,630
+Un poco más de sesgo por árbol, a cambio de mucha menos varianza.
+
+69
+00:03:59,750 --> 00:04:04,818
+El error típico: imaginar que cada árbol recibe un grupo fijo de variables, por
+
+70
+00:04:04,818 --> 00:04:09,630
+ejemplo el árbol uno las variables uno, cinco y ocho, y el árbol dos otras.
+
+71
+00:04:09,750 --> 00:04:10,900
+Eso es por árbol.
+
+72
+00:04:11,020 --> 00:04:14,985
+El Random Forest sortea en cada nodo, y por eso un mismo árbol termina
+
+73
+00:04:14,985 --> 00:04:18,440
+usando muchas variables distintas a lo largo de su recorrido.
+
+74
+00:04:18,560 --> 00:04:19,780
+Piensa un segundo.
+
+75
+00:04:19,900 --> 00:04:23,388
+Si con menos candidatas los árboles se parecen menos, ¿por qué
+
+76
+00:04:23,388 --> 00:04:26,370
+no usar siempre una sola variable candidata por nodo?
+
+77
+00:04:27,090 --> 00:04:31,455
+Porque cada árbol se vuelve demasiado malo: con una sola candidata, el
+
+78
+00:04:31,455 --> 00:04:35,010
+corte se hace sobre una variable al azar, sea buena o no.
+
+79
+00:04:35,130 --> 00:04:37,670
+Sigma sube tanto que se come la ganancia en ro.
+
+80
+00:04:37,790 --> 00:04:41,140
+Hay un punto intermedio, y no se adivina: se valida.
+
+81
+00:04:41,260 --> 00:04:43,250
+Eso es justo el próximo video.
+
+82
+00:04:43,370 --> 00:04:46,660
+Para llevarte: Random Forest es bagging de árboles más un
+
+83
+00:04:46,660 --> 00:04:49,200
+sorteo de variables candidatas en cada nodo.
+
+84
+00:04:49,320 --> 00:04:53,810
+Eso baja la correlación entre árboles, a cambio de árboles un poco peores.
+
+85
+00:04:53,930 --> 00:04:57,880
+Y con max_features igual al total de variables, vuelves al bagging.
+
+86
+00:04:58,000 --> 00:05:01,349
+Siguiente parada: max_features en la práctica, con datos
+
+87
+00:05:01,349 --> 00:05:04,100
+reales, y un error en el notebook de la clase.

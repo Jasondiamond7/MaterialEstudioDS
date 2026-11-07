@@ -1,0 +1,335 @@
+1
+00:00:00,250 --> 00:00:02,710
+Décima parada: la comparación final.
+
+2
+00:00:02,830 --> 00:00:08,030
+Árbol, regresión logística, bagging y Random Forest, medidos con la misma vara.
+
+3
+00:00:08,150 --> 00:00:10,110
+El resultado tiene una sorpresa.
+
+4
+00:00:10,230 --> 00:00:15,130
+Después de toda la clase, la pregunta obvia: ¿el Random Forest le gana a todo?
+
+5
+00:00:15,250 --> 00:00:19,620
+Vamos a medirlo con honestidad, y la respuesta va a depender de los datos.
+
+6
+00:00:19,740 --> 00:00:22,090
+Una advertencia antes de mirar números.
+
+7
+00:00:22,210 --> 00:00:25,270
+El test de Heart tiene solo 76 pacientes.
+
+8
+00:00:25,390 --> 00:00:29,395
+Comparar modelos con una sola partición tan chica es como decidir quién es el
+
+9
+00:00:29,395 --> 00:00:32,880
+mejor atleta con una sola carrera, con viento a favor para algunos.
+
+10
+00:00:33,000 --> 00:00:36,035
+Por eso usamos validación cruzada repetida:
+
+11
+00:00:36,035 --> 00:00:39,070
+cinco bloques, tres veces, quince carreras.
+
+12
+00:00:39,190 --> 00:00:43,790
+Heart, AUC con validación cruzada cinco por tres.
+
+13
+00:00:43,910 --> 00:00:47,020
+El árbol solo: 0.753.
+
+14
+00:00:47,140 --> 00:00:50,450
+El bagging de árboles: 0.893.
+
+15
+00:00:50,570 --> 00:00:53,890
+El Random Forest: 0.906.
+
+16
+00:00:54,010 --> 00:00:57,550
+Y la regresión logística: 0.913.
+
+17
+00:00:57,670 --> 00:00:59,940
+La más simple de todas queda arriba.
+
+18
+00:01:00,060 --> 00:01:01,340
+¿Gana la logística?
+
+19
+00:01:01,460 --> 00:01:05,020
+Mira los desvíos: cerca de 0.035.
+
+20
+00:01:05,140 --> 00:01:11,440
+Entre 0.906 y 0.913 hay menos de una centésima: es un empate técnico.
+
+21
+00:01:11,560 --> 00:01:15,448
+Lo que sí es claro: el bagging y el Random Forest
+
+22
+00:01:15,448 --> 00:01:18,860
+rescatan al árbol, de 0.753 a cerca de 0.9.
+
+23
+00:01:18,980 --> 00:01:22,184
+Y en Heart, con 303 pacientes y relaciones casi
+
+24
+00:01:22,184 --> 00:01:24,910
+lineales, la logística ya era muy buena.
+
+25
+00:01:25,030 --> 00:01:28,197
+Ames es otro mundo: casi tres mil casas, ochenta
+
+26
+00:01:28,197 --> 00:01:31,430
+variables, y relaciones no lineales con umbrales.
+
+27
+00:01:31,550 --> 00:01:35,900
+Error de prueba del árbol solo: 45 800 dólares.
+
+28
+00:01:36,020 --> 00:01:38,470
+Bagging: 28 900.
+
+29
+00:01:38,590 --> 00:01:42,390
+Random Forest con un tercio de las variables: 27 000.
+
+30
+00:01:42,510 --> 00:01:44,470
+Aquí el bosque gana con claridad.
+
+31
+00:01:44,590 --> 00:01:47,813
+Y un detalle que asusta a muchos: en las casas de
+
+32
+00:01:47,813 --> 00:01:51,760
+entrenamiento, el error del bosque es de solo 9 700 dólares.
+
+33
+00:01:51,880 --> 00:01:53,990
+Casi tres veces menos que en la prueba.
+
+34
+00:01:54,110 --> 00:01:55,070
+¿Sobreajuste?
+
+35
+00:01:55,190 --> 00:01:58,070
+No es un problema mientras el error de prueba sea el
+
+36
+00:01:58,070 --> 00:02:00,340
+menor de todas las alternativas, y lo es.
+
+37
+00:02:00,460 --> 00:02:02,610
+¿Y qué dice el notebook del profesor?
+
+38
+00:02:02,730 --> 00:02:04,550
+Lo replicamos celda por celda.
+
+39
+00:02:04,670 --> 00:02:10,738
+En Heart, con 120 árboles, el bagging base tiene un AUC de
+
+40
+00:02:10,738 --> 00:02:15,760
+prueba de 0.905, y el Random Forest base, 0.928.
+
+41
+00:02:15,880 --> 00:02:20,660
+Tras la búsqueda, el Random Forest llega a 0.941 en la prueba.
+
+42
+00:02:20,780 --> 00:02:23,500
+Pero ojo: son 76 pacientes.
+
+43
+00:02:23,620 --> 00:02:27,960
+Con otra semilla, el orden puede cambiar, y el propio notebook lo advierte.
+
+44
+00:02:28,080 --> 00:02:32,762
+La conclusión del notebook lo dice mejor que nadie: el ganador debe justificarse con
+
+45
+00:02:32,762 --> 00:02:36,830
+validación cruzada y desempeño en prueba, no por el nombre del algoritmo.
+
+46
+00:02:36,950 --> 00:02:41,370
+El flujo de trabajo que propone la diapositiva diecisiete tiene cuatro pasos.
+
+47
+00:02:41,490 --> 00:02:44,110
+Uno, separar la prueba, antes de todo.
+
+48
+00:02:44,230 --> 00:02:46,210
+Dos, definir la métrica.
+
+49
+00:02:46,330 --> 00:02:50,580
+Tres, ajustar con validación cruzada u OOB.
+
+50
+00:02:50,700 --> 00:02:53,100
+Cuatro, evaluar una vez y explicar.
+
+51
+00:02:53,220 --> 00:02:58,369
+Y lo que hay que evitar: filtrar información preparando los datos antes de separar; elegir
+
+52
+00:02:58,369 --> 00:03:03,518
+la exactitud cuando la clase positiva es muy rara; interpretar la importancia por impureza
+
+53
+00:03:03,518 --> 00:03:06,950
+como causalidad; y ajustar mirando una y otra vez la prueba.
+
+54
+00:03:07,070 --> 00:03:09,893
+Como dice la nota de la diapositiva: el modelo no
+
+55
+00:03:09,893 --> 00:03:12,370
+corrige un diseño de evaluación defectuoso.
+
+56
+00:03:12,490 --> 00:03:13,790
+¿Dónde encaja mejor?
+
+57
+00:03:13,910 --> 00:03:17,390
+La diapositiva dieciséis da cuatro familias de aplicaciones.
+
+58
+00:03:17,510 --> 00:03:18,710
+Riesgo y fraude.
+
+59
+00:03:18,830 --> 00:03:19,490
+Salud.
+
+60
+00:03:19,610 --> 00:03:22,140
+Operaciones, como fallas o demanda.
+
+61
+00:03:22,260 --> 00:03:24,920
+Y marketing, como respuesta o abandono.
+
+62
+00:03:25,040 --> 00:03:28,344
+Lo común: datos tabulares, relaciones complejas, y
+
+63
+00:03:28,344 --> 00:03:31,120
+prioridad alta en el desempeño predictivo.
+
+64
+00:03:31,240 --> 00:03:35,560
+El error típico: vender el Random Forest como solución universal.
+
+65
+00:03:35,680 --> 00:03:40,460
+La nota de la diapositiva quince lo dice explícitamente: evitar venderlo así.
+
+66
+00:03:40,580 --> 00:03:43,223
+En Heart empató con una logística, que además se
+
+67
+00:03:43,223 --> 00:03:45,590
+puede explicar coeficiente por coeficiente.
+
+68
+00:03:45,710 --> 00:03:50,210
+Primero define para qué es el modelo; después compara números con la misma vara.
+
+69
+00:03:50,330 --> 00:03:51,550
+Piensa un segundo.
+
+70
+00:03:51,670 --> 00:03:55,030
+En Heart, la logística y el Random Forest empatan.
+
+71
+00:03:55,150 --> 00:03:57,980
+Tienes que explicarle el modelo a un equipo médico.
+
+72
+00:03:58,100 --> 00:03:58,940
+¿Cuál usas?
+
+73
+00:03:59,660 --> 00:04:00,730
+La logística.
+
+74
+00:04:00,850 --> 00:04:04,622
+Con el mismo desempeño, gana el modelo que se puede explicar: cada
+
+75
+00:04:04,622 --> 00:04:07,880
+coeficiente dice cómo cambia el riesgo con cada variable.
+
+76
+00:04:08,000 --> 00:04:10,926
+El bosque se reserva para cuando su ventaja es clara,
+
+77
+00:04:10,926 --> 00:04:13,410
+como en Ames, o cuando solo importa predecir.
+
+78
+00:04:13,530 --> 00:04:20,109
+Para llevarte: bagging y Random Forest rescatan al árbol: en Heart, de 0.753
+
+79
+00:04:20,109 --> 00:04:25,390
+a cerca de 0.9; en Ames, de 45 800 a 27 000 dólares de error.
+
+80
+00:04:25,510 --> 00:04:29,308
+Contra otros modelos, el ganador depende de los datos: en
+
+81
+00:04:29,308 --> 00:04:33,040
+Heart, empate con la logística; en Ames, gana el bosque.
+
+82
+00:04:33,160 --> 00:04:36,670
+Y se decide con validación cruzada y prueba, no por el nombre.
+
+83
+00:04:36,790 --> 00:04:39,796
+Última parada: el repaso final de la clase, con las
+
+84
+00:04:39,796 --> 00:04:42,920
+preguntas de la diapositiva dieciocho y un checklist.

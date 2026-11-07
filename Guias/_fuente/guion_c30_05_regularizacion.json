@@ -1,0 +1,3839 @@
+{
+ "clase": "Clase 30",
+ "titulo": "Regularización: Ridge, Lasso y estandarizar",
+ "cabecera": "Clase 30  ·  Regularización: Ridge, Lasso y estandarizar",
+ "profesora": "Prof. Laura Sánchez",
+ "voz": "es-MX-DaliaNeural",
+ "rate": "+0%",
+ "fps": 25,
+ "beats": [
+  {
+   "seccion": "Introducción",
+   "say": "Regularización. Ridge, Lasso, y por qué hay que estandarizar. Es la herramienta para frenar a los modelos que memorizan.",
+   "acciones": [
+    {
+     "id": "t_fondo",
+     "tipo": "caja",
+     "x": 960,
+     "y": 540,
+     "w": 1920,
+     "h": 1080,
+     "radio": 0,
+     "relleno": "navy",
+     "entrada": "ninguna"
+    },
+    {
+     "id": "t_franja",
+     "tipo": "caja",
+     "x": 12,
+     "y": 540,
+     "w": 24,
+     "h": 1080,
+     "radio": 0,
+     "relleno": "teal",
+     "entrada": "ninguna"
+    },
+    {
+     "id": "t_clase",
+     "tipo": "texto",
+     "texto": "CLASE 30  ·  PREPARACIÓN PARA MACHINE LEARNING",
+     "x": 140,
+     "y": 330,
+     "ancla": "lm",
+     "tam": 40,
+     "peso": "b",
+     "color": "#96D6DC",
+     "entrada": "subir"
+    },
+    {
+     "id": "t_tit",
+     "tipo": "texto",
+     "texto": "Regularización: Ridge, Lasso y estandarizar",
+     "x": 140,
+     "y": 450,
+     "ancla": "lm",
+     "tam": 84,
+     "peso": "b",
+     "color": "blanco",
+     "entrada": "subir",
+     "t": 0.1
+    },
+    {
+     "id": "t_lin",
+     "tipo": "caja",
+     "x0": 140,
+     "y0": 540,
+     "x1": 420,
+     "y1": 548,
+     "radio": 0,
+     "relleno": "teal",
+     "desde": {
+      "x1": 140
+     },
+     "t": 0.2
+    },
+    {
+     "id": "t_sub",
+     "tipo": "texto",
+     "texto": "Cómo frenar a un modelo demasiado complejo",
+     "x": 140,
+     "y": 610,
+     "ancla": "lm",
+     "tam": 46,
+     "color": "#E2EAF4",
+     "entrada": "subir",
+     "t": 0.25
+    },
+    {
+     "id": "t_pie",
+     "tipo": "texto",
+     "texto": "Diplomado Data Science UC 2026  ·  Prof. Laura Sánchez",
+     "x": 140,
+     "y": 960,
+     "ancla": "lm",
+     "tam": 32,
+     "color": "#96AAC8",
+     "t": 0.3
+    }
+   ]
+  },
+  {
+   "seccion": "1. La idea: castigar la complejidad",
+   "say": "Te acuerdas del sobreajuste: [[a]]un modelo que memoriza hasta el ruido de los datos. [[b]]¿Cómo lo frenamos?",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "grafico",
+     "x0": 380,
+     "y0": 240,
+     "x1": 1540,
+     "y1": 880,
+     "xmin": 0,
+     "xmax": 11,
+     "ymin": 0.2,
+     "ymax": 1.0,
+     "series": [
+      {
+       "xs": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+       ],
+       "ys": [
+        0.42,
+        0.33,
+        0.55,
+        0.47,
+        0.66,
+        0.52,
+        0.74,
+        0.69,
+        0.62,
+        0.86
+       ],
+       "color": "tinta",
+       "linea": false,
+       "marcadores": 13,
+       "revela": 1
+      },
+      {
+       "xs": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+       ],
+       "ys": [
+        0.42,
+        0.33,
+        0.55,
+        0.47,
+        0.66,
+        0.52,
+        0.74,
+        0.69,
+        0.62,
+        0.86
+       ],
+       "color": "rojo",
+       "suave": true,
+       "grosor": 6,
+       "revela": 0
+      }
+     ],
+     "rejilla": false,
+     "id": "g0",
+     "entrada": "fade",
+     "t": 0.2,
+     "dur": 0.7
+    },
+    {
+     "series.1.revela": 1,
+     "id": "g0",
+     "en": "a",
+     "dur": 2.4,
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "memoriza el ruido",
+     "x": 960,
+     "y": 300,
+     "tam": 48,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e1",
+     "entrada": "pop",
+     "en": "a",
+     "t": 1.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "¿cómo lo frenamos?",
+     "x": 960,
+     "y": 980,
+     "tam": 56,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e2",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "La idea se parece a un impuesto. [[a]]Al error del modelo le sumamos una multa, [[b]]que crece cuando los coeficientes son grandes.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x": 430,
+     "y": 480,
+     "w": 520,
+     "h": 260,
+     "radio": 32,
+     "relleno": "violetaclaro",
+     "borde": "violeta",
+     "grosor": 5,
+     "id": "e3",
+     "entrada": "subir",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "error del modelo",
+     "x": 430,
+     "y": 480,
+     "tam": 50,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e4",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "+",
+     "x": 800,
+     "y": 480,
+     "tam": 110,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e5",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "caja",
+     "x": 1170,
+     "y": 480,
+     "w": 520,
+     "h": 260,
+     "radio": 32,
+     "relleno": "ambarclaro",
+     "borde": "ambar",
+     "grosor": 5,
+     "id": "e6",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "multa",
+     "x": 1170,
+     "y": 440,
+     "tam": 60,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e7",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "por coeficientes grandes",
+     "x": 1170,
+     "y": 530,
+     "tam": 34,
+     "peso": "sb",
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e8",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "regularizar = castigar la complejidad",
+     "x": 960,
+     "y": 800,
+     "tam": 56,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e9",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.6
+    }
+   ]
+  },
+  {
+   "say": "¿Y qué es un coeficiente? [[a]]Es el número que le dice al modelo cuánto pesa cada variable. Por ejemplo, cuánto sube el precio por cada metro cuadrado.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "precio  =",
+     "x": 280,
+     "y": 480,
+     "tam": 64,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "lm",
+     "id": "e10",
+     "entrada": "pop",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "β₁",
+     "x": 560,
+     "y": 480,
+     "tam": 70,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e11",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "× superficie",
+     "x": 760,
+     "y": 480,
+     "tam": 56,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "lm",
+     "id": "e12",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "+",
+     "x": 1100,
+     "y": 480,
+     "tam": 60,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e13",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "β₂",
+     "x": 1220,
+     "y": 480,
+     "tam": 70,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e14",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "× habitaciones   + …",
+     "x": 1400,
+     "y": 480,
+     "tam": 50,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "lm",
+     "id": "e15",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.6
+    },
+    {
+     "tipo": "texto",
+     "texto": "coeficiente = peso de cada variable",
+     "x": 960,
+     "y": 750,
+     "tam": 50,
+     "peso": "sb",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e16",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.9
+    }
+   ]
+  },
+  {
+   "seccion": "2. Ridge y Lasso en las viviendas",
+   "say": "Veámoslo con los datos de la clase. [[a]]Predecimos el precio de las viviendas con la superficie, las habitaciones y la antigüedad. [[b]]Y le agregamos una columna de ruido aleatorio, que no tiene nada que ver con el precio.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "superficie",
+     "x": 330,
+     "y": 450,
+     "tam": 52,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e17",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "habitaciones",
+     "x": 750,
+     "y": 450,
+     "tam": 52,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e18",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.25
+    },
+    {
+     "tipo": "texto",
+     "texto": "antigüedad",
+     "x": 1170,
+     "y": 450,
+     "tam": 52,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e19",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "ruido aleatorio",
+     "x": 1590,
+     "y": 450,
+     "tam": 52,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e20",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "sin relación con el precio",
+     "x": 1590,
+     "y": 560,
+     "tam": 36,
+     "peso": "sb",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e21",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.4
+    }
+   ]
+  },
+  {
+   "say": "Primero, sin regularizar. [[a]]La superficie tiene un coeficiente de cincuenta y seis coma cuatro. [[b]]El ruido, apenas menos cero coma cuatro.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "linea",
+     "x0": 160,
+     "y0": 760,
+     "x1": 1800,
+     "y1": 760,
+     "color": "tinta",
+     "grosor": 4,
+     "punta": false,
+     "guion": false,
+     "id": "bbase",
+     "entrada": "ninguna",
+     "dur": 0.5,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "superficie",
+     "x": 330,
+     "y": 880,
+     "tam": 40,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "bn0",
+     "entrada": "pop",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "habitaciones",
+     "x": 760,
+     "y": 880,
+     "tam": 40,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "bn1",
+     "entrada": "pop",
+     "t": 0.30000000000000004
+    },
+    {
+     "tipo": "texto",
+     "texto": "antigüedad",
+     "x": 1190,
+     "y": 880,
+     "tam": 40,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "bn2",
+     "entrada": "pop",
+     "t": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "ruido",
+     "x": 1620,
+     "y": 880,
+     "tam": 40,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "bn3",
+     "entrada": "pop",
+     "t": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x0": 188,
+     "y0": 410.3076,
+     "x1": 272,
+     "y1": 760,
+     "radio": 6,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "b_sin0",
+     "en": "a",
+     "dur": 0.6,
+     "desde": {
+      "y0": 760
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "56.4",
+     "x": 230,
+     "y": 374.3076,
+     "tam": 34,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "l_sin0",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.6
+    },
+    {
+     "tipo": "caja",
+     "x0": 618,
+     "y0": 685.9596,
+     "x1": 702,
+     "y1": 760,
+     "radio": 6,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "b_sin1",
+     "en": "a",
+     "t": 0.12,
+     "dur": 0.6,
+     "desde": {
+      "y0": 760
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1048,
+     "y0": 760,
+     "x1": 1132,
+     "y1": 834.9084,
+     "radio": 6,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "b_sin2",
+     "en": "a",
+     "t": 0.24,
+     "dur": 0.6,
+     "desde": {
+      "y1": 760
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1478,
+     "y0": 760,
+     "x1": 1562,
+     "y1": 763,
+     "radio": 6,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "b_sin3",
+     "en": "a",
+     "t": 0.36,
+     "dur": 0.6,
+     "desde": {
+      "y1": 760
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "−0.40",
+     "x": 1520,
+     "y": 720,
+     "tam": 34,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "l_sin3",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.9
+    },
+    {
+     "tipo": "texto",
+     "texto": "sin regularizar",
+     "x": 960,
+     "y": 190,
+     "tam": 54,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "ttl",
+     "entrada": "subir",
+     "t": 0.2
+    }
+   ]
+  },
+  {
+   "say": "Con Ridge, [[a]]la superficie baja a cincuenta y tres coma ocho. [[b]]Y el ruido queda en menos cero coma cuarenta y cuatro: achicado, pero no es cero.",
+   "acciones": [
+    {
+     "tipo": "caja",
+     "x0": 288,
+     "y0": 426.43379999999996,
+     "x1": 372,
+     "y1": 760,
+     "radio": 6,
+     "relleno": "azul",
+     "borde": null,
+     "grosor": 0,
+     "id": "b_ridge0",
+     "en": "a",
+     "dur": 0.6,
+     "desde": {
+      "y0": 760
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "53.8",
+     "x": 330,
+     "y": 390.43379999999996,
+     "tam": 34,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "l_ridge0",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.6
+    },
+    {
+     "tipo": "caja",
+     "x0": 718,
+     "y0": 689.4502,
+     "x1": 802,
+     "y1": 760,
+     "radio": 6,
+     "relleno": "azul",
+     "borde": null,
+     "grosor": 0,
+     "id": "b_ridge1",
+     "en": "a",
+     "t": 0.12,
+     "dur": 0.6,
+     "desde": {
+      "y0": 760
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1148,
+     "y0": 760,
+     "x1": 1232,
+     "y1": 830.1158,
+     "radio": 6,
+     "relleno": "azul",
+     "borde": null,
+     "grosor": 0,
+     "id": "b_ridge2",
+     "en": "a",
+     "t": 0.24,
+     "dur": 0.6,
+     "desde": {
+      "y1": 760
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1578,
+     "y0": 760,
+     "x1": 1662,
+     "y1": 763,
+     "radio": 6,
+     "relleno": "azul",
+     "borde": null,
+     "grosor": 0,
+     "id": "b_ridge3",
+     "en": "a",
+     "t": 0.36,
+     "dur": 0.6,
+     "desde": {
+      "y1": 760
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "−0.44",
+     "x": 1620,
+     "y": 720,
+     "tam": 34,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "l_ridge3",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.9
+    },
+    {
+     "alfa": 0.35,
+     "id": "l_sin0",
+     "en": "a",
+     "dur": 0.3
+    },
+    {
+     "alfa": 0.35,
+     "id": "l_sin3",
+     "en": "a",
+     "dur": 0.3
+    },
+    {
+     "texto": "Ridge",
+     "color": "azul",
+     "id": "ttl",
+     "en": "a"
+    },
+    {
+     "tipo": "anillo",
+     "x": 1620,
+     "y": 730,
+     "w": 260,
+     "h": 150,
+     "radio": 30,
+     "color": "ambar",
+     "grosor": 6,
+     "pulso": true,
+     "id": "rr",
+     "entrada": "fade",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "Con Lasso, [[a]]la superficie queda en cincuenta y cuatro coma tres. [[b]]¿Y el ruido? Exactamente cero. [[c]]Lasso la descartó.",
+   "acciones": [
+    {
+     "quitar": [
+      "rr"
+     ],
+     "dur": 0.2
+    },
+    {
+     "tipo": "caja",
+     "x0": 388,
+     "y0": 423.2718,
+     "x1": 472,
+     "y1": 760,
+     "radio": 6,
+     "relleno": "violeta",
+     "borde": null,
+     "grosor": 0,
+     "id": "b_lasso0",
+     "en": "a",
+     "dur": 0.6,
+     "desde": {
+      "y0": 760
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "54.3",
+     "x": 430,
+     "y": 387.2718,
+     "tam": 34,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "l_lasso0",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.6
+    },
+    {
+     "tipo": "caja",
+     "x0": 818,
+     "y0": 699.8104,
+     "x1": 902,
+     "y1": 760,
+     "radio": 6,
+     "relleno": "violeta",
+     "borde": null,
+     "grosor": 0,
+     "id": "b_lasso1",
+     "en": "a",
+     "t": 0.12,
+     "dur": 0.6,
+     "desde": {
+      "y0": 760
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1248,
+     "y0": 760,
+     "x1": 1332,
+     "y1": 820.1028,
+     "radio": 6,
+     "relleno": "violeta",
+     "borde": null,
+     "grosor": 0,
+     "id": "b_lasso2",
+     "en": "a",
+     "t": 0.24,
+     "dur": 0.6,
+     "desde": {
+      "y1": 760
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1678,
+     "y0": 757,
+     "x1": 1762,
+     "y1": 760,
+     "radio": 6,
+     "relleno": "violeta",
+     "borde": null,
+     "grosor": 0,
+     "id": "b_lasso3",
+     "en": "a",
+     "t": 0.36,
+     "dur": 0.6,
+     "desde": {
+      "y0": 760
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0",
+     "x": 1720,
+     "y": 720,
+     "tam": 34,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "l_lasso3",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.9
+    },
+    {
+     "alfa": 0.35,
+     "id": "l_ridge0",
+     "en": "a",
+     "dur": 0.3
+    },
+    {
+     "alfa": 0.35,
+     "id": "l_ridge3",
+     "en": "a",
+     "dur": 0.3
+    },
+    {
+     "texto": "Lasso",
+     "color": "violeta",
+     "id": "ttl",
+     "en": "a"
+    },
+    {
+     "tipo": "anillo",
+     "x": 1720,
+     "y": 730,
+     "w": 110,
+     "h": 110,
+     "radio": 0,
+     "color": "rojo",
+     "grosor": 6,
+     "pulso": true,
+     "id": "r0",
+     "entrada": "fade",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "descartada",
+     "x": 1620,
+     "y": 640,
+     "tam": 48,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e22",
+     "entrada": "pop",
+     "en": "c"
+    }
+   ]
+  },
+  {
+   "say": "Esa es la gran diferencia. Ridge penaliza la suma de los coeficientes al cuadrado: [[a]]los achica a todos, pero normalmente sin llegar a cero. Conserva todas las variables.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 300,
+     "w": 1500,
+     "h": 170,
+     "radio": 36,
+     "relleno": "azulclaro",
+     "borde": "azul",
+     "grosor": 5,
+     "id": "e23",
+     "entrada": "subir",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "error  +  α · Σ β²",
+     "x": 960,
+     "y": 300,
+     "tam": 80,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e24",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "Ridge · L2",
+     "x": 960,
+     "y": 150,
+     "tam": 44,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e25",
+     "entrada": "pop",
+     "t": 0.1
+    },
+    {
+     "tipo": "caja",
+     "x0": 300,
+     "y0": 340,
+     "x1": 450,
+     "y1": 640,
+     "radio": 6,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "ra0",
+     "en": "a",
+     "dur": 0.5,
+     "desde": {
+      "y0": 640
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 700,
+     "y0": 460,
+     "x1": 850,
+     "y1": 640,
+     "radio": 6,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "ra1",
+     "en": "a",
+     "t": 0.1,
+     "dur": 0.5,
+     "desde": {
+      "y0": 640
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1100,
+     "y0": 520,
+     "x1": 1250,
+     "y1": 640,
+     "radio": 6,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "ra2",
+     "en": "a",
+     "t": 0.2,
+     "dur": 0.5,
+     "desde": {
+      "y0": 640
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1500,
+     "y0": 600,
+     "x1": 1650,
+     "y1": 640,
+     "radio": 6,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "ra3",
+     "en": "a",
+     "t": 0.30000000000000004,
+     "dur": 0.5,
+     "desde": {
+      "y0": 640
+     }
+    },
+    {
+     "y0": 380,
+     "id": "ra0",
+     "en": "a",
+     "t": 0.7,
+     "dur": 1.0
+    },
+    {
+     "y0": 490,
+     "id": "ra1",
+     "en": "a",
+     "t": 0.7,
+     "dur": 1.0
+    },
+    {
+     "y0": 540,
+     "id": "ra2",
+     "en": "a",
+     "t": 0.7,
+     "dur": 1.0
+    },
+    {
+     "y0": 610,
+     "id": "ra3",
+     "en": "a",
+     "t": 0.7,
+     "dur": 1.0
+    },
+    {
+     "tipo": "texto",
+     "texto": "todas más pequeñas, ninguna en cero",
+     "x": 960,
+     "y": 780,
+     "tam": 44,
+     "peso": "sb",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e26",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.8
+    }
+   ]
+  },
+  {
+   "say": "Lasso, en cambio, penaliza la suma de los valores absolutos. [[a]]Eso sí puede llevar coeficientes exactamente a cero, [[b]]así que además elige variables.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 300,
+     "w": 1500,
+     "h": 170,
+     "radio": 36,
+     "relleno": "violetaclaro",
+     "borde": "violeta",
+     "grosor": 5,
+     "id": "e27",
+     "entrada": "subir",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "error  +  α · Σ |β|",
+     "x": 960,
+     "y": 300,
+     "tam": 80,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e28",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "Lasso · L1",
+     "x": 960,
+     "y": 150,
+     "tam": 44,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e29",
+     "entrada": "pop",
+     "t": 0.1
+    },
+    {
+     "tipo": "caja",
+     "x0": 300,
+     "y0": 340,
+     "x1": 450,
+     "y1": 640,
+     "radio": 6,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "la0",
+     "en": "a",
+     "dur": 0.5,
+     "desde": {
+      "y0": 640
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 700,
+     "y0": 460,
+     "x1": 850,
+     "y1": 640,
+     "radio": 6,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "la1",
+     "en": "a",
+     "t": 0.1,
+     "dur": 0.5,
+     "desde": {
+      "y0": 640
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1100,
+     "y0": 520,
+     "x1": 1250,
+     "y1": 640,
+     "radio": 6,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "la2",
+     "en": "a",
+     "t": 0.2,
+     "dur": 0.5,
+     "desde": {
+      "y0": 640
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1500,
+     "y0": 600,
+     "x1": 1650,
+     "y1": 640,
+     "radio": 6,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "la3",
+     "en": "a",
+     "t": 0.30000000000000004,
+     "dur": 0.5,
+     "desde": {
+      "y0": 640
+     }
+    },
+    {
+     "alfa": 0,
+     "id": "la3",
+     "en": "a",
+     "t": 0.5,
+     "dur": 0.8
+    },
+    {
+     "tipo": "marca",
+     "x": 1590,
+     "y": 600,
+     "tam": 90,
+     "forma": "cruz",
+     "color": "rojo",
+     "id": "e30",
+     "entrada": "ninguna",
+     "en": "a",
+     "t": 0.9,
+     "dur": 0.5,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "selecciona variables",
+     "x": 960,
+     "y": 780,
+     "tam": 50,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "fondo_txt": "verdeclaro",
+     "id": "e31",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "Una forma de recordarlo: Ridge le pide a todo el equipo que trabaje un poco menos. [[a]]Lasso, en cambio, despide a los que no aportan.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x": 330,
+     "y": 460,
+     "w": 300,
+     "h": 180,
+     "radio": 26,
+     "relleno": "tealclaro",
+     "borde": "teal",
+     "grosor": 4,
+     "id": "e32",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "texto",
+     "texto": "variable 1",
+     "x": 330,
+     "y": 460,
+     "tam": 40,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e33",
+     "entrada": "pop",
+     "t": 0.1
+    },
+    {
+     "tipo": "caja",
+     "x": 750,
+     "y": 460,
+     "w": 300,
+     "h": 180,
+     "radio": 26,
+     "relleno": "tealclaro",
+     "borde": "teal",
+     "grosor": 4,
+     "id": "e34",
+     "entrada": "subir",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "variable 2",
+     "x": 750,
+     "y": 460,
+     "tam": 40,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e35",
+     "entrada": "pop",
+     "t": 0.2
+    },
+    {
+     "tipo": "caja",
+     "x": 1170,
+     "y": 460,
+     "w": 300,
+     "h": 180,
+     "radio": 26,
+     "relleno": "tealclaro",
+     "borde": "teal",
+     "grosor": 4,
+     "id": "e36",
+     "entrada": "subir",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "variable 3",
+     "x": 1170,
+     "y": 460,
+     "tam": 40,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e37",
+     "entrada": "pop",
+     "t": 0.30000000000000004
+    },
+    {
+     "tipo": "caja",
+     "x": 1590,
+     "y": 460,
+     "w": 300,
+     "h": 180,
+     "radio": 26,
+     "relleno": "tealclaro",
+     "borde": "teal",
+     "grosor": 4,
+     "id": "e38",
+     "entrada": "subir",
+     "t": 0.30000000000000004
+    },
+    {
+     "tipo": "texto",
+     "texto": "ruido",
+     "x": 1590,
+     "y": 460,
+     "tam": 40,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e39",
+     "entrada": "pop",
+     "t": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "Ridge: todos trabajan menos",
+     "x": 960,
+     "y": 700,
+     "tam": 48,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e40",
+     "entrada": "pop",
+     "t": 0.6
+    },
+    {
+     "tipo": "texto",
+     "texto": "Lasso: despide a los que no aportan",
+     "x": 960,
+     "y": 830,
+     "tam": 48,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e41",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "marca",
+     "x": 1590,
+     "y": 460,
+     "tam": 110,
+     "forma": "cruz",
+     "color": "rojo",
+     "id": "e42",
+     "entrada": "ninguna",
+     "en": "a",
+     "t": 0.3,
+     "dur": 0.5,
+     "desde": {
+      "progreso": 0
+     }
+    }
+   ]
+  },
+  {
+   "say": "¿Y cuánto castigo? Eso lo controla alfa. [[a]]Con alfa cero, no hay castigo: es la regresión de siempre. [[b]]Mientras más grande, más castigo.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "linea",
+     "x0": 300,
+     "y0": 520,
+     "x1": 1620,
+     "y1": 520,
+     "color": "gris",
+     "grosor": 8,
+     "punta": true,
+     "guion": false,
+     "id": "e43",
+     "entrada": "ninguna",
+     "t": 0.2,
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "α",
+     "x": 960,
+     "y": 400,
+     "tam": 110,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e44",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "caja",
+     "x": 380,
+     "y": 520,
+     "w": 44,
+     "h": 44,
+     "radio": 22,
+     "relleno": "teal",
+     "borde": null,
+     "grosor": 0,
+     "id": "knob",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "α = 0: sin castigo",
+     "x": 380,
+     "y": 620,
+     "tam": 40,
+     "peso": "sb",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e45",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "x": 1500,
+     "id": "knob",
+     "en": "b",
+     "dur": 2.2,
+     "ease": "inout"
+    },
+    {
+     "tipo": "texto",
+     "texto": "más castigo",
+     "x": 1500,
+     "y": 620,
+     "tam": 40,
+     "peso": "sb",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e46",
+     "entrada": "pop",
+     "en": "b",
+     "t": 1.8
+    }
+   ]
+  },
+  {
+   "say": "Alfa es un hiperparámetro: [[a]]un número que eliges tú antes de entrenar. [[b]]Y lo eliges con la validación, nunca con la prueba.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "alfa = hiperparámetro",
+     "x": 960,
+     "y": 330,
+     "tam": 62,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e47",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "caja",
+     "x0": 260,
+     "y0": 560,
+     "x1": 1100,
+     "y1": 700,
+     "radio": 20,
+     "relleno": "violeta",
+     "borde": null,
+     "grosor": 0,
+     "id": "e48",
+     "en": "a",
+     "dur": 0.7,
+     "desde": {
+      "x1": 260
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "entrenamiento",
+     "x": 680,
+     "y": 630,
+     "tam": 44,
+     "peso": "b",
+     "color": "blanco",
+     "ancla": "mm",
+     "id": "e49",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x0": 1120,
+     "y0": 560,
+     "x1": 1390,
+     "y1": 700,
+     "radio": 20,
+     "relleno": "azul",
+     "borde": null,
+     "grosor": 0,
+     "id": "e50",
+     "en": "b",
+     "dur": 0.4,
+     "desde": {
+      "x1": 1120
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1410,
+     "y0": 560,
+     "x1": 1660,
+     "y1": 700,
+     "radio": 20,
+     "relleno": "rojo",
+     "borde": null,
+     "grosor": 0,
+     "id": "e51",
+     "en": "b",
+     "t": 0.5,
+     "dur": 0.4,
+     "desde": {
+      "x1": 1410
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "elige alfa",
+     "x": 1255,
+     "y": 760,
+     "tam": 40,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e52",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.5
+    },
+    {
+     "tipo": "marca",
+     "x": 1535,
+     "y": 760,
+     "tam": 50,
+     "forma": "cruz",
+     "color": "rojo",
+     "id": "e53",
+     "entrada": "ninguna",
+     "en": "b",
+     "t": 1.0,
+     "dur": 0.5,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "validación",
+     "x": 1255,
+     "y": 630,
+     "tam": 34,
+     "peso": "b",
+     "color": "blanco",
+     "ancla": "mm",
+     "id": "e54",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.6
+    },
+    {
+     "tipo": "texto",
+     "texto": "prueba",
+     "x": 1535,
+     "y": 630,
+     "tam": 34,
+     "peso": "b",
+     "color": "blanco",
+     "ancla": "mm",
+     "id": "e55",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.7
+    }
+   ]
+  },
+  {
+   "say": "Hay un tercer castigo, Elastic Net, [[a]]que simplemente mezcla los dos.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "Ridge",
+     "x": 560,
+     "y": 480,
+     "tam": 70,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e56",
+     "entrada": "pop"
+    },
+    {
+     "tipo": "texto",
+     "texto": "+",
+     "x": 800,
+     "y": 480,
+     "tam": 100,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e57",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "Lasso",
+     "x": 1040,
+     "y": 480,
+     "tam": 70,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e58",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "=",
+     "x": 1280,
+     "y": 480,
+     "tam": 100,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e59",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "Elastic Net",
+     "x": 1560,
+     "y": 480,
+     "tam": 70,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e60",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.6
+    }
+   ]
+  },
+  {
+   "say": "Mira ahora el camino de Lasso. [[a]]Vamos subiendo alfa, de menos castigo a más castigo, [[b]]y los coeficientes se van apagando de a uno.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "grafico",
+     "x0": 300,
+     "y0": 230,
+     "x1": 1480,
+     "y1": 850,
+     "xmin": -2.2,
+     "xmax": 2.1,
+     "ymin": -15,
+     "ymax": 62,
+     "series": [
+      {
+       "xs": [
+        -2.0,
+        -1.796,
+        -1.602,
+        -1.398,
+        -1.201,
+        -1.0,
+        -0.801,
+        -0.6,
+        -0.4,
+        -0.2,
+        0.0,
+        0.2,
+        0.4,
+        0.6,
+        0.8,
+        1.0,
+        1.2,
+        1.4,
+        1.6,
+        1.8,
+        1.9
+       ],
+       "ys": [
+        56.39,
+        56.39,
+        56.38,
+        56.36,
+        56.34,
+        56.3,
+        56.24,
+        56.15,
+        56.0,
+        55.75,
+        55.36,
+        54.75,
+        53.77,
+        52.23,
+        49.77,
+        45.89,
+        40.05,
+        30.78,
+        16.09,
+        0.0,
+        0.0
+       ],
+       "color": "violeta",
+       "grosor": 7,
+       "revela": 0
+      },
+      {
+       "xs": [
+        -2.0,
+        -1.796,
+        -1.602,
+        -1.398,
+        -1.201,
+        -1.0,
+        -0.801,
+        -0.6,
+        -0.4,
+        -0.2,
+        0.0,
+        0.2,
+        0.4,
+        0.6,
+        0.8,
+        1.0,
+        1.2,
+        1.4,
+        1.6,
+        1.8,
+        1.9
+       ],
+       "ys": [
+        11.93,
+        11.92,
+        11.91,
+        11.9,
+        11.87,
+        11.83,
+        11.76,
+        11.65,
+        11.48,
+        11.22,
+        10.81,
+        10.17,
+        9.14,
+        7.52,
+        4.94,
+        0.86,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "color": "azul",
+       "grosor": 7,
+       "revela": 0
+      },
+      {
+       "xs": [
+        -2.0,
+        -1.796,
+        -1.602,
+        -1.398,
+        -1.201,
+        -1.0,
+        -0.801,
+        -0.6,
+        -0.4,
+        -0.2,
+        0.0,
+        0.2,
+        0.4,
+        0.6,
+        0.8,
+        1.0,
+        1.2,
+        1.4,
+        1.6,
+        1.8,
+        1.9
+       ],
+       "ys": [
+        -12.07,
+        -12.06,
+        -12.05,
+        -12.03,
+        -12.01,
+        -11.96,
+        -11.89,
+        -11.78,
+        -11.6,
+        -11.33,
+        -10.89,
+        -10.19,
+        -9.08,
+        -7.33,
+        -4.56,
+        -0.16,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "color": "ambar",
+       "grosor": 7,
+       "revela": 0
+      },
+      {
+       "xs": [
+        -2.0,
+        -1.796,
+        -1.602,
+        -1.398,
+        -1.201,
+        -1.0,
+        -0.801,
+        -0.6,
+        -0.4,
+        -0.2,
+        0.0,
+        0.2,
+        0.4,
+        0.6,
+        0.8,
+        1.0,
+        1.2,
+        1.4,
+        1.6,
+        1.8,
+        1.9
+       ],
+       "ys": [
+        -0.39,
+        -0.38,
+        -0.37,
+        -0.36,
+        -0.33,
+        -0.3,
+        -0.24,
+        -0.14,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "color": "rojo",
+       "grosor": 7,
+       "revela": 0
+      }
+     ],
+     "yticks": [
+      0,
+      20,
+      40,
+      60
+     ],
+     "yfmt": "{:.0f}",
+     "xlabel": "alpha (escala logarítmica: más castigo →)",
+     "ylabel": "coef.",
+     "rejilla": true,
+     "id": "gp",
+     "entrada": "fade",
+     "t": 0.2,
+     "dur": 0.7
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.01",
+     "x": -2,
+     "y": -15,
+     "tam": 30,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "ref": "gp",
+     "dy": 34,
+     "id": "gx0",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.1",
+     "x": -1,
+     "y": -15,
+     "tam": 30,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "ref": "gp",
+     "dy": 34,
+     "id": "gx1",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.05
+    },
+    {
+     "tipo": "texto",
+     "texto": "1",
+     "x": 0,
+     "y": -15,
+     "tam": 30,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "ref": "gp",
+     "dy": 34,
+     "id": "gx2",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "10",
+     "x": 1,
+     "y": -15,
+     "tam": 30,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "ref": "gp",
+     "dy": 34,
+     "id": "gx3",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.15000000000000002
+    },
+    {
+     "tipo": "texto",
+     "texto": "100",
+     "x": 2,
+     "y": -15,
+     "tam": 30,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "ref": "gp",
+     "dy": 34,
+     "id": "gx4",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "tipo": "caja",
+     "x": 1560,
+     "y": 330,
+     "w": 40,
+     "h": 14,
+     "radio": 7,
+     "relleno": "violeta",
+     "borde": null,
+     "grosor": 0,
+     "id": "e61",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "superficie",
+     "x": 1600,
+     "y": 330,
+     "tam": 36,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "lm",
+     "id": "e62",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "caja",
+     "x": 1560,
+     "y": 410,
+     "w": 40,
+     "h": 14,
+     "radio": 7,
+     "relleno": "azul",
+     "borde": null,
+     "grosor": 0,
+     "id": "e63",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "habitaciones",
+     "x": 1600,
+     "y": 410,
+     "tam": 36,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "lm",
+     "id": "e64",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "caja",
+     "x": 1560,
+     "y": 490,
+     "w": 40,
+     "h": 14,
+     "radio": 7,
+     "relleno": "ambar",
+     "borde": null,
+     "grosor": 0,
+     "id": "e65",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "antigüedad",
+     "x": 1600,
+     "y": 490,
+     "tam": 36,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "lm",
+     "id": "e66",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "tipo": "caja",
+     "x": 1560,
+     "y": 570,
+     "w": 40,
+     "h": 14,
+     "radio": 7,
+     "relleno": "rojo",
+     "borde": null,
+     "grosor": 0,
+     "id": "e67",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.30000000000000004
+    },
+    {
+     "tipo": "texto",
+     "texto": "ruido",
+     "x": 1600,
+     "y": 570,
+     "tam": 36,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "lm",
+     "id": "e68",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.30000000000000004
+    },
+    {
+     "series.0.revela": 1,
+     "series.1.revela": 1,
+     "series.2.revela": 1,
+     "series.3.revela": 1,
+     "id": "gp",
+     "en": "b",
+     "dur": 4.5,
+     "ease": "lineal"
+    }
+   ]
+  },
+  {
+   "say": "El ruido es el primero en apagarse: [[a]]con alfa cerca de cero coma cuatro. [[b]]Después, la antigüedad y las habitaciones. [[c]]Y la superficie, la que de verdad importa, aguanta hasta el final.",
+   "acciones": [
+    {
+     "tipo": "linea",
+     "x0": -0.4,
+     "y0": -15,
+     "x1": -0.4,
+     "y1": 62,
+     "color": "rojo",
+     "grosor": 4,
+     "punta": false,
+     "guion": true,
+     "ref": "gp",
+     "id": "v04",
+     "entrada": "ninguna",
+     "en": "a",
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "alfa ≈ 0.4",
+     "x": -0.4,
+     "y": 58,
+     "tam": 36,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "lm",
+     "ref": "gp",
+     "dx": 12,
+     "id": "v04t",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "anillo",
+     "x": -0.4,
+     "y": 0,
+     "w": 70,
+     "h": 70,
+     "radio": 0,
+     "color": "rojo",
+     "grosor": 6,
+     "pulso": true,
+     "ref": "gp",
+     "id": "rr0",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "quitar": [
+      "rr0"
+     ],
+     "en": "b",
+     "dur": 0.3
+    },
+    {
+     "tipo": "anillo",
+     "x": 1.1,
+     "y": 0,
+     "w": 80,
+     "h": 80,
+     "radio": 0,
+     "color": "azul",
+     "grosor": 6,
+     "pulso": true,
+     "ref": "gp",
+     "id": "rr1",
+     "entrada": "fade",
+     "en": "b",
+     "t": 0.2
+    },
+    {
+     "quitar": [
+      "rr1"
+     ],
+     "en": "c",
+     "dur": 0.3
+    },
+    {
+     "tipo": "anillo",
+     "x": 1.8,
+     "y": 0,
+     "w": 90,
+     "h": 90,
+     "radio": 0,
+     "color": "violeta",
+     "grosor": 6,
+     "pulso": true,
+     "ref": "gp",
+     "id": "rr2",
+     "entrada": "fade",
+     "en": "c"
+    }
+   ]
+  },
+  {
+   "say": "Ojo: que Lasso anule una variable depende de alfa y de los datos. [[a]]No es magia, es el resultado de cuánto castigo aplicas.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "depende de alfa y de los datos",
+     "x": 960,
+     "y": 430,
+     "tam": 62,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e69",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "texto",
+     "texto": "no es magia",
+     "x": 960,
+     "y": 600,
+     "tam": 56,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e70",
+     "entrada": "pop",
+     "en": "a"
+    }
+   ]
+  },
+  {
+   "say": "Piensa un segundo: si lo que quieres es quedarte con pocas variables, [[a]]¿usas Ridge o Lasso?",
+   "pausa": 0.5,
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "Ridge",
+     "x": 600,
+     "y": 480,
+     "tam": 90,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e71",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "Lasso",
+     "x": 1320,
+     "y": 480,
+     "tam": 90,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e72",
+     "entrada": "pop",
+     "t": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "o",
+     "x": 960,
+     "y": 480,
+     "tam": 60,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e73",
+     "entrada": "pop",
+     "t": 0.35
+    }
+   ]
+  },
+  {
+   "say": "Lasso. [[a]]Porque puede llevar coeficientes exactamente a cero, y esas variables salen del modelo.",
+   "acciones": [
+    {
+     "tipo": "anillo",
+     "x": 1320,
+     "y": 480,
+     "w": 380,
+     "h": 190,
+     "radio": 50,
+     "color": "verde",
+     "grosor": 6,
+     "pulso": true,
+     "id": "rl",
+     "entrada": "fade"
+    },
+    {
+     "tipo": "marca",
+     "x": 1320,
+     "y": 640,
+     "tam": 90,
+     "forma": "check",
+     "color": "verde",
+     "id": "e74",
+     "entrada": "ninguna",
+     "en": "a",
+     "dur": 0.5,
+     "desde": {
+      "progreso": 0
+     }
+    }
+   ]
+  },
+  {
+   "seccion": "3. Por qué estandarizar",
+   "say": "Ahora, la pregunta clave: ¿por qué hay que estandarizar? [[a]]Porque la penalización mira el tamaño de los coeficientes, [[b]]y ese tamaño depende de las unidades.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "la multa mira el tamaño del coeficiente",
+     "x": 960,
+     "y": 330,
+     "tam": 56,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e75",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "el tamaño depende de las unidades",
+     "x": 960,
+     "y": 520,
+     "tam": 56,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e76",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "Mira este ejemplo. Un mismo efecto, expresado en dos unidades. [[a]]Tres por cada metro cuadrado, [[b]]o trescientos por cada cien metros cuadrados.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x": 520,
+     "y": 440,
+     "w": 640,
+     "h": 260,
+     "radio": 30,
+     "relleno": "tealclaro",
+     "borde": "teal",
+     "grosor": 5,
+     "id": "e77",
+     "entrada": "subir",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "3",
+     "x": 520,
+     "y": 410,
+     "tam": 110,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e78",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "por cada m²",
+     "x": 520,
+     "y": 510,
+     "tam": 40,
+     "peso": "sb",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e79",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "tipo": "caja",
+     "x": 1400,
+     "y": 440,
+     "w": 640,
+     "h": 260,
+     "radio": 30,
+     "relleno": "ambarclaro",
+     "borde": "ambar",
+     "grosor": 5,
+     "id": "e80",
+     "entrada": "subir",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "300",
+     "x": 1400,
+     "y": 410,
+     "tam": 110,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e81",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "por cada 100 m²",
+     "x": 1400,
+     "y": 510,
+     "tam": 40,
+     "peso": "sb",
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e82",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "=",
+     "x": 960,
+     "y": 440,
+     "tam": 120,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e83",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "el mismo efecto",
+     "x": 960,
+     "y": 760,
+     "tam": 56,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e84",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.6
+    }
+   ]
+  },
+  {
+   "say": "Con Ridge y alfa igual a uno, la multa es el coeficiente al cuadrado. [[a]]Tres al cuadrado es nueve. [[b]]Trescientos al cuadrado es noventa mil.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "multa  =  α · β²   con α = 1",
+     "x": 960,
+     "y": 860,
+     "tam": 44,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e85",
+     "entrada": "pop",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "3²  =  9",
+     "x": 520,
+     "y": 640,
+     "tam": 70,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e86",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "300²  =  90.000",
+     "x": 1400,
+     "y": 640,
+     "tam": 70,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e87",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "Es exactamente el mismo efecto, [[a]]pero castigado diez mil veces más.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x0": 300,
+     "y0": 720,
+     "x1": 400,
+     "y1": 780,
+     "radio": 8,
+     "relleno": "teal",
+     "borde": null,
+     "grosor": 0,
+     "id": "e88",
+     "t": 0.2,
+     "dur": 0.5,
+     "desde": {
+      "x1": 300
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "9",
+     "x": 450,
+     "y": 750,
+     "tam": 44,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "lm",
+     "id": "e89",
+     "entrada": "pop",
+     "t": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x0": 300,
+     "y0": 820,
+     "x1": 1500,
+     "y1": 900,
+     "radio": 8,
+     "relleno": "ambar",
+     "borde": null,
+     "grosor": 0,
+     "id": "e90",
+     "en": "a",
+     "dur": 1.2,
+     "desde": {
+      "x1": 300
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "90.000",
+     "x": 1560,
+     "y": 860,
+     "tam": 44,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "lm",
+     "id": "e91",
+     "entrada": "pop",
+     "en": "a",
+     "t": 1.0
+    },
+    {
+     "tipo": "texto",
+     "texto": "× 10.000",
+     "x": 960,
+     "y": 400,
+     "tam": 150,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e92",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "veces más castigo",
+     "x": 960,
+     "y": 520,
+     "tam": 54,
+     "peso": "sb",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e93",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.8
+    }
+   ]
+  },
+  {
+   "say": "Piensa un segundo: si pasas la superficie de metros cuadrados a centenas de metros cuadrados, [[a]]¿Ridge castiga más o menos a esa variable?",
+   "pausa": 0.5,
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "m²",
+     "x": 560,
+     "y": 480,
+     "tam": 90,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e94",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "linea",
+     "x0": 760,
+     "y0": 480,
+     "x1": 1160,
+     "y1": 480,
+     "color": "gris",
+     "grosor": 8,
+     "punta": true,
+     "guion": false,
+     "id": "e95",
+     "entrada": "ninguna",
+     "t": 0.5,
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "centenas de m²",
+     "x": 1500,
+     "y": 480,
+     "tam": 80,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e96",
+     "entrada": "pop",
+     "t": 0.7
+    },
+    {
+     "tipo": "texto",
+     "texto": "¿más castigo o menos castigo?",
+     "x": 960,
+     "y": 760,
+     "tam": 60,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e97",
+     "entrada": "pop",
+     "en": "a"
+    }
+   ]
+  },
+  {
+   "say": "Más. [[a]]El coeficiente se multiplica por cien, así que la multa se multiplica por diez mil. [[b]]Cambiar la unidad cambió el modelo.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "más castigo",
+     "x": 960,
+     "y": 880,
+     "tam": 66,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e98",
+     "entrada": "pop"
+    },
+    {
+     "tipo": "texto",
+     "texto": "coeficiente × 100  →  multa × 10.000",
+     "x": 960,
+     "y": 960,
+     "tam": 44,
+     "peso": "sb",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e99",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "misma realidad, otro modelo",
+     "x": 960,
+     "y": 620,
+     "tam": 50,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e100",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "La solución es estandarizar: [[a]]a cada valor le restas la media, [[b]]y lo divides por la desviación estándar. El resultado se llama puntaje z.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "z",
+     "x": 360,
+     "y": 450,
+     "tam": 150,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e101",
+     "entrada": "pop",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "=",
+     "x": 490,
+     "y": 450,
+     "tam": 100,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e102",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "x − media",
+     "x": 840,
+     "y": 400,
+     "tam": 80,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "znum",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "linea",
+     "x0": 600,
+     "y0": 450,
+     "x1": 1080,
+     "y1": 450,
+     "color": "tinta",
+     "grosor": 6,
+     "punta": false,
+     "guion": false,
+     "id": "zlin",
+     "entrada": "ninguna",
+     "en": "b",
+     "t": 0.1,
+     "dur": 0.4,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "desviación estándar",
+     "x": 840,
+     "y": 510,
+     "tam": 64,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "zden",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "queda todo en una escala comparable",
+     "x": 960,
+     "y": 800,
+     "tam": 56,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e103",
+     "entrada": "pop",
+     "en": "b",
+     "t": 1.0
+    }
+   ]
+  },
+  {
+   "say": "Por ejemplo, una casa de ciento veinte metros cuadrados, [[a]]con media ochenta y desviación veinte. [[b]]Ciento veinte menos ochenta, entre veinte: z igual a dos.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "linea",
+     "x0": 300,
+     "y0": 560,
+     "x1": 1620,
+     "y1": 560,
+     "color": "gris",
+     "grosor": 6,
+     "punta": true,
+     "guion": false,
+     "id": "e104",
+     "entrada": "ninguna",
+     "t": 0.2,
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "40",
+     "x": 300.0,
+     "y": 620,
+     "tam": 36,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e105",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "60",
+     "x": 630.0,
+     "y": 620,
+     "tam": 36,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e106",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "80",
+     "x": 960.0,
+     "y": 620,
+     "tam": 36,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e107",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "100",
+     "x": 1290.0,
+     "y": 620,
+     "tam": 36,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e108",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "120",
+     "x": 1620.0,
+     "y": 620,
+     "tam": 36,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e109",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "caja",
+     "x": 960.0,
+     "y": 560,
+     "w": 28,
+     "h": 28,
+     "radio": 14,
+     "relleno": "teal",
+     "borde": null,
+     "grosor": 0,
+     "id": "e110",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "media 80",
+     "x": 960,
+     "y": 470,
+     "tam": 44,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e111",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "caja",
+     "x": 1620.0,
+     "y": 560,
+     "w": 40,
+     "h": 40,
+     "radio": 20,
+     "relleno": "ambar",
+     "borde": null,
+     "grosor": 0,
+     "id": "e112",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "120 m²",
+     "x": 1620,
+     "y": 470,
+     "tam": 44,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e113",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "(120 − 80) / 20  =  2",
+     "x": 960,
+     "y": 810,
+     "tam": 70,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e114",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "2 desviaciones sobre el promedio",
+     "x": 960,
+     "y": 940,
+     "tam": 46,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e115",
+     "entrada": "pop",
+     "en": "b",
+     "t": 1.2
+    }
+   ]
+  },
+  {
+   "say": "Con las habitaciones pasa igual. [[a]]Cuatro coma cinco habitaciones, con media tres y desviación uno coma cinco. [[b]]Cuatro coma cinco menos tres, entre uno coma cinco: z igual a uno.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "habitaciones: 4.5  ·  media 3  ·  desviación 1.5",
+     "x": 960,
+     "y": 330,
+     "tam": 48,
+     "peso": "sb",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e116",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "(4.5 − 3) / 1.5  =  1",
+     "x": 960,
+     "y": 520,
+     "tam": 90,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e117",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "1 desviación sobre el promedio",
+     "x": 960,
+     "y": 740,
+     "tam": 52,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e118",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.8
+    }
+   ]
+  },
+  {
+   "say": "Ahora la superficie y las habitaciones hablan en el mismo idioma: [[a]]cuántas desviaciones se alejan de su promedio.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "superficie",
+     "x": 520,
+     "y": 480,
+     "tam": 70,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e119",
+     "entrada": "pop"
+    },
+    {
+     "tipo": "texto",
+     "texto": "habitaciones",
+     "x": 1400,
+     "y": 480,
+     "tam": 70,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e120",
+     "entrada": "pop",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "↔",
+     "x": 960,
+     "y": 480,
+     "tam": 100,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e121",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "misma escala",
+     "x": 960,
+     "y": 720,
+     "tam": 66,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e122",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.4
+    }
+   ]
+  },
+  {
+   "seccion": "4. El efecto en las viviendas",
+   "say": "Con las viviendas de la clase, probamos Ridge con alfa igual a treinta. [[a]]Con la superficie en metros cuadrados, el R cuadrado de validación es cero coma novecientos dieciséis.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "Ridge con α = 30  ·  R² en validación",
+     "x": 960,
+     "y": 170,
+     "tam": 48,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e123",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "linea",
+     "x0": 300,
+     "y0": 880,
+     "x1": 1620,
+     "y1": 880,
+     "color": "tinta",
+     "grosor": 4,
+     "punta": false,
+     "guion": false,
+     "id": "e124",
+     "entrada": "ninguna",
+     "t": 0.2,
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "superficie en m²",
+     "x": 600,
+     "y": 940,
+     "tam": 42,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e125",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "superficie en centenas de m²",
+     "x": 1320,
+     "y": 940,
+     "tam": 42,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e126",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "caja",
+     "x0": 450,
+     "y0": 403.68,
+     "x1": 590,
+     "y1": 880,
+     "radio": 8,
+     "relleno": "rojo",
+     "borde": null,
+     "grosor": 0,
+     "id": "r2a",
+     "en": "a",
+     "dur": 0.9,
+     "desde": {
+      "y0": 880
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.916",
+     "x": 520,
+     "y": 367.68,
+     "tam": 38,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "r2al",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.8
+    },
+    {
+     "tipo": "texto",
+     "texto": "sin estandarizar",
+     "x": 1560,
+     "y": 260,
+     "tam": 40,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e127",
+     "entrada": "pop",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "estandarizando",
+     "x": 1560,
+     "y": 340,
+     "tam": 40,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e128",
+     "entrada": "pop",
+     "t": 0.7
+    }
+   ]
+  },
+  {
+   "say": "Si medimos la superficie en centenas de metros cuadrados, [[a]]cae a cero coma quinientos treinta y dos. [[b]]Solo por cambiar la unidad.",
+   "acciones": [
+    {
+     "tipo": "caja",
+     "x0": 1170,
+     "y0": 603.36,
+     "x1": 1310,
+     "y1": 880,
+     "radio": 8,
+     "relleno": "rojo",
+     "borde": null,
+     "grosor": 0,
+     "id": "r2b",
+     "en": "a",
+     "dur": 0.9,
+     "desde": {
+      "y0": 880
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.532",
+     "x": 1240,
+     "y": 567.36,
+     "tam": 38,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "r2bl",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.8
+    },
+    {
+     "tipo": "anillo",
+     "x": 1240,
+     "y": 730,
+     "w": 220,
+     "h": 340,
+     "radio": 30,
+     "color": "rojo",
+     "grosor": 6,
+     "pulso": true,
+     "id": "rr3",
+     "entrada": "fade",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "¡solo cambió la unidad!",
+     "x": 1320,
+     "y": 450,
+     "tam": 46,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e129",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.3
+    }
+   ]
+  },
+  {
+   "say": "Con estandarización, [[a]]el R cuadrado queda en cero coma ochocientos ochenta y siete [[b]]en los dos casos.",
+   "acciones": [
+    {
+     "quitar": [
+      "rr3"
+     ],
+     "dur": 0.2
+    },
+    {
+     "tipo": "caja",
+     "x0": 610,
+     "y0": 418.76,
+     "x1": 750,
+     "y1": 880,
+     "radio": 8,
+     "relleno": "teal",
+     "borde": null,
+     "grosor": 0,
+     "id": "r2c",
+     "en": "a",
+     "dur": 0.9,
+     "desde": {
+      "y0": 880
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.887",
+     "x": 680,
+     "y": 382.76,
+     "tam": 38,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "r2cl",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.8
+    },
+    {
+     "tipo": "caja",
+     "x0": 1330,
+     "y0": 418.76,
+     "x1": 1470,
+     "y1": 880,
+     "radio": 8,
+     "relleno": "teal",
+     "borde": null,
+     "grosor": 0,
+     "id": "r2d",
+     "en": "b",
+     "dur": 0.9,
+     "desde": {
+      "y0": 880
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.887",
+     "x": 1400,
+     "y": 382.76,
+     "tam": 38,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "r2dl",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.8
+    },
+    {
+     "tipo": "texto",
+     "texto": "iguales",
+     "x": 1040,
+     "y": 560,
+     "tam": 54,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "fondo_txt": "verdeclaro",
+     "id": "e130",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.9
+    }
+   ]
+  },
+  {
+   "say": "Algo parecido pasa con los coeficientes. [[a]]Sin estandarizar, son dos coma dieciocho, ocho coma diecinueve y menos cero coma ochenta y seis. [[b]]Estandarizados, cincuenta y seis coma cuatro, once coma nueve y menos doce coma uno.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "sin estandarizar",
+     "x": 520,
+     "y": 250,
+     "tam": 48,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e131",
+     "entrada": "pop",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "estandarizados",
+     "x": 1400,
+     "y": 250,
+     "tam": 48,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e132",
+     "entrada": "pop",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "2.18",
+     "x": 520,
+     "y": 400,
+     "tam": 70,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e133",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "8.19",
+     "x": 520,
+     "y": 520,
+     "tam": 70,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e134",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "−0.86",
+     "x": 520,
+     "y": 640,
+     "tam": 70,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e135",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "56.4",
+     "x": 1400,
+     "y": 400,
+     "tam": 70,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e136",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "11.9",
+     "x": 1400,
+     "y": 520,
+     "tam": 70,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e137",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "−12.1",
+     "x": 1400,
+     "y": 640,
+     "tam": 70,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e138",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "⇄",
+     "x": 960,
+     "y": 520,
+     "tam": 100,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e139",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "no se pueden comparar: cambian las unidades",
+     "x": 960,
+     "y": 850,
+     "tam": 48,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e140",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.8
+    }
+   ]
+  },
+  {
+   "say": "Un error típico: estandarizar con todos los datos, incluida la prueba. [[a]]El estandarizador se ajusta solo con el entrenamiento, y lo más cómodo es hacerlo dentro de un Pipeline.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "error: estandarizar con todo",
+     "x": 960,
+     "y": 220,
+     "tam": 52,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e141",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "texto",
+     "texto": "make_pipeline(StandardScaler(), Ridge(alpha=10))",
+     "x": 960,
+     "y": 470,
+     "tam": 42,
+     "peso": "m",
+     "color": "tinta",
+     "ancla": "mm",
+     "fondo_txt": "#E8EDF4",
+     "pad": 24,
+     "id": "e142",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "make_pipeline(StandardScaler(), Lasso(alpha=2))",
+     "x": 960,
+     "y": 590,
+     "tam": 42,
+     "peso": "m",
+     "color": "tinta",
+     "ancla": "mm",
+     "fondo_txt": "#E8EDF4",
+     "pad": 24,
+     "id": "e143",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "fit solo con el entrenamiento",
+     "x": 960,
+     "y": 800,
+     "tam": 52,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e144",
+     "entrada": "pop",
+     "en": "a",
+     "t": 1.0
+    }
+   ]
+  },
+  {
+   "say": "Y un recordatorio: estandarizar no arregla un modelo malo. [[a]]Solo hace comparable la penalización.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "no arregla un modelo malo",
+     "x": 960,
+     "y": 440,
+     "tam": 64,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e145",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "texto",
+     "texto": "solo hace comparable la penalización",
+     "x": 960,
+     "y": 620,
+     "tam": 52,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e146",
+     "entrada": "pop",
+     "en": "a"
+    }
+   ]
+  },
+  {
+   "seccion": "5. Para llevar",
+   "say": "Para llevarte: [[a]]Ridge achica, Lasso puede anular. [[b]]Estandariza siempre antes de Ridge o Lasso. [[c]]Y alfa se elige con la validación.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "Ridge achica  ·  Lasso puede anular",
+     "x": 960,
+     "y": 330,
+     "tam": 56,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e147",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "estandariza antes de Ridge o Lasso",
+     "x": 960,
+     "y": 520,
+     "tam": 56,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e148",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "alfa se elige con la validación",
+     "x": 960,
+     "y": 710,
+     "tam": 56,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e149",
+     "entrada": "pop",
+     "en": "c"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,2023 @@
+{
+ "clase": "Clase 34",
+ "titulo": "Impureza: Gini y entropía",
+ "cabecera": "Clase 34  ·  Impureza: Gini y entropía",
+ "profesora": "Prof. Eduardo Rodríguez",
+ "voz": "es-MX-DaliaNeural",
+ "rate": "+0%",
+ "fps": 25,
+ "beats": [
+  {
+   "seccion": "Introducción",
+   "say": "Tercera parada. Antes de entender por qué el árbol eligió reclamos, necesitamos una regla para medir el desorden de un grupo. Hoy calculas Gini y entropía a mano.",
+   "acciones": [
+    {
+     "id": "t_fondo",
+     "tipo": "caja",
+     "x": 960,
+     "y": 540,
+     "w": 1920,
+     "h": 1080,
+     "radio": 0,
+     "relleno": "navy",
+     "entrada": "ninguna"
+    },
+    {
+     "id": "t_franja",
+     "tipo": "caja",
+     "x": 12,
+     "y": 540,
+     "w": 24,
+     "h": 1080,
+     "radio": 0,
+     "relleno": "#EA580C",
+     "entrada": "ninguna"
+    },
+    {
+     "id": "t_clase",
+     "tipo": "texto",
+     "texto": "CLASE 34  ·  ÁRBOLES DE DECISIÓN",
+     "x": 140,
+     "y": 330,
+     "ancla": "lm",
+     "tam": 40,
+     "peso": "b",
+     "color": "#96D6DC",
+     "entrada": "subir"
+    },
+    {
+     "id": "t_tit",
+     "tipo": "texto",
+     "texto": "Impureza: Gini y entropía",
+     "x": 140,
+     "y": 450,
+     "ancla": "lm",
+     "tam": 100,
+     "peso": "b",
+     "color": "blanco",
+     "entrada": "subir",
+     "t": 0.1
+    },
+    {
+     "id": "t_lin",
+     "tipo": "caja",
+     "x0": 140,
+     "y0": 540,
+     "x1": 420,
+     "y1": 548,
+     "radio": 0,
+     "relleno": "teal",
+     "desde": {
+      "x1": 140
+     },
+     "t": 0.2
+    },
+    {
+     "id": "t_sub",
+     "tipo": "texto",
+     "texto": "Cómo mide un árbol qué tan mezclado está un grupo",
+     "x": 140,
+     "y": 610,
+     "ancla": "lm",
+     "tam": 46,
+     "color": "#E2EAF4",
+     "entrada": "subir",
+     "t": 0.25
+    },
+    {
+     "id": "t_pie",
+     "tipo": "texto",
+     "texto": "Diplomado Data Science UC 2026  ·  Prof. Eduardo Rodríguez",
+     "x": 140,
+     "y": 960,
+     "ancla": "lm",
+     "tam": 32,
+     "color": "#96AAC8",
+     "t": 0.3
+    }
+   ]
+  },
+  {
+   "seccion": "1. ¿Cómo mide el árbol?",
+   "say": "En el video anterior, la raíz preguntó por reclamos. [[a]]¿Por qué reclamos, y no la edad, o los segundos? [[b]]El árbol no elige por intuición. [[c]]Prueba cortes y se queda con el que deja los grupos menos mezclados. Para eso necesita medir la mezcla.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "¿por qué reclamos y no otra?",
+     "x": 960,
+     "y": 280,
+     "tam": 66,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e1",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "no elige por intuición",
+     "x": 960,
+     "y": 450,
+     "tam": 48,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "fondo_txt": "linea",
+     "id": "e2",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "busca grupos menos mezclados",
+     "x": 960,
+     "y": 590,
+     "tam": 54,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e3",
+     "entrada": "pop",
+     "en": "c"
+    }
+   ]
+  },
+  {
+   "seccion": "2. Analogía: tres frascos",
+   "say": "Piensa en tres frascos con pelotas. [[a]]El primero tiene solo pelotas verdes: es puro. [[b]]El segundo tiene ocho verdes y dos rojas. [[c]]El tercero, cinco y cinco: la mezcla máxima.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x": 420,
+     "y": 520,
+     "w": 400,
+     "h": 420,
+     "radio": 40,
+     "relleno": "blanco",
+     "borde": "verde",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e4",
+     "entrada": "subir",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "puro",
+     "x": 420,
+     "y": 360,
+     "tam": 44,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "id": "e5",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "puntos",
+     "grupos": [
+      {
+       "n": 10,
+       "rect": [
+        280,
+        440,
+        560,
+        660
+       ],
+       "color": "verde"
+      }
+     ],
+     "radio": 22,
+     "id": "e6",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 520,
+     "w": 400,
+     "h": 420,
+     "radio": 40,
+     "relleno": "blanco",
+     "borde": "ambar",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e7",
+     "entrada": "subir",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "80 / 20",
+     "x": 960,
+     "y": 360,
+     "tam": 44,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e8",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.1
+    },
+    {
+     "tipo": "puntos",
+     "grupos": [
+      {
+       "n": 8,
+       "rect": [
+        820,
+        440,
+        1100,
+        560
+       ],
+       "color": "verde"
+      },
+      {
+       "n": 2,
+       "rect": [
+        820,
+        600,
+        1100,
+        690
+       ],
+       "color": "rojo"
+      }
+     ],
+     "radio": 22,
+     "id": "e9",
+     "entrada": "fade",
+     "en": "b",
+     "t": 0.2
+    },
+    {
+     "tipo": "caja",
+     "x": 1500,
+     "y": 520,
+     "w": 400,
+     "h": 420,
+     "radio": 40,
+     "relleno": "blanco",
+     "borde": "rojo",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e10",
+     "entrada": "subir",
+     "en": "c"
+    },
+    {
+     "tipo": "texto",
+     "texto": "50 / 50",
+     "x": 1500,
+     "y": 360,
+     "tam": 44,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e11",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.1
+    },
+    {
+     "tipo": "puntos",
+     "grupos": [
+      {
+       "n": 5,
+       "rect": [
+        1360,
+        440,
+        1640,
+        560
+       ],
+       "color": "verde"
+      },
+      {
+       "n": 5,
+       "rect": [
+        1360,
+        600,
+        1640,
+        690
+       ],
+       "color": "rojo"
+      }
+     ],
+     "radio": 22,
+     "id": "e12",
+     "entrada": "fade",
+     "en": "c",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "analogía",
+     "x": 1860,
+     "y": 1000,
+     "tam": 26,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "rm",
+     "id": "e13",
+     "entrada": "pop",
+     "t": 0.6
+    }
+   ]
+  },
+  {
+   "say": "Ahora un juego. [[a]]Sacas una pelota al azar, la devuelves, y sacas otra. [[b]]¿Cuál es la probabilidad de que las dos sean de distinto color? [[c]]En el frasco puro, cero. En el de cincuenta y cincuenta, la mitad de las veces. [[d]]Esa probabilidad tiene nombre: es el índice de Gini.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "saco 2 pelotas (devolviendo la primera)",
+     "x": 960,
+     "y": 150,
+     "tam": 40,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e14",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "¿de distinto color?",
+     "x": 960,
+     "y": 830,
+     "tam": 48,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e15",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.0,
+     "fmt": "{:.2f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 420,
+     "y": 900,
+     "tam": 60,
+     "color": "verde",
+     "ancla": "mm",
+     "id": "e16",
+     "entrada": "fade",
+     "en": "c",
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.5,
+     "fmt": "{:.2f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 1500,
+     "y": 900,
+     "tam": 60,
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e17",
+     "entrada": "fade",
+     "en": "c",
+     "t": 0.6,
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.31999999999999984,
+     "fmt": "{:.2f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 960,
+     "y": 900,
+     "tam": 60,
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e18",
+     "entrada": "fade",
+     "en": "d",
+     "t": 0.4,
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "= índice de Gini",
+     "x": 960,
+     "y": 990,
+     "tam": 40,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e19",
+     "entrada": "pop",
+     "en": "d",
+     "t": 0.8
+    }
+   ]
+  },
+  {
+   "seccion": "3. Paso a paso: las fórmulas",
+   "say": "Paso a paso. [[a]]Sea pe sub i la proporción de la clase i dentro del nodo. [[b]]La probabilidad de sacar dos de la misma clase es la suma de los pe al cuadrado. [[c]]Y Gini es uno menos eso.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "p_i = proporción de la clase i DENTRO del nodo",
+     "x": 960,
+     "y": 230,
+     "tam": 46,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e20",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "misma clase dos veces:  p₀² + p₁²",
+     "x": 960,
+     "y": 400,
+     "tam": 54,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e21",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 600,
+     "w": 900,
+     "h": 168.0,
+     "radio": 26,
+     "relleno": "blanco",
+     "borde": "violeta",
+     "grosor": 4,
+     "sombra": true,
+     "id": "e22",
+     "entrada": "subir",
+     "en": "c"
+    },
+    {
+     "tipo": "texto",
+     "texto": "Gini = 1 − Σ pᵢ²",
+     "x": 960,
+     "y": 600,
+     "tam": 80,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e23",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.1
+    }
+   ]
+  },
+  {
+   "say": "Con dos clases, queda uno menos pe al cuadrado, menos uno menos pe, al cuadrado. [[a]]La otra medida es la entropía, que viene de la teoría de la información: la medida del desorden. [[b]]Es menos la suma de pe por logaritmo en base dos de pe.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 280,
+     "w": 1100,
+     "h": 130.20000000000002,
+     "radio": 26,
+     "relleno": "blanco",
+     "borde": "violeta",
+     "grosor": 4,
+     "sombra": true,
+     "id": "e24",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "texto",
+     "texto": "Gini = 1 − p² − (1 − p)²",
+     "x": 960,
+     "y": 280,
+     "tam": 62,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e25",
+     "entrada": "pop",
+     "t": 0.1
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 560,
+     "w": 1100,
+     "h": 130.20000000000002,
+     "radio": 26,
+     "relleno": "blanco",
+     "borde": "azul",
+     "grosor": 4,
+     "sombra": true,
+     "id": "e26",
+     "entrada": "subir",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "Entropía = − Σ pᵢ · log₂ pᵢ",
+     "x": 960,
+     "y": 560,
+     "tam": 62,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e27",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "teoría de la información · «medida del desorden»",
+     "x": 960,
+     "y": 700,
+     "tam": 36,
+     "peso": "sb",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e28",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "log₂: logaritmo en base dos",
+     "x": 960,
+     "y": 800,
+     "tam": 34,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e29",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "seccion": "4. Ejemplo: el Gini de la raíz",
+   "say": "Ejemplo con la raíz del árbol de la clase. [[a]]Hay tres mil ciento cincuenta clientes, y se fugan cuatrocientos noventa y cinco. [[b]]La proporción que se queda es dos mil seiscientos cincuenta y cinco sobre tres mil ciento cincuenta: cero coma ocho cuatro dos nueve. [[c]]La que se fuga: cero coma uno cinco siete uno.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "la raíz · datos reales de la clase",
+     "x": 960,
+     "y": 170,
+     "tam": 44,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e30",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "puntos",
+     "grupos": [
+      {
+       "n": 84,
+       "rect": [
+        300,
+        260,
+        1100,
+        520
+       ],
+       "color": "#94A3B8"
+      },
+      {
+       "n": 16,
+       "rect": [
+        1160,
+        260,
+        1620,
+        520
+       ],
+       "color": "rojo"
+      }
+     ],
+     "radio": 14,
+     "id": "e31",
+     "entrada": "fade",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "p_queda = 2.655 / 3.150 =",
+     "x": 940,
+     "y": 640,
+     "tam": 48,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "e32",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.8428571428571429,
+     "fmt": "{:.4f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 970,
+     "y": 640,
+     "tam": 60,
+     "color": "gris",
+     "ancla": "lm",
+     "id": "e33",
+     "entrada": "fade",
+     "en": "b",
+     "t": 0.5,
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "p_fuga = 495 / 3.150 =",
+     "x": 940,
+     "y": 750,
+     "tam": 48,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "e34",
+     "entrada": "pop",
+     "en": "c"
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.15714285714285714,
+     "fmt": "{:.4f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 970,
+     "y": 750,
+     "tam": 60,
+     "color": "rojo",
+     "ancla": "lm",
+     "id": "e35",
+     "entrada": "fade",
+     "en": "c",
+     "t": 0.5,
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "cada punto ≈ 1 % de los clientes",
+     "x": 960,
+     "y": 560,
+     "tam": 28,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e36",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "datos reales de la clase (recalculados)",
+     "x": 1860,
+     "y": 1050,
+     "tam": 26,
+     "peso": "sb",
+     "color": "teal",
+     "ancla": "rm",
+     "id": "e37",
+     "entrada": "pop",
+     "t": 0.6
+    }
+   ]
+  },
+  {
+   "say": "Ahora Gini. [[a]]Cero coma ocho cuatro dos nueve al cuadrado da cero coma siete uno cero cuatro. [[b]]Cero coma uno cinco siete uno al cuadrado, cero coma cero dos cuatro siete. [[c]]Uno menos las dos: cero coma dos seis cuatro nueve. El Gini de la raíz es cero coma doscientos sesenta y cinco.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "Gini de la raíz",
+     "x": 960,
+     "y": 180,
+     "tam": 48,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e38",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.8429² = 0.7104",
+     "x": 960,
+     "y": 340,
+     "tam": 56,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e39",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.1571² = 0.0247",
+     "x": 960,
+     "y": 450,
+     "tam": 56,
+     "peso": "sb",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e40",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "1 − 0.7104 − 0.0247 =",
+     "x": 900,
+     "y": 600,
+     "tam": 56,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "e41",
+     "entrada": "pop",
+     "en": "c"
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.2649,
+     "fmt": "{:.4f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 930,
+     "y": 600,
+     "tam": 84,
+     "color": "violeta",
+     "ancla": "lm",
+     "id": "e42",
+     "entrada": "fade",
+     "en": "c",
+     "t": 0.5,
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "datos reales de la clase (recalculados)",
+     "x": 1860,
+     "y": 1050,
+     "tam": 26,
+     "peso": "sb",
+     "color": "teal",
+     "ancla": "rm",
+     "id": "e43",
+     "entrada": "pop",
+     "t": 0.6
+    }
+   ]
+  },
+  {
+   "say": "Y la entropía de la misma raíz. [[a]]Cero coma ocho cuatro dos nueve por menos cero coma dos cuatro seis seis, en valor absoluto, da cero coma dos cero siete nueve. [[b]]Cero coma uno cinco siete uno por dos coma seis siete: cero coma cuatro uno nueve cinco. [[c]]Sumadas: cero coma seis dos siete cuatro.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "entropía de la raíz",
+     "x": 960,
+     "y": 180,
+     "tam": 48,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e44",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "texto",
+     "texto": "log₂ 0.8429 = -0.2466     log₂ 0.1571 = -2.670",
+     "x": 960,
+     "y": 290,
+     "tam": 40,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e45",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.8429 × 0.2466 = 0.2079",
+     "x": 960,
+     "y": 420,
+     "tam": 54,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e46",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.1571 × 2.670 = 0.4195",
+     "x": 960,
+     "y": 530,
+     "tam": 54,
+     "peso": "sb",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e47",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.2079 + 0.4195 =",
+     "x": 900,
+     "y": 680,
+     "tam": 56,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "e48",
+     "entrada": "pop",
+     "en": "c"
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.6274,
+     "fmt": "{:.4f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 930,
+     "y": 680,
+     "tam": 84,
+     "color": "azul",
+     "ancla": "lm",
+     "id": "e49",
+     "entrada": "fade",
+     "en": "c",
+     "t": 0.5,
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "datos reales de la clase (recalculados)",
+     "x": 1860,
+     "y": 1050,
+     "tam": 26,
+     "peso": "sb",
+     "color": "teal",
+     "ancla": "rm",
+     "id": "e50",
+     "entrada": "pop",
+     "t": 0.6
+    }
+   ]
+  },
+  {
+   "seccion": "5. Las dos curvas",
+   "say": "¿Cómo se comportan las dos medidas? [[a]]En el eje horizontal, la proporción de fuga del nodo. [[b]]Gini sube desde cero, llega a cero coma cinco con mitad y mitad, y vuelve a cero. [[c]]La entropía hace lo mismo, pero su máximo es uno.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "grafico",
+     "x0": 300,
+     "y0": 230,
+     "x1": 1200,
+     "y1": 860,
+     "xmin": 0,
+     "xmax": 1,
+     "ymin": 0,
+     "ymax": 1.05,
+     "series": [
+      {
+       "xs": [
+        0.0,
+        0.025,
+        0.05,
+        0.075,
+        0.1,
+        0.125,
+        0.15,
+        0.175,
+        0.2,
+        0.225,
+        0.25,
+        0.275,
+        0.3,
+        0.325,
+        0.35,
+        0.375,
+        0.4,
+        0.425,
+        0.45,
+        0.475,
+        0.5,
+        0.525,
+        0.55,
+        0.575,
+        0.6,
+        0.625,
+        0.65,
+        0.675,
+        0.7,
+        0.725,
+        0.75,
+        0.775,
+        0.8,
+        0.825,
+        0.85,
+        0.875,
+        0.9,
+        0.925,
+        0.95,
+        0.975,
+        1.0
+       ],
+       "ys": [
+        0.0,
+        0.04875000000000007,
+        0.09500000000000008,
+        0.13874999999999993,
+        0.17999999999999994,
+        0.21875,
+        0.2550000000000001,
+        0.28875000000000006,
+        0.31999999999999984,
+        0.3487499999999999,
+        0.375,
+        0.39874999999999994,
+        0.4200000000000001,
+        0.43875,
+        0.455,
+        0.46875,
+        0.48,
+        0.48875,
+        0.49499999999999994,
+        0.49875,
+        0.5,
+        0.49875,
+        0.49500000000000005,
+        0.48875,
+        0.48,
+        0.46875,
+        0.4549999999999999,
+        0.43875,
+        0.42,
+        0.39875,
+        0.375,
+        0.34874999999999995,
+        0.3199999999999999,
+        0.28875000000000006,
+        0.25500000000000006,
+        0.21875,
+        0.17999999999999994,
+        0.13874999999999993,
+        0.09500000000000003,
+        0.04875000000000006,
+        0.0
+       ],
+       "color": "violeta",
+       "grosor": 7,
+       "revela": 0.0,
+       "suave": true
+      },
+      {
+       "xs": [
+        0.0,
+        0.025,
+        0.05,
+        0.075,
+        0.1,
+        0.125,
+        0.15,
+        0.175,
+        0.2,
+        0.225,
+        0.25,
+        0.275,
+        0.3,
+        0.325,
+        0.35,
+        0.375,
+        0.4,
+        0.425,
+        0.45,
+        0.475,
+        0.5,
+        0.525,
+        0.55,
+        0.575,
+        0.6,
+        0.625,
+        0.65,
+        0.675,
+        0.7,
+        0.725,
+        0.75,
+        0.775,
+        0.8,
+        0.825,
+        0.85,
+        0.875,
+        0.9,
+        0.925,
+        0.95,
+        0.975,
+        1.0
+       ],
+       "ys": [
+        0.0,
+        0.16866093149667025,
+        0.28639695711595625,
+        0.38431154412649704,
+        0.4689955935892812,
+        0.5435644431995964,
+        0.6098403047164004,
+        0.6690158350565576,
+        0.7219280948873623,
+        0.7691928290130138,
+        0.8112781244591328,
+        0.8485481782946158,
+        0.8812908992306927,
+        0.9097361225311662,
+        0.934068055375491,
+        0.954434002924965,
+        0.9709505944546686,
+        0.9837082626231859,
+        0.9927744539878083,
+        0.99819587904281,
+        1.0,
+        0.99819587904281,
+        0.9927744539878083,
+        0.9837082626231857,
+        0.9709505944546686,
+        0.954434002924965,
+        0.934068055375491,
+        0.9097361225311661,
+        0.8812908992306927,
+        0.8485481782946158,
+        0.8112781244591328,
+        0.7691928290130137,
+        0.7219280948873623,
+        0.6690158350565576,
+        0.6098403047164005,
+        0.5435644431995964,
+        0.4689955935892811,
+        0.38431154412649693,
+        0.2863969571159563,
+        0.16866093149667033,
+        0.0
+       ],
+       "color": "azul",
+       "grosor": 7,
+       "revela": 0.0,
+       "suave": true
+      }
+     ],
+     "xticks": [
+      0,
+      0.25,
+      0.5,
+      0.75,
+      1
+     ],
+     "yticks": [
+      0,
+      0.25,
+      0.5,
+      0.75,
+      1.0
+     ],
+     "yfmt": "{:.2f}",
+     "xlabel": "proporción de fuga en el nodo (p)",
+     "id": "gc",
+     "entrada": "fade",
+     "en": "a",
+     "dur": 0.7
+    },
+    {
+     "series.0.revela": 1.0,
+     "id": "gc",
+     "en": "b",
+     "dur": 2.0
+    },
+    {
+     "tipo": "texto",
+     "texto": "Gini · máx 0.5",
+     "x": 1530,
+     "y": 420,
+     "tam": 44,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e51",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.6
+    },
+    {
+     "series.1.revela": 1.0,
+     "id": "gc",
+     "en": "c",
+     "dur": 2.0
+    },
+    {
+     "tipo": "texto",
+     "texto": "entropía · máx 1",
+     "x": 1530,
+     "y": 300,
+     "tam": 44,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e52",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.6
+    }
+   ]
+  },
+  {
+   "say": "Las dos valen cero cuando el nodo es puro, y son máximas con la mezcla perfecta. [[a]]Nuestra raíz está aquí, en quince coma siete por ciento de fuga: [[b]]Gini cero coma dos seis cinco, entropía cero coma seis dos siete. [[c]]Gini se calcula más rápido, porque no usa logaritmos, y es el criterio por defecto en sklearn.",
+   "acciones": [
+    {
+     "tipo": "linea",
+     "x0": 0.15714285714285714,
+     "y0": 0,
+     "x1": 0.15714285714285714,
+     "y1": 1.0,
+     "color": "rojo",
+     "grosor": 4,
+     "punta": false,
+     "guion": true,
+     "ref": "gc",
+     "id": "e53",
+     "entrada": "ninguna",
+     "en": "a",
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "caja",
+     "x": 0.15714285714285714,
+     "y": 0.26489795918367354,
+     "w": 22,
+     "h": 22,
+     "radio": 11,
+     "relleno": "violeta",
+     "borde": null,
+     "grosor": 0,
+     "ref": "gc",
+     "id": "e54",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "caja",
+     "x": 0.15714285714285714,
+     "y": 0.6274303352684106,
+     "w": 22,
+     "h": 22,
+     "radio": 11,
+     "relleno": "azul",
+     "borde": null,
+     "grosor": 0,
+     "ref": "gc",
+     "id": "e55",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "raíz: p = 0.157",
+     "x": 1530,
+     "y": 560,
+     "tam": 40,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e56",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "Gini 0.265 · entropía 0.627",
+     "x": 1530,
+     "y": 640,
+     "tam": 36,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e57",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "Gini: sin logaritmos · default de sklearn",
+     "x": 1530,
+     "y": 780,
+     "tam": 32,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e58",
+     "entrada": "pop",
+     "en": "c"
+    }
+   ]
+  },
+  {
+   "seccion": "6. La tabla de la diapositiva 11",
+   "say": "La diapositiva once resume cuatro nodos típicos. [[a]]Puro: cero y cero. [[b]]Ochenta y cuatro contra dieciséis. [[c]]Mitad y mitad: cero coma cinco y uno. [[d]]Y seis contra noventa y cuatro, como la hoja de fuga del árbol.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "composición del nodo",
+     "x": 380,
+     "y": 230,
+     "tam": 32,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "lm",
+     "id": "e59",
+     "entrada": "pop"
+    },
+    {
+     "tipo": "texto",
+     "texto": "Gini",
+     "x": 1230,
+     "y": 230,
+     "tam": 32,
+     "peso": "sb",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e60",
+     "entrada": "pop"
+    },
+    {
+     "tipo": "texto",
+     "texto": "entropía",
+     "x": 1530,
+     "y": 230,
+     "tam": 32,
+     "peso": "sb",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e61",
+     "entrada": "pop"
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 330,
+     "w": 1300,
+     "h": 100,
+     "radio": 18,
+     "relleno": "blanco",
+     "borde": "verde",
+     "grosor": 3,
+     "id": "e62",
+     "entrada": "subir",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "100 % se queda (puro)",
+     "x": 380,
+     "y": 330,
+     "tam": 38,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "lm",
+     "id": "e63",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.05
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.000",
+     "x": 1230,
+     "y": 330,
+     "tam": 44,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e64",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.000",
+     "x": 1530,
+     "y": 330,
+     "tam": 44,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e65",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.15
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 450,
+     "w": 1300,
+     "h": 100,
+     "radio": 18,
+     "relleno": "blanco",
+     "borde": "gris",
+     "grosor": 3,
+     "id": "e66",
+     "entrada": "subir",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "84 % / 16 %  ← «nuestra raíz»",
+     "x": 380,
+     "y": 450,
+     "tam": 38,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "lm",
+     "id": "e67",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.05
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.269",
+     "x": 1230,
+     "y": 450,
+     "tam": 44,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e68",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.634",
+     "x": 1530,
+     "y": 450,
+     "tam": 44,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e69",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.15
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 570,
+     "w": 1300,
+     "h": 100,
+     "radio": 18,
+     "relleno": "blanco",
+     "borde": "rojo",
+     "grosor": 3,
+     "id": "e70",
+     "entrada": "subir",
+     "en": "c"
+    },
+    {
+     "tipo": "texto",
+     "texto": "50 % / 50 % (máxima mezcla)",
+     "x": 380,
+     "y": 570,
+     "tam": 38,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "lm",
+     "id": "e71",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.05
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.500",
+     "x": 1230,
+     "y": 570,
+     "tam": 44,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e72",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "1.000",
+     "x": 1530,
+     "y": 570,
+     "tam": 44,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e73",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.15
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 690,
+     "w": 1300,
+     "h": 100,
+     "radio": 18,
+     "relleno": "blanco",
+     "borde": "ambar",
+     "grosor": 3,
+     "id": "e74",
+     "entrada": "subir",
+     "en": "d"
+    },
+    {
+     "tipo": "texto",
+     "texto": "6 % / 94 %  ← hoja de fuga",
+     "x": 380,
+     "y": 690,
+     "tam": 38,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "lm",
+     "id": "e75",
+     "entrada": "pop",
+     "en": "d",
+     "t": 0.05
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.113",
+     "x": 1230,
+     "y": 690,
+     "tam": 44,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e76",
+     "entrada": "pop",
+     "en": "d",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.327",
+     "x": 1530,
+     "y": 690,
+     "tam": 44,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e77",
+     "entrada": "pop",
+     "en": "d",
+     "t": 0.15
+    }
+   ]
+  },
+  {
+   "say": "Ahora, una alerta del material. [[a]]Esa fila dice que el Gini de nuestra raíz es cero coma doscientos sesenta y nueve. [[b]]Pero ochenta y cuatro contra dieciséis es un redondeo. [[c]]La raíz real tiene ochenta y cuatro coma tres contra quince coma siete, y su Gini exacto es cero coma doscientos sesenta y cinco, el mismo de la diapositiva anterior.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "alerta del material",
+     "x": 960,
+     "y": 140,
+     "tam": 48,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e78",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "anillo",
+     "x": 1230,
+     "y": 450,
+     "w": 200,
+     "h": 110,
+     "radio": 20,
+     "color": "ambar",
+     "grosor": 6,
+     "pulso": true,
+     "id": "e79",
+     "entrada": "fade",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "84 / 16 es un redondeo",
+     "x": 960,
+     "y": 870,
+     "tam": 40,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e80",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "real: 84.3 / 15.7  →  Gini 0.265",
+     "x": 960,
+     "y": 950,
+     "tam": 40,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "id": "e81",
+     "entrada": "pop",
+     "en": "c"
+    }
+   ]
+  },
+  {
+   "seccion": "7. El error típico",
+   "say": "El error típico con la impureza: [[a]]usar las proporciones de toda la base en un nodo hijo. [[b]]Los pe se recalculan en cada nodo, con los clientes que cayeron ahí. [[c]]En el nodo de los que reclamaron, la fuga no es quince coma siete: es setenta y cinco coma cinco. Y su Gini es cero coma tres siete, no cero coma dos seis cinco.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "usar la p de toda la base en un hijo",
+     "x": 960,
+     "y": 260,
+     "tam": 58,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e1",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tachado": 1.0,
+     "color": "gris",
+     "id": "e1",
+     "en": "b",
+     "dur": 0.6
+    },
+    {
+     "tipo": "texto",
+     "texto": "los pᵢ se recalculan en CADA nodo",
+     "x": 960,
+     "y": 430,
+     "tam": 54,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "fondo_txt": "verdeclaro",
+     "id": "e82",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.4
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 680,
+     "w": 1200,
+     "h": 240,
+     "radio": 30,
+     "relleno": "blanco",
+     "borde": "rojo",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e83",
+     "entrada": "subir",
+     "en": "c"
+    },
+    {
+     "tipo": "texto",
+     "texto": "nodo «reclamó»: 278 clientes, 210 se fugan",
+     "x": 960,
+     "y": 620,
+     "tam": 40,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e84",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "p = 0.755  →  Gini = 0.370",
+     "x": 960,
+     "y": 710,
+     "tam": 52,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e85",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.4
+    }
+   ]
+  },
+  {
+   "seccion": "8. Piensa un segundo",
+   "say": "Piensa un segundo. [[a]]Un nodo tiene veinte observaciones: quince de la clase A y cinco de la clase B. [[b]]¿Cuál es su Gini? Y si te animas, ¿su entropía?",
+   "pausa": 0.6,
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "puntos",
+     "grupos": [
+      {
+       "n": 15,
+       "rect": [
+        520,
+        300,
+        1180,
+        420
+       ],
+       "color": "azul"
+      },
+      {
+       "n": 5,
+       "rect": [
+        1240,
+        300,
+        1400,
+        420
+       ],
+       "color": "ambar"
+      }
+     ],
+     "radio": 24,
+     "id": "e86",
+     "entrada": "fade",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "15 de A · 5 de B",
+     "x": 960,
+     "y": 520,
+     "tam": 56,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e87",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "¿Gini? ¿entropía?",
+     "x": 960,
+     "y": 680,
+     "tam": 68,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e88",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "La proporción de A es cero coma setenta y cinco. [[a]]Al cuadrado, cero coma cinco seis dos cinco. La de B, cero coma veinticinco, al cuadrado cero coma cero seis dos cinco. [[b]]Gini: uno menos cero coma seis dos cinco, igual a cero coma tres siete cinco. [[c]]Y la entropía: cero coma tres uno uno más cero coma cinco: cero coma ocho uno uno.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "p_A = 15 / 20 = 0.75",
+     "x": 960,
+     "y": 230,
+     "tam": 54,
+     "peso": "sb",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e89",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.75² + 0.25² = 0.5625 + 0.0625 = 0.625",
+     "x": 960,
+     "y": 360,
+     "tam": 50,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e90",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "Gini = 1 − 0.625 =",
+     "x": 900,
+     "y": 500,
+     "tam": 60,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "e91",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.375,
+     "fmt": "{:.3f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 930,
+     "y": 500,
+     "tam": 84,
+     "color": "violeta",
+     "ancla": "lm",
+     "id": "e92",
+     "entrada": "fade",
+     "en": "b",
+     "t": 0.4,
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.75 × 0.415 + 0.25 × 2 = 0.311 + 0.5 =",
+     "x": 900,
+     "y": 680,
+     "tam": 46,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "e93",
+     "entrada": "pop",
+     "en": "c"
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.8112781244591328,
+     "fmt": "{:.3f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 930,
+     "y": 680,
+     "tam": 72,
+     "color": "azul",
+     "ancla": "lm",
+     "id": "e94",
+     "entrada": "fade",
+     "en": "c",
+     "t": 0.5,
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "ejercicio de la diapositiva 19 (Arbol de decision.pptx)",
+     "x": 960,
+     "y": 850,
+     "tam": 28,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e95",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.9
+    }
+   ]
+  },
+  {
+   "seccion": "9. Para llevar",
+   "say": "Para llevarte: [[a]]la impureza mide qué tan mezclado está un nodo. Vale cero si es puro. [[b]]Gini es uno menos la suma de los pe al cuadrado, con máximo cero coma cinco. Entropía, con máximo uno. [[c]]Y los pe se recalculan en cada nodo.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "impureza = mezcla · 0 si es puro",
+     "x": 960,
+     "y": 300,
+     "tam": 54,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e96",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "Gini máx 0.5 · entropía máx 1",
+     "x": 960,
+     "y": 480,
+     "tam": 54,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e97",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "los pᵢ son del nodo",
+     "x": 960,
+     "y": 660,
+     "tam": 54,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e98",
+     "entrada": "pop",
+     "en": "c"
+    }
+   ]
+  },
+  {
+   "seccion": "10. Siguiente parada",
+   "say": "Siguiente parada: [[a]]usar la impureza para elegir el primer corte. Lo vas a calcular a mano, con reclamos contra edad.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 480,
+     "w": 760,
+     "h": 260,
+     "radio": 40,
+     "relleno": "ambarclaro",
+     "borde": "ambar",
+     "grosor": 6,
+     "id": "e99",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "4",
+     "x": 680,
+     "y": 480,
+     "tam": 120,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e100",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "El primer corte, a mano",
+     "x": 1060,
+     "y": 480,
+     "tam": 40,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "ancho_max": 520,
+     "id": "e101",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.15
+    }
+   ]
+  }
+ ]
+}

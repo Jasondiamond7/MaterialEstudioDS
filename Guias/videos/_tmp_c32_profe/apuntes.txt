@@ -1,0 +1,219 @@
+Apuntes · Clase 32 · Reducción de dimensionalidad y
+representación de variables
+
+Para leer antes de los ejercicios · lectura de ~35 min
+
+Lo más importante, en 6 ideas
+1 Más columnas no es más información. Costo, multicolinealidad, ruido y varianza: se reduce por selección
+
+        o por extracción.
+
+2 Representar antes de reducir. Estandarizar, codificar y construir variables; lo aprendido (media, categorías,
+        tasas) solo con entrenamiento.
+
+3 PCA = direcciones de máxima varianza. Vectores propios de la covarianza; el valor propio λ es la varianza
+        que explica cada uno.
+
+4 Elegir k con criterio. Umbral de varianza, codo y validación cruzada dentro de un Pipeline.
+
+5 Cargas y correlaciones. Carga × √λ = correlación; los componentes se nombran leyendo sus cargas.
+
+6 t-SNE explora, PCA produce. t-SNE conserva vecindades locales, no es determinista y no transforma datos
+        nuevos.
+
+Cada sección trae una explicación, un ejemplo resuelto con números distintos a los de los ejercicios y una pista para el notebook
+C32_ReduccionDimensionalidad.ipynb o el cuaderno C32_Ejercicios_Cuaderno_ReduccionDimensionalidad.pdf.
+
+1 El problema de la dimensionalidad
+
+Más variables aumentan el costo, introducen redundancia (multicolinealidad) y ruido, y con pocas filas disparan la
+varianza del modelo. La multicolinealidad se mide con el VIF = 1/(1 − R²), donde R² sale de explicar esa variable con
+todas las demás: VIF > 10 es una señal fuerte. Reducir puede ser seleccionar (quitar columnas) o extraer
+(combinarlas).
+
+Ejemplo resuelto · un modelo de 40 columnas con 200 filas
+
+Pregunta                                           Cálculo           Resultado
+
+Filas por columna                                  200 / 40          5 (muy pocas)
+
+VIF si R² = 0.96 al explicar una variable con 1/(1 − 0.96) = 1/0.04  25
+
+las demás
+
+VIF si R² = 0.50                                   1/0.50            2 (sin problema)
+
+Tras quitar 25 columnas redundantes: filas 200 / 15                  13.3
+
+por columna
+
+Un VIF de 25 dice que esa variable casi se puede calcular con las otras: sobra. En el notebook de la clase, segundos y
+frec_llamadas tienen VIF 40.8 y 48.3. Selección = eliminar una de las dos; extracción = resumirlas en un componente.
+
+Apuntes · Clase 32 · Reducción de dimensionalidad                                                                                  1
+Pista para la Parte A del notebook y el Bloque 1 del cuaderno
+Reproduce la matriz de correlaciones, calcula el VIF de las seis variables de uso y repite el experimento de columnas de ruido
+con 100 filas.
+
+2 Escalar, codificar y construir
+
+La estandarización resta la media y divide por la desviación: z = (x − media)/desviación. Después de ella, todas las
+variables tienen media 0 y desviación 1. La normalización min-max lleva a [0, 1]. Para variables categóricas: ordinal
+si hay orden, one-hot si no; target o frequency encoding con muchas categorías. Las variables construidas
+(cocientes) se crean antes de reducir.
+
+Ejemplo resuelto · llamadas de un cliente
+
+Pregunta                                           Cálculo                         Resultado
+
+segundos: media 4.000, desviación 3.000 · z        (10.000 − 4.000)/3.000          z = 2
+de 10.000
+
+reclamos: media 0.1, desviación 0.3 · z de un 1 (1 − 0.1)/0.3                      z = 3
+
+min-max de 10.000 con mínimo 50 y máximo           (10.000 − 50)/(17.000 − 50)     0.587
+17.000
+
+Cuánto más varianza tiene segundos que             3.000² / 0.3² = 9.000.000/0.09  100.000.000 veces
+reclamos (sin escalar)
+
+Región con 5 categorías, canal con 4 y estado 4 + 3 + 1                            8 (sin drop: 5 + 4 + 2 = 11)
+binario: columnas one-hot con drop = 'first'
+
+duracion_prom_llamada de 7.200 segundos 7.200 / 90                                 80 s
+
+en 90 llamadas
+
+Sin escalar, un cliente que se desvía 2 sd en segundos pesa igual que otro 3 sd en reclamos solo si estandarizas. Con target
+encoding: comuna A con 40 clientes y 8 fugas, tasa global 0.15, suavizado m = 20: (8 + 20·0.15)/(40 + 20) = 11/60 = 0.183, no
+el 0.20 crudo.
+
+Apuntes · Clase 32 · Reducción de dimensionalidad                                                                               2
+Pista para la Parte B del notebook y los Bloques 2 y 5 del cuaderno
+
+Estandariza con fit solo en entrenamiento, compara PCA con y sin estandarizar y arma un ColumnTransformer con ordinal,
+one-hot y target encoding.
+
+3 PCA a mano con una matriz 2×2
+
+Con datos estandarizados, la matriz de covarianza es la matriz de correlaciones. Sus valores propios λ son las
+varianzas de los componentes y sus vectores propios, las direcciones. Para [[1, r], [r, 1]] los valores propios son 1 + r
+y 1 − r, con vectores (1, 1)/√2 y (1, −1)/√2. Un punto z se proyecta con el producto punto: puntaje = v · z.
+
+Ejemplo resuelto · dos variables con r = 0.6
+
+Pregunta                                           Cálculo                 Resultado
+
+Valores propios                                    1 + 0.6 · 1 − 0.6       λ₁ = 1.6 · λ₂ = 0.4
+
+Varianza explicada                                 1.6/2 · 0.4/2           80 % · 20 %
+
+Vectores propios                                   (1, 1)/√2 · (1, −1)/√2  (0.707, 0.707) · (0.707, −0.707)
+
+Punto z = (1.0, 0.2): puntaje en PC1               (1.0 + 0.2)/√2          0.849
+
+Puntaje en PC2                                     (1.0 − 0.2)/√2          0.566
+
+Reconstruir con solo PC1 y error                   0.849·(0.707, 0.707) = (0.6, 0.6) · (0.4² + 0.4²) (0.6, 0.6) · 0.32
+
+PC1 es la diagonal («ambas altas o ambas bajas»); PC2, lo que las diferencia. Conservar solo PC1 mantiene el 80 % de la
+varianza. Los dos vectores son perpendiculares: (0.707·0.707 + 0.707·(−0.707)) = 0.
+
+Pista para la Parte C del notebook (C1) y el Bloque 3 del cuaderno
+
+Calcula la matriz de covarianza del entrenamiento escalado, diagonalízala con np.linalg.eigh y compara con PCA. Ojo: los
+signos pueden ser opuestos.
+
+Apuntes · Clase 32 · Reducción de dimensionalidad                                                                          3
+4 Varianza explicada y cuántos componentes
+
+La varianza explicada del componente j es λⱼ/Σλ. Con p variables estandarizadas Σλ = p. La acumulada indica cuánta
+información conservas con k componentes. Reglas de apoyo: el umbral (80 o 90 %), el codo del scree plot y el
+criterio de Kaiser (λ > 1); la decisión final se contrasta con el desempeño en validación.
+
+Ejemplo resuelto · seis variables estandarizadas
+
+λ = 2.4, 1.5, 1.0, 0.6, 0.3, 0.2 (suman 6.0).
+
+Componente                         Cálculo                                        Varianza · acumulada
+
+PC1                                2.4/6                                          40.0 % · 40.0 %
+
+PC2                                1.5/6                                          25.0 % · 65.0 %
+
+PC3                                1.0/6                                          16.7 % · 81.7 %
+
+PC4                                0.6/6                                          10.0 % · 91.7 %
+
+Para 80 % · para 90 % · Kaiser primer k con acumulada ≥ umbral                    k = 3 · k = 4 · k = 2
+(λ > 1)
+
+Los criterios no coinciden y está bien: son referencias, no verdades (la profesora insistió en bajarlas al contexto). En los datos
+de la clase, 8 componentes dan 85.0 % y en la base real 7 dan 80.4 %.
+
+Pista para la Parte C del notebook (C2 y C3) y el Bloque 1 y 2 del cuaderno
+Dibuja el scree plot, calcula k para 80, 85 y 90 % y elige k con GridSearchCV sobre un Pipeline.
+
+5 Cargas y correlaciones con los componentes
+
+Cada fila de components_ es un componente; sus cargas (norma 1) dicen cuánto pesa cada variable. El puntaje de un
+cliente es Σ carga·z. La correlación entre una variable y el componente es carga · √λ. El signo global de un
+componente es arbitrario; lo que importa es la relación entre signos.
+
+Ejemplo resuelto · PC1 con cuatro variables y λ = 1.6
+
+Pregunta                                           Cálculo                                         Resultado
+
+Cargas de PC1: (0.5, 0.5, 0.5, −0.5): norma √(4 · 0.25)                                            1 (correcto)
+
+Cliente z = (2, 1, 0, 1): puntaje                  0.5·2 + 0.5·1 + 0.5·0 − 0.5·1                   1.0
+
+Correlación de la variable 1 con PC1               0.5 · √1.6 = 0.5 · 1.265                        0.63
+
+Cómo se llama el componente                        tres variables suben juntas y la cuarta baja    «A, B y C altas / D baja»
+
+El nombre es una interpretación: ponerlo exige leer las cargas, no confiar en la diapositiva. En los datos de la clase PC1 (34.9
+%) reúne segundos, llamadas, contactos, SMS, monto y CLV: «uso del servicio».
+
+Apuntes · Clase 32 · Reducción de dimensionalidad                                                                                   4
+Pista para la Parte C del notebook (C4) y el Bloque 4 del cuaderno
+Imprime components_ como tabla, grafica el círculo de correlaciones y repite el PCA sin estandarizar para ver qué cambia.
+
+6 t-SNE, PCA y la decisión final
+
+t-SNE calcula qué tan probable es que cada cliente sea vecino de otro y mueve puntos en 2D hasta reproducir esas
+vecindades. Perplexity controla el tamaño de la vecindad. No es determinista, no tiene transform y no se
+interpretan distancias entre islas. Para modelar se usa PCA (o selección).
+
+Ejemplo resuelto · elegir la técnica
+
+Situación                                          Técnica                  Por qué
+
+Seis variables de uso casi iguales y un modelo     PCA (o seleccionar una)  reduce y transforma datos nuevos
+liviano para producción
+
+Ver si hay estructuras locales no lineales entre   t-SNE                    explorar y visualizar
+clientes
+
+Tengo segundos y llamadas y quiero la duración     feature engineering      cociente, antes de reducir
+media
+
+Una columna no aporta y complica la explicación selección                   conserva variables originales
+
+Un modelo que aprendió con 8 componentes necesita el mismo PCA (con el mismo escalador) al predecir: por eso todo va en
+un Pipeline. Con t-SNE no se puede: cada vez que llega un cliente habría que recalcular el mapa.
+
+Apuntes · Clase 32 · Reducción de dimensionalidad                                                                          5
+Pista para la Parte D del notebook y el Bloque 6 y 7 del cuaderno
+Prueba perplexity 5, 30 y 80, cambia la semilla, calcula la trustworthiness y decide qué técnica usarías en cada caso.
+
+Lo que debes recordar
+• Sesión 31 (Introducción al ML) todavía no está en este material: aquí solo se usó lo que la clase 32 recuerda de ella
+
+    (supervisado vs no supervisado).
+• Orden sugerido: apuntes → Bloques 1–4 del cuaderno → Partes A–C del notebook → Bloques 5–7 → Parte D → ejercicio
+
+    de cierre.
+
+Apuntes · Clase 32 · Reducción de dimensionalidad                                                                        6
+

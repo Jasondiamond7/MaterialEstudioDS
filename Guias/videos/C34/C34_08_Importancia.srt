@@ -1,0 +1,315 @@
+1
+00:00:00,250 --> 00:00:01,310
+Octava parada.
+
+2
+00:00:01,430 --> 00:00:04,160
+¿Qué variables importan en un modelo de árboles?
+
+3
+00:00:04,280 --> 00:00:07,610
+Hay dos maneras de medirlo, y dan respuestas distintas.
+
+4
+00:00:07,730 --> 00:00:09,300
+Hoy aprendes cuál creerle.
+
+5
+00:00:09,420 --> 00:00:14,210
+El árbol de profundidad tres usó seis variables de doce: eso ya es selección.
+
+6
+00:00:14,330 --> 00:00:18,110
+Pero para un bosque de trescientos árboles necesitas un número por variable.
+
+7
+00:00:18,230 --> 00:00:21,450
+sklearn te lo da en una línea: feature_importances_.
+
+8
+00:00:21,570 --> 00:00:25,510
+El problema es que ese número engaña, de una forma muy precisa.
+
+9
+00:00:25,630 --> 00:00:28,010
+Primero, la importancia por impureza.
+
+10
+00:00:28,130 --> 00:00:31,885
+Suma, para cada variable, la ganancia de todos los cortes donde
+
+11
+00:00:31,885 --> 00:00:35,700
+participó, ponderada por cuántos clientes pasaban por cada nodo.
+
+12
+00:00:35,820 --> 00:00:38,130
+Y se normaliza para que todas sumen uno.
+
+13
+00:00:38,250 --> 00:00:40,210
+Su sesgo se llama cardinalidad.
+
+14
+00:00:40,330 --> 00:00:44,470
+Una variable con muchos valores distintos ofrece muchos umbrales para probar.
+
+15
+00:00:44,590 --> 00:00:48,502
+Es como una lotería: quien compra dos mil seiscientos boletos gana más
+
+16
+00:00:48,502 --> 00:00:51,520
+seguido que quien compra dos, aunque no sea más hábil.
+
+17
+00:00:51,640 --> 00:00:54,784
+Por puro azar, alguno de tantos cortes reduce algo la
+
+18
+00:00:54,784 --> 00:00:57,750
+impureza, y la importancia por impureza lo premia.
+
+19
+00:00:57,870 --> 00:01:00,580
+La alternativa es la importancia por permutación.
+
+20
+00:01:00,700 --> 00:01:02,500
+Tomas datos que el modelo no vio.
+
+21
+00:01:02,620 --> 00:01:07,210
+Desordenas al azar una sola columna, como si esa variable se volviera ruido.
+
+22
+00:01:07,330 --> 00:01:09,050
+Y mides cuánto cae el AUC.
+
+23
+00:01:09,170 --> 00:01:12,750
+Si el modelo necesitaba esa variable, el AUC cae mucho.
+
+24
+00:01:12,870 --> 00:01:14,470
+Si no, casi nada.
+
+25
+00:01:14,590 --> 00:01:15,940
+Un ejemplo del apunte.
+
+26
+00:01:16,060 --> 00:01:18,210
+El modelo tiene AUC cero coma nueve.
+
+27
+00:01:18,330 --> 00:01:21,923
+Desordenas reclamos, y el AUC baja a cero coma ocho seis
+
+28
+00:01:21,923 --> 00:01:24,810
+cinco: importancia cero coma cero tres cinco.
+
+29
+00:01:24,930 --> 00:01:28,594
+Desordenas una variable ruidosa, y baja a cero coma ocho
+
+30
+00:01:28,594 --> 00:01:31,800
+nueve nueve: importancia cero coma cero cero uno.
+
+31
+00:01:31,920 --> 00:01:33,700
+El modelo casi no la usaba.
+
+32
+00:01:33,820 --> 00:01:38,620
+Una regla sin excepciones: la permutación se mide sobre datos que el modelo no vio.
+
+33
+00:01:38,740 --> 00:01:41,765
+Sobre el entrenamiento, hereda el sobreajuste:
+
+34
+00:01:41,765 --> 00:01:44,330
+mide memoria, no capacidad de predecir.
+
+35
+00:01:44,450 --> 00:01:47,564
+Es más lenta, porque repite el desorden veinte veces,
+
+36
+00:01:47,564 --> 00:01:50,150
+pero mide lo que uno cree que está midiendo.
+
+37
+00:01:50,270 --> 00:01:53,847
+Ahora con los datos de la clase: un Random Forest de trescientos
+
+38
+00:01:53,847 --> 00:01:57,479
+árboles, entrenado con el setenta y cinco por ciento, y medido en
+
+39
+00:01:57,479 --> 00:02:00,050
+setecientos ochenta y ocho clientes de prueba.
+
+40
+00:02:00,170 --> 00:02:02,790
+A la izquierda, la importancia por impureza.
+
+41
+00:02:02,910 --> 00:02:04,950
+A la derecha, por permutación.
+
+42
+00:02:05,070 --> 00:02:06,570
+Mira tres variables.
+
+43
+00:02:06,690 --> 00:02:11,360
+Ce ele ve: quinta por impureza, con cero coma uno cero nueve.
+
+44
+00:02:11,480 --> 00:02:15,740
+Por permutación cae al séptimo lugar, con cero coma cero uno cuatro.
+
+45
+00:02:15,860 --> 00:02:19,634
+Estado, que es binaria: décima por impureza, y sexta
+
+46
+00:02:19,634 --> 00:02:22,610
+por permutación, por encima de ce ele ve.
+
+47
+00:02:22,730 --> 00:02:25,610
+Y número de fallas sube del octavo al quinto lugar.
+
+48
+00:02:25,730 --> 00:02:27,820
+Hagamos la cuenta que delata el sesgo.
+
+49
+00:02:27,940 --> 00:02:33,144
+Por impureza, ce ele ve vale cero coma uno cero nueve, y estado cero coma cero
+
+50
+00:02:33,144 --> 00:02:37,680
+cuatro cinco: ce ele ve parece dos coma cuatro veces más importante.
+
+51
+00:02:37,800 --> 00:02:43,376
+Por permutación, ce ele ve vale cero coma cero uno cuatro, y estado cero coma cero uno
+
+52
+00:02:43,376 --> 00:02:47,720
+ocho cinco: ahora estado vale uno coma tres veces lo que ce ele ve.
+
+53
+00:02:47,840 --> 00:02:49,210
+El orden se dio vuelta.
+
+54
+00:02:49,330 --> 00:02:51,330
+Una alerta pequeña del material.
+
+55
+00:02:51,450 --> 00:02:54,244
+El notebook de la clase dice que ce ele ve tiene la
+
+56
+00:02:54,244 --> 00:02:56,490
+cuarta importancia por impureza más alta.
+
+57
+00:02:56,610 --> 00:03:01,300
+Es la quinta: antigüedad está por encima, con cero coma uno uno tres.
+
+58
+00:03:01,420 --> 00:03:05,190
+Pasa porque la tabla de la diapositiva veintiuno no muestra antigüedad.
+
+59
+00:03:05,310 --> 00:03:06,790
+La conclusión no cambia.
+
+60
+00:03:06,910 --> 00:03:11,370
+El error típico: reportar feature_importances_ como «lo que más importa».
+
+61
+00:03:11,490 --> 00:03:14,304
+Tiene dos problemas: premia la cardinalidad, y
+
+62
+00:03:14,304 --> 00:03:16,690
+además no dice la dirección del efecto.
+
+63
+00:03:16,810 --> 00:03:20,490
+Una importancia alta no dice si la variable sube o baja la fuga.
+
+64
+00:03:20,610 --> 00:03:25,400
+Usa permutación sobre el test, y para la dirección, lee las reglas del árbol.
+
+65
+00:03:25,520 --> 00:03:26,740
+Piensa un segundo.
+
+66
+00:03:26,860 --> 00:03:31,734
+Agregas al modelo una columna con el número de identificación de cada cliente: tres mil
+
+67
+00:03:31,734 --> 00:03:35,600
+ciento cincuenta valores distintos, sin ninguna relación con la fuga.
+
+68
+00:03:35,720 --> 00:03:37,570
+¿Qué le pasa en cada importancia?
+
+69
+00:03:38,290 --> 00:03:41,796
+Por impureza puede salir sorprendentemente alta: tiene miles
+
+70
+00:03:41,796 --> 00:03:44,660
+de cortes para probar, y alguno acierta por azar.
+
+71
+00:03:44,780 --> 00:03:48,030
+Por permutación, cerca de cero: desordenarla en el
+
+72
+00:03:48,030 --> 00:03:50,760
+test no cambia nada, porque nunca predijo.
+
+73
+00:03:50,880 --> 00:03:53,670
+Es la prueba más clara del sesgo por cardinalidad.
+
+74
+00:03:53,790 --> 00:03:56,225
+Para llevarte: la importancia por impureza
+
+75
+00:03:56,225 --> 00:03:58,660
+premia a las variables con muchos valores.
+
+76
+00:03:58,780 --> 00:04:02,657
+La importancia por permutación mide cuánto cae el AUC si la variable se
+
+77
+00:04:02,657 --> 00:04:05,770
+vuelve ruido, y se calcula siempre sobre datos no vistos.
+
+78
+00:04:05,890 --> 00:04:09,240
+Siguiente parada: las fortalezas y los límites del árbol.
+
+79
+00:04:09,360 --> 00:04:13,900
+Lo que no le importa, como escalar, y lo que sí le duele, la inestabilidad.

@@ -1,0 +1,219 @@
+# Autoencoders: aprender un resumen y reconstruir imágenes.
+# Extrae el ZIP y fija su carpeta como directorio de trabajo en RStudio:
+# Session > Set Working Directory > To Source File Location.
+# Instala una vez: install.packages(c("RSNNS", "nnet"))
+# Ejecuta las secciones en orden o usa: Rscript autoencoders.R
+# Todo el cálculo se realiza en R con RSNNS, stats, graphics y nnet.
+# Las figuras de la presentación ilustran la receta de Python con Adam.
+# Aquí usamos descenso por gradiente de RSNNS: los resultados pueden diferir.
+
+# 00. Paquetes ----
+if (.Platform$OS.type == "windows") invisible(Sys.setlocale("LC_CTYPE", ""))
+library(RSNNS)
+library(nnet)
+
+# 01. Lectura de datos y separación de conjuntos ----
+datos <- read.csv("digitos.csv")
+X <- as.matrix(datos[, grepl("^px", names(datos))]) / 16
+y <- datos$digito
+tr <- datos$conjunto == "entrenamiento"
+va <- datos$conjunto == "validacion"
+te <- datos$conjunto == "prueba"
+X_tr <- X[tr, , drop = FALSE]
+X_va <- X[va, , drop = FALSE]
+X_te <- X[te, , drop = FALSE]
+print(rbind(entrenamiento = dim(X_tr), validacion = dim(X_va), prueba = dim(X_te)))
+# Una fila = una imagen; 64 columnas = intensidades entre 0 y 1.
+# La etiqueta y no se utiliza para entrenar el autoencoder.
+
+# 02. Parámetros que puedes modificar ----
+DIM_LATENTE <- 8L
+ARQUITECTURAS <- list(c(DIM_LATENTE), c(32L, DIM_LATENTE, 32L))
+ACTIVACION <- "Act_TanH"       # También se puede comparar "Act_Logistic".
+TASA <- 0.02                  # Paso del descenso por gradiente.
+EPOCAS <- c(25L, 75L, 150L)    # Presupuestos que compararemos con validación.
+SEMILLA <- 20261022L
+EXPERIMENTO <- "base"         # Otro nombre conserva los resultados anteriores.
+CUANTIL <- 0.95               # Corte fijado antes de observar prueba.
+# Solo indicamos las capas ocultas: entrada y salida tienen 64 valores.
+# 8 significa 64 -> 8 -> 64; 32,8,32 significa 64 -> 32 -> 8 -> 32 -> 64.
+# Mantén DIM_LATENTE en el centro de estas arquitecturas.
+# Esta receta actualiza por imagen; no utiliza los lotes ni Adam de Python.
+SALIDA <- file.path("mis_resultados", paste0(EXPERIMENTO, "_R"))
+dir.create(SALIDA, recursive = TRUE, showWarnings = FALSE)
+
+# 03. Entrenar desde cero y seleccionar con validación ----
+seleccion <- data.frame()
+mejor_mse <- Inf
+for (capas in ARQUITECTURAS) {
+  nombre <- paste0("AE", paste(capas, collapse = "_"))
+  for (epocas in EPOCAS) {
+    # Cada llamada entrena una candidata nueva, desde la misma semilla.
+    # mlp recibe X_tr como entrada y también como objetivo de reconstrucción.
+    set.seed(SEMILLA)
+    red <- mlp(
+      x = X_tr, y = X_tr,
+      size = capas, maxit = epocas,
+      hiddenActFunc = ACTIVACION,
+      outputActFunc = "Act_IdentityPlusBias",
+      learnFunc = "Std_Backpropagation",
+      learnFuncParams = c(TASA, 0)
+    )
+    # predict aplica la red; no actualiza pesos con validación.
+    rec_tr <- predict(red, X_tr)
+    rec_va <- predict(red, X_va)
+    mse_tr <- mean((X_tr - rec_tr)^2)
+    mse_va <- mean((X_va - rec_va)^2)
+    seleccion <- rbind(seleccion, data.frame(modelo = nombre, epocas = epocas,
+                         entrenamiento = mse_tr, validacion = mse_va))
+    if (mse_va < mejor_mse) {
+      mejor_mse <- mse_va
+      modelo <- red
+      capas_elegidas <- capas
+      epocas_elegidas <- epocas
+    }
+    cat(nombre, "| épocas", epocas, "| MSE validación", round(mse_va, 6), "\n")
+  }
+}
+# Conservamos el modelo elegido; no volvemos a entrenar ese objeto.
+# EPOCAS compara 3 presupuestos, no selecciona entre todas las épocas intermedias.
+print(seleccion)
+cat("Elegida:", paste(capas_elegidas, collapse = " -> "), "| épocas", epocas_elegidas, "\n")
+write.csv(seleccion, file.path(SALIDA, "seleccion.csv"), row.names = FALSE)
+
+# 04. Observar cuánto ayuda entrenar más ----
+png(file.path(SALIDA, "curvas.png"), width = 1400, height = 650, res = 140)
+par(mfrow = c(1, length(ARQUITECTURAS)), mar = c(4, 4, 3, 1))
+for (nombre in unique(seleccion$modelo)) {
+  puntos <- seleccion[seleccion$modelo == nombre, ]
+  matplot(puntos$epocas, puntos[, c("entrenamiento", "validacion")],
+          type = "b", pch = c(16, 17), lty = c(1, 2), col = c("steelblue", "darkorange"),
+          xlab = "Épocas de cada candidata", ylab = "MSE al terminar", main = nombre)
+  legend("topright", c("Entrenamiento", "Validación"),
+         col = c("steelblue", "darkorange"), lty = c(1, 2), pch = c(16, 17), bty = "n")
+}
+dev.off()
+# Cada punto es una candidata entrenada desde cero hasta ese presupuesto.
+
+# 05. Reconstruir y comparar con PCA ----
+reconstruidas <- predict(modelo, X_va)
+mse_ae <- mean((X_va - reconstruidas)^2)
+# prcomp aprende la media y las direcciones solo con entrenamiento.
+pca <- prcomp(X_tr, center = TRUE,
+              scale. = FALSE, rank. = DIM_LATENTE)
+Z_va <- predict(pca, X_va)
+rec_pca <- sweep(Z_va %*% t(pca$rotation),
+                2, pca$center, "+")
+mse_pca <- mean((X_va - rec_pca)^2)
+media <- colMeans(X_tr)
+rec_media <- matrix(media, nrow(X_va), ncol(X_va), byrow = TRUE)
+comparacion <- data.frame(modelo = c("Media", "PCA", "Autoencoder"),
+                         mse_validacion = c(mean((X_va - rec_media)^2), mse_pca, mse_ae))
+print(comparacion)
+write.csv(comparacion, file.path(SALIDA, "comparacion_validacion.csv"), row.names = FALSE)
+
+# Las columnas muestran el mismo caso; las filas comparan original, PCA y red.
+png(file.path(SALIDA, "reconstrucciones_validacion.png"), width = 1400, height = 750, res = 140)
+par(mfrow = c(3, 6), mar = c(1, 1, 2, 1))
+for (nombre in c("Original", "PCA", "Autoencoder")) {
+  imagenes <- switch(nombre, Original = X_va, PCA = rec_pca, Autoencoder = reconstruidas)
+  for (i in seq_len(6)) {
+    pixeles <- matrix(imagenes[i, ], 8, 8, byrow = TRUE)
+    # image dibuja desde abajo: invertir filas y transponer conserva la orientación.
+    image(t(pmin(pmax(pixeles[8:1, ], 0), 1)), col = gray(seq(1, 0, length.out = 256)),
+          zlim = c(0, 1), axes = FALSE, asp = 1, main = nombre)
+  }
+}
+dev.off()
+# La figura limita los tonos visibles a [0,1]; el MSE usa las salidas completas.
+
+# 06. Observar el vector latente del modelo elegido ----
+# predict devuelve la imagen. Para ver el resumen, recorremos solo el encoder.
+# weightMatrix y extractNetInfo recuperan los pesos y sesgos ya aprendidos.
+pesos <- weightMatrix(modelo)
+unidades <- extractNetInfo(modelo)$unitDefinitions
+H <- X
+anteriores <- seq_len(ncol(X))
+ultima <- ncol(X)
+capa_latente <- ceiling(length(capas_elegidas) / 2)
+for (j in seq_len(capa_latente)) {
+  actuales <- ultima + seq_len(capas_elegidas[j])
+  H <- sweep(H %*% pesos[anteriores, actuales, drop = FALSE],
+             2, unidades$unitBias[actuales], "+")
+  if (ACTIVACION == "Act_TanH") H <- tanh(H) else H <- plogis(H)
+  anteriores <- actuales
+  ultima <- max(actuales)
+}
+print(dim(H))  # Una fila por imagen; DIM_LATENTE columnas.
+write.csv(H[va, , drop = FALSE], file.path(SALIDA, "vectores_validacion.csv"), row.names = FALSE)
+# Cambia DIM_LATENTE o TASA, cambia EXPERIMENTO y repite 02–06.
+
+# 07. Prueba: ejecutar solo después de fijar la receta ----
+EVALUAR_PRUEBA <- FALSE
+# En terminal también puedes usar: Rscript autoencoders.R --evaluar-prueba
+prueba_habilitada <- EVALUAR_PRUEBA || "--evaluar-prueba" %in% commandArgs(trailingOnly = TRUE)
+if (prueba_habilitada) {
+  rec_te <- predict(modelo, X_te)
+  pca_te <- sweep(predict(pca, X_te) %*% t(pca$rotation), 2, pca$center, "+")
+  media_te <- matrix(media, nrow(X_te), ncol(X_te), byrow = TRUE)
+  prueba <- data.frame(modelo = c("Media", "PCA", "Autoencoder"), mse_prueba = c(
+    mean((X_te - media_te)^2), mean((X_te - pca_te)^2), mean((X_te - rec_te)^2)))
+  print(prueba)
+  write.csv(prueba, file.path(SALIDA, "comparacion_prueba.csv"), row.names = FALSE)
+} else {
+  cat("Prueba pendiente. Fija la receta, activa EVALUAR_PRUEBA y ejecuta 07–09.\n")
+}
+
+# 08. Ampliación: ¿sirve la representación para clasificar? ----
+if (prueba_habilitada) {
+  Z <- predict(pca, X)
+  utilidad <- data.frame()
+  for (nombre in c("Pixeles", "PCA", "Autoencoder")) {
+    representacion <- switch(nombre, Pixeles = X, PCA = Z, Autoencoder = H)
+    # Centrar y escalar usando exclusivamente entrenamiento.
+    centro <- colMeans(representacion[tr, , drop = FALSE])
+    escala <- apply(representacion[tr, , drop = FALSE], 2, sd)
+    escala[escala == 0] <- 1
+    valores <- sweep(sweep(representacion, 2, centro, "-"), 2, escala, "/")
+    tabla <- as.data.frame(valores)
+    names(tabla) <- paste0("v", seq_len(ncol(tabla)))
+    tabla$digito <- factor(y)
+    # El encoder permanece fijo. Solo este clasificador usa las etiquetas.
+    set.seed(SEMILLA)
+    clasificador <- multinom(digito ~ ., data = tabla[tr, ],
+                            decay = 0.01, maxit = 500, trace = FALSE, MaxNWts = 10000)
+    probabilidades <- predict(clasificador, tabla[te, ], type = "probs")
+    predichas <- predict(clasificador, tabla[te, ])
+    prob_real <- probabilidades[cbind(seq_len(sum(te)), match(as.character(y[te]), colnames(probabilidades)))]
+    utilidad <- rbind(utilidad, data.frame(representacion = nombre,
+                   log_loss = -mean(log(pmax(prob_real, 1e-15))),
+                   exactitud = mean(predichas == y[te]), errores = sum(predichas != y[te])))
+  }
+  print(utilidad)
+  write.csv(utilidad, file.path(SALIDA, "utilidad.csv"), row.names = FALSE)
+}
+
+# 09. Ampliación: error grande y desplazamiento artificial ----
+if (prueba_habilitada) {
+  error_va <- rowMeans((X_va - predict(modelo, X_va))^2)
+  umbral <- unname(quantile(error_va, CUANTIL))
+  # Mover una columna a la derecha y rellenar con ceros la izquierda.
+  desplazadas <- X_te * 0
+  for (fila in 0:7) {
+    desplazadas[, fila * 8 + 2:8] <- X_te[, fila * 8 + 1:7]
+  }
+  error_original <- rowMeans((X_te - predict(modelo, X_te))^2)
+  error_desplazada <- rowMeans((desplazadas - predict(modelo, desplazadas))^2)
+  # Se compara cada reconstrucción con su propia entrada; no se elimina ruido.
+  estres <- data.frame(error_original, error_desplazada)
+  write.csv(estres, file.path(SALIDA, "estres.csv"), row.names = FALSE)
+  alertas <- data.frame(umbral = umbral, total = nrow(X_te),
+                       originales = sum(error_original > umbral),
+                       desplazadas = sum(error_desplazada > umbral))
+  print(alertas)
+  write.csv(alertas, file.path(SALIDA, "alertas.csv"), row.names = FALSE)
+  cat("Estrés artificial: no mide detección de defectos reales.\n")
+  cat("Selección y umbral usan validación; no garantizan falsas alarmas futuras.\n")
+}
+cat("La prueba ya se mostró en clase: esta comparación es retrospectiva.\n")
+cat("Resultados en", SALIDA, "\n")

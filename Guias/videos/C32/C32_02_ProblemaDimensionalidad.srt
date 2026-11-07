@@ -1,0 +1,431 @@
+1
+00:00:00,250 --> 00:00:03,170
+Primera parada: el problema de la dimensionalidad.
+
+2
+00:00:03,290 --> 00:00:06,680
+Por qué tener demasiadas variables puede perjudicar a un modelo.
+
+3
+00:00:06,800 --> 00:00:10,640
+Imagina que investigas un accidente, y hablas con seis testigos.
+
+4
+00:00:10,760 --> 00:00:12,210
+Parece mucha evidencia.
+
+5
+00:00:12,330 --> 00:00:16,920
+Pero los seis leyeron la misma noticia en el diario, y te cuentan la misma historia.
+
+6
+00:00:17,040 --> 00:00:20,670
+En realidad tienes un solo testigo, repetido seis veces.
+
+7
+00:00:20,790 --> 00:00:23,210
+Con las variables de un modelo pasa lo mismo.
+
+8
+00:00:23,330 --> 00:00:25,540
+Más columnas no son más información.
+
+9
+00:00:25,660 --> 00:00:27,300
+¿Por qué sobran las variables?
+
+10
+00:00:27,420 --> 00:00:28,870
+Hay cuatro razones.
+
+11
+00:00:28,990 --> 00:00:30,430
+Una: el costo.
+
+12
+00:00:30,550 --> 00:00:33,800
+Más columnas, más memoria y más tiempo, y un modelo más
+
+13
+00:00:33,800 --> 00:00:36,460
+difícil de explicar y de poner en producción.
+
+14
+00:00:36,580 --> 00:00:38,610
+Dos: la multicolinealidad.
+
+15
+00:00:38,730 --> 00:00:43,300
+Variables que cuentan la misma historia, y que vuelven inestable a una regresión.
+
+16
+00:00:43,420 --> 00:00:44,840
+Tres: el ruido.
+
+17
+00:00:44,960 --> 00:00:47,080
+Columnas que no traen ninguna señal.
+
+18
+00:00:47,200 --> 00:00:49,310
+Y cuatro: sesgo y varianza.
+
+19
+00:00:49,430 --> 00:00:53,388
+Con pocas observaciones, cada variable extra hace más inestables
+
+20
+00:00:53,388 --> 00:00:56,790
+las predicciones, sin que el modelo gane nada a cambio.
+
+21
+00:00:56,910 --> 00:00:59,790
+Veamos la multicolinealidad en los datos de la clase.
+
+22
+00:00:59,910 --> 00:01:02,820
+Esta es la correlación entre las seis variables de uso.
+
+23
+00:01:02,940 --> 00:01:07,060
+Todas están entre cero coma sesenta y seis, y cero coma noventa y nueve.
+
+24
+00:01:07,180 --> 00:01:09,862
+La más fuerte: segundos hablados y número de
+
+25
+00:01:09,862 --> 00:01:12,300
+llamadas, con cero coma noventa y nueve.
+
+26
+00:01:12,420 --> 00:01:15,290
+Es casi una sola variable, con dos nombres.
+
+27
+00:01:15,410 --> 00:01:16,420
+¿Cómo se mide?
+
+28
+00:01:16,540 --> 00:01:19,840
+Con el VIF, el factor de inflación de la varianza.
+
+29
+00:01:19,960 --> 00:01:24,890
+Tomas una variable, y tratas de explicarla con todas las demás, con una regresión.
+
+30
+00:01:25,010 --> 00:01:26,680
+Eso te da un R cuadrado.
+
+31
+00:01:26,800 --> 00:01:30,300
+Y el VIF es uno dividido en uno menos R cuadrado.
+
+32
+00:01:30,420 --> 00:01:34,470
+Si es mayor que diez, es una señal fuerte de que esa variable sobra.
+
+33
+00:01:34,590 --> 00:01:36,360
+Hagamos un ejemplo del apunte.
+
+34
+00:01:36,480 --> 00:01:40,472
+Si una variable se explica con R cuadrado cero coma noventa y seis, uno
+
+35
+00:01:40,472 --> 00:01:43,620
+menos cero coma noventa y seis es cero coma cero cuatro.
+
+36
+00:01:43,740 --> 00:01:47,250
+Y uno dividido en cero coma cero cuatro, da veinticinco.
+
+37
+00:01:47,370 --> 00:01:50,810
+Veinticinco es mucho más que diez: esa variable sobra.
+
+38
+00:01:50,930 --> 00:01:54,706
+En cambio, con R cuadrado cero coma cincuenta, el VIF
+
+39
+00:01:54,706 --> 00:01:57,840
+es uno dividido en cero coma cincuenta: dos.
+
+40
+00:01:57,960 --> 00:01:58,850
+Sin problema.
+
+41
+00:01:58,970 --> 00:02:01,330
+Ahora, los datos reales de la clase.
+
+42
+00:02:01,450 --> 00:02:04,488
+Segundos tiene un VIF de cuarenta coma ocho, y el
+
+43
+00:02:04,488 --> 00:02:07,340
+número de llamadas, cuarenta y ocho coma tres.
+
+44
+00:02:07,460 --> 00:02:09,550
+Contactos, doce coma dos.
+
+45
+00:02:09,670 --> 00:02:14,410
+Las otras tres, monto, mensajes y valor del cliente, están bajo cinco.
+
+46
+00:02:14,530 --> 00:02:19,295
+Un VIF de cuarenta y ocho coma tres quiere decir que el R cuadrado es
+
+47
+00:02:19,295 --> 00:02:23,370
+uno menos uno dividido en cuarenta y ocho coma tres: 0.979.
+
+48
+00:02:23,490 --> 00:02:25,504
+Casi el noventa y ocho por ciento de las
+
+49
+00:02:25,504 --> 00:02:27,720
+llamadas se explica con las otras variables.
+
+50
+00:02:27,840 --> 00:02:28,940
+Ahora el ruido.
+
+51
+00:02:29,060 --> 00:02:31,110
+La profesora hizo un experimento.
+
+52
+00:02:31,230 --> 00:02:33,896
+Tomó solo cien clientes, y les fue agregando
+
+53
+00:02:33,896 --> 00:02:36,320
+columnas de puro ruido, números al azar.
+
+54
+00:02:36,440 --> 00:02:38,160
+¿Qué crees que pasa con el modelo?
+
+55
+00:02:38,580 --> 00:02:41,490
+En entrenamiento, el modelo mejora y mejora.
+
+56
+00:02:41,610 --> 00:02:47,080
+Con cuatrocientas columnas de ruido, el AUC de entrenamiento llega a uno: perfecto.
+
+57
+00:02:47,200 --> 00:02:52,630
+Pero en la prueba, cae de 0.715, a 0.569.
+
+58
+00:02:52,750 --> 00:02:54,100
+Eso es sobreajuste.
+
+59
+00:02:54,220 --> 00:02:57,083
+El modelo usa el ruido para memorizar a los cien
+
+60
+00:02:57,083 --> 00:02:59,410
+clientes, y con clientes nuevos, falla.
+
+61
+00:02:59,530 --> 00:03:03,700
+Con pocas filas, cada columna extra es una oportunidad de memorizar.
+
+62
+00:03:03,820 --> 00:03:07,380
+Una regla práctica: mira cuántas filas tienes por columna.
+
+63
+00:03:07,500 --> 00:03:10,144
+Con doscientas filas y cuarenta columnas, son
+
+64
+00:03:10,144 --> 00:03:13,140
+doscientas entre cuarenta: cinco filas por columna.
+
+65
+00:03:13,260 --> 00:03:14,190
+Muy pocas.
+
+66
+00:03:14,310 --> 00:03:17,446
+Si quitas veinticinco columnas redundantes, quedan
+
+67
+00:03:17,446 --> 00:03:20,520
+quince: doscientas entre quince, trece coma tres.
+
+68
+00:03:20,640 --> 00:03:22,870
+Hay un efecto más, muy curioso.
+
+69
+00:03:22,990 --> 00:03:26,170
+En muchas dimensiones, todas las distancias se parecen.
+
+70
+00:03:26,290 --> 00:03:30,680
+Medimos qué tan lejos está el punto más lejano, comparado con el más cercano.
+
+71
+00:03:30,800 --> 00:03:34,810
+Con puntos al azar en dos dimensiones, esa razón vale cuarenta y uno:
+
+72
+00:03:34,810 --> 00:03:38,180
+el más lejano está muchísimo más lejos que el más cercano.
+
+73
+00:03:38,300 --> 00:03:40,700
+En diez dimensiones, dos coma siete.
+
+74
+00:03:40,820 --> 00:03:42,960
+En cien, cero coma treinta y nueve.
+
+75
+00:03:43,080 --> 00:03:46,020
+Y en mil dimensiones, apenas cero coma uno.
+
+76
+00:03:46,140 --> 00:03:48,410
+Todos quedan a casi la misma distancia.
+
+77
+00:03:48,530 --> 00:03:49,570
+¿Por qué importa?
+
+78
+00:03:49,690 --> 00:03:52,952
+Porque muchos métodos, como K-Means o t-SNE, se
+
+79
+00:03:52,952 --> 00:03:55,520
+basan en «quién está cerca de quién».
+
+80
+00:03:55,640 --> 00:03:59,630
+Si todos están igual de cerca, la idea de vecino pierde sentido.
+
+81
+00:03:59,750 --> 00:04:01,350
+¿Y cómo se sale de esto?
+
+82
+00:04:01,470 --> 00:04:04,156
+La profesora usó una imagen bonita: un globo
+
+83
+00:04:04,156 --> 00:04:06,780
+terráqueo es un objeto en tres dimensiones.
+
+84
+00:04:06,900 --> 00:04:11,310
+Pero lo puedes dibujar en un mapa plano, sin perder las relaciones entre países.
+
+85
+00:04:11,430 --> 00:04:16,460
+Esa estructura más simple, doblada dentro de un espacio grande, se llama manifold.
+
+86
+00:04:16,580 --> 00:04:21,150
+Reducir dimensiones es, en el fondo, encontrar y desdoblar esa estructura.
+
+87
+00:04:21,270 --> 00:04:23,090
+Para reducir hay dos caminos.
+
+88
+00:04:23,210 --> 00:04:24,720
+Uno: la selección.
+
+89
+00:04:24,840 --> 00:04:28,380
+Quitas columnas redundantes, y conservas las originales.
+
+90
+00:04:28,500 --> 00:04:30,160
+Es más fácil de interpretar.
+
+91
+00:04:30,280 --> 00:04:31,820
+Dos: la extracción.
+
+92
+00:04:31,940 --> 00:04:36,420
+Combinas columnas en variables nuevas, como los componentes de PCA.
+
+93
+00:04:36,540 --> 00:04:40,470
+En el ejemplo de los testigos: seleccionar es escuchar a uno solo.
+
+94
+00:04:40,590 --> 00:04:43,630
+Extraer es escribir un resumen con lo que dijeron los seis.
+
+95
+00:04:43,750 --> 00:04:48,170
+Un error típico: confundir variables correlacionadas con variables ruido.
+
+96
+00:04:48,290 --> 00:04:49,890
+Son problemas distintos.
+
+97
+00:04:50,010 --> 00:04:54,790
+Las correlacionadas sí tienen señal, pero repetida: cuentan la misma historia.
+
+98
+00:04:54,910 --> 00:04:59,240
+El ruido no aporta nada, aunque no se parezca a ninguna otra variable.
+
+99
+00:04:59,360 --> 00:05:02,225
+Piensa un segundo: una variable se explica con las
+
+100
+00:05:02,225 --> 00:05:04,460
+demás con R cuadrado cero coma noventa.
+
+101
+00:05:04,580 --> 00:05:06,100
+¿Cuánto vale su VIF?
+
+102
+00:05:07,020 --> 00:05:10,118
+Uno dividido en uno menos cero coma noventa: uno
+
+103
+00:05:10,118 --> 00:05:12,700
+dividido en cero coma uno, igual a diez.
+
+104
+00:05:12,820 --> 00:05:15,050
+Justo en el límite de la regla práctica.
+
+105
+00:05:15,170 --> 00:05:20,430
+Para llevarte: las variables sobran por costo, multicolinealidad, ruido y varianza.
+
+106
+00:05:20,550 --> 00:05:24,980
+La multicolinealidad se mide con el VIF: más de diez es mala señal.
+
+107
+00:05:25,100 --> 00:05:27,410
+Y se reduce por selección o por extracción.
+
+108
+00:05:27,530 --> 00:05:31,370
+Siguiente parada: escalar las variables, antes de reducir.

@@ -1,0 +1,225 @@
+##### [0] markdown
+# Reconocimiento de imágenes con Random Forest
+
+Este ejemplo utiliza **CIFAR-10** para mostrar que Random Forest también puede trabajar con imágenes.
+
+Cada imagen se transforma en un vector con sus valores **RGB**. No se aplicará extracción de características ni optimización de hiperparámetros. El objetivo es mostrar la versatilidad del modelo de forma simple.
+##### [1] code
+from pathlib import Path
+import pickle
+import tarfile
+import urllib.request
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import (
+    accuracy_score,
+    balanced_accuracy_score,
+    f1_score,
+    classification_report,
+    ConfusionMatrixDisplay,
+)
+
+sns.set_theme(style="whitegrid")
+
+RANDOM_STATE = 42
+TRAIN_SAMPLES = 10_000
+TEST_SAMPLES = 2_500
+##### [2] markdown
+## 1. Carga de CIFAR-10
+
+El código busca una copia local. Si no existe, descarga la versión Python desde la [fuente oficial](https://www.cs.toronto.edu/~kriz/cifar.html).
+##### [3] code
+CIFAR_URL = "https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz"
+DATA_DIR = Path.cwd() / "data_cifar10"
+
+
+def locate_cifar10():
+    candidates = [
+        Path.home() / ".keras/datasets/cifar-10-batches-py-target/cifar-10-batches-py",
+        Path.home() / ".keras/datasets/cifar-10-batches-py",
+        DATA_DIR / "cifar-10-batches-py",
+    ]
+    for folder in candidates:
+        if (folder / "data_batch_1").exists():
+            return folder
+
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    archive = DATA_DIR / "cifar-10-python.tar.gz"
+    urllib.request.urlretrieve(CIFAR_URL, archive)
+    with tarfile.open(archive, "r:gz") as tar:
+        tar.extractall(DATA_DIR, filter="data")
+    return DATA_DIR / "cifar-10-batches-py"
+
+
+def read_batch(path):
+    with open(path, "rb") as file:
+        batch = pickle.load(file, encoding="bytes")
+    images = batch[b"data"].reshape(-1, 3, 32, 32).transpose(0, 2, 3, 1)
+    labels = np.asarray(batch[b"labels"])
+    return images, labels
+
+
+def load_cifar10(folder):
+    train_batches = [read_batch(folder / f"data_batch_{i}") for i in range(1, 6)]
+    X_train = np.concatenate([batch[0] for batch in train_batches])
+    y_train = np.concatenate([batch[1] for batch in train_batches])
+    X_test, y_test = read_batch(folder / "test_batch")
+
+    with open(folder / "batches.meta", "rb") as file:
+        metadata = pickle.load(file, encoding="bytes")
+    classes = [name.decode("utf-8") for name in metadata[b"label_names"]]
+    return X_train, y_train, X_test, y_test, classes
+
+
+cifar_folder = locate_cifar10()
+X_train_full, y_train_full, X_test_full, y_test_full, class_names = load_cifar10(cifar_folder)
+
+print("Entrenamiento oficial:", X_train_full.shape)
+print("Test oficial:", X_test_full.shape)
+print("Clases:", class_names)
+##### [4] markdown
+## 2. Muestra de imágenes
+
+CIFAR-10 contiene imágenes RGB de 32 × 32 píxeles pertenecientes a 10 categorías.
+##### [5] code
+rng = np.random.default_rng(RANDOM_STATE)
+indices = rng.choice(len(X_train_full), 15, replace=False)
+
+fig, axes = plt.subplots(3, 5, figsize=(10, 6))
+for ax, index in zip(axes.ravel(), indices):
+    ax.imshow(X_train_full[index])
+    ax.set_title(class_names[y_train_full[index]])
+    ax.axis("off")
+plt.tight_layout()
+plt.show()
+##### [6] markdown
+## 3. Preparación de los datos
+
+Se selecciona una muestra estratificada para reducir el tiempo de ejecución. Cada imagen conserva únicamente sus valores RGB y pasa de una matriz `32 × 32 × 3` a un vector de **3.072 variables**.
+##### [7] code
+def stratified_sample(X, y, n_samples):
+    if n_samples >= len(y):
+        return X, y
+    selected, _ = train_test_split(
+        np.arange(len(y)),
+        train_size=n_samples,
+        stratify=y,
+        random_state=RANDOM_STATE,
+    )
+    return X[selected], y[selected]
+
+
+X_train_img, y_train = stratified_sample(X_train_full, y_train_full, TRAIN_SAMPLES)
+X_test_img, y_test = stratified_sample(X_test_full, y_test_full, TEST_SAMPLES)
+
+X_train = X_train_img.reshape(len(X_train_img), -1).astype("float32") / 255.0
+X_test = X_test_img.reshape(len(X_test_img), -1).astype("float32") / 255.0
+
+print("Forma original:", X_train_img.shape)
+print("Forma para Random Forest:", X_train.shape)
+##### [8] code
+class_counts = pd.Series(y_train).map(dict(enumerate(class_names))).value_counts().sort_index()
+
+sns.barplot(x=class_counts.index, y=class_counts.values, color="#17B6B0")
+plt.title("Distribución de clases en entrenamiento")
+plt.xlabel("Clase")
+plt.ylabel("Imágenes")
+plt.xticks(rotation=35, ha="right")
+plt.tight_layout()
+plt.show()
+##### [9] markdown
+## 4. Random Forest
+
+El modelo recibe directamente los valores RGB. Se usan 150 árboles y el resto de los hiperparámetros mantiene valores simples.
+##### [10] code
+random_forest = RandomForestClassifier(
+    n_estimators=150,
+    random_state=RANDOM_STATE,
+    n_jobs=-1,
+    oob_score=True,
+)
+
+random_forest.fit(X_train, y_train)
+print(f"Accuracy OOB: {random_forest.oob_score_:.3f}")
+##### [11] markdown
+## 5. Desempeño en el conjunto de test
+##### [12] code
+y_pred = random_forest.predict(X_test)
+y_probability = random_forest.predict_proba(X_test)
+
+test_results = pd.DataFrame({
+    "Métrica": ["Accuracy", "Balanced accuracy", "F1 macro"],
+    "Test": [
+        accuracy_score(y_test, y_pred),
+        balanced_accuracy_score(y_test, y_pred),
+        f1_score(y_test, y_pred, average="macro"),
+    ],
+})
+
+display(test_results.style.format({"Test": "{:.3f}"}))
+##### [13] code
+report = pd.DataFrame(
+    classification_report(
+        y_test,
+        y_pred,
+        target_names=class_names,
+        output_dict=True,
+        zero_division=0,
+    )
+).T
+
+display(report.loc[class_names, ["precision", "recall", "f1-score"]].round(3))
+##### [14] code
+fig, ax = plt.subplots(figsize=(9, 8))
+ConfusionMatrixDisplay.from_predictions(
+    y_test,
+    y_pred,
+    display_labels=class_names,
+    normalize="true",
+    cmap="Blues",
+    values_format=".2f",
+    ax=ax,
+)
+ax.set_title("Matriz de confusión normalizada en test")
+plt.xticks(rotation=40, ha="right")
+plt.tight_layout()
+plt.show()
+##### [15] markdown
+## 6. Ejemplos de predicción
+##### [16] code
+confidence = y_probability.max(axis=1)
+sample_indices = rng.choice(len(X_test_img), 15, replace=False)
+
+fig, axes = plt.subplots(3, 5, figsize=(11, 7))
+for ax, index in zip(axes.ravel(), sample_indices):
+    correct = y_pred[index] == y_test[index]
+    color = "green" if correct else "red"
+    ax.imshow(X_test_img[index])
+    ax.set_title(
+        f"Real: {class_names[y_test[index]]}\n"
+        f"Pred: {class_names[y_pred[index]]} ({confidence[index]:.2f})",
+        color=color,
+        fontsize=9,
+    )
+    ax.axis("off")
+plt.tight_layout()
+plt.show()
+##### [17] markdown
+# Conclusión
+
+Este ejemplo muestra que Random Forest puede aplicarse directamente a imágenes después de convertir los píxeles RGB en variables.
+
+El modelo reconoce algunos patrones de color y textura, pero no entiende explícitamente la posición ni la estructura espacial de los objetos. Por esta razón, su desempeño en CIFAR-10 suele ser inferior al de modelos especializados como las redes neuronales convolucionales.
+
+La principal enseñanza es la **versatilidad de Random Forest**: el mismo algoritmo puede trabajar con datos tabulares, variables clínicas, precios de viviendas e incluso píxeles de imágenes.
+##### [18] code
+print("Resumen")
+print(f"- Accuracy OOB: {random_forest.oob_score_:.3f}")
+print(f"- Accuracy test: {accuracy_score(y_test, y_pred):.3f}")
+print(f"- F1 macro test: {f1_score(y_test, y_pred, average='macro'):.3f}")

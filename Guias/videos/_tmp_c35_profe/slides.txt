@@ -1,0 +1,399 @@
+######## Clase Random Forest.pptx
+=== slide 1
+RANDOM FOREST
+Y BAGGING
+Modelos ensamblados desde la intuición hasta la práctica
+Bastian Galasso
+[notas] Duración sugerida: 45 a 60 minutos.
+Apertura: preguntar al curso qué ocurriría si varios modelos cometen errores distintos y luego votan.
+Idea central: combinar árboles ayuda a estabilizar predicciones, siempre que los árboles no repitan exactamente los mismos errores.
+=== slide 2
+Objetivos y ruta de la clase
+02
+Random Forest y Bagging
+2/18
+Al terminar, podrás explicar el mecanismo y decidir cuándo usar cada modelo.
+1
+Ensamblados
+Por qué combinar modelos
+2
+Bootstrap
+Muestras con reemplazo
+3
+Bagging
+Promedio o votación
+4
+Random Forest
+Azar en filas y variables
+5
+Práctica
+Ajuste, evaluación y usos
+Pregunta guía
+¿Cómo podemos reducir la inestabilidad de un árbol sin renunciar a su capacidad para capturar relaciones no lineales?
+[notas] Presentar la pregunta guía y anticipar que bagging reduce varianza, mientras Random Forest también reduce la correlación entre árboles.
+=== slide 3
+Por qué un árbol puede ser inestable
+03
+Random Forest y Bagging
+3/18
+Pequeños cambios en los datos pueden producir particiones distintas.
+Edad < 35
+Ingreso < 900
+Compra
+No compra
+Compra
+Muestra A
+Ingreso < 820
+Antigüedad < 2
+Compra
+No compra
+Compra
+Muestra B
+[notas] Explicar que los árboles profundos suelen tener bajo sesgo y alta varianza.
+Actividad breve: pedir al curso que identifique qué predicción podría cambiar entre los dos árboles.
+Los diagramas son ilustrativos. No provienen de un conjunto de datos real.
+=== slide 4
+Modelos ensamblados
+04
+Random Forest y Bagging
+4/18
+Un ensamblado combina varios modelos base para producir una sola predicción.
+Datos
+Modelo 1
+Modelo 2
+Modelo B
+Agregación
+Predicción final
+Beneficio
+Si los modelos cometen errores parcialmente distintos, la agregación reduce el error que depende de una muestra particular.
+[notas] Distinguir dos ideas: diversidad entre modelos y agregación de resultados.
+Bagging crea diversidad cambiando las filas. Random Forest añade diversidad cambiando también las variables disponibles en cada división.
+=== slide 5
+Muestreo bootstrap
+05
+Random Forest y Bagging
+5/18
+Cada muestra bootstrap tiene n observaciones extraídas con reemplazo desde los datos originales.
+Datos originales
+1
+2
+3
+4
+5
+6
+7
+8
+Bootstrap 1
+1
+2
+2
+4
+6
+6
+7
+8
+Bootstrap 2
+1
+1
+3
+3
+4
+5
+7
+7
+Bootstrap 3
+2
+3
+4
+4
+5
+6
+6
+8
+≈ 63,2%
+observaciones únicas esperadas en una muestra grande
+Las repeticiones crean conjuntos de entrenamiento distintos sin recolectar datos nuevos.
+[notas] Subrayar dos palabras: con reemplazo. Una fila puede aparecer varias veces y otra puede quedar fuera.
+Para n grande, la proporción esperada de observaciones únicas se aproxima a 1 − e⁻¹ = 63,2%.
+Las muestras mostradas son ilustrativas.
+
+Fuentes:
+Efron, B. (1979). Bootstrap Methods: Another Look at the Jackknife. https://doi.org/10.1214/aos/1176344552
+=== slide 6
+Observaciones fuera de bolsa (OOB)
+06
+Random Forest y Bagging
+6/18
+Las filas que no entran en una muestra bootstrap sirven como validación interna para ese árbol.
+Bootstrap del árbol b
+Árbol b
+Filas OOB
+Predicción y error OOB
+≈ 36,8%
+queda fuera de una muestra bootstrap grande
+Uso principal
+Estimar el desempeño sin reservar un conjunto de validación adicional, cuando el modelo implementa OOB.
+[notas] Cada observación recibe predicciones solo de los árboles para los cuales quedó fuera de la muestra bootstrap.
+El error OOB ayuda a ajustar el modelo, aunque un conjunto de prueba independiente sigue siendo la referencia final cuando está disponible.
+
+Fuentes:
+Breiman, L. (2001). Random Forests. https://doi.org/10.1023/A:1010933404324
+=== slide 7
+Bagging: definición
+07
+Random Forest y Bagging
+7/18
+Bootstrap aggregating
+Entrena el mismo tipo de modelo sobre muestras bootstrap distintas y agrega sus predicciones.
+Clasificación
+Votación mayoritaria o promedio de probabilidades
+Regresión
+Promedio de las predicciones individuales
+B = número de modelos base
+[notas] Pronunciación útil: bagging combina bootstrap y aggregating.
+Aunque puede aplicarse a varios modelos base, los árboles se usan con frecuencia porque se benefician mucho de la reducción de varianza.
+
+Fuentes:
+Breiman, L. (1996). Bagging Predictors. https://doi.org/10.1007/BF00058655
+=== slide 8
+Algoritmo de bagging
+08
+Random Forest y Bagging
+8/18
+1
+Muestrear
+Crear B muestras bootstrap
+2
+Entrenar
+Ajustar un árbol en cada muestra
+3
+Predecir
+Obtener B respuestas para x
+4
+Agregar
+Votar o promediar
+Entrenamiento paralelo
+Los árboles no dependen unos de otros. Esto permite entrenarlos al mismo tiempo.
+[notas] Recorrer el algoritmo de izquierda a derecha.
+Aclarar que cada árbol suele crecer sin poda o con pocos límites, según la implementación y el problema.
+La independencia entre árboles facilita el paralelismo.
+=== slide 9
+Por qué bagging reduce la varianza
+09
+Random Forest y Bagging
+9/18
+Promediar suaviza errores individuales cuando los modelos no están perfectamente correlacionados.
+ρ
+Correlación entre errores
+Menor ρ produce mayor ganancia
+B
+Cantidad de árboles
+Más árboles estabilizan el promedio
+Límite importante
+Si ρ es alto, muchos árboles repiten errores parecidos. Aumentar B no elimina ese componente.
+[notas] La fórmula supone varianzas similares y correlación común. Se usa aquí para explicar la intuición.
+Con B grande, el término (1 − ρ)/B se reduce. El término ρ permanece.
+Esta limitación motiva la selección aleatoria de variables en Random Forest.
+=== slide 10
+Random Forest: definición
+10
+Random Forest y Bagging
+10/18
+Random Forest = bagging de árboles + selección aleatoria de variables
+Filas
+Cada árbol recibe una muestra bootstrap
+Variables
+Cada división evalúa solo un subconjunto aleatorio
+Resultado
+Los árboles se parecen menos entre sí
+Objetivo
+Reducir la correlación entre árboles para mejorar el promedio.
+[notas] Random Forest conserva la agregación de bagging y añade azar en las variables candidatas.
+La selección ocurre en cada nodo, no una sola vez por árbol.
+
+Fuentes:
+Breiman, L. (2001). Random Forests. https://doi.org/10.1023/A:1010933404324
+=== slide 11
+Selección aleatoria de variables
+11
+Random Forest y Bagging
+11/18
+En cada nodo, el algoritmo prueba mtry variables elegidas al azar entre p variables disponibles.
+p = 8 variables
+Edad
+Ingreso
+Zona
+Canal
+Saldo
+Uso
+Antig.
+Mora
+mtry = 3
+Ingreso · Saldo · Antig.
+Mejor división
+Saldo < 420
+Una variable dominante no controla todos los árboles ni todos los nodos.
+[notas] En este ejemplo, el nodo solo considera tres de ocho variables.
+El mejor corte se busca dentro del subconjunto, aunque otra variable excluida pudiera ofrecer un corte mejor en ese nodo.
+El costo de introducir diversidad puede ser un pequeño aumento del sesgo, compensado por menor varianza.
+=== slide 12
+Bagging y Random Forest
+12
+Random Forest y Bagging
+12/18
+Aspecto
+Bagging con árboles
+Random Forest
+Muestreo de filas
+Bootstrap
+Bootstrap
+Variables por nodo
+Todas las variables
+Subconjunto aleatorio
+Correlación entre árboles
+Puede mantenerse alta
+Tiende a disminuir
+Agregación
+Voto o promedio
+Voto o promedio
+Uso OOB
+Disponible en ambos modelos
+Diferencia clave
+Random Forest controla la similitud entre árboles mediante mtry.
+[notas] Usar esta tabla como pausa de síntesis. Preguntar qué fila explica la reducción de correlación en Random Forest.
+=== slide 13
+Ejemplo de clasificación
+13
+Random Forest y Bagging
+13/18
+Cinco árboles estiman si un cliente responderá a una campaña.
+Árbol 1
+Sí
+Árbol 2
+No
+Árbol 3
+Sí
+Árbol 4
+Sí
+Árbol 5
+No
+3 votos Sí
+2 votos No
+Predicción: Sí
+Probabilidad estimada por votos: 3/5 = 0,60
+[notas] Ejemplo simplificado con etiquetas duras.
+Muchas implementaciones promedian probabilidades de clase en lugar de contar únicamente la clase ganadora de cada árbol.
+Pregunta al curso: ¿cambiaría la decisión si el umbral fuera 0,70?
+=== slide 14
+Hiperparámetros principales
+14
+Random Forest y Bagging
+14/18
+n_estimators
+Número de árboles
+Más árboles estabilizan el resultado y aumentan el costo.
+max_features
+Variables candidatas por nodo
+Menos variables reducen correlación y pueden aumentar sesgo.
+max_depth / min_samples_leaf
+Complejidad de cada árbol
+Controlan hojas pequeñas y la suavidad de la predicción.
+bootstrap / max_samples
+Cómo muestrear filas
+Definen si hay reemplazo y cuánto usa cada árbol.
+class_weight
+Peso de las clases
+Ayuda cuando la variable objetivo está desbalanceada.
+Prioridad práctica
+Primero valida n_estimators, max_features y el tamaño mínimo de hoja.
+[notas] Relacionar cada hiperparámetro con el compromiso sesgo-varianza y con el costo computacional.
+No existe un valor universal. Usar validación cruzada u OOB y una métrica alineada con el problema.
+Los nombres corresponden a la API de scikit-learn y pueden variar en otras bibliotecas.
+
+Fuentes:
+scikit-learn. RandomForestClassifier documentation. https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html
+=== slide 15
+Ventajas y limitaciones
+15
+Random Forest y Bagging
+15/18
+Ventajas
+Limitaciones
+Buen desempeño sin suponer una relación lineal
+Menor varianza que un árbol individual
+Captura interacciones y umbrales de forma automática
+Poco sensible al escalamiento de variables
+OOB ofrece una estimación interna del error
+Menor interpretabilidad que un solo árbol
+Mayor costo de memoria y predicción
+La importancia por impureza puede inducir a error
+No extrapola bien fuera del rango observado en regresión
+Bagging comparte gran parte de estas propiedades. Random Forest suele ganar cuando la aleatoriedad de variables reduce errores correlacionados.
+[notas] Evitar vender Random Forest como solución universal.
+Para interpretar, preferir importancia por permutación, curvas de dependencia parcial o explicaciones locales, según el objetivo.
+En regresión, el promedio de valores de hojas no produce extrapolación lineal fuera del rango aprendido.
+
+Fuentes:
+scikit-learn. Ensemble methods user guide. https://scikit-learn.org/stable/modules/ensemble.html
+=== slide 16
+Aplicaciones frecuentes
+16
+Random Forest y Bagging
+16/18
+1
+Riesgo y fraude
+Clasificar transacciones o clientes con señales heterogéneas.
+2
+Salud
+Apoyar predicciones clínicas con variables tabulares.
+3
+Operaciones
+Predecir fallas, demanda o tiempos con relaciones no lineales.
+4
+Marketing
+Estimar respuesta, abandono o valor de clientes.
+Encaja mejor
+Datos tabulares, relaciones complejas y una prioridad alta en desempeño predictivo.
+[notas] Los ejemplos describen tipos de problema, no recomendaciones regulatorias ni clínicas.
+Random Forest destaca en datos tabulares con mezcla de efectos no lineales e interacciones.
+En imágenes, texto o series muy largas, modelos especializados pueden resultar más adecuados.
+=== slide 17
+Flujo de trabajo y errores comunes
+17
+Random Forest y Bagging
+17/18
+1
+Separar prueba
+2
+Definir métrica
+3
+Ajustar con CV u OOB
+4
+Evaluar y explicar
+Evitar
+Filtración de información al preparar datos antes de separar conjuntos
+Elegir accuracy cuando la clase positiva es muy rara
+Interpretar importancia por impureza como causalidad
+Ajustar hiperparámetros mirando repetidamente el conjunto de prueba
+[notas] Enfatizar que el modelo no corrige un diseño de evaluación defectuoso.
+Para clases desbalanceadas considerar precisión, recall, F1, PR-AUC o costos específicos.
+Toda transformación aprendida de datos debe ajustarse dentro del proceso de validación.
+=== slide 18
+Síntesis y comprobación
+18
+Random Forest y Bagging
+18/18
+Tres ideas para llevar
+1
+Bootstrap crea diversidad al cambiar las filas.
+2
+Bagging reduce varianza mediante agregación.
+3
+Random Forest reduce también la correlación entre árboles.
+Preguntas de repaso
+¿Por qué aparecen filas repetidas en bootstrap?
+¿Qué problema busca resolver max_features?
+¿Qué aporta OOB y qué no reemplaza siempre?
+Siguiente paso sugerido: entrenar ambos modelos sobre el mismo conjunto y comparar error, tiempo e importancia por permutación.
+[notas] Respuestas esperadas: el muestreo es con reemplazo; max_features disminuye correlación; OOB estima generalización interna, pero una prueba independiente sigue siendo útil.
+Cierre práctico: proponer un notebook posterior con un árbol, bagging y Random Forest bajo la misma partición de datos.

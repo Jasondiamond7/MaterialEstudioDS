@@ -1,0 +1,359 @@
+1
+00:00:00,250 --> 00:00:02,200
+Clase treinta y seis: boosting.
+
+2
+00:00:02,320 --> 00:00:05,923
+La idea es simple y poderosa: muchos modelos débiles, uno
+
+3
+00:00:05,923 --> 00:00:09,020
+detrás de otro, cada uno corrigiendo al anterior.
+
+4
+00:00:09,140 --> 00:00:11,473
+Un árbol de decisión con solo dos niveles
+
+5
+00:00:11,473 --> 00:00:13,920
+predice bastante mal el precio de una casa.
+
+6
+00:00:14,040 --> 00:00:16,700
+Pero imagina que entrenas un segundo árbol, que se
+
+7
+00:00:16,700 --> 00:00:19,360
+dedica solo a corregir lo que el primero hizo mal.
+
+8
+00:00:19,480 --> 00:00:22,310
+Y un tercero, que corrige lo que todavía queda.
+
+9
+00:00:22,430 --> 00:00:24,920
+Esa cadena de correcciones se llama boosting.
+
+10
+00:00:25,040 --> 00:00:26,170
+Piensa en el golf.
+
+11
+00:00:26,290 --> 00:00:28,290
+El hoyo está a doscientos metros.
+
+12
+00:00:28,410 --> 00:00:31,750
+Nadie intenta embocar desde la salida con un golpe perfecto.
+
+13
+00:00:31,870 --> 00:00:34,660
+El primer golpe deja la bola a cuarenta metros.
+
+14
+00:00:34,780 --> 00:00:37,770
+El segundo no vuelve a empezar: apunta solo a esos
+
+15
+00:00:37,770 --> 00:00:40,760
+cuarenta metros que faltan, y deja la bola a diez.
+
+16
+00:00:40,880 --> 00:00:44,990
+El tercer golpe apunta a esos diez metros, y deja la bola a dos.
+
+17
+00:00:45,110 --> 00:00:49,750
+Cada golpe es modesto, pero cada uno trabaja sobre el error que dejó el anterior.
+
+18
+00:00:49,870 --> 00:00:52,770
+Y la posición final es la suma de todos los golpes.
+
+19
+00:00:52,890 --> 00:00:56,083
+En boosting, el primer golpe es una predicción base:
+
+20
+00:00:56,083 --> 00:00:58,540
+por ejemplo, el promedio de los precios.
+
+21
+00:00:58,660 --> 00:01:00,430
+A eso lo llamamos efe cero.
+
+22
+00:01:00,550 --> 00:01:04,356
+Cada golpe siguiente es un árbol pequeño, hache uno, hache
+
+23
+00:01:04,356 --> 00:01:07,440
+dos, que apunta al error que queda: el residuo.
+
+24
+00:01:07,560 --> 00:01:09,390
+Y la predicción final es la suma.
+
+25
+00:01:09,510 --> 00:01:10,820
+¿Y esa letra griega?
+
+26
+00:01:10,940 --> 00:01:13,280
+Es eta, la tasa de aprendizaje.
+
+27
+00:01:13,400 --> 00:01:16,384
+Cada árbol no se suma completo: se suma solo una
+
+28
+00:01:16,384 --> 00:01:19,120
+fracción, por ejemplo un treinta por ciento.
+
+29
+00:01:19,240 --> 00:01:24,140
+La diapositiva tres lo dice así: eta controla cuánto aporta cada nuevo modelo.
+
+30
+00:01:24,260 --> 00:01:27,300
+Hagamos la suma a mano, con el ejemplo del apunte.
+
+31
+00:01:27,420 --> 00:01:31,420
+El precio base, efe cero, es 160 mil dólares.
+
+32
+00:01:31,540 --> 00:01:36,320
+Para una casa, los tres árboles predicen más 50, más 20 y menos 10.
+
+33
+00:01:36,440 --> 00:01:38,430
+Y eta vale 0.3.
+
+34
+00:01:38,550 --> 00:01:45,730
+Etapa uno: 160 más 0.3 por 50, o sea 160 más 15: 175.
+
+35
+00:01:45,850 --> 00:01:51,880
+Etapa dos: 175 más 0.3 por 20, más 6: 181.
+
+36
+00:01:52,000 --> 00:01:58,440
+Etapa tres: 181 más 0.3 por menos 10, menos 3: 178.
+
+37
+00:01:58,560 --> 00:02:00,090
+Fíjate en dos cosas.
+
+38
+00:02:00,210 --> 00:02:04,630
+Cada árbol aporta solo un treinta por ciento de lo que predice: pasos chicos.
+
+39
+00:02:04,750 --> 00:02:07,324
+Y el tercer árbol corrige hacia abajo: si los
+
+40
+00:02:07,324 --> 00:02:10,070
+anteriores se pasaron, el siguiente lo compensa.
+
+41
+00:02:10,190 --> 00:02:11,860
+Ahora con datos reales.
+
+42
+00:02:11,980 --> 00:02:16,000
+Tomamos las casas de Ames y una sola variable: la superficie habitable.
+
+43
+00:02:16,120 --> 00:02:23,490
+Predecir con el promedio deja un error típico, un RMSE, de 78 500 dólares.
+
+44
+00:02:23,610 --> 00:02:27,480
+Con un árbol, el error baja a 68 400.
+
+45
+00:02:27,600 --> 00:02:31,180
+Con cinco árboles, a 55 400.
+
+46
+00:02:31,300 --> 00:02:34,250
+Y con cincuenta, a 50 900.
+
+47
+00:02:34,370 --> 00:02:38,890
+Cada árbol trabajó sobre los residuos del anterior, y el error se fue achicando.
+
+48
+00:02:39,010 --> 00:02:40,530
+¿Y por qué no baja a cero?
+
+49
+00:02:40,650 --> 00:02:43,749
+Porque una sola variable no explica todo el precio: dos
+
+50
+00:02:43,749 --> 00:02:46,510
+casas del mismo tamaño pueden valer muy distinto.
+
+51
+00:02:46,630 --> 00:02:50,150
+Lo que queda es ruido, o información que no le dimos al modelo.
+
+52
+00:02:50,270 --> 00:02:53,395
+Todos los modelos de esta clase siguen el mismo ciclo
+
+53
+00:02:53,395 --> 00:02:55,930
+de cinco pasos, el de la diapositiva cinco.
+
+54
+00:02:56,050 --> 00:02:58,750
+Uno, inicializar con una predicción base.
+
+55
+00:02:58,870 --> 00:03:00,500
+Dos, medir el error.
+
+56
+00:03:00,620 --> 00:03:03,580
+Tres, ajustar un nuevo aprendiz a ese error.
+
+57
+00:03:03,700 --> 00:03:06,830
+Cuatro, actualizar, sumando su contribución.
+
+58
+00:03:06,950 --> 00:03:12,040
+Y cinco, detener: después de eme etapas, o cuando la validación deja de mejorar.
+
+59
+00:03:12,160 --> 00:03:15,720
+Y la diapositiva remata con la frase clave de toda la clase: la
+
+60
+00:03:15,720 --> 00:03:19,450
+definición exacta de error separa a AdaBoost de Gradient Boosting.
+
+61
+00:03:19,570 --> 00:03:22,160
+AdaBoost mide el error con pesos.
+
+62
+00:03:22,280 --> 00:03:24,370
+Gradient Boosting, con residuos.
+
+63
+00:03:24,490 --> 00:03:26,890
+La ruta de la clase tiene cuatro etapas.
+
+64
+00:03:27,010 --> 00:03:29,590
+Intuición: aprender de los errores.
+
+65
+00:03:29,710 --> 00:03:32,780
+Fundamentos: AdaBoost y los gradientes.
+
+66
+00:03:32,900 --> 00:03:36,830
+Implementaciones: XGBoost, LightGBM y CatBoost.
+
+67
+00:03:36,950 --> 00:03:39,250
+Y decisión: comparar y ajustar.
+
+68
+00:03:39,370 --> 00:03:43,701
+Y una pregunta guía para todo el recorrido: ¿cómo equilibramos capacidad
+
+69
+00:03:43,701 --> 00:03:47,370
+predictiva, velocidad, datos categóricos e interpretabilidad?
+
+70
+00:03:47,490 --> 00:03:50,337
+El error típico al empezar: pensar que boosting es
+
+71
+00:03:50,337 --> 00:03:53,240
+entrenar muchos árboles en paralelo y promediarlos.
+
+72
+00:03:53,360 --> 00:03:55,510
+Eso es bagging, la clase anterior.
+
+73
+00:03:55,630 --> 00:03:58,460
+En boosting, cada árbol depende del anterior, y
+
+74
+00:03:58,460 --> 00:04:01,110
+todos ven los mismos datos de entrenamiento.
+
+75
+00:04:01,230 --> 00:04:04,181
+Lo que cambia de un árbol a otro no es la muestra:
+
+76
+00:04:04,181 --> 00:04:06,600
+es el objetivo, los pesos o los residuos.
+
+77
+00:04:06,720 --> 00:04:07,940
+Piensa un segundo.
+
+78
+00:04:08,060 --> 00:04:12,373
+En el ejemplo de las tres etapas, ¿cuánto valdría la predicción si eta
+
+79
+00:04:12,373 --> 00:04:15,700
+fuera uno, es decir, si cada árbol se sumara completo?
+
+80
+00:04:16,420 --> 00:04:24,080
+Con eta igual a uno, sumas todo: 160 más 50, más 20, menos 10, igual a 220.
+
+81
+00:04:24,200 --> 00:04:27,670
+Con eta igual a 0.3 llegamos a 178.
+
+82
+00:04:27,790 --> 00:04:30,594
+Con eta igual a uno se avanza más rápido, pero
+
+83
+00:04:30,594 --> 00:04:32,910
+cada árbol se toma demasiado en serio.
+
+84
+00:04:33,030 --> 00:04:36,290
+Más adelante veremos por qué los pasos chicos suelen ganar.
+
+85
+00:04:36,410 --> 00:04:39,318
+Para llevarte: boosting entrena modelos simples en
+
+86
+00:04:39,318 --> 00:04:42,110
+secuencia, cada uno sobre el error del anterior.
+
+87
+00:04:42,230 --> 00:04:46,780
+La predicción final es una suma: efe cero, más eta por cada árbol.
+
+88
+00:04:46,900 --> 00:04:50,090
+Y la definición de error es lo que distingue a cada algoritmo.
+
+89
+00:04:50,210 --> 00:04:52,780
+Siguiente parada: boosting frente a bagging.
+
+90
+00:04:52,900 --> 00:04:55,740
+Mismos árboles, filosofías opuestas.

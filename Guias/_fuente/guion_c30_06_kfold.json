@@ -1,0 +1,4494 @@
+{
+ "clase": "Clase 30",
+ "titulo": "Validación cruzada K-Fold",
+ "cabecera": "Clase 30  ·  Validación cruzada K-Fold",
+ "profesora": "Prof. Laura Sánchez",
+ "voz": "es-MX-DaliaNeural",
+ "rate": "+0%",
+ "fps": 25,
+ "beats": [
+  {
+   "seccion": "Introducción",
+   "say": "Validación cruzada, K-Fold. Cómo evaluar un modelo sin depender de la suerte de una sola división.",
+   "acciones": [
+    {
+     "id": "t_fondo",
+     "tipo": "caja",
+     "x": 960,
+     "y": 540,
+     "w": 1920,
+     "h": 1080,
+     "radio": 0,
+     "relleno": "navy",
+     "entrada": "ninguna"
+    },
+    {
+     "id": "t_franja",
+     "tipo": "caja",
+     "x": 12,
+     "y": 540,
+     "w": 24,
+     "h": 1080,
+     "radio": 0,
+     "relleno": "teal",
+     "entrada": "ninguna"
+    },
+    {
+     "id": "t_clase",
+     "tipo": "texto",
+     "texto": "CLASE 30  ·  PREPARACIÓN PARA MACHINE LEARNING",
+     "x": 140,
+     "y": 330,
+     "ancla": "lm",
+     "tam": 40,
+     "peso": "b",
+     "color": "#96D6DC",
+     "entrada": "subir"
+    },
+    {
+     "id": "t_tit",
+     "tipo": "texto",
+     "texto": "Validación cruzada K-Fold",
+     "x": 140,
+     "y": 450,
+     "ancla": "lm",
+     "tam": 100,
+     "peso": "b",
+     "color": "blanco",
+     "entrada": "subir",
+     "t": 0.1
+    },
+    {
+     "id": "t_lin",
+     "tipo": "caja",
+     "x0": 140,
+     "y0": 540,
+     "x1": 420,
+     "y1": 548,
+     "radio": 0,
+     "relleno": "teal",
+     "desde": {
+      "x1": 140
+     },
+     "t": 0.2
+    },
+    {
+     "id": "t_sub",
+     "tipo": "texto",
+     "texto": "Un resultado estable, en lugar de uno de suerte",
+     "x": 140,
+     "y": 610,
+     "ancla": "lm",
+     "tam": 46,
+     "color": "#E2EAF4",
+     "entrada": "subir",
+     "t": 0.25
+    },
+    {
+     "id": "t_pie",
+     "tipo": "texto",
+     "texto": "Diplomado Data Science UC 2026  ·  Prof. Laura Sánchez",
+     "x": 140,
+     "y": 960,
+     "ancla": "lm",
+     "tam": 32,
+     "color": "#96AAC8",
+     "t": 0.3
+    }
+   ]
+  },
+  {
+   "seccion": "1. El problema de una sola partición",
+   "say": "Imagina que tu profesor te pone un solo examen. [[a]]Si justo salen las preguntas que dominas, sacas un siete. [[b]]Si salen las que no estudiaste, sacas un cuatro.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "tarjeta",
+     "x": 480,
+     "y": 560,
+     "w": 560,
+     "h": 520,
+     "titulo": "Examen A",
+     "items": [
+      "Pregunta 1",
+      "Pregunta 2",
+      "Pregunta 3"
+     ],
+     "color": "verde",
+     "id": "e1",
+     "entrada": "subir",
+     "en": "a",
+     "dur": 0.7
+    },
+    {
+     "tipo": "numero",
+     "valor": 7.0,
+     "fmt": "{:.1f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 480,
+     "y": 920,
+     "tam": 90,
+     "color": "verde",
+     "ancla": "mm",
+     "id": "e2",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.4,
+     "dur": 0.9,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "tarjeta",
+     "x": 1440,
+     "y": 560,
+     "w": 560,
+     "h": 520,
+     "titulo": "Examen B",
+     "items": [
+      "Pregunta 1",
+      "Pregunta 2",
+      "Pregunta 3"
+     ],
+     "color": "rojo",
+     "id": "e3",
+     "entrada": "subir",
+     "en": "b",
+     "dur": 0.7
+    },
+    {
+     "tipo": "numero",
+     "valor": 4.0,
+     "fmt": "{:.1f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 1440,
+     "y": 920,
+     "tam": 90,
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e4",
+     "entrada": "fade",
+     "en": "b",
+     "t": 0.4,
+     "dur": 0.9,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    }
+   ]
+  },
+  {
+   "say": "¿Cuál de las dos notas dice cuánto sabes de verdad? [[a]]Ninguna: depende de la suerte del examen.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "¿cuál dice cuánto sabes?",
+     "x": 960,
+     "y": 980,
+     "tam": 54,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e5",
+     "entrada": "pop",
+     "t": 0.2
+    },
+    {
+     "tipo": "anillo",
+     "x": 480,
+     "y": 920,
+     "w": 300,
+     "h": 130,
+     "radio": 40,
+     "color": "ambar",
+     "grosor": 6,
+     "pulso": true,
+     "id": "rn1",
+     "entrada": "fade",
+     "t": 0.5
+    },
+    {
+     "tipo": "anillo",
+     "x": 1440,
+     "y": 920,
+     "w": 300,
+     "h": 130,
+     "radio": 40,
+     "color": "ambar",
+     "grosor": 6,
+     "pulso": true,
+     "id": "rn2",
+     "entrada": "fade",
+     "t": 0.9
+    },
+    {
+     "tipo": "texto",
+     "texto": "depende de la suerte",
+     "x": 960,
+     "y": 780,
+     "tam": 52,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e6",
+     "entrada": "pop",
+     "en": "a"
+    }
+   ]
+  },
+  {
+   "say": "Con los datos pasa igual. Si divides en entrenamiento y validación una sola vez, [[a]]esa partición puede salir fácil, [[b]]o difícil, solo por azar.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "20 filas de ejemplo",
+     "x": 960,
+     "y": 200,
+     "tam": 44,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e7",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "caja",
+     "x0": 280,
+     "y0": 300,
+     "x1": 338,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s10",
+     "entrada": "fade"
+    },
+    {
+     "tipo": "caja",
+     "x0": 346,
+     "y0": 300,
+     "x1": 404,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s11",
+     "entrada": "fade",
+     "t": 0.03
+    },
+    {
+     "tipo": "caja",
+     "x0": 412,
+     "y0": 300,
+     "x1": 470,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s12",
+     "entrada": "fade",
+     "t": 0.06
+    },
+    {
+     "tipo": "caja",
+     "x0": 478,
+     "y0": 300,
+     "x1": 536,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s13",
+     "entrada": "fade",
+     "t": 0.09
+    },
+    {
+     "tipo": "caja",
+     "x0": 544,
+     "y0": 300,
+     "x1": 602,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s14",
+     "entrada": "fade",
+     "t": 0.12
+    },
+    {
+     "tipo": "caja",
+     "x0": 610,
+     "y0": 300,
+     "x1": 668,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s15",
+     "entrada": "fade",
+     "t": 0.15
+    },
+    {
+     "tipo": "caja",
+     "x0": 676,
+     "y0": 300,
+     "x1": 734,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s16",
+     "entrada": "fade",
+     "t": 0.18
+    },
+    {
+     "tipo": "caja",
+     "x0": 742,
+     "y0": 300,
+     "x1": 800,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s17",
+     "entrada": "fade",
+     "t": 0.21
+    },
+    {
+     "tipo": "caja",
+     "x0": 808,
+     "y0": 300,
+     "x1": 866,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s18",
+     "entrada": "fade",
+     "t": 0.24
+    },
+    {
+     "tipo": "caja",
+     "x0": 874,
+     "y0": 300,
+     "x1": 932,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s19",
+     "entrada": "fade",
+     "t": 0.27
+    },
+    {
+     "tipo": "caja",
+     "x0": 940,
+     "y0": 300,
+     "x1": 998,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s110",
+     "entrada": "fade",
+     "t": 0.3
+    },
+    {
+     "tipo": "caja",
+     "x0": 1006,
+     "y0": 300,
+     "x1": 1064,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s111",
+     "entrada": "fade",
+     "t": 0.32999999999999996
+    },
+    {
+     "tipo": "caja",
+     "x0": 1072,
+     "y0": 300,
+     "x1": 1130,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s112",
+     "entrada": "fade",
+     "t": 0.36
+    },
+    {
+     "tipo": "caja",
+     "x0": 1138,
+     "y0": 300,
+     "x1": 1196,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s113",
+     "entrada": "fade",
+     "t": 0.39
+    },
+    {
+     "tipo": "caja",
+     "x0": 1204,
+     "y0": 300,
+     "x1": 1262,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s114",
+     "entrada": "fade",
+     "t": 0.42
+    },
+    {
+     "tipo": "caja",
+     "x0": 1270,
+     "y0": 300,
+     "x1": 1328,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s115",
+     "entrada": "fade",
+     "t": 0.44999999999999996
+    },
+    {
+     "tipo": "caja",
+     "x0": 1336,
+     "y0": 300,
+     "x1": 1394,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s116",
+     "entrada": "fade",
+     "t": 0.48
+    },
+    {
+     "tipo": "caja",
+     "x0": 1402,
+     "y0": 300,
+     "x1": 1460,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s117",
+     "entrada": "fade",
+     "t": 0.51
+    },
+    {
+     "tipo": "caja",
+     "x0": 1468,
+     "y0": 300,
+     "x1": 1526,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s118",
+     "entrada": "fade",
+     "t": 0.54
+    },
+    {
+     "tipo": "caja",
+     "x0": 1534,
+     "y0": 300,
+     "x1": 1592,
+     "y1": 370,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s119",
+     "entrada": "fade",
+     "t": 0.57
+    },
+    {
+     "tipo": "caja",
+     "x0": 280,
+     "y0": 560,
+     "x1": 338,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s20",
+     "entrada": "fade",
+     "t": 0.1
+    },
+    {
+     "tipo": "caja",
+     "x0": 346,
+     "y0": 560,
+     "x1": 404,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s21",
+     "entrada": "fade",
+     "t": 0.13
+    },
+    {
+     "tipo": "caja",
+     "x0": 412,
+     "y0": 560,
+     "x1": 470,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s22",
+     "entrada": "fade",
+     "t": 0.16
+    },
+    {
+     "tipo": "caja",
+     "x0": 478,
+     "y0": 560,
+     "x1": 536,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s23",
+     "entrada": "fade",
+     "t": 0.19
+    },
+    {
+     "tipo": "caja",
+     "x0": 544,
+     "y0": 560,
+     "x1": 602,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s24",
+     "entrada": "fade",
+     "t": 0.22
+    },
+    {
+     "tipo": "caja",
+     "x0": 610,
+     "y0": 560,
+     "x1": 668,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s25",
+     "entrada": "fade",
+     "t": 0.25
+    },
+    {
+     "tipo": "caja",
+     "x0": 676,
+     "y0": 560,
+     "x1": 734,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s26",
+     "entrada": "fade",
+     "t": 0.28
+    },
+    {
+     "tipo": "caja",
+     "x0": 742,
+     "y0": 560,
+     "x1": 800,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s27",
+     "entrada": "fade",
+     "t": 0.31
+    },
+    {
+     "tipo": "caja",
+     "x0": 808,
+     "y0": 560,
+     "x1": 866,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s28",
+     "entrada": "fade",
+     "t": 0.33999999999999997
+    },
+    {
+     "tipo": "caja",
+     "x0": 874,
+     "y0": 560,
+     "x1": 932,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s29",
+     "entrada": "fade",
+     "t": 0.37
+    },
+    {
+     "tipo": "caja",
+     "x0": 940,
+     "y0": 560,
+     "x1": 998,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s210",
+     "entrada": "fade",
+     "t": 0.4
+    },
+    {
+     "tipo": "caja",
+     "x0": 1006,
+     "y0": 560,
+     "x1": 1064,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s211",
+     "entrada": "fade",
+     "t": 0.42999999999999994
+    },
+    {
+     "tipo": "caja",
+     "x0": 1072,
+     "y0": 560,
+     "x1": 1130,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s212",
+     "entrada": "fade",
+     "t": 0.45999999999999996
+    },
+    {
+     "tipo": "caja",
+     "x0": 1138,
+     "y0": 560,
+     "x1": 1196,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s213",
+     "entrada": "fade",
+     "t": 0.49
+    },
+    {
+     "tipo": "caja",
+     "x0": 1204,
+     "y0": 560,
+     "x1": 1262,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s214",
+     "entrada": "fade",
+     "t": 0.52
+    },
+    {
+     "tipo": "caja",
+     "x0": 1270,
+     "y0": 560,
+     "x1": 1328,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s215",
+     "entrada": "fade",
+     "t": 0.5499999999999999
+    },
+    {
+     "tipo": "caja",
+     "x0": 1336,
+     "y0": 560,
+     "x1": 1394,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s216",
+     "entrada": "fade",
+     "t": 0.58
+    },
+    {
+     "tipo": "caja",
+     "x0": 1402,
+     "y0": 560,
+     "x1": 1460,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s217",
+     "entrada": "fade",
+     "t": 0.61
+    },
+    {
+     "tipo": "caja",
+     "x0": 1468,
+     "y0": 560,
+     "x1": 1526,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s218",
+     "entrada": "fade",
+     "t": 0.64
+    },
+    {
+     "tipo": "caja",
+     "x0": 1534,
+     "y0": 560,
+     "x1": 1592,
+     "y1": 630,
+     "radio": 8,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "s219",
+     "entrada": "fade",
+     "t": 0.6699999999999999
+    },
+    {
+     "relleno": "azul",
+     "id": "s11",
+     "en": "a",
+     "dur": 0.4
+    },
+    {
+     "relleno": "azul",
+     "id": "s16",
+     "en": "a",
+     "t": 0.05,
+     "dur": 0.4
+    },
+    {
+     "relleno": "azul",
+     "id": "s18",
+     "en": "a",
+     "t": 0.1,
+     "dur": 0.4
+    },
+    {
+     "relleno": "azul",
+     "id": "s113",
+     "en": "a",
+     "t": 0.15000000000000002,
+     "dur": 0.4
+    },
+    {
+     "relleno": "azul",
+     "id": "s117",
+     "en": "a",
+     "t": 0.2,
+     "dur": 0.4
+    },
+    {
+     "relleno": "azul",
+     "id": "s22",
+     "en": "b",
+     "dur": 0.4
+    },
+    {
+     "relleno": "azul",
+     "id": "s23",
+     "en": "b",
+     "t": 0.05,
+     "dur": 0.4
+    },
+    {
+     "relleno": "azul",
+     "id": "s29",
+     "en": "b",
+     "t": 0.1,
+     "dur": 0.4
+    },
+    {
+     "relleno": "azul",
+     "id": "s214",
+     "en": "b",
+     "t": 0.15000000000000002,
+     "dur": 0.4
+    },
+    {
+     "relleno": "azul",
+     "id": "s218",
+     "en": "b",
+     "t": 0.2,
+     "dur": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "partición A",
+     "x": 160,
+     "y": 335,
+     "tam": 36,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e8",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.96,
+     "fmt": "{:.2f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 1740,
+     "y": 335,
+     "tam": 64,
+     "color": "verde",
+     "ancla": "mm",
+     "id": "e9",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.5,
+     "dur": 0.8,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "partición B",
+     "x": 160,
+     "y": 595,
+     "tam": 36,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e10",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.82,
+     "fmt": "{:.2f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 1740,
+     "y": 595,
+     "tam": 64,
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e11",
+     "entrada": "fade",
+     "en": "b",
+     "t": 0.5,
+     "dur": 0.8,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    }
+   ]
+  },
+  {
+   "say": "[[a]]Mismo modelo, mismos datos. [[b]]Solo cambió el corte, y la nota cambió mucho.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "mismo modelo, mismos datos",
+     "x": 960,
+     "y": 820,
+     "tam": 54,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e12",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "solo cambió el corte",
+     "x": 960,
+     "y": 930,
+     "tam": 54,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e13",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "En las viviendas de la clase lo comprobamos. Repetimos trescientas particiones simples y medimos el R cuadrado de validación. [[a]]Mira cómo se reparten los resultados.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "300 particiones simples  ·  R² de validación",
+     "x": 960,
+     "y": 200,
+     "tam": 48,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e14",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "linea",
+     "x0": 280,
+     "y0": 800,
+     "x1": 1640,
+     "y1": 800,
+     "color": "tinta",
+     "grosor": 4,
+     "punta": false,
+     "guion": false,
+     "id": "hbase",
+     "entrada": "ninguna",
+     "en": "a",
+     "dur": 0.4,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 439.22222222222155,
+     "y0": 792,
+     "x1": 478.5555555555549,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb0",
+     "en": "a",
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 482.5555555555549,
+     "y0": 800,
+     "x1": 521.8888888888883,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb1",
+     "en": "a",
+     "t": 0.05,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 525.8888888888883,
+     "y0": 800,
+     "x1": 565.2222222222217,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb2",
+     "en": "a",
+     "t": 0.1,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 569.2222222222217,
+     "y0": 800,
+     "x1": 608.555555555555,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb3",
+     "en": "a",
+     "t": 0.15000000000000002,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 612.555555555555,
+     "y0": 792,
+     "x1": 651.8888888888885,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb4",
+     "en": "a",
+     "t": 0.2,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 655.8888888888885,
+     "y0": 784,
+     "x1": 695.2222222222218,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb5",
+     "en": "a",
+     "t": 0.25,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 699.2222222222218,
+     "y0": 776,
+     "x1": 738.5555555555552,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb6",
+     "en": "a",
+     "t": 0.30000000000000004,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 742.5555555555552,
+     "y0": 760,
+     "x1": 781.8888888888885,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb7",
+     "en": "a",
+     "t": 0.35000000000000003,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 785.8888888888885,
+     "y0": 760,
+     "x1": 825.222222222222,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb8",
+     "en": "a",
+     "t": 0.4,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 829.222222222222,
+     "y0": 784,
+     "x1": 868.5555555555553,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb9",
+     "en": "a",
+     "t": 0.45,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 872.5555555555553,
+     "y0": 760,
+     "x1": 911.8888888888887,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb10",
+     "en": "a",
+     "t": 0.5,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 915.8888888888887,
+     "y0": 640,
+     "x1": 955.2222222222221,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb11",
+     "en": "a",
+     "t": 0.55,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 959.2222222222221,
+     "y0": 688,
+     "x1": 998.5555555555554,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb12",
+     "en": "a",
+     "t": 0.6000000000000001,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1002.5555555555554,
+     "y0": 696,
+     "x1": 1049.111111111111,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb13",
+     "en": "a",
+     "t": 0.65,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1053.111111111111,
+     "y0": 624,
+     "x1": 1092.4444444444443,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb14",
+     "en": "a",
+     "t": 0.7000000000000001,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1096.4444444444443,
+     "y0": 544,
+     "x1": 1135.7777777777778,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb15",
+     "en": "a",
+     "t": 0.75,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1139.7777777777778,
+     "y0": 528,
+     "x1": 1179.1111111111113,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb16",
+     "en": "a",
+     "t": 0.8,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1183.1111111111113,
+     "y0": 488,
+     "x1": 1222.4444444444443,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb17",
+     "en": "a",
+     "t": 0.8500000000000001,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1226.4444444444443,
+     "y0": 544,
+     "x1": 1265.7777777777778,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb18",
+     "en": "a",
+     "t": 0.9,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1269.7777777777778,
+     "y0": 568,
+     "x1": 1309.1111111111104,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb19",
+     "en": "a",
+     "t": 0.9500000000000001,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1313.1111111111104,
+     "y0": 648,
+     "x1": 1352.444444444444,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb20",
+     "en": "a",
+     "t": 1.0,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1356.444444444444,
+     "y0": 712,
+     "x1": 1395.7777777777771,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb21",
+     "en": "a",
+     "t": 1.05,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1399.7777777777771,
+     "y0": 752,
+     "x1": 1439.1111111111106,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb22",
+     "en": "a",
+     "t": 1.1,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1443.1111111111106,
+     "y0": 760,
+     "x1": 1482.444444444444,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb23",
+     "en": "a",
+     "t": 1.1500000000000001,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.80",
+     "x": 300.0,
+     "y": 836,
+     "tam": 32,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "ht0",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.85",
+     "x": 661.1111111111106,
+     "y": 836,
+     "tam": 32,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "ht1",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.90",
+     "x": 1022.2222222222221,
+     "y": 836,
+     "tam": 32,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "ht2",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.95",
+     "x": 1383.3333333333326,
+     "y": 836,
+     "tam": 32,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "ht3",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    }
+   ]
+  },
+  {
+   "say": "Algunas particiones dan cerca de [[a]]cero coma ochenta y dos. [[b]]Otras, cerca de cero coma noventa y seis.",
+   "acciones": [
+    {
+     "tipo": "linea",
+     "x0": 444.4444444444438,
+     "y0": 300,
+     "x1": 444.4444444444438,
+     "y1": 800,
+     "color": "rojo",
+     "grosor": 5,
+     "punta": false,
+     "guion": true,
+     "id": "vmin",
+     "entrada": "ninguna",
+     "en": "a",
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.82",
+     "x": 444.4444444444438,
+     "y": 250,
+     "tam": 44,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e15",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "linea",
+     "x0": 1455.555555555555,
+     "y0": 300,
+     "x1": 1455.555555555555,
+     "y1": 800,
+     "color": "verde",
+     "grosor": 5,
+     "punta": false,
+     "guion": true,
+     "id": "vmax",
+     "entrada": "ninguna",
+     "en": "b",
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.96",
+     "x": 1455.555555555555,
+     "y": 250,
+     "tam": 44,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "fondo_txt": "verdeclaro",
+     "id": "e16",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.3
+    }
+   ]
+  },
+  {
+   "say": "Con mala suerte, habrías creído que el modelo es regular. [[a]]Con buena suerte, que es excelente. [[b]]Y es el mismo modelo.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "mala suerte: parece regular",
+     "x": 560,
+     "y": 450,
+     "tam": 40,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e17",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "buena suerte: parece excelente",
+     "x": 1500,
+     "y": 450,
+     "tam": 40,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "fondo_txt": "verdeclaro",
+     "id": "e18",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "el mismo modelo",
+     "x": 960,
+     "y": 960,
+     "tam": 56,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e19",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "seccion": "2. Cómo funciona K-Fold",
+   "say": "La solución se llama validación cruzada, o K-Fold. [[a]]La idea: en vez de un solo corte, [[b]]hacemos varios y promediamos.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "K-Fold",
+     "x": 960,
+     "y": 330,
+     "tam": 130,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e20",
+     "entrada": "pop",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "validación cruzada",
+     "x": 960,
+     "y": 500,
+     "tam": 60,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e21",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "varios cortes  →  promedio",
+     "x": 960,
+     "y": 720,
+     "tam": 64,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e22",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "Paso uno: partimos los datos en K partes del mismo tamaño, que llamamos pliegues. [[a]]K lo eliges tú. Por ejemplo, cinco.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x0": 380,
+     "y0": 352,
+     "x1": 620,
+     "y1": 428,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb00",
+     "entrada": "fade",
+     "en": "a"
+    },
+    {
+     "tipo": "caja",
+     "x0": 640,
+     "y0": 352,
+     "x1": 880,
+     "y1": 428,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb01",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.06
+    },
+    {
+     "tipo": "caja",
+     "x0": 900,
+     "y0": 352,
+     "x1": 1140,
+     "y1": 428,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb02",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.12
+    },
+    {
+     "tipo": "caja",
+     "x0": 1160,
+     "y0": 352,
+     "x1": 1400,
+     "y1": 428,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb03",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.18
+    },
+    {
+     "tipo": "caja",
+     "x0": 1420,
+     "y0": 352,
+     "x1": 1660,
+     "y1": 428,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb04",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.24
+    },
+    {
+     "tipo": "texto",
+     "texto": "Pliegue 1",
+     "x": 340,
+     "y": 390,
+     "tam": 34,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "fl0",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "datos partidos en K = 5 pliegues",
+     "x": 960,
+     "y": 170,
+     "tam": 48,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e23",
+     "entrada": "subir",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "1",
+     "x": 500,
+     "y": 390,
+     "tam": 44,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "fn0",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "2",
+     "x": 760,
+     "y": 390,
+     "tam": 44,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "fn1",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.26
+    },
+    {
+     "tipo": "texto",
+     "texto": "3",
+     "x": 1020,
+     "y": 390,
+     "tam": 44,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "fn2",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.32
+    },
+    {
+     "tipo": "texto",
+     "texto": "4",
+     "x": 1280,
+     "y": 390,
+     "tam": 44,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "fn3",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.38
+    },
+    {
+     "tipo": "texto",
+     "texto": "5",
+     "x": 1540,
+     "y": 390,
+     "tam": 44,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "fn4",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.44
+    }
+   ]
+  },
+  {
+   "say": "Paso dos: [[a]]el primer pliegue hace de validación. [[b]]Los otros cuatro entrenan. Y se calcula la nota.",
+   "acciones": [
+    {
+     "relleno": "azul",
+     "id": "fb00",
+     "en": "a",
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "valida",
+     "x": 500,
+     "y": 300,
+     "tam": 36,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e24",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "entrenan",
+     "x": 1020,
+     "y": 300,
+     "tam": 36,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e25",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "nota 1",
+     "x": 1800,
+     "y": 390,
+     "tam": 44,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e26",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.9
+    }
+   ]
+  },
+  {
+   "say": "Paso tres: repetimos rotando. [[a]]Ahora valida el segundo pliegue. [[b]]Luego el tercero, [[c]]el cuarto, [[d]]y el quinto.",
+   "acciones": [
+    {
+     "tipo": "caja",
+     "x0": 380,
+     "y0": 442,
+     "x1": 620,
+     "y1": 518,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb10",
+     "entrada": "fade",
+     "en": "a"
+    },
+    {
+     "tipo": "caja",
+     "x0": 640,
+     "y0": 442,
+     "x1": 880,
+     "y1": 518,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb11",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.06
+    },
+    {
+     "tipo": "caja",
+     "x0": 900,
+     "y0": 442,
+     "x1": 1140,
+     "y1": 518,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb12",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.12
+    },
+    {
+     "tipo": "caja",
+     "x0": 1160,
+     "y0": 442,
+     "x1": 1400,
+     "y1": 518,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb13",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.18
+    },
+    {
+     "tipo": "caja",
+     "x0": 1420,
+     "y0": 442,
+     "x1": 1660,
+     "y1": 518,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb14",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.24
+    },
+    {
+     "tipo": "texto",
+     "texto": "Pliegue 2",
+     "x": 340,
+     "y": 480,
+     "tam": 34,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "fl1",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "relleno": "azul",
+     "id": "fb11",
+     "en": "a",
+     "t": 0.6,
+     "dur": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "nota 2",
+     "x": 1800,
+     "y": 480,
+     "tam": 44,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e27",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.9
+    },
+    {
+     "tipo": "caja",
+     "x0": 380,
+     "y0": 532,
+     "x1": 620,
+     "y1": 608,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb20",
+     "entrada": "fade",
+     "en": "b"
+    },
+    {
+     "tipo": "caja",
+     "x0": 640,
+     "y0": 532,
+     "x1": 880,
+     "y1": 608,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb21",
+     "entrada": "fade",
+     "en": "b",
+     "t": 0.06
+    },
+    {
+     "tipo": "caja",
+     "x0": 900,
+     "y0": 532,
+     "x1": 1140,
+     "y1": 608,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb22",
+     "entrada": "fade",
+     "en": "b",
+     "t": 0.12
+    },
+    {
+     "tipo": "caja",
+     "x0": 1160,
+     "y0": 532,
+     "x1": 1400,
+     "y1": 608,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb23",
+     "entrada": "fade",
+     "en": "b",
+     "t": 0.18
+    },
+    {
+     "tipo": "caja",
+     "x0": 1420,
+     "y0": 532,
+     "x1": 1660,
+     "y1": 608,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb24",
+     "entrada": "fade",
+     "en": "b",
+     "t": 0.24
+    },
+    {
+     "tipo": "texto",
+     "texto": "Pliegue 3",
+     "x": 340,
+     "y": 570,
+     "tam": 34,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "fl2",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "relleno": "azul",
+     "id": "fb22",
+     "en": "b",
+     "t": 0.6,
+     "dur": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "nota 3",
+     "x": 1800,
+     "y": 570,
+     "tam": 44,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e28",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.9
+    },
+    {
+     "tipo": "caja",
+     "x0": 380,
+     "y0": 622,
+     "x1": 620,
+     "y1": 698,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb30",
+     "entrada": "fade",
+     "en": "c"
+    },
+    {
+     "tipo": "caja",
+     "x0": 640,
+     "y0": 622,
+     "x1": 880,
+     "y1": 698,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb31",
+     "entrada": "fade",
+     "en": "c",
+     "t": 0.06
+    },
+    {
+     "tipo": "caja",
+     "x0": 900,
+     "y0": 622,
+     "x1": 1140,
+     "y1": 698,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb32",
+     "entrada": "fade",
+     "en": "c",
+     "t": 0.12
+    },
+    {
+     "tipo": "caja",
+     "x0": 1160,
+     "y0": 622,
+     "x1": 1400,
+     "y1": 698,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb33",
+     "entrada": "fade",
+     "en": "c",
+     "t": 0.18
+    },
+    {
+     "tipo": "caja",
+     "x0": 1420,
+     "y0": 622,
+     "x1": 1660,
+     "y1": 698,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb34",
+     "entrada": "fade",
+     "en": "c",
+     "t": 0.24
+    },
+    {
+     "tipo": "texto",
+     "texto": "Pliegue 4",
+     "x": 340,
+     "y": 660,
+     "tam": 34,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "fl3",
+     "entrada": "pop",
+     "en": "c"
+    },
+    {
+     "relleno": "azul",
+     "id": "fb33",
+     "en": "c",
+     "t": 0.6,
+     "dur": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "nota 4",
+     "x": 1800,
+     "y": 660,
+     "tam": 44,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e29",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.9
+    },
+    {
+     "tipo": "caja",
+     "x0": 380,
+     "y0": 712,
+     "x1": 620,
+     "y1": 788,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb40",
+     "entrada": "fade",
+     "en": "d"
+    },
+    {
+     "tipo": "caja",
+     "x0": 640,
+     "y0": 712,
+     "x1": 880,
+     "y1": 788,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb41",
+     "entrada": "fade",
+     "en": "d",
+     "t": 0.06
+    },
+    {
+     "tipo": "caja",
+     "x0": 900,
+     "y0": 712,
+     "x1": 1140,
+     "y1": 788,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb42",
+     "entrada": "fade",
+     "en": "d",
+     "t": 0.12
+    },
+    {
+     "tipo": "caja",
+     "x0": 1160,
+     "y0": 712,
+     "x1": 1400,
+     "y1": 788,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb43",
+     "entrada": "fade",
+     "en": "d",
+     "t": 0.18
+    },
+    {
+     "tipo": "caja",
+     "x0": 1420,
+     "y0": 712,
+     "x1": 1660,
+     "y1": 788,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "fb44",
+     "entrada": "fade",
+     "en": "d",
+     "t": 0.24
+    },
+    {
+     "tipo": "texto",
+     "texto": "Pliegue 5",
+     "x": 340,
+     "y": 750,
+     "tam": 34,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "fl4",
+     "entrada": "pop",
+     "en": "d"
+    },
+    {
+     "relleno": "azul",
+     "id": "fb44",
+     "en": "d",
+     "t": 0.6,
+     "dur": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "nota 5",
+     "x": 1800,
+     "y": 750,
+     "tam": 44,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e30",
+     "entrada": "pop",
+     "en": "d",
+     "t": 0.9
+    }
+   ]
+  },
+  {
+   "say": "Cada pliegue validó una vez, y entrenó las otras cuatro. [[a]]Así todos los datos tienen su turno de ser examen.",
+   "acciones": [
+    {
+     "tipo": "anillo",
+     "x": 1020,
+     "y": 570,
+     "w": 1380,
+     "h": 490,
+     "radio": 40,
+     "color": "ambar",
+     "grosor": 6,
+     "pulso": true,
+     "id": "rg",
+     "entrada": "fade",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "todos tienen su turno de validar",
+     "x": 960,
+     "y": 900,
+     "tam": 52,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e31",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    }
+   ]
+  },
+  {
+   "say": "Paso cuatro: [[a]]promediamos las cinco notas. [[b]]Y miramos también cuánto varían entre sí: la desviación.",
+   "acciones": [
+    {
+     "quitar": [
+      "rg"
+     ],
+     "dur": 0.2
+    },
+    {
+     "quitar": [
+      "e31"
+     ],
+     "dur": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "promedio de las 5 notas",
+     "x": 700,
+     "y": 900,
+     "tam": 48,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e32",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "desviación entre pliegues",
+     "x": 1380,
+     "y": 900,
+     "tam": 48,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e33",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "el resultado es un promedio y una dispersión",
+     "x": 960,
+     "y": 1000,
+     "tam": 40,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e34",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.6
+    }
+   ]
+  },
+  {
+   "seccion": "3. Un ejemplo a mano",
+   "say": "Hagamos un ejemplo a mano. Tenemos cien filas y cuatro pliegues. [[a]]Cada pliegue tiene cien entre cuatro: veinticinco filas de validación. [[b]]Y entrenamos con las otras setenta y cinco.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "100 filas  ·  K = 4",
+     "x": 960,
+     "y": 190,
+     "tam": 54,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e35",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "puntos",
+     "grupos": [
+      {
+       "n": 25,
+       "rect": [
+        260,
+        300,
+        560,
+        720
+       ],
+       "color": "azul"
+      },
+      {
+       "n": 75,
+       "rect": [
+        660,
+        300,
+        1660,
+        720
+       ],
+       "color": "#C4B5FD"
+      }
+     ],
+     "radio": 12,
+     "visibles": 100,
+     "id": "pk",
+     "entrada": "ninguna",
+     "en": "a",
+     "dur": 1.6,
+     "desde": {
+      "visibles": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "numero",
+     "valor": 25,
+     "fmt": "{:.0f}",
+     "sufijo": " valida",
+     "prefijo": "",
+     "x": 410,
+     "y": 800,
+     "tam": 90,
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e36",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.5,
+     "dur": 0.8,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "numero",
+     "valor": 75,
+     "fmt": "{:.0f}",
+     "sufijo": " entrenan",
+     "prefijo": "",
+     "x": 1160,
+     "y": 800,
+     "tam": 90,
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e37",
+     "entrada": "fade",
+     "en": "b",
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    }
+   ]
+  },
+  {
+   "say": "Las cuatro notas fueron cero coma ochenta, cero coma ochenta y cuatro, cero coma setenta y ocho y cero coma ochenta y seis. [[a]]El promedio es la suma, tres coma veintiocho, entre cuatro: [[b]]cero coma ochenta y dos.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "linea",
+     "x0": 300,
+     "y0": 860,
+     "x1": 1500,
+     "y1": 860,
+     "color": "tinta",
+     "grosor": 4,
+     "punta": false,
+     "guion": false,
+     "id": "e38",
+     "entrada": "ninguna",
+     "dur": 0.4,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 450,
+     "y0": 380.0,
+     "x1": 600,
+     "y1": 860,
+     "radio": 8,
+     "relleno": "azul",
+     "borde": null,
+     "grosor": 0,
+     "id": "kb0",
+     "t": 0.3,
+     "dur": 0.5,
+     "desde": {
+      "y0": 860
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.80",
+     "x": 525,
+     "y": 340.0,
+     "tam": 44,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e39",
+     "entrada": "pop",
+     "t": 0.7
+    },
+    {
+     "tipo": "caja",
+     "x0": 730,
+     "y0": 356.0,
+     "x1": 880,
+     "y1": 860,
+     "radio": 8,
+     "relleno": "azul",
+     "borde": null,
+     "grosor": 0,
+     "id": "kb1",
+     "t": 0.6499999999999999,
+     "dur": 0.5,
+     "desde": {
+      "y0": 860
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.84",
+     "x": 805,
+     "y": 316.0,
+     "tam": 44,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e40",
+     "entrada": "pop",
+     "t": 1.0499999999999998
+    },
+    {
+     "tipo": "caja",
+     "x0": 1010,
+     "y0": 392.0,
+     "x1": 1160,
+     "y1": 860,
+     "radio": 8,
+     "relleno": "azul",
+     "borde": null,
+     "grosor": 0,
+     "id": "kb2",
+     "t": 1.0,
+     "dur": 0.5,
+     "desde": {
+      "y0": 860
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.78",
+     "x": 1085,
+     "y": 352.0,
+     "tam": 44,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e41",
+     "entrada": "pop",
+     "t": 1.4
+    },
+    {
+     "tipo": "caja",
+     "x0": 1290,
+     "y0": 344.0,
+     "x1": 1440,
+     "y1": 860,
+     "radio": 8,
+     "relleno": "azul",
+     "borde": null,
+     "grosor": 0,
+     "id": "kb3",
+     "t": 1.3499999999999999,
+     "dur": 0.5,
+     "desde": {
+      "y0": 860
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.86",
+     "x": 1365,
+     "y": 304.0,
+     "tam": 44,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e42",
+     "entrada": "pop",
+     "t": 1.7499999999999998
+    },
+    {
+     "tipo": "texto",
+     "texto": "(0.80 + 0.84 + 0.78 + 0.86) / 4  =  3.28 / 4",
+     "x": 960,
+     "y": 200,
+     "tam": 50,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e43",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "linea",
+     "x0": 300,
+     "y0": 368.00000000000006,
+     "x1": 1500,
+     "y1": 368.00000000000006,
+     "color": "violeta",
+     "grosor": 6,
+     "punta": false,
+     "guion": true,
+     "id": "kmed",
+     "entrada": "ninguna",
+     "en": "b",
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "promedio 0.82",
+     "x": 1560,
+     "y": 368.00000000000006,
+     "tam": 44,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "lm",
+     "id": "e44",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.3
+    }
+   ]
+  },
+  {
+   "say": "La desviación mide cuánto se alejan las notas del promedio. [[a]]Las diferencias son cero coma cero dos, cero coma cero dos, cero coma cero cuatro y cero coma cero cuatro. [[b]]Las elevamos al cuadrado, las promediamos y sacamos la raíz.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "diferencias con el promedio",
+     "x": 960,
+     "y": 200,
+     "tam": 46,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e45",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "caja",
+     "x": 430,
+     "y": 400,
+     "w": 260,
+     "h": 150,
+     "radio": 20,
+     "relleno": "blanco",
+     "borde": "linea",
+     "grosor": 3,
+     "id": "e46",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.02",
+     "x": 430,
+     "y": 400,
+     "tam": 64,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e47",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.05
+    },
+    {
+     "tipo": "caja",
+     "x": 780,
+     "y": 400,
+     "w": 260,
+     "h": 150,
+     "radio": 20,
+     "relleno": "blanco",
+     "borde": "linea",
+     "grosor": 3,
+     "id": "e48",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.25
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.02",
+     "x": 780,
+     "y": 400,
+     "tam": 64,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e49",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "caja",
+     "x": 1130,
+     "y": 400,
+     "w": 260,
+     "h": 150,
+     "radio": 20,
+     "relleno": "blanco",
+     "borde": "linea",
+     "grosor": 3,
+     "id": "e50",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.04",
+     "x": 1130,
+     "y": 400,
+     "tam": 64,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e51",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.55
+    },
+    {
+     "tipo": "caja",
+     "x": 1480,
+     "y": 400,
+     "w": 260,
+     "h": 150,
+     "radio": 20,
+     "relleno": "blanco",
+     "borde": "linea",
+     "grosor": 3,
+     "id": "e52",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.75
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.04",
+     "x": 1480,
+     "y": 400,
+     "tam": 64,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e53",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.8
+    },
+    {
+     "tipo": "texto",
+     "texto": "√( (0.02² + 0.02² + 0.04² + 0.04²) / 4 )",
+     "x": 960,
+     "y": 620,
+     "tam": 56,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e54",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "= √0.001",
+     "x": 960,
+     "y": 740,
+     "tam": 64,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e55",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.9
+    }
+   ]
+  },
+  {
+   "say": "Da cero coma cero treinta y dos. [[a]]Una desviación pequeña: las notas se parecen entre sí.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "= 0.032",
+     "x": 960,
+     "y": 900,
+     "tam": 100,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "id": "e56",
+     "entrada": "pop"
+    },
+    {
+     "tipo": "texto",
+     "texto": "desviación pequeña = resultado estable",
+     "x": 960,
+     "y": 1000,
+     "tam": 44,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "fondo_txt": "verdeclaro",
+     "id": "e57",
+     "entrada": "pop",
+     "en": "a"
+    }
+   ]
+  },
+  {
+   "say": "Piensa un segundo: [[a]]si la desviación entre pliegues fuera muy grande, ¿qué te diría del modelo?",
+   "pausa": 0.5,
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "desviación muy grande",
+     "x": 960,
+     "y": 400,
+     "tam": 80,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e58",
+     "entrada": "pop",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "¿qué significa?",
+     "x": 960,
+     "y": 580,
+     "tam": 64,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e59",
+     "entrada": "pop",
+     "en": "a"
+    }
+   ]
+  },
+  {
+   "say": "Que el resultado depende mucho de la muestra: [[a]]el modelo no es estable, y no te puedes fiar de un solo número.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "depende mucho de la muestra",
+     "x": 960,
+     "y": 760,
+     "tam": 60,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e60",
+     "entrada": "pop"
+    },
+    {
+     "tipo": "texto",
+     "texto": "poco estable",
+     "x": 960,
+     "y": 880,
+     "tam": 52,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e61",
+     "entrada": "pop",
+     "en": "a"
+    }
+   ]
+  },
+  {
+   "seccion": "4. K-Fold en las viviendas de la clase",
+   "say": "Volvamos a las viviendas de la clase. [[a]]De las trescientas, cuarenta y cinco quedan reservadas para la prueba. [[b]]K-Fold se hace con las doscientas cincuenta y cinco restantes.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x0": 160,
+     "y0": 380,
+     "x1": 1450,
+     "y1": 520,
+     "radio": 20,
+     "relleno": "violeta",
+     "borde": null,
+     "grosor": 0,
+     "id": "dv",
+     "entrada": "subir",
+     "en": "a"
+    },
+    {
+     "tipo": "caja",
+     "x0": 1470,
+     "y0": 380,
+     "x1": 1760,
+     "y1": 520,
+     "radio": 20,
+     "relleno": "rojo",
+     "borde": null,
+     "grosor": 0,
+     "id": "dt",
+     "entrada": "subir",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "255 viviendas de desarrollo",
+     "x": 805,
+     "y": 450,
+     "tam": 50,
+     "peso": "b",
+     "color": "blanco",
+     "ancla": "mm",
+     "id": "e62",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "prueba: 45",
+     "x": 1615,
+     "y": 450,
+     "tam": 44,
+     "peso": "b",
+     "color": "blanco",
+     "ancla": "mm",
+     "id": "e63",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "candado",
+     "x": 1615,
+     "y": 640,
+     "tam": 90,
+     "color": "rojo",
+     "abierto": 0,
+     "disco": false,
+     "id": "e64",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "fuera de todo el K-Fold",
+     "x": 1615,
+     "y": 760,
+     "tam": 34,
+     "peso": "sb",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e65",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.7
+    },
+    {
+     "tipo": "texto",
+     "texto": "300 viviendas",
+     "x": 960,
+     "y": 250,
+     "tam": 54,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e66",
+     "entrada": "subir"
+    }
+   ]
+  },
+  {
+   "say": "Con cinco pliegues, cada uno tiene cincuenta y uno viviendas. [[a]]Cinco veces cincuenta y uno, doscientas cincuenta y cinco.",
+   "acciones": [
+    {
+     "tipo": "caja",
+     "x0": 164,
+     "y0": 560,
+     "x1": 414,
+     "y1": 660,
+     "radio": 10,
+     "relleno": "azul",
+     "borde": null,
+     "grosor": 0,
+     "id": "e67",
+     "entrada": "fade",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "51",
+     "x": 289,
+     "y": 610,
+     "tam": 48,
+     "peso": "b",
+     "color": "blanco",
+     "ancla": "mm",
+     "id": "e68",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "caja",
+     "x0": 422,
+     "y0": 560,
+     "x1": 672,
+     "y1": 660,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "e69",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "51",
+     "x": 547,
+     "y": 610,
+     "tam": 48,
+     "peso": "b",
+     "color": "blanco",
+     "ancla": "mm",
+     "id": "e70",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "tipo": "caja",
+     "x0": 680,
+     "y0": 560,
+     "x1": 930,
+     "y1": 660,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "e71",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "51",
+     "x": 805,
+     "y": 610,
+     "tam": 48,
+     "peso": "b",
+     "color": "blanco",
+     "ancla": "mm",
+     "id": "e72",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.30000000000000004
+    },
+    {
+     "tipo": "caja",
+     "x0": 938,
+     "y0": 560,
+     "x1": 1188,
+     "y1": 660,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "e73",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.30000000000000004
+    },
+    {
+     "tipo": "texto",
+     "texto": "51",
+     "x": 1063,
+     "y": 610,
+     "tam": 48,
+     "peso": "b",
+     "color": "blanco",
+     "ancla": "mm",
+     "id": "e74",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.4
+    },
+    {
+     "tipo": "caja",
+     "x0": 1196,
+     "y0": 560,
+     "x1": 1446,
+     "y1": 660,
+     "radio": 10,
+     "relleno": "#C4B5FD",
+     "borde": null,
+     "grosor": 0,
+     "id": "e75",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "51",
+     "x": 1321,
+     "y": 610,
+     "tam": 48,
+     "peso": "b",
+     "color": "blanco",
+     "ancla": "mm",
+     "id": "e76",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "5 × 51 = 255",
+     "x": 805,
+     "y": 780,
+     "tam": 64,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e77",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.7
+    }
+   ]
+  },
+  {
+   "say": "Estos fueron los R cuadrado de validación en cada pliegue: [[a]]cero coma novecientos cuarenta y uno, [[b]]cero coma novecientos treinta y uno, [[c]]cero coma novecientos dieciocho, [[d]]cero coma ochocientos noventa y cinco, [[e]]y cero coma novecientos treinta y tres.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "R² por pliegue (eje desde 0.80)",
+     "x": 960,
+     "y": 200,
+     "tam": 46,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e78",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "linea",
+     "x0": 300,
+     "y0": 860,
+     "x1": 1560,
+     "y1": 860,
+     "color": "tinta",
+     "grosor": 4,
+     "punta": false,
+     "guion": false,
+     "id": "e79",
+     "entrada": "ninguna",
+     "dur": 0.4,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 420,
+     "y0": 408.8000000000003,
+     "x1": 570,
+     "y1": 860,
+     "radio": 8,
+     "relleno": "azul",
+     "borde": null,
+     "grosor": 0,
+     "id": "fk0",
+     "en": "a",
+     "dur": 0.6,
+     "desde": {
+      "y0": 860
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.941",
+     "x": 495,
+     "y": 372.8000000000003,
+     "tam": 40,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "fkl0",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "pliegue 1",
+     "x": 495,
+     "y": 904,
+     "tam": 32,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e80",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "tipo": "caja",
+     "x0": 650,
+     "y0": 440.79999999999995,
+     "x1": 800,
+     "y1": 860,
+     "radio": 8,
+     "relleno": "azul",
+     "borde": null,
+     "grosor": 0,
+     "id": "fk1",
+     "en": "b",
+     "dur": 0.6,
+     "desde": {
+      "y0": 860
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.931",
+     "x": 725,
+     "y": 404.79999999999995,
+     "tam": 40,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "fkl1",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "pliegue 2",
+     "x": 725,
+     "y": 904,
+     "tam": 32,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e81",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.2
+    },
+    {
+     "tipo": "caja",
+     "x0": 880,
+     "y0": 482.40000000000003,
+     "x1": 1030,
+     "y1": 860,
+     "radio": 8,
+     "relleno": "azul",
+     "borde": null,
+     "grosor": 0,
+     "id": "fk2",
+     "en": "c",
+     "dur": 0.6,
+     "desde": {
+      "y0": 860
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.918",
+     "x": 955,
+     "y": 446.40000000000003,
+     "tam": 40,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "fkl2",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "pliegue 3",
+     "x": 955,
+     "y": 904,
+     "tam": 32,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e82",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.2
+    },
+    {
+     "tipo": "caja",
+     "x0": 1110,
+     "y0": 556.0000000000001,
+     "x1": 1260,
+     "y1": 860,
+     "radio": 8,
+     "relleno": "azul",
+     "borde": null,
+     "grosor": 0,
+     "id": "fk3",
+     "en": "d",
+     "dur": 0.6,
+     "desde": {
+      "y0": 860
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.895",
+     "x": 1185,
+     "y": 520.0000000000001,
+     "tam": 40,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "fkl3",
+     "entrada": "pop",
+     "en": "d",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "pliegue 4",
+     "x": 1185,
+     "y": 904,
+     "tam": 32,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e83",
+     "entrada": "pop",
+     "en": "d",
+     "t": 0.2
+    },
+    {
+     "tipo": "caja",
+     "x0": 1340,
+     "y0": 434.4,
+     "x1": 1490,
+     "y1": 860,
+     "radio": 8,
+     "relleno": "azul",
+     "borde": null,
+     "grosor": 0,
+     "id": "fk4",
+     "en": "e",
+     "dur": 0.6,
+     "desde": {
+      "y0": 860
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.933",
+     "x": 1415,
+     "y": 398.4,
+     "tam": 40,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "fkl4",
+     "entrada": "pop",
+     "en": "e",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "pliegue 5",
+     "x": 1415,
+     "y": 904,
+     "tam": 32,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e84",
+     "entrada": "pop",
+     "en": "e",
+     "t": 0.2
+    }
+   ]
+  },
+  {
+   "say": "El promedio es cero coma novecientos veinticuatro, [[a]]y la desviación, cero coma cero dieciséis. [[b]]Un resultado alto, y estable.",
+   "acciones": [
+    {
+     "tipo": "linea",
+     "x0": 300,
+     "y0": 464.16000000000025,
+     "x1": 1560,
+     "y1": 464.16000000000025,
+     "color": "violeta",
+     "grosor": 6,
+     "punta": false,
+     "guion": true,
+     "id": "fmed",
+     "entrada": "ninguna",
+     "en": "a",
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "media 0.924",
+     "x": 1620,
+     "y": 464.16000000000025,
+     "tam": 44,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "lm",
+     "id": "e85",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "caja",
+     "x0": 300,
+     "y0": 413.2800000000002,
+     "x1": 1560,
+     "y1": 515.0400000000003,
+     "radio": 0,
+     "relleno": "violetaclaro",
+     "borde": null,
+     "grosor": 0,
+     "z": 0.2,
+     "id": "fband",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "± 0.016",
+     "x": 1620,
+     "y": 524.1600000000003,
+     "tam": 40,
+     "peso": "sb",
+     "color": "violeta",
+     "ancla": "lm",
+     "id": "e86",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "Compáralo con una sola partición. [[a]]Allí el resultado podía ir de cero coma ochenta y dos a cero coma noventa y seis. [[b]]K-Fold te da un número estable, con su dispersión.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "una partición  vs  K-Fold",
+     "x": 960,
+     "y": 200,
+     "tam": 48,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e87",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "linea",
+     "x0": 280,
+     "y0": 800,
+     "x1": 1640,
+     "y1": 800,
+     "color": "tinta",
+     "grosor": 4,
+     "punta": false,
+     "guion": false,
+     "id": "hbase",
+     "entrada": "ninguna",
+     "en": "a",
+     "dur": 0.4,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 439.22222222222155,
+     "y0": 792,
+     "x1": 478.5555555555549,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb0",
+     "en": "a",
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 482.5555555555549,
+     "y0": 800,
+     "x1": 521.8888888888883,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb1",
+     "en": "a",
+     "t": 0.05,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 525.8888888888883,
+     "y0": 800,
+     "x1": 565.2222222222217,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb2",
+     "en": "a",
+     "t": 0.1,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 569.2222222222217,
+     "y0": 800,
+     "x1": 608.555555555555,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb3",
+     "en": "a",
+     "t": 0.15000000000000002,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 612.555555555555,
+     "y0": 792,
+     "x1": 651.8888888888885,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb4",
+     "en": "a",
+     "t": 0.2,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 655.8888888888885,
+     "y0": 784,
+     "x1": 695.2222222222218,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb5",
+     "en": "a",
+     "t": 0.25,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 699.2222222222218,
+     "y0": 776,
+     "x1": 738.5555555555552,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb6",
+     "en": "a",
+     "t": 0.30000000000000004,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 742.5555555555552,
+     "y0": 760,
+     "x1": 781.8888888888885,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb7",
+     "en": "a",
+     "t": 0.35000000000000003,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 785.8888888888885,
+     "y0": 760,
+     "x1": 825.222222222222,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb8",
+     "en": "a",
+     "t": 0.4,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 829.222222222222,
+     "y0": 784,
+     "x1": 868.5555555555553,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb9",
+     "en": "a",
+     "t": 0.45,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 872.5555555555553,
+     "y0": 760,
+     "x1": 911.8888888888887,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb10",
+     "en": "a",
+     "t": 0.5,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 915.8888888888887,
+     "y0": 640,
+     "x1": 955.2222222222221,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb11",
+     "en": "a",
+     "t": 0.55,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 959.2222222222221,
+     "y0": 688,
+     "x1": 998.5555555555554,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb12",
+     "en": "a",
+     "t": 0.6000000000000001,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1002.5555555555554,
+     "y0": 696,
+     "x1": 1049.111111111111,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb13",
+     "en": "a",
+     "t": 0.65,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1053.111111111111,
+     "y0": 624,
+     "x1": 1092.4444444444443,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb14",
+     "en": "a",
+     "t": 0.7000000000000001,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1096.4444444444443,
+     "y0": 544,
+     "x1": 1135.7777777777778,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb15",
+     "en": "a",
+     "t": 0.75,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1139.7777777777778,
+     "y0": 528,
+     "x1": 1179.1111111111113,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb16",
+     "en": "a",
+     "t": 0.8,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1183.1111111111113,
+     "y0": 488,
+     "x1": 1222.4444444444443,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb17",
+     "en": "a",
+     "t": 0.8500000000000001,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1226.4444444444443,
+     "y0": 544,
+     "x1": 1265.7777777777778,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb18",
+     "en": "a",
+     "t": 0.9,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1269.7777777777778,
+     "y0": 568,
+     "x1": 1309.1111111111104,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb19",
+     "en": "a",
+     "t": 0.9500000000000001,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1313.1111111111104,
+     "y0": 648,
+     "x1": 1352.444444444444,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb20",
+     "en": "a",
+     "t": 1.0,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1356.444444444444,
+     "y0": 712,
+     "x1": 1395.7777777777771,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb21",
+     "en": "a",
+     "t": 1.05,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1399.7777777777771,
+     "y0": 752,
+     "x1": 1439.1111111111106,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb22",
+     "en": "a",
+     "t": 1.1,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "caja",
+     "x0": 1443.1111111111106,
+     "y0": 760,
+     "x1": 1482.444444444444,
+     "y1": 800,
+     "radio": 4,
+     "relleno": "#94A3B8",
+     "borde": null,
+     "grosor": 0,
+     "id": "hb23",
+     "en": "a",
+     "t": 1.1500000000000001,
+     "dur": 0.5,
+     "desde": {
+      "y0": 800
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.80",
+     "x": 300.0,
+     "y": 836,
+     "tam": 32,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "ht0",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.85",
+     "x": 661.1111111111106,
+     "y": 836,
+     "tam": 32,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "ht1",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.90",
+     "x": 1022.2222222222221,
+     "y": 836,
+     "tam": 32,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "ht2",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.95",
+     "x": 1383.3333333333326,
+     "y": 836,
+     "tam": 32,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "ht3",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "linea",
+     "x0": 1193.3888888888882,
+     "y0": 300,
+     "x1": 1193.3888888888882,
+     "y1": 800,
+     "color": "violeta",
+     "grosor": 7,
+     "punta": false,
+     "guion": false,
+     "id": "hk",
+     "entrada": "ninguna",
+     "en": "b",
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "K-Fold: 0.924",
+     "x": 1193.3888888888882,
+     "y": 260,
+     "tam": 44,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e88",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.3
+    }
+   ]
+  },
+  {
+   "say": "Un detalle de la clase: [[a]]el cuaderno hizo el K-Fold con las trescientas filas, [[b]]y eso incluye la prueba. Dio cero coma novecientos veintiuno. Lo correcto es usar solo entrenamiento más validación.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x0": 160,
+     "y0": 380,
+     "x1": 1450,
+     "y1": 520,
+     "radio": 20,
+     "relleno": "violeta",
+     "borde": null,
+     "grosor": 0,
+     "id": "e89",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "caja",
+     "x0": 1470,
+     "y0": 380,
+     "x1": 1760,
+     "y1": 520,
+     "radio": 20,
+     "relleno": "rojo",
+     "borde": null,
+     "grosor": 0,
+     "id": "e90",
+     "entrada": "subir",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "300 filas",
+     "x": 960,
+     "y": 450,
+     "tam": 50,
+     "peso": "b",
+     "color": "blanco",
+     "ancla": "mm",
+     "id": "e91",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "anillo",
+     "x": 960,
+     "y": 450,
+     "w": 1660,
+     "h": 190,
+     "radio": 40,
+     "color": "ambar",
+     "grosor": 6,
+     "pulso": true,
+     "id": "r300",
+     "entrada": "fade",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "incluye la prueba",
+     "x": 1615,
+     "y": 640,
+     "tam": 44,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e92",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.3
+    },
+    {
+     "tipo": "marca",
+     "x": 1615,
+     "y": 760,
+     "tam": 80,
+     "forma": "cruz",
+     "color": "rojo",
+     "id": "e93",
+     "entrada": "ninguna",
+     "en": "b",
+     "t": 0.6,
+     "dur": 0.5,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.921,
+     "fmt": "{:.3f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 960,
+     "y": 880,
+     "tam": 80,
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e94",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.4,
+     "dur": 0.8,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "incorrecto: 0.921",
+     "x": 960,
+     "y": 980,
+     "tam": 40,
+     "peso": "sb",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e95",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.3
+    }
+   ]
+  },
+  {
+   "say": "K-Fold se usa durante el desarrollo, para comparar y elegir modelos. [[a]]La prueba sigue reservada hasta el final, y K-Fold no la reemplaza.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "K-Fold: durante el desarrollo",
+     "x": 960,
+     "y": 380,
+     "tam": 58,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e96",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "texto",
+     "texto": "la prueba: al final, una sola vez",
+     "x": 960,
+     "y": 560,
+     "tam": 58,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e97",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "candado",
+     "x": 960,
+     "y": 780,
+     "tam": 100,
+     "color": "rojo",
+     "abierto": 0,
+     "disco": true,
+     "id": "e98",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.4
+    }
+   ]
+  },
+  {
+   "say": "Y si trabajas con un Pipeline, [[a]]K-Fold repite todos los pasos dentro de cada pliegue, sin filtrar información.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "cross_val_score(pipe, X_dev, y_dev, cv=KFold(5, shuffle=True, random_state=42))",
+     "x": 960,
+     "y": 440,
+     "tam": 34,
+     "peso": "m",
+     "color": "tinta",
+     "ancla": "mm",
+     "fondo_txt": "#E8EDF4",
+     "pad": 26,
+     "ancho_max": 1500,
+     "id": "e99",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "texto",
+     "texto": "cada pliegue re-aprende sus pasos",
+     "x": 960,
+     "y": 700,
+     "tam": 56,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e100",
+     "entrada": "pop",
+     "en": "a"
+    }
+   ]
+  },
+  {
+   "say": "Piensa un segundo: con doscientas cincuenta y cinco filas y cinco pliegues, [[a]]¿cuántas filas entrenan en cada vuelta?",
+   "pausa": 0.5,
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "255 filas  ·  5 pliegues",
+     "x": 960,
+     "y": 400,
+     "tam": 64,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e101",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "texto",
+     "texto": "¿cuántas entrenan?",
+     "x": 960,
+     "y": 600,
+     "tam": 72,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e102",
+     "entrada": "pop",
+     "en": "a"
+    }
+   ]
+  },
+  {
+   "say": "Doscientas cuatro: [[a]]doscientas cincuenta y cinco menos las cincuenta y una que validan.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "204",
+     "x": 960,
+     "y": 760,
+     "tam": 130,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "fondo_txt": "verdeclaro",
+     "id": "e103",
+     "entrada": "pop"
+    },
+    {
+     "tipo": "texto",
+     "texto": "255 − 51 = 204",
+     "x": 960,
+     "y": 930,
+     "tam": 60,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e104",
+     "entrada": "pop",
+     "en": "a"
+    }
+   ]
+  },
+  {
+   "seccion": "5. Para llevar",
+   "say": "Para llevarte: [[a]]K-Fold te da un promedio y una dispersión, [[b]]en lugar de un solo número de suerte. [[c]]Y se hace con entrenamiento y validación: la prueba queda fuera.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "promedio + dispersión",
+     "x": 960,
+     "y": 330,
+     "tam": 60,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e105",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "no un solo número de suerte",
+     "x": 960,
+     "y": 510,
+     "tam": 56,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e106",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "la prueba queda fuera",
+     "x": 960,
+     "y": 690,
+     "tam": 56,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e107",
+     "entrada": "pop",
+     "en": "c"
+    }
+   ]
+  }
+ ]
+}

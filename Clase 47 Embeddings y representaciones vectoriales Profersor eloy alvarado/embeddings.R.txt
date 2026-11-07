@@ -1,0 +1,231 @@
+# Cátedra 47. Búsqueda de textos con TF-IDF y embeddings.
+# Extraer el ZIP y mantener juntos el programa y los tres CSV.
+# Requiere R 4.1 o posterior; utiliza solo funciones de R base.
+# Terminal: Rscript embeddings.R
+# RStudio: abrir este archivo y pulsar Source; o source('ruta/embeddings.R').
+# Para ejecutar secciones a mano, fijar primero la carpeta extraída como
+# directorio de trabajo y ejecutar las secciones 00-07 en orden.
+# Los CSV de resultados van a mis_resultados_r y se reemplazan al repetir.
+#
+# El caso ficticio Aula Abierta tiene 12 fichas de ayuda y 16 consultas de
+# validación; 12 tienen respuesta. Usamos vectores ya calculados, sin conexión.
+# Modelo: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2.
+# Variante ONNX cuantizada; media de tokens válidos y 384 coordenadas normalizadas.
+
+# 00. Configuración y funciones auxiliares ----
+options(OutDec = '.')
+if (.Platform$OS.type == 'windows') invisible(Sys.setlocale('LC_CTYPE', '.UTF-8'))
+
+# Localizar los CSV junto al programa, también al usar source desde otra carpeta.
+archivos_source <- lapply(sys.frames(), function(marco) marco$ofile)
+archivos_source <- Filter(Negate(is.null), archivos_source)
+argumento_archivo <- grep('^--file=', commandArgs(FALSE), value = TRUE)
+if (length(archivos_source) > 0) {
+  archivo_actual <- tail(archivos_source, 1)[[1]]
+  CARPETA <- dirname(normalizePath(archivo_actual))
+} else if (length(argumento_archivo) > 0) {
+  archivo_actual <- sub('^--file=', '', argumento_archivo[1])
+  CARPETA <- dirname(normalizePath(archivo_actual))
+} else {
+  CARPETA <- getwd()
+}
+
+K <- 3L  # Cambiar a 1 y repetir sección 05 para comparar Hit@1 con Hit@3.
+EVALUAR_PRUEBA <- FALSE  # Reservar la prueba hasta elegir la configuración final.
+SALIDA <- file.path(CARPETA, 'mis_resultados_r')
+dir.create(SALIDA, showWarnings = FALSE)
+
+leer <- function(nombre) {
+  read.csv(file.path(CARPETA, nombre), fileEncoding = 'UTF-8-BOM',
+           check.names = FALSE, stringsAsFactors = FALSE, na.strings = NULL)
+}
+guardar <- function(nombre, tabla) {
+  # La marca UTF-8 permite reconocer las tildes al abrir el CSV en Excel.
+  archivo <- file(file.path(SALIDA, nombre), open = 'wt', encoding = 'UTF-8')
+  on.exit(close(archivo))
+  cat('\ufeff', file = archivo)
+  write.csv(tabla, archivo, row.names = FALSE)
+}
+normalizar <- function(matriz) {
+  # Cada fila es un vector. Una fila de ceros se conserva como fila nula.
+  normas <- sqrt(rowSums(matriz^2))
+  matriz / ifelse(normas > 0, normas, 1)
+}
+
+# 01. Ejemplos de destilación y geometría ----
+# Error entre el vector del maestro y la salida del estudiante.
+referencia_maestro <- c(0.2, 0.8)
+salida_estudiante <- c(0.4, 0.6)
+error_destilacion <- mean((salida_estudiante - referencia_maestro)^2)
+cat(sprintf('Error ilustrativo de destilación: %.2f\n', error_destilacion))
+
+# Geometría: coordenadas = [veces clave, veces recuperar]. No son salidas de MiniLM.
+textos_ejemplo <- c(q = 'recuperar clave', A = 'clave clave',
+                   B = paste(rep('recuperar clave', 4), collapse = ' '))
+contar_ejemplo <- function(texto) {
+  palabras <- strsplit(texto, ' ', fixed = TRUE)[[1]]
+  c(sum(palabras == 'clave'), sum(palabras == 'recuperar'))
+}
+coseno <- function(vector_a, vector_b) {
+  producto <- sum(vector_a * vector_b)
+  norma_a <- sqrt(sum(vector_a^2))
+  norma_b <- sqrt(sum(vector_b^2))
+  if (norma_a == 0 || norma_b == 0) stop('El coseno no está definido para norma cero.')
+  producto / (norma_a * norma_b)
+}
+
+consulta_ejemplo <- contar_ejemplo(textos_ejemplo['q'])
+filas_geometria <- list()
+for (nombre in names(textos_ejemplo)) {
+  texto <- unname(textos_ejemplo[nombre])
+  vector <- contar_ejemplo(texto)
+  filas_geometria[[nombre]] <- data.frame(
+    texto_id = nombre, texto = texto,
+    conteo_clave = vector[1], conteo_recuperar = vector[2],
+    norma = sqrt(sum(vector^2)),
+    producto_q = sum(consulta_ejemplo * vector),
+    distancia_q = sqrt(sum((consulta_ejemplo - vector)^2)),
+    coseno_q = coseno(consulta_ejemplo, vector)
+  )
+}
+geometria <- do.call(rbind, filas_geometria)  # Unir las filas en una tabla.
+guardar('ejemplo_geometria.csv', geometria)
+print(geometria)
+
+# 02. Leer las fichas y seleccionar las consultas de validación ----
+documentos <- leer('documentos.csv')
+todas_las_consultas <- leer('consultas.csv')
+conjunto <- if (EVALUAR_PRUEBA) 'prueba' else 'validacion'
+consultas <- todas_las_consultas[todas_las_consultas$conjunto == conjunto, , drop = FALSE]
+ids_documentos <- documentos$id
+cat(nrow(documentos), 'fichas y', nrow(consultas), 'consultas de', conjunto, '\n')
+
+# 03. TF-IDF: una referencia basada en coincidencias de palabras ----
+# TF (Term Frequency): conteo del término en el texto.
+# DF (Document Frequency): número de documentos que contienen el término.
+# IDF (Inverse Document Frequency): peso inverso de esa presencia en el corpus.
+# El vocabulario y los IDF se calculan con las 12 fichas.
+separar_palabras <- function(texto) {
+  texto <- chartr('áéíóúüñ', 'aeiouun', tolower(texto))
+  regmatches(texto, gregexpr('[a-z0-9]+', texto))[[1]]
+}
+vocabulario <- unique(unlist(lapply(documentos$texto, separar_palabras)))
+vocabulario <- sort(vocabulario, method = 'radix')
+
+contar_palabras <- function(textos) {
+  conteos <- matrix(0, nrow = length(textos), ncol = length(vocabulario))
+  for (i in seq_along(textos)) {
+    palabras <- separar_palabras(textos[i])
+    columnas <- match(palabras, vocabulario)
+    columnas <- columnas[!is.na(columnas)]  # Ignorar palabras fuera del vocabulario.
+    conteos[i, ] <- tabulate(columnas, nbins = length(vocabulario))
+  }
+  conteos
+}
+conteos_documentos <- contar_palabras(documentos$texto)
+conteos_consultas <- contar_palabras(consultas$texto)
+frecuencia_documental <- colSums(conteos_documentos > 0)
+idf <- log((1 + nrow(documentos)) / (1 + frecuencia_documental)) + 1
+# sweep multiplica cada columna por su IDF, antes de normalizar cada fila.
+tfidf_documentos <- normalizar(sweep(conteos_documentos, 2, idf, '*'))
+tfidf_consultas <- normalizar(sweep(conteos_consultas, 2, idf, '*'))
+puntajes_tfidf <- tfidf_consultas %*% t(tfidf_documentos)
+
+# 04. Leer embeddings y calcular cosenos entre consultas y fichas ----
+filas_vectores <- leer('vectores.csv')
+vectores <- as.matrix(filas_vectores[, -1])
+rownames(vectores) <- filas_vectores$id
+D <- normalizar(vectores[documentos$id, , drop = FALSE])
+Q <- normalizar(vectores[consultas$id, , drop = FALSE])
+# D: 12 x 384. Q: 16 x 384. S: 16 x 12 (una casilla por pareja).
+# %*% multiplica matrices; t(D) pone los documentos en columnas.
+# Los vectores tienen norma uno: producto interno = coseno.
+puntajes_minilm <- Q %*% t(D)
+tabla_puntajes <- data.frame(consulta = consultas$id, puntajes_minilm, check.names = FALSE)
+names(tabla_puntajes) <- c('consulta', ids_documentos)
+guardar('puntajes_por_consulta.csv', tabla_puntajes)
+
+if (conjunto == 'validacion') {
+  i <- match('V01', consultas$id)
+  j <- match('D01', ids_documentos)
+  productos <- Q[i, ] * D[j, ]  # Multiplicar coordenada a coordenada.
+  detalle <- data.frame(coordenada = seq_len(ncol(D)), consulta = Q[i, ],
+                        documento = D[j, ], producto = productos)
+  guardar('detalle_V01_D01.csv', detalle)
+  cat(sprintf('V01 con D01: suma de 384 productos = %.8f\n', sum(productos)))
+}
+
+# 05. Ordenar documentos y evaluar en las 12 consultas respondibles ----
+# Hit@K (Hit Rate at K): proporción con relevante entre los primeros K.
+# MRR (Mean Reciprocal Rank): promedio de 1/posición de la ficha relevante.
+# MRR usa el ranking completo: cambiar K no cambia MRR.
+stopifnot(K >= 1, K <= nrow(documentos))
+filas_ranking <- list()
+filas_resumen <- list()
+for (modelo in c('TF-IDF', 'MiniLM')) {
+  puntajes <- if (modelo == 'TF-IDF') puntajes_tfidf else puntajes_minilm
+  aciertos <- numeric(0)
+  rangos_reciprocos <- numeric(0)
+  for (i in seq_len(nrow(consultas))) {
+    # Mayor puntaje primero; empates resueltos por identificador de ficha.
+    orden <- order(-puntajes[i, ], ids_documentos, method = 'radix')
+    relevante <- consultas$relevante[i]  # Vacío si ninguna ficha responde.
+    posicion_relevante <- 0
+    if (nzchar(relevante) && sqrt(sum(puntajes[i, ]^2)) > 0) {
+      posicion_relevante <- match(relevante, ids_documentos[orden])
+    }
+    # Sin coincidencias léxicas, una fila nula aporta cero a ambas métricas.
+    if (nzchar(relevante)) {
+      acierto <- as.integer(posicion_relevante > 0 && posicion_relevante <= K)
+      reciproco <- if (posicion_relevante > 0) 1 / posicion_relevante else 0
+      aciertos <- c(aciertos, acierto)
+      rangos_reciprocos <- c(rangos_reciprocos, reciproco)
+    }
+    filas_ranking[[length(filas_ranking) + 1]] <- data.frame(
+      modelo = modelo, consulta = consultas$id[i], posicion = seq_along(orden),
+      documento = ids_documentos[orden], similitud = puntajes[i, orden],
+      relevante = as.integer(ids_documentos[orden] == relevante)
+    )
+  }
+  filas_resumen[[modelo]] <- data.frame(
+    modelo = modelo, conjunto = conjunto, n_respondibles = length(aciertos), k = K,
+    hit_k = mean(aciertos), mrr = mean(rangos_reciprocos)
+  )
+}
+ranking <- do.call(rbind, filas_ranking)
+resumen <- do.call(rbind, filas_resumen)
+guardar('ranking.csv', ranking)
+guardar('resumen.csv', resumen)
+print(resumen)
+
+# 06. Cortes de aceptación: incluir preguntas sin respuesta ----
+# El coseno no es una probabilidad. Estos cortes son ilustrativos.
+tiene_respuesta <- nzchar(consultas$relevante)
+mejor_puntaje <- apply(puntajes_minilm, 1, max)
+filas_umbrales <- list()
+for (corte in c(0.3, 0.5, 0.7, 0.9)) {
+  acepta <- mejor_puntaje >= corte
+  filas_umbrales[[length(filas_umbrales) + 1]] <- data.frame(
+    corte = corte,
+    respondibles_aceptadas = sum(tiene_respuesta & acepta),
+    respondibles_total = sum(tiene_respuesta),
+    sin_respuesta_aceptadas = sum(!tiene_respuesta & acepta),
+    sin_respuesta_total = sum(!tiene_respuesta)
+  )
+}
+umbrales <- do.call(rbind, filas_umbrales)
+guardar('umbrales.csv', umbrales)
+print(umbrales)
+
+# 07. Reproducir la variación explicada por la proyección PCA ----
+# PCA se calcula sobre las 12 fichas centradas.
+# La búsqueda anterior conserva las 384 coordenadas originales.
+pca_documentos <- prcomp(D, center = TRUE, scale. = FALSE)
+varianzas <- pca_documentos$sdev^2
+proporcion_variacion <- varianzas / sum(varianzas)
+cat(sprintf('PCA: PC1 = %.1f%%; PC2 = %.1f%%; ambos = %.1f%%\n',
+            100 * proporcion_variacion[1], 100 * proporcion_variacion[2],
+            100 * sum(proporcion_variacion[1:2])))
+cat('Resultados guardados en:', SALIDA, '\n')
+# Al modificar o añadir textos, hay que volver a calcular sus embeddings.
+# Editar los CSV de textos no actualiza los valores guardados en vectores.csv.

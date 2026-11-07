@@ -1,0 +1,447 @@
+1
+00:00:00,250 --> 00:00:03,300
+Octava parada: las implementaciones modernas.
+
+2
+00:00:03,420 --> 00:00:07,260
+La misma idea de Gradient Boosting, con mucha ingeniería encima.
+
+3
+00:00:07,380 --> 00:00:10,850
+Entrenamos trescientos cincuenta árboles sobre las casas de Ames.
+
+4
+00:00:10,970 --> 00:00:14,420
+El Gradient Boosting de scikit-learn tardó unos tres segundos.
+
+5
+00:00:14,540 --> 00:00:17,040
+XGBoost, menos de medio segundo.
+
+6
+00:00:17,160 --> 00:00:19,310
+LightGBM, medio segundo.
+
+7
+00:00:19,430 --> 00:00:22,200
+Misma idea, pero seis veces más rápido.
+
+8
+00:00:22,320 --> 00:00:23,280
+¿Qué hay debajo?
+
+9
+00:00:23,400 --> 00:00:26,610
+Empecemos por XGBoost: la equis viene de extremo.
+
+10
+00:00:26,730 --> 00:00:29,220
+La diapositiva doce lo define como un sistema
+
+11
+00:00:29,220 --> 00:00:31,710
+optimizado para datos tabulares y producción.
+
+12
+00:00:31,830 --> 00:00:35,613
+Cuatro ideas: un objetivo regularizado, gradientes de primer y
+
+13
+00:00:35,613 --> 00:00:38,786
+segundo orden, submuestreo de filas y columnas, y un
+
+14
+00:00:38,786 --> 00:00:42,020
+tratamiento eficiente de datos dispersos y faltantes.
+
+15
+00:00:42,140 --> 00:00:45,240
+La idea más importante es el objetivo regularizado.
+
+16
+00:00:45,360 --> 00:00:49,840
+El objetivo es la pérdida de entrenamiento, más una penalización por complejidad.
+
+17
+00:00:49,960 --> 00:00:53,690
+La penalización tiene dos partes: gamma por el número de hojas,
+
+18
+00:00:53,690 --> 00:00:56,710
+y lambda por el tamaño de los valores de las hojas.
+
+19
+00:00:56,830 --> 00:00:59,460
+Piensa en gamma como una multa por cada hoja.
+
+20
+00:00:59,580 --> 00:01:04,020
+Un corte nuevo solo vale la pena si mejora la pérdida más de lo que cuesta la multa.
+
+21
+00:01:04,140 --> 00:01:08,320
+Si un corte mejora la pérdida en 5 y gamma vale 3, se hace.
+
+22
+00:01:08,440 --> 00:01:10,260
+Si la mejora en 2, no.
+
+23
+00:01:10,380 --> 00:01:12,730
+Y lambda encoge los valores de las hojas.
+
+24
+00:01:12,850 --> 00:01:15,550
+Hagamos la cuenta, con pérdida cuadrática.
+
+25
+00:01:15,670 --> 00:01:19,900
+Una hoja tiene tres casas, con residuos 3, 5 y 4.
+
+26
+00:01:20,020 --> 00:01:22,520
+Su valor óptimo es la suma de los residuos,
+
+27
+00:01:22,520 --> 00:01:25,020
+dividida por el número de casas más lambda.
+
+28
+00:01:25,140 --> 00:01:29,860
+Con lambda igual a cero, 12 sobre 3: 4, el promedio de siempre.
+
+29
+00:01:29,980 --> 00:01:33,370
+Con lambda igual a uno, 12 sobre 4: 3.
+
+30
+00:01:33,490 --> 00:01:36,880
+Con lambda igual a tres, 12 sobre 6: 2.
+
+31
+00:01:37,000 --> 00:01:40,370
+Cuanto más grande lambda, más se encoge la hoja hacia cero.
+
+32
+00:01:40,490 --> 00:01:45,010
+Y el efecto es más fuerte en hojas con pocos datos, que son las menos confiables.
+
+33
+00:01:45,130 --> 00:01:47,080
+¿Y los gradientes de segundo orden?
+
+34
+00:01:47,200 --> 00:01:48,970
+Volvamos al cerro con niebla.
+
+35
+00:01:49,090 --> 00:01:51,000
+El gradiente te dice la pendiente.
+
+36
+00:01:51,120 --> 00:01:54,120
+La segunda derivada te dice cuán curvo es el terreno.
+
+37
+00:01:54,240 --> 00:01:58,049
+Con las dos, XGBoost calcula pasos mejor calibrados: sabe
+
+38
+00:01:58,049 --> 00:02:00,990
+no solo hacia dónde ir, sino cuánto avanzar.
+
+39
+00:02:01,110 --> 00:02:02,600
+Ahora LightGBM.
+
+40
+00:02:02,720 --> 00:02:05,230
+Según la diapositiva trece, busca entrenar
+
+41
+00:02:05,230 --> 00:02:07,860
+rápido y escalar a muchas filas y variables.
+
+42
+00:02:07,980 --> 00:02:10,220
+Su primera idea son los histogramas.
+
+43
+00:02:10,340 --> 00:02:12,984
+Para buscar el mejor corte de una variable, un
+
+44
+00:02:12,984 --> 00:02:15,340
+árbol clásico prueba cada valor distinto.
+
+45
+00:02:15,460 --> 00:02:18,908
+LightGBM primero agrupa los valores en intervalos, los
+
+46
+00:02:18,908 --> 00:02:22,100
+bins, y solo prueba los bordes de esos intervalos.
+
+47
+00:02:22,220 --> 00:02:28,050
+Con datos reales: la superficie habitable de Ames tiene 1 292 valores distintos.
+
+48
+00:02:28,170 --> 00:02:32,850
+LightGBM los agrupa, por defecto, en 255 bins.
+
+49
+00:02:32,970 --> 00:02:36,560
+Cinco veces menos cortes que probar, y mucha menos memoria.
+
+50
+00:02:36,680 --> 00:02:39,210
+La segunda idea: cómo crece el árbol.
+
+51
+00:02:39,330 --> 00:02:41,080
+Es la diapositiva catorce.
+
+52
+00:02:41,200 --> 00:02:45,390
+Por nivel: se expande un nivel completo, todas las hojas a la vez.
+
+53
+00:02:45,510 --> 00:02:47,450
+Es lo que suele hacer XGBoost.
+
+54
+00:02:47,570 --> 00:02:51,960
+Por hoja: se expande solo la hoja con mayor ganancia, una a la vez.
+
+55
+00:02:52,080 --> 00:02:55,540
+Es lo que hace LightGBM, y el árbol queda asimétrico.
+
+56
+00:02:55,660 --> 00:02:58,098
+Crecer por hoja es más eficiente con muchos
+
+57
+00:02:58,098 --> 00:03:00,650
+datos: pone las hojas donde más ganancia hay.
+
+58
+00:03:00,770 --> 00:03:04,132
+Pero tiene un riesgo, y la diapositiva lo advierte: con
+
+59
+00:03:04,132 --> 00:03:07,250
+datos pequeños, puede sobreajustar si no se limita.
+
+60
+00:03:07,370 --> 00:03:09,360
+Un poco de aritmética de hojas.
+
+61
+00:03:09,480 --> 00:03:12,807
+Un árbol por nivel con profundidad cuatro tiene,
+
+62
+00:03:12,807 --> 00:03:15,510
+como máximo, dos a la cuarta: 16 hojas.
+
+63
+00:03:15,630 --> 00:03:20,821
+En LightGBM, con 15 hojas el árbol puede ser asimétrico: 15 hojas son 14
+
+64
+00:03:20,821 --> 00:03:24,930
+cortes, y en el caso extremo, una rama de profundidad 14.
+
+65
+00:03:25,050 --> 00:03:28,176
+Por eso la regla práctica: el número de hojas, menor
+
+66
+00:03:28,176 --> 00:03:30,580
+que dos elevado a la profundidad máxima.
+
+67
+00:03:30,700 --> 00:03:33,820
+Con profundidad cinco, menos de 32 hojas.
+
+68
+00:03:33,940 --> 00:03:36,190
+¿Se nota el riesgo en los datos de la clase?
+
+69
+00:03:36,310 --> 00:03:40,639
+LightGBM con 31 hojas por árbol, en Ames: su RMSE
+
+70
+00:03:40,639 --> 00:03:44,350
+en entrenamiento es de solo 8 000 dólares.
+
+71
+00:03:44,470 --> 00:03:46,150
+En test, 27 000.
+
+72
+00:03:46,270 --> 00:03:50,930
+Más de tres veces peor fuera de los datos que vio: una señal clara de sobreajuste.
+
+73
+00:03:51,050 --> 00:03:53,400
+LightGBM trae dos trucos más.
+
+74
+00:03:53,520 --> 00:03:57,944
+GOSS: conserva las filas con gradientes grandes, las que el modelo todavía
+
+75
+00:03:57,944 --> 00:04:01,830
+predice mal, y toma solo una muestra de las de gradiente pequeño.
+
+76
+00:04:01,950 --> 00:04:06,316
+Y EFB: agrupa variables dispersas que casi nunca están activas a la
+
+77
+00:04:06,316 --> 00:04:09,770
+vez, como muchas columnas de un one-hot, en una sola.
+
+78
+00:04:09,890 --> 00:04:11,540
+Y una alerta del notebook.
+
+79
+00:04:11,660 --> 00:04:15,406
+El LightGBM del notebook usa subsample igual a 0.8, para que
+
+80
+00:04:15,406 --> 00:04:18,840
+cada árbol vea solo el ochenta por ciento de las filas.
+
+81
+00:04:18,960 --> 00:04:22,095
+Pero en LightGBM, ese submuestreo solo se activa si
+
+82
+00:04:22,095 --> 00:04:25,660
+subsample_freq es mayor que cero, y por defecto vale cero.
+
+83
+00:04:25,780 --> 00:04:30,770
+Lo comprobamos: con o sin ese 0.8, las predicciones son idénticas.
+
+84
+00:04:30,890 --> 00:04:33,590
+XGBoost, en cambio, sí lo aplica.
+
+85
+00:04:33,710 --> 00:04:34,550
+¿Y CatBoost?
+
+86
+00:04:34,670 --> 00:04:37,993
+Es la quinta implementación de la clase, especialista en
+
+87
+00:04:37,993 --> 00:04:40,960
+variables categóricas: las maneja de forma nativa.
+
+88
+00:04:41,080 --> 00:04:45,170
+La diapositiva dieciocho la recomienda cuando dominan muchas categorías.
+
+89
+00:04:45,290 --> 00:04:49,061
+Pero en la práctica de la clase no se usó, y no está instalada en este
+
+90
+00:04:49,061 --> 00:04:51,970
+entorno, así que no tenemos números propios para ella.
+
+91
+00:04:52,090 --> 00:04:55,177
+El error típico: pensar que XGBoost y LightGBM son
+
+92
+00:04:55,177 --> 00:04:57,770
+algoritmos distintos de Gradient Boosting.
+
+93
+00:04:57,890 --> 00:05:01,177
+No lo son: son implementaciones de la misma idea,
+
+94
+00:05:01,177 --> 00:05:03,860
+residuos y gradientes, árbol tras árbol.
+
+95
+00:05:03,980 --> 00:05:07,085
+Lo que cambia es la ingeniería: regularización,
+
+96
+00:05:07,085 --> 00:05:10,190
+histogramas, crecimiento por hoja, y velocidad.
+
+97
+00:05:10,310 --> 00:05:11,530
+Piensa un segundo.
+
+98
+00:05:11,650 --> 00:05:15,070
+El XGBoost del notebook usa profundidad máxima tres.
+
+99
+00:05:15,190 --> 00:05:18,440
+¿Cuántas hojas puede tener cada árbol, como máximo?
+
+100
+00:05:18,560 --> 00:05:22,320
+¿Y cómo se compara con las 31 hojas del LightGBM de Ames?
+
+101
+00:05:23,040 --> 00:05:25,670
+Dos elevado a tres: 8 hojas.
+
+102
+00:05:25,790 --> 00:05:29,520
+El LightGBM de Ames usa casi cuatro veces más hojas por árbol.
+
+103
+00:05:29,640 --> 00:05:32,041
+Árboles mucho más complejos, y eso ayuda a
+
+104
+00:05:32,041 --> 00:05:34,670
+explicar su brecha entre entrenamiento y test.
+
+105
+00:05:34,790 --> 00:05:37,560
+Para llevarte: XGBoost agrega un objetivo
+
+106
+00:05:37,560 --> 00:05:40,735
+regularizado, con gamma y lambda, y usa segundo
+
+107
+00:05:40,735 --> 00:05:41,140
+orden.
+
+108
+00:05:41,260 --> 00:05:44,578
+LightGBM usa histogramas y crece hoja por hoja: muy
+
+109
+00:05:44,578 --> 00:05:47,180
+rápido, pero cuidado con datos pequeños.
+
+110
+00:05:47,300 --> 00:05:50,020
+Y CatBoost es el especialista en categóricas.
+
+111
+00:05:50,140 --> 00:05:52,388
+Siguiente parada: early stopping, y los
+
+112
+00:05:52,388 --> 00:05:55,270
+hiperparámetros que de verdad mueven el resultado.

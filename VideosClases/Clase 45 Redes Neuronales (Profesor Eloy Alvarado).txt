@@ -1,0 +1,1529 @@
+Ok, muchas gracias.
+Ya, bueno, esperando que todos se encuentren bien por esta emergencia climática que está.
+Vamos a dar comienzo, ahí se hizo una pregunta respecto a los ayudantes, si es que va a ser de carácter obligatorio, sobre todo por la asistencia,
+Pero el ayudante Montserrat va a consultarlo.
+Mientras tanto, vamos al comienzo y como siempre,
+la clase va a quedar grabada para hacer su vida,
+digamos, al Moodle.
+Ya está disponible también todos los activos.
+Como de costumbre, cuando hacemos cosas más aplicadas,
+tenemos la presentación, los códigos equivalentes en R y
+Python en conjunto con la base de datos para que lo puedan ir
+digamos replicando los resultados cuando así los tiene en conveniente y ahí todo lo que estamos
+haciendo puede ser digamos reproducible y ya puede ser reproducible en sus propios computadores.
+No obstante ahora estamos entrando en metodologías que toman un poco más de tiempo,
+no obstante lo que estamos haciendo ahora como vamos a ver recién de manera introductoria lo que
+eso es las redes neuronales que la hablamos mucho y les comentaba que va a ser los
+sistemas que yo que yo vi mucho el concepto
+el concepto la semana pasada
+hoy vamos a entrar en cosas un poco más digamos más concretas la técnica per se
+entonces la semana pasada el jueves pasado vimos el ejemplo de los números
+escrito a mano y cómo los podíamos reconocer y distintas maneras de cómo
+cuál es la distinta las distintas metodologías que podíamos utilizar pero
+de manera un poco más etérea un poco más general que le decía que era un
+poco era más como el marco metodológico conceptual que vamos a estar trabajando
+y en estas próximas sesiones vamos a concretizarlo vamos a hacer la bajada
+algo más técnico, ya más con código, más con herramientas, con nombre y apellido.
+Entonces, lo que vamos a ver hoy son lo que son las redes neuronales.
+¿Cómo lo definimos? ¿Qué es? ¿Qué son, más bien?
+Y un poco la terminología que vamos a estar utilizando para...
+Cuando hablemos de esta metodología, de estas técnicas.
+Entonces, lo que vamos a ver hoy, vamos a seguir con el ejemplo de la imagen de escritos, ya de números escritos a mano,
+pero vamos a entender y vamos a entrar en detalle de analizar ya cómo una red neuronal, en este caso,
+transforma una imagen, ya que en este caso son los números escritos a mano,
+una predicción y cómo aprende a hacer esa transformación, qué es lo que vamos a entender por aprender,
+cuáles son las transformaciones que vamos a utilizar, qué está dentro de esa red, que nosotros en la sesión pasada
+vimos que yo les comentaba que era una entrada, un sistema de, en esencia, una secuencia de procesos,
+así lo definí de una manera bien general y una salida. Entonces ahora vamos a entrar dentro de ese sistema,
+y cómo lo definimos, qué hace, cuáles son las operatorias matemáticas,
+las operaciones matemáticas que están dentro de ese proceso.
+Ahora, vamos a seguir paso a paso cada operación,
+vamos a hacerlo primero con números pequeños,
+y después vamos a saltarnos a la imagen,
+que ya en esencia vimos que lo podíamos representar como una matriz.
+Esto es lo que nosotros vamos a ver hoy,
+Entonces vamos a dar comienzo.
+Entonces si se fijan, un pequeño recordatorio en la
+imagen que tenemos a la izquierda,
+que en esencia era la cuarta imagen dentro del conjunto de
+datos que teníamos, que el conjunto de datos que yo les
+pasé la semana pasada era la vectorización de esa imagen.
+Recuerden que era una imagen que tenía 8 filas y 8 columnas.
+Entonces tenía 64 pixeles.
+Entonces podíamos representarlo como una matriz.
+los materiales 8x8 y al principio nosotros podíamos tener distintas
+representaciones que fue lo que comentamos la la semana pasada, o sea yo
+podría cuando lo teníamos de blanco a negro ya podíamos tener
+distintos escales ya en principio podríamos hacer de 0 a 16 siendo 16 el
+negro y 0 el blanco o podríamos por ejemplo tener imágenes que tengan
+colores y ahí tendríamos que una de las formas de representarlo es hacerlo como
+un vector dentro de cada celda con las dimensiones rojo verde y azul ya para
+representar la gama de colores que tenemos disponibles pero también me
+pasé una discretización y hablamos un poco en detalle de qué era la
+representación que en esencia es como represento la redundancia o como
+matematizo algo que no es inherentemente el número, ya, entonces eso tenía bastantes repercusiones en
+cómo íbamos a operar dentro de estas distintas técnicas. Si os fijáis tenemos entonces la imagen 8x8
+64 píxeles ya y tenemos vamos a hablar de una intensidad dentro de cada píxel, a la derecha de
+esa imagen nosotros tenemos algo que vamos a llamar más más a la derecha
+hablamos en el gráfico de la derecha vamos a tener 10 probabilidades porque
+nosotros recuerden que nuestro objetivo general lo que queríamos hacer era
+generar alguna técnica en particular la red neural es que una red que me lea
+esas imágenes y me clasifique las imágenes que ahora ya no son entradas naturalmente número,
+sino que solo las presentamos como número en una predicción de algún número entre 0 y 9,
+ya que son las posibles clases que pueden salir y pueden estar representadas en ese conjunto de datos.
+Ya, entonces, para hacer 10 probabilidades, lo que nosotros queremos obtener, en donde cada una
+debiese representar los distintos dígitos posibles ya entonces esos dos
+tamaños vienen de los datos ya el primero 64 o 8 x 8 que es de los
+datos que tenemos a disposición y los segundos que son las probabilidades
+vienen de la pregunta que nosotros tenemos nosotros nos planteamos en el
+interrogante de clasificar esas imágenes entre 0 y 9 entonces de ahí viene
+las 10 probabilidades pero vamos al centro en el centro tenemos un 32 que son las 32 activaciones
+ya no yo digamos escogí para esta red en particular una capa intermedia con 32 unidades
+entonces que vamos a entender por una capa intermedia es lo que está entre la entrada que son los datos
+y la salida que son lo que queremos hacer entonces ahí tenemos el primer concepto en términos
+conceptual, o sea, en términos metodológicos. Las capas intermedias son las distintas unidades,
+digamos, que están entre medio dentro de la operación, ya que nosotros la utilizamos para
+obtener, digamos, estas predicciones que nosotros queremos en términos de las probabilidades de los
+dígitos. También le podemos llamar neuronas artificiales, proponen que esto hace una referencia
+a un cerebro, a un punto de neurona. Entonces, cada una de estas unidades que son las que están
+en medio de las 32 activaciones va a recibir los 64 números que hacen referencia a las 64 celdas
+de cada imagen. La va a recibir, ¿cierto? Porque nosotros podemos vectorizar esta imagen porque es
+8 por 8 yo puedo poner la primera fila al lado de la segunda y así voy a tener un vector de 64 números
+que van a representar en este caso la intensidad del número o el color que nosotros porque
+nosotros estamos matematizando bajo cierta escala entonces cada unidad recibe de esta unidad de
+activación digamos para recibir 64 números y va a ser alguna cuenta con pesos en esencia va a
+ser número 1 por algún valor más número 2 por segundo valor y así sucesivamente.
+Ahora al terminar esa operación va a entregar un número y a ese resultado
+nosotros le vamos a llamar activación y va a representar una de las 32
+activaciones que digamos establecí para esta primera red.
+entonces 32 unidades van a producir 32 activaciones para una misma imagen ya
+porque la imagen el número 3 que son 64 números van a entrar en cada una de
+estas
+cada una de estas unidades que van a producir 32 activaciones entonces
+al tener 64 números van a ir a 64 unidades que a su vez me van a
+entregar 64 operaciones y eso sólo para una imagen ya y a pesar de que den 0 ya
+porque yo puedo hacer pesos que sean todos 0 y aún así eso sigue siendo una
+activación valido por no no no a lo que voy es que que diga activación no
+significa necesariamente que tenga que ser distinto de 0 para que no se mal
+entienda sino que se va eso simplemente una operatoria tengo números y le
+aplico una función que me entrega una activación y eso lo hago 32 veces. Ahora
+entendemos que cada una de esas activaciones, cada una de esas funciones
+va a ser distinta, con distintos pesos y distinta operatoria, para que sean
+distintas, porque si se fijan en el gráfico al medio esas activaciones que
+están representadas de manera
+de manera concreta, digamos son distintos, entonces intenta
+representar que es un distinto valor de oro numérico ahora porque 32 uno
+podría decir bueno porque la mitad de 64 ya no necesariamente uno podría hacer
+otra otra dimensión ya o simplemente un valor que decidimos probar y aquí
+estamos entrando ya en las primeras restricciones o dificultades que tiene
+esta metodología que yo tal como definí 32 puedo definir otro número ya o puedo
+definir más capas intermedias entonces entramos en el concepto de que ya no es
+una única forma de hacer la red neuronal, sino que hay muchas formas de hacerlo y este
+número 32 tiende a ser algo que llamamos un hiperparámetro, algo que definimos antes
+de ajustarlo con los datos. Yo decidí que había una red neuronal con 32 funciones de
+activación o neuronas artificiales que el otro nombre a quien le podemos dar. Entonces,
+está fijado antes de hacer
+antes de hacer el la la metodología y
+vamos a implementarla con datos
+entonces tenemos tenemos la el conjunto
+de entrada ya que va a ser nuestro
+nuestras todas nuestras imágenes y cada
+una de estas son un imagen que es 8x8
+que lo podemos matematizar o vectorizar
+como una un vector de 64 valores que van a entrar a 32 neuronas artificiales que me van a entregar
+32 activaciones o números pero esos son 32 números por imagen entonces ya vemos que cuando
+trabajo con muchas imágenes voy a tener muchos valores que calcular entonces lo que va a hacer
+de cuando tengo todos esos valores las 32 no lo voy a tratar de reunir ya y hacer otra operación
+tal que pueda entregar en la capa de salida que es la las probabilidades que nosotros queremos
+alguna función que me lleve o me lo mapé esos 32 datos a las 10 probabilidades que
+deberían representar las distintas clases que nosotros queremos identificar
+entonces
+si nos fijamos
+vemos el caso del dígito 8
+que también nosotros nos concentramos
+la sección pasada
+entonces sabemos que cada imagen
+homogéneamente a lo largo de todo el conjunto de datos son
+imágenes 8x8
+imágenes 8x8
+y dentro de cada celda con guías pensándolo como una matriz hay un
+número entre 0 y 16 que representa la intensidad siendo 16 el negro más oscuro
+y 0 el blanco.
+Entonces nosotros podemos ahora pasar o hacer una transformación de esos
+valores ya entre 0 y 16 de la base de datos que estaban vectorizados lo podemos dividir cada uno esos valores por
+16 y lo podemos en esencia llevar a un valor
+entre 0 y 1 ya que eso lo vamos a llamar la intensidad entonces cada intensidad
+decir x sub j va a estar definida como la intensidad inherente dentro de la celda de vídeo 16 que es el máximo
+entonces por ejemplo para la
+cuarta casilla de la primera fila que es un 14 y voy a tener 14 sobre 16 que va a
+ser punto 875 que va a ser entonces la intensidad de esa celda ya lo mismo para
+8 sobre 16 y así digamos y una correspondencia entendemos que el 0 va a quedarse en 0
+porque representa el blanco entonces tenemos el mismo orden esa transformación
+en esencia monótona en esencia no cambia el orden no me di no me no me
+distorsiona digamos lo que lo que representaba en un inicio
+y sabemos además dentro del conjunto de datos que esa imagen está etiquetado
+como un 8 que lo guardamos aparte porque lo que nosotros como querer después
+para corroborar que las predicciones que estamos haciendo
+son buenas en principio
+entonces si se fijan a la derecha también tenemos el histograma de qué
+tanto es la intensidad a lo largo de esa imagen y ahí vemos que está representado
+las las las valores que tienen mayor intensidad tienden a estar dentro de la
+posición cercana al a la posición 4 que es al medio entonces se entiende que
+esto está relativamente centrado ahora así es como lo vamos a hacer para
+cada una de las imágenes. Vamos a ver la intensidad que viene por el conjunto de datos,
+lo vamos a definir de 16. Sabemos que el máximo de 16 por construcción, porque esa es la
+forma en que están codificadas las imágenes, por lo que podemos tener, digamos, cada una
+de las imágenes van a estar, digamos, en la misma escala. Ya no voy a tener una imagen
+con intensidad sobre 1 y así con esta transformación que si se fijan requiere saber que la intensidad
+máxima es 16 podemos digamos uniformizar digamos la escala en la cual vamos a estar trabajando
+ahora veámoslos para otra imagen si se fijan también además del 8 tenemos todos los números
+que están disponibles y vamos a querer, digamos, usar una misma red para dos
+imágenes distintas, el 8 y el 3. Entonces los pesos y los sesgos, que vamos a ver
+un poquito más adelante que lo vamos a definir, pero los pesos en
+referencia a la forma funcional de cada activación, recuerden que les
+comentaba que era un peso por el valor de entrada más otro peso por valor de
+entrada y así digamos se va generando el valor de la activación, no esa neurona artificial.
+En este caso, vamos a ejemplo, la entrada para el número 8, para el número 3, van a ocupar los
+mismos pesos y los mismos sesgos, porque vamos a dar una noción de error en este sentido,
+y vamos a definir más un poco matemáticamente un poco más adelante
+y si se tijan cuando no dejo inmutable digamos los pesos y los sesgos que en
+esencia es definir que entran a la misma neurona ya con la misma configuración
+las barras que representan las activaciones cambian porque la entrada
+distinta, cada entrada tiene distintas intensidades que fueron digamos
+estandarizadas entre 0 y 1 bajo las mismas cuentas, aporto de
+intensidades distintas utilizando la misma la misma operatoria entonces si
+pensamos por ejemplo en una unidad que tiene 64 pesos porque son 64 entradas en
+imagen y un sesgo porque voy a hacer cada entrada de la imagen multiplicada por un valor más un
+pequeño error que yo lo estoy llamando sesgo, pensémos en ese caso si tengo la imagen de
+por ejemplo la imagen del 8 calcula un resultado cuando entras en neurona artificial y con la
+imagen del 3 vuelvo a usar esos mismos parámetros que fueron utilizados para la imagen 8 y calculo
+valor si se fijan me entrega cosas similares cuando vemos los gráficos de barras pero no los mismos
+porque no son el mismo tipo de dato inicial son en principio debiesen representar cosas
+distintas y vamos a repetir eso para las 32 digamos unidades que están ocultas en la capa
+intermedia y vamos a obtener una nueva lista de números que van a ser las 32 activaciones
+que son lo que se representa en el gráfico.
+Tengo 32 activaciones bajo la misma configuración para distintos números y si se fijan las activaciones,
+que son la forma funcional, el resultado funcional cuando hago la operatoria,
+me entregan valores distintos.
+Entonces, en ese espacio, digamos, numérico,
+la red y esta metodología va a tratar de buscar discrepancias
+por ejemplo, siempre que estrés tiende a haber una tendencia de que
+muchas activaciones son bajas, entonces
+la red va a tratar de clasificarla de alguna manera
+entonces cuando nosotros vamos a hacer predicción
+nosotros vamos a mantener fijos esos parámetros
+y durante el entrenamiento, que es cuando estamos creando la red
+los vamos a ir modificando
+y vamos a ocupar, digamos, nuevamente una métrica de perdida
+perdida logarítmica en principio
+si se fijan en cierta activación en ambos casos
+varias barras son
+cero o muy muy cercanas a cero
+ahora tampoco debemos interpretar, digamos, que la unidad con el número 8
+como la probabilidad de que sea el número 8
+esto no son probabilidades, simplemente son los valores que se le está asignando en cada una de las 32 activaciones que yo definí en un principio
+como la configuración y estructura de la red
+estas unidades que están la neurona artificial en las activaciones que tengo
+no representan una clase en particular
+es decir, no es que la activación 32 representa
+o muy predominantemente el 8 o el 7 o algún número en particular, sino que
+aquí estamos buscando combinaciones no lineales entre estas activaciones, que es un
+poco más profundo, ya que simplemente hacer una correspondencia
+uno a uno, digamos, por alguna de las clases. Siguiendo entonces.
+Ahora, ¿qué es esta activación, Perse?
+Le hablé que habíamos que hacer un cálculo.
+Y en cada una de estas unidades, que son las 32, que nuevamente están predefinidas,
+nosotros vamos a definir la siguiente estructura de cálculo.
+En general es así, lo que cambia son otras cosas.
+Cada x que está en esta función a va a ser las x sub jota que son las intensidades de la imagen
+Entonces nosotros vamos a tener 64 intensidades
+Cada entrada se va a multiplicar por un peso y va a ser el propio peso de esa intensidad
+Entonces para la primera celda que está arriba a la izquierda va a tener un peso asociado
+para esa celda en particular y así para las 64 que están disponibles
+la vamos a multiplicar y después vamos a multiplicar los productos digamos de las entradas con sus pesos
+y vamos a añadir un sesgo ya que es este B, que es una pequeña noción de error digamos
+que es una constante que yo la voy a ir ajustando o se va a ir ajustando mediante una metodología de optimización
+tal como los pesos también porque los x no son no pueden cambiar porque son los datos de a todo
+el resto si lo podemos ir digamos modificando para que una métrica de evaluación sea la más baja
+posible que nosotros vamos a ocupar la métrica de pérdida logarítmica ahora ese resultado nos lo vamos a llevar
+a cierto va a ser la multiplicación de producto más un sesgo entonces un peso
+positivo va a hacer que a un mente su entrada
+o hace que aumenta su entrada y por consecuencia va a aumentar la suma del
+todo entonces también podemos tener peso negativo
+y si se fijan hago un paralelismo muy clásico con lo que es una regresión en principio
+porque tiene la misma forma lineal si un peso negativo entonces va a hacer que esa suma baje
+ya y ese valor de esa suma ya va a entrar a otro lado y aquí vamos a estar haciendo operaciones
+de matemática que van a entrar operaciones matemáticas que ese resultado va a ir a otra
+función y esa función va a ir a otra función y va a haber una secuencia de procesos matemáticos
+hasta que podamos llegar en este caso particular a las probabilidades que queremos obtener que
+son estas 10 probabilidades de clasificación después de la multiplicación de producto
+nosotros le vamos a sumar este sesgo que en esencia va a desplazar esta suma completa ya y que va
+permitir que esa unidad esa unidad se neurona artificial tengo una respuesta
+distinta de 0 incluso cuando todas sus entradas son 0 que significaría que hay
+una imagen que sólo es blanca no necesariamente imagen blanca activación
+0 entonces tengo esa flexibilidad ahora
+falta una segunda operación nosotros hacemos el producto y lo multiplicamos el
+y obtenemos el A. Y ahora a eso es lo que nosotros le vamos a llamar, tomamos ese A y le vamos a aplicar
+una función de activación. Inicialmente nosotros vamos a comenzar con la función
+ReLU, que es rectified linear unit, que las reglas super sencillas, va a ser el máximo entre 0 y ese
+valor a entonces si el a es positivo es el valor a y si es que es negativo entonces 0 y si es ser entonces
+0 entonces nos vamos a graficar fácilmente eso y entenderá que es como la línea y algún valor se
+empieza a subir con el valor de ahora
+si fijan ejemplos clásicos relu la función relu de menos 2 la va a llevar a 0 y si es 3 va a ser 3
+porque va a ser simplemente el valor positivo que se está obteniendo. Entonces, si se fijan y lo
+graficamos, la función relu va a mantenerse constante en cero hasta que la suma A sea positiva
+y va a subir linealmente conforme el valor de A tras ese valor. Pero ahora, veamos una cuenta
+bien particular para que veamos cómo opera internamente esto. Pensemos que tenemos el X,
+como dos celdas, si se fijan, estamos viendo acá toda la imagen, estamos usando un caso bien
+particular, que mis entradas son 0,5 y 1. Entonces se fijan que es como un gris y un negro, no más
+que eso porque definimos que 1 en la intensidad que vendría siendo 16 sobre 16 va a ser el negro
+absoluto y el 0,5 por consecuencia va a ser un gris intermedio entre el 0 y el 1. Tenemos que
+los pesos son 0,8 y menos 0,4 y el sesgo que voy a predefinir va a ser 0,2. Entonces la primera
+contribución va a ser 0,8, es decir, el peso del primero por el valor del primero que es 0,5. Entonces
+va a ser 0,8 por 0,5. Si se fijan estamos haciendo esta operación w1 por x1 w1 por x1
+la segunda va a ser menos 0,4 por 1 que es menos 0,4, 0,8 por 0,5 es 0,4 también
+entonces cuando lo sumo porque voy a tener w1 x1 más w2 por x2 va a ser 0,4
+más menos 0,4 que se van a cancelar y por consecuencia cuando le sumo el sesgo
+voy a que 0,2 me va a quedar en 0,2 en lo que representa este gráfico entonces
+w1 por x1 me da 0,4, w2 por x2 me da menos 0,4, le sumo el sesgo y
+por consecuencia el a como un todo es 0,2 dado que le sumo el sesgo ya
+ahora cambiamos la segunda entrada en vez de 1 va a ser 2 entonces mi x va a ser
+0,5 como 2 si hago eso ya la contribución del segundo va a ser menos
+0,4 por 2 que es menos 0,8, hago el mismo operatorio entonces va a ser 0,4 menos
+0,8 más 0,2 por consecuencia el valor del a va a ser menos 0,2
+que es negativo y como ocupa una función de activación relu que sabemos
+que si es negativo no se me lo lleva a cero entonces la activación de 0 va a
+ser 0 y en el caso anterior cuando la segunda entrada era 1 era 0,2
+entonces ya tengo dos formas de cómo opera eso es lo que se hace internamente
+dentro cada esa neurona artificial si fijan ahí los pesos no cambiaron ya
+solamente cambió la entrada y por eso cambió la activación
+ahora lo que nosotros vamos a querer hacer es ir modificando esos pesos ya
+y ese es eso también, tal que tras las funciones de activación y las
+consecuencias de las subsiguientes operaciones funcionales me mapeen, digamos me
+lleven a probabilidades que sean coherentes con la clasificación.
+Entonces yo les dije que vimos la función relu, pero la función relu es una de
+muchas funciones de activación que podemos utilizar. La función relu ya
+sabemos que si es negativo le lleva 0, si es 0 es 0 y si es positivo dejar para
+positivo. También tenemos
+distintas otras funciones de activación, por ejemplo la sigmoide o la
+tangente hiperbólica. Entonces sabemos que relu deja pasar la parte positiva y
+ganó una negativa porque la lleva 0. La sigmoide va a comprimir cualquier
+número ya al intervalo 0 1 si se fijan la activación es el eje y por consecuencia
+en cualquier valor que pudiese tener el a que en principio son los reales pero
+muy grandes vendrían siendo recuerden que la es
+la suma de los productos más en sesgo me lo va a llevar a 0 1
+y la siguiente que es la tangente hiperbólica me va a producir valores entre menos uno y uno. Ahora, la
+la guía de cómo voy a escoger la función de activación, la forma funcional voy a utilizar
+para como función de activación es un hiperparámetro en principio. Hay ciertas pautas,
+ya por ejemplo yo voy a querer ocupar funciones relu o soft relu digamos cuando en el ser tengo
+un apunto sin una algo más continuo en las capas interiores y voy a querer ocupar por ejemplo
+una sigmoide que me lleva las cosas a 0 1 en las capas casi de salida porque eso me va a ayudar a
+mapiar a números que sean coherentes con una probabilidad
+y en esa noción digamos yo no puedo mapiar algo a una probabilidad una
+función relu porque relu en principio si se fijan en el gráfico su dominio
+digamos de activación es 0 más en el sigmoide es entre 0 y 1 y el tangente
+menos y un y uno entonces cada una va a tener distintas aplicaciones en conforme yo voy a tener
+distintas tareas en este caso de clasificación por probabilidades de asignación de clase la
+sigmoide va a tener un rol fundamental porque me va a llevar las cosas a un valor que yo puedo
+interpretar como una probabilidad
+siguiente
+ahora siguiendo con el col con la canti los conceptos que vamos a utilizar es la
+noción de capa una capa en esencia reúne varias
+unidades y nosotros dijimos que teníamos la unidad anterior era la que
+hacía esta operatoria y llevaba una función de activación.
+Todas las capas reciben la misma entrada, pero cada una de estas tiene sus propios pesos y su propio sesgo.
+Entonces ya empezamos a tener diferencias en cuanto al operatorio que vamos a tener.
+Van a entrar en la misma entrada, van a tener la misma forma funcional en principio que la suma de los productos, pero con distintos valores.
+Entonces, los valores pueden ser distintos, las cuentas van a ser distintas,
+también van a ser sus resultados, porque van a tener distintos pesos.
+Veamos el ejemplo. Si se fijan acá, tengo una entrada de 1, 2.
+Entrada de X. Primera celda 1, segunda celda 2.
+Es lo mismo que decir X es igual a 1,2.
+la matriz W, si se fijan ahora reúnen los pesos pero de manera matricial, tiene dos columnas
+la primera contiene los pesos 1,05 y la otra menos 1,05
+ahora los sesgos que yo estoy definiendo que es el B, como lo definimos anteriormente
+es el D acá, ahora lo estoy definiendo, ahora que tengo dos, digamos, unidades
+lo voy a definir como 0,0, sin sesgo por ahora, para que no nos compliquemos
+¿Cómo hago el calcullo entonces?
+Si se fijan, voy a tener que hacerlo a dos pasos, primero, a 1, que va a ser la primera unidad
+va a ser 1 la entrada por su peso 1 por 1 más 2 por 0,5 más el sesgo que yo dije que es 0
+si se fijan aquí estoy haciendo de manera vectorial esto
+estoy multiplicando peso por entrada más peso por entrada más sesgo
+en el caso de acá porque son 2
+entonces va a ser 1 por 1 más 2 por 0,5 más el sesgo que me da 2
+y ahora a esa
+le aplico
+la función relu
+ya que sabemos que es el máximo entre 0,a
+y en este caso es a la 1, que sabemos que es 2, entonces va a ser el máximo entre 0 y 2
+para el segundo caso
+voy a hacer
+1, pero ahora voy a multiplicar con la segunda columna, entonces voy a hacer 1 por menos 1 más 2 por 0,5
+y si se fijan lo que estoy haciendo es simplemente álgebra matricial
+estoy multiplicando una matriz 1 por 2 por una matriz 2 por 2
+y le estoy aplicando la función
+entonces el a2 me va a dar, cuando le sumo el sesgo 0, me va a dar 0
+y sabemos que el relu de 0 va a mapear esa cantidad a 0
+Entonces las activaciones en estas dos neuronas están definidas como 2 para el primer caso y 0 para el segundo.
+Entonces yo puedo definirlo de manera vectorial, h, como un (2, 0).
+Entonces, fíjense, eso es lo que pasa dentro de la red neuronal.
+hace simplemente cálculo matricial, multiplicación de pesos por entradas y lo mete en alguna función de activación.
+La elección de la función de activación no es menor, pero tenemos que entender primero cómo opera cada una de estas.
+Entonces, si se fijan, ahora podemos hablar de una noción de arquitectura.
+nosotros sabemos y vamos a leer la arquitectura como de izquierda a derecha
+siendo izquierda a la entrada, entonces tenemos por la entrada tenemos un
+imagen de 8 píxeles por 8 píxeles que sabemos que entrega 64 entradas
+64 x sub j
+32 es en la capa intermedia es el número de unidades de la capa oculta porque en la capa intermedia
+que nosotros decidimos probar que de manera arbitraria sabemos que es un hiperparámetro
+no es algo que podemos estimar y optimizarlo de alguna manera un poco más matemático
+y 10 que vendría haciendo la salida porque son las probabilidades que nosotros queremos clasificar
+cada una de estas imágenes porque sabemos a priori que los números escritos están entre 0 y 9
+ahora al número de unidades ocultas ya lo vamos o lo vamos a llamar el ancho de la capa si la capa
+oculta tiene muchas unidades ya unidades o neuronas artificiales es un es una capa muy
+y en un poco el concepto un poco más intuitivo de cómo lo
+mostrarán cuando hablamos por ejemplo es muy profunda se estamos hablando que hay
+muchas capas y que son por ejemplo capas muy anchas profundas y ancho
+significa que son muchas capas capas conectadas unas con otras porque nada me
+dice esto no tenemos ninguna obligación de que sólo vaya una capa oculta que sabemos que
+la entrada la entrada entra en la capa oculta y en este ejemplo la capa oculta me lo va a
+pegar la salida pero yo podría tener una red un poco más profunda en donde la entrada
+entra la capa oculta y en vez de que la capa oculta me mape las cosas a las probabilidades directamente
+sino que se vaya a otra capa oculta y así a otra capa oculta y a otra capa oculta y ahí
+hablamos de una red un poco más profunda, o de deep learning en principio. Entonces, al número de
+unidades que va a estar en estas capas, digamos, o que son las neuronas, digamos,
+le vamos a llamar, o vamos a decir que el número de este, de número de neuronas va a ser un
+hiperparámetros, un hiperparámetro porque lo tenemos que fijar antes de hacer la
+el valor. No es por ejemplo un valor como en una regresión en un SAM que es un
+beta y yo sé que hay un beta y luego lo defino sino que la número de neuronal
+lo tengo que definir para hacer cualquier cálculo tengo que saber cuánta
+neuronal lo tengo, lo voy a tener que establecer de antemano
+eso me genera un problema porque yo no tengo ninguna información
+para decir, bueno, cuántas neuronas debíes escoger.
+Y hay ciertas guías, pero ninguna es, en esencia, es heurística.
+No hay una forma óptima que siempre funciona, que va a entregar el mejor resultado.
+Tenemos guías y pautas, que lo vamos a mover un poco más adelante, pero
+una forma, digamos, matemáticamente óptima no existe, porque tenemos muchos parámetros
+y encontrar uno óptimo a priori no es posible.
+Hiperparámetro es distinto de lo que es parámetro. Parámetros son estos betas, por ejemplo, las regresiones.
+Y son cosas que podemos ir cambiando a lo largo. Vamos ajustando la red. Por ejemplo, los pesos. Los pesos sí los podemos ir cambiando.
+Y los sesgos también los podemos ir cambiando.
+Eso lo vamos a ir modificando conforme yo vaya ajustando con las distintas imágenes.
+ahora
+nosotros nuevamente no teníamos ninguna obligación de ocupar 32, esto simplemente
+por por simplicidad ya en general ésta lo vamos a conseguir con una red densa ya
+porque cada unidad de las 32 va a recibir los 64 píxeles tampoco tenemos
+que o no hay ninguna obligación y aquí entramos en todas las
+configuraciones posibles que podemos hacer es que no necesariamente cada neurona tiene que recibir
+todos los pixeles simplemente puede hacer una parte del del imagen ya que puede ir cambiando
+ya que le podemos la vamos a ver cuando veamos redes convolucionales ya
+y en este caso entonces tenemos sólo una capa oculta ya podemos entonces ver ya y prever que
+la red más complicada y que son computacionalmente más costosas van a
+ser más neuronas, más capas, distintas funciones de activación y la complejidad
+ya se vuelve sustancialmente mayor. Por eso lo tenemos en esta configuración
+un poco más menos profunda, digamos, más superficial para que podamos ejecutar
+los códigos de nuestro computador.
+ahora vamos a mantener si se fijan lo que hace la activación o la función de
+activación es introducir no linealidad porque la
+forma funcional de lo que nosotros le llamamos la variable o cantidad a es
+simplemente una ponderación peso por entrada más peso por entrada más peso
+por entrada más a que es por definición una forma lineal
+y lo que hace la función de activación es que a esa resultado lineal la
+incorporo y le agrego una no linealidad de alguna forma y ahí entra las
+distintas formas de agregar la no linealidad con las funciones de activación
+o las distintas clases de función de activación.
+vamos a mantener la convención de que x es una fila porque si se fijan yo podría,
+tal como lo estábamos haciendo acá, yo podría hacer el recorrido hacia la
+derecha o podría hacer el recorrido hacia la izquierda, o sea hacia abajo, perdón, y
+hacer hacia abajo, de arriba hacia abajo, de arriba hacia abajo o de izquierda a derecha,
+izquierda a derecha, bajo una, izquierda a derecha. Tenemos que seguir siempre el
+mismo camino sino no va a ser consistente en nuestro resultado. Entonces vamos a
+definir que x es una fila y va a tener x1, x11 va a ser la primera set de la
+primera fila. Entonces primero vamos a calcular
+x por w1, entonces la primera entrada, la primera fila por el peso asociados a esa
+primera fila más el primer sesgo
+podemos hacer lo mismo para una cantidad
+h ya si se fijan en el s ahora entra el
+h que es la salida de la primera función
+entonces vamos a calcular h y ese h va a
+entrar en la forma lineal de ese paso de
+s
+ahora si yo los junto
+por propiedades de distribuidad digamos, va a seguir en la misma forma. Entonces si se fijan
+cuando el S simplemente puede mezclar ambas cantidades. Entonces si pongo muchas capas
+lineales sin función de activación yo en principio podría acoplarlas en solo una capa.
+Entonces, si no queremos eso, si no hay funciones de activación no lineales, las podemos juntar
+en una función a fin que hace lo mismo.
+Entonces queremos tener esa profundidad porque sabemos que con ello la función aprende más
+cosas.
+Entonces, esa es una de las razones por la que nosotros hacemos la función de activación.
+acá
+tenemos
+en el gráfico de acá, primera coordenada, segunda coordenada, tenemos 0 0 0 1 1 0 1 1
+y si se fijan voy a tratar de implementarlo en hacer una transformación
+con distintos tipos de activación
+si se fijan
+los
+los puntos que tienen
+entradas distintas van a pertenecer
+a la clase 1 que es el triangulito
+y los que tienen entradas iguales van a pertenecer
+a la clase 0, ya, así lo voy a definir
+si se fijan cuando quiero separar esto
+esto, si se fijan se acuerdan un poco de clasificador de margen máximo, cosas de ese estilo, yo no puedo
+generar una línea que me separe perfectamente estas clases, ya toda línea que haga voy a tener algún
+error, pero ahora yo puedo calcular diferencias, en vez de trabajar directamente con la posición
+voy a trabajar con la diferencia y si se fijan voy a tener entonces los cuatro puntos, los cuatro
+punto yo voy a trabajar con x1-x2 en la primera coordenada y en el otro x2-x1
+hago los cálculos y voy a llevarlo a un mapeo de 0,0 hasta un mapeo h1,h2
+y puedo hacer pequeñas cálculos respecto a ello
+ahora eso es en esencia una transformación del espacio y en esa
+transformación del espacio, o sea, o ese espacio transformado, una recta si separa las clases.
+Si se fijan acá, esta línea puntuada si separa las clases, porque si se fijan este 0,1 representa
+al valor que está acá y el valor que está acá arriba que es 0,1, perdón, y el este era 1,0,
+0,1 me lo lleva al valor 1,0 y el valor que está acá que es el 1,0 y el 0,1 me lo deja donde estaba
+y el valor 0,0 me lo deja en 0,0, si lo dejan acá, esto me lo lleva acá y el 1,1 me lo lleva al 0,0
+entonces lo que hizo fue pasar el punto de arriba a la derecha lo llevó al 0,0 y ahora no tengo el
+problema porque puedo tener una recta y me va a separar las distintas observaciones de manera perfecta
+va a reconocer cuando me digo de manera perfecta significa que hay una línea o una regla que me va a
+separar las observaciones que son clase 0 y las observaciones que son clase 1, entonces una
+recta en ese espacio transformado si separa las clases, ahora los pesos del ejemplo que acabamos
+de hacer acá están hechos a mano, digamos para demostrar que yo transformando el espacio
+si puedo separar correctamente ciertas clases. Ahora no estamos diciendo que eso siempre
+se va a poder hacer porque se puede demostrar y digamos que hay veces que simplemente hay
+cosas que no se pueden separar, no se pueden distinguir, pero es posible. Entonces tenemos
+esta noción de transformar el espacio que de cierta manera es lo que hace la
+la función de activación nos va a permitir distinguir y cambiar digamos o
+clasificar de mejor manera
+entonces
+veamos acá queremos expandir ahora ya empezamos con el caso 1 a un numerito
+después con dos celdas simplemente sigamos ya veamos cómo es una capa
+digamos que va a procesar distintas observaciones o varias observaciones
+la observación la tenemos reducida pero se entiende la idea que lo que
+queremos representar acá es que todo esto puede ser representado de manera
+matricial entonces cada fila de x va a ser una observación entonces x va a ser
+tres observaciones con dos entradas porque vamos a entender que tiene
+simplemente dos píxeles. Entendemos que después eso va a ser 64 para el lado
+porque son los 64 píxeles que va a tener la imagen de 8x8.
+Entonces cada fila de X es una observación, cada columna de W va a
+contener esos pesos que produce una unidad.
+y voy a tener entonces el producto tal como lo hicimos antes acá que lo que
+nosotros hicimos fue multiplicar x por w lo que vamos a hacer aquí es
+multiplicar x por doble ya x en general tiene una dimensión de n por p n siendo
+la cantidad de observaciones y p el número de en este caso píxeles las
+imágenes y w va a tener el tamaño p por p por la misma cantidad de tamaño y q
+por la la activación que va a tener entonces el producto va a tener dimensión
+n por q entonces matematizando esto esto es 3 por 2 estos 2 por 2 entonces una
+matriz 3 por 2 por 2 por 2 me da una matriz 3 por 2 que es la dimensión de
+la matriz H. Ahora, podemos replicar exactamente la misma
+operatura que hicimos antes. Por ejemplo, para el x2,1 va a ser, que es esta de acá,
+va a ser 2 por 1 más 1 por 0,5 en la primera coordenada y la segunda coordenada va a ser
+2 por menos 1 más 1 por 0,5
+entonces ese valor me lo va a llevar a 2,5
+pero ese es el A
+ahora ese A lo voy a meter en la función relu
+el 2,5 va a quedar como 2,5
+porque es el relu, simplemente me lleva a hacer las cosas negativas
+entonces sigue el 2,5
+y el menos 1,5 me lo lleva a 0
+operando de la misma manera para todas estas cosas
+voy a llegar a esta matriz y esta matriz es la que está representada acá. Eso es lo que hace de manera más extensa y con más valores hacia la derecha, porque recuerden que esto simplemente estoy considerando como que hay dos pixeles.
+Primer pixel, segundo pixel, pero cuando lo vemos con el 8x8 voy a tener 64 para el lado, porque cada fila hace una observación, entonces cada observación va a tener 64 pixeles.
+Entonces, va a ser una matriz, por ejemplo, n, el número de observaciones, por 64.
+Ahora, vamos a ver por qué computacionalmente estas cosas son un poco más costosas.
+Nosotros podemos ver que, por ejemplo, en una regresión, el número de parámetros no son tanto, porque son los betas.
+Intercepto más todos los coeficientes que acompañan el número de covariables.
+Entonces, en general, el número de parámetros no es algo tan gigantesco.
+No obstante, aquí ya tenemos una noción bastante más grande, porque cada neurona va a tener sus pesos asociados.
+Entonces, primero vamos a contar lo que necesita una unidad oculta.
+Entonces, va a recibir 64 entradas, que es cada pixel de cada imagen.
+entonces va a necesitar 64 pesos en una unidad que va a tener una activación
+entonces va a ser x1 x2 x3 x4 cada x va a tener asociado un w por si ya cada w
+va a ser un parámetro que voy a tener que modificar y optimizar digamos
+más el sesgo entonces voy a tener 64 más 1
+parámetros por unidad o neurona artificial con 32 neuronas o 32 activaciones voy a tener 64 más 1
+por 32 parámetros ya 64 más 1 por 32 parámetros ya solo en esa primera pasada que es la pasada de
+la entrada a la primera capa ahora
+sólo esa primera capa tiene 32 por 65 que es 2080 parámetros que si usted lo
+comparar con la región es bastante bastante mayor
+ahora la figura digamos si se fijan va a separar esta
+cantidad tengo el 2080 que son la primera capa
+tengo 32 y ahora quiero ver cómo usando porque todavía no llegó a la carga final
+y fijan estos son los 2048 y estos son los sesgos entonces esta multiplicación al 2048 y los de uno
+son la cantidad de sesgo por la cantidad de activaciones y ahora cada activación va a estar
+asociada a cada una de las clases entonces cada una de las 10 unidades que son las cantidades de
+salida va a recibir las 32 activaciones ya jesús pregunta sería cómo crear variables
+intermedias para simplificar el problema o sea si lo veo desde la primación es crear variables
+intermedias, comillas, porque tú estás haciendo operaciones matemáticas, pero a eso le aplicas
+una función, entonces cuando estás creando varias intermedias, pero esas variables después
+tienen que ser optimizadas. Entonces todo lo que dijiste es razonable, excepto el simplificar,
+porque aquí no lo estamos simplificando, es todo lo contrario, lo estamos complejizando,
+porque en esa complejidad nosotros podemos aprender, digamos, las discrepancias que nos van a permitir
+clasificar las distintas imágenes porque cuando estoy haciendo esta
+transformación y lo estoy transformando el espacio de datos ya o el espacio en
+el que estoy trabajando tal que en ese espacio transformado yo si pueda
+clasificar mejor porque en el espacio original no lo puedo hacer tan fácilmente
+siguen entonces cada una de esas 10 unidades de salida va a recibir 32
+activaciones ya cada una de esas necesitan un sistema adicional entonces esa capa de salida o de
+la capa oculta a la salida va a ser 10 por 32 más 1 ya porque son 32 las activaciones más
+más el sesgo por la 10 de salida entonces si lo si lo junto digamos ya si fijan acá son
+las 10 capas de salida, los 320 digamos asociados a activaciones por salida más los 10 sesgos,
+entonces junto a esto si la capa oculta tiene un ancho 32 voy a tener que ajustar
+2410 parámetros entonces influye mucho cuánto es el ancho de esa capa que tan profunda es
+o que tan ancha porque si fuese un ancho 16 y hago el mismo ejemplo voy a tener 1210 y
+1200 en parámetros es bastante cantidad entonces imagínense agrego eso simplemente una capa se
+agrego una capa adicional, pensemos otra capa de 32, voy a agregar no
+simplemente el doble porque aquí también voy a tener 5 adicionales
+entonces sube exponencialmente la cantidad de parámetros. Si ustedes se fijan
+muchas veces los modelos de ya que salen ahora se
+cuantifican digamos en qué tan buenos comillas o qué tantos parámetros tienen
+Y no están ni por cerca de los miles, sino que son millones y billones de parámetros,
+que están predefinidos y preajustados. Entonces, son campos muy profundos que tienen muchos parámetros
+que fueron ajustados y fueron entrenados alguna vez. Ya aquí estamos recién entrando en los
+precursores de los modelos que son los que se ocupan actualmente. Entonces,
+siguiendo entonces, hagamos lo que nosotros vamos a llamar la propagación y vamos a tomar un poco de
+esta slide anterior que vamos a completar, digamos, la predicción porque recuerden que nosotros
+clasificamos y cuantificamos cuántos predictores son y tenemos que ver cómo llegamos a la predicción
+Entonces nosotros vamos o esperamos digamos que hay dos activaciones porque W1 tiene dos columnas
+si se fijan acá W1 tiene dos columnas entonces espero dos activaciones. Esta es la entrada
+ya que es bastante sencilla. Entonces la entrada en este caso va a ser 1,2 los pesos son en la
+matriz 1, -1, 0,5, 0,5 y tengo sesgo 0, 0 para no complicar entonces yo voy a multiplicar
+voy a calcular el a 1 1 y el a 1 2 entonces hacemos lo mismo que estábamos
+haciendo antes al principio 1 por 1 más 2 por 0,5 que el mismo cálculo y el 1
+por menos 1 más 2 por 0,5 y me entrega este valor entonces matricial o
+vectorialmente voy a tener el 2,0, lo paso al relu y eso me lo va a dejar igual porque
+los positivos y los ceros, el 0 lo dejan 0 y el positivo lo deja igual. Ahora, vamos
+a conservar esas coordenadas que son 2,0. No las vamos a sumar en un único número,
+salió un poco más atrás, que es una otra forma de implementarlo
+porque cada uno de esos números va a tener su propio peso en la capa de
+salida cuando lo tratemos de mapear a las probabilidades de clasificación
+si se fijan hasta ahora no hemos ocupado ningún lado
+cuál efectivamente era la clase o la etiqueta de esa imagen. Solo simplemente
+hemos ocupado las intensidades de la imagen.
+Ahora, no hemos ocupado esa etiqueta y no sabemos, digamos, cómo se va a propagar.
+Entonces, esa propagación puede hacerse para
+la imagen cuya clase desconocemos. Porque la idea
+que nosotros queremos hacer es aprender con las imágenes que están clasificadas
+pero queremos hacer predicciones sobre imágenes y no sabemos su predicción
+entonces vamos a tener el H que es en esencia lo que está entregando la
+red neuronal y lo vamos a tener digamos presente ya porque ahora queremos pasar
+esas funciones de activación y cómo las funciones de activación me llevan a una
+probabilidad de asignación de clasificación de clase.
+Entonces, tengo el H, que tratamos de ver cómo se calculaba, que es 2,0
+y esa salida va a tener pesos 0,5, menos 1, ya transpuesto, porque si fijan acá, eso es
+en esencia a este valor 0,5 menos 1 pero es transporte entonces el valor
+ahora el sesgo va a ser menos 0,5
+voy a definir un s tal como lo definimos cuando quería agregar no linealidad
+el s va a ser entonces 2 por 0,5 su peso y ese 2 viene del h más 0 que es el
+segundo componente el h por menos uno ya que es el del doble de 2
+menos o más su sesgo ya como su sesgo es negativo menos 0,5 eso me queda un
+valor 0,5 y si se fijan acá ahora
+esta cantidad este s va a ser 0,5 y ese 0,5
+lo voy a poner como si fuese un P, ya.
+ese P, yo ahora, eso sigue siendo un
+puntaje, sigue siendo una función de
+activación que podría ser dado que
+viene de un ReLU y de una
+suma de productos, podría ser positivo.
+Ya no necesariamente lo puedo interpretar
+con una probabilidad, porque yo con otro
+valor podría tener un valor 2 y no va a
+ser lo mismo y lo voy a interpretar como
+una probabilidad per se, por
+Por consecuencia, simplemente un número, un puntaje.
+Lo que vamos a ocupar ahora, la salida que les he mencionado,
+usualmente la función relu de activación la ocupamos para capas intermedias,
+pero ahora queremos ver cómo pasamos a las probabilidades efectivas de clasificación.
+Y ahí nosotros vamos a ocupar la segunda función de activación, que es la función de activación sigmoide.
+¿Ya?
+Ese sigmoide es lo que va a transformarlo en algo que nosotros vamos a interpretar como
+una probabilidad, sin serlo de que se pase porque no todo el número entre 0 y 1 es una probabilidad,
+pero vamos a hacer esa analogía.
+Y lo que hacemos es esta cantidad, 1 sobre 1 más exponencial de menos el valor que tenemos,
+¿Ya?
+Y esa cantidad, fija que esta función, yo le pongo un sigma por sigmoide, sigmoide del
+0.5 o sigma de 0.5, aplico esta función y me va a dar 0,622
+y se fijan ahora ese puntaje es más positivo que simplemente el 0.5 original
+que yo tenía, si yo lo hubiese interpretado como entre 0 y 1. Ahora si nosotros ponemos e
+interpretamos eso como una clasificación, por ejemplo si fuese una
+clasificación binaria, el umbral usual sería 0.5, ese valor es mayor que 0.5,
+entonces lo clasificaríamos como clase 1, pero en el ejemplo que nosotros tenemos
+no es una clasificación binaria, sino que es una clasificación que tiene 10
+salidas, porque son los 10 números entre 0 y 9, ya, entonces no podemos ocupar la
+sigmoide usuario, tenemos que ocupar otra función de activación, ya.
+Y haciendo un pequeño, una pequeña pausa, digamos aquí, es que la función de
+activación de salida es la que es más sugerente, la de intermedio uno podría
+jugar bastante con cosas pero la de salida por ejemplo si es lo que yo quiero
+predecir es un número, estoy en una regresión cuantitativa, la función de
+salida va a ser simplemente una función lineal, el mismo número, sin tener como
+que en la última capa no hay en la función de activación sino que
+simplemente se repita el as o que sea la identidad. ¿Cuál es la pérdida que voy a utilizar para
+optimizar esto? El error cuadrático tal como en regresión, de hecho uno puede hacer un paralelismo
+en una red neuronal con una capa y una neurona, es muy similar, de hecho es exactamente lo mismo
+que hacer una regresión en la regresión lineal múltiple. En el caso de...
+Corre con abuela, tome clase amor, corre la capa, ya voy yo en un rato, corre con abuela.
+¿Puedo montar ahí, por favor?
+Ya.
+Tenemos entonces, si la tarea, el objetivo que nosotros queremos hacer es una clasificación binaria,
+voy a querer hacer una sigmoide, porque me va a llevar algo 0 y 1 y yo voy a poner un umbral,
+y ese umbral lo puedo interpretar como una probabilidad de clasificación entre 0 y 1.
+¿Cuál es la pérdida que utilizo ahí?
+la entropía cruzada binaria en este caso porque estoy haciendo clasificación
+binaria y en las clases excluyentes que el caso de nosotros porque si se fijan
+los números no puede ser 4 y 5 a la vez entonces son clases excluyentes la
+salida que nosotros vamos a ocupar es una función que se llama una función de
+activación que se llama softmax ya y vamos a ocupar la pérdida de entropía cruzada
+multiclase
+Ahora, esto es lo que nosotros queremos, ahora, entranos como se hace esto.
+No obstante, creo que podemos hacer un pequeño break antes de entrar en el
+calculo mismo de las Softmax. ¿Les parece? Yo creo que podemos volver en unos 15 minutos más.
+¿Productor, qué dijo entropía cruzada multiclase?
+Sí.
+Es otra variante de la entropía usual, ya, porque la mayoría de la entropía están hechas
+para clases binarias, clasificación binaria es lo que uno se ve.
+Tal como ustedes ven, regresión logística para clasificación binaria, la regresión
+logística mantiene una variante para clasificación de varias clases, no solo dos.
+Claro, gracias.
+Entonces, vamos un pequeño break, les parece, y volvemos en 15 minutos más.
+[Pausa: recreo de unos 15 minutos hacia 1:07:22 del video aprox. El video no contiene el tramo del descanso; la clase continúa directamente con el regreso del recreo.]
+Vamos a continuar entonces con este segundo bloque.
+Ya, entonces, vimos que la función de activación en la capa salida tiene bastante importancia.
+Y sobre todo tenemos varias funciones de activación en la capa salida conforme es nuestro objetivo,
+de regresión, en términos de regresión, de predicción cuantitativa, clasificación
+binaria o si tenemos clases excluyentes que es el caso que nosotros tenemos y ahí vamos
+a ocupar las softmax. Entonces, ¿qué es esta función softmax? Veamos y vamos a ver cómo es el
+recorrido de esto. Entonces tenemos puntajes que son capas de que vienen de las funciones de
+activación de la salida y de la capa intermedia que yo la definí como ejemplo digamos cero
+logaritmo de 2 y cero. No son probabilidades y nosotros queremos que la capa de salida sean
+probabilidades o algo que podamos interpretar como probabilidades porque si tengo 10 posibilidades
+yo voy a predecir la que tiene mayor probabilidad, esa es la lógica de esto.
+Entonces voy a tener entonces los puntajes 0, el logaritmo de 2, 0. Al exponenciar
+esas cantidades voy a quedar nuevamente en puntajes 1, 2 y 1 que son las 4.
+Entonces los puedo dividir por esa suma ya y voy a pasar estas cantidades 1, 2, 1
+a 0,25, 0,5, 0,25 y eso sí lo puedo interpretar como una
+como una probabilidad ya se fijan ahora al hacer esa transformación yo
+digamos esfuerzo que todos sean números entre 0 y 1 y que además la suma de
+estos me de 1
+0.25 más 0.5 más 0.25 va a ser 1
+entonces qué es lo que yo voy a querer hacer para obtener y digamos
+esforzar digamos esta cantidad
+voy a ocupar la función que está acá abajo dice fijan el valor que tenía
+original lo voy a exponenciar y lo voy a dividir de la suma de los valores exponenciados, que es
+esta cantidad que está aquí. Entonces eso es lo que hicimos. Tengo el S, lo voy a exponenciar
+componente a componente y lo voy a dividir de la suma de los valores que están exponenciados.
+Y ahora yo podría definirlo SC de una forma más general, pero yo lo voy a definir para que el
+c sea igual a 1, cuando el c es igual a 1 entonces no tengo mayor problema y la suma de las
+lo que yo voy a interpretar como probabilidades va a estar definido y va a sumar 1
+entonces
+aquí el sub índice y ya este sub índice y de este p, fijan ahora lo voy a definir como un p con una
+probabilidad que hacer un cuarto, un medio y un cuarto
+ese sub índice y nos va a decir que debemos de vamos buscar la probabilidad
+asignada a la clase realmente observada ya tenemos las etiquetas entonces no
+necesariamente vamos a ocupar la probabilidad máxima que era la lógica
+de lo que yo le decía pero tenemos que compensar cosas que no es sólo
+simplemente si esto me da la probabilidad máxima, la mayor probabilidad, entonces es el valor que yo voy a predecir
+porque si no sería muy sesgado, muy inicial en análisis
+por ejemplo, si la clase verdadera recibió un valor o puntaje 0,1
+ya, es decir, el valor real recibió una predicción en términos de probabilidad de 0, 1, la pérdida,
+en este caso pérdida logarítmica, es aproximadamente, la pérdida recibió un 0, 1, entonces, aproximadamente
+recibió una, o sea, recibió la clase real recibió un 0, 1, la pérdida es aproximadamente
+2.3
+aunque otra clase haya recibido un valor alto si se fijan acá otro valor alto
+va a llegar a una pérdida menor
+la exactitud que nosotros y ahora hacemos referencia a cuando vimos los
+conceptos de métrica en la matriz de confusión solo registra si nosotros
+aceptamos a ese valor ya si no la juntamos entonces no va a computar
+digamos no va a estar dentro la métrica de exactitud
+ahora esa pérdida que nosotros estamos utilizando va a examinar cuánto respaldo
+le dimos a la respuesta correcta porque también nosotros no queremos
+simplemente equivocarnos siempre o que era el caso imagínense la que la
+vemos la tabla de confusión la matriz de confusión que a veces yo decía
+siempre que era que ningún correo era spam y podría tener métricas buenas pero en realidad no
+estaba solucionando nada. Entonces esta pérdida que estamos utilizando va a examinar digamos
+cuánto respaldo le dimos a lo que nosotros a esta respuesta digamos que estamos dando.
+Entonces por eso puede pasar que dos modelos que tienen la misma cantidad de aciertos en términos
+de lo que entra en la exactitud pueden tener pérdidas distintas porque no
+siempre voy a acertar en la forma que a mí me conviene. Acuérdense que acertar
+en el caso de los spams, digo que era spam y efectivamente era spam y
+digo que no era spam y efectivamente no era spam. Uno tiene un bastante más utilidad que otro.
+Entonces, pueden haber incluso digamos que un modelo digamos puede cometer más errores
+y tener menor perdida promedio, ya porque nosotros vamos a compensar de distinta manera.
+Entonces si se fijan a la curva mientras avances a la derecha, conforme avanza a la derecha
+o baja, ya baja al avanzar a la derecha, lo que está pasando es que da más probabilidad
+a la clase verdadera, o si yo doy más probabilidad a la clase verdadera, que vendría siendo
+el primer componente de este vector, entonces eso va a reducir la pérdida. ¿Qué quiere
+decir eso? Que si yo estoy seguro de que es esa y es efectivamente la clase verdadera,
+la pérdida de equivocarme va a ser menor, ya, en la forma en que yo estoy definiendo
+la métrica con la cual voy a definir si la red está ajustando correctamente.
+Entonces, el salto que pasa si se fijan, después de 0,5 la diferencia no es tanta,
+ya, en términos de lo que va bajando, pero cercano a 0, ya, es... el salto es sustancial,
+es sustancial porque esto es un logaritmo natural y el logaritmo natural cercano a 0 se va a infinito, digamos, a la asíntota.
+Entonces, esta es la forma en que nosotros vamos a ir midiendo la pérdida.
+Nosotros vamos a ocupar el menos logaritmo de la probabilidad real y la probabilidad real termina de nuestro conjunto de datos.
+Ahora, sabemos cómo operan dentro de las capas, dentro de neuronas, cómo podemos pasar a la capa de predicción,
+Pero estamos trabajando siempre, en el minuto de los cálculos, con un imágen.
+¿Cómo puedo hacer esto? ¿Cómo optimizo, digamos, tal como lo hago con las regresiones, etc.?
+¿Cómo encuentro cuáles son los pesos, los parámetros que tiene este modelo?
+Que son los distintos W y los distintos B, que son las cosas que yo puedo cambiar.
+No puedo cambiar cuántas capas son, no puedo cambiar cuántas neuronas artificiales son.
+Eso tengo que... ese nivel es para mucho, está predefinido.
+Entonces, ¿cómo lo hago? Y si se fijan, esta cantidad es algo muy similar a lo que ustedes ya conocen.
+Esta es la pérdida media y ese L podría ser otro tipo de pérdida.
+Y sabemos en esencia calcular la pérdida de una imagen que es ese L
+Entonces lo que yo hago, el primer término de este J que va a llamar es la pérdida media, el promedio de las pérdidas
+Y voy a hacer una especie de penalización
+y si fijan acá este theta dentro de la pérdida en esencia va a representar todos los pesos y todos
+los sesgos que podamos modificar porque si no tendría que poner muchos, todos los W y todos los b
+por eso pongo un theta simplemente que son los parámetros que yo quiero modificar para que
+que mejore o disminuya la pérdida porque ese va a ser nuestro valor.
+Ahora, esos valores van a cambiar las probabilidades que yo voy a estar asignando en la capa de
+salida.
+Entonces, ahora aquí es la clave que yo voy a poder definir que aprende la red porque
+tengo la métrica de pérdida que va a definir que también está aprendiendo o está ajustando
+y achuntando le digamos las clases que son las reales porque tengo una etiqueta y una
+penalización. En esa segunda parte, si se fijan, suma los cuadrados de los pesos, que
+es el W de las capas, y lo multiplica por lambda medios. Entonces el signo del peso
+desaparece al elevarlo al cuadrado, entonces se puede tener menos w al cuadrado
+se puede tener el menos w al cuadrado, o paréntesis de menos w al cuadrado
+lo mismo que w al cuadrado, entonces los pesos lo estamos viendo en términos de magnitud
+y si duplicó la magnitud de los pesos, se cuadraplica, en esencia si es
+duplicó el W, pasó a ser 2W, ahora en esta métrica va a ser 4W cuadrado.
+Entonces se va a amplificar mayor más, su contribución se cuadra y implica.
+Entonces este lambda, tal como por ejemplo está el lambda en la penalización ridge o
+la penalización lasso, incluso el spline si lo conoces,
+Contra, digamos, cuánto pesa esa preferencia por pesos pequeños frente al ajuste a los datos.
+Entonces, se fijan qué tanto preferimos W o pesos grandes.
+En general, el mínimo va a ser de la función completa.
+entonces vamos el modelo la optimización va a jugar con esas dos cantidades de la pérdida con la
+penalización en términos de sus pesos ya porque no si yo simplemente llevo los pesos a cero
+eso se va a pelear bastante puede poder podrían pelear bastante las predicciones si entonces
+esa va a ser nuestra cantidad de que nosotros vamos a hacer nuestra función objetivo en el
+si se fijan la pérdida media con una penalización ya entonces esta penalización
+como nosotros vamos a querer que minimizar esto porque queremos que el peso sea lo más chico
+entonces queremos que el jota sea lo más chico va a desincentivar que los w sea grande porque si
+los w son muy grandes hasta el cuadrado se va a cuadriplicar y esta cantidad va a ser más grande
+y yo que lo que quiero es minimizar toda esta cantidad.
+Entonces, esto es una penalización per se.
+Entonces, va a tratar de, con esta función objetivo,
+va a tratar de que los W sean tan grandes.
+Eso va a tender cuando se optimiza.
+Entonces...
+Sabemos entonces que tenemos nuestra función objetivo
+y queremos ver cómo obtenemos ese valor.
+Ya, ese valor va a utilizar la función objetivo y en esencia vamos a ocupar el gradiente,
+que es la forma multivariada de la derivada, ya que con la derivada encontramos máximo
+y mínimo, ¿sí?
+Entonces, lo que nosotros hacemos es derivar componente a componente, ya, si por ejemplo
+el W, o sea, el J en función de los pesos es W-3 al cuadrado, yo lo derivo y puedo ocupar un eta, digamos.
+Yo lo voy a definir en términos de esta cantidad de penalización.
+Y yo puedo definirlo en términos de... para encontrar, digamos, si se fijan acá, W es una variable.
+Entonces, W es lo que nosotros queríamos encontrar.
+Y por eso ustedes se fijan y lo han escuchado quizás que son estos modelos de inteligencia artificial que son como libres, se le llaman modelos como open weight, que son con los pesos libres, es decir, ya se conocen cuáles son estos W y por consecuencia tú conoces todo lo que hace ese sistema
+que obviamente no son exactamente estos porque son bastante más complicados, pero se conocen los pesos, porque los pesos son los que definen en esencia la red.
+una vez que yo sé los pesos es mucho más fácil yo pasarte mi red de neural
+y tú fácilmente la vas a poder ocupar
+utilizar la red de neural no es tan costoso como entrenar la red de neural
+entonces con esta cantidad y el gradiente digamos
+nosotros podemos encontrar esos pesos que minimicen
+esta cantidad que va a ser nuestra función objetivo
+y mi esencia es que minimicen
+la pérdida media, pero que tenga una penalización para pesos grandes.
+Entonces, veamos un ejemplo completo.
+Lo vamos a hacer con una observación para que sea bastante más sencillo.
+Tengo una entrada, una unidad oculta y una salida binaria.
+Entonces, tengo que el x es 0,5 y la etiqueta, el y, es 1.
+Tengo los parámetros entonces W1, B1, W2, B2, sus pesos asociados
+0.4, 0.1, 0.8, menos 0.2
+Entonces calculo la primera activación
+A1, W1 por X más B, que es el sesgo
+Entonces W1 es 0.4 por la primera componente, que en este caso es 1, son la componente antes acá
+Recuerden A1, 1 y A1, 2
+Entonces a1, 0,4 x 0,5, más el sesgo, que es b1, que es 0, b1, que es 0,1, 0,4 x 0,5, más 0,1, 0,3
+Ahora aplico una función relu, una función de activación, entonces va a ser el máximo entre 0 y el valor de a, 0,3, queda como 0,3
+Ahora, esa función de activación, si se fija en esto, es la capa oculta, y esto es la función de salida, la capa de salida.
+Va a ser el segundo peso, W2, con su sesgo asociado, pero ahora lo que entra aquí es lo que salió de la capa oculta, que es 0,3.
+entonces va a ser el segundo peso que es 0,8 por el valor que salió de la función de activación que es 0,3
+0,8 por 0,3
+más
+el sesgo es menos 0,2
+menos 0,2 que eso me da 0.04 y ahora se pica eso es lo que entra en la función de activación
+de
+la capa de salida y dijimos que la capa de salida y ocupar una función de activación softmax
+y la función de softmax entonces sabemos que tenemos que exponenciar ese valor
+ocupar esta cantidad en principio que otra forma de escribir lo que está acá
+Esto es para todos las variables pero en este caso sólo para una, no hay mayor problema
+Entonces 1 más 1 más 1 sobre, perdón, 1 más exponencial de menos 0.04 y eso es
+aproximadamente 0.51. Ahora aplico y veo la pérdida logarítmica de esto que es menos
+logaritmo de p que es aproximadamente 0.67 y si se fijan siempre calculo un producto
+por sus pesos, lo meto con una función de activación, eso me va a dar un valor, ese
+valor ahora entra a otra función y así voy juntando y si se fijan eso es súper
+consistente con el concepto que le había dicho yo que era una seguidilla o
+una secuencia de procesos matemáticos para de transformaciones funcionales
+digamos de números, entonces aquí hago producto por suma, función de activación,
+esa función de activación entra en otro lado y así sucesivamente, yo pudiese seguir
+haciendo esta función, que en esencia es transformar el espacio de datos, digamos, a algo muy, muy no
+lineal, que hay algo no muy, muy no lineal, quizás en esos espacios sí se puede identificar bien las
+clases, que quizás en el espacio original no se podía distinguir. Entonces,
+Despegan ese es el cálculo, digamos, estandar ahora. Veamos. Nosotros sabemos y les comentaba que
+la clase del ejemplo que nosotros vivimos, les dije, es etiqueta 1, porque estábamos trabajando
+en clase binaria, entonces igual a 1. Sabemos que la perdida está definida con menos logaritmo de esa
+de ese p esa probabilidad
+pero tenemos que identificar digamos un término que está definido como el y
+menos p ya o p menos y más la verdad
+la pérdida va a depender de p porque el l es menos lo mismo de p ya y esa pérdida
+o esa probabilidad de depende del puntaje de a 2 y el a 2 depende del a 1
+Entonces, en el ejemplo de nosotros, i es igual a 1, por lo que la pérdida, que es menos logaritmo de p, y su derivada, que vendría siendo menos 1 sobre p, por consecuencia, también voy a tener, por regla de la cadena, digamos, voy a tener esta cantidad,
+voy a poder encontrar la derivada de, que en esencia es la forma de optimizar, de la pérdida conforme el valor original que yo estaba trabajando, que era la salida de activación
+eso me va a llevar y me va a llevar a un valor que va a ser p-1 en términos simbólicos, algebraicos
+Ahora, ahí lo único que estoy haciendo es ocupar regla de la cadena porque yo sé que
+esto depende de P, P depende de A2 y por consecuencia entonces L le depende de P a 2, entonces
+es simplemente regla de la cadena.
+La forma en que estoy optimizando este valor.
+Si la clase fuese 0, porque en el ejemplo igual era 1, acá y es igual a 0, la perdida
+ahora ya no va a ser menos logaritmo de p sino que va a ser menos logaritmo de el
+recíproco, que es clasificación binaria entonces va a ser menos logaritmo de 1
+menos p y voy a poder hacer el mismo ejemplo con regla de la cadena y voy a
+quedar con p ya en ambos casos el delta 2 ya que vendría siendo esta derivada lo
+puedo reescribir como p menos y eso es un caso particular de cuando ocupo la
+capa de salida la función de sigmoide la función sigmoide y además ocupo
+entropía, entropía cruzada binaria, no el caso general pero para este caso es un
+poco más cómodo porque trabajo con premios y simplemente.
+Entonces, vimos en la anterior que ese delta 2 me daba 0,49 en negativo.
+En el lado a cada izquierda, yo voy a tener esencia
+en los distintos puntajes. Por ejemplo yo sé que a2 es w2 por h que es la salida de la primera capa más el segundo sesgo b2
+su derivada respecto a w2 va a ser 0,3 ya está exactamente acá
+entonces la derivada de la pérdida respecto al segundo peso va a ser simplemente delta 2 por h
+estoy simplemente devolviéndome los cálculos y reemplazando que va a ser menos 0,49 por 0,3 que
+es la h, ¿sí? estoy reemplazando simplemente me llega a menos 0,14
+ahora para el b2 que es el otro sesgo el multiplicador es 1
+y simplemente va a quedar delta o la derivada de la entropía respecto al
+segundo sesgo simplemente como menos 0,49 si? entonces si se fijan se sacan de la
+tropia respecto al segundo peso y el primer peso pero eso es los parámetros
+de salida estoy si se fijan acá estoy tratando de optimizar los pesos cuando
+hago ahora en la capa de la primera capa la
+capa oculta yo voy a definir el término del delta 1 delta 1 va a estar
+dependiendo de delta 2 el segundo peso y la salida o derivada de la ReLU entonces
+va a ser delta 2 que lo acabo de calcular está acá el w2 que sabemos que es 0,8 y la derivada
+digamos que es 1 entonces me va a quedar 0,392 y ahí llegó los primeros cuatro parámetros y ahí
+si se fijan lo que estoy haciendo estoy partiendo de la salida y me estoy devolviendo me estoy
+devolviendo. Calculo de igual manera la derivada de la pérdida respecto al primer
+peso y al primer sesgo. Si se fijan, todos estos cálculos lo único que hacen es sacar
+derivada de la entropía respecto a los distintos pesos y a los distintos sesgos.
+Y cuando hago eso, los reúno, los junto. Junto todas estas cantidades en un vector.
+Y si se fijan lo que hace es juntarme esta cantidad los distintos pesos de
+el 0,147 y el 0,49 y lo que hace es la derivada. Si se fijan esto es el vector de derivadas.
+la entropía derivada respecto a w1 que es 0,196, la entropía o sea la
+perdida perdón la perdida logarítmica respecto a b1 que es esta cantidad que
+está acá respecto a w2 y respecto a b2 y si fijan este es el equivalente de la
+derivada pero en más dimensiones eso es todo lo que estamos haciendo
+que es la forma que nosotros tenemos para optimizar y encontrar los mejores
+valores que me minimicen esta cantidad
+en esencia lo podemos hacer
+matemáticamente en computador bastante fácil
+ahora eso es lo que nosotros llamamos
+back propagation o retro propagation, retro propagation en esencia saco los valores y
+después calculo sus gradientes tal que eso me sirve como insumo para
+optimizar la cantidad J, ya voy a cambiar los pesos tal que esa cantidad
+que se le queda aliente de la eriva sea menor
+o el j sea menor en principio entonces lo que hago ahora es aplicar esta
+cantidad voy a querer que en la siguiente iteración que yo haga cuando
+siga optimizando
+esa cantidad de los parámetros se vea digamos el j se vea diminuir y por
+consecuencia también la pérdida probablemente sea se vea diminuida
+entonces luego de esto todas las calculadas que todas las derivadas que
+calculé en un principio ya se calcularon digamos antes de empezar a
+cambiar los parámetros yo todos estos valores que están acá si se fijan todos
+estos son el gradiente los valores que están aquí
+y ahora lo que hago son los valores originales que yo tenía 0,4, 0,1, 0,8,
+menos 0,2 que son las variables que están acá
+iniciales yo les voy a ocupar menos un ETA por esa
+razón o tasa de cambio dentro de los distintos parámetros
+pues es un eta de 0,1 que hace referencia a la penalización
+una noción de
+digamos de peso dentro de esa razón de cambio.
+Entonces
+se fijan tengo el valor original menos ese eta por
+la componente específica dentro del gradiente y ese va a ser mi nuevo ahora
+nuevo parámetro. Ya no voy a trabajar con 0.4 sino que voy a trabajar
+con 0,41 y lo que voy a hacer ahora voy a calcular lo mismo es decir voy a calcular el 0.5 que era
+nuestro x pero ahora ya no con estos valores no con este w1 inicial sino que con con el w1 actualizado
+Entonces, si se fijan, yo puedo seguir haciendo estas cosas.
+Calculo el venta al inicial, lo multiplico, función de
+activación, llega la probabilidad,
+me devuelvo y calculo las probabilidades,
+o sea, las derivadas, digamos, del término numérico con el
+gradiente, actualizo los pesos de los parámetros o los
+parámetros en general, que estos son los pesos y los
+sesgos, y calculo nuevamente.
+entonces voy calculo me devuelvo actualizo los parámetros calculo de
+nuevo calculo la saca el cargo el cálculo en términos de la producto de
+las sumas más la función de activación llegó a la última capa de salida
+calculo los gradientes actualizo los parámetros
+calculo de nuevo y así sucesivamente y por eso son un bucle ya estos son
+son, potencialmente son bastante intensivos, entonces porque calculan muchas veces y van
+actualizando los parámetros hasta que sigue o se llega una regla de parada, es decir,
+si por ejemplo todos los parámetros cambiaron muy muy poco, entonces ese es un, una buena
+cantidad de parámetros óptimos, ya. Y eso es lo que hace la red, así es como
+aprende parte de unos pesos iniciales calcula ve que tanto fueron las tasas de
+cambio actualiza los parámetros al actualizar los parámetros calcula de
+nuevo y hace esto nuevamente un bucle hasta que los parámetros cambian muy muy
+poco y cuando cambia muy muy poco entonces muy poco entonces dice paramos
+ya y eso van a ser nuestros pesos eso es todo lo que hace una red en cómo lo
+entrenamos ahora qué es lo que nosotros hacemos entonces
+cuando ya hacemos y terminamos ese bucle nosotros vamos a calcular todos sus
+sesgos vamos a tener los sesgos y vamos a tener además todos los pesos
+entonces cuál es el círculo el bucle calculan las predicciones que son los
+valores finales voy a medir la pérdida, calcular los gradientes, actualizo los
+parámetros, lo meto en un optimizador y ese optimizador me va a hacer repetir
+esta cantidad hasta que yo llegue a
+un valor digamos óptimo ya pero en general en términos de un criterio de
+parada, es decir que si los parámetros no cambian mucho después de mil veces
+que hago eso entonces me quedo con eso no hay una forma de óptimo global en general
+entonces
+términos conceptuales lote actualización y época nosotros hablamos de un lote ya la actualización
+que nosotros hablamos en términos de actualizar los parámetros y la época que no lo hemos
+mencionado. Entonces no son equivalentes. Un lote simplemente nosotros le vamos a
+llamar un grupo de observaciones. A la actualización o una actualización va a
+ser, va a cambiar los parámetros a partir de ese lote. Porque si yo pongo
+una cantidad de parámetros, o sea una cantidad de imágenes,
+eso me va a hacer cambiar los
+los pesos ya no necesariamente aquí se tiene que hacer una observación a una observación porque como nosotros vimos en un inicio
+está acá esto puede tener distintas dimensiones
+si yo quiso hacer hacerlo que todos los lotes fuese de uno entonces tendría que hacer
+una observación
+actualiza parámetros otra observación actualiza parámetros que es muy costoso entonces lo que yo hago es poner cientos
+pequeños batches o batch o lotes para
+que aprenda digamos en términos de
+bloques y le paso 10 imágenes y con eso
+actualiza los primeros parámetros y
+luego le paso otras 10 imágenes etcétera
+entonces eso tengo los primeros
+es lo que nosotros le vamos a llamar los lotes
+una actualización va a cambiar los
+parámetros conforme un lote predefinido
+y una época ya o una época completa en
+principio una época completa el o termina más bien el recorrido por todas
+las observaciones de entrenamiento es decir si yo digo que un lote de diez y
+tengo 100 observaciones cuando hace 10 por 10 o a 10 más 10 más 10 y cumplir
+las 100 entonces eso pasa a ser una época y ahora yo puedo seguir pasando
+observaciones para seguir actualizando pero eso es una primera época es para
+tener una métrica de que tantas veces estamos haciendo las cosas
+entonces por ejemplo si tengo 1077 imágenes que el caso que nosotros
+estábamos viendo en el ejemplo de los dígitos
+si hago 16 x 64 ya que es 1024 va a cubrir los lotes completos
+si hago ventanas digamos de 16 ya
+y van a quedar en esencia una colita que son 53 valores o 53 imágenes entonces
+yo puedo cuantificar cuántas
+cuántas actualizaciones voy a hacer por época y voy a hacer entonces 17
+actualizaciones por época porque caben 17 lotes, cada lote me hace una
+actualización completa de los parámetros por consecuencia si yo hago por ejemplo
+120 épocas cada una tiene 17 actualizaciones yo voy a hacer 2040
+actualizaciones de parámetros y al final como este los 53 valores que me
+quedaron restante porque yo hice una descomposición 16 x 64
+y 53 el último lote no va a completar las 64 imágenes por
+consecuencia lo voy a hacer al final y con ese simplemente voy a tener el
+restante de entrenamiento si se fijan cada época me va a actualizar los
+parámetros y ya se dan cuenta que ya son hartos parámetros y lo estoy
+actualizando muchas veces entonces esto es un proceso que es naturalmente muy
+iterativo hacen la misma cosa muchas veces pero la van mejorando
+de a poco ya en cada época yo actualizo y espero que esa pérdida disminuya y
+después disminuya disminuya disminuya y cuando vemos que la pérdida se estanca
+entonces decimos hasta que llegamos porque seguir haciendo la actualización
+podría o conjeturamos más bien la verdad es que no pareciera seguir
+mejorando aunque hoy hay casos ilustres digamos que la pérdida baja baja baja
+baja baja y está mucho rato mucho rato en plano donde uno en la práctica dice
+ya esto no va a mejorar y después de muchas épocas mejora por algún motivo
+No se sabe por qué, digo, se pasó, pero mejora en algún sentido.
+En la práctica lo que nosotros hacemos es que si ya la mejora no sigue disminuyendo,
+o sea, la pérdida no sigue disminuyendo, la paramos, porque si no, cada vez vamos a estar teniendo, digamos, un costo computacional bastante alto.
+Todas estas cosas pueden fácilmente pasar días y semanas computándose.
+Entonces, siguiendo.
+utilicemos esta pérdida digamos o esta función de j como le voy a hablar acá
+un l que es el w los pesos menos 3 al cuadrado y va a cambiar simplemente la
+tasa en la cual yo voy a estar modificando los parámetros y se fijan
+acá dependiendo de la tasa en la pérdida cuadrática que es la penalización es el
+lambda va conforme yo voy haciendo más actualizaciones la pérdida va a ir disminuyendo o va a ser
+menor más bien. Entonces esa tasa que también es un hiperparámetro también va a jugar
+un rol fundamental cuando nosotros hagamos este tipo de metodologías tal como cuando
+si vamos por ejemplo regresiones o se hacen regresiones con ridge o
+compensación ridge o con penalización lasso es el lambda que está asociado que
+el valor de penalización en cuando tengo la función de error cuadrático o sumo
+cuadrado error perdón más esa penalización va a influir mucho porque
+va a depender qué tanto que tanto penalizo que lo való en ese en ese
+contexto que los parámetros sean de una magnitud mayor que si se fijan es muy
+similar a interpretación que le estamos dando dentro de este contexto
+ahora si se fijan cuando nosotros empezamos y hicimos el ejemplo 1 a 1
+partimos de acá de que los pesos están predefinidos el primer peso es 0,4 el
+segundo peso es 0,8 pero porque en ningún lado no definimos por qué yo lo
+discomodado. En principio no sabemos cuáles son esos pesos porque son los que nosotros queremos
+encontrar. Entonces hay formas y heurísticas que dicen que uno podría dar, por ejemplo,
+pesos uniformes, todos los pesos que sean iguales y después con las actualizaciones van a llegar al
+el valor idóneo, óptimo que nosotros queremos, pero en principio cuando nosotros queremos empezar a entrenar una red
+necesitamos valores iniciales para todos los parámetros, los pesos y los sesgos, entonces para todos los W para todos los b
+y si se fijan estos son los que nosotros dimos por este vector, pesos y sesgos
+Entonces, en la figura que está a la izquierda, que se deja acá, va a mostrar, digamos, son
+tres unidades con las mismas conexiones de entradas. H1, H2, H3, con los mismos pesos.
+Y en el de la derecha, distintos pesos. Entonces son entradas con pesos iguales, entradas con
+pesos distintos. Entonces, son intercambiables en principio, entonces estoy haciendo un pequeño
+experimento. ¿Qué pasa si todas las entradas tienen los mismos pesos? ¿Qué pasa si los pesos son
+distintos? Si yo tengo pesos buenos, pensémoslo así, nosotros tenemos pesos óptimos y no sabemos
+cuáles son si mis pesos están muy cercanos a esa cantidad óptima
+se va a demorar menos la red en minimizar comillas ese esa pérdida cuadrática
+luego esa pérdida logarítmica pero entonces
+y se tiene acá tenemos distintas formas de definir los
+los pesos que yo voy a establecer para dar recién inicio al proceso de
+de entrenamiento entonces
+qué pasa con esto a priori nosotros no sabemos cuáles son los pesos óptimos en general se define
+pesos uniformes como en el lado de la izquierda porque en general en estadística y en cienciado
+cuando yo no sé nada yo asumo que todo es más o menos igual, los uniformes y tiende a ser una
+buena parsimonia en principio. Nosotros tenemos que tener bien claro que la red en encontrar los
+pesos óptimos se podría demorar más si los pesos que yo escogí como iniciales, pesos y sesgos me
+refiero, está muy lejano de los óptimos. Por eso, a veces pasa que la red se demora en aprender
+bien llegar a esos valores e incluso a veces dependiendo de los pesos iniciales, pudiese no
+llegar a los valores óptimos y no tener valores muy buenos, digamos, sólo porque los pesos iniciales
+o mis parámetros iniciales no fueran buenos. Entonces, cuando no tengo buenos resultados,
+significa que la red esté mala, sino que quizás los pesos iniciales que yo utilicé
+no fueron correctamente escogidos. Porque aquí el descenso gradiente y el
+cuando llamo el gradiente es una métrica local. Entonces trata de buscar mínimos y
+máximos locales que no significa que sea el global. Entonces encuentro soluciones
+que funcionen, pero no soluciones que sean las mejores en principio. De una manera
+para el prográsco lo quiero decir.
+Ya, entonces, los pesos, tenemos que tener cuidado con cómo
+inicializamos estas cantidades.
+Otro concepto que es la capacidad de la misma
+regularización, que es el término que estamos utilizando
+dentro de nuestra función objetivo.
+Si os fijan acá, conforme yo voy a tener los distintos pesos,
+yo voy a tener distintas penalizaciones, entonces con un alfa igual a 1 yo voy a tener en esencia
+una ecuación cuadrática, y que se va a ir penalizando en esencia valores muy grandes
+cuando tengo un lambda muy grande se va a penalizar de manera cuadrática, es decir,
+el valor de la penalización nuevamente es esta cantidad por eso está cuadrado, va a
+mayor y por consecuencia se va a penalizar más. Recuerden que nosotros estamos tratando de
+minimizar esa cantidad. Entonces, que sea un valor más grande, esta penalización no es algo bueno
+en principio para nosotros. Y cuando un pre-pnalización es un 501, entonces no le importa mucho que los
+pesos sean muy grandes. Entonces, ese valor que nuevamente también es un hiperparámetro. Entonces,
+aquí tenemos un sinfín de configuraciones, no sabemos cuántas capas tenemos que utilizar,
+no sabemos cuántas neuronas tenemos que utilizar, la función de activación tampoco,
+si bien tenemos cierta receta y ciertas heurísticas que podemos utilizar,
+por ejemplo para la función de activación de la capa de salida,
+la forma matemática que vamos a representar la entrada,
+en muchas configuraciones, entonces cuando empiezo a ver todas las configuraciones que puedo hacer,
+son demasiadas, entonces en este sentido la experiencia trabajando con este tipo
+de metodología en algún campo en particular tiene que ser bastante
+digamos sustancial porque tienden a hacer cosas que funcionan y siguen
+funcionando dentro del mismo contexto, ya entonces dado que tengo muchas
+posibilidades y por consecuencia muchos hiperparámetros
+no puedo decirte en ningún momento, bueno si alguno me pregunta ya cuántas
+cuántas capas les pongo, cuántas neuronas hago, las terretes, como no sé, a priori yo no te puedo decir
+cuál es, cuál debíse ser esa configuración porque la tienes que probar. Entonces, naturalmente
+estas metodologías tienden a ser mucho prueba y error. Pruebo, veo cómo funciona, cambio los
+hiperparámetros, pruebo, veo cómo funciona y trato de encontrar y llegar una solución, en términos de
+alguna métrica en particular. Ahora, todo esto aplica con las metodologías que hemos visto antes,
+separación entre entrenamiento y prueba o test, o training y validación, digamos,
+training y testeo, perdón. Y en general nosotros vamos a tener gráficos de este
+estilo, digamos. Vamos a tener un entrenamiento y una validación. Y en general, si se fijan,
+acá tengo la perdida logarítmica. Conforme yo tengo más épocas, que si se fijan es como dejar
+el modelo aprendiendo, si yo tengo, dejo mucho ocurriendo el modelo, de decir,
+realiza la la operatoria, saca los gradientes, se devuelve, actualiza los
+parámetros y así sucesivamente y lo hago con mucha época, es decir, sigue aprendiendo los
+datos, sigue aprendiendo los datos, si lo dejo mucho tiempo, el error o la
+la pérdida logarítmica va a ir tendiendo a cero porque ya voy a entrar a un punto de sobre ajuste
+en donde ya no va a aprender del fenómeno sino que va a estar aprendiendo exactamente de los
+datos porque lo ha visto tantas veces que dice bueno es el fenómeno mis datos son el fenómeno
+no son lo que estoy tratando de modelar con que en mi objetivo sino que simplemente estoy modelando
+los datos. Un obstante, para la validación tiende a estancarse en cierto punto.
+Siguiendo, entonces si usted...
+Entonces,
+que
+catalogamos acá, vamos a tener gráficos de ese estilo.
+Ahora, en la figura que tenemos acá, si se fijan, tengo la separación,
+entrenamiento, validación y prueba. Yo lo voy a separar. En el entrenamiento voy a
+tener 1077 imágenes, la validación va a tener 360
+y el conjunto de prueba 360. Recuerden que la validación es la que yo pruebo
+y cojo mi modelo. Ahora, la regla con la cual yo voy a escoger el
+modelo, y esto nuevamente, este modelo va a ir a competir con otros modelos,
+lo voy a definir en términos de
+quien el modelo que tenga la menor pérdida de la logarítmica en validación
+y vamos a guardar digamos cómo cambia cada uno de los parámetros, si? Entonces
+siguiendo, el código que está disponible dependiendo si lo ocupan en R, en R o Python
+lo pueden ir corriendo y aquí está digamos la sección o la separación que
+casi cada sección. Primero configura, si se fijan voy a definir cuáles son todos los
+hiperparámetros porque los tengo que pre-definir, los tengo definir antes de ejecutar la red.
+Luego los voy a entrenar, voy a encontrar y copiar los pesos y luego voy a inspeccionar,
+digamos, las distintas métricas y cómo cambia esta cosa. Todos los resultados que están
+en esta presentación son del código en Python, no del código en R. Pueden diferir en cierto
+sentido por la forma en que están programados, pero es usualmente cuando uno pone, no son
+tantas diferencias digamos computacionales, las mayores diferencias vienen por distintos
+tipos de peso o distintas inicializaciones que se utilizan.
+Entonces vamos a utilizar digamos dos candidatos de modelo, de dos redes, que son las dos que
+hemos visto se fijan cuando nosotros vimos la métrica y lo definimos
+trivialmente hace rato ya pero volver la arquitectura 64 por donde entrada por
+lo por la entrada de las imágenes 32 por el número de neuronas artificiales y la
+capa de salida y se fijan acabamos de hacer dos cosas que tienen la misma
+entrada la misma salida pero en la capa oculta difieren 64 16 10 y 64 32 10
+pues es sólo una tiene más neuronas que otra las capas para tener una una
+función de activación rectified linear o relu oculta y softmax de salida porque
+estamos bajo el mismo problema el ajuste ya que voy a ocupar yo el optimizador
+vamos a un optimizador que se llama adam ya que lo podemos ver un poco más adelante
+una tasa de aprendizaje de .002 y los lotes 64 y este alfa que hace referencia
+a ese ETA que estábamos utilizando anteriormente.
+El presupuesto que vamos a tener que en la esencia es una forma de
+cuantificar qué tanto puedo dejar el modelo corriendo,
+va a ser 120 épocas.
+Entonces, vamos a ver un modelo mejor y va a aprender más rápido.
+Entonces, quien aprenda más rápido en 120 épocas debe ser
+funcionario mejor, ya al menos en términos de validación y
+esperamos que prueba.
+Entonces, yo voy a seleccionar el modelo con la pérdida
+logarítmica
+en python
+vamos a utilizar scikit-learn y en R lo
+lo vamos a ocupar digamos con un ajuste independiente
+que lo vamos a utilizar. Sin embargo hay varios paquetes
+que hacen todas estas cosas de manera un poquito más automatizada y con
+distintas implementaciones. Entonces
+si se fijan acá vamos a tratar de abrir la red
+y vamos a visualizarlos, ya, porque son tantos números que tenemos que, los que se tienen que ver
+que es un poco más difícil de verlo como número porque no vamos a verle esos patrones
+entonces, si abrimos la red, que vamos a entrenar y ustedes lo pueden ejecutar con los códigos
+se fijan acá, W, que es dos pesos, tiene 64, dimensión 64 por 32
+Cada columna de SW contiene los 64 pesos de una unidad oculta.
+Esto es una unidad oculta. Y son 32 unidades ocultas o son 32 para el lado.
+Esos valores se van a multiplicar, vamos a multiplicar los pixeles por esos pesos de esa columna.
+se le va a sumar el sesgo y ese valor que sabemos que era, no se olvida el A
+se le va a sumar el sesgo y luego se le va a aplicar la función de activación
+si se fijan esto lo que estamos haciendo
+estas son 360 imágenes por 64
+por los pesos más el sesgo, esto entra en la función de activación que me entrega el H
+entonces si ustedes hacen el análisis matricial, esto me va a entregar 360 por 64 que es la dimensión de X
+por la dimensión de W1 que es 64 por 32, este 1 hace referencia al entorno de imagen
+más un vector de 32 eso me da una matriz h que vendría siendo las funciones de
+activación o los valores de activación de 360 por 32 que lo lo vemos de esta
+manera sabemos que esos valores ahora entran cuando queremos calcular la
+segunda cantidad que nosotros le llamamos s por ejemplo multiplicamos los max que
+ahora este h hace de x con los segundos pesos le sumo el segundo sesgo y
+aplico la función softmax y llego las probabilidades de salir si se fijan
+siempre es entrada sal a una función o entra una función esa función me
+entrega algo ese algo ahora entra otra función y esa función me saca algo y
+eso puede entrar a otra función en este caso simplemente lo hacemos una vez
+tengo unos datos, entra una función, eso sale, ese de salida que vendría siendo esta matriz H, entra en la función
+en este caso de acá, ya con los segundos pesos, aplico la función softmax y eso me lo mapea a probabilidades de clasificación
+y aquí lo podemos visualizar. Simplemente aquí yo puedo
+aumentar el número de las... cambiar las dimensiones y cambiar cuántas veces saco
+esta composición de funciones en esencia que es lo que estoy haciendo en términos numéricos.
+Ahora, cuando veo los resultados, la red con 16, con ancho 16 y la red con ancho 32, en
+el caso de la red 16 va a alcanzar su mejor pérdida porque nada me dice que conforme
+yo aumente la cantidad de épocas la pérdida siga bajando, pues también puede pasar que
+aumentan las épocas y en algún punto empieza a subir el error.
+O sea, acá en la época 116 la red con 16 capas, o sea 16 neuronas, alcanza su pérdida
+de validación menor, o su mejor pérdida de validación más bien.
+Y la 32, la que tiene una red de 32 neuronas artificiales,
+alcanza un valor menor, pero lo hace en una época mayor.
+Pero si se fijan, uno esperaría esa dinámica.
+Si yo agrego más neuronas, la hago más compleja,
+va a aprender mejor, o va a aprender más, digamos, pero se va a demorar más también.
+Entonces, tengo ahí una noción de qué tan complejo quiero que sea mi modelo,
+conforme a qué tan bueno quiero que sea mi ajuste.
+Entonces, en este caso la diferencia es bastante poca.
+Dos épocas y bajo, digamos, en 0,02 aproximadamente, y un poco más,
+en la pérdida logarítmica.
+Entonces, esto sugiere que nos quedemos con la red con 32.
+Y se fijan, los gráficos son bastante similares.
+Esto es lo que ustedes van a ver cuando lo ejecutan y cuando
+las cosas se demoran mucho, este gráfico se va haciendo de
+poco.
+Porque si se fijan, aquí está calculando la pérdida
+logarítmica, esta sin penalización,
+y va calculando a poco.
+y cada época, dependiendo de la magnitud y complejidad de la red y tu input, se puede
+demorar mucho. A mí me ha pasado que, por ejemplo, trabajo con imágenes de mayor magnitud
+y esto se va ejecutando punto a punto y cada punto se demora 10 minutos, al tal punto que
+llegar al gráfico de acá será un par de horas y aquí uno lo va haciendo. Entonces,
+tiene que poner una regla de parada y aquí pareciera que se entregó la
+pérdida logarítmica es la menor. Si se fijan las dos redes son prácticamente
+similares pero la con 32 llega a un ajuste a una pérdida menor, por
+consecuencia nos quedamos con eso. Entonces, si fijen acá
+eso nada me dice que una va a ser mejor que otra cuando lo pruebas con nuevos
+valores porque puede ser que la red con 32 neuronas sea
+haya sobreajustado, que no es algo que nosotros queremos. Entonces voy a hacer la prueba
+con otros modelos porque cuando lo hice con la validación estuve escogiendo dentro de redes, es decir, una red con 16 o una red con 32
+y ahora esa red también tiene que ser mejor a otros modelos que también hemos escogido, por ejemplo, una regresión logística
+Y vemos acá que cuando lo pruebo en, digamos, imágenes que el modelo no conoce, tengo una
+pérdida logarítmica mejor con la red neuronal que con, por ejemplo, un modelo de regresión
+logística.
+tengo una pérdida logarítmica menor, pero si se fijan, la red tiene más errores dentro de las 360
+imágenes. Entonces eso es lo que hablábamos en el inicio, yo puedo tener una pérdida menor pero
+mayores discrepancia en términos de errores que no la chunto, no la chunte al valor que efectivamente
+iba que debiese ser. Pero en términos de la pérdida logarítmica, es menor que en nuestra métrica.
+¿Verdad?
+Las logísticas, o si, cometen menos errores, pero no las junto tanto, tampoco.
+Entonces, hay una, se sopeza, digamos, estas dos cantidades,
+generar una pérdida logarítmica tiende a ser una buena cantidad, digamos,
+para una métrica buena para este tipo de métodos de tareas,
+que son clasificación multiclase.
+Si se fijan acá en términos de métrica usuales, la exactitud de la logística es 97.78 y de la red 97.22.
+Entonces si se fijan acá, si nos guiamos por las métricas que siempre utilizábamos en términos de la métrica de exactitud,
+uno diría, bueno, la logística es mejor.
+Pero cuando uno aceleralece un poco más profundo, ve que no necesariamente la exactitud es quién me va a definir el modelo mejor,
+sino que además tenga que ver alguna métrica de perdí, en este caso la perdida logarítmica es menor en la red, por lo cual preferimos esa.
+Entonces, aquí estamos viendo el caso binario, un ejemplo que tenemos la clasificación binaria,
+y vemos los umbrales en los cuales nosotros vamos a definir.
+le vamos a definir un numeral de 0,5 como el estándar y vemos un caso, digamos, hipotético de por qué
+estas métricas que están acá, que es decir, por qué pasa que la pérdida logarítmica es menor,
+pero se equivoca más y tiene peor exactitud, pero al revés, tengo mayor pérdida logarítmica,
+pero me equivoco menos. Entonces, es un poco confuso porque es como, bueno, yo me quiero equivocar menos,
+pero también no quiero tener mayor pérdida en términos de lo arremi, entonces ¿por qué puede pasar esto?
+es porque cuando
+va a depender de qué tanto es la probabilidad que yo asigno a la clase
+ya recuerde que nosotros también queremos penalizar hacer
+predicciones malas muy seguros ya entonces también queremos penalizar eso
+y eso es lo que cuantifica, digamos, la métrica, la métrica de pérdida logarítmica, no simplemente
+la probabilidad. Entonces eso se está cuantificando cuando veo y porque utilizo la pérdida logarítmica
+para, digamos, penalizar ese tipo de actitudes, comillas, que puede tener el modelo, es decir,
+como equivocarse pero con ganas, entonces una probabilidad muy grande de equivocarse,
+Así es, como que el modelo diga que está muy seguro,
+siendo que no debies haber estado para nada seguro porque
+no era una buena predicción.
+Eso también lo queremos analizar cuando vemos y escogemos el
+mejor modelo para este tipo de metodologías.
+Entonces, si fijan acá, cuando lo implemento para las
+imágenes, ya. Esto es el equivalente cuando a una matriz de confusión, ya. O la matriz
+de... ¿Cuántas veces le estoy adjuntando? Si se fijan acá, es un equivalente de matriz
+de confusión para múltiples clases. Si la etiqueta real del número era 0 y efectivamente
+yo predije que era 0 eran 36 ya si se fijan acá esto es un ejemplo más o menos estándar
+y si fijan cuando es 0 no tengo problemas cuando es 1 a veces me equivoco y pienso que es un 6
+cuando es 2 a veces me equivoco y pienso que un 3 cuando es 3 a veces me equivoco y pienso que un 9
+ya así sucesivamente si se fijan acá yo voy viendo que tanto me voy equivocando y como me está
+cómo se está equivocando el modelo. Entonces esta figura también es
+digamos descriptiva para entender porque ningún modelo va a clasificar
+perfectamente todo porque si clasifica perfectamente todo entonces probablemente
+estoy en un ajuste o hay alguna fuga de datos, digamos, de la prueba al entrenamiento.
+Entonces esto me entrega, digamos, identificar dónde están los errores y cuáles son los
+tipos de errores. Si se fijan acá, cosas raras, digamos, uno pensaría, bueno, si es real
+es 7 y yo pensaría que debiesen haber errores en el 1 porque el 1 y el 7 más o menos se
+parecen, digamos. Entonces ahí uno puede ir viendo cómo el modelo se está equivocando
+y ver cómo es la distribución de los errores.
+Veamos entonces casos particulares,
+que son los mismos casos o diseminar los casos extremos.
+Entonces, mostramos los primeros seis errores según algún orden
+declarado.
+Si fijan acá, el real era 9 y yo, o el modelo,
+también predijo 8.
+Y la probabilidad máxima asociada fue un 0,64.
+Y así vale el resto de valores.
+si fijan esto, parezco, no se ve muy como un 1, pero y se predijo un 6
+era un 1 y se predijo otro 6 porque aprendió de manera mal, ya 7 era un 7 y se predijo un 8
+era un 5 y se predijo un 6, si fijan acá es súper entendible, el 5 se parece bastante a ese 6
+y este 6 se predijo como un 1 de alguna manera y con un P máximo de 0,99
+Entonces, son más o menos casos generales, no fueron escogidos con algún orden en particular.
+Entonces, está el valor del dígito real, lo que se predijo y la mayor probabilidad de haber predicho esa cantidad.
+Y aquí uno podría ver ciertas nociones.
+Entonces, vamos a tomar, digamos, una imagen y vamos a leer estas tres métricas.
+Real, predicho o la etiqueta observada, en esencia, que es la clasificación,
+lo real que nosotros estamos considerando, porque también la etiqueta también puede tener errores,
+pero por eso vamos a leer la etiqueta observada, la predicción del modelo y la probabilidad máxima.
+Entonces, nosotros no definimos esa etiqueta sino que viene de los conjuntos de datos y
+eso también por general errores, que a veces el conjunto de datos dice que es cierta cosa,
+cierta etiqueta digamos, por ejemplo un correo dice que es spam pero en realidad nunca fue
+spam, entonces ahí tenemos problemas con la base de datos que estamos utilizando. Entonces,
+este tipo de representaciones es cuando nosotros empezamos a ver
+cómo se está equivocando. Si se fijan acá, aquí me equivoqué de 2, 4, 5, 6, 7, 8, 9, 10 veces.
+10 veces en esta cantidad y aquí veo 6 de esas 10 y veo cómo se está equivocando.
+Si se fijan acá, pareciera que este es uno de los peores errores porque es un
+el real en un 6 predije un 1 y lo predije con una probabilidad muy alta de 0,99. Entonces, eso se va a
+penalizar bastante cuando veo la pérdida logarítmica porque estoy prediciendo mal
+con mucha probabilidad. Entonces, veamos esas predicciones que se calcularon. Entonces, si fíjense acá,
+cada barra, digamos, corresponde a una imagen mal clasificada. Entonces el
+dígito real era ocho, o sea nueve, perdón, y se dijo que era ocho y además tengo su probabilidad.
+Entonces se fijan, este seis y uno, que era el caso que yo les mencionaba, que era el caso real
+era seis y una predicción uno, la probabilidad era súper alta, que se dijo prácticamente máxima.
+Entonces, esa cantidad, ese valor, ese 6 que está siendo predicho como un 1 y con una muy grande probabilidad, me está generando una gran gran pérdida.
+Por eso, esto tenemos que hacer el análisis bien de las clases que están siendo mal clasificadas, las observaciones que están siendo mal clasificadas.
+porque esas pequeñas observaciones que están acá
+me van a generar una pérdida sustancial. Entonces ahí tengo que ver, por ejemplo,
+está bien efectivamente clasificado, yo puedo ver la imagen y decir
+ah, aquí, quizás no era un 6, quizás siempre fue un 1,
+pero cuando lo vemos, vemos que sí, era un 6,
+tenemos que tener cuidado con esas cosas
+de siempre dudar, digamos, de los votos que tenemos.
+Ahora, en general uno no quisiera hacer
+este valor que está acá es un umbral de 0,9, una probabilidad muy muy alta, sobre todo con 10 clases
+tener una probabilidad de 0,9 para una clase en particular es muy muy particular porque tengo muchas opciones
+o la red es muy buena o hay ahí una sobre confianza del modelo con su predicción
+Y como lo vimos la semana pasada también, cuando nosotros hicimos un pequeño shift,
+ya, pasamos, corremos el dígito 1, una celda hacia la derecha y vimos que nuestro modelo
+no funcionaba muy bien, en este caso, ya, es una esencia, una prueba de estrés porque
+El modelo fue entrenado con los datos que estaban acá,
+los originales, los que están en la primera fila.
+Pero el conjunto de prueba fue desplazado.
+Cuando uno lo desplaza, ¿uno qué esperaría?
+¿Esperaría que funcione mejor que antes o peor que en otros
+modelos. En general,
+estos análisis de perturbar de alguna manera el conjunto de prueba para ver la
+robustez del modelo entrenado para que no, para asegurarme de que no sea
+exactamente lo mismo con lo cual aprendió, entonces por consecuencia el
+modelo lo puede ser para una mayor cantidad de casos, tiende a ser, digamos,
+un buen tipo de ejercicio ahora, cuantificar eso y ver cuáles son estas perturbaciones
+digamos, cuáles son estas perturbaciones que yo puedo hacer para tratar de cuantificar qué tan
+robusto es. No es el objetivo de esta sesión en particular, estamos viendo las redes neuronales,
+pero el tener aquí este ejemplo de perturbar, porque si se fijan esto, simplemente cuando ustedes
+ven el vector porque eso puede ser un número yo estoy corriendo los datos para un lado.
+Si eso son técnicas digamos que uno puede ver o puede realizar para mejorar de cierta manera
+el reto o tener una métrica adicional de qué tan robusto es porque recuerden que todas estas
+redes, todos estos modelos lo estamos utilizando para después ocuparlo con otros datos. El modelo
+no conocen. Entonces, modelos más robustos tendrán a preferirse por sobre modelos que
+están más sobre ajustados, están muy especializados.
+Ahora, ¿cuál es el alcance de lo que hemos hecho, digamos, antes de sacar una conclusión
+general? Vamos a precisar bien qué es lo que evaluamos. Entonces, entrenamos dos anchos
+de redes neuronales, con 16 y 32 y un mismo presupuesto ya que también puede ser algo que
+se puede objetar porque se entiende que la vez con 16 se demora menos que la de 32 entonces si yo
+pongo un presupuesto en términos de épocas estoy prefiriendo naturalmente de 32 qué pasa si lo
+pongo en términos de tiempo hay otro tipo de presupuesto entonces bueno pero bajo el mismo
+presupuesto de época yo puedo comparar esas dos redes candidatas en una
+ejecución, digamos, una ejecución en particular.
+Si yo quiero estudiar, digamos, la estabilidad de los resultados, tendría
+que repetir ese mismo proceso con varios valores de inicialización, ya,
+que en esencia van a ser la distinta semilla, tengo, digamos, diversidad y
+hay variabilidad dentro de los valores que voy a encontrar dentro del gradiente.
+Entonces, naturalmente existe metodología donde yo hago esto muchas veces con distintas configuraciones
+tal que yo pueda, digamos, robustecer y estudiar, digamos, que los resultados no simplemente son
+o no están muy sujetos a los valores iniciales con los cuales yo medí.
+Entonces, yo voy a generar, en general, voy a tratar de hacer esto con distintas semillas
+para ver que los resultados que estoy obteniendo se siguen, siguen sucediendo,
+digamos siguen pasando.
+Siempre voy a ver el conjunto de prueba para ver qué tan bueno es el modelo.
+Nuevamente, siempre mi modelo va a estar muy ligado a ese conjunto de datos inicial
+que yo estuve estudiando.
+Entonces, como lo vimos la semana pasada, si yo tengo escritos nuevos,
+es decir, otra persona escribe los números, no necesariamente va a tener buenos resultados
+porque las imágenes fueron entrenadas con un tipo de número.
+Y esta red, digamos, no necesariamente, si yo hago perturbaciones, por ejemplo, de desplazamiento,
+nada más segura que va a tener un desempeño correcto.
+Ya en general, estas perturbaciones tienden a ser bastante disruptivas en cuanto a la
+performance se puede tener. Nosotros lo vimos la semana pasada con otro modelo y ese modelo también.
+Las perturbaciones en términos de rendimiento también suceden acá.
+Entonces, antes de seguir robusteciendo esta red, por ejemplo, agregándole capas,
+cambiando la red, los tipos de función de activación, tenemos que ver ciertas cosas.
+por ejemplo, si yo tengo una pérdida no finita, en el sentido de que la pérdida va aumentándose,
+voy a tener que revisar los datos, la escala de los datos, la representación, los distintos
+tipos de tasa y la estabilidad numérica, porque recuerden que aquí igual estoy optimizando
+y las optimizaciones en este sentido son numéricas y puede fallar el optimizador.
+Si el entrenamiento no mejora, que cuando veo esta línea en términos de pérdida y
+se estanca, quizás el gradiente no está encontrando o encontró un mínimo local y de ahí no se movió.
+La capacidad también puede estar fallando, digamos el valor lambda, la tasa o el objetivo que yo estoy
+definiendo. Si mejora sólo el entrenamiento pero no baja la validación, entonces voy a tener que
+empezar a entrar con métricas de regularización y cambiar el lambda, cambiar el número de épocas y
+y revisar los datos y si falla en otro contexto quizás me tengo que replantear
+digamos la forma en que estoy evaluando el problema puede haber un problema en
+términos de la distribución de los datos digamos en términos de las clases
+cuál va a ser la unidad de partición que estoy definiendo que puede estar
+susceptible a que hice una partición de entrenamiento validación y prueba muy
+desbalanceada y o como la métrica de evaluación que estoy utilizando ya
+entonces son pequeños síntomas que hay que evaluarlos antes de decir ya pongamos
+la banda una pongamos le pongamos la más computacionalmente compleja y
+matemáticamente compleja porque así va a aprender mejor y se puede demorar más
+pero así va a aprender mejor tenemos que ver todas estas cosas porque incluso si
+si yo pongo una red más compleja y tengo ese mismo tipo de síntomas no necesariamente se van a
+no necesariamente se van a mejorar, ya no se van a ir. Entonces, lo que tenemos que hacer digamos
+este procedimiento, este bucle para cuando queremos tener las redes neuronales es, tenemos que
+estandarizar los datos antes de separarlos, es decir, por ejemplo, cuando nosotros pasamos la
+intensidad de 0 a 16 a algo entre 0 y 1.
+Voy a coger la época con mayor exactitud de prueba, ya, entonces voy a
+ver cómo baja el entrenamiento, voy a coger con validación y en la prueba,
+digamos, va a estar sujeto a la época que yo estoy definiendo. La época en general
+a mayor cantidad de épocas, más tiempo se va a demorar en el entrenamiento.
+Yo simplemente general voy a comunicar la pérdida del entrenamiento, no así en la
+prueba. En general la época de entrenamiento y la validación me va a ayudar a escoger
+la red y con la red yo voy a compararlo, pues se va a hacer mi candidato de red y lo voy
+a comparar con otras metodologías, por ejemplo Naive Bayes o regresión logística, etc.
+Y tengo que obviamente contextualizar esto, digamos, contextualizar lo de que si bien la red tiende a aprender mejor que otras metodologías y tiende a tener un mayor rendimiento en la generalización,
+en general cuando yo le paso imágenes de números a una red neural clasifica
+mejor que si se lo pasase por ejemplo a un Naive Bayes o a una regresión
+logística multiclase, digamos, tiene un mayor poder de clasificación
+eso no significa que va a funcionar bien siempre
+si podemos complejizar y mejorar la red tenemos que tener en cuenta esas cosas
+¿Verdad?
+Ahora, finalmente, todas estas cosas pueden ir mutando, pueden ir, las configuraciones
+pueden ir cambiando.
+Yo puedo cambiar el tipo de recetas, ¿ya?
+¿Qué es el tipo de transformaciones?
+El tipo de la cantidad de épocas que yo voy a utilizar, la cantidad de neuronas, ¿ya?
+Que en esencia es cambiar la arquitectura de la red, ¿ya?
+Cambiar el número de parámetros, que en esencia va a ser cuántos pesos estoy utilizando,
+cuántas funciones de activación.
+Todas esas cosas van a ir cambiando, ya.
+Y yo voy a tener que cambiarlo porque si se fijan son hiperparámetros.
+Al ser hiperparámetros yo no los puedo definir de antemano.
+No sé que si van a dar buenos resultados.
+Entonces, en general se habla mucho de la arquitectura de la red, ya.
+Y eso forma parte del mismo análisis, ya.
+Ustedes van a probar inicialmente una red, por ejemplo, muy superficial,
+que no tenga tantas capas para ver cómo funciona.
+Luego van a probar una red que tenga una mayor profundidad
+y van a ir viendo cómo van los resultados.
+Y ahí van a tratar de decir, bueno, tengo que ir a una red más profunda,
+estoy haciendo efectivamente las funciones de activación correctas,
+estoy haciendo las transformaciones correctas y voy a empezar a realizar los síntomas.
+Si bien los síntomas no son tan, digamos,
+analíticos, como por ejemplo es un diagnóstico en modelos lineales o
+regresiones, aquí uno puede ver estos síntomas y tener medidas remediales
+para las distintas problemáticas que están, digamos, hay
+especificadas.
+¿Cómo lo resumimos? Tenemos los datos, hacemos nuestras
+transformaciones, función de activación, nuevamente eso entra a otra transformación,
+tengo las probabilidades, calculo las pérdidas logarítmicas y me devuelvo, ya.
+Ese es el proceso iterativo que hace esta red neuronal y mientras más se hace, más va a cambiar los parámetros
+hasta que llegue a una regla de parada en alguna cantidad de épocas.
+No necesariamente como en todas estas metodologías
+que hay un menor, un mayor, un menor, digamos, error de entrenamiento
+o una métrica de entrenamiento mejor.
+Significa que en la prueba va a salir o voy a tener mejores resultados.
+Nosotros esperamos que si se comporta bien con los conjuntos de entrenamiento
+en un conjunto que se parecen, que son de prueba y quien no lo conoce
+debiese funcionar bien también.
+Entonces, este es el proceso de dativo.
+datos, transformaciones lineales, funciones de activación, otra transformación
+y así sucesivamente conforme cuántas capas quiero
+hasta llegar a una métrica de salida
+llego a esa métrica de salida que en este caso es la perdida de logarítmica
+y me devuelvo a backpropagation que en esencia es la retropropagación
+para encontrar y actualizar los parámetros
+una vez que actualice los parámetros, repito el proceso
+y así lo repito hasta que yo esté satisfecho, digamos, con los valores y tenga buenos resultados en principio
+eso es la arquitectura general de las redes neuronales
+conforme vamos avanzando vamos a ver quizás otras arquitecturas, por ejemplo, que pasa si
+ocupo la función de convolución como dentro de esta red
+y ahí nacen las redes convolucionales, ya que son muy buenas cuando tengo datos que son regulares.
+Por ejemplo, series de edad, series de tiempo o imágenes que tienen toda la misma cantidad de pixeles o mismo tamaño.
+Entonces, aquí con esta es la base, simplemente, la base general de lo que son las redes neuronales.
+Y como último, lo que realmente pasa en este caso es que las redes o las capas ocultas tienden a ser
+bastante similares y lo que viene de la tarea o del objetivo de la problemática, está muy definido con
+la capa de salida o la reta que la activas la función de activación de la
+salida entonces si quiero hacer una función de activación
+o sea tengo un problema de clasificación yo quiero que la
+activación de salida me entre algo que puede interpretar como probabilidades y
+si quiero hacer una predicción cuantitativa yo quiero que me lo
+entreguen la misma escala
+eso es lo que tenemos por hoy no sé si alguna pregunta duda respecto a la
+metodología de redes neuronales es un poco complicado entenderla en un principio
+pero uno uno entendiendo bien la red neuronal clásica todas las variantes que le
+siguen siguen la misma estructura sólo que agregan un pequeño cambio
+alguna duda pregunta que se tenga que hago a disposición por ahora
+toda esta red neuronal es calcular cosas y meter la otra función
+calcularla, de la otra función. Le recomiendo
+próxima lectura en la
+¿A dónde hizo?
+Bueno, pero lo que le estaba diciendo, le recomiendo que ejecuten ya sea en R o en
+Python el código, porque yo les puse en la salida, las salidas intermedias
+todo para que lo vayan entiendo, si lo van corriendo línea en línea les va a ir diciendo qué es lo que
+está haciendo. Yo les recomiendo que lo corran en R porque está un poquito más desglosado y es como
+más operatoria normal pero nuevamente esta es la primera, lo que más difícil de digerir, el resto
+es pequeñas variantes, qué pasa si cambiamos otra función de activación? Recuerden acá,
+tengo algo que no es un número, lo paso a un número y hago operaciones hasta que llegó
+algo que conozco. Eso es lo que estamos haciendo y lo hacemos muchas veces. La parte de optimizadores
+no están tan relevantes, lo que necesitamos saber es cómo operan estas cosas, cuáles son las
+problemática y la implementación.
+¿Sí?
+Eso. ¿Alguna otra duda?
+Pregunta.
+Si no, lo podemos...

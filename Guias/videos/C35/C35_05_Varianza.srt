@@ -1,0 +1,363 @@
+1
+00:00:00,250 --> 00:00:02,350
+Quinta parada: la matemática.
+
+2
+00:00:02,470 --> 00:00:05,807
+Una sola fórmula explica por qué el bagging funciona, y por qué
+
+3
+00:00:05,807 --> 00:00:08,880
+tiene un límite que ningún número de árboles puede cruzar.
+
+4
+00:00:09,000 --> 00:00:11,734
+Si promediar árboles es tan bueno, ¿por qué no usar
+
+5
+00:00:11,734 --> 00:00:14,040
+un millón de árboles y llegar a error cero?
+
+6
+00:00:14,160 --> 00:00:15,930
+Spoiler: no se puede.
+
+7
+00:00:16,050 --> 00:00:16,950
+Hay un piso.
+
+8
+00:00:17,070 --> 00:00:20,690
+Y entender ese piso es entender por qué existe el Random Forest.
+
+9
+00:00:20,810 --> 00:00:22,210
+Piensa en una encuesta.
+
+10
+00:00:22,330 --> 00:00:25,995
+Si preguntas a mil personas que piensan de forma independiente, sus
+
+11
+00:00:25,995 --> 00:00:29,550
+caprichos individuales se cancelan, y el promedio es muy estable.
+
+12
+00:00:29,670 --> 00:00:34,138
+Pero si las mil leen el mismo diario cada mañana, comparten el mismo sesgo, y
+
+13
+00:00:34,138 --> 00:00:37,620
+ese sesgo común no se cancela, por mucho que agregues gente.
+
+14
+00:00:37,740 --> 00:00:39,460
+Con los árboles pasa lo mismo.
+
+15
+00:00:39,580 --> 00:00:41,776
+Lo que importa no es solo cuántos árboles
+
+16
+00:00:41,776 --> 00:00:44,080
+promedias, sino cuánto se parecen entre sí.
+
+17
+00:00:44,200 --> 00:00:45,060
+La fórmula.
+
+18
+00:00:45,180 --> 00:00:48,240
+Cada árbol tiene una varianza, sigma al cuadrado.
+
+19
+00:00:48,360 --> 00:00:52,190
+Dos árboles cualesquiera tienen una correlación ro entre sus predicciones.
+
+20
+00:00:52,310 --> 00:00:56,317
+Entonces la varianza del promedio de B árboles es: ro sigma al
+
+21
+00:00:56,317 --> 00:01:00,130
+cuadrado, más uno menos ro, por sigma al cuadrado, sobre B.
+
+22
+00:01:00,250 --> 00:01:01,600
+Mírala por partes.
+
+23
+00:01:01,720 --> 00:01:07,030
+El segundo término tiene a B abajo: con más árboles, se achica, hasta desaparecer.
+
+24
+00:01:07,150 --> 00:01:10,650
+Pero el primero, ro sigma al cuadrado, no depende de B.
+
+25
+00:01:10,770 --> 00:01:15,500
+Ese es el piso: por muchos árboles que agregues, la varianza no baja de ahí.
+
+26
+00:01:15,620 --> 00:01:17,970
+Dos casos extremos para fijar la idea.
+
+27
+00:01:18,090 --> 00:01:21,950
+Si los árboles son idénticos, ro vale uno, y la varianza es
+
+28
+00:01:21,950 --> 00:01:24,960
+sigma al cuadrado: promediar no sirve de nada.
+
+29
+00:01:25,080 --> 00:01:28,531
+Si fueran independientes, ro cero, la varianza sería
+
+30
+00:01:28,531 --> 00:01:31,850
+sigma al cuadrado sobre B: cada árbol extra ayuda.
+
+31
+00:01:31,970 --> 00:01:34,865
+La nota de la diapositiva nueve aclara que la fórmula
+
+32
+00:01:34,865 --> 00:01:37,650
+supone varianzas parecidas y una correlación común.
+
+33
+00:01:37,770 --> 00:01:42,458
+Y una precisión útil: ro es la correlación entre las predicciones de dos árboles para un
+
+34
+00:01:42,458 --> 00:01:46,400
+mismo caso, que es lo mismo que la correlación de sus errores en ese caso.
+
+35
+00:01:46,520 --> 00:01:50,360
+La diapositiva la llama correlación entre errores: es lo mismo.
+
+36
+00:01:50,480 --> 00:01:53,070
+Ahora un ejemplo con números, del apunte.
+
+37
+00:01:53,190 --> 00:01:55,560
+Sigma al cuadrado igual a 64.
+
+38
+00:01:55,680 --> 00:01:57,990
+Primero con ro igual a 0.5.
+
+39
+00:01:58,110 --> 00:02:02,220
+Con un árbol: 32 más 32, igual a 64.
+
+40
+00:02:02,340 --> 00:02:08,060
+Con cuatro árboles: 32 más 32 sobre cuatro, que es 8: total 40.
+
+41
+00:02:08,180 --> 00:02:11,970
+Con dieciséis: 32 más 2, igual a 34.
+
+42
+00:02:12,090 --> 00:02:14,630
+Y con infinitos árboles, 32.
+
+43
+00:02:14,750 --> 00:02:18,740
+Ahora con ro igual a 0.1, árboles menos parecidos.
+
+44
+00:02:18,860 --> 00:02:24,250
+Con un árbol, igual: 6.4 más 57.6, 64.
+
+45
+00:02:24,370 --> 00:02:29,250
+Con cuatro: 6.4 más 14.4, igual a 20.8.
+
+46
+00:02:29,370 --> 00:02:33,620
+Con dieciséis, 6.4 más 3.6, igual a 10.
+
+47
+00:02:33,740 --> 00:02:37,020
+Y el piso es 6.4: cinco veces más bajo.
+
+48
+00:02:37,140 --> 00:02:41,669
+La lección del ejemplo: con ro igual a 0.5, pasar de dieciséis
+
+49
+00:02:41,669 --> 00:02:45,540
+árboles a infinitos solo baja la varianza de 34 a 32.
+
+50
+00:02:45,660 --> 00:02:49,720
+Con ro igual a 0.1, el piso entero es cinco veces menor.
+
+51
+00:02:49,840 --> 00:02:54,310
+Árboles que se parecen ya no aportan: hay que bajar ro, no solo subir B.
+
+52
+00:02:54,430 --> 00:02:56,110
+¿Se cumple con datos reales?
+
+53
+00:02:56,230 --> 00:02:57,540
+Lo medimos en Ames.
+
+54
+00:02:57,660 --> 00:03:02,225
+Entrenamos el mismo bosque sesenta veces, cada vez con otra submuestra de casas, y
+
+55
+00:03:02,225 --> 00:03:06,010
+medimos cuánto varían las predicciones en un conjunto de validación.
+
+56
+00:03:06,130 --> 00:03:10,500
+Un árbol solo tiene una desviación de unos 36 600 dólares.
+
+57
+00:03:10,620 --> 00:03:15,470
+Y la correlación entre dos árboles del bagging resultó ro igual a 0.049.
+
+58
+00:03:15,590 --> 00:03:19,480
+Con esos dos números, la fórmula predice la desviación del promedio.
+
+59
+00:03:19,600 --> 00:03:22,940
+Con diez árboles: 13 900 dólares.
+
+60
+00:03:23,060 --> 00:03:25,400
+Y lo medido fue 13 900.
+
+61
+00:03:25,520 --> 00:03:31,400
+Con cien árboles, la fórmula dice 8 800, y lo medido fue 8 800.
+
+62
+00:03:31,520 --> 00:03:34,886
+Y el piso, la raíz de ro sigma al cuadrado, es 8
+
+63
+00:03:34,886 --> 00:03:37,620
+100 dólares: ahí se detiene el bagging.
+
+64
+00:03:37,740 --> 00:03:38,810
+¿Y si bajamos ro?
+
+65
+00:03:38,930 --> 00:03:43,692
+Un Random Forest que mira un tercio de las variables en cada corte
+
+66
+00:03:43,692 --> 00:03:47,660
+tiene ro igual a 0.024, y su piso baja a 5 800 dólares.
+
+67
+00:03:47,780 --> 00:03:55,020
+Mirando solo el 10 % de las variables, ro baja a 0.011, y el piso a 4 400.
+
+68
+00:03:55,140 --> 00:03:58,236
+Cada árbol es un poco peor, sigma sube, pero se
+
+69
+00:03:58,236 --> 00:04:00,870
+parecen mucho menos, y el promedio gana.
+
+70
+00:04:00,990 --> 00:04:05,976
+Eso es exactamente lo que dice la diapositiva nueve: si ro es alto, muchos árboles
+
+71
+00:04:05,976 --> 00:04:09,990
+repiten errores parecidos, y aumentar B no elimina ese componente.
+
+72
+00:04:10,110 --> 00:04:13,020
+Esa limitación es la que motiva el Random Forest.
+
+73
+00:04:13,140 --> 00:04:15,725
+El error típico: subir y subir el número de
+
+74
+00:04:15,725 --> 00:04:18,370
+árboles esperando que el error siga bajando.
+
+75
+00:04:18,490 --> 00:04:21,892
+En Ames, con cien árboles el bagging ya está en
+
+76
+00:04:21,892 --> 00:04:24,570
+8 800, a un paso de su piso de 8 100.
+
+77
+00:04:24,690 --> 00:04:29,350
+Más árboles no rompen el piso: lo que lo baja es que los árboles se parezcan menos.
+
+78
+00:04:29,470 --> 00:04:33,250
+Piensa un segundo, con sigma al cuadrado igual a 64.
+
+79
+00:04:33,370 --> 00:04:38,320
+Opción uno: ro igual a 0.5, y pasas de dieciséis árboles a mil.
+
+80
+00:04:38,440 --> 00:04:43,530
+Opción dos: te quedas con dieciséis árboles, pero bajas ro a 0.1.
+
+81
+00:04:43,650 --> 00:04:45,330
+¿Cuál reduce más la varianza?
+
+82
+00:04:46,050 --> 00:04:51,350
+Opción uno: 32 más 32 sobre mil, igual a 32.03.
+
+83
+00:04:51,470 --> 00:04:57,100
+Opción dos: 6.4 más 57.6 sobre dieciséis, igual a 10.
+
+84
+00:04:57,220 --> 00:04:58,770
+Gana por lejos bajar ro.
+
+85
+00:04:58,890 --> 00:05:02,300
+Mil árboles parecidos valen menos que dieciséis distintos.
+
+86
+00:05:02,420 --> 00:05:05,745
+Para llevarte: la varianza del promedio es ro sigma al
+
+87
+00:05:05,745 --> 00:05:09,070
+cuadrado, más uno menos ro, sigma al cuadrado sobre B.
+
+88
+00:05:09,190 --> 00:05:14,280
+Más árboles borran el segundo término, pero el piso, ro sigma al cuadrado, queda.
+
+89
+00:05:14,400 --> 00:05:18,020
+Para bajar el piso hay que bajar ro: árboles menos parecidos.
+
+90
+00:05:18,140 --> 00:05:20,240
+Esa es la idea del Random Forest.
+
+91
+00:05:20,360 --> 00:05:25,250
+Siguiente parada: el Random Forest, y cómo baja ro con azar en las variables.

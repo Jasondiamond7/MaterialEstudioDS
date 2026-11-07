@@ -1,0 +1,403 @@
+1
+00:00:00,250 --> 00:00:02,560
+Sexta parada: el margen suave.
+
+2
+00:00:02,680 --> 00:00:06,011
+Vas a calcular holguras a mano, a ver la pérdida hinge, y a
+
+3
+00:00:06,011 --> 00:00:08,890
+mirar qué hace el parámetro C con los datos reales.
+
+4
+00:00:09,010 --> 00:00:14,730
+Estos son los 398 casos de entrenamiento, con radio y concavidad estandarizados.
+
+5
+00:00:14,850 --> 00:00:18,300
+Mira la zona del medio: benignos y malignos se mezclan.
+
+6
+00:00:18,420 --> 00:00:21,310
+No existe ninguna recta que los separe sin errores.
+
+7
+00:00:21,430 --> 00:00:23,100
+¿La SVM se rinde?
+
+8
+00:00:23,220 --> 00:00:23,640
+No.
+
+9
+00:00:23,760 --> 00:00:27,080
+Deja que algunos puntos crucen, pero les cobra por cruzar.
+
+10
+00:00:27,200 --> 00:00:30,060
+Piensa en un estacionamiento con líneas pintadas.
+
+11
+00:00:30,180 --> 00:00:32,864
+Puedes pasarte un poco de la línea, pero te ponen
+
+12
+00:00:32,864 --> 00:00:35,220
+una multa proporcional a cuánto te pasaste.
+
+13
+00:00:35,340 --> 00:00:38,010
+Si la multa es barata, mucha gente se pasa.
+
+14
+00:00:38,130 --> 00:00:41,490
+Si es carísima, todos se esfuerzan por no tocar la línea.
+
+15
+00:00:41,610 --> 00:00:44,670
+En la SVM, el valor de la multa se llama C.
+
+16
+00:00:44,790 --> 00:00:47,310
+La diapositiva treinta y seis lo escribe así.
+
+17
+00:00:47,430 --> 00:00:50,518
+Se minimiza un medio de la norma de w al cuadrado,
+
+18
+00:00:50,518 --> 00:00:53,050
+más C por la suma de las holguras, ksi i.
+
+19
+00:00:53,170 --> 00:00:56,468
+La condición se relaja: y·f(x) ya no tiene que ser
+
+20
+00:00:56,468 --> 00:00:59,370
+mayor que uno, sino mayor que uno menos ksi.
+
+21
+00:00:59,490 --> 00:01:04,090
+Y en la solución, cada holgura vale el máximo entre cero y uno menos y·f.
+
+22
+00:01:04,210 --> 00:01:07,460
+En inglés esto se llama soft margin, margen suave.
+
+23
+00:01:07,580 --> 00:01:11,010
+La holgura mide cuánto se pasó cada punto del borde de su lado.
+
+24
+00:01:11,130 --> 00:01:14,460
+Calculemos tres holguras, con la tabla de la diapositiva.
+
+25
+00:01:14,580 --> 00:01:20,820
+Un punto con y·f igual a 1.4: uno menos 1.4 es negativo, así que ksi es cero.
+
+26
+00:01:20,940 --> 00:01:22,980
+Correcto, y fuera del margen.
+
+27
+00:01:23,100 --> 00:01:26,900
+Con y·f igual a 0.5: ksi es 0.5.
+
+28
+00:01:27,020 --> 00:01:29,870
+Está bien clasificado, pero dentro de la calle.
+
+29
+00:01:29,990 --> 00:01:35,290
+Y con menos 0.3: ksi es uno más 0.3, igual a 1.3.
+
+30
+00:01:35,410 --> 00:01:36,900
+Está mal clasificado.
+
+31
+00:01:37,020 --> 00:01:38,690
+Fíjate en el segundo caso.
+
+32
+00:01:38,810 --> 00:01:41,870
+Está bien clasificado, y aun así paga holgura.
+
+33
+00:01:41,990 --> 00:01:44,653
+La holgura penaliza las violaciones del margen,
+
+34
+00:01:44,653 --> 00:01:46,750
+no solo los errores de clasificación.
+
+35
+00:01:46,870 --> 00:01:52,026
+Esa función, el máximo entre cero y uno menos y·f, tiene nombre propio: es la
+
+36
+00:01:52,026 --> 00:01:56,580
+pérdida hinge, la pérdida bisagra, de la diapositiva sesenta y seis.
+
+37
+00:01:56,700 --> 00:02:00,017
+Vale cero cuando el caso queda más allá del margen correcto,
+
+38
+00:02:00,017 --> 00:02:02,670
+y crece en línea recta cuando se acerca o cruza.
+
+39
+00:02:02,790 --> 00:02:07,760
+A su lado, la pérdida logística: logaritmo de uno más e a la menos y·f.
+
+40
+00:02:07,880 --> 00:02:10,080
+Comparemos en los tres puntos de la tabla.
+
+41
+00:02:10,200 --> 00:02:14,650
+Con 1.4: hinge cero, logística 0.220.
+
+42
+00:02:14,770 --> 00:02:20,030
+Con 0.5: hinge 0.5, logística 0.474.
+
+43
+00:02:20,150 --> 00:02:25,760
+Con menos 0.3: hinge 1.3, logística 0.854.
+
+44
+00:02:25,880 --> 00:02:31,100
+La diferencia clave: la hinge se apaga del todo; la logística nunca llega a cero.
+
+45
+00:02:31,220 --> 00:02:34,130
+Y de ahí sale lo más importante de la SVM.
+
+46
+00:02:34,250 --> 00:02:37,348
+Los puntos lejos del margen, del lado correcto,
+
+47
+00:02:37,348 --> 00:02:40,050
+tienen pérdida cero: no influyen en nada.
+
+48
+00:02:40,170 --> 00:02:43,075
+Solo los que están en el borde, dentro de la calle o
+
+49
+00:02:43,075 --> 00:02:45,310
+del lado equivocado, mueven la frontera.
+
+50
+00:02:45,430 --> 00:02:47,240
+Esos son los vectores de soporte.
+
+51
+00:02:47,360 --> 00:02:51,160
+En la logística, en cambio, todos los puntos aportan algo.
+
+52
+00:02:51,280 --> 00:02:53,120
+Ahora, el parámetro C.
+
+53
+00:02:53,240 --> 00:02:57,444
+Según la diapositiva treinta y siete: un C pequeño le da poco peso a las
+
+54
+00:02:57,444 --> 00:03:01,240
+violaciones: el modelo se regulariza más, y la calle se ensancha.
+
+55
+00:03:01,360 --> 00:03:05,880
+Un C grande castiga mucho las violaciones del entrenamiento: la calle se angosta.
+
+56
+00:03:06,000 --> 00:03:10,432
+Un ejemplo: si las holguras suman cuatro, con C igual a 0.1 la
+
+57
+00:03:10,432 --> 00:03:14,150
+multa total es 0.4; con C igual a diez, es cuarenta.
+
+58
+00:03:14,270 --> 00:03:18,810
+Veámoslo con los datos reales, una SVM lineal con dos variables.
+
+59
+00:03:18,930 --> 00:03:22,702
+Con C igual a 0.01, la calle es ancha: 2.24
+
+60
+00:03:22,702 --> 00:03:27,000
+desviaciones estándar, y 188 vectores de soporte.
+
+61
+00:03:27,120 --> 00:03:32,810
+Con C igual a uno, se angosta a 0.86, con 83 vectores de soporte.
+
+62
+00:03:32,930 --> 00:03:39,140
+Y con C igual a cien, apenas cambia: 0.82 de ancho y 78 vectores de soporte.
+
+63
+00:03:39,260 --> 00:03:40,140
+¿Y en la prueba?
+
+64
+00:03:40,260 --> 00:03:45,000
+Los tres modelos aciertan exactamente lo mismo: 88.3 por ciento.
+
+65
+00:03:45,120 --> 00:03:47,950
+Cambiar C movió la calle, pero no mejoró nada.
+
+66
+00:03:48,070 --> 00:03:50,911
+Como dice la diapositiva: un C mayor no siempre
+
+67
+00:03:50,911 --> 00:03:53,450
+mejora el modelo; lo decide la validación.
+
+68
+00:03:53,570 --> 00:03:59,690
+Ahora, el modelo de la clase: SVM lineal con las cuatro variables y C igual a 0.1.
+
+69
+00:03:59,810 --> 00:04:03,529
+De los 398 casos de entrenamiento, 308 quedan bien
+
+70
+00:04:03,529 --> 00:04:06,950
+clasificados y fuera del margen: holgura cero.
+
+71
+00:04:07,070 --> 00:04:11,140
+70 quedan dentro de la calle, y 20 quedan del lado equivocado.
+
+72
+00:04:11,260 --> 00:04:13,120
+¿Cuántos vectores de soporte tiene?
+
+73
+00:04:13,240 --> 00:04:18,170
+93: los que quedan en el borde, dentro de la calle o del lado equivocado.
+
+74
+00:04:18,290 --> 00:04:21,190
+47 benignos y 46 malignos.
+
+75
+00:04:21,310 --> 00:04:26,020
+Los otros 305 casos podrían desaparecer, y la frontera sería la misma.
+
+76
+00:04:26,140 --> 00:04:27,580
+¿Y cómo se elige C?
+
+77
+00:04:27,700 --> 00:04:30,710
+Con validación cruzada, solo en el entrenamiento.
+
+78
+00:04:30,830 --> 00:04:36,720
+Esta curva prueba trece valores de C, de 0.001 a mil, con las cuatro variables.
+
+79
+00:04:36,840 --> 00:04:40,970
+Con C muy chico, el modelo subajusta: 66 por ciento.
+
+80
+00:04:41,090 --> 00:04:47,340
+El máximo de la validación cruzada está justo en C igual a 0.1: 94.0 por ciento.
+
+81
+00:04:47,460 --> 00:04:49,160
+Después la curva se aplana.
+
+82
+00:04:49,280 --> 00:04:52,392
+El error típico: leer C como si fuera la fuerza de la
+
+83
+00:04:52,392 --> 00:04:55,210
+regularización, al estilo de la lambda de Lasso.
+
+84
+00:04:55,330 --> 00:04:57,865
+Es al revés: un C grande significa menos
+
+85
+00:04:57,865 --> 00:05:00,970
+regularización, porque las violaciones pesan más.
+
+86
+00:05:01,090 --> 00:05:03,960
+Y en R, el mismo parámetro se llama cost.
+
+87
+00:05:04,080 --> 00:05:05,300
+Piensa un segundo.
+
+88
+00:05:05,420 --> 00:05:09,980
+Tres puntos tienen y·f igual a dos, cero, y menos 1.5.
+
+89
+00:05:10,100 --> 00:05:11,590
+¿Cuánto vale cada holgura?
+
+90
+00:05:11,710 --> 00:05:14,090
+¿Y cuánto suma la multa con C igual a dos?
+
+91
+00:05:14,810 --> 00:05:17,990
+Con dos: cero, porque está más allá del margen.
+
+92
+00:05:18,110 --> 00:05:20,660
+Con cero: uno, justo en la frontera.
+
+93
+00:05:20,780 --> 00:05:23,610
+Con menos 1.5: 2.5.
+
+94
+00:05:23,730 --> 00:05:27,750
+La suma es 3.5, y con C igual a dos la multa es siete.
+
+95
+00:05:27,870 --> 00:05:31,794
+Para llevarte: la holgura es el máximo entre cero y uno menos
+
+96
+00:05:31,794 --> 00:05:35,010
+y·f, la pérdida hinge, y castiga violar el margen.
+
+97
+00:05:35,130 --> 00:05:40,550
+C es el precio de cada violación: chico, calle ancha; grande, calle angosta.
+
+98
+00:05:40,670 --> 00:05:44,311
+Y C se elige con validación cruzada en entrenamiento: con
+
+99
+00:05:44,311 --> 00:05:47,250
+el kernel lineal de la clase, el mejor es 0.1.
+
+100
+00:05:47,370 --> 00:05:49,580
+Siguiente parada: los kernels.
+
+101
+00:05:49,700 --> 00:05:54,140
+Cómo una SVM puede trazar fronteras curvas sin dejar de ser lineal por dentro.

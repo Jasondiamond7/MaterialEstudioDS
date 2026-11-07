@@ -1,0 +1,5120 @@
+1
+00:00:00,000 --> 00:00:11,680
+Podíamos verlo como una variante de reenerales.
+
+2
+00:00:11,680 --> 00:00:18,200
+Y en ese sentido, entonces, entender bien reenerales nos da un piso bastante sólido
+
+3
+00:00:18,200 --> 00:00:20,240
+para entender el resto de metodologías.
+
+4
+00:00:20,240 --> 00:00:24,760
+Entonces, después vimos un toncodes, que en esencia, si se acuerdan, en reenerales
+
+5
+00:00:24,760 --> 00:00:27,160
+nosotros podíamos predecir y podíamos clasificar.
+
+6
+00:00:27,160 --> 00:00:34,440
+y eso dependía mucho de cuál era la función de activación que nosotros teníamos en la última capa
+
+7
+00:00:34,440 --> 00:00:43,240
+y en general, en rellenos normales, nuestra entrada o la dimensión de nuestra entrada no era necesariamente nuestra salida
+
+8
+00:00:43,240 --> 00:00:49,800
+nosotros vimos el ejemplo de clasificación de los números de escrito a mano
+
+9
+00:00:49,800 --> 00:00:54,640
+entonces teníamos algo que representábamos como una matriz
+
+10
+00:00:54,640 --> 00:00:59,560
+y nuestra salida era un número entre 0 y 9 ya que eran 10 categorías
+
+11
+00:00:59,560 --> 00:01:04,560
+entonces las dimensiones variaban y en AutonCoders nosotros vimos que
+
+12
+00:01:04,560 --> 00:01:11,400
+queríamos aprender de nuestra entrada para reconstruir nuestra entrada
+
+13
+00:01:11,400 --> 00:01:18,320
+entonces ahí la principal característica era que el tamaño de nuestra entrada de
+
+14
+00:01:18,320 --> 00:01:21,840
+nuestros datos, lo que nosotros tenemos como sumo para nuestra red iba a tener la
+
+15
+00:01:21,840 --> 00:01:26,280
+misma dimensión que al final y teníamos además
+
+16
+00:01:26,840 --> 00:01:32,520
+esta capa, que era esta función latente que nosotros le hicimos de
+
+17
+00:01:32,520 --> 00:01:37,760
+8 dimensiones en la sesión pasada.
+
+18
+00:01:37,760 --> 00:01:40,120
+Ahora,
+
+19
+00:01:40,120 --> 00:01:44,960
+queremos ver lo que es Empery, lo que queremos, lo que vamos a ver hoy
+
+20
+00:01:44,960 --> 00:01:54,080
+es cómo represento cosas que ahora no son tan naturales de matematizar porque
+
+21
+00:01:54,080 --> 00:02:02,200
+uno puede ver si son datos un excel, un excel particular ya y que tiene
+
+22
+00:02:02,200 --> 00:02:07,600
+número la entrada o como insumo una red es bastante natural porque un conjunto
+
+23
+00:02:07,600 --> 00:02:12,320
+de una base bien definida las imágenes con ciertas transformaciones podemos
+
+24
+00:02:12,320 --> 00:02:16,880
+verlas como matrices y el verlas como matrices también sigue siendo como algo más natural,
+
+25
+00:02:16,880 --> 00:02:27,040
+pero pensemos ahora en textos. Nosotros vimos tangencialmente cómo podemos matematizar esos
+
+26
+00:02:27,040 --> 00:02:34,040
+textos. Yo les comentaba cuando vimos el ejemplo de los correos, podríamos contar palabras cuando
+
+27
+00:02:34,040 --> 00:02:41,320
+queríamos clasificar, por ejemplo, si un correo era spam o no. Nosotros podríamos contar cuántas
+
+28
+00:02:41,320 --> 00:02:45,960
+palabras tenía en particular las frecuencias, ciertas palabras que pueden
+
+29
+00:02:45,960 --> 00:02:50,240
+ser clave, que nosotros hablamos de la palabra oferta, por ejemplo, la
+
+30
+00:02:50,240 --> 00:02:55,880
+longitud también. Uno podría dar ciertas reglas que podrían determinar o que
+
+31
+00:02:55,880 --> 00:03:02,760
+podríamos utilizar como variables para identificar si ese correo en particular,
+
+32
+00:03:02,760 --> 00:03:08,360
+esa observación, podría ser clasificada como spam o no. Y si se fijan cuando
+
+33
+00:03:08,360 --> 00:03:12,520
+estábamos haciendo eso nosotros estábamos desfragmentando la observación algo que
+
+34
+00:03:12,520 --> 00:03:17,060
+no era matemático no era una observación que es un texto libre una
+
+35
+00:03:17,060 --> 00:03:24,200
+concatenación de símbolos lo matematizamos de alguna manera ya ahora
+
+36
+00:03:24,200 --> 00:03:28,560
+nosotros nos vamos a utilizar digamos el
+
+37
+00:03:28,560 --> 00:03:33,000
+el mismo tipo de codificador de imágenes recuerden cuando veíamos
+
+38
+00:03:33,000 --> 00:03:37,880
+un coder que nosotros codificamos con la función latente y luego decodificamos
+
+39
+00:03:37,880 --> 00:03:42,880
+con otra función para reconstruirlo porque le bajamos la dimensión.
+
+40
+00:03:42,880 --> 00:03:48,880
+Nosotros vamos a escoger en este sentido, vamos a escoger un modelo que está entrenado
+
+41
+00:03:48,880 --> 00:03:52,880
+para representar oraciones o textos.
+
+42
+00:03:52,880 --> 00:03:58,880
+Entonces vamos a utilizar ciertas herramientas para matematizar un texto
+
+43
+00:03:58,880 --> 00:04:05,880
+pero lo vamos a matizar de cierta manera en particular y esa representación va a ser vectorial.
+
+44
+00:04:05,880 --> 00:04:10,420
+vectorial. Entonces lo que vamos a hacer en principio es que los textos van a ser
+
+45
+00:04:10,420 --> 00:04:16,700
+vistos como un punto en el espacio, en el espacio digamos hipercube, porque
+
+46
+00:04:16,700 --> 00:04:21,740
+va a tener muchas dimensiones. En nuestro caso, lo que vamos a hacer en el
+
+47
+00:04:21,740 --> 00:04:27,100
+ejemplo de hoy, no vamos a entrenar en principio la red porque la vamos a
+
+48
+00:04:27,100 --> 00:04:32,860
+ocupar, lo que quiere decir que no vamos a cambiar los pesos que están dentro
+
+49
+00:04:32,860 --> 00:04:38,260
+dentro del modelo, ya porque nosotros vamos a ocupar una red que ya está establecida,
+
+50
+00:04:38,260 --> 00:04:41,060
+ya no vamos a dejar fijos en principio.
+
+51
+00:04:41,060 --> 00:04:49,060
+Y ahora, también se puede hacer, que lo vamos a modificar, lo vamos a especificar, digamos,
+
+52
+00:04:49,060 --> 00:04:57,660
+cómo lo llamamos, esa cosa, cuando utilizar una red y adaptarla a nuestra actividad, a
+
+53
+00:04:57,660 --> 00:04:59,660
+nuestra aplicación en particular.
+
+54
+00:04:59,660 --> 00:05:06,380
+lo que nosotros queríamos hacer en principio es tener textos y matematizarlos como un punto
+
+55
+00:05:06,380 --> 00:05:13,340
+en el espacio y tener una noción de cercanía. ¿Son similares o no estos puntos? Entenderemos que
+
+56
+00:05:13,340 --> 00:05:18,580
+si dos puntos están en esa representación, están cerca entre sí en términos de alguna métrica,
+
+57
+00:05:18,580 --> 00:05:25,180
+tipo distancia, entonces vamos a considerar que son, por ejemplo, textos que son parecidos entre sí.
+
+58
+00:05:25,180 --> 00:05:31,720
+entonces hay una métrica o una noción de similitud ya cuando yo represento en
+
+59
+00:05:31,720 --> 00:05:38,120
+términos vectoriales esos distintos tipos de texto ya entonces vamos a
+
+60
+00:05:38,120 --> 00:05:45,600
+ocupar una forma que me lleva texto a una representación vectorial matemática
+
+61
+00:05:45,600 --> 00:05:52,080
+y vamos a ocupar eso para darnos una una tarea de por ejemplo buscar ya buscar
+
+62
+00:05:52,080 --> 00:05:57,680
+documentos, vamos a una tarea y después vamos a definir qué es lo que tenemos que hacer cuando
+
+63
+00:05:57,680 --> 00:06:02,120
+queremos buscar esa tarea en términos de similitud. Entonces nos vamos a preguntar ahora es cómo hay
+
+64
+00:06:02,120 --> 00:06:08,600
+una representación aprendida a encontrar información pertinente y vamos a definir que entendemos por esa
+
+65
+00:06:08,600 --> 00:06:12,680
+tarea y vamos a ver cómo lo podemos representar y cómo lo vamos a conectar con Rayne Neuronal y
+
+66
+00:06:12,680 --> 00:06:17,760
+Antocobers que vamos a ver que esto es en esencia otra variante de lo que nosotros ya hemos visto
+
+67
+00:06:17,760 --> 00:06:24,400
+como reino de una vez sólo que ahora si bien nuestras entradas son texto comillas
+
+68
+00:06:24,400 --> 00:06:30,840
+libre antes de entrar a nuestra red nosotros lo matematizamos y lo vemos en
+
+69
+00:06:30,840 --> 00:06:35,400
+principio como un vector y al verlo como un vector entonces ya podemos aplicar
+
+70
+00:06:35,400 --> 00:06:40,960
+todas las cosas que hemos visto antes con la actualización de pesos con la
+
+71
+00:06:40,960 --> 00:06:45,840
+activa la función de activación etc
+
+72
+00:06:45,840 --> 00:06:48,840
+Entonces,
+
+73
+00:06:51,040 --> 00:06:57,320
+imaginemos que tenemos una noción de
+
+74
+00:06:57,320 --> 00:07:04,400
+un aula ficticia y nosotros estamos en el equipo de soporte
+
+75
+00:07:04,400 --> 00:07:12,480
+y esto ofrece el curso online, etcétera, y me llegan distintas solicitudes.
+
+76
+00:07:12,480 --> 00:07:18,560
+y como el equipo digamos de soporte ya tiene de cierta manera preguntas
+
+77
+00:07:18,560 --> 00:07:23,960
+recurrentes que tienen que se le hacen en términos de la plataforma
+
+78
+00:07:23,960 --> 00:07:27,560
+que ya la tienen definida tienen instructivos por ejemplo si les
+
+79
+00:07:27,560 --> 00:07:33,840
+pregunta algo entonces tienen fichas definidas para entregarlo. Ahora
+
+80
+00:07:34,280 --> 00:07:40,640
+estos son documentos breves, texto en principio, entonces matematizable por lo
+
+81
+00:07:40,640 --> 00:07:44,000
+por lo que les comentaba antes.
+
+82
+00:07:44,240 --> 00:07:50,080
+Y este equipo, digamos, tiene 12 fichas. Los de fichas que hablan de setas
+
+83
+00:07:50,080 --> 00:07:54,120
+problemáticas o resolución de problemáticas que son recurrentes.
+
+84
+00:07:54,120 --> 00:07:58,880
+Entonces lo que nosotros queremos construir es un herramienta, una
+
+85
+00:07:58,880 --> 00:08:05,800
+metodología que actúe como un buscador, que encuentre la ficha de las 12 que se
+
+86
+00:08:05,800 --> 00:08:12,360
+tienen disponible que entrega una ayuda pertenente bajo cierta consulta. Por
+
+87
+00:08:12,360 --> 00:08:19,800
+ejemplo, si un estudiante pregunta, como un ticket pensemos,
+
+88
+00:08:19,800 --> 00:08:25,280
+olvide mi clave, como vuelvo a entrar.
+
+89
+00:08:25,280 --> 00:08:31,480
+Tenemos por ejemplo una ficha que es la primera que habla de el acceso y escribe
+
+90
+00:08:31,480 --> 00:08:37,300
+digamos explica cómo recuperar la contraseña. Ahora, uno podría hacer
+
+91
+00:08:37,300 --> 00:08:45,140
+cosas que son un poco más intuitivas, por ejemplo, poder frecuencias como
+
+92
+00:08:45,140 --> 00:08:51,900
+cuando lo vimos con el caso de los spam, el caso de los spams, si se
+
+93
+00:08:51,900 --> 00:08:57,100
+acuerdan nosotros contábamos palabras y aquí podría hacer algo similar, solo que
+
+94
+00:08:57,100 --> 00:09:01,100
+ahora no va a ser spam y no spam, sino que va a ser ficha 1 hasta ficha 2
+
+95
+00:09:01,100 --> 00:09:07,660
+y pudiamos extenderlo de esa manera. Pero en estas frases que tenemos, tengo un
+
+96
+00:09:07,660 --> 00:09:16,060
+contexto. Y en este caso, por ejemplo, yo pudiese hacer la similitud o el
+
+97
+00:09:16,060 --> 00:09:21,660
+sinónimo de clave con contraseña. Entonces si veo frecuencia de palabras, no
+
+98
+00:09:21,660 --> 00:09:25,660
+voy a tener una similitud porque clave no es lo mismo que contraseña. Entonces
+
+99
+00:09:25,660 --> 00:09:31,780
+tengo que tener una otra forma un poco más robusta de identificar esas similitudes,
+
+100
+00:09:31,780 --> 00:09:40,900
+identificar ese parafraseo, ese sinónimo dentro de algo que puede ser computable
+
+101
+00:09:40,900 --> 00:09:45,500
+por una red neural. Entonces necesitamos que eso sea un número y ese número, dado que son
+
+102
+00:09:45,500 --> 00:09:49,500
+sinónimos, sean parecidos entre sí.
+
+103
+00:09:49,500 --> 00:09:59,300
+Entonces, veamos las fichas que se tienen disponibles en este caso, en este caso, digamos,
+
+104
+00:09:59,300 --> 00:10:00,300
+ejemplo.
+
+105
+00:10:00,300 --> 00:10:10,660
+Entonces, es un documento breve, de texto, plano, en el múdul, les puse un CSV, digamos,
+
+106
+00:10:10,660 --> 00:10:15,900
+que explicita que es cada una de estas, pero en esencia son 12, las identificamos como
+
+107
+00:10:15,900 --> 00:10:20,700
+de 01, de 02, de 03, y así para cada uno que habla de algún tema en particular.
+
+108
+00:10:20,700 --> 00:10:25,220
+El primero habla de acceso, el quinto habla de pagos y el texto asociado que se le pone
+
+109
+00:10:25,220 --> 00:10:30,940
+como respuesta cuando se tiene alguna consulta de ese estilo.
+
+110
+00:10:30,940 --> 00:10:37,260
+Ahora, simplemente son requerimientos, son consultas.
+
+111
+00:10:37,260 --> 00:10:44,260
+La identificación de 05 hace simplemente referencia a un orden, no tiene mayor relevancia.
+
+112
+00:10:44,260 --> 00:10:48,700
+lo que tenemos lo importante de acá es que tenemos 12 fichas y lo que yo quiero
+
+113
+00:10:48,700 --> 00:10:54,420
+hacer es cómo puedo resolver el problema que acabo de decir. Si un estudiante me
+
+114
+00:10:54,420 --> 00:10:59,340
+pregunta o me dice mi clave cómo puedo entrar, cómo puedo generar alguna
+
+115
+00:10:59,340 --> 00:11:08,620
+herramienta que automáticamente asigne esa ficha como respuesta
+
+116
+00:11:08,620 --> 00:11:16,180
+a esa consulta. Ahora, si se fijan, es muy similar a un problema de clasificación.
+
+117
+00:11:16,180 --> 00:11:22,540
+Para un input quiero asignarlo a una de 12 categorías. El problema y el principal
+
+118
+00:11:22,540 --> 00:11:26,380
+problema que tengo acá es que mis entradas y mis salidas no son números.
+
+119
+00:11:26,380 --> 00:11:30,620
+Entonces, la noción de cercanía, la noción de error, que era la forma en
+
+120
+00:11:30,620 --> 00:11:34,460
+que nosotros ajustábamos nuestros pesos en nuestras redes, ya no es tan
+
+121
+00:11:34,460 --> 00:11:39,900
+entitido. Entonces tenemos que tener una forma un poquito más metodológica, un poquito más formal de
+
+122
+00:11:39,900 --> 00:11:46,660
+pasar esos textos a un número, que es lo que nosotros vamos a llamar el embedding o una
+
+123
+00:11:46,660 --> 00:11:53,180
+representación vectorial. Entonces el procedimiento que vamos a seguir, o que vamos a construir,
+
+124
+00:11:53,180 --> 00:12:01,300
+recuerden que tienen los códigos en R&M en Python a disposición, lo pueden ir ejecutando, es primero
+
+125
+00:12:01,300 --> 00:12:08,020
+cuatro etapas, son cuatro etapas, en el principio lo vamos a ver 1, 2 y 3 y 4, en principio 1,
+
+126
+00:12:08,020 --> 00:12:16,580
+vamos a concentrar entonces en primero representar, que en esencia es asignar números al contenido,
+
+127
+00:12:16,580 --> 00:12:22,980
+entonces cómo convertir una consulta de texto y un documento que son las fichas en vectores
+
+128
+00:12:22,980 --> 00:12:30,060
+comparables, entonces tengo que tenerlo, tener alguna forma de llevar esos textos a algo que sea
+
+129
+00:12:30,060 --> 00:12:36,180
+en un mismo dominio, en un mismo soporte. ¿Qué quiere decir eso? Que si lo llevo por ejemplo un
+
+130
+00:12:36,180 --> 00:12:43,180
+vector esos vectores tienen que tener igual dimensión. Y la otra pregunta es ¿cómo llevo eso que eso no es un
+
+131
+00:12:43,180 --> 00:12:48,520
+número a algo que es un número? No es tan trivial esa pregunta. Entonces la representación puede afectar
+
+132
+00:12:48,520 --> 00:12:56,620
+mucho las cosas porque la representación me entrega la forma en la cual yo voy a ver cercanías,
+
+133
+00:12:56,620 --> 00:13:03,200
+y la métrica que voy a ocupar para las cercanías va a depender mucho del objeto con el cual yo estoy
+
+134
+00:13:03,200 --> 00:13:09,140
+viendo dos cosas, ya nosotros sabemos la distancia entre dos puntos, pero si tengo un vector van a
+
+135
+00:13:09,140 --> 00:13:14,620
+depender mucho de cómo voy a generar ese vector que nuevamente viene a partir de un texto, entonces
+
+136
+00:13:14,620 --> 00:13:19,660
+tengo muchas formas de representar ese texto. Entonces la primera forma bastante importante que
+
+137
+00:13:19,660 --> 00:13:26,420
+es como asigno algún número, algún elemento matemático a ese contenido, que contenido puede
+
+138
+00:13:26,420 --> 00:13:33,340
+tener aparte distintas longitudes, la consulta no tiene que ser necesariamente igual. Luego voy a
+
+139
+00:13:33,340 --> 00:13:41,780
+entrar en la etapa de comparación, que significa producir un puntaje para cada par o pareja que es
+
+140
+00:13:41,780 --> 00:13:47,340
+consulta documento. Entonces para una consulta tengo un documento que es el idóneo, entonces
+
+141
+00:13:47,340 --> 00:13:55,420
+cómo voy a comparar esos pares, esos puntajes que yo voy a definir. Y en esa situación quiero
+
+142
+00:13:55,420 --> 00:14:01,060
+producir un puntaje, quiero producir un puntaje de qué pasa si la pregunta que
+
+143
+00:14:01,060 --> 00:14:07,020
+nos planteamos de olvide mi clave cómo vuelvo a entrar
+
+144
+00:14:07,020 --> 00:14:12,420
+sabemos que la ficha 1 es la que se esperaría que resuelva ese problema
+
+145
+00:14:12,420 --> 00:14:16,260
+pero también todo eso para tener un número, una comparación, un ranking, un
+
+146
+00:14:16,260 --> 00:14:22,460
+puntaje, qué pasa cuál es el puntaje de esta pregunta con el segundo, con la
+
+147
+00:14:22,460 --> 00:14:26,100
+segunda ficha o con la quinta ficha que habla de pagos que no tienen nada que
+
+148
+00:14:26,100 --> 00:14:31,740
+ver con la entrada, digamos, al portal, a esta aula virtual que yo les comentaba.
+
+149
+00:14:31,740 --> 00:14:37,580
+Entonces, tengo que definir alguna manera de matematizar y rankear esas cosas.
+
+150
+00:14:37,580 --> 00:14:40,940
+Entonces, lo que vamos a estar respondiendo es qué significa que esos
+
+151
+00:14:40,940 --> 00:14:47,220
+vectores sean parecidos y qué vamos a entender por parecidos.
+
+152
+00:14:47,220 --> 00:14:52,060
+Luego de eso, nosotros tenemos que ordenar esos puntajes para decidir, por ejemplo,
+
+153
+00:14:52,060 --> 00:14:59,380
+ejemplo, en el caso de que nos planteábamos, bajo alguna pregunta, alguna consulta, ¿qué ficha voy a
+
+154
+00:14:59,380 --> 00:15:06,420
+mostrar primero? Entonces, puedo tener que ordenar esos pares o esas fichas en función a cuál es la
+
+155
+00:15:06,420 --> 00:15:12,660
+más presida o que puede que puede recibir esa pregunta o consulta que hizo el estudiante.
+
+156
+00:15:12,660 --> 00:15:22,660
+entonces tengo que ordenar esas posibles respuestas para mostrarlas
+
+157
+00:15:22,660 --> 00:15:34,660
+ahora, la ultima etapa que es evaluar, digamos, es mas allá que simplemente la matematización de las cosas
+
+158
+00:15:34,660 --> 00:15:38,660
+porque requiere revisar la pertinencia del resultado
+
+159
+00:15:38,660 --> 00:15:44,060
+vamos a ver por ejemplo unos casos en donde se muestra algo que pareciera ser similar
+
+160
+00:15:44,060 --> 00:15:50,900
+pero no necesariamente lo es, porque no lo puedo deducir, no puedo comprobar concretamente
+
+161
+00:15:50,900 --> 00:15:56,900
+o estar totalmente seguro de que lo que está haciendo esta metodología, esta herramienta
+
+162
+00:15:58,660 --> 00:16:03,620
+está correcto sólo a través del puntaje que yo le voy a estar asignando en la segunda etapa
+
+163
+00:16:03,620 --> 00:16:14,580
+que en esencia es la comparación, la generación de los puntajes. Ahora, esta última etapa es
+
+164
+00:16:14,580 --> 00:16:19,620
+super importante porque nosotros vamos a un poco más aurística porque en esencia
+
+165
+00:16:19,620 --> 00:16:25,340
+todo lo matemático me puede decir que estas cosas son similares pero tengo que tener una
+
+166
+00:16:25,340 --> 00:16:31,540
+una certeza de que los resultados que estoy estudiando para la problemática o aplicación
+
+167
+00:16:31,540 --> 00:16:36,500
+que estoy realizando, efectivamente son coherentes con lo que la pregunta está
+
+168
+00:16:36,500 --> 00:16:44,820
+queriendo responder. Entonces, no porque tenga apuntajes muy similares o
+
+169
+00:16:44,820 --> 00:16:49,860
+más altos, digamos, que lo que ha generado en la etapa 2, voy a tener
+
+170
+00:16:49,860 --> 00:16:55,140
+necesariamente buenas respuestas a esas consultas. Estas van a ser las cuatro
+
+171
+00:16:55,140 --> 00:17:03,500
+etapas que vamos a identificar, digamos, en este ejemplo, digamos, ficticio.
+
+172
+00:17:03,500 --> 00:17:10,980
+Entonces, vamos a entender qué es el embedding primero, ¿ya?
+
+173
+00:17:10,980 --> 00:17:12,860
+¿Qué es el embedding de un texto?
+
+174
+00:17:12,860 --> 00:17:16,500
+Que nosotros, de cierta manera, no hemos hablado en sesiones pasadas, ¿ya?
+
+175
+00:17:16,500 --> 00:17:19,140
+Que es este concepto de representar, ¿ya?
+
+176
+00:17:19,140 --> 00:17:26,140
+de representar algo no necesariamente matemático como algo como un elemento matemático
+
+177
+00:17:26,140 --> 00:17:33,020
+podemos concordar que un texto puede tener muchas representaciones matemáticas
+
+178
+00:17:33,020 --> 00:17:39,180
+yo puedo contar el número, puedo por ejemplo llevarlo a un plano, a un par
+
+179
+00:17:39,180 --> 00:17:44,520
+en donde la primera coordenada es el número de vocales y la segunda coordenada es el número
+
+180
+00:17:44,520 --> 00:17:49,960
+de consonantes, puedo llevarlo a un número simplemente contando cuantas
+
+181
+00:17:49,960 --> 00:17:54,080
+palabras tiene el texto y así suminicia entonces tengo muchas representaciones
+
+182
+00:17:54,080 --> 00:18:00,640
+que pueden llevar algo no numérico a algo numérico, entonces el embedding es un
+
+183
+00:18:00,640 --> 00:18:08,440
+vector que representa un objeto en un espacio numérico entonces imagínense
+
+184
+00:18:08,440 --> 00:18:13,520
+que yo tengo un texto de entrada x y tengo un codificador que es lo que
+
+185
+00:18:13,520 --> 00:18:22,040
+nosotros vamos a ver que está entrenado ya que lleva esa entrada de texto a un
+
+186
+00:18:22,040 --> 00:18:26,400
+punto en el espacio y se fijan este punto en el espacio que es un vector
+
+187
+00:18:26,400 --> 00:18:32,040
+tiene de dimensiones ya en donde tengo la primera componente la segunda
+
+188
+00:18:32,040 --> 00:18:40,560
+componente y así sumisí ya cuando se fijan me lleva algo un texto a un vector
+
+189
+00:18:40,560 --> 00:18:46,640
+Ahora, ¿qué es lo importante ahí? Lo importante ahí es cuál es la función de F.
+
+190
+00:18:46,640 --> 00:18:56,440
+Esa función de F tiene que ser, digamos, compleja para poder, digamos, representar
+
+191
+00:18:56,440 --> 00:19:06,040
+distintos tipos de texto. Por ejemplo, puede variar respecto de idiomas.
+
+192
+00:19:06,040 --> 00:19:09,560
+Los idiomas pueden tener distintas representaciones.
+
+193
+00:19:09,560 --> 00:19:13,120
+Entonces, es muy importante cuál es la representación que estamos utilizando.
+
+194
+00:19:13,120 --> 00:19:17,840
+Es súper difícil de llegar a una función que funcione siempre bien.
+
+195
+00:19:17,840 --> 00:19:21,600
+De hecho, no ninguna funciona siempre bien, solo que tengo que ir probando y hay unas que funcionan
+
+196
+00:19:21,600 --> 00:19:26,400
+mejor en ciertos contextos que otros. Y nosotros vamos a ver, vamos a utilizar una y yo les voy a
+
+197
+00:19:26,400 --> 00:19:33,120
+mencionar dos otras herramientas, digamos, que pueden ser utilizadas en este contexto.
+
+198
+00:19:33,120 --> 00:19:42,800
+Entonces, estas representaciones, si se fijan de alguna manera, ya fueron entrenadas.
+
+199
+00:19:42,800 --> 00:19:48,320
+Ya fueron entrenadas entre texto y representación, porque tienen que ser consistentes dentro de sí.
+
+200
+00:19:48,320 --> 00:19:56,040
+Por ejemplo, si el texto es clave y una entrada es clave y se le asigna un vector,
+
+201
+00:19:56,040 --> 00:20:01,760
+yo esperaría que contraseña, como otra entrada, otra observación, también tenga
+
+202
+00:20:01,760 --> 00:20:07,920
+una representación vectorial no tan lejos de la primera que es clara.
+
+203
+00:20:07,920 --> 00:20:13,120
+Entonces tienen que tener una consistencia interna que además tiene que ser consistente con el idioma.
+
+204
+00:20:13,120 --> 00:20:21,120
+Entonces es un problema bastante más complicado de abarcar y nosotros lo vamos a ver en términos de una representación, una función.
+
+205
+00:20:21,120 --> 00:20:27,520
+Claramente esta función es bastante más compleja que simplemente definir un f que depende de un parámetro en particular.
+
+206
+00:20:27,520 --> 00:20:32,840
+porque no son un parámetro, son muchos parámetros.
+
+207
+00:20:32,840 --> 00:20:39,560
+Ahora, siguiendo, veamos esta pequeña representación.
+
+208
+00:20:39,560 --> 00:20:51,960
+Por ejemplo, podemos hacer pasar texto a número vectorial,
+
+209
+00:20:51,960 --> 00:20:53,320
+pero de una manera bien ingenua.
+
+210
+00:20:53,320 --> 00:21:00,440
+Si el texto es clave, yo puedo contar cuantas palabras del texto o entrada es clave y en ese
+
+211
+00:21:00,440 --> 00:21:09,500
+caso el texto clave va a ser pasado a un vector de tres dimensiones que va a ser 100. Si es
+
+212
+00:21:09,500 --> 00:21:19,400
+contraseña el texto, voy a hacer 010. Si es video clave, va a ser 101. Y si se fijan, uno,
+
+213
+00:21:19,400 --> 00:21:27,400
+Teóricamente podría hacerlo con todas las palabras, pero va a quedar un vector de dimensión demasiado gigantesco como para poder trabajarlo.
+
+214
+00:21:27,400 --> 00:21:31,400
+Entonces, ¿cuál es el problema que tengo acá?
+
+215
+00:21:31,400 --> 00:21:34,400
+Es lo que les comentaba en un principio, la coincidencia.
+
+216
+00:21:34,400 --> 00:21:38,400
+Aquí, clave y contraseña, lo ocupo como sinónimos.
+
+217
+00:21:38,400 --> 00:21:45,400
+Y al ocuparlo como sinónimos, si se fijan acá, en este vector, en esta representación vectorial, son ortogonales.
+
+218
+00:21:45,400 --> 00:21:55,040
+porque 100 y 010 son ortogonales entre sí, ya, entonces van a ser súper distintos bajo esa representación.
+
+219
+00:21:55,040 --> 00:22:04,400
+Entonces esta representación no me sirve para, digamos, tener una noción de cercanía entre la palabra clave
+
+220
+00:22:04,400 --> 00:22:10,960
+y la palabra contraseña. Entonces esta representación que es bastante ingenua no me serviría, digamos,
+
+221
+00:22:10,960 --> 00:22:15,420
+por ejemplo para la consulta que tengo anterior, que la tenía del estudiante.
+
+222
+00:22:15,420 --> 00:22:24,820
+Entonces el conteo en general no me va a servir, por el hecho de que en texto tengo sinónimos.
+
+223
+00:22:24,820 --> 00:22:28,500
+Dos cosas que son distintas pueden ser muy similares entre sí.
+
+224
+00:22:28,500 --> 00:22:34,660
+Entonces, tengo que tener cuidado con estos conteos.
+
+225
+00:22:34,660 --> 00:22:44,100
+Entonces, mi problema es que sirve para identificar cuando hay una igualdad exacta, porque cualquier
+
+226
+00:22:44,100 --> 00:22:54,740
+otro texto que tiene la palabra clave va a estar dentro de una combinación lineal de
+
+227
+00:22:54,740 --> 00:23:02,660
+este vector, pero el problema son los sinónimos. Clave y contraseña son sinónimos, pero cuando
+
+228
+00:23:02,660 --> 00:23:07,740
+tengo esta representación vectorial en términos de bases en principio no voy a
+
+229
+00:23:07,740 --> 00:23:14,620
+tener digamos una noción de similitud de o de cercanía entonces estas
+
+230
+00:23:14,620 --> 00:23:18,060
+relaciones de cercanía de sinónimos en términos de palabra no funcionan
+
+231
+00:23:18,060 --> 00:23:23,420
+también cuando trabaja con texto ahora
+
+232
+00:23:23,420 --> 00:23:28,260
+siguiendo entonces yo tengo que tener una una noción de
+
+233
+00:23:28,260 --> 00:23:36,680
+cercanía o una noción de relación. Entonces, esta señal que yo les comentaba, porque nosotros
+
+234
+00:23:36,680 --> 00:23:44,220
+sabemos que clave y contraseña son similares entre sí, son sinónimos. Entonces, la señal es
+
+235
+00:23:44,220 --> 00:23:51,980
+una información que tenemos antes de calcularlos en Bering, que es esta representación, y corrienta
+
+236
+00:23:51,980 --> 00:23:58,980
+de cierta manera el aprendizaje, el aprendizaje de esta representación.
+
+237
+00:23:58,980 --> 00:24:05,160
+Por ejemplo, ¿qué tengo que tener ahí yo? Por eso estos modelos de LLM de Inteligencia
+
+238
+00:24:05,160 --> 00:24:11,460
+Artificial son súper costosos porque para yo tener eso tengo que saber que son similares.
+
+239
+00:24:11,460 --> 00:24:18,580
+Entonces tengo que tener algunos datos que digan que son similares.
+
+240
+00:24:18,580 --> 00:24:25,680
+yo puedo tener por ejemplo dos frases, olvidé mi clave y no recuerdo mi
+
+241
+00:24:25,680 --> 00:24:31,760
+contraseña, si yo lo matematizo no comparten palabras entre sí, entonces en
+
+242
+00:24:31,760 --> 00:24:36,240
+términos de frecuencia son distintos, pero yo sé que son similares pero eso no sé
+
+243
+00:24:36,240 --> 00:24:42,980
+yo como persona, entonces tengo que tener alguna señal, algo que me indique ya como
+
+244
+00:24:42,980 --> 00:24:50,340
+información apendada a los textos que son un parafraseo entre sí, ya, no que en
+
+245
+00:24:50,340 --> 00:24:54,620
+esencia expresan lo mismo, ya, no son exactamente lo mismo pero tienen la misma
+
+246
+00:24:54,620 --> 00:24:58,940
+intención, es decir, olvidé mi clave, no recuerdo mi contraseña, la intención es
+
+247
+00:24:58,940 --> 00:25:04,100
+que no puedo entrar al portal del aula el aula abierta, digo, entonces esa es la
+
+248
+00:25:04,100 --> 00:25:09,380
+noción de par, ya, entonces yo puedo hacer esas similitudes y hay una señal de
+
+249
+00:25:09,380 --> 00:25:13,820
+relación. Entonces son un parafraseo entre sí.
+
+250
+00:25:13,820 --> 00:25:17,620
+También voy a tener por ejemplo
+
+251
+00:25:18,380 --> 00:25:24,900
+olvide mi clave como como entrada, como consulta y el par de las fichas 01 que
+
+252
+00:25:24,900 --> 00:25:29,780
+indica el instructivo de cómo recuperar la contraseña. Entonces es una pareja
+
+253
+00:25:29,780 --> 00:25:34,980
+relevante porque olvide mi clave es solucionada comillas o es categorizada
+
+254
+00:25:34,980 --> 00:25:40,420
+como con las fichas de 01. Entonces lo puedo categorizar con etiquetas 1 que sirve.
+
+255
+00:25:40,420 --> 00:25:45,980
+Y olvidé mi clave y las fichas de pagos no, porque no responde a la consulta que se tenía.
+
+256
+00:25:45,980 --> 00:25:53,340
+Entonces, no necesariamente esas representaciones van a ser iguales.
+
+257
+00:25:53,340 --> 00:25:57,180
+Siempre no necesariamente voy a ocupar las mismas etiquetas binarias siempre.
+
+258
+00:25:57,180 --> 00:26:08,140
+y también va a depender obviamente del idioma. Entonces, todas estas codificadores que me llevan
+
+259
+00:26:08,140 --> 00:26:14,780
+a una representación vectorial, estos textos, tienden a ser distintos entre sí, distintas
+
+260
+00:26:14,780 --> 00:26:20,580
+dimensiones en términos matemáticos de los vectores y la forma en que lo llevan, digamos,
+
+261
+00:26:20,580 --> 00:26:24,580
+es porque en esencia es una una proyección
+
+262
+00:26:24,580 --> 00:26:27,580
+ahora
+
+263
+00:26:27,580 --> 00:26:35,020
+si fijan eso requiere mucho mucha información mucho dato porque tengo un
+
+264
+00:26:35,020 --> 00:26:40,180
+digamos un empecido infinito digamos formas de combinar palabras para
+
+265
+00:26:40,180 --> 00:26:44,780
+llevarlo a otro par entonces todas estas cosas requieren un entrenamiento muy
+
+266
+00:26:44,780 --> 00:26:48,700
+grado ser una codificación bueno la representación vectorial muy buena
+
+267
+00:26:48,700 --> 00:26:52,660
+requiere mucho costo computacional y por eso lo vamos a utilizar y no lo vamos a
+
+268
+00:26:52,660 --> 00:26:57,540
+entrenar, no lo podrías hacerlo. Ahora lo que se hace es tener
+
+269
+00:26:57,540 --> 00:27:02,220
+partir de una base, partir de una representación y tratar de adaptarlo a lo
+
+270
+00:27:02,220 --> 00:27:08,300
+que yo tengo. Entonces, esas marcas que en esencia es información apendada a
+
+271
+00:27:08,300 --> 00:27:13,820
+los datos que yo tengo originales, lo pueden ser de principio por personas ya,
+
+272
+00:27:13,820 --> 00:27:22,340
+cosa que ya se sabe pero necesitamos tener esta esa noción de referencia ya
+
+273
+00:27:22,340 --> 00:27:26,260
+entonces se vuelve de cierta manera algo que está más o menos supervisado
+
+274
+00:27:26,260 --> 00:27:31,100
+porque tengo una noción de de qué está bien y qué está mal cuando esa señal es
+
+275
+00:27:31,100 --> 00:27:38,060
+correcta y cuando no ya cuando hay un parafraseo y sin significar lo mismo
+
+276
+00:27:38,060 --> 00:27:43,060
+entonces todo esto justifica digamos que
+
+277
+00:27:43,060 --> 00:27:44,060
+todos estos módulos son
+
+278
+00:27:44,060 --> 00:27:47,060
+son costosos computacionalmente por la
+
+279
+00:27:47,060 --> 00:27:49,060
+por la representación, o sea, más allá de
+
+280
+00:27:49,060 --> 00:27:51,060
+el cálculo matemático es por la
+
+281
+00:27:51,060 --> 00:27:53,060
+representación misma de que requieres
+
+282
+00:27:53,060 --> 00:27:56,060
+obtener este tipo de datos
+
+283
+00:27:56,060 --> 00:27:59,060
+entonces
+
+284
+00:28:00,060 --> 00:28:02,060
+en el caso que vamos a estar viendo nosotros
+
+285
+00:28:02,060 --> 00:28:05,060
+es aprendizaje de estos pares utilizando
+
+286
+00:28:05,060 --> 00:28:15,940
+todos estos datos fue previamente hecho. Este f que está acá ya lo vamos a tener dado, con
+
+287
+00:28:15,940 --> 00:28:26,980
+sus pesos asociados, con sus parámetros asociados. Entonces, tenemos el entrenamiento y nosotros vamos a
+
+288
+00:28:26,980 --> 00:28:33,460
+coger algunos de esos modelos que me representan matemáticamente en términos
+
+289
+00:28:33,460 --> 00:28:38,980
+vectoriales, algún texto. Eso es externo a las fichas que yo tengo en este
+
+290
+00:28:38,980 --> 00:28:44,580
+ejemplo. Obviamente ese entrenamiento fue realizado con mucha más información,
+
+291
+00:28:44,580 --> 00:28:50,300
+con mucho texto y lo que vamos a ver acá también con distintos, en
+
+292
+00:28:50,300 --> 00:28:55,980
+distintos idiomas. Nosotros simplemente lo vamos a utilizar. Entonces hubo una
+
+293
+00:28:55,980 --> 00:29:01,980
+etapa de un aprendizaje preyo que es esa representación y es lo que más cuesta en principio porque
+
+294
+00:29:01,980 --> 00:29:09,100
+tengo que excepcionarme de que cosas similares me lo está llevando a puntos en el espacio
+
+295
+00:29:09,100 --> 00:29:17,820
+cercanos entre sí. Entonces, en ese aprendizaje van cambiando los pesos porque en esencia
+
+296
+00:29:17,820 --> 00:29:24,740
+es una red de neural. Lo que nosotros vamos a hacer es utilizar ese modelo, esa representación
+
+297
+00:29:24,740 --> 00:29:37,820
+para buscar fichas que respondan a distintas consultas, o cuáles son las más pertinentes.
+
+298
+00:29:37,820 --> 00:29:45,860
+Eso es lo que nosotros vamos a hacer. Entonces nosotros para ello vamos a ocupar una representación
+
+299
+00:29:45,860 --> 00:29:52,300
+que le llamamos Mini LEM, que hace referencia a una cosa
+
+300
+00:29:52,300 --> 00:29:56,300
+creada por Microsoft, que es Mini Language Model.
+
+301
+00:29:56,300 --> 00:30:00,420
+En esencial, me representa texto de manera matemática,
+
+302
+00:30:00,420 --> 00:30:02,780
+pero sin un costo computacional tan grande.
+
+303
+00:30:02,780 --> 00:30:04,300
+Por eso el mini.
+
+304
+00:30:07,820 --> 00:30:10,580
+Entonces, vamos a ocupar esa forma de representación y vamos
+
+305
+00:30:10,580 --> 00:30:15,780
+a llevarlo o ese Mini LEM va a llevar las cosas a un espacio
+
+306
+00:30:15,780 --> 00:30:21,780
+o observaciones vectoriales, que nosotros vamos a tratar de encontrar una métrica,
+
+307
+00:30:21,780 --> 00:30:29,780
+una noción de similitud que nos va a servir y vamos a ver qué es, digamos,
+
+308
+00:30:29,780 --> 00:30:33,780
+o qué vamos a considerar que dos cosas sean similares.
+
+309
+00:30:33,780 --> 00:30:37,780
+¿Cómo lo vamos a ver? No solo el texto, sino cómo vamos a considerar que dos cosas
+
+310
+00:30:37,780 --> 00:30:43,780
+son similares en el espacio que nos lleva esta herramienta de mini-elec.
+
+311
+00:30:45,780 --> 00:30:53,080
+entonces ciertas salvedades, la representación, no puedo enfatizar más lo importante que es porque
+
+312
+00:30:53,080 --> 00:31:01,280
+depende mucho del contexto, entonces estos modelos, por ejemplo, modelos de representación que hay,
+
+313
+00:31:01,280 --> 00:31:08,640
+que se pueden descargar, son muy difíciles de entrenar porque va a depender mucho del contexto
+
+314
+00:31:08,640 --> 00:31:13,400
+de las frases, las frases no son números en principio, son bastante más complicadas, por eso
+
+315
+00:31:13,400 --> 00:31:17,960
+texto bastante más difícil que de
+
+316
+00:31:17,960 --> 00:31:23,000
+de computar porque la representación matemática y la herramienta que
+
+317
+00:31:23,000 --> 00:31:28,120
+nosotros tenemos funcionan bien en términos matemáticos. Podemos hacer las
+
+318
+00:31:28,120 --> 00:31:31,400
+funciones de activación, podemos hacer combinaciones lineares, podemos tener los
+
+319
+00:31:31,400 --> 00:31:34,400
+P's, podemos utilizarlo, podemos hacer descenso gradiente, tenemos formas de
+
+320
+00:31:34,400 --> 00:31:38,720
+trabajar con números, con números y vectores, pero con
+
+321
+00:31:38,720 --> 00:31:44,080
+con texto, si bien si lo pasamos a número podemos hacer cosas porque ya
+
+322
+00:31:44,080 --> 00:31:48,280
+tenemos esta maquinaria pero si el traspaso que es la representación
+
+323
+00:31:48,280 --> 00:31:53,400
+virtual no está correctamente hecha o no es una buena representación entonces
+
+324
+00:31:53,400 --> 00:31:55,960
+todo lo que hagamos después de esa representación no va a tener
+
+325
+00:31:55,960 --> 00:32:00,800
+necesariamente buenos resultados, no se va a depender mucho del contexto
+
+326
+00:32:00,800 --> 00:32:10,800
+Entonces, si fijan acá tengo dos escenas que son en principio similares, si uno lo ve, por ejemplo, en términos matemáticos.
+
+327
+00:32:10,800 --> 00:32:21,800
+Entonces, me senté en el banco de la plaza, ocupa la palabra banco, si ocupo, por ejemplo, simplemente el conteo de la palabra banco,
+
+328
+00:32:21,800 --> 00:32:28,800
+estas dos frases serían iguales, a pesar de que eran distintas, que son distintas en referencia al contexto.
+
+329
+00:32:28,800 --> 00:32:33,260
+tengo bastante adicional el problema que habíamos visto de la similitud por
+
+330
+00:32:33,260 --> 00:32:38,660
+sinónimo, que habíamos visto acá, clave y contraseña, cosas que son simulares las
+
+331
+00:32:38,660 --> 00:32:45,500
+matematizan de manera distinta, también se ocupa esa misma regla, cosas que son
+
+332
+00:32:45,500 --> 00:32:50,940
+que son distintas las voy a clasificar como iguales, ya porque tienen la
+
+333
+00:32:50,940 --> 00:32:55,580
+frecuencia 1 la palabra banco, y como banco tiene distintas acepciones
+
+334
+00:32:55,580 --> 00:33:00,580
+entonces se expresan distintas
+
+335
+00:33:00,740 --> 00:33:06,380
+intenciones o sentidos de esa frase, esa
+
+336
+00:33:09,980 --> 00:33:13,780
+consulta. Entonces, tengo que tener cuidado con cómo voy a hacer la representación, por eso,
+
+337
+00:33:13,780 --> 00:33:18,500
+enfatizar bastante que el modelo de representación que estoy haciendo para texto es sumamente
+
+338
+00:33:18,500 --> 00:33:25,940
+porque digamos esa es la forma en que lo llevo a algo matemático.
+
+339
+00:33:25,940 --> 00:33:30,500
+Dictor Chavarri dice en el idioma ingles es más fácil para la IAA porque Banco
+
+340
+00:33:30,500 --> 00:33:36,420
+Bech es distinto de Banco. Sí, pero también hay otros problemas en inglés. Cada idioma
+
+341
+00:33:36,420 --> 00:33:41,100
+tiene sus propias particularidades. En general en español
+
+342
+00:33:41,100 --> 00:33:48,100
+español tenemos hartas problemas porque español es reglas generales
+
+343
+00:33:48,100 --> 00:33:55,100
+y luego muchas excepciones a la regla. En cambio en inglés es al revés. Tengo
+
+344
+00:33:55,100 --> 00:34:00,100
+excepciones a la regla y después las reglas generales.
+
+345
+00:34:00,100 --> 00:34:10,100
+En español tengo mucho sinónimo, digamos, en general. Entonces tiende a ser
+
+346
+00:34:10,100 --> 00:34:15,580
+ser un idioma más complicado, pero nuevamente cada idioma tiene su propia complejidad. Claudia.
+
+347
+00:34:16,900 --> 00:34:23,180
+Profesor, buenas tardes. Estaba pensando si alguien escribe, por ejemplo, solamente bancos
+
+348
+00:34:23,180 --> 00:34:27,420
+sin más contexto, ¿cómo se refleja esa ambigüedad a los resultados?
+
+349
+00:34:30,300 --> 00:34:33,620
+Se va a depender de la representación. Por ejemplo, si veo el conteo,
+
+350
+00:34:35,620 --> 00:34:39,020
+tengo hartos problemas porque no sé cómo diferenciarlo, no puedo discernirlo,
+
+351
+00:34:39,020 --> 00:34:46,900
+no lo voy a poder clasificar bien. Una palabra seca, a secas no me dice mucho.
+
+352
+00:34:46,900 --> 00:34:52,540
+Ahora, nuestros modelos de representación están alimentados con un sinfín de texto.
+
+353
+00:34:52,540 --> 00:34:59,420
+Ya como que vieron muchas posibles combinaciones de lo que...
+
+354
+00:34:59,420 --> 00:35:04,500
+de las posibilidades de texto que puedo tener o de pares de texto que puedo
+
+355
+00:35:04,500 --> 00:35:09,180
+tener. Tienen que ser modelos que fueron entrenados con mucho, mucho
+
+356
+00:35:09,180 --> 00:35:13,100
+datos, ya, no simplemente con un par de palabras. Entonces, una observación en
+
+357
+00:35:13,100 --> 00:35:17,860
+particular de una palabra no me va a afectar tanto la representación porque
+
+358
+00:35:17,860 --> 00:35:20,700
+ahí tiene millones y millones de palabras y de textos que fueron entradas,
+
+359
+00:35:20,700 --> 00:35:25,140
+ya que con el cual fueron entrenados. Pero en ese problema particular que tú
+
+360
+00:35:25,140 --> 00:35:30,580
+mencionas, no tengo una forma de decir ni, porque en términos matemáticos, a menos
+
+361
+00:35:30,580 --> 00:35:39,380
+que tenga otra información, el banco de banca y banco de un banco crediticio, digamos, son iguales.
+
+362
+00:35:39,380 --> 00:35:45,860
+No hay ausencia distinta de más información, van a ser los mismos, independiente de la
+
+363
+00:35:45,860 --> 00:35:49,460
+representación que utilicen. Ok, gracias.
+
+364
+00:35:49,460 --> 00:36:03,940
+Entonces, tengo que tener esa representación y tenemos distintas cosas. Ahora, yo les comentaba
+
+365
+00:36:03,940 --> 00:36:10,060
+que es súper difícil llegar a hacer representación desde cero. Entonces, no queremos hacer eso,
+
+366
+00:36:10,060 --> 00:36:13,940
+porque es muy costoso, por un sinfín de cosas, porque no tengo todos los datos disponibles,
+
+367
+00:36:13,940 --> 00:36:18,580
+es costoso computacionalmente, toma tiempo, toma dinero, un sinfín de cosas. Entonces,
+
+368
+00:36:18,580 --> 00:36:24,220
+que yo voy a hacer y hay una herramienta que usa una técnica que es destilación
+
+369
+00:36:24,220 --> 00:36:32,700
+que es aprender de los vectores de que otra red o de las salidas de otra red que ya aprendió
+
+370
+00:36:32,700 --> 00:36:37,380
+recuerden que esta representación por ejemplo el minilem es otra red de neuralza final les
+
+371
+00:36:37,380 --> 00:36:45,140
+comentaba todo puede ser visto como una variante o exactamente una red de neural entonces en este
+
+372
+00:36:45,140 --> 00:36:52,300
+en este contexto ya tengo una red entrenada que le llamo el maestro y que
+
+373
+00:36:52,300 --> 00:36:57,500
+entrega una cierta referencia a otra red que le llamo el estudiante que
+
+374
+00:36:57,500 --> 00:37:04,900
+intenta imitar al maestro. Entonces, maestro y estudiante son dos modelos ya de
+
+375
+00:37:04,900 --> 00:37:11,220
+redes en algún sentido y en este ejemplo yo lo que quiero es hacer
+
+376
+00:37:11,220 --> 00:37:19,940
+una adaptación multilingüe, fíjate acá sale I forgot my password que está en inglés, entonces
+
+377
+00:37:19,940 --> 00:37:29,180
+esa noción da, o sea esa entrada me da una referencia vectorial de 0208, entonces el maestro
+
+378
+00:37:29,180 --> 00:37:35,180
+recibe la frase que está en inglés que es I forgot my password y entrega un vector de referencia
+
+379
+00:37:35,180 --> 00:37:41,180
+0208 y el estudiante recibe su traducción
+
+380
+00:37:41,180 --> 00:37:46,900
+olvide mi contraseña y queremos que representen el mismo contenido porque
+
+381
+00:37:46,900 --> 00:37:51,740
+son en principio lo mismo entonces
+
+382
+00:37:51,940 --> 00:37:56,460
+representan lo mismo a pesar del idioma porque hay problema el password y
+
+383
+00:37:56,460 --> 00:38:00,620
+olviden mi contraseña son inherentemente cosas que son muy muy muy
+
+384
+00:38:00,620 --> 00:38:05,620
+similares y que no lo mismo. Entonces queremos que el estudiante
+
+385
+00:38:05,620 --> 00:38:11,420
+represente lo mismo que el modelo maestro. Entonces tengo un par de frases
+
+386
+00:38:11,420 --> 00:38:15,620
+I forgot my password y yo olvidé mi contraseña.
+
+387
+00:38:15,620 --> 00:38:19,940
+Entonces la frase original y la frase traucía.
+
+388
+00:38:19,940 --> 00:38:24,620
+Como entrenamiento, como datos de entrenamiento. Tengo el par que deben
+
+389
+00:38:24,620 --> 00:38:30,060
+ser iguales y sé cuál es la referencia. Entonces yo puedo entrenar la red del
+
+390
+00:38:30,060 --> 00:38:36,540
+estudiante tal que se vaya iterando hasta que se parezca.
+
+391
+00:38:36,540 --> 00:38:44,180
+Entonces, en este caso el maestro entrega 0 2 0 8, el estudiante entrega inicialmente
+
+392
+00:38:44,180 --> 00:38:49,980
+0 4 0 6, y podemos sacar por ejemplo su error cuadrativo medio.
+
+393
+00:38:49,980 --> 00:38:55,900
+En esencia, cuánto se fijan por coordenadas, 0 4 el estudiante, 0 2 el maestro al
+
+394
+00:38:55,900 --> 00:38:59,780
+cuadrado, 0 6 0 8, y puedo sacar lo que me estoy equivocando.
+
+395
+00:38:59,780 --> 00:39:03,580
+y ahí puedo ocupar tal como es una red, fíjate que es una renda lunar,
+
+396
+00:39:05,780 --> 00:39:09,660
+reto de propagación para actualizar mis pesos,
+
+397
+00:39:09,660 --> 00:39:13,780
+tal que conforme voy iterando esta red y la dejo ejecutar,
+
+398
+00:39:13,780 --> 00:39:15,460
+digamos, la que te dejo corriendo,
+
+399
+00:39:15,460 --> 00:39:20,140
+esta red entienda o aprenda que cuando le paso el par
+
+400
+00:39:20,140 --> 00:39:23,420
+I forgot my password y le pasé olvide mi contraseña,
+
+401
+00:39:23,420 --> 00:39:26,340
+me lo debiese llevar una representación vectorial
+
+402
+00:39:26,340 --> 00:39:30,700
+que toayan iguales.
+
+403
+00:39:30,700 --> 00:39:33,180
+Entonces, ese es el proceso que le vamos a llamar destilación.
+
+404
+00:39:33,180 --> 00:39:37,620
+Y si se fijan, acá este proceso es mucho más rápido que
+
+405
+00:39:37,620 --> 00:39:43,020
+aprender desde seca, porque lo más costoso computacionalmente
+
+406
+00:39:43,020 --> 00:39:45,940
+es llevar un texto a un número.
+
+407
+00:39:45,940 --> 00:39:49,820
+Ajustar otro número a otro número es infinitamente menos
+
+408
+00:39:49,820 --> 00:39:51,500
+costoso.
+
+409
+00:39:51,500 --> 00:39:56,500
+Por eso, este proceso de destilación es bastante utilizado, ¿ya?
+
+410
+00:39:56,500 --> 00:39:58,660
+Porque no tenemos que entrenar una red de 0,
+
+411
+00:39:58,660 --> 00:40:03,180
+no necesitamos un conjunto de datos de texto enorme, ¿ya?
+
+412
+00:40:03,180 --> 00:40:08,060
+Y si se fijan, podemos hacer paralelismo entre idiomas, ¿si?
+
+413
+00:40:08,060 --> 00:40:10,580
+Ahora, este caso no es en particular algo que viene del
+
+414
+00:40:10,580 --> 00:40:14,900
+minilm, que es el modelo que vamos a ocupar.
+
+415
+00:40:14,900 --> 00:40:20,700
+Pero, digamos, ilustra la idea del proceso de destilación que
+
+416
+00:40:20,700 --> 00:40:24,020
+vamos a entender para no partir de que cero.
+
+417
+00:40:24,020 --> 00:40:28,420
+Y en general, hoy en día, a menos que quiera hacer algo muy,
+
+418
+00:40:28,420 --> 00:40:30,980
+muy particular, no tiene mucho sentido empezar de cero,
+
+419
+00:40:30,980 --> 00:40:36,740
+sino que siempre hay algo o algún modelo de uso genético,
+
+420
+00:40:36,740 --> 00:40:39,780
+digamos, general que uno pueda adaptar a las aplicaciones
+
+421
+00:40:39,780 --> 00:40:40,260
+propias.
+
+422
+00:40:40,260 --> 00:40:40,760
+¿Sí?
+
+423
+00:40:44,180 --> 00:40:47,860
+Entonces, ¿cuál vamos a ocupar nosotros?
+
+424
+00:40:47,860 --> 00:40:55,860
+Nosotros vamos a ocupar el modelo o esta representación vectorial de este tipo de embedding que le vamos a llamar mini-LM.
+
+425
+00:40:57,860 --> 00:41:03,860
+Tienes comentadas? Algo grabado en Microsoft. LM hace referencia a Language Model.
+
+426
+00:41:03,860 --> 00:41:11,860
+Y se fijan cuando usted habla de traje y pelea y todas estas cosas, también le llaman LLM, que es Large Language Model, que son el contrario de lo que estamos haciendo.
+
+427
+00:41:11,860 --> 00:41:17,200
+estamos haciendo por algo muy pequeño que tiene en principio pocos parámetros, pocos pesos, por
+
+428
+00:41:17,200 --> 00:41:23,940
+el por ende lo podemos ejecutar rápidamente, no así large language model que ocupan muchos parámetros
+
+429
+00:41:23,940 --> 00:41:33,000
+y son más costosos que otros elementos, entonces es un paralelismo digamos que simplemente difiere
+
+430
+00:41:33,000 --> 00:41:40,340
+escala y obviamente en complejidad. Entonces, lo que hace esta red de Mini-LM
+
+431
+00:41:40,340 --> 00:41:46,620
+es representar palabras y esta parte, este Mini-LM es multilinguaje, entonces ya
+
+432
+00:41:46,620 --> 00:41:51,460
+lo puedo aplicar con distintos lenguajes. Fijan acá, este es el modelo que
+
+433
+00:41:51,460 --> 00:41:55,660
+nos entrega Microsoft, nos pone a disposición esto.
+
+434
+00:41:55,660 --> 00:42:06,500
+y lo que hace este, esta red digamos, esta herramienta, es llevar frases a
+
+435
+00:42:06,500 --> 00:42:15,820
+un punto en el espacio y ese punto en el espacio tiene dimensión 384
+
+436
+00:42:18,140 --> 00:42:24,420
+perdón, entradas en un vector. Entonces todo texto me lo lleva a algo en el
+
+437
+00:42:24,420 --> 00:42:30,780
+espacio 384 dimensional, lo cual es muy grande pero entenderán que los textos
+
+438
+00:42:30,780 --> 00:42:34,660
+son bastante complicados, entonces necesito tener cierta holgura y flexibilidad
+
+439
+00:42:34,660 --> 00:42:38,180
+porque si lo planteo en cuatro dimensiones no voy a poder hacer mucho
+
+440
+00:42:38,180 --> 00:42:42,180
+porque los textos son lo suficientemente complicado para que no puedan ser
+
+441
+00:42:42,180 --> 00:42:46,620
+representados cuatro dimensionalmente, no puede ser el argumento de que 384
+
+442
+00:42:46,620 --> 00:42:54,960
+me sigue diciendo poco, es un texto muy complejo. Entonces, me lleva texto a un
+
+443
+00:42:54,960 --> 00:43:00,400
+vector de dimensión 384, que fue entrenado con estos pares que yo les
+
+444
+00:43:00,400 --> 00:43:06,280
+comentaba, entonces con estos que ha tenido como entrenamiento estas señales.
+
+445
+00:43:06,280 --> 00:43:15,600
+Ahora, nosotros vamos a elegir no reutilizar, perdón, no re-entrena
+
+446
+00:43:15,600 --> 00:43:20,240
+sus pesos sino que los vamos a reutilizar ya no nos vamos a adaptar
+
+447
+00:43:20,240 --> 00:43:25,800
+necesariamente a nuestro aplicación sino que lo vamos a usar
+
+448
+00:43:25,800 --> 00:43:31,800
+directamente se podría adaptar pero necesitamos entrenarlo digo que no va a
+
+449
+00:43:31,800 --> 00:43:35,000
+ser tan costoso como hacerlo desde cero pero si va a requerir un tiempo de
+
+450
+00:43:35,000 --> 00:43:38,440
+cómputo entonces creo que nos tienen que quedar
+
+451
+00:43:38,440 --> 00:43:45,680
+claro de este mini lm es que nos lleva texto a un vector de 384 dimensiones
+
+452
+00:43:45,680 --> 00:43:53,720
+como lo represento entonces este mini lm me lleva
+
+453
+00:43:53,720 --> 00:44:01,000
+texto a número pero la pregunta natural es bueno porque 384 y cómo hace eso
+
+454
+00:44:01,000 --> 00:44:08,880
+Ahora esa es la pregunta, eso es lo relevante de todos estos modelos, porque
+
+455
+00:44:08,880 --> 00:44:13,400
+tal como yo tengo una representación entre 184 yo tengo infinitas
+
+456
+00:44:13,400 --> 00:44:19,080
+representaciones vectoriales, unas pueden ser más útiles que otras
+
+457
+00:44:19,080 --> 00:44:24,960
+y empíricamente uno se va valiando en el sentido de qué tan útiles son, entonces
+
+458
+00:44:24,960 --> 00:44:30,780
+MiniLM tiene esta utilidad digamos y aparte que está digamos en cierta manera
+
+459
+00:44:30,780 --> 00:44:34,620
+validado por Microsoft y tenemos cierto nivel de éxito cuando lo utilizamos y
+
+460
+00:44:34,620 --> 00:44:38,300
+sobre todo que no está contoso computacionalmente pero tenemos otras
+
+461
+00:44:38,300 --> 00:44:44,300
+herramientas ya en ePnet, la Pc, la Pc
+
+462
+00:44:44,300 --> 00:44:51,020
+que en esencia se basan en distintas estructuras de redes neuronales ya
+
+463
+00:44:51,020 --> 00:44:57,220
+para llevar texto a un objeto matemático, no necesariamente en la misma dimensión,
+
+464
+00:44:57,220 --> 00:45:02,980
+nada de esto me lo va a llevar necesariamente a un vector de 384 dimensiones, sino que cada
+
+465
+00:45:02,980 --> 00:45:07,180
+una va a tener su propia representación, que tiene que ser consistente entre sí, es decir,
+
+466
+00:45:07,180 --> 00:45:12,940
+no puedo comparar una representación que está hecha con mini lm con una representación que
+
+467
+00:45:12,940 --> 00:45:19,940
+están en MPNN, ya, tengo que tener la misma forma de traducir los textos a
+
+468
+00:45:19,940 --> 00:45:24,940
+a un número, digamos, un punto en el espacio en este caso.
+
+469
+00:45:24,940 --> 00:45:27,940
+Tengo que ser consistente con eso.
+
+470
+00:45:27,940 --> 00:45:31,940
+Nada me asegura que una es mejor que otra y ese es uno de los problemas que tengo acá.
+
+471
+00:45:31,940 --> 00:45:34,940
+Se va valigando de manera empírica en términos de para qué funciona bien,
+
+472
+00:45:34,940 --> 00:45:36,940
+para qué no funciona bien, etcétera.
+
+473
+00:45:36,940 --> 00:45:41,940
+Porque nuevamente las representaciones de objetos en términos matemáticos son infinitas.
+
+474
+00:45:41,940 --> 00:45:45,860
+yo tengo unas infinitas formas de representar matemáticamente algo, unas
+
+475
+00:45:45,860 --> 00:45:51,260
+útiles otras no tanto, pero nada me dice que una va a ser mejor que otra en
+
+476
+00:45:51,260 --> 00:45:56,700
+términos a priori, yo lo valido digamos en términos de que tan útil es la
+
+477
+00:45:56,700 --> 00:46:00,060
+aplicación que yo estoy realizando.
+
+478
+00:46:00,740 --> 00:46:03,540
+Entonces
+
+479
+00:46:03,900 --> 00:46:09,540
+todos han escuchado la noción de token, que es un token para que lo ocupamos, que
+
+480
+00:46:09,540 --> 00:46:16,740
+cada entrada, por ejemplo cuando ocupan con TGPT, con Cloud, que ese toque. Y si se fijan,
+
+481
+00:46:18,420 --> 00:46:23,620
+nosotros pasamos texto, todas estas tres metodologías que les comentaba, pero nosotros vamos a ocupar el LLM
+
+482
+00:46:25,340 --> 00:46:37,180
+a un número, ya a un objeto. Una pregunta y dice Jorge. Dice, y cuando se probaron estos LLM,
+
+483
+00:46:37,180 --> 00:46:41,800
+se entrenó esta representación virtual simplemente usando combinatoria, se probó
+
+484
+00:46:41,800 --> 00:46:50,000
+variando componente a componente los componentes del vector y se eligió el mejor
+
+485
+00:46:50,000 --> 00:46:55,540
+no necesariamente combinatoria, dentro de sí tienen otras metodologías
+
+486
+00:46:55,540 --> 00:47:00,200
+porque como ya les comentaba hay en reno orales, y las reno orales tienen muchas variantes
+
+487
+00:47:00,200 --> 00:47:06,720
+entonces piénselo así tengo una modelo cajanera tengo texto ya con ciertas
+
+488
+00:47:06,720 --> 00:47:11,880
+señales que me lo lleva un número dependiendo de la matematización que hago
+
+489
+00:47:11,880 --> 00:47:15,720
+y todas las operaciones que yo tengo entre medio yo puedo llegar a la noción
+
+490
+00:47:15,720 --> 00:47:20,560
+de pérdida y va a decir cuánto es mejor y cuando no pero va a depender mucho de
+
+491
+00:47:20,560 --> 00:47:26,160
+la representación y eso se probó con mucho dado y por eso es lo costoso de
+
+492
+00:47:26,160 --> 00:47:30,180
+estas cosas ellos ellos llegaron a que estos modelos son buenos porque lo fue
+
+493
+00:47:30,180 --> 00:47:34,200
+probando con tanto datos que lo pudieron validar espíricamente en términos de un
+
+494
+00:47:34,200 --> 00:47:39,480
+error y términos de la representación que están utilizando
+
+495
+00:47:39,680 --> 00:47:45,500
+se representó de manera victorial pero la matemática o la operatoria que se hizo
+
+496
+00:47:45,500 --> 00:47:50,040
+para llegar a esa representación victorial no necesariamente es
+
+497
+00:47:50,040 --> 00:47:55,080
+digamos única cada una de estas ocupa cosas distintas y la forma en que lo
+
+498
+00:47:55,080 --> 00:48:00,160
+validaron en términos tal como cuando hacemos una red y vemos que la pérdida
+
+499
+00:48:00,160 --> 00:48:04,520
+logarítmica sea menor, ya esta red hace lo mismo, solo que los objetos con los
+
+500
+00:48:04,520 --> 00:48:08,760
+cuales están trabajando y sacan esa pérdida logarítmica, por ejemplo,
+
+501
+00:48:08,760 --> 00:48:14,440
+fueron desde o vienen desde una representación.
+
+502
+00:48:16,440 --> 00:48:24,000
+En términos, volvamos al concepto de token, ya, entonces nosotros dijimos que
+
+503
+00:48:24,000 --> 00:48:27,520
+queremos matematizar cosas, queremos tener un objeto y lo quiero matematizar
+
+504
+00:48:27,520 --> 00:48:34,680
+entonces matematizar no significa simplemente sustituir cada palabra por
+
+505
+00:48:34,680 --> 00:48:39,840
+un número y sumar, entonces la matematización es un poco más complicada
+
+506
+00:48:39,840 --> 00:48:46,160
+primero cada modelo de los que hemos visto divide el texto que se quiere
+
+507
+00:48:46,160 --> 00:48:54,740
+cambiar en tokens, y esos tokens son palabras o fragmentos de palabras. Luego,
+
+508
+00:48:54,740 --> 00:49:01,980
+por ejemplo, un vocabulario, pensamos en español, asigna un identificador a
+
+509
+00:49:01,980 --> 00:49:08,580
+cada una de esas piezas de ese token, y ese identificador es una clave, digamos,
+
+510
+00:49:08,580 --> 00:49:18,100
+para localizar una representación que ya fue aprendida en el modelo. Entonces
+
+511
+00:49:18,780 --> 00:49:25,300
+cada uno de esos token, si se fijan tengo el texto, lo llevo a token y
+
+512
+00:49:25,300 --> 00:49:30,420
+cada uno de esos token los voy a llevar a un vector.
+
+513
+00:49:30,420 --> 00:49:36,820
+Y luego ese vector de contexto por token los junto de alguna manera, que va a
+
+514
+00:49:36,820 --> 00:49:42,120
+detenido de la red, que los lleva al vector de la oración. Entonces, no es que yo todo
+
+515
+00:49:42,120 --> 00:49:49,680
+el texto lo paso directamente a un vector, sino que lo separo, matematizo cada
+
+516
+00:49:49,680 --> 00:49:56,700
+fragmento o texto y luego esos los junto para hacer el vector
+
+517
+00:49:56,700 --> 00:50:03,220
+de la oración completa o el texto completo. No es todo de una.
+
+518
+00:50:03,220 --> 00:50:13,220
+Entonces, cada una de estas cosas lo lleva y tiene su forma distinta. Cada una de estas metodologías tiene su forma distinta de matematizar estas cosas.
+
+519
+00:50:13,220 --> 00:50:25,220
+Por ejemplo, el minilm que vamos a utilizar nosotros, el multilinguaje, resume, digamos, las posiciones en términos de la medida de las posiciones pálidas.
+
+520
+00:50:25,220 --> 00:50:34,220
+y su salida es un vector de 384 valores o dimensión, un vector de dimensión 384
+
+521
+00:50:34,220 --> 00:50:37,220
+y por eso es mini porque no tiene tanta dimensión
+
+522
+00:50:37,220 --> 00:50:46,220
+mpnet ya y la pce tiene una dimensión bastante más alta ya
+
+523
+00:50:46,220 --> 00:50:49,220
+y
+
+524
+00:50:49,220 --> 00:50:55,200
+por consecuencia son un poco más costosos o más costosos la verdad que
+
+525
+00:50:55,200 --> 00:51:00,300
+el modelo que vamos a utilizar nosotros. Aquí en principio las dimensiones no
+
+526
+00:51:00,300 --> 00:51:05,540
+son intercambiables ya y además tenemos que ocuparse, tenemos que usar el mismo
+
+527
+00:51:05,540 --> 00:51:10,340
+codificador o la forma de representación, la figura que le llamamos codificador a
+
+528
+00:51:10,340 --> 00:51:17,660
+quien nos lleva el texto al número, que también le podemos llamar codificador o
+
+529
+00:51:17,660 --> 00:51:21,000
+o la función de representación matemática.
+
+530
+00:51:21,000 --> 00:51:23,680
+De distintas formas hacen referencia a lo mismo.
+
+531
+00:51:23,680 --> 00:51:27,600
+La idea es, la realidad principal es,
+
+532
+00:51:27,600 --> 00:51:31,120
+llevan texto al número.
+
+533
+00:51:31,120 --> 00:51:34,520
+Ahora, uno pudiese decir, bueno, estas dos cosas tienen la misma
+
+534
+00:51:34,520 --> 00:51:36,360
+dimensión. ¿Los puedo comparar?
+
+535
+00:51:36,360 --> 00:51:39,040
+No, tampoco, porque tienen la misma dimensión,
+
+536
+00:51:39,040 --> 00:51:42,500
+pero la forma en que fueron llenados cada uno de esos
+
+537
+00:51:42,500 --> 00:51:47,360
+vectores en términos de número no fue la misma.
+
+538
+00:51:47,360 --> 00:51:52,760
+Entonces, si quiero comparar dos observaciones en términos matemáticos tras una representación,
+
+539
+00:51:52,760 --> 00:51:56,040
+tienen que haber necesariamente utilizado la misma representación.
+
+540
+00:51:56,040 --> 00:51:58,520
+Porque si no estoy comparando cosas que son distintas.
+
+541
+00:51:58,520 --> 00:51:59,520
+Sí.
+
+542
+00:52:04,600 --> 00:52:07,240
+Veamos entonces,
+
+543
+00:52:07,240 --> 00:52:12,680
+dónde salen ciertos números, tío, del ejemplo que hemos visto.
+
+544
+00:52:12,680 --> 00:52:14,880
+Entonces,
+
+545
+00:52:14,880 --> 00:52:23,880
+Veamos el ejemplo de textos, y vamos a contar palabras, vamos a seguir en este ejemplo que sabemos que nos funciona bien.
+
+546
+00:52:24,880 --> 00:52:31,880
+Entonces, y en principio solo vamos a estar interesados en la operación matemática que va a estar detrás.
+
+547
+00:52:31,880 --> 00:52:37,880
+Y van a ser textos pequeños, por algunas razones, para poder ejecutarlo y poder entenderlo más fácilmente.
+
+548
+00:52:37,880 --> 00:52:42,880
+Entonces, vamos simplemente a poner un vocabulario de dos palabras.
+
+549
+00:52:42,880 --> 00:52:48,880
+La primera coordenada, entonces vamos a llevar algo a un vector de dimensión 2,
+
+550
+00:52:48,880 --> 00:52:50,880
+que es algo muy, muy reducido.
+
+551
+00:52:50,880 --> 00:52:54,880
+Entonces, la primera coordenada va a contar cuántas veces sale clave en el texto,
+
+552
+00:52:54,880 --> 00:53:01,880
+y la segunda coordenada va a contar cuántas veces sale la palabra recuperar.
+
+553
+00:53:01,880 --> 00:53:02,880
+¿Ya?
+
+554
+00:53:02,880 --> 00:53:05,160
+Si se fijan, si tengo el texto
+
+555
+00:53:05,160 --> 00:53:11,440
+Q, una consulta, una pregunta a un estudiante que dice recuperar clave
+
+556
+00:53:11,440 --> 00:53:17,880
+entonces es el vector 1,1 porque tiene una palabra que se llama clave
+
+557
+00:53:17,880 --> 00:53:20,500
+y una palabra que se llama recuperar, independiente del orden
+
+558
+00:53:20,500 --> 00:53:23,320
+un texto A que se llama clave clave va a ser 2,0
+
+559
+00:53:23,320 --> 00:53:26,840
+y el texto B va a ser recuperar clave que va a estar repetido 4 veces
+
+560
+00:53:26,840 --> 00:53:30,000
+entonces va a ser 4,4 porque va a ser recuperar clave, recuperar clave,
+
+561
+00:53:30,000 --> 00:53:35,980
+lugar al clave, pues cuento cada una, son cuatro veces, entonces me lo llevo un vector 4 a 4.
+
+562
+00:53:35,980 --> 00:53:37,980
+Entonces, si fijan ahí tengo
+
+563
+00:53:39,260 --> 00:53:44,500
+tres puntos en el espacio. Y eso simplemente sale de contar cosas, que nosotros sabemos que
+
+564
+00:53:45,500 --> 00:53:50,000
+no es muy bueno cuando tengo parafraseo y también cuando las cosas,
+
+565
+00:53:51,100 --> 00:53:56,220
+cuando las cosas representan cosas distintas, la pone como,
+
+566
+00:53:56,940 --> 00:53:58,940
+quizás muy similar, el caso del banco
+
+567
+00:54:00,000 --> 00:54:08,600
+y cuando las cosas son similares las ponen como distintas, que es el caso de clave y contraseña.
+
+568
+00:54:08,600 --> 00:54:14,320
+Ahora, queremos ver la geometría de estas cosas, y si fijan tengo tres puntos en el espacio
+
+569
+00:54:14,320 --> 00:54:19,680
+y voy a querer encontrar una noción de similitud.
+
+570
+00:54:19,680 --> 00:54:26,680
+Entonces recuerden, estas metodologías me llevan las cosas a un punto en el espacio.
+
+571
+00:54:26,680 --> 00:54:31,480
+punto en el espacio va a ser un vector de alguna dimensión. Ahora se
+
+572
+00:54:31,480 --> 00:54:36,880
+toca ver cuando tengo por ejemplo dos mensajes que están representados de
+
+573
+00:54:36,880 --> 00:54:44,200
+manera vectorial en 384 valores en un vector, ¿cómo puedo decir si esos dos,
+
+574
+00:54:44,200 --> 00:54:49,320
+esas dos representaciones son iguales? Entonces para ello vamos a ver un caso
+
+575
+00:54:49,320 --> 00:54:55,400
+más simple que es en vez de 384 veamos una representación que es en
+
+576
+00:54:55,400 --> 00:54:59,480
+términos dosdimensional para que podamos en la matemática más fácilmente.
+
+577
+00:54:59,480 --> 00:55:06,400
+Entonces, si tengo estos números yo puedo ver
+
+578
+00:55:06,400 --> 00:55:16,040
+cómo se ven en el plano. Entonces, si se fijan el vector q que era
+
+579
+00:55:16,040 --> 00:55:24,360
+1,1 lo puedo ver como el punto que está acá, cierto? 1,1 y su vector desde el
+
+580
+00:55:24,360 --> 00:55:31,180
+origen hasta esa cantidad. El punto A, que es 2,0, va a estar en el
+
+581
+00:55:31,180 --> 00:55:38,100
+primer en el eje horizontal, esta línea azul y el B va a pasar a través del Q
+
+582
+00:55:38,100 --> 00:55:43,140
+porque es 4,4 pero va a llegar a una magnitud distinta.
+
+583
+00:55:43,140 --> 00:55:49,060
+Y ya la forma que nosotros vamos a representar cada una de estas
+
+584
+00:55:49,060 --> 00:55:52,940
+observaciones, si se fijan eso es un punto en el espacio y en este espacio es el
+
+585
+00:55:52,940 --> 00:56:00,740
+plano porque es dosdimensional. Ahora, también podemos ver su dirección desde
+
+586
+00:56:00,740 --> 00:56:05,180
+el punto, desde el origen hacia el punto. Si tuviesen la representación que
+
+587
+00:56:05,180 --> 00:56:09,260
+acá no podría pasar porque estoy contando cosas o son positivas, también
+
+588
+00:56:09,260 --> 00:56:14,380
+pudiese tener otras formas en otro lado, en otra dirección.
+
+589
+00:56:14,380 --> 00:56:19,700
+Entonces, lo estamos matematizando como simplemente un vector en el plano porque
+
+590
+00:56:19,700 --> 00:56:28,100
+estoy trabajando en vectores de dimensión 2. Ahora lo que yo quiero comparar es qué
+
+591
+00:56:28,100 --> 00:56:34,140
+tan similares son esas cosas, son estos vectores que representan nuevamente mensajes, consultas,
+
+592
+00:56:34,140 --> 00:56:43,580
+texto. Entonces, siguiendo. Veamos la distancia. Entonces, si se fijan, tengo una distancia,
+
+593
+00:56:43,580 --> 00:56:47,620
+un vector dosdimensional
+
+594
+00:56:47,980 --> 00:56:54,620
+y yo conozco distancias claras que es por ejemplo la distancia en euclíada y en
+
+595
+00:56:54,620 --> 00:56:59,820
+esencia simplemente mide la separación digamos entre dos puntos y nosotros
+
+596
+00:56:59,820 --> 00:57:04,780
+tenemos los puntos que es el Q, el A y el B. Entonces yo puedo calcular la
+
+597
+00:57:04,780 --> 00:57:10,260
+distancia euclíada entre Q y A y entre Q y B porque uno podría preguntarse
+
+598
+00:57:10,260 --> 00:57:17,500
+bueno de estos puntos que está acá cuál se parece más a Q recuperar clave
+
+599
+00:57:17,500 --> 00:57:23,020
+el texto clave clave o recuperar clave repetido cuatro veces
+
+600
+00:57:23,020 --> 00:57:29,220
+entonces yo veo y saco la distancia euclíana
+
+601
+00:57:29,220 --> 00:57:34,500
+saco la distancia euclíana, la distancia euclíana entre el punto Q y el punto A
+
+602
+00:57:34,500 --> 00:57:40,780
+es raíz de 2 y la distancia entre el punto Q y el punto B
+
+603
+00:57:40,780 --> 00:57:49,420
+es de raíz de 18. Ahora, si se fijan, Q y B tienen la misma dirección pero
+
+604
+00:57:49,420 --> 00:57:53,620
+longitudes distintas, tienen la misma dirección, van hacia el mismo lado,
+
+605
+00:57:53,620 --> 00:58:00,260
+las flechas apuntan hacia el mismo lado. Entonces esa dirección que es seguir esta flechita
+
+606
+00:58:00,260 --> 00:58:08,500
+si, está para acá, corresponde a conservar la misma proporción entre los dos conteos,
+
+607
+00:58:08,500 --> 00:58:14,580
+o entre las dos coordenadas, porque si se fijan la proporción entre Q y Q es 1 a 1 y la proporción
+
+608
+00:58:14,580 --> 00:58:22,980
+entre en B es 1 a 1, entonces eso me lleva a la misma dirección, ya, y el A apunta sobre el eje
+
+609
+00:58:22,980 --> 00:58:29,740
+horizontal y expresa en esencia otro perfil, otra cosa distinta, entonces esa diferencia en la que
+
+610
+00:58:29,740 --> 00:58:37,660
+nosotros queremos, digamos, notar, digamos, cuando quiero ver cuando digo las
+
+611
+00:58:37,660 --> 00:58:41,800
+cosas son similares, también estoy diciendo internamente cuando son
+
+612
+00:58:41,800 --> 00:58:45,380
+distintas, entonces voy a tener que tener en
+
+613
+00:58:45,380 --> 00:58:49,460
+consideración la distancia y aquí va a salir algo que va a ser el producto
+
+614
+00:58:49,460 --> 00:58:55,980
+interno y el coseno, que son las propiedades que vamos a ocupar para ver
+
+615
+00:58:55,980 --> 00:58:59,980
+esta noción de similitud.
+
+616
+00:59:00,620 --> 00:59:06,060
+Ahora, si lo vemos en términos de distancia euclidiana a secas,
+
+617
+00:59:06,060 --> 00:59:14,580
+el punto A está más cerca del punto Q, pero el B conserva otro perfil que tiene
+
+618
+00:59:14,580 --> 00:59:17,780
+la misma dirección, entonces también es bastante similar a pesar de que estoy
+
+619
+00:59:17,780 --> 00:59:21,340
+ocupando la distancia euclidiana. Entonces tengo que tener cuidado, si ocupo
+
+620
+00:59:21,340 --> 00:59:24,780
+solo esta noción va a ser un poquito más complicado.
+
+621
+00:59:24,780 --> 00:59:29,220
+siguen entonces de estas propiedades que les comentaba yo voy a tener el
+
+622
+00:59:29,220 --> 00:59:34,860
+el producto interno ya que en esencia es una multiplicación o multiplicar y
+
+623
+00:59:34,860 --> 00:59:47,140
+sumar, si se fijan voy a multiplicar el vector Q con el vector A ya entonces
+
+624
+00:59:47,140 --> 00:59:53,220
+este producto interno es simplemente multiplicar y sumar ya que en términos
+
+625
+00:59:53,220 --> 01:00:00,780
+en términos vectoriales es multiplicar la transpuesta de Q por el vector A, es
+
+626
+01:00:00,780 --> 01:00:09,180
+una forma reducida de escribir. Entonces, el índice J recorre las D coordenadas y Q
+
+627
+01:00:09,180 --> 01:00:16,300
+transpuesta se va a leer como el producto interno de Q con A, Q transpuesta A, que
+
+628
+01:00:16,300 --> 01:00:30,300
+esta noción que está aquí. Nosotros teníamos que Q era 1,1 y teníamos que el punto o la representación del texto A era 2,0 y la representación del texto B era 4,4.
+
+629
+01:00:30,300 --> 01:00:45,300
+Entonces cuando hago el producto interno entre Q y A va a ser el primer componente de Q por el primer componente de A más, y fíjense eso es 1 por 2 más el primer componente de Q
+
+630
+01:00:45,300 --> 01:00:51,420
+de Q por el segundo componente de A, 1 por 0, ya eso me da 2. Hago el mismo
+
+631
+01:00:51,420 --> 01:00:58,660
+ejercicio con el producto B, el producto interno de D, me queda 1 por 4 más 1 por 4
+
+632
+01:00:58,660 --> 01:01:06,100
+que me da 8. Tiene un producto interno mayor pero no puedo quedarme ahí, ya
+
+633
+01:01:06,100 --> 01:01:09,940
+porque eso no es necesariamente una medida de similitud, porque va a
+
+634
+01:01:09,940 --> 01:01:14,380
+depender mucho del tamaño de los valores, entonces estos 8 por 8
+
+635
+01:01:14,380 --> 01:01:18,880
+o sea 8,8 va a ser más grande, entonces no puedo simplemente considerar el producto como algo que
+
+636
+01:01:18,880 --> 01:01:25,200
+sea tan interpretable en términos de la semejanza de lo que yo quiero, de los perfiles o de los textos
+
+637
+01:01:25,200 --> 01:01:31,560
+que yo quiero identificar. Para ello también tengo que considerar las cadenas en las cuales
+
+638
+01:01:31,560 --> 01:01:40,720
+están los valores. Por ejemplo, si el B es el 4,4 entonces 2B es 8,8 y en principio genera o
+
+639
+01:01:40,720 --> 01:01:46,520
+identifica el mismo perfil porque sigue en la misma dirección solo que tiene
+
+640
+01:01:46,520 --> 01:01:52,440
+distinta longitud entonces Q transpose B que es su producto interno va a ser el
+
+641
+01:01:52,440 --> 01:02:00,040
+doble y va a ser 16 entonces necesitamos contar con esa
+
+642
+01:02:00,040 --> 01:02:06,160
+con esa con esa propiedad digamos de hacer un poquito agnóstico y de cierta
+
+643
+01:02:06,160 --> 01:02:12,520
+manera necesitamos una operación que mida la longitud y permita retirar su
+
+644
+01:02:12,520 --> 01:02:17,880
+efecto ya porque nosotros acá tenemos si no un efecto muy muy muy
+
+645
+01:02:17,880 --> 01:02:21,680
+promedio antes digamos dentro de la noción de semejanza o similitud que
+
+646
+01:02:21,680 --> 01:02:28,960
+nosotros queremos llegar entonces ahí van a ser la norma euclidiana
+
+647
+01:02:28,960 --> 01:02:37,880
+y en ese sentido nosotros vamos a utilizar la norma pliedena en donde vamos a
+
+648
+01:02:37,880 --> 01:02:43,080
+dividir digamos la norma del punto Q, la norma del punto A, la norma del punto B
+
+649
+01:02:43,080 --> 01:02:49,160
+si se fijan es la raíz de cada valor de cada una de sus componentes al cuadrado
+
+650
+01:02:49,160 --> 01:02:53,320
+entonces de Q que era 1,1 va a ser la raíz de 1 al cuadrado más 1 al cuadrado que
+
+651
+01:02:53,320 --> 01:03:00,440
+raíz de 2. Del B va a ser raíz de 2 al cuadrado más 0 al cuadrado, 2, y del B
+
+652
+01:03:00,440 --> 01:03:05,480
+o sea, de esa cadena y del B va a salir raíz de 32. Ahora,
+
+653
+01:03:05,480 --> 01:03:13,040
+entonces vamos a utilizar esa cantidad que por definición es esta para
+
+654
+01:03:13,040 --> 01:03:19,260
+digamos de cierta manera normalizar y hacer comparables las distancias que
+
+655
+01:03:19,260 --> 01:03:22,240
+estábamos calculando.
+
+656
+01:03:23,320 --> 01:03:29,100
+Entonces, ¿qué vamos a hacer? Cada uno de los vectores o de las representaciones vectoriales
+
+657
+01:03:29,100 --> 01:03:34,540
+van a ser divididas por su norma, ¿verdad? Su norma ocultidiana.
+
+658
+01:03:34,540 --> 01:03:44,680
+Entonces, el Q va a quedar como el vector 1,1 dividido cada componente a componente por raíz de 2.
+
+659
+01:03:44,680 --> 01:03:52,520
+Entonces va a quedar 1 sobre raíz de 2, que es 0.7071 para ambos componentes.
+
+660
+01:03:52,520 --> 01:04:00,520
+para el vector A va a quedar 1 0 porque era 2 0 inicialmente y para el B va a quedar 4,4 y va a quedar si se fijan
+
+661
+01:04:01,520 --> 01:04:06,620
+el mismo vector que Q y ahora sí lo puedo comparar y estos dos números tienen hacer
+
+662
+01:04:07,600 --> 01:04:12,980
+además que compartían dirección tiene que ser muy muy muy sensencial el mismo en realidad
+
+663
+01:04:13,640 --> 01:04:15,640
+para cuando quiero hacer la comparación
+
+664
+01:04:16,920 --> 01:04:18,920
+ahora
+
+665
+01:04:18,920 --> 01:04:24,800
+eso de cierta manera hace comparar la longitud pero ahora tengo que considerar
+
+666
+01:04:24,800 --> 01:04:32,740
+también el ángulo en el cual está este vector. Cierta salvedad tiene que pasar
+
+667
+01:04:32,740 --> 01:04:37,280
+que el punto no puede ser el origen porque si no, no puedo dividir el 0, si es 0, 0
+
+668
+01:04:37,280 --> 01:04:40,460
+va a tener raíz de 0 al cuadrado, vamos a hacer al cuadrado y así todas las dimensiones
+
+669
+01:04:40,460 --> 01:04:45,600
+puede estar dividido por 0, no puedo hacer eso. Entonces, el normalizar ahora, cuando ocupamos la
+
+670
+01:04:45,600 --> 01:04:49,600
+la norma escrodiana y la divido cada vector, o sea, componente a componente por esa norma,
+
+671
+01:04:49,600 --> 01:04:57,600
+entonces retira, digamos, la escala y conserva estos mismos perfiles que yo quiero comparar
+
+672
+01:04:57,600 --> 01:05:08,960
+entre las coordenadas. Pero nuevamente la dirección sigue estando un poco libre. Entonces lo que tengo
+
+673
+01:05:08,960 --> 01:05:15,560
+que hacer yo ahora es considerar esa dirección dentro de mi análisis. Entonces si se fijan acá
+
+674
+01:05:15,560 --> 01:05:24,600
+yo tengo el producto interno entre el vector Q y el vector z, los voy a dividir su norma para sacar
+
+675
+01:05:24,600 --> 01:05:32,360
+el efecto de la longitud y esto es lo que yo voy a definir como el coseno porque compara las
+
+676
+01:05:32,360 --> 01:05:41,200
+direcciones. Entonces cuando tengo el texto A y hago esta cantidad, digamos, se fijan cuando
+
+677
+01:05:41,200 --> 01:05:54,200
+yo he vivido el texto A y hice el producto interno, me dio 2, lo dividí de raíz de 2 y de 2, porque es cada uno de raíz de 2 y de 2, supernormal de pleidiana,
+
+678
+01:05:54,200 --> 01:06:09,200
+y en esencia hago esta operación, me va a entregar el coseno que el texto A, el coseno de este texto es 0.7071 y para el punto B es 1,
+
+679
+01:06:09,200 --> 01:06:16,560
+entonces B ocupa el primer lugar, ya, tiene la misma dirección que la consulta original.
+
+680
+01:06:16,560 --> 01:06:21,920
+Entonces vamos a estar diciendo que ahí tengo una noción de similitud.
+
+681
+01:06:21,920 --> 01:06:26,560
+Entonces, ¿cómo interpreto esto? Si se fijan, tengo Q y B que están representados de la misma
+
+682
+01:06:26,560 --> 01:06:37,200
+manera y tengo un ángulo adicional, ya. Entonces, esta noción de coseno va a considerar, dado que ocupa
+
+683
+01:06:37,200 --> 01:06:41,840
+también la norma criana, no sólo la longitud sino también el ángulo en el
+
+684
+01:06:41,840 --> 01:06:47,540
+cual estoy trabajando. Entonces un coseno por ejemplo 0,8 es un
+
+685
+01:06:47,540 --> 01:06:53,600
+puntaje geométrico en esencia hay una similitud pero va a depender del ángulo
+
+686
+01:06:53,600 --> 01:06:58,760
+y si se fijan el ángulo entre Q y B en términos de diferentes es 0 por
+
+687
+01:06:58,760 --> 01:07:03,900
+consecuencia su valor es 1. Entonces siguen la misma noción, siguen la misma
+
+688
+01:07:03,900 --> 01:07:11,540
+dirección y podemos decir que esos dos representaciones son mucho más
+
+689
+01:07:11,540 --> 01:07:20,460
+similares entre sí que Q y A. Entonces Q y B son más similares.
+
+690
+01:07:20,460 --> 01:07:25,940
+Entonces, eso es lo que nosotros hacemos con las
+
+691
+01:07:25,940 --> 01:07:29,740
+representaciones matemáticas, las representaciones vectoriales. Aquí lo hicimos
+
+692
+01:07:29,740 --> 01:07:34,380
+con dos dimensiones, pero nosotros vamos a utilizar las representaciones vectoriales
+
+693
+01:07:34,380 --> 01:07:38,780
+que nos entrega MINILEM o las otras metodologías que me lo llevan a un vector de mucha más
+
+694
+01:07:38,780 --> 01:07:46,480
+dimensión. Entonces, en resumidas cuentas, la distancia entre A y B, si se fijan, simplemente
+
+695
+01:07:46,480 --> 01:07:52,100
+compara la separación, el producto interno considera las coordenadas con efecto de escala
+
+696
+01:07:52,100 --> 01:07:57,020
+y el coseno me además compara la dirección retirando la escala.
+
+697
+01:07:57,020 --> 01:08:07,020
+y se fijan acá, la menor distancia considera a, porque si yo lo veo así, este punto está más cercano a ese
+
+698
+01:08:07,020 --> 01:08:17,020
+No obstante, el mayor coseno favorece a b, por eso conserva el mismo perfil
+
+699
+01:08:17,020 --> 01:08:24,020
+Entonces tengo que tener una noción de similitud entre los vectores
+
+700
+01:08:24,020 --> 01:08:29,020
+vectores entonces tengo que casarme con alguna médica, es decir, ¿cómo voy a
+
+701
+01:08:29,020 --> 01:08:33,500
+decir que dos cosas son iguales? que son vectores que están en el espacio ¿cómo
+
+702
+01:08:33,500 --> 01:08:38,340
+voy a decir que uno es más cerca que otro? y eso o esa medida, esa métrica
+
+703
+01:08:38,340 --> 01:08:42,020
+que voy a utilizar va a depender del modelo y de lo que yo quiero hacer
+
+704
+01:08:42,020 --> 01:08:48,220
+el coseno en general funciona porque tiene... tomo en consideración la
+
+705
+01:08:48,220 --> 01:08:51,700
+consideración la dirección pero no necesariamente va a solucionar todos los
+
+706
+01:08:51,700 --> 01:08:55,420
+problema recuerden que esto también está sujeto a la misma representación vectorial que yo estoy
+
+707
+01:08:55,420 --> 01:09:01,660
+utilizando. Hay una noción de variabilidad en términos de la respuesta y de la performance que puedo
+
+708
+01:09:01,660 --> 01:09:09,740
+tener en este de acá. Entonces finalmente si se fijan acá el min el m me entrega un vector y me
+
+709
+01:09:09,740 --> 01:09:17,740
+lleva los textos a algo de 384 dimensiones, de 384 coordenadas que cuando yo quiero sacar el
+
+710
+01:09:17,740 --> 01:09:22,320
+coseno, voy a tener que hacerlo en esta operación matemática que es bastante más
+
+711
+01:09:22,320 --> 01:09:25,080
+complicada, por eso lo hicimos con dos dimensiones.
+
+712
+01:09:25,080 --> 01:09:31,440
+Entonces, es un ejemplo un poco más didáctico, un poco más acotado para
+
+713
+01:09:31,440 --> 01:09:35,720
+entender la operación matemática que se hace por detrás, pero en la
+
+714
+01:09:35,720 --> 01:09:40,640
+práctica son vectores de mucha mayor magnitud.
+
+715
+01:09:40,640 --> 01:09:47,640
+Eso respecto a la representación. Entonces, si fijan acá el embedding
+
+716
+01:09:47,640 --> 01:09:54,720
+es representar texto como número en algún sentido, en algún vector. Y aquí tengo entonces distintas
+
+717
+01:09:54,720 --> 01:09:59,600
+herramientas para ver cuándo son similares. Produto interno, la norma, normalización y el
+
+718
+01:09:59,600 --> 01:10:07,480
+coseno. Cada uno tiene sus proyesos contra. Entonces, ahora vamos a la pauta y vamos a seguir con estas
+
+719
+01:10:07,480 --> 01:10:13,720
+partes que habíamos dicho en un inicio, que es la comparación y el orden que tenemos pendiente aún.
+
+720
+01:10:13,720 --> 01:10:23,400
+eso volvemos a las 8 5 15 minutos más
+
+721
+01:10:26,200 --> 01:10:30,920
+recording stopped nos vemos
+
+722
+01:28:13,720 --> 01:28:20,240
+ya entonces estoy compartiendo el
+
+723
+01:28:20,240 --> 01:28:22,240
+cierto y sí ya
+
+724
+01:28:22,240 --> 01:28:29,240
+entonces vimos que era el embedding como necesitamos como eso me lleva a algo un
+
+725
+01:28:29,240 --> 01:28:34,000
+objeto y lo matematiza en algo
+
+726
+01:28:34,720 --> 01:28:39,040
+numérico un vector en principio con distintas dimensiones dependiendo de la
+
+727
+01:28:39,040 --> 01:28:42,040
+herramienta que nosotros vamos a utilizar.
+
+728
+01:28:42,040 --> 01:28:44,760
+Y volvamos, en esencia, al ejemplo que nosotros estábamos
+
+729
+01:28:44,760 --> 01:28:45,260
+viendo.
+
+730
+01:28:45,260 --> 01:28:47,220
+Nosotros teníamos un equipo de soporte, digamos,
+
+731
+01:28:47,220 --> 01:28:50,640
+de una página que nosotros llamamos Ábula Libre y que
+
+732
+01:28:50,640 --> 01:28:53,940
+tenían 12 fichas con los distintos identificadores del 1
+
+733
+01:28:53,940 --> 01:28:59,440
+al 12 que hacen referencia a respuestas para distintas
+
+734
+01:28:59,440 --> 01:29:01,320
+consultas, ¿ya?
+
+735
+01:29:01,320 --> 01:29:04,060
+Del 1 el acceso a la clave, el acceso de recuperar la
+
+736
+01:29:04,060 --> 01:29:07,440
+contraseña, el segundo para la grabación de los videos,
+
+737
+01:29:07,440 --> 01:29:11,660
+Y así sumisigue para cada una de las posibles y recurrentes
+
+738
+01:29:11,660 --> 01:29:16,040
+consultas que hacen los alumnos en este aula.
+
+739
+01:29:16,040 --> 01:29:20,560
+Entonces, ¿qué rol cumple cada conjunto en el ejemplo que
+
+740
+01:29:20,560 --> 01:29:22,000
+nosotros estábamos viendo?
+
+741
+01:29:22,000 --> 01:29:33,320
+Primero, nosotros tenemos que el mini LM es quien hace,
+
+742
+01:29:33,320 --> 01:29:41,800
+esencia la transformación entre el objeto a, o sea, entre el texto a objeto matemático, pero
+
+743
+01:29:41,800 --> 01:29:49,680
+que fue entrenado ya con otros textos, ya fue pre entrenado anterior a la aplicación que
+
+744
+01:29:49,680 --> 01:29:54,680
+nosotros estábamos haciendo. Nosotros vamos a ocupar 12 fichas de aula abierta, que va a ser
+
+745
+01:29:54,680 --> 01:30:00,560
+la base que nosotros vamos a considerar para ver nociones de similitud, ya, se van a ajustar
+
+746
+01:30:00,560 --> 01:30:05,140
+los vocabularios, los pesos y vamos a ver algo que es el arte F y DF, y que no
+
+747
+01:30:05,140 --> 01:30:11,020
+reentrenar la representación o el codificador mini lm, sino que
+
+748
+01:30:11,020 --> 01:30:15,320
+simplemente lo vamos a utilizar. Vamos a tener 16 consultas de
+
+749
+01:30:15,320 --> 01:30:19,340
+evaluación que va a comparar, digamos, ciertas recetas y elegir decisiones de
+
+750
+01:30:19,340 --> 01:30:22,500
+búsqueda, ya con distintas nociones, digamos,
+
+751
+01:30:22,500 --> 01:30:27,860
+y vamos a hacer 16 consultas de prueba, porque sigue aplicándose esto de la
+
+752
+01:30:27,860 --> 01:30:33,020
+separación, entrenamiento que fue hecho en este caso la validación y la prueba.
+
+753
+01:30:33,020 --> 01:30:41,180
+Entonces, siguiendo, si nosotros antes de implementarlo y ver el ejemplo con
+
+754
+01:30:41,180 --> 01:30:46,780
+número, digamos, si nosotros quisiéramos adaptar el codificación,
+
+755
+01:30:46,780 --> 01:30:52,940
+podríamos hacerlo con el proceso de destilación, o podríamos hacerlo con el
+
+756
+01:30:52,940 --> 01:30:58,820
+conjunto de entrenamiento propio. Entonces, tendríamos que tener
+
+757
+01:30:58,820 --> 01:31:04,500
+conjuntos de datos de este estilo. Por ejemplo, cuál es la consulta
+
+758
+01:31:04,500 --> 01:31:10,980
+cuál es la consulta, cuál es la ficha asociada y si es que hay una
+
+759
+01:31:10,980 --> 01:31:16,020
+señal es relevante o no. Y si se fijan esto tendríamos que tenerlo en una
+
+760
+01:31:16,020 --> 01:31:24,860
+gran cantidad para poder tener una red, ya que en esencia es un codificador que
+
+761
+01:31:24,860 --> 01:31:30,340
+nos lleva texto a número de manera un poco más certera. Y entonces necesitaríamos
+
+762
+01:31:30,340 --> 01:31:37,900
+ese tipo de conjunto de atlas en una gran magnitud para poder
+
+763
+01:31:37,900 --> 01:31:42,140
+nosotros hacer ese entrenamiento y por eso lo que nosotros hemos tratado de
+
+764
+01:31:42,140 --> 01:31:49,860
+mantenerlo un poco más sencillo, digamos, optar por una opción más simple que es
+
+765
+01:31:49,860 --> 01:31:55,940
+utilizar esta red mini lm para la representación vectorial.
+
+766
+01:31:55,940 --> 01:31:59,020
+Aparte, con el pequeño ejemplo que nosotros tenemos,
+
+767
+01:31:59,020 --> 01:32:03,900
+tenemos una gran variedad, nuevamente, estas cosas son bastante costosas
+
+768
+01:32:03,900 --> 01:32:06,300
+computacionalmente.
+
+769
+01:32:06,300 --> 01:32:14,140
+entonces veamos el proceso de comparación entonces el embedding es
+
+770
+01:32:14,140 --> 01:32:20,100
+quien lleva el texto a algo numérico y ese numérico ahora tengo que
+
+771
+01:32:20,100 --> 01:32:25,980
+compararlo respecto de alguna referencia entonces nosotros vamos a ver algo que se
+
+772
+01:32:25,980 --> 01:32:32,620
+llama tf.idf que hace referencia a 10 frequency la frecuencia cada término y
+
+773
+01:32:32,620 --> 01:32:40,520
+IDF hace referencia a la frecuencia inversa del documento, entonces TF
+
+774
+01:32:40,520 --> 01:32:46,300
+simplemente a cuántas veces se repite la palabra en un texto y el IDF es la
+
+775
+01:32:46,300 --> 01:32:52,420
+frecuencia inversa de documentos que en esencia va a dar más peso a las palabras
+
+776
+01:32:52,420 --> 01:32:57,700
+presentes en menos ficha, es decir, lo más raro tiene más peso porque es más
+
+777
+01:32:57,700 --> 01:33:04,620
+difícil de encontrar. Entonces lo vamos a definir de esta manera. El tfidf,
+
+778
+01:33:04,620 --> 01:33:09,260
+este no es un menos sino que es el guión, va a estar definido de esta manera en donde
+
+779
+01:33:09,260 --> 01:33:15,900
+el idf lo vamos a definir como logaritmo de 1 más la cantidad de fichas sobre 1
+
+780
+01:33:15,900 --> 01:33:22,620
+más la frecuencia del documento, ya, de la palabra o la ficha que contiene la
+
+781
+01:33:22,620 --> 01:33:28,760
+palabra J décima y el I representa un texto en particular esto más uno. Esto va a ser el IDF,
+
+782
+01:33:30,300 --> 01:33:36,680
+entonces va a ser la frecuencia del término cada palabra multiplicado por esa cantidad y en esencia
+
+783
+01:33:36,680 --> 01:33:42,800
+vamos a poder encontrar un valor numérico y vamos a tener una noción de comparación. Entonces,
+
+784
+01:33:43,720 --> 01:33:52,040
+¿cómo lo utilizamos? Si se fijan acá, vamos a pasar primero cada ficha del antoce que tenemos
+
+785
+01:33:52,040 --> 01:33:59,400
+por minlm entonces vamos a tener una representación en 384 coordenadas de
+
+786
+01:33:59,400 --> 01:34:04,920
+cada una de las fichas y dividimos digamos su vector por su norma por lo
+
+787
+01:34:04,920 --> 01:34:07,600
+que hablábamos antes para hacerlo comparable pues nos dependa de la
+
+788
+01:34:07,600 --> 01:34:14,280
+magnitud, entonces voy a tener un vector de 384 coordenadas de la cual yo aquí
+
+789
+01:34:14,280 --> 01:34:18,600
+veo sólo 16 porque si no son muchas entonces aquí veo la primera 16 para la
+
+790
+01:34:18,600 --> 01:34:22,160
+primera ficha yo veo las primeras 16 coordenadas y veo su valor numeríctico
+
+791
+01:34:22,160 --> 01:34:27,480
+esto obviamente es un vector que sigue para allá 388 coordenadas adicionales
+
+792
+01:34:27,480 --> 01:34:32,160
+o sea 184 en total
+
+793
+01:34:32,160 --> 01:34:38,520
+así entonces si fijan el minilm me lleva el texto a este tipo de
+
+794
+01:34:38,520 --> 01:34:44,400
+representación y voy a querer repetir ese mismo procedimiento para las
+
+795
+01:34:44,400 --> 01:34:51,060
+consultas que nuevamente es otro texto y ahora voy a tener dos cosas que están
+
+796
+01:34:51,060 --> 01:34:58,320
+en la misma dimensión ya son vectores de 384 coordenadas y nosotros podemos
+
+797
+01:34:58,320 --> 01:35:05,660
+tener una noción de similitud o una noción de cercanía
+
+798
+01:35:07,380 --> 01:35:13,200
+2 necesitamos hacer una comparación recuerden que nuestra nuestra
+
+799
+01:35:13,200 --> 01:35:21,360
+nuestra pregunta inicial era hay una consulta y queremos asignarle una ficha la más cercana
+
+800
+01:35:21,360 --> 01:35:29,720
+posible y aquí puede resolver esa pregunta entonces si fijan acá b01 hace referencia a
+
+801
+01:35:29,720 --> 01:35:37,840
+las consultas y d01 hace referencia a las fichas entonces estos vectores vectores están acá
+
+802
+01:35:37,840 --> 01:35:42,960
+primero provienen del embedding, que nosotros lo guardamos, que es la
+
+803
+01:35:42,960 --> 01:35:47,680
+representación, que no es simplemente los conteos que nosotros hicimos
+
+804
+01:35:47,680 --> 01:35:51,640
+porque sabemos que no funciona muy bien, nosotros hicimos el embedding con el minlm
+
+805
+01:35:51,640 --> 01:35:57,880
+y vamos a identificar las distintas parejas consulta01 con ficha01
+
+806
+01:35:57,880 --> 01:36:04,400
+para las distintas coordenadas, porque recuerden tiene 384 coordenadas
+
+807
+01:36:04,400 --> 01:36:09,840
+entonces estos vectores ya están normalizados y yo voy a hacer el producto
+
+808
+01:36:09,840 --> 01:36:16,880
+interno y el producto interno entre estas dos me da menos punto 0.00114
+
+809
+01:36:16,880 --> 01:36:22,280
+y así lo hago para todas y puedo calcular su suma porque recuerdan que es
+
+810
+01:36:22,280 --> 01:36:27,960
+el producto interno, multiplico y sumo. Entonces lo hago para todas las cantidades
+
+811
+01:36:27,960 --> 01:36:34,600
+y luego de ello, digamos como estas cosas ya están normalizadas simplemente en la
+
+812
+01:36:34,600 --> 01:36:40,680
+suma, porque esto está dividido de su norma euclíana, y voy a tener en esencia el
+
+813
+01:36:40,680 --> 01:36:46,920
+coseno de la primera consulta con la ficha 01
+
+814
+01:36:47,000 --> 01:36:55,360
+y me da 0.45. Eso yo lo puedo repetir para el resto
+
+815
+01:36:55,360 --> 01:37:01,120
+de fichas entonces la primera consulta que nosotros sabemos
+
+816
+01:37:01,120 --> 01:37:05,240
+recuerde que la primera consulta es olvide mi clave y nosotros sabemos que
+
+817
+01:37:05,240 --> 01:37:11,260
+la ficha 0 1 hace referencia a recuperar contraseña entonces es la que debiese
+
+818
+01:37:11,260 --> 01:37:15,200
+tener una mayor noción de similitud, debiese tener un mayor
+
+819
+01:37:15,200 --> 01:37:18,400
+valor por consecuencia cuando lo vemos con la
+
+820
+01:37:18,400 --> 01:37:23,120
+consulta el par consulta ficha y veo la primera consulta con la primera ficha
+
+821
+01:37:23,120 --> 01:37:32,640
+tiene un valor 0.45 y cuando lo vemos con el resto tienen valores menores y así lo podemos hacer para
+
+822
+01:37:32,640 --> 01:37:38,660
+cada consulta y para cada ficha y puedo hacer todos los pares, en donde voy a tener en esencia
+
+823
+01:37:38,660 --> 01:38:06,660
+una matriz de 16 consultas por 12 fichas, 16 por 12. Y esta matriz Q que es 16 por 384 que hace referencia a, si se fijan, Q por detrás puesto, hace referencia a la operación que nosotros hicimos antes pero extendida al resto de los datos.
+
+824
+01:38:06,660 --> 01:38:13,580
+Ahora, si os fijan esos son los puntajes y si nos volvemos al inicio de la sesión
+
+825
+01:38:13,580 --> 01:38:20,060
+yo les comentaba que primero represento, entonces mini lm, luego comparo que es
+
+826
+01:38:20,060 --> 01:38:23,100
+que en la parte que estoy haciendo estoy sacando, le estoy dando estos
+
+827
+01:38:23,100 --> 01:38:28,700
+puntajes, voy a querer ahora ordenarlos, si? entonces ya los pasean a un valor
+
+828
+01:38:28,700 --> 01:38:32,420
+numérico y los puedo comparar, en esencia tengo una métrica en términos del
+
+829
+01:38:32,420 --> 01:38:38,420
+coseno de qué número es más cercano o qué par tiene una mayor similitud en
+
+830
+01:38:38,420 --> 01:38:43,340
+esencia la consulta 1 y la ficha 0 1 tiene una mayor similitud por el valor
+
+831
+01:38:43,340 --> 01:38:47,140
+que tengo el coseno entonces que ordenarnos ahora entonces ya los yo
+
+832
+01:38:47,140 --> 01:38:52,140
+tengo una métrica para compararnos los quiero ordenar entonces veamos ahora
+
+833
+01:38:52,140 --> 01:38:58,300
+tengo la consulta de acceso que era olvide mi clave como la recupere
+
+834
+01:38:58,300 --> 01:39:04,600
+cierto? Olvidé mi clave cómo vuelvo a entrar. Entonces, sabemos que el documento
+
+835
+01:39:04,600 --> 01:39:08,100
+que responde a eso es el primer documento que explica cómo recuperarla
+
+836
+01:39:08,100 --> 01:39:12,060
+contra C. Ahora,
+
+837
+01:39:12,060 --> 01:39:22,180
+cuando vemos el TF y DF, vemos que el D01 es la que nosotros sabemos que es
+
+838
+01:39:22,180 --> 01:39:27,780
+la que da respuesta, le asigna en términos de puntaje, si se fijan acá
+
+839
+01:39:27,780 --> 01:39:35,300
+yo ocupé el coseno y esta es la forma de rankearlos, esta es la forma de rankearlos
+
+840
+01:39:36,300 --> 01:39:44,300
+el IDF a la ficha que nosotros sabemos que es la correcta le dio el lugar 6 y le dio un puntaje 0
+
+841
+01:39:44,300 --> 01:39:53,820
+y el minilem situó la ficha 0 1 en primer lugar que era la más semejante o tiene mayor puntaje
+
+842
+01:39:53,820 --> 01:39:58,820
+porque le dio 0.45 y era el documento
+
+843
+01:39:58,820 --> 01:40:04,980
+pertenente, entonces en este caso el coseno está entregando el mayor, la
+
+844
+01:40:04,980 --> 01:40:09,820
+mayor, la mayor, digamos, noción de similitud correcta.
+
+845
+01:40:09,820 --> 01:40:17,220
+Entonces, si se fijan acá, el TF y DF es una forma alternativa
+
+846
+01:40:17,220 --> 01:40:23,900
+a el mini lm porque aquí simplemente estoy contando frecuencias y
+
+847
+01:40:23,900 --> 01:40:29,300
+multiplicándolas por su frecuencia relativa dentro o la inversa de su
+
+848
+01:40:29,300 --> 01:40:32,980
+frecuencia dentro de cada documento para cada palabra
+
+849
+01:40:32,980 --> 01:40:37,540
+entonces este es otro tipo de codificación y nosotros sabemos que el
+
+850
+01:40:37,540 --> 01:40:42,460
+conteo no es tan bueno entonces si bien esto se basa en con esto sabemos que no
+
+851
+01:40:42,460 --> 01:40:46,500
+se va no va a funcionar también porque se basa en conteo entonces cuando lo
+
+852
+01:40:46,500 --> 01:40:51,620
+comparamos con mini lm que hace una representación vectorial, el conteo le
+
+853
+01:40:51,620 --> 01:40:55,460
+da a todos los valores bastante, cantidades bastante similares, en cambio
+
+854
+01:40:55,460 --> 01:41:01,180
+el mini lm si entrega al d01 un mayor puntaje, ya.
+
+855
+01:41:01,180 --> 01:41:10,460
+Entonces esta consulta que sabemos que habla de clave y la ficha 01 habla
+
+856
+01:41:10,460 --> 01:41:15,860
+de contraseña, puedo considerar dentro de su noción de similitud y
+
+857
+01:41:15,860 --> 01:41:22,540
+representación vectorial la parásprisis o el parafraseo entre clave y contraseño
+
+858
+01:41:22,540 --> 01:41:29,140
+porque fue entrenado no simplemente con pocos datos sino que fue entrenado
+
+859
+01:41:29,140 --> 01:41:33,940
+con muchas, muchas cantidades usted ya sabe reconocer esa similitud dentro de la
+
+860
+01:41:33,940 --> 01:41:40,100
+representación. Entonces tengo una forma de cómo compararlos. ¿Qué es lo que
+
+861
+01:41:40,100 --> 01:41:47,140
+que es lo que hago después. Tengo una segunda consulta, la 02 y le pongo no
+
+862
+01:41:47,140 --> 01:41:52,180
+pude asistir, puedo ver el vídeo después
+
+863
+01:41:52,340 --> 01:41:58,460
+y de 02 responde en esencial en la segunda ficha a las grabaciones se
+
+864
+01:41:58,460 --> 01:42:02,580
+publican al día siguiente y duran 30 días, que es una respuesta a esta
+
+865
+01:42:02,580 --> 01:42:07,140
+consulta. Sabemos que debiese tener la mayor similitud porque lo podemos
+
+866
+01:42:07,140 --> 01:42:11,880
+digamos extender desde el contexto, no necesariamente desde el puntaje.
+
+867
+01:42:11,880 --> 01:42:19,680
+Entonces la posición en mini lm que le da a esta consulta, la primera posición
+
+868
+01:42:19,680 --> 01:42:28,520
+le da el documento 06 que habla de becas, la posición 2 en términos del ranking
+
+869
+01:42:28,520 --> 01:42:32,280
+y el puntaje del término del coseno
+
+870
+01:42:32,280 --> 01:42:40,400
+que le da a minlm lo pone en segunda posición la ficha 2 que es la que efectivamente responde a
+
+871
+01:42:40,400 --> 01:42:47,400
+la consulta que se realizó y en tercer lugar da el de 0 1 que no responde a la métrica que
+
+872
+01:42:47,400 --> 01:42:54,000
+o sea la consulta que se está haciendo entonces vemos que no necesariamente lo va a poner en el
+
+873
+01:42:54,000 --> 01:43:02,580
+primer ranking o el mayor puntaje la consulta o la respuesta correcta o la ficha correcta a la
+
+874
+01:43:02,580 --> 01:43:14,760
+consulta que se está realizando. Entonces vamos a llamar a este rango de R, que va a ser la posición
+
+875
+01:43:14,760 --> 01:43:22,280
+de la ficha relevante. Si se fijan acá, las fichas relevantes están en la posición 2. Nosotros
+
+876
+01:43:22,280 --> 01:43:25,180
+quisiéramos que estuviese en la posición 1 porque es la más relevante
+
+877
+01:43:25,180 --> 01:43:32,640
+porque es la que responde a B0-2. En este caso está en la posición 2
+
+878
+01:43:32,640 --> 01:43:40,120
+y al mostrar tres documentos va a estar la relevante dentro de esas tres.
+
+879
+01:43:40,120 --> 01:43:47,040
+Entonces esos tres documentos son tres filas para una consulta particular
+
+880
+01:43:47,040 --> 01:43:52,840
+y ahí tengo un acierto porque le ajunté cuando sugerí la ficha 02
+
+881
+01:43:54,120 --> 01:43:56,120
+naturalmente yo voy a preguntarme
+
+882
+01:43:59,640 --> 01:44:03,560
+cómo tengo que implementar esto porque no siempre voy a tener el mayor puntaje
+
+883
+01:44:04,320 --> 01:44:09,120
+entonces en esto sale la noción de hit
+
+884
+01:44:09,880 --> 01:44:11,200
+a
+
+885
+01:44:11,200 --> 01:44:17,020
+que son el acierto entre los primeros K y si se fijan en la anterior los
+
+886
+01:44:17,020 --> 01:44:20,340
+aciertos fueron
+
+887
+01:44:21,260 --> 01:44:25,700
+uno entre los primeros tres
+
+888
+01:44:25,700 --> 01:44:30,860
+entonces vamos a cambiar la unidad de las filas
+
+889
+01:44:30,860 --> 01:44:36,020
+entonces ahora tenemos tres consultas distintas que son de evaluación y el
+
+890
+01:44:36,020 --> 01:44:44,480
+ranking real ya que le está dando mini lm a cada una de estas ya entonces el b01
+
+891
+01:44:44,480 --> 01:44:51,040
+pregunta por la clave y su ficha que la d01 también quedó primera el b02 que
+
+892
+01:44:51,040 --> 01:44:58,040
+pregunta por el vídeo d02 quedó en la posición segunda ya como vimos recién
+
+893
+01:44:58,040 --> 01:45:06,240
+ya en la b04 que se pide una prórroga d04 quedó quinta ya hay una le pusimos
+
+894
+01:45:06,240 --> 01:45:11,520
+una cualificación para saber cuál es la que responde a b01 responde de 0 1 a b02
+
+895
+01:45:11,520 --> 01:45:18,400
+responde de 0 2 y así entonces b04 responde para b04 responde de 0 4 pero
+
+896
+01:45:18,400 --> 01:45:25,520
+el rango que le dio en mini lm fue 5 entonces cuando analizo en términos de
+
+897
+01:45:25,520 --> 01:45:29,980
+los aciertos entre los primeros K
+
+898
+01:45:29,980 --> 01:45:36,840
+en P01, por ejemplo, si K es igual a 3, en este caso los aciertos en los
+
+899
+01:45:36,840 --> 01:45:41,440
+primeros K, o sea, si no, K igual a 3
+
+900
+01:45:41,760 --> 01:45:48,320
+vamos a asignar 1 cuando la posición del relevante es la primera, es decir, la que
+
+901
+01:45:48,320 --> 01:45:58,520
+tiene el mayor puntaje. 2 en el caso del B02 y en el último caso 5 en el caso de que
+
+902
+01:45:58,520 --> 01:46:07,320
+tuviésemos 5 como primeros K, pero en este caso dijimos que caería a 3, entonces el
+
+903
+01:46:07,320 --> 01:46:12,600
+aporte entre los primeros K, el primero va a ser 1 porque está entre el 1 y el
+
+904
+01:46:12,600 --> 01:46:17,400
+tercero, en el B2 va a estar, va a ser 1 porque va a estar en el primero y el
+
+905
+01:46:17,400 --> 01:46:23,960
+0 que el caso del segundo y en caso 4 va a ser 0 porque le puso mini lm una
+
+906
+01:46:23,960 --> 01:46:28,320
+posición 5 y como le puso una posición 5 no se muestra entre los primeros 3 y
+
+907
+01:46:28,320 --> 01:46:33,120
+por consecuencia se le va a signar un 0 decir que no se recomendó
+
+908
+01:46:33,120 --> 01:46:38,580
+así entonces si veo los primeros aciertos en los primeros 3 ya consulta
+
+909
+01:46:38,580 --> 01:46:44,040
+las primeras tres respuestas va a ser 1 más 1 más 0
+
+910
+01:46:44,040 --> 01:46:51,960
+va a ser entonces 2 sobre 3 me da 2 tercios, si se fijan
+
+911
+01:46:51,960 --> 01:46:58,040
+hace referencia a las tres consultas que yo estoy utilizando y el 02 aporta
+
+912
+01:46:58,040 --> 01:47:07,240
+solo o la misma cantidad que el P01, entonces si se fijan acá estoy viendo
+
+913
+01:47:07,240 --> 01:47:12,360
+cuántas yo tengo que mostrar antes de encontrar el acierto en particular y
+
+914
+01:47:12,360 --> 01:47:15,040
+aquí si se fijan yo lo estoy simplemente ordenando en términos de la
+
+915
+01:47:15,040 --> 01:47:18,880
+puntuación que yo estoy utilizando yo estoy utilizando minilm para hacer una
+
+916
+01:47:18,880 --> 01:47:23,760
+representación y luego lo estoy puntuando en función al coseno ya no
+
+917
+01:47:23,760 --> 01:47:27,440
+necesariamente eso me va a entregar buenos resultados siempre y esta es una de
+
+918
+01:47:27,440 --> 01:47:32,120
+las formas que yo voy a tener de digamos cuantificar
+
+919
+01:47:32,120 --> 01:47:36,560
+qué tanto voy a yo
+
+920
+01:47:36,560 --> 01:47:45,840
+digamos tener cierta certeza de que las recomendaciones que yo estoy haciendo en
+
+921
+01:47:45,840 --> 01:47:50,240
+la problemática original o el problema original que nosotros estamos tratando de resolver están
+
+922
+01:47:50,240 --> 01:47:56,720
+funcionando ya porque recuerden que tenemos que tener un cuarto paso que es verificar que las
+
+923
+01:47:56,720 --> 01:48:00,360
+cosas que está haciendo están bien porque no necesariamente que tengo un puntaje correcto
+
+924
+01:48:00,360 --> 01:48:07,960
+significa que estoy haciendo lo que quiero que hagan esta técnica.
+
+925
+01:48:07,960 --> 01:48:13,480
+Entonces, otra metodología para definir el orden en el cual yo voy a presentar
+
+926
+01:48:13,480 --> 01:48:19,960
+las cosas es el MRR, que se referencia a Mean Reciprocal Grant, que es el
+
+927
+01:48:19,960 --> 01:48:26,480
+promedio del rango recíproco. Entonces, cada consulta va a aportar el
+
+928
+01:48:26,480 --> 01:48:29,220
+recíproco de su posición en las fichas
+
+929
+01:48:29,220 --> 01:48:31,480
+relevantes entonces en la b01 está en la
+
+930
+01:48:31,480 --> 01:48:35,080
+primera posición entonces 1 sobre 1 o 1
+
+931
+01:48:35,080 --> 01:48:38,200
+a la menos 1 en cambio en el 2
+
+932
+01:48:38,200 --> 01:48:41,360
+del vídeo estaba en la posición 2
+
+933
+01:48:41,360 --> 01:48:43,400
+entonces es 2 a la menos 1 que es un
+
+934
+01:48:43,400 --> 01:48:46,920
+medio ya que su recíproco o 1 sobre 2 y en
+
+935
+01:48:46,920 --> 01:48:48,480
+el 4
+
+936
+01:48:48,480 --> 01:48:51,960
+estaba en la posición 5 entonces
+
+937
+01:48:51,960 --> 01:48:56,040
+su recíproco es 0,2 y el numerador
+
+938
+01:48:56,040 --> 01:49:04,160
+suma 1.7 lo divido a 3 y me queda 0,567. Entonces, la primera consulta y la
+
+939
+01:49:04,160 --> 01:49:11,940
+segunda consulta acertaban dentro de los primeros K respuestas y el MRR va a
+
+940
+01:49:11,940 --> 01:49:17,400
+distinguir el primer del segundo, el primer lugar del segundo. Si se fijan, acá
+
+941
+01:49:17,400 --> 01:49:25,320
+el hit, o lo acierto entre los primeros tres, para el B01 y el B02
+
+942
+01:49:25,320 --> 01:49:30,920
+le estaba asignando el mismo punto, el mismo valor, en cambio el MRR va a
+
+943
+01:49:30,920 --> 01:49:35,640
+distinguir entre el primer lugar y el segundo lugar porque le está sopesando
+
+944
+01:49:35,640 --> 01:49:38,640
+y va a depender de la posición en principio, entonces esto va a ser el
+
+945
+01:49:38,640 --> 01:49:44,720
+recíproco de la posición y este va a ser si es que sale entre los primeros K
+
+946
+01:49:44,720 --> 01:49:48,680
+o los primeros intentos, entonces simplemente yo le voy a estar dando
+
+947
+01:49:48,680 --> 01:49:55,320
+distintas interpretaciones y distinto orden en cuanto yo voy a
+
+948
+01:49:55,320 --> 01:50:01,880
+presentar esta búsqueda de esencia de fichas. Entonces, fíjense acá,
+
+949
+01:50:01,880 --> 01:50:12,080
+los denominadores son 12 porque tengo 12 fichas.
+
+950
+01:50:13,720 --> 01:50:18,440
+Las preguntas son las consultas que sí tienen respuesta. Entonces, fíjense acá,
+
+951
+01:50:18,440 --> 01:50:28,720
+yo tengo con la metodología TF y DF y con mini LM y en ambos casos mini LM tiene un mayor rendimiento
+
+952
+01:50:28,720 --> 01:50:39,600
+en términos de el acierto, digamos términos del orden que estoy asignando a las respuestas o a
+
+953
+01:50:39,600 --> 01:50:46,920
+los panels de respuesta consulta ficha. Ahora eso no significa que ese tipo de embedding, que en
+
+954
+01:50:46,920 --> 01:50:51,760
+es una representación, esto también sigue siendo una representación, solo que en
+
+955
+01:50:51,760 --> 01:50:56,640
+una representación basada en conteo necesariamente va a ser universalmente
+
+956
+01:50:56,640 --> 01:51:03,200
+mejor, pero MIMLM al ser entrenado con tantos y tantos datos de texto ya sabemos
+
+957
+01:51:03,200 --> 01:51:08,520
+que va a aprender o aprendió en algún punto
+
+958
+01:51:08,600 --> 01:51:15,240
+bastante más digamos de cómo representar numéricamente texto.
+
+959
+01:51:15,240 --> 01:51:24,320
+Tenemos entonces que TF y DF recupera 7 de 12 consultas y el MINI LM 11 de 12 consultas.
+
+960
+01:51:24,320 --> 01:51:30,440
+Entonces, claramente vamos a favorecer la representación vectorial de MINI LM respecto
+
+961
+01:51:30,440 --> 01:51:36,840
+de la representación basada en conteos y del inverso o el recíproco de los conteos.
+
+962
+01:51:36,840 --> 01:51:47,520
+entonces dos cosas que estas cosas no se van a explicar, fíjense acá, tengo una
+
+963
+01:51:47,520 --> 01:51:52,720
+consulta que dice no puedo asistir puedo ver el vídeo después ya que es la
+
+964
+01:51:52,720 --> 01:51:57,360
+primera consulta y la ficha que responde es la de la grabación
+
+965
+01:51:57,360 --> 01:52:05,200
+es la ficha 2 el rango en minilem es el 2 que la habíamos visto, si se fijan acá
+
+966
+01:52:05,200 --> 01:52:11,560
+lo planteé, no puedo asistir, puedo ver el vídeo, le definió el rango el mini LEM
+
+967
+01:52:11,560 --> 01:52:19,120
+como en posición 2, en posición 2, entonces ese es su rango que le dio mini LEM
+
+968
+01:52:19,120 --> 01:52:23,480
+y la otra consulta fue, me conceden más días automáticamente si pido prórroga
+
+969
+01:52:23,480 --> 01:52:31,440
+y D04 era la respuesta y el mini LEM le entregaba el rango 3
+
+970
+01:52:31,440 --> 01:52:37,320
+ahora mostrar tres candidatos va a permitir que se encuentre la respuesta
+
+971
+01:52:37,320 --> 01:52:44,360
+de la primera consulta ya porque va a ser de 2 y en la segunda si muestro 3 va a
+
+972
+01:52:44,360 --> 01:52:51,360
+quedar afuera porque el rango estaba en el quinto ya entonces
+
+973
+01:52:51,360 --> 01:52:57,280
+tengo que tener cuidado de cuántos muestro ya para cuando hago el orden
+
+974
+01:52:57,280 --> 01:53:04,520
+hasta qué valor voy a considerar, hasta qué orden voy a considerar que puedo mostrar en esta búsqueda.
+
+975
+01:53:04,520 --> 01:53:10,400
+Recuerden que esto es extensible, imagínense tengo 100 pichas, nosotros estamos haciendo con 12,
+
+976
+01:53:10,400 --> 01:53:13,840
+por eso estamos planteando como entre 3 y 5 los valores que podemos mostrar,
+
+977
+01:53:13,840 --> 01:53:18,960
+pero esto tiene una utilidad mayor cuando tengo, imagínense, muchas otras pichas.
+
+978
+01:53:18,960 --> 01:53:30,640
+Entonces, si te fijas acá, tengo que tener, digamos, cierta...
+
+979
+01:53:30,640 --> 01:53:38,760
+No sé si lo puedo explicar, ya, cuando quiero implementar esta metodología, porque nuevamente
+
+980
+01:53:38,760 --> 01:53:39,760
+va a representar...
+
+981
+01:53:39,760 --> 01:53:47,680
+Nosotros no podemos creer a ciegas, digamos, que MiniLemme me va a entregar una representación
+
+982
+01:53:47,680 --> 01:53:50,880
+que me va a dar una comparación certera, ya.
+
+983
+01:53:50,880 --> 01:53:55,000
+Puede que en ciertos casos me funcione bien y en otros me
+
+984
+01:53:55,000 --> 01:53:56,480
+funcione super mal.
+
+985
+01:53:56,480 --> 01:53:59,120
+Y recuerden que tenemos muchas representaciones en principio
+
+986
+01:53:59,120 --> 01:54:04,080
+infinitas de los textos a imágenes.
+
+987
+01:54:04,080 --> 01:54:12,680
+Entonces, hasta ahora, ya, nosotros destacamos de cierta
+
+988
+01:54:12,680 --> 01:54:19,280
+manera una potencial ventaja de conectar distintas palabras, ya por ejemplo los
+
+989
+01:54:19,280 --> 01:54:23,540
+sinónimos, el parafraseo que vimos que en un principio si teníamos una
+
+990
+01:54:23,540 --> 01:54:28,280
+representación vectorial que
+
+991
+01:54:28,280 --> 01:54:35,800
+era en términos de conteo no tenía o tenía problemas cuando
+
+992
+01:54:35,800 --> 01:54:41,300
+dos palabras eran sinónimos, pero se escribían distintos entonces las ponía
+
+993
+01:54:41,300 --> 01:54:50,580
+como vectores octogonales. Entonces estamos viendo una potencial ventaja que tiene, digamos,
+
+994
+01:54:50,580 --> 01:54:58,900
+esta representación o esta codificación de minilem en identificar esos sinónimos.
+
+995
+01:54:58,900 --> 01:55:06,620
+Entonces ¿cuál podría ser un problema? Entonces, si se fijan acá, en este ejemplo
+
+996
+01:55:06,620 --> 01:55:12,140
+se muestra otro tipo de necesidades, porque nosotros vemos que tenemos que identificar
+
+997
+01:55:12,140 --> 01:55:19,500
+o vemos una necesidad de identificar sinónimos. Entonces, acá en estos ejemplos vamos a tener
+
+998
+01:55:19,500 --> 01:55:24,920
+una necesidad de conservar exactamente un código. Si se fijan, tengo dos consultas,
+
+999
+01:55:24,920 --> 01:55:33,700
+cuando vence a 17 y cuando vence a 71. Entonces, son parecidos en términos de texto y aparecen
+
+1000
+01:55:33,700 --> 01:55:40,820
+en textos casi iguales, entonces una representación pudiese representarlo para la redundancia
+
+1001
+01:55:40,820 --> 01:55:50,020
+numéricamente, muy similares, ¿ya? Pero corresponden a fechas distintas, ¿si? Entonces, entonces
+
+1002
+01:55:50,020 --> 01:56:00,380
+cuando implemento con minilem y ejecuto, digamos, la representación y el codificador, las dos
+
+1003
+01:56:00,380 --> 01:56:09,740
+recetas digamos van a acertar ya en el primer lugar para ambas preguntas ya
+
+1004
+01:56:09,740 --> 01:56:15,100
+porque se representan de manera muy similar ya
+
+1005
+01:56:15,100 --> 01:56:22,220
+pero ya esta pequeña diferencia puede generar que en otros en otras
+
+1006
+01:56:22,220 --> 01:56:29,340
+representaciones ya queden no se puede diferenciar entre ambas porque dado que
+
+1007
+01:56:29,340 --> 01:56:35,400
+son los mismos caracteres pero simplemente con un pequeño cambio de
+
+1008
+01:56:35,400 --> 01:56:43,980
+orden va a depender la va a depender la representación si efectivamente los
+
+1009
+01:56:43,980 --> 01:56:49,280
+está clasificando o los está representando en puntos en el espacio en
+
+1010
+01:56:49,280 --> 01:56:54,860
+el espacio que son cercanos entre sí ya siendo que son cosas distintas y pueden
+
+1011
+01:56:54,860 --> 01:56:57,900
+llegar a ser tan cercanos que después yo no pueda separarlos y no puede
+
+1012
+01:56:57,900 --> 01:57:03,900
+identificar cuál es la ficha pertinente que responde esa consulta.
+
+1013
+01:57:03,900 --> 01:57:09,980
+Entonces queremos que las cosas que son similares se parezcan entre sí, pero
+
+1014
+01:57:09,980 --> 01:57:14,620
+quiero además considerar ciertas diferencias tal que me la hagan o que me
+
+1015
+01:57:14,620 --> 01:57:20,540
+permitan discernir entre distintas respuestas para aquellas consultas.
+
+1016
+01:57:20,540 --> 01:57:24,220
+Entonces son muy similares, no las puedo representar de la misma manera. Entonces,
+
+1017
+01:57:24,220 --> 01:57:28,980
+una representación que no considera el orden en el cual está saliendo,
+
+1018
+01:57:28,980 --> 01:57:36,660
+pudiese tener ese problema de que voy a tener una misma representación para dos textos, en principio.
+
+1019
+01:57:36,660 --> 01:57:42,180
+Entonces, no es simplemente ocupar cualquier representación acerca,
+
+1020
+01:57:42,180 --> 01:57:46,580
+y eso justifica también que no puedo transponer en ningún sentido o desordenar
+
+1021
+01:57:46,580 --> 01:57:51,180
+el vector de representación vectorial que tengo o que estoy utilizando,
+
+1022
+01:57:51,180 --> 01:58:00,700
+independiente de la dimensión que se utiliza o la que lo lleva esta representación vectorial que
+
+1023
+01:58:00,700 --> 01:58:10,780
+hace en este caso MiniLem u otra herramienta. Veamos ahora, tenemos otra consulta. La consulta
+
+1024
+01:58:10,780 --> 01:58:20,820
+es cuál es el precio total en pesos y la fecha 5, la ficha 5 digo, responde a que
+
+1025
+01:58:20,820 --> 01:58:27,460
+el arancel puede pagarse en tres cuotas mensuales sin interés. Si se fijan
+
+1026
+01:58:27,460 --> 01:58:36,900
+la pregunta no tiene respuesta en la ficha 05 y en ninguna otra, pero D05
+
+1027
+01:58:36,900 --> 01:58:45,780
+es la más cercana a esa consulta. Si se fijan acá lo vemos el total de fichas
+
+1028
+01:58:45,940 --> 01:58:52,860
+la más cercana es la 5 porque habla de pagos. La 6 uno podría decir también
+
+1029
+01:58:52,860 --> 01:58:55,860
+pero si se fijan
+
+1030
+01:58:56,300 --> 01:59:04,320
+la 5 es la más cercana en términos en términos temáticos pero sigue sin
+
+1031
+01:59:04,320 --> 01:59:08,360
+responder la consulta en principio, ya entonces esa información que está
+
+1032
+01:59:08,360 --> 01:59:14,360
+relacionada porque hablan de pagos y de precios y de digamos cancele o cuotas
+
+1033
+01:59:14,360 --> 01:59:20,740
+etcétera tienen información similar pero la cantidad de cuotas no permite
+
+1034
+01:59:20,740 --> 01:59:28,160
+deducir el monto total, ya entonces lo que va a pasar es que cuando aplico el
+
+1035
+01:59:28,160 --> 01:59:37,880
+coseno de mini LEM va a ser, por ejemplo, un número relativamente bueno, ya, en este
+
+1036
+01:59:37,880 --> 01:59:48,520
+caso va a ser 0,6, si mal recuerdo, 0,26, algo de ese estilo, que va a estar
+
+1037
+01:59:48,520 --> 01:59:54,280
+ordenado o va a tener el primer ranking, porque dentro de todas las fichas el
+
+1038
+01:59:54,280 --> 02:00:00,080
+coseno del minileme va a poner las
+
+1039
+02:00:00,080 --> 02:00:05,780
+cercana a la más similar a una respuesta coherente a la consulta que se está
+
+1040
+02:00:05,780 --> 02:00:09,740
+definiendo. No obstante,
+
+1041
+02:00:11,380 --> 02:00:16,620
+no responde la pregunta. Entonces, el buscador que hace referencia entre la
+
+1042
+02:00:16,620 --> 02:00:20,860
+consulta y los documentos, que en este caso son las pichas, puede poner algo en
+
+1043
+02:00:20,860 --> 02:00:26,500
+primera posición pero no necesariamente responder a la consulta. Entonces, este
+
+1044
+02:00:26,500 --> 02:00:31,500
+procedimiento que nosotros estábamos haciendo, además va a necesitar una decisión adicional
+
+1045
+02:00:31,500 --> 02:00:38,580
+sobre cuándo mostrar los posibles candidatos de las fichas y cómo reconocer digamos que
+
+1046
+02:00:38,580 --> 02:00:46,660
+falta información porque pareciera ser similar pero no responde la pregunta entonces conocemos
+
+1047
+02:00:46,660 --> 02:00:50,260
+el número de cuantas pero no los monta dice la cantidad de cuantas entonces no puedo tomar y
+
+1048
+02:00:50,260 --> 02:00:56,280
+responder efectivamente a esa consulta. Entonces, tengo que tener una noción de
+
+1049
+02:00:56,280 --> 02:01:01,280
+cuándo mostrar las cosas. Si se fijan acá, este gráfico, este acá, mide
+
+1050
+02:01:01,280 --> 02:01:08,980
+aceptación y no necesariamente aciertos. Entonces, vamos a tomar
+
+1051
+02:01:08,980 --> 02:01:15,340
+el mayor coseno de cada consulta, el coseno del mini LEM, y lo vamos a
+
+1052
+02:01:15,340 --> 02:01:22,540
+comparar con un corte. Y en este caso al pasar
+
+1053
+02:01:23,660 --> 02:01:34,340
+cierto umbral, que va a ser 0,3, vamos a aceptar 9 de 12 consultas
+
+1054
+02:01:34,540 --> 02:01:39,860
+que son respondibles, digamos. Y con un umbral de 0,5 vamos a aceptar
+
+1055
+02:01:39,860 --> 02:01:43,700
+solo 3. Y si fíjense, estamos haciendo cierto paralelismo cuando hacemos, por ejemplo,
+
+1056
+02:01:43,700 --> 02:01:47,700
+clasificación cuando poníamos cierto umbral de threshold.
+
+1057
+02:01:47,700 --> 02:01:55,760
+Entonces, las cuatro consultas que no tienen respuesta van a quedar
+
+1058
+02:01:55,760 --> 02:02:02,020
+rechazadas en ambos casos, que son los casos donde no tengo, digamos, una
+
+1059
+02:02:02,020 --> 02:02:06,520
+respuesta necesariamente correcta, pero sí puede ser tímida, puede ser
+
+1060
+02:02:06,520 --> 02:02:15,520
+parecida. Entonces voy a definir ciertos umbrales que van a tener que
+
+1061
+02:02:15,520 --> 02:02:22,840
+superar para poder ser presentadas como posibles candidatas a ser escogidas.
+
+1062
+02:02:22,840 --> 02:02:29,080
+Entonces escoger ese corte en el cual yo voy a aceptar
+
+1063
+02:02:29,080 --> 02:02:36,640
+digamos ciertas respuestas, va a requerir considerar el costo de rechazar preguntas
+
+1064
+02:02:36,640 --> 02:02:42,640
+que sí podían ser respondidas y tengo que aceptar el riesgo de aceptar información
+
+1065
+02:02:42,640 --> 02:02:48,440
+insuficiente ya usando validación. Y si se fijan entramos en los mismos conceptos que teníamos de
+
+1066
+02:02:50,840 --> 02:02:56,200
+tabla de matriz de confusión, es decir, yo me puedo equivocar también porque estoy poniendo aquí
+
+1067
+02:02:56,200 --> 02:03:01,760
+una binarización de cuando mostrarla. Entonces, aceptar significa superar el
+
+1068
+02:03:01,760 --> 02:03:05,800
+corte, pero no va necesariamente a decir que el primer documento que está
+
+1069
+02:03:05,800 --> 02:03:10,040
+dentro de esa aceptación es efectivamente el correcto que responde a
+
+1070
+02:03:10,040 --> 02:03:15,540
+la consulta que se está realizando. No depende, va a depender del
+
+1071
+02:03:15,540 --> 02:03:19,360
+ranking, digamos, o el ranking puede ponerlo en primera posición, pero no
+
+1072
+02:03:19,360 --> 02:03:23,960
+necesariamente eso me va a hacer que la respuesta a la
+
+1073
+02:03:23,960 --> 02:03:30,260
+consulta que se realizó va a ser necesariamente la una una respuesta
+
+1074
+02:03:30,260 --> 02:03:34,100
+válida ya porque no recuerdo nosotros estamos haciendo estamos pasando un
+
+1075
+02:03:34,100 --> 02:03:39,380
+texto a un objeto matemático y vamos y vamos a ver cosas en eso en esa
+
+1076
+02:03:39,380 --> 02:03:43,940
+dimensión matemática que se parece entre sí pero no precisamente porque se
+
+1077
+02:03:43,940 --> 02:03:49,460
+parece en esa representación significa que responde a lo que estoy a la
+
+1078
+02:03:49,460 --> 02:03:59,900
+pregunta o la consulta que se está expresando. Entonces, fíjense acá, tenemos
+
+1079
+02:03:59,900 --> 02:04:06,020
+al principio dijimos las cuatro etapas, dijimos representar, ya lo vimos, comparar,
+
+1080
+02:04:06,020 --> 02:04:11,780
+ya lo vimos porque esto es pasarlo a un objeto matemático, comparar es asignarlo
+
+1081
+02:04:11,780 --> 02:04:17,380
+un puntaje, ordenar es ver cuáles son los que muestro primero y ahora estoy
+
+1082
+02:04:17,380 --> 02:04:21,140
+viendo la parte de si es que efectivamente los documentos que están
+
+1083
+02:04:21,140 --> 02:04:26,100
+rankeados de primera en primeros órdenes me responden a la consulta que
+
+1084
+02:04:26,100 --> 02:04:30,900
+efectivamente yo o sea la consulta que efectivamente tengo
+
+1085
+02:04:30,900 --> 02:04:37,620
+entonces primero tengo la primera etapa que es si es que voy a aceptar digamos
+
+1086
+02:04:37,620 --> 02:04:46,620
+la consulta que voy a comprobar ahí si el puntaje que he asignado con el
+
+1087
+02:04:46,620 --> 02:04:52,180
+principio, en principio estamos ocupando el coseno, alcanza el corte definido, es decir, bajo cierto
+
+1088
+02:04:52,180 --> 02:04:58,060
+puntaje yo no voy a querer mostrar esa pregunta, entonces voy a simplemente mostrar las respuestas
+
+1089
+02:04:58,060 --> 02:05:06,980
+que son lo suficientemente similares en términos de la representación vectorial para ser consideradas
+
+1090
+02:05:08,100 --> 02:05:13,380
+luego voy a querer recuperar esa información, entonces yo voy a comprobar ahí que la ficha
+
+1091
+02:05:13,380 --> 02:05:18,580
+pertinente aparece entre los candidatos y ahí voy a ver cuánto van a ser los
+
+1092
+02:05:18,580 --> 02:05:24,420
+aciertos entre las primeras de las primeras K opciones y finalmente voy a
+
+1093
+02:05:24,420 --> 02:05:28,140
+ver si se responde correctamente con alguno de los posibles candidatos
+
+1094
+02:05:28,140 --> 02:05:32,300
+entonces la respuesta voy a ver si la respuesta utiliza fielmente la
+
+1095
+02:05:32,300 --> 02:05:37,340
+información suficiente de la ficha efectivamente responde a la pregunta o
+
+1096
+02:05:37,340 --> 02:05:42,860
+no ya entonces en el caso de la pregunta del precio cuál es el precio total en
+
+1097
+02:05:42,860 --> 02:05:49,020
+pesos y tengo las fichas 05, las fichas 05 puede quedar primero para una pregunta
+
+1098
+02:05:49,020 --> 02:05:54,680
+de precio pero no ser suficiente entonces va a cumplir el umbral, va a ser
+
+1099
+02:05:54,680 --> 02:06:00,820
+pertinente pero no va a responder correctamente, entonces tengo que
+
+1100
+02:06:02,820 --> 02:06:06,540
+simplemente encontrar algo que es similar entre 100 términos de
+
+1101
+02:06:06,540 --> 02:06:10,220
+representación matemática no significa que estoy haciendo efectivamente el
+
+1102
+02:06:10,220 --> 02:06:15,100
+proceso que quiera yo hacer. El proceso, la última parte que es
+
+1103
+02:06:15,100 --> 02:06:20,260
+comprobar estas cosas es un poco más complicado y por eso
+
+1104
+02:06:20,260 --> 02:06:25,520
+es difícil de matematizar porque ya no matematizamos, ya comparamos los
+
+1105
+02:06:25,520 --> 02:06:32,500
+puntajes y en términos matemáticos bajo esa representación son similares pero
+
+1106
+02:06:32,500 --> 02:06:37,460
+no podemos accederar que responde efectivamente a la pregunta, ya, entonces
+
+1107
+02:06:37,460 --> 02:06:44,820
+no podemos abarcar o atacar ese problema, esa etapa, de manera matemática, porque ya fue
+
+1108
+02:06:44,820 --> 02:06:49,260
+matematizado. Nosotros pudiésemos probar otra representación y ver si sucede el problema,
+
+1109
+02:06:49,260 --> 02:06:57,060
+pero igual voy a tener que inspeccionar si efectivamente se está dando la interpretación,
+
+1110
+02:06:57,060 --> 02:07:06,740
+o sea, se está respondiendo efectivamente a la consulta. Siguiendo. Nosotros queremos ver,
+
+1111
+02:07:06,740 --> 02:07:12,800
+ya cuántos queremos mostrar veamos las distintas dos las dos recetas que hemos visto la basada en
+
+1112
+02:07:12,800 --> 02:07:19,340
+conteo y la basada en la representación vectorial yo puedo ver cuántos si se fijan acá los aciertos
+
+1113
+02:07:19,340 --> 02:07:25,460
+en los primeros candidatos es o la chunta la primera o la chunta la primera los aciertos en
+
+1114
+02:07:25,460 --> 02:07:30,900
+los primeros tres candidatos es cuántas veces la chunta cuando tiro los primeros tres que tienen
+
+1115
+02:07:30,900 --> 02:07:37,000
+la primera, las tres mayores puntadas y el MRR hace referencia
+
+1116
+02:07:37,000 --> 02:07:45,500
+dependiendo del recíproco de su importancia. Entonces si se fijan acá
+
+1117
+02:07:45,500 --> 02:07:52,500
+cuando ocupo estas distintas configuraciones, mostrar más candidatos
+
+1118
+02:07:52,500 --> 02:07:59,180
+va a tener mayor, un poco mayor de certeza porque tengo más
+
+1119
+02:07:59,180 --> 02:08:03,380
+posibilidades en las cuales yo le puedo adjuntar a lo que yo estoy buscando.
+
+1120
+02:08:03,380 --> 02:08:09,620
+Si adjunto a la primera ya muestro 1, en el caso del mini lm 10 de 12 consultas fueron
+
+1121
+02:08:09,620 --> 02:08:16,420
+respondidas pero ya al agregar 3, pasé de 11 a 12 ya porque voy a poder
+
+1122
+02:08:16,420 --> 02:08:21,260
+permitirme cierto error en el sentido de que no necesariamente lo que yo
+
+1123
+02:08:21,260 --> 02:08:26,900
+recomiendo términos de mayor puntaje va a ser efectivamente lo que la respuesta
+
+1124
+02:08:26,900 --> 02:08:32,100
+correcta entonces me doy un par de opciones en este caso tres vendría siendo o
+
+1125
+02:08:32,100 --> 02:08:38,020
+dar tres candidatos notaría una cierta algura para definir en el caso de esta
+
+1126
+02:08:38,020 --> 02:08:42,620
+búsqueda por eso cuando ustedes por ejemplo hacen búsqueda en cualquier
+
+1127
+02:08:42,620 --> 02:08:47,180
+tipo de búsqueda nunca les muestra sólo una opción sino que muestra más de una
+
+1128
+02:08:47,180 --> 02:08:52,460
+porque tengo una mayor chance de juntarle digamos o hacer este match en término de
+
+1129
+02:08:52,460 --> 02:09:00,340
+similitudes de alguna métrica con más de una opción simplemente.
+
+1130
+02:09:00,340 --> 02:09:09,220
+Entonces esa noción dice, fijan acá va a ser bastante más útil. Ahora, cierto
+
+1131
+02:09:09,220 --> 02:09:14,260
+cierto que tenemos que tener que por ejemplo el MRR no cambia en funcionar
+
+1132
+02:09:14,260 --> 02:09:20,620
+cuántas yo estoy diciendo porque siempre va a ocupar en términos de
+
+1133
+02:09:20,620 --> 02:09:25,180
+de que cuál les va a mostrar o es en términos numéricos porque siempre va a ocupar los rangos completos
+
+1134
+02:09:25,180 --> 02:09:30,600
+y ahí esos rangos completos no cambiaron, entonces por eso este número de MRR se mantiene constante
+
+1135
+02:09:30,600 --> 02:09:33,780
+no así los aciertos en los primeros K valores
+
+1136
+02:09:35,300 --> 02:09:41,800
+ahora analicemos un poco la representación, entonces vemos que el embedding es pasar un objeto
+
+1137
+02:09:42,660 --> 02:09:44,660
+no matemático a algo matemático
+
+1138
+02:09:44,740 --> 02:09:47,340
+y el minileme me llevó texto
+
+1139
+02:09:47,340 --> 02:09:54,420
+que fue pasado a tokens y los tokens fueron pasados después a un vector de 384 coordenadas
+
+1140
+02:09:55,740 --> 02:10:03,060
+no podemos graficar 384 coordenadas entonces la forma que quiero representar es en términos de
+
+1141
+02:10:03,060 --> 02:10:07,500
+una análisis de componentes principales que me lo va a resumir en las primeras dos coordenadas ya
+
+1142
+02:10:07,500 --> 02:10:15,660
+es una una proyección al AR2 en principio y se fijan acá esta va a ser la representación ya
+
+1143
+02:10:15,660 --> 02:10:22,820
+que va a resumir las 384 no es claramente una representación certera yo veo que la primera
+
+1144
+02:10:22,820 --> 02:10:29,300
+componente principal que sabemos que reúne la mayor variabilidad tiene el 20% de la variabilidad
+
+1145
+02:10:29,300 --> 02:10:36,060
+de los datos y tengo la segunda componente principal que es 14.2 que reúne la segunda
+
+1146
+02:10:36,060 --> 02:10:42,020
+la la el segundo orden de variabilidad entre los datos entonces en total aquí simplemente estoy
+
+1147
+02:10:42,020 --> 02:10:48,980
+viendo el 34.3% de la variabilidad de los datos, lo cual es poco dentro de
+
+1148
+02:10:48,980 --> 02:10:52,740
+todo el resto de
+
+1149
+02:10:52,820 --> 02:10:57,940
+coeficientes y coordenadas que tengo. Entonces hay un sinfín de otras
+
+1150
+02:10:57,940 --> 02:11:00,980
+digamos
+
+1151
+02:11:02,420 --> 02:11:09,340
+fuentes de variabilidad que no estoy representando en esta proyección en 2D.
+
+1152
+02:11:09,340 --> 02:11:13,960
+entonces si se fijan acá yo estoy haciendo simplemente una proyección del
+
+1153
+02:11:13,960 --> 02:11:22,880
+espacio R384, que es un vector de 384 coordenadas, a R2
+
+1154
+02:11:22,880 --> 02:11:28,200
+y el PCA es una de las formas que yo puedo hacer esa
+
+1155
+02:11:28,200 --> 02:11:33,680
+esa representación pero no es la única entonces
+
+1156
+02:11:33,680 --> 02:11:40,120
+Si se fijan acá, yo puedo ver la representación de cada una de las fichas
+
+1157
+02:11:40,120 --> 02:11:47,480
+de 0 1, de 0 2 y así sumisigue, no así de las consultas. Si se fijan esto es
+
+1158
+02:11:47,480 --> 02:11:53,080
+cada una de estas fichas fue pasada a un punto en el espacio de 384 y luego esas
+
+1159
+02:11:53,080 --> 02:12:05,080
+384, fueron pasadas a un punto en R2, en términos de su componente principal.
+
+1160
+02:12:05,080 --> 02:12:09,640
+Nosotros podemos ver similitudes. Si se fijan acá, nosotros nos devolvemos a ver
+
+1161
+02:12:09,640 --> 02:12:15,160
+las fichas y vemos que las fichas...
+
+1162
+02:12:15,160 --> 02:12:24,520
+Aquí, D11 y D12 son muy muy similares porque vimos que eran prácticamente dos códigos
+
+1163
+02:12:24,520 --> 02:12:27,560
+distintos pero con distintas fechas pero misma hora.
+
+1164
+02:12:27,560 --> 02:12:31,600
+Entonces cuando vemos su representación en términos de las componentes principales,
+
+1165
+02:12:31,600 --> 02:12:41,000
+en términos de las primeras dos componentes principales, vemos que D11 y D12 ya son muy
+
+1166
+02:12:41,000 --> 02:12:46,560
+parecidos en estar en esta proyección en R2. Entonces, eso que sugiere, sugiere que sus
+
+1167
+02:12:46,560 --> 02:12:56,640
+tectos son muy similares, pero no son exactamente iguales porque no están en el mismo punto.
+
+1168
+02:12:56,640 --> 02:13:02,240
+No puedo decir un orden de ranking en este espacio porque el ranking lo calculo en el
+
+1169
+02:13:02,240 --> 02:13:10,680
+espacio original que es de 384 coordenadas. Entonces, el PSA no entrega una forma de ver
+
+1170
+02:13:10,680 --> 02:13:18,960
+similitudes entre observaciones, digamos, que o de distintas
+
+1171
+02:13:18,960 --> 02:13:24,320
+representaciones de observaciones, que sería lo correcto de decir.
+
+1172
+02:13:24,720 --> 02:13:30,080
+Siguiendo entonces, recordemos nuevamente, en vez de pasar objetos a cosas
+
+1173
+02:13:30,080 --> 02:13:37,680
+numéricas, yo puedo pasar, yo puedo utilizar esa representación,
+
+1174
+02:13:37,680 --> 02:13:43,200
+esto claramente ilusativo, no es exactamente lo mismo con lo que estamos haciendo, pero para
+
+1175
+02:13:43,200 --> 02:13:50,760
+otro uso, no necesariamente para texto, no necesariamente para hacer esta búsqueda entre
+
+1176
+02:13:50,760 --> 02:13:59,400
+similitud, yo puedo ocuparla para otras funciones, entonces podemos entrenar por ejemplo un clasificador
+
+1177
+02:13:59,400 --> 02:14:04,920
+sobre esos embedding, entonces si se fijan el embedding pasa a ser simplemente una noción de
+
+1178
+02:14:04,920 --> 02:14:10,320
+transformación de los datos, bastante más compleja, pero una transformación de
+
+1179
+02:14:10,320 --> 02:14:13,720
+los datos y estos datos pueden ser
+
+1180
+02:14:14,200 --> 02:14:22,560
+que son, o sea, son texto. Por ejemplo, pudiésemos ocupar el mini-lm para
+
+1181
+02:14:23,320 --> 02:14:31,000
+pasarlos a niveles, a vectores de 384 coordenadas y luego entrenar algún
+
+1182
+02:14:31,000 --> 02:14:37,660
+clasificador que me diga si yo tuviese las etiquetas, si es que tengo un
+
+1183
+02:14:37,660 --> 02:14:42,740
+correo por ejemplo que sea spam o no. Imagínense, yo tengo los spams, los
+
+1184
+02:14:42,740 --> 02:14:46,940
+correos que yo sé que son spam y cuáles son spam y cuáles no y en vez de hacer
+
+1185
+02:14:46,940 --> 02:14:51,140
+lo que habíamos hecho antes con AY, bias y relección logística etcétera, que
+
+1186
+02:14:51,140 --> 02:14:56,540
+pasa con teo, yo puedo ocupar el embedding para pasar el texto del spam a una
+
+1187
+02:14:56,540 --> 02:15:00,180
+representación vectorial. Yo sé cuál es la etiqueta porque sé cuando es spam y
+
+1188
+02:15:00,180 --> 02:15:06,600
+cuando no y utilizar esta representación vectorial ya con minilm para ser el
+
+1189
+02:15:06,600 --> 02:15:14,600
+clasificador de correos spam o no yo puedo hacer agrupamiento ya y ahí vamos a
+
+1190
+02:15:14,600 --> 02:15:20,860
+necesitar revisar digamos la estabilidad y la utilidad de los grupos ya va a ser
+
+1191
+02:15:20,860 --> 02:15:24,680
+una noción de clustering se fijan el embedding lo que me está haciendo es
+
+1192
+02:15:24,680 --> 02:15:29,220
+llevar me está cambiando el espacio el dominio en el cual yo estoy trabajando
+
+1193
+02:15:29,220 --> 02:15:34,900
+pero me lo está matematizando. Entonces, en ese espacio quizás puedo hacer
+
+1194
+02:15:34,900 --> 02:15:41,300
+un agrupamiento bastante más certero que en el espacio original.
+
+1195
+02:15:41,300 --> 02:15:45,060
+Y también lo que nosotros estábamos haciendo, que es la búsqueda.
+
+1196
+02:15:45,060 --> 02:15:50,940
+Ver cuáles son los vecinos más cercanos porque estábamos viendo una noción de similitud.
+
+1197
+02:15:50,940 --> 02:15:54,540
+¿Cuál es lo más cercano a lo que nosotros tenemos?
+
+1198
+02:15:54,540 --> 02:15:57,620
+Y eso es lo que nosotros estábamos haciendo cuando estábamos sacando este coseno.
+
+1199
+02:15:57,620 --> 02:16:01,580
+coseno de la representación en mini-le'en. Entonces, este embedding, esta
+
+1200
+02:16:01,580 --> 02:16:05,720
+transformación de texto a representación matemática puede tener
+
+1201
+02:16:05,720 --> 02:16:13,340
+distintas aplicaciones. No se saca de mente buscar similitudes.
+
+1202
+02:16:16,380 --> 02:16:22,540
+Ya entonces, terminando, ¿qué podemos hacer o qué debemos realizar cuando
+
+1203
+02:16:22,540 --> 02:16:28,460
+queremos cambiar la aplicación o tenemos distintas
+
+1204
+02:16:30,060 --> 02:16:34,300
+distintos objetivos como lo acabamos de mencionar. Yo puedo
+
+1205
+02:16:34,300 --> 02:16:40,140
+cambiar el codificador. El codificador nosotros dijimos mini lm pero tal
+
+1206
+02:16:40,140 --> 02:16:47,460
+como está esa hay muchos más. Entonces esa representación
+
+1207
+02:16:47,460 --> 02:16:51,500
+va a cambiar bastante los resultados porque
+
+1208
+02:16:51,500 --> 02:16:58,760
+recuerden tengo infinitas formas de representar algo que es numérico, algo que no es numérico
+
+1209
+02:16:58,760 --> 02:17:09,460
+de manera numérica, entonces puedo probar cuando quiero hacer estas cosas, quiero probar algo que
+
+1210
+02:17:09,460 --> 02:17:15,340
+o quiero probar más de algún codificador para ver si los resultados que estoy teniendo son
+
+1211
+02:17:15,340 --> 02:17:20,100
+relativamente consistente, aunque yo también puedo ver los resultados en
+
+1212
+02:17:20,100 --> 02:17:24,620
+cuanto a la pertinencia de la respuesta que tengo en las distintas consultas,
+
+1213
+02:17:24,620 --> 02:17:28,960
+que también hay otra forma de validar empíricamente que lo que estoy
+
+1214
+02:17:28,960 --> 02:17:34,220
+haciendo tiene alguna noción o está funcionando en principio.
+
+1215
+02:17:34,220 --> 02:17:38,220
+Puedo hacer otra división de las fichas, puedo revisar qué fragmentos
+
+1216
+02:17:38,220 --> 02:17:42,100
+contienen información suficiente y cuáles no, entonces clasificar cuándo
+
+1217
+02:17:42,100 --> 02:17:46,960
+voy a necesitar información adicional. Puedo tener otro dominio o otro tipo de
+
+1218
+02:17:46,960 --> 02:17:52,220
+consultas, ya evaluar con ejemplos que son adicionales o son más
+
+1219
+02:17:52,220 --> 02:17:58,600
+representativos de algún uso particular. Entonces voy a poder de cierta manera
+
+1220
+02:17:58,600 --> 02:18:04,660
+particularizar la red o el embedding a la aplicación que yo estoy utilizando y
+
+1221
+02:18:04,660 --> 02:18:08,620
+puedo ocuparse en el caso que estoy de búsqueda otro punto, otra noción de
+
+1222
+02:18:08,620 --> 02:18:12,580
+corte mínimo o en principio otro
+
+1223
+02:18:12,580 --> 02:18:18,240
+puntaje del coseno de minilem pero podemos ocupar otra también ya que por
+
+1224
+02:18:18,240 --> 02:18:22,740
+ejemplo no consigue el término de dirección entonces todas esas cosas
+
+1225
+02:18:22,740 --> 02:18:27,500
+tenemos que setearla digamos configurarla antes de hacer esta
+
+1226
+02:18:27,500 --> 02:18:30,420
+implementación
+
+1227
+02:18:30,500 --> 02:18:35,220
+y que tiene muchas variantes ya tengo muchas muchas muchas opciones distintas
+
+1228
+02:18:35,220 --> 02:18:39,580
+que puedo modificar que me van a entregar estos resultados la idea es que
+
+1229
+02:18:39,580 --> 02:18:45,340
+yo tengo que nuevamente en la última etapa validar que las cosas que yo estoy haciendo tienen algún
+
+1230
+02:18:45,340 --> 02:18:52,100
+correlato con lo que yo quiero hacer ya no porque tengo un puntaje un puntaje alto significa que
+
+1231
+02:18:52,100 --> 02:18:57,220
+más va a estar respondiendo o está haciendo efectivamente el objetivo que yo plantee en un
+
+1232
+02:18:57,220 --> 02:19:02,860
+principio. Entonces si se fijan acá para ya ir cerrando esto tiene el mismo la misma
+
+1233
+02:19:02,860 --> 02:19:09,540
+noción de lo que hicimos o la misma herramienta que nosotros usamos de Reino
+
+1234
+02:19:09,540 --> 02:19:14,260
+Nacional. Todo esto que está aquí ocupa exactamente las mismas cosas que estamos
+
+1235
+02:19:14,260 --> 02:19:17,780
+haciendo. Puede ser un poco más complicado en términos de la operatoria interna que
+
+1236
+02:19:17,780 --> 02:19:23,020
+hace el embedding, pero por ejemplo para la clasificación, lo único que me va a
+
+1237
+02:19:23,020 --> 02:19:27,820
+hacer el embedding es cambiar mi entrada, es decir, el embedding cuando lo hago en
+
+1238
+02:19:27,820 --> 02:19:32,980
+clasificación, me va a cambiar la entrada a un número y ese número va a
+
+1239
+02:19:32,980 --> 02:19:36,460
+ser la entrada de mi red neuronale. Entonces, todos son en principio
+
+1240
+02:19:36,460 --> 02:19:40,220
+red neuronales. Todo lo que nosotros vemos con esta GPT y cosas estas tolas son
+
+1241
+02:19:40,220 --> 02:19:44,860
+obviamente versiones más sofisticadas de lo que estamos viendo, un poco más
+
+1242
+02:19:44,860 --> 02:19:49,260
+complejas, pero todos recaen dentro de la misma categoría. Todos tienen alguna
+
+1243
+02:19:49,260 --> 02:19:52,620
+representación, sobre todo las cosas textuales, tienen alguna representación
+
+1244
+02:19:52,620 --> 02:20:00,020
+matemática que con la cual nos va a permitir hacer alguna operatoria
+
+1245
+02:20:00,020 --> 02:20:04,380
+que va a dar algún puntaje de similitud y
+
+1246
+02:20:04,380 --> 02:20:08,340
+puedo digamos hacer distintas distintos objetivos lo que nosotros vamos a ver un
+
+1247
+02:20:08,340 --> 02:20:13,060
+poco más en la siguiente sesión es cómo puedo pasar a esta cosa algo
+
+1248
+02:20:13,060 --> 02:20:17,460
+generativo, ese es como el ideal que queremos ir cerrando.
+
+1249
+02:20:17,460 --> 02:20:20,900
+Entonces volviendo a la pregunta inicial, si se fijan yo tenía la consulta de
+
+1250
+02:20:20,900 --> 02:20:28,180
+olvidé mi clave sabemos que D01 es la ficha correcta y bajo el Mini LME y con
+
+1251
+02:20:28,180 --> 02:20:34,740
+las distintos ranking yo tengo entonces el D01 como la principal respuesta a esa
+
+1252
+02:20:34,740 --> 02:20:40,540
+consulta y vemos entonces bajo esa representación que estamos
+
+1253
+02:20:40,540 --> 02:20:47,100
+ocupando Mini LME que es embedding, ya, nos están entregando buenos resultados
+
+1254
+02:20:47,100 --> 02:20:55,740
+tenemos entonces los distintos pasos, el peding, el puntaje, luego la comparación y luego la
+
+1255
+02:20:55,740 --> 02:21:02,820
+verificación. Entonces esos son los cuatro pasos que nosotros tenemos que tener y analizar dentro
+
+1256
+02:21:02,820 --> 02:21:12,260
+de este tipo de tecnologías. Si se fijan acá, todo esto se resume al principio. El primer paso
+
+1257
+02:21:12,260 --> 02:21:17,900
+siempre definir cómo voy a representar yo de cosas no matemáticas, si bien aquí
+
+1258
+02:21:17,900 --> 02:21:25,800
+lo estamos particularizando en texto, podrían ser otros tipos, otro tipo de
+
+1259
+02:21:25,800 --> 02:21:32,720
+cosas, ya, pues pensemos vídeo por ejemplo, igual es algo no matemático o algo no
+
+1260
+02:21:32,720 --> 02:21:37,480
+innatamente número que lo quiero representar como número, luego voy a
+
+1261
+02:21:37,480 --> 02:21:44,080
+tener que asignar algún puntaje, ordenarlos y luego evaluar y efectivamente ver que lo que estoy
+
+1262
+02:21:44,080 --> 02:21:51,240
+realizando tiene algún correlato con el objetivo que yo planteé en un principio. Esto en cuanto
+
+1263
+02:21:54,640 --> 02:22:02,680
+a lo que es en BEND, si se fijan todo esto puede ser resumido muy brevemente en utilizar
+
+1264
+02:22:02,680 --> 02:22:12,040
+herramientas de red en principio para pasar algo no matemático en algo matemático y una vez que
+
+1265
+02:22:12,040 --> 02:22:16,900
+estoy en el mundo matemático de vectores puedo aplicar redes neuronales para los distintos
+
+1266
+02:22:16,900 --> 02:22:22,760
+objetivos que hemos visto a lo largo de estas últimas sesiones, ya sea clasificación, similitud,
+
+1267
+02:22:22,760 --> 02:22:31,840
+búsqueda, clustering, etcétera. Entonces todo esto está conectado, se pueden ver muy distintos
+
+1268
+02:22:31,840 --> 02:22:35,160
+pero por debajo estamos ocupando las mismas tecnologías.
+
+1269
+02:22:35,160 --> 02:22:41,320
+En esencia son las redes neuronales, solamente que vamos cambiando ciertas cosas dentro de
+
+1270
+02:22:41,320 --> 02:22:42,320
+esta estructura.
+
+1271
+02:22:42,320 --> 02:22:50,520
+¿Alguna pregunta, duda que haya salido hoy?
+
+1272
+02:22:50,520 --> 02:22:53,680
+Si no, volvemos el próximo jueves.
+
+1273
+02:22:53,680 --> 02:23:00,320
+Y luego de esto, el jueves que es la última sesión que me toca a mí y luego viene el
+
+1274
+02:23:00,320 --> 02:23:06,040
+profesor Jonathan Acosta, con las últimas siguientes semanas.
+
+1275
+02:23:06,040 --> 02:23:11,600
+¿Les parece? Si hay alguna consulta también me pueden mandar el correo, me estoy
+
+1276
+02:23:11,600 --> 02:23:17,360
+demorando un poquito en responder estas últimas preguntas, pero me puedo
+
+1277
+02:23:17,360 --> 02:23:24,960
+honorar pero siempre respondo. Eso. Nos vemos entonces el jueves misma hora.
+
+1278
+02:23:24,960 --> 02:23:29,000
+Gracias a todos, buenas noches.
+
+1279
+02:23:29,000 --> 02:23:33,800
+Chau que estén bien, buenas noches
+
+1280
+02:23:36,120 --> 02:23:39,320
+Recording stopped
+

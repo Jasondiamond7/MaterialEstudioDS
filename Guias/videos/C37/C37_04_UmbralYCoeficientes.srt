@@ -1,0 +1,395 @@
+1
+00:00:00,250 --> 00:00:04,271
+Cuarta parada: el umbral con datos reales, los odds, y cómo leer
+
+2
+00:00:04,271 --> 00:00:07,600
+los coeficientes de la logística sin caer en trampas.
+
+3
+00:00:07,720 --> 00:00:10,270
+¿El umbral tiene que ser siempre 0.5?
+
+4
+00:00:10,390 --> 00:00:12,931
+Si un falso negativo es un cáncer que no se
+
+5
+00:00:12,931 --> 00:00:15,590
+detecta, quizás convenga dar la alarma antes.
+
+6
+00:00:15,710 --> 00:00:19,179
+El umbral no es una propiedad del modelo: es una decisión,
+
+7
+00:00:19,179 --> 00:00:21,870
+y se toma pensando en el costo de cada error.
+
+8
+00:00:21,990 --> 00:00:25,040
+Piensa en un guardia de aeropuerto que decide a quién revisar.
+
+9
+00:00:25,160 --> 00:00:28,515
+Si es muy exigente, revisa a casi todos: no se le
+
+10
+00:00:28,515 --> 00:00:31,870
+escapa nada, pero molesta a mucha gente inocente.
+
+11
+00:00:31,990 --> 00:00:36,280
+Si es relajado, casi no molesta, pero se le pueden escapar cosas.
+
+12
+00:00:36,400 --> 00:00:40,270
+Bajar el umbral es volverse exigente; subirlo, relajarse.
+
+13
+00:00:40,390 --> 00:00:44,038
+Ahora con los datos reales: la logística de la clase en
+
+14
+00:00:44,038 --> 00:00:46,890
+los 171 casos de prueba, con tres umbrales.
+
+15
+00:00:47,010 --> 00:00:53,900
+Con te igual a 0.3, detecta 59 de los 64 malignos, pero da 13 falsas alarmas.
+
+16
+00:00:54,020 --> 00:00:58,560
+Con 0.5, detecta 58 y da 4 falsas alarmas.
+
+17
+00:00:58,680 --> 00:01:04,170
+Con 0.8, detecta solo 52, y da apenas 2 falsas alarmas.
+
+18
+00:01:04,290 --> 00:01:11,410
+En métricas: con 0.3, sensibilidad 0.922 y especificidad 0.879.
+
+19
+00:01:11,530 --> 00:01:16,300
+Con 0.5, 0.906 y 0.963.
+
+20
+00:01:16,420 --> 00:01:21,090
+Con 0.8, 0.812 y 0.981.
+
+21
+00:01:21,210 --> 00:01:24,490
+Subir el umbral gana especificidad y pierde sensibilidad.
+
+22
+00:01:24,610 --> 00:01:26,130
+Siempre es un intercambio.
+
+23
+00:01:26,250 --> 00:01:30,710
+Pero ojo: estos números de prueba sirven para ver el efecto, no para elegir.
+
+24
+00:01:30,830 --> 00:01:34,430
+El umbral se elige con validación, dentro del entrenamiento.
+
+25
+00:01:34,550 --> 00:01:40,659
+Con validación cruzada en los 398 casos, la sensibilidad y la especificidad
+
+26
+00:01:40,659 --> 00:01:45,710
+se igualan cerca de te igual a 0.34: ambas, alrededor de 0.93.
+
+27
+00:01:45,830 --> 00:01:48,810
+Para leer los coeficientes, necesitamos los odds.
+
+28
+00:01:48,930 --> 00:01:51,200
+Los odds son pe sobre uno menos pe.
+
+29
+00:01:51,320 --> 00:01:56,820
+Con probabilidad 0.8, los odds son 0.8 sobre 0.2: cuatro.
+
+30
+00:01:56,940 --> 00:01:59,190
+Cuatro a uno, como en las apuestas.
+
+31
+00:01:59,310 --> 00:02:02,750
+Con 0.5, los odds valen uno: es parejo.
+
+32
+00:02:02,870 --> 00:02:05,745
+Y aquí está la conexión con eta: el logaritmo de
+
+33
+00:02:05,745 --> 00:02:08,200
+los odds es justamente el puntaje lineal.
+
+34
+00:02:08,320 --> 00:02:10,980
+O sea, los odds son e elevado a eta.
+
+35
+00:02:11,100 --> 00:02:16,254
+En el ejemplo de la diapositiva diecisiete, eta valía uno:
+
+36
+00:02:16,254 --> 00:02:20,520
+los odds son e, 2.718, y la probabilidad, 0.731.
+
+37
+00:02:20,640 --> 00:02:23,200
+Ahora sí, la diapositiva dieciocho.
+
+38
+00:02:23,320 --> 00:02:27,140
+Si x jota sube en una unidad, con los demás predictores fijos,
+
+39
+00:02:27,140 --> 00:02:30,220
+los odds se multiplican por e elevado a beta jota.
+
+40
+00:02:30,340 --> 00:02:35,320
+Con beta igual a 0.8: e a la 0.8 es 2.23.
+
+41
+00:02:35,440 --> 00:02:38,260
+Los odds se multiplican por 2.23.
+
+42
+00:02:38,380 --> 00:02:41,830
+Pero la probabilidad no se multiplica por 2.23.
+
+43
+00:02:41,950 --> 00:02:49,580
+Sigamos el ejemplo: eta pasa de uno a 1.8, y los odds, de 2.718 a 6.05.
+
+44
+00:02:49,700 --> 00:02:54,280
+La probabilidad pasa de 0.731 a 0.858.
+
+45
+00:02:54,400 --> 00:02:59,152
+Sube, pero no se multiplica: si se multiplicara por 2.23,
+
+46
+00:02:59,152 --> 00:03:03,570
+daría 1.63, y una probabilidad no puede pasar de uno.
+
+47
+00:03:03,690 --> 00:03:05,990
+Dos advertencias más de la diapositiva.
+
+48
+00:03:06,110 --> 00:03:08,836
+Con variables estandarizadas, una unidad es una
+
+49
+00:03:08,836 --> 00:03:11,040
+desviación estándar del entrenamiento.
+
+50
+00:03:11,160 --> 00:03:15,240
+Y la interpretación es una asociación condicional, no un efecto causal.
+
+51
+00:03:15,360 --> 00:03:17,804
+La diapositiva veintiocho muestra los
+
+52
+00:03:17,804 --> 00:03:20,313
+coeficientes del glm de R, en unidades
+
+53
+00:03:20,313 --> 00:03:21,040
+originales.
+
+54
+00:03:21,160 --> 00:03:27,950
+Intercepto menos 42.25; radio, 1.34; textura,
+
+55
+00:03:27,950 --> 00:03:34,740
+0.442; suavidad, 124.98; y concavidad, 21.41.
+
+56
+00:03:34,860 --> 00:03:39,438
+La diapositiva lee la textura: una unidad más de textura
+
+57
+00:03:39,438 --> 00:03:44,180
+multiplica los odds por e a la 0.4421, es decir, por 1.56.
+
+58
+00:03:44,300 --> 00:03:47,470
+Cuidado si alguien aplica esa misma lectura a la suavidad.
+
+59
+00:03:47,590 --> 00:03:51,896
+Una unidad más de suavidad multiplicaría los odds por
+
+60
+00:03:51,896 --> 00:03:55,390
+e elevado a 124.98: un número de 55 cifras.
+
+61
+00:03:55,510 --> 00:04:02,320
+No tiene sentido práctico, porque la suavidad de toda la base va de 0.053 a 0.163.
+
+62
+00:04:02,440 --> 00:04:04,390
+Una unidad completa no existe.
+
+63
+00:04:04,510 --> 00:04:09,392
+La lectura útil es otra: un aumento de 0.01 multiplica
+
+64
+00:04:09,392 --> 00:04:13,190
+los odds por e a la 1.25, o sea, por 3.49.
+
+65
+00:04:13,310 --> 00:04:19,359
+Y en Python los coeficientes salen distintos, porque las variables están estandarizadas:
+
+66
+00:04:19,359 --> 00:04:24,170
+el radio vale 4.92 por desviación estándar, en vez de 1.34 por unidad.
+
+67
+00:04:24,290 --> 00:04:26,550
+Pero las probabilidades son las mismas.
+
+68
+00:04:26,670 --> 00:04:31,370
+Para el caso nuevo de la clase, las dos versiones dan 0.3919.
+
+69
+00:04:31,490 --> 00:04:33,510
+Una precisión sobre lo dicho en clase.
+
+70
+00:04:33,630 --> 00:04:36,310
+Se dijo que el estimador de máxima verosimilitud
+
+71
+00:04:36,310 --> 00:04:38,710
+tiene garantizado que su solución es única.
+
+72
+00:04:38,830 --> 00:04:39,690
+No siempre.
+
+73
+00:04:39,810 --> 00:04:44,176
+Si las clases están perfectamente separadas, la verosimilitud sigue subiendo
+
+74
+00:04:44,176 --> 00:04:47,680
+a medida que el coeficiente crece, y nunca llega a un máximo.
+
+75
+00:04:47,800 --> 00:04:51,149
+Un ejemplo pequeño: seis puntos, los tres negativos a la
+
+76
+00:04:51,149 --> 00:04:53,780
+izquierda y los tres positivos a la derecha.
+
+77
+00:04:53,900 --> 00:04:58,730
+Con beta igual a uno, la log verosimilitud es menos 0.978.
+
+78
+00:04:58,850 --> 00:05:01,690
+Con dos, menos 0.295.
+
+79
+00:05:01,810 --> 00:05:04,680
+Con cinco, menos 0.014.
+
+80
+00:05:04,800 --> 00:05:08,310
+Con diez, menos 0.00009.
+
+81
+00:05:08,430 --> 00:05:10,940
+Siempre sube hacia cero, sin detenerse.
+
+82
+00:05:11,060 --> 00:05:14,730
+En la práctica, el programa se detiene en un valor arbitrario.
+
+83
+00:05:14,850 --> 00:05:18,990
+El error típico de esta parte: elegir el umbral mirando la prueba.
+
+84
+00:05:19,110 --> 00:05:22,954
+Si pruebas varios umbrales en los 171 casos y te quedas con el
+
+85
+00:05:22,954 --> 00:05:25,930
+que dio mejor, ya usaste la prueba para decidir.
+
+86
+00:05:26,050 --> 00:05:30,209
+La diapositiva once lo dice: mirar la prueba para decidir la convierte en
+
+87
+00:05:30,209 --> 00:05:33,570
+validación, y su número deja de ser una evaluación honesta.
+
+88
+00:05:33,690 --> 00:05:34,910
+Piensa un segundo.
+
+89
+00:05:35,030 --> 00:05:38,351
+Si un coeficiente vale menos 0.7, ¿qué les pasa a los
+
+90
+00:05:38,351 --> 00:05:40,920
+odds cuando esa variable sube una unidad?
+
+91
+00:05:41,840 --> 00:05:46,500
+Se multiplican por e a la menos 0.7, que es 0.497.
+
+92
+00:05:46,620 --> 00:05:49,480
+Es decir, los odds se reducen casi a la mitad.
+
+93
+00:05:49,600 --> 00:05:53,390
+Un coeficiente negativo baja los odds; uno positivo los sube.
+
+94
+00:05:53,510 --> 00:05:57,913
+Para llevarte: el umbral es una decisión: bajarlo gana sensibilidad,
+
+95
+00:05:57,913 --> 00:06:01,410
+subirlo gana especificidad, y se elige con validación.
+
+96
+00:06:01,530 --> 00:06:05,820
+Un coeficiente multiplica los odds por e elevado a beta, no la probabilidad.
+
+97
+00:06:05,940 --> 00:06:10,950
+Y hay que leerlo en la escala de su variable: para la suavidad, de a 0.01.
+
+98
+00:06:11,070 --> 00:06:14,200
+Siguiente parada: las máquinas de vectores de soporte.
+
+99
+00:06:14,320 --> 00:06:17,840
+El hiperplano, el margen, y los puntos que lo sostienen.

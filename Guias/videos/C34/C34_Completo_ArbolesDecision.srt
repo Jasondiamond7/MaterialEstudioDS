@@ -1,0 +1,4047 @@
+1
+00:00:00,250 --> 00:00:00,710
+Hola.
+
+2
+00:00:00,830 --> 00:00:03,781
+Bienvenido a la serie de videos de la clase treinta y
+
+3
+00:00:03,781 --> 00:00:06,120
+cuatro, con el profesor Eduardo Rodríguez.
+
+4
+00:00:06,240 --> 00:00:08,872
+Hoy conoces el modelo más fácil de explicar de
+
+5
+00:00:08,872 --> 00:00:11,160
+todo el diplomado: el árbol de decisión.
+
+6
+00:00:11,280 --> 00:00:14,450
+El profesor lo presentó con una frase que conviene recordar.
+
+7
+00:00:14,570 --> 00:00:17,387
+El árbol de decisión es la técnica más simple de
+
+8
+00:00:17,387 --> 00:00:19,970
+todas, y a la vez una de las más peligrosas.
+
+9
+00:00:20,090 --> 00:00:23,100
+Simple, porque se dibuja y se explica a cualquiera.
+
+10
+00:00:23,220 --> 00:00:25,960
+Peligrosa, porque sobreajusta muchísimo.
+
+11
+00:00:26,080 --> 00:00:27,440
+Peligrosa en serio.
+
+12
+00:00:27,560 --> 00:00:30,346
+Un árbol sobreajustado puede funcionar uno o dos
+
+13
+00:00:30,346 --> 00:00:32,900
+meses en producción, y fallar al cuarto mes.
+
+14
+00:00:33,020 --> 00:00:37,780
+Por eso, dice el profesor, separar entrenamiento y prueba aquí es obligatorio.
+
+15
+00:00:37,900 --> 00:00:39,660
+¿Dónde estamos en el diplomado?
+
+16
+00:00:39,780 --> 00:00:42,890
+La clase treinta preguntó si los datos eran confiables.
+
+17
+00:00:43,010 --> 00:00:45,610
+La treinta y uno, cómo aprende un modelo.
+
+18
+00:00:45,730 --> 00:00:48,690
+La treinta y dos, en qué forma se los entregamos.
+
+19
+00:00:48,810 --> 00:00:51,720
+La treinta y tres, con cuáles variables me quedo.
+
+20
+00:00:51,840 --> 00:00:55,250
+Y hoy, la treinta y cuatro pregunta: ¿cómo lo explico?
+
+21
+00:00:55,370 --> 00:00:58,238
+Los datos son los mismos de la clase treinta y tres:
+
+22
+00:00:58,238 --> 00:01:00,500
+la base de fuga de clientes de una telco.
+
+23
+00:01:00,620 --> 00:01:05,145
+Tres mil ciento cincuenta clientes, doce variables originales, y cuatrocientos
+
+24
+00:01:05,145 --> 00:01:08,800
+noventa y cinco que se fueron: el quince coma siete por ciento.
+
+25
+00:01:08,920 --> 00:01:11,413
+Para entender cómo piensa un árbol, juguemos a
+
+26
+00:01:11,413 --> 00:01:13,960
+adivinar un personaje con preguntas de sí o no.
+
+27
+00:01:14,080 --> 00:01:16,300
+Empiezas con todos los candidatos.
+
+28
+00:01:16,420 --> 00:01:18,200
+Preguntas: ¿usa lentes?
+
+29
+00:01:18,320 --> 00:01:19,850
+La mitad queda afuera.
+
+30
+00:01:19,970 --> 00:01:24,890
+Preguntas otra cosa, y otra, hasta que el grupo que queda es casi de un solo tipo.
+
+31
+00:01:25,010 --> 00:01:28,400
+Un árbol de decisión hace exactamente eso con los clientes.
+
+32
+00:01:28,520 --> 00:01:30,640
+Cada pregunta parte al grupo en dos.
+
+33
+00:01:30,760 --> 00:01:35,230
+Y al final, en cada grupo, predice la proporción de fuga que observó ahí.
+
+34
+00:01:35,350 --> 00:01:36,910
+Veámoslo en un dibujo.
+
+35
+00:01:37,030 --> 00:01:39,578
+Cada punto es un cliente, ubicado según dos
+
+36
+00:01:39,578 --> 00:01:42,540
+variables: cuánto usa el servicio y su antigüedad.
+
+37
+00:01:42,660 --> 00:01:43,890
+Los rojos se fueron.
+
+38
+00:01:44,010 --> 00:01:45,430
+Los grises se quedaron.
+
+39
+00:01:45,550 --> 00:01:48,720
+El árbol hace su primera pregunta: ¿usa menos de cuatro?
+
+40
+00:01:48,840 --> 00:01:50,200
+Es un corte vertical.
+
+41
+00:01:50,320 --> 00:01:52,310
+A la derecha casi todos se quedan.
+
+42
+00:01:52,430 --> 00:01:55,276
+A la izquierda hay mezcla, así que el árbol sigue
+
+43
+00:01:55,276 --> 00:01:58,180
+preguntando solo ahí: ¿antigüedad mayor que cinco?
+
+44
+00:01:58,300 --> 00:01:59,660
+Un corte horizontal.
+
+45
+00:01:59,780 --> 00:02:01,420
+Quedaron tres rectángulos.
+
+46
+00:02:01,540 --> 00:02:04,810
+Arriba a la izquierda: poco uso y mucha antigüedad.
+
+47
+00:02:04,930 --> 00:02:08,090
+Abajo a la izquierda: poco uso y poca antigüedad.
+
+48
+00:02:08,210 --> 00:02:10,400
+Y a la derecha, los que usan mucho.
+
+49
+00:02:10,520 --> 00:02:13,351
+En cada rectángulo el árbol predice una constante:
+
+50
+00:02:13,351 --> 00:02:15,560
+la proporción de rojos que hay adentro.
+
+51
+00:02:15,680 --> 00:02:18,980
+Compáralo con la regresión logística de la carpeta anterior.
+
+52
+00:02:19,100 --> 00:02:24,010
+La logística ajusta una sola frontera, global y lineal, para todo el espacio.
+
+53
+00:02:24,130 --> 00:02:26,965
+El árbol, en cambio, dibuja muchas fronteras
+
+54
+00:02:26,965 --> 00:02:29,800
+locales, y todas perpendiculares a los ejes.
+
+55
+00:02:29,920 --> 00:02:32,600
+Esa forma de partir trae tres consecuencias.
+
+56
+00:02:32,720 --> 00:02:37,100
+Captura la no linealidad sola, sin que nadie construya un logaritmo.
+
+57
+00:02:37,220 --> 00:02:41,820
+Captura interacciones solas: una rama puede usar variables distintas que la otra.
+
+58
+00:02:41,940 --> 00:02:46,830
+Pero solo corta en ángulo recto: una frontera diagonal le cuesta muchos escalones.
+
+59
+00:02:46,950 --> 00:02:50,500
+Ahora con el árbol real de la clase, de profundidad tres.
+
+60
+00:02:50,620 --> 00:02:53,654
+Sigamos a un cliente: reclamó, hizo cuarenta
+
+61
+00:02:53,654 --> 00:02:56,620
+llamadas al mes, y no tuvo fallas técnicas.
+
+62
+00:02:56,740 --> 00:03:01,120
+Primera pregunta, en la raíz: ¿reclamos menor o igual a cero coma cinco?
+
+63
+00:03:01,240 --> 00:03:05,070
+Él sí reclamó, así que la respuesta es no: va a la derecha.
+
+64
+00:03:05,190 --> 00:03:07,846
+Segunda pregunta: ¿frecuencia de llamadas menor
+
+65
+00:03:07,846 --> 00:03:10,050
+o igual a cincuenta y siete coma cinco?
+
+66
+00:03:10,170 --> 00:03:12,180
+Cuarenta, sí: izquierda.
+
+67
+00:03:12,300 --> 00:03:15,310
+Tercera: ¿fallas menor o igual a cero coma cinco?
+
+68
+00:03:15,430 --> 00:03:17,810
+Cero fallas, sí: izquierda.
+
+69
+00:03:17,930 --> 00:03:19,230
+Llegó a una hoja.
+
+70
+00:03:19,350 --> 00:03:22,792
+En esa hoja cayeron sesenta y siete clientes del entrenamiento,
+
+71
+00:03:22,792 --> 00:03:25,470
+y se fugó el sesenta y siete coma dos por ciento.
+
+72
+00:03:25,590 --> 00:03:26,980
+Esa es su predicción.
+
+73
+00:03:27,100 --> 00:03:31,189
+Comparado con la tasa general de quince coma siete, es un lift de cuatro
+
+74
+00:03:31,189 --> 00:03:34,540
+coma tres: cuatro veces más riesgo que un cliente promedio.
+
+75
+00:03:34,660 --> 00:03:37,910
+Tres cosas de la clase treinta y tres hoy se explican solas.
+
+76
+00:03:38,030 --> 00:03:41,138
+Uno: la ganancia de información que usamos como filtro es
+
+77
+00:03:41,138 --> 00:03:44,300
+exactamente el criterio con que el árbol elige cada corte.
+
+78
+00:03:44,420 --> 00:03:47,502
+Dos: la importancia de un árbol es selección embedded:
+
+79
+00:03:47,502 --> 00:03:50,070
+el árbol elige variables mientras se entrena.
+
+80
+00:03:50,190 --> 00:03:52,830
+Tres: reclamos era la variable más fuerte, y
+
+81
+00:03:52,830 --> 00:03:55,230
+hoy la vas a ver siempre arriba de todo.
+
+82
+00:03:55,350 --> 00:03:59,150
+Y por eso hoy no construimos las cincuenta variables de la clase pasada.
+
+83
+00:03:59,270 --> 00:04:02,080
+El árbol puede llegar a lo mismo partiendo el espacio.
+
+84
+00:04:02,200 --> 00:04:05,930
+Con las doce originales, además, el árbol se puede leer.
+
+85
+00:04:06,050 --> 00:04:09,370
+Y que se pueda leer es justamente la razón para elegir un árbol.
+
+86
+00:04:09,490 --> 00:04:12,862
+El error típico de esta clase: pensar que, como el
+
+87
+00:04:12,862 --> 00:04:15,560
+árbol es fácil, no hace falta validarlo.
+
+88
+00:04:15,680 --> 00:04:16,710
+Es al revés.
+
+89
+00:04:16,830 --> 00:04:19,562
+Como sobreajusta tanto, el árbol es el modelo
+
+90
+00:04:19,562 --> 00:04:21,990
+que más exige validación cruzada y poda.
+
+91
+00:04:22,110 --> 00:04:23,330
+Piensa un segundo.
+
+92
+00:04:23,450 --> 00:04:25,944
+En la clase treinta y tres construimos logaritmo
+
+93
+00:04:25,944 --> 00:04:27,970
+de segundos para ayudar a la logística.
+
+94
+00:04:28,090 --> 00:04:29,950
+¿Por qué un árbol no lo necesita?
+
+95
+00:04:30,670 --> 00:04:33,023
+Porque el árbol solo pregunta si una variable
+
+96
+00:04:33,023 --> 00:04:35,220
+está por encima o por debajo de un umbral.
+
+97
+00:04:35,340 --> 00:04:39,270
+Puede poner ese umbral donde quiera, y cortar la curva en escalones.
+
+98
+00:04:39,390 --> 00:04:43,860
+Un logaritmo mueve el número del umbral, pero no cambia quién queda a cada lado.
+
+99
+00:04:43,980 --> 00:04:46,700
+Lo vas a comprobar con un número en el video nueve.
+
+100
+00:04:46,820 --> 00:04:51,790
+Para llevarte: un árbol parte el espacio con preguntas de sí o no, en rectángulos.
+
+101
+00:04:51,910 --> 00:04:54,650
+Cada hoja predice la tasa de fuga de su grupo.
+
+102
+00:04:54,770 --> 00:04:58,050
+Y es simple de explicar, pero fácil de sobreajustar.
+
+103
+00:04:58,170 --> 00:05:01,273
+Siguiente parada: leer el árbol completo de la clase,
+
+104
+00:05:01,273 --> 00:05:03,790
+y convertir sus hojas en reglas de negocio.
+
+105
+00:05:04,690 --> 00:05:05,860
+Segunda parada.
+
+106
+00:05:05,980 --> 00:05:09,322
+Hoy aprendes a leer un árbol en voz alta, caja por caja, y a
+
+107
+00:05:09,322 --> 00:05:12,330
+convertir sus hojas en reglas que el negocio entiende.
+
+108
+00:05:12,450 --> 00:05:17,320
+Este es el árbol de la clase, entrenado con los tres mil ciento cincuenta clientes.
+
+109
+00:05:17,440 --> 00:05:21,370
+Profundidad tres: como máximo tres preguntas encadenadas.
+
+110
+00:05:21,490 --> 00:05:24,210
+Y ninguna hoja con menos de sesenta clientes.
+
+111
+00:05:24,330 --> 00:05:27,290
+Cabe en una lámina, y eso es su gran virtud.
+
+112
+00:05:27,410 --> 00:05:30,800
+Fíjate en algo: había doce variables disponibles.
+
+113
+00:05:30,920 --> 00:05:35,249
+El árbol usó solo seis: reclamos, segundos, antigüedad, ce
+
+114
+00:05:35,249 --> 00:05:38,980
+ele ve, frecuencia de llamadas y número de fallas.
+
+115
+00:05:39,100 --> 00:05:41,550
+Las otras seis no aparecen en ningún corte.
+
+116
+00:05:41,670 --> 00:05:46,360
+El árbol las descartó solo: eso es la selección embedded de la clase treinta y tres.
+
+117
+00:05:46,480 --> 00:05:47,910
+¿Cómo se lee una caja?
+
+118
+00:05:48,030 --> 00:05:49,430
+Arriba va la pregunta.
+
+119
+00:05:49,550 --> 00:05:53,170
+Abajo, cuántos clientes llegaron ahí y qué proporción se fugó.
+
+120
+00:05:53,290 --> 00:05:57,290
+Y una convención de sklearn: el «sí» siempre va a la izquierda.
+
+121
+00:05:57,410 --> 00:06:00,250
+Si se cumple la condición, bajas por la izquierda.
+
+122
+00:06:00,370 --> 00:06:01,600
+Ojo con la raíz.
+
+123
+00:06:01,720 --> 00:06:05,238
+Reclamos vale cero o uno, así que «reclamos menor o
+
+124
+00:06:05,238 --> 00:06:08,480
+igual a cero coma cinco» significa: no reclamó.
+
+125
+00:06:08,600 --> 00:06:12,230
+La izquierda son los que no reclamaron, y la derecha, los que sí.
+
+126
+00:06:12,350 --> 00:06:14,120
+Recorramos la rama izquierda.
+
+127
+00:06:14,240 --> 00:06:16,840
+No reclamaron dos mil ochocientos setenta y dos
+
+128
+00:06:16,840 --> 00:06:19,550
+clientes: el noventa y uno por ciento de la base.
+
+129
+00:06:19,670 --> 00:06:22,760
+Y de ellos se fuga solo el nueve coma nueve por ciento.
+
+130
+00:06:22,880 --> 00:06:26,830
+Siguiente pregunta: ¿usa novecientos treinta y cuatro segundos o menos?
+
+131
+00:06:26,950 --> 00:06:29,344
+Los que usan poco son cuatrocientos cuarenta y
+
+132
+00:06:29,344 --> 00:06:31,790
+cuatro, con treinta y cinco por ciento de fuga.
+
+133
+00:06:31,910 --> 00:06:36,900
+Los que usan más, dos mil cuatrocientos veintiocho, con apenas cinco coma tres.
+
+134
+00:06:37,020 --> 00:06:38,210
+Y el tercer nivel.
+
+135
+00:06:38,330 --> 00:06:42,387
+Entre los que usan poco, los de antigüedad mayor a veintiocho y medio se fugan
+
+136
+00:06:42,387 --> 00:06:45,560
+un cuarenta y tres por ciento: uso bajo pese a la antigüedad.
+
+137
+00:06:45,680 --> 00:06:49,162
+Y a la derecha está el núcleo sano de la cartera: dos mil trescientos
+
+138
+00:06:49,162 --> 00:06:52,190
+cincuenta y nueve clientes con cuatro coma cinco por ciento.
+
+139
+00:06:52,310 --> 00:06:54,900
+Ahora la rama derecha: los que reclamaron.
+
+140
+00:06:55,020 --> 00:06:59,580
+Son doscientos setenta y ocho, y se fuga el setenta y cinco coma cinco por ciento.
+
+141
+00:06:59,700 --> 00:07:03,010
+Debajo, ¿hace cincuenta y siete llamadas al mes o menos?
+
+142
+00:07:03,130 --> 00:07:06,299
+Los que reclamaron y usan poco: doscientos dieciséis,
+
+143
+00:07:06,299 --> 00:07:08,750
+con ochenta y cinco coma seis por ciento.
+
+144
+00:07:08,870 --> 00:07:11,660
+Y la última pregunta: ¿tuvo fallas técnicas?
+
+145
+00:07:11,780 --> 00:07:15,374
+Si reclamó, usa poco y tuvo fallas: ciento cuarenta y nueve
+
+146
+00:07:15,374 --> 00:07:18,480
+clientes, y se fuga el noventa y cuatro por ciento.
+
+147
+00:07:18,600 --> 00:07:21,400
+El profesor lo dijo así: esto es una locura.
+
+148
+00:07:21,520 --> 00:07:24,500
+Ahora traduce cada hoja a una regla de negocio.
+
+149
+00:07:24,620 --> 00:07:28,353
+Ordenadas de mayor a menor fuga, las siete hojas cubren a los tres
+
+150
+00:07:28,353 --> 00:07:31,350
+mil ciento cincuenta clientes, sin repetir a ninguno.
+
+151
+00:07:31,470 --> 00:07:33,980
+Esto es lo que da un árbol y una logística no.
+
+152
+00:07:34,100 --> 00:07:38,370
+«Cliente que reclamó, usa poco y tuvo fallas» no es un coeficiente.
+
+153
+00:07:38,490 --> 00:07:41,404
+Es un segmento de ciento cuarenta y nueve personas, al
+
+154
+00:07:41,404 --> 00:07:43,670
+que se le puede mandar una campaña mañana.
+
+155
+00:07:43,790 --> 00:07:45,980
+Midamos qué tan bueno es ese segmento.
+
+156
+00:07:46,100 --> 00:07:49,460
+El lift es la tasa de la hoja dividida por la tasa general.
+
+157
+00:07:49,580 --> 00:07:54,980
+Cero coma nueve cuatro cero, dividido en cero coma uno cinco siete: casi seis.
+
+158
+00:07:55,100 --> 00:07:58,290
+Ese grupo se fuga seis veces más que el cliente promedio.
+
+159
+00:07:58,410 --> 00:08:00,220
+Y ahora el cálculo de campaña.
+
+160
+00:08:00,340 --> 00:08:03,176
+Esa hoja tiene ciento cuarenta y nueve clientes: el
+
+161
+00:08:03,176 --> 00:08:05,400
+cuatro coma siete por ciento de la base.
+
+162
+00:08:05,520 --> 00:08:09,527
+Adentro hay ciento cuarenta fugados, de los cuatrocientos noventa y cinco
+
+163
+00:08:09,527 --> 00:08:12,930
+que hay en total: el veintiocho por ciento de todas las fugas.
+
+164
+00:08:13,050 --> 00:08:15,785
+Llamando a menos del cinco por ciento de la cartera,
+
+165
+00:08:15,785 --> 00:08:18,100
+llegas a más de un cuarto de los que se van.
+
+166
+00:08:18,220 --> 00:08:21,020
+El profesor también mostró una hoja más chica.
+
+167
+00:08:21,140 --> 00:08:25,013
+No reclamó, usa más de novecientos treinta y cuatro segundos,
+
+168
+00:08:25,013 --> 00:08:28,060
+pero vale poco: ce ele ve menor a sesenta y uno.
+
+169
+00:08:28,180 --> 00:08:31,504
+Sesenta y nueve clientes, el dos coma dos por ciento de la
+
+170
+00:08:31,504 --> 00:08:34,370
+base, con casi treinta y cinco por ciento de fuga.
+
+171
+00:08:34,490 --> 00:08:39,000
+Sirve para una campaña de bajo presupuesto, más precisa que tirar una moneda.
+
+172
+00:08:39,120 --> 00:08:43,040
+Y aquí entra el ce ele ve, el valor del cliente en el tiempo.
+
+173
+00:08:43,160 --> 00:08:46,950
+Antes de gastar en retener, pregunta si ese cliente vale la pena.
+
+174
+00:08:47,070 --> 00:08:49,840
+A veces conviene un regalo para que se quede contento.
+
+175
+00:08:49,960 --> 00:08:52,910
+Y a veces es un cliente que ni siquiera conviene tener.
+
+176
+00:08:53,030 --> 00:08:55,480
+Son decisiones de negocio, no del árbol.
+
+177
+00:08:55,600 --> 00:08:57,940
+Ahora, tres alertas del material.
+
+178
+00:08:58,060 --> 00:09:02,035
+Primera: la diapositiva siete, y la explicación en clase, resumen la
+
+179
+00:09:02,035 --> 00:09:05,951
+regla del noventa y cuatro por ciento con dos preguntas: reclamó, y
+
+180
+00:09:05,951 --> 00:09:08,640
+llamadas menor a cincuenta y siete coma cinco.
+
+181
+00:09:08,760 --> 00:09:12,115
+Con solo esas dos, el grupo es de doscientos dieciséis
+
+182
+00:09:12,115 --> 00:09:15,160
+clientes, y la fuga es ochenta y cinco coma seis.
+
+183
+00:09:15,280 --> 00:09:19,410
+El noventa y cuatro exige la tercera pregunta: que haya tenido fallas.
+
+184
+00:09:19,530 --> 00:09:23,537
+Segunda: al leer en voz alta la hoja de sesenta y nueve clientes, se
+
+185
+00:09:23,537 --> 00:09:26,660
+dijo «segundos menor a novecientos treinta y cuatro».
+
+186
+00:09:26,780 --> 00:09:30,773
+Pero esa hoja está en la rama contraria: segundos mayor a novecientos
+
+187
+00:09:30,773 --> 00:09:34,360
+treinta y cuatro, y ce ele ve menor a sesenta y uno coma tres.
+
+188
+00:09:34,480 --> 00:09:39,250
+Tercera: la tabla de la diapositiva nueve muestra solo cinco de las siete hojas.
+
+189
+00:09:39,370 --> 00:09:42,300
+Faltan la de sesenta y nueve, y la de ciento cuatro.
+
+190
+00:09:42,420 --> 00:09:47,570
+El error típico al leer hojas: confiar en una tasa calculada con muy pocos clientes.
+
+191
+00:09:47,690 --> 00:09:52,075
+Con una hoja de cinco clientes, cada cliente mueve la tasa veinte puntos:
+
+192
+00:09:52,075 --> 00:09:55,800
+cinco de cinco es cien por ciento, cuatro de cinco es ochenta.
+
+193
+00:09:55,920 --> 00:09:59,220
+Con sesenta, cada cliente mueve menos de dos puntos.
+
+194
+00:09:59,340 --> 00:10:02,660
+Por eso la clase fija sesenta clientes como mínimo por hoja.
+
+195
+00:10:02,780 --> 00:10:04,000
+Piensa un segundo.
+
+196
+00:10:04,120 --> 00:10:06,982
+Un cliente que no reclamó, usa mil doscientos
+
+197
+00:10:06,982 --> 00:10:09,780
+segundos, y tiene un ce ele ve de cincuenta.
+
+198
+00:10:09,900 --> 00:10:13,130
+¿En qué hoja cae, y cuál es su probabilidad de fuga?
+
+199
+00:10:13,850 --> 00:10:15,550
+No reclamó: izquierda.
+
+200
+00:10:15,670 --> 00:10:19,270
+Mil doscientos es más que novecientos treinta y cuatro: derecha.
+
+201
+00:10:19,390 --> 00:10:22,910
+Cincuenta es menor que sesenta y uno coma tres: izquierda.
+
+202
+00:10:23,030 --> 00:10:25,602
+Cae en la hoja de sesenta y nueve clientes, con
+
+203
+00:10:25,602 --> 00:10:28,120
+treinta y cuatro coma ocho por ciento de fuga.
+
+204
+00:10:28,240 --> 00:10:33,590
+Para llevarte: «sí» va a la izquierda, y cada caja dice regla, clientes y tasa.
+
+205
+00:10:33,710 --> 00:10:37,710
+Cada hoja es un segmento: regla, tamaño, tasa y lift.
+
+206
+00:10:37,830 --> 00:10:41,760
+Y las hojas chicas mienten: por eso hay un mínimo de clientes por hoja.
+
+207
+00:10:41,880 --> 00:10:46,060
+Siguiente parada: ¿por qué el árbol eligió reclamos como primera pregunta?
+
+208
+00:10:46,180 --> 00:10:49,810
+Para responder, hay que medir el desorden: Gini y entropía.
+
+209
+00:10:50,690 --> 00:10:51,740
+Tercera parada.
+
+210
+00:10:51,860 --> 00:10:54,627
+Antes de entender por qué el árbol eligió reclamos,
+
+211
+00:10:54,627 --> 00:10:57,720
+necesitamos una regla para medir el desorden de un grupo.
+
+212
+00:10:57,840 --> 00:11:00,110
+Hoy calculas Gini y entropía a mano.
+
+213
+00:11:00,230 --> 00:11:03,450
+En el video anterior, la raíz preguntó por reclamos.
+
+214
+00:11:03,570 --> 00:11:06,500
+¿Por qué reclamos, y no la edad, o los segundos?
+
+215
+00:11:06,620 --> 00:11:08,570
+El árbol no elige por intuición.
+
+216
+00:11:08,690 --> 00:11:12,300
+Prueba cortes y se queda con el que deja los grupos menos mezclados.
+
+217
+00:11:12,420 --> 00:11:14,400
+Para eso necesita medir la mezcla.
+
+218
+00:11:14,520 --> 00:11:16,630
+Piensa en tres frascos con pelotas.
+
+219
+00:11:16,750 --> 00:11:19,750
+El primero tiene solo pelotas verdes: es puro.
+
+220
+00:11:19,870 --> 00:11:22,470
+El segundo tiene ocho verdes y dos rojas.
+
+221
+00:11:22,590 --> 00:11:26,030
+El tercero, cinco y cinco: la mezcla máxima.
+
+222
+00:11:26,150 --> 00:11:27,210
+Ahora un juego.
+
+223
+00:11:27,330 --> 00:11:31,020
+Sacas una pelota al azar, la devuelves, y sacas otra.
+
+224
+00:11:31,140 --> 00:11:34,380
+¿Cuál es la probabilidad de que las dos sean de distinto color?
+
+225
+00:11:34,500 --> 00:11:36,310
+En el frasco puro, cero.
+
+226
+00:11:36,430 --> 00:11:39,530
+En el de cincuenta y cincuenta, la mitad de las veces.
+
+227
+00:11:39,650 --> 00:11:42,940
+Esa probabilidad tiene nombre: es el índice de Gini.
+
+228
+00:11:43,060 --> 00:11:44,040
+Paso a paso.
+
+229
+00:11:44,160 --> 00:11:47,210
+Sea pe sub i la proporción de la clase i dentro del nodo.
+
+230
+00:11:47,330 --> 00:11:51,580
+La probabilidad de sacar dos de la misma clase es la suma de los pe al cuadrado.
+
+231
+00:11:51,700 --> 00:11:53,420
+Y Gini es uno menos eso.
+
+232
+00:11:53,540 --> 00:11:58,670
+Con dos clases, queda uno menos pe al cuadrado, menos uno menos pe, al cuadrado.
+
+233
+00:11:58,790 --> 00:12:01,892
+La otra medida es la entropía, que viene de la teoría
+
+234
+00:12:01,892 --> 00:12:04,350
+de la información: la medida del desorden.
+
+235
+00:12:04,470 --> 00:12:07,600
+Es menos la suma de pe por logaritmo en base dos de pe.
+
+236
+00:12:07,720 --> 00:12:09,980
+Ejemplo con la raíz del árbol de la clase.
+
+237
+00:12:10,100 --> 00:12:14,630
+Hay tres mil ciento cincuenta clientes, y se fugan cuatrocientos noventa y cinco.
+
+238
+00:12:14,750 --> 00:12:18,688
+La proporción que se queda es dos mil seiscientos cincuenta y cinco sobre
+
+239
+00:12:18,688 --> 00:12:21,870
+tres mil ciento cincuenta: cero coma ocho cuatro dos nueve.
+
+240
+00:12:21,990 --> 00:12:25,280
+La que se fuga: cero coma uno cinco siete uno.
+
+241
+00:12:25,400 --> 00:12:26,390
+Ahora Gini.
+
+242
+00:12:26,510 --> 00:12:31,020
+Cero coma ocho cuatro dos nueve al cuadrado da cero coma siete uno cero cuatro.
+
+243
+00:12:31,140 --> 00:12:35,770
+Cero coma uno cinco siete uno al cuadrado, cero coma cero dos cuatro siete.
+
+244
+00:12:35,890 --> 00:12:39,150
+Uno menos las dos: cero coma dos seis cuatro nueve.
+
+245
+00:12:39,270 --> 00:12:42,530
+El Gini de la raíz es cero coma doscientos sesenta y cinco.
+
+246
+00:12:42,650 --> 00:12:44,610
+Y la entropía de la misma raíz.
+
+247
+00:12:44,730 --> 00:12:48,638
+Cero coma ocho cuatro dos nueve por menos cero coma dos cuatro seis
+
+248
+00:12:48,638 --> 00:12:52,080
+seis, en valor absoluto, da cero coma dos cero siete nueve.
+
+249
+00:12:52,200 --> 00:12:55,214
+Cero coma uno cinco siete uno por dos coma seis
+
+250
+00:12:55,214 --> 00:12:57,780
+siete: cero coma cuatro uno nueve cinco.
+
+251
+00:12:57,900 --> 00:13:00,890
+Sumadas: cero coma seis dos siete cuatro.
+
+252
+00:13:01,010 --> 00:13:03,100
+¿Cómo se comportan las dos medidas?
+
+253
+00:13:03,220 --> 00:13:06,350
+En el eje horizontal, la proporción de fuga del nodo.
+
+254
+00:13:06,470 --> 00:13:11,610
+Gini sube desde cero, llega a cero coma cinco con mitad y mitad, y vuelve a cero.
+
+255
+00:13:11,730 --> 00:13:14,860
+La entropía hace lo mismo, pero su máximo es uno.
+
+256
+00:13:14,980 --> 00:13:19,550
+Las dos valen cero cuando el nodo es puro, y son máximas con la mezcla perfecta.
+
+257
+00:13:19,670 --> 00:13:23,874
+Nuestra raíz está aquí, en quince coma siete por ciento de fuga: Gini
+
+258
+00:13:23,874 --> 00:13:27,530
+cero coma dos seis cinco, entropía cero coma seis dos siete.
+
+259
+00:13:27,650 --> 00:13:30,203
+Gini se calcula más rápido, porque no usa
+
+260
+00:13:30,203 --> 00:13:33,440
+logaritmos, y es el criterio por defecto en sklearn.
+
+261
+00:13:33,560 --> 00:13:36,800
+La diapositiva once resume cuatro nodos típicos.
+
+262
+00:13:36,920 --> 00:13:38,500
+Puro: cero y cero.
+
+263
+00:13:38,620 --> 00:13:40,750
+Ochenta y cuatro contra dieciséis.
+
+264
+00:13:40,870 --> 00:13:43,610
+Mitad y mitad: cero coma cinco y uno.
+
+265
+00:13:43,730 --> 00:13:47,380
+Y seis contra noventa y cuatro, como la hoja de fuga del árbol.
+
+266
+00:13:47,500 --> 00:13:49,760
+Ahora, una alerta del material.
+
+267
+00:13:49,880 --> 00:13:54,250
+Esa fila dice que el Gini de nuestra raíz es cero coma doscientos sesenta y nueve.
+
+268
+00:13:54,370 --> 00:13:57,170
+Pero ochenta y cuatro contra dieciséis es un redondeo.
+
+269
+00:13:57,290 --> 00:14:02,358
+La raíz real tiene ochenta y cuatro coma tres contra quince coma siete, y su Gini exacto es
+
+270
+00:14:02,358 --> 00:14:06,480
+cero coma doscientos sesenta y cinco, el mismo de la diapositiva anterior.
+
+271
+00:14:06,600 --> 00:14:08,993
+El error típico con la impureza: usar las
+
+272
+00:14:08,993 --> 00:14:11,620
+proporciones de toda la base en un nodo hijo.
+
+273
+00:14:11,740 --> 00:14:15,590
+Los pe se recalculan en cada nodo, con los clientes que cayeron ahí.
+
+274
+00:14:15,710 --> 00:14:18,888
+En el nodo de los que reclamaron, la fuga no es quince
+
+275
+00:14:18,888 --> 00:14:21,360
+coma siete: es setenta y cinco coma cinco.
+
+276
+00:14:21,480 --> 00:14:25,300
+Y su Gini es cero coma tres siete, no cero coma dos seis cinco.
+
+277
+00:14:25,420 --> 00:14:26,640
+Piensa un segundo.
+
+278
+00:14:26,760 --> 00:14:31,520
+Un nodo tiene veinte observaciones: quince de la clase A y cinco de la clase B.
+
+279
+00:14:31,640 --> 00:14:32,640
+¿Cuál es su Gini?
+
+280
+00:14:32,760 --> 00:14:34,670
+Y si te animas, ¿su entropía?
+
+281
+00:14:35,390 --> 00:14:38,090
+La proporción de A es cero coma setenta y cinco.
+
+282
+00:14:38,210 --> 00:14:41,160
+Al cuadrado, cero coma cinco seis dos cinco.
+
+283
+00:14:41,280 --> 00:14:46,310
+La de B, cero coma veinticinco, al cuadrado cero coma cero seis dos cinco.
+
+284
+00:14:46,430 --> 00:14:51,280
+Gini: uno menos cero coma seis dos cinco, igual a cero coma tres siete cinco.
+
+285
+00:14:51,400 --> 00:14:56,910
+Y la entropía: cero coma tres uno uno más cero coma cinco: cero coma ocho uno uno.
+
+286
+00:14:57,030 --> 00:15:00,640
+Para llevarte: la impureza mide qué tan mezclado está un nodo.
+
+287
+00:15:00,760 --> 00:15:02,230
+Vale cero si es puro.
+
+288
+00:15:02,350 --> 00:15:06,880
+Gini es uno menos la suma de los pe al cuadrado, con máximo cero coma cinco.
+
+289
+00:15:07,000 --> 00:15:09,130
+Entropía, con máximo uno.
+
+290
+00:15:09,250 --> 00:15:11,360
+Y los pe se recalculan en cada nodo.
+
+291
+00:15:11,480 --> 00:15:15,270
+Siguiente parada: usar la impureza para elegir el primer corte.
+
+292
+00:15:15,390 --> 00:15:18,340
+Lo vas a calcular a mano, con reclamos contra edad.
+
+293
+00:15:19,210 --> 00:15:20,210
+Cuarta parada.
+
+294
+00:15:20,330 --> 00:15:22,845
+Hoy haces a mano el cálculo que el árbol hace
+
+295
+00:15:22,845 --> 00:15:25,080
+miles de veces: la ganancia de un corte.
+
+296
+00:15:25,200 --> 00:15:27,830
+Y descubres por qué reclamos gana por paliza.
+
+297
+00:15:27,950 --> 00:15:30,650
+Dos candidatos para la primera pregunta del árbol.
+
+298
+00:15:30,770 --> 00:15:33,210
+Candidato A: ¿el cliente reclamó?
+
+299
+00:15:33,330 --> 00:15:36,160
+Candidato B: ¿tiene más de cuarenta años?
+
+300
+00:15:36,280 --> 00:15:40,160
+El árbol elige el que deja a los dos grupos hijos menos mezclados.
+
+301
+00:15:40,280 --> 00:15:41,450
+Hoy lo calculas tú.
+
+302
+00:15:41,570 --> 00:15:43,070
+La regla es la ganancia.
+
+303
+00:15:43,190 --> 00:15:46,630
+Es la impureza del padre, menos la impureza de los hijos.
+
+304
+00:15:46,750 --> 00:15:50,670
+Pero cada hijo se pondera por su tamaño: ene sub jota sobre ene.
+
+305
+00:15:50,790 --> 00:15:51,760
+¿Por qué ponderar?
+
+306
+00:15:51,880 --> 00:15:56,070
+Porque un hijo puro con dos clientes no vale lo mismo que un hijo puro con dos mil.
+
+307
+00:15:56,190 --> 00:15:59,245
+Sin ponderar, el algoritmo aislaría a tres clientes
+
+308
+00:15:59,245 --> 00:16:01,760
+purísimos y creería haber encontrado algo.
+
+309
+00:16:01,880 --> 00:16:05,190
+Empecemos por el candidato A, con los datos reales.
+
+310
+00:16:05,310 --> 00:16:08,690
+El padre es la raíz: Gini cero coma dos seis cinco.
+
+311
+00:16:08,810 --> 00:16:13,020
+Los que reclamaron son doscientos setenta y ocho, y se fugan doscientos diez.
+
+312
+00:16:13,140 --> 00:16:16,085
+Los que no reclamaron, dos mil ochocientos setenta y
+
+313
+00:16:16,085 --> 00:16:18,520
+dos, y se fugan doscientos ochenta y cinco.
+
+314
+00:16:18,640 --> 00:16:21,680
+Paso uno: la proporción de fuga de cada hijo.
+
+315
+00:16:21,800 --> 00:16:26,340
+Doscientos diez sobre doscientos setenta y ocho: cero coma siete cinco cinco.
+
+316
+00:16:26,460 --> 00:16:29,522
+Doscientos ochenta y cinco sobre dos mil ochocientos
+
+317
+00:16:29,522 --> 00:16:32,230
+setenta y dos: cero coma cero nueve nueve dos.
+
+318
+00:16:32,350 --> 00:16:34,840
+Paso dos: el Gini de cada hijo.
+
+319
+00:16:34,960 --> 00:16:38,570
+Cero coma tres siete cero, y cero coma uno siete nueve.
+
+320
+00:16:38,690 --> 00:16:40,260
+Paso tres: ponderar.
+
+321
+00:16:40,380 --> 00:16:44,088
+El hijo de los que reclamaron pesa doscientos setenta y ocho sobre
+
+322
+00:16:44,088 --> 00:16:47,290
+tres mil ciento cincuenta: cero coma cero ocho ocho tres.
+
+323
+00:16:47,410 --> 00:16:50,210
+El otro pesa cero coma nueve uno uno siete.
+
+324
+00:16:50,330 --> 00:16:53,320
+El Gini ponderado es cero coma uno nueve seis.
+
+325
+00:16:53,440 --> 00:16:55,370
+Paso cuatro: restar al padre.
+
+326
+00:16:55,490 --> 00:16:58,895
+Cero coma dos seis cinco menos cero coma uno nueve seis: la
+
+327
+00:16:58,895 --> 00:17:01,780
+ganancia de reclamos es cero coma cero seis nueve.
+
+328
+00:17:01,900 --> 00:17:06,760
+Ahora el candidato B, edad mayor que cuarenta, también con los datos reales.
+
+329
+00:17:06,880 --> 00:17:10,435
+Arriba de cuarenta hay novecientos setenta clientes, y se fugan
+
+330
+00:17:10,435 --> 00:17:13,370
+ciento cuarenta y siete: quince coma dos por ciento.
+
+331
+00:17:13,490 --> 00:17:16,400
+Hasta cuarenta, dos mil ciento ochenta, y se fugan
+
+332
+00:17:16,400 --> 00:17:19,310
+trescientos cuarenta y ocho: dieciséis por ciento.
+
+333
+00:17:19,430 --> 00:17:23,490
+Las dos tasas se parecen muchísimo a la del padre, quince coma siete.
+
+334
+00:17:23,610 --> 00:17:25,180
+Hagamos la cuenta rápida.
+
+335
+00:17:25,300 --> 00:17:30,070
+Gini de los hijos: cero coma dos cinco siete, y cero coma dos seis ocho.
+
+336
+00:17:30,190 --> 00:17:33,390
+Ponderados por su tamaño: cero coma dos seis cinco.
+
+337
+00:17:33,510 --> 00:17:35,580
+Exactamente el Gini del padre.
+
+338
+00:17:35,700 --> 00:17:36,950
+La ganancia es cero.
+
+339
+00:17:37,070 --> 00:17:38,020
+El veredicto.
+
+340
+00:17:38,140 --> 00:17:41,430
+Reclamos baja la impureza en cero coma cero seis nueve.
+
+341
+00:17:41,550 --> 00:17:42,840
+Edad, en cero.
+
+342
+00:17:42,960 --> 00:17:44,670
+El árbol elige reclamos.
+
+343
+00:17:44,790 --> 00:17:48,101
+Y lo mismo pasa con la entropía: la ganancia de reclamos
+
+344
+00:17:48,101 --> 00:17:50,820
+es cero coma uno tres uno, y la de edad, cero.
+
+345
+00:17:50,940 --> 00:17:51,980
+Mismo ganador.
+
+346
+00:17:52,100 --> 00:17:54,360
+Ahora, una alerta del material.
+
+347
+00:17:54,480 --> 00:17:58,111
+La diapositiva trece propone este mismo ejercicio, y su nota de
+
+348
+00:17:58,111 --> 00:18:01,972
+respuesta dice que el candidato A da un Gini ponderado de cero coma
+
+349
+00:18:01,972 --> 00:18:05,200
+uno seis ocho, y ganancia de cero coma cero nueve siete.
+
+350
+00:18:05,320 --> 00:18:06,220
+Eso está mal.
+
+351
+00:18:06,340 --> 00:18:09,762
+Lo acabas de calcular: con los datos reales da cero coma
+
+352
+00:18:09,762 --> 00:18:12,450
+uno nueve seis, y cero coma cero seis nueve.
+
+353
+00:18:12,570 --> 00:18:14,850
+Lo mismo que dice la diapositiva doce.
+
+354
+00:18:14,970 --> 00:18:17,470
+Y hay dos detalles más en esa diapositiva.
+
+355
+00:18:17,590 --> 00:18:21,286
+Usa doscientos once y doscientos ochenta y cuatro fugas, y los datos
+
+356
+00:18:21,286 --> 00:18:24,330
+reales son doscientos diez y doscientos ochenta y cinco.
+
+357
+00:18:24,450 --> 00:18:29,100
+Con sus números, la ganancia daría cero coma cero siete cero: casi igual.
+
+358
+00:18:29,220 --> 00:18:32,794
+Y los conteos del candidato edad, mil quinientos cincuenta y nueve
+
+359
+00:18:32,794 --> 00:18:35,610
+y mil quinientos noventa y uno, no salen de la base.
+
+360
+00:18:35,730 --> 00:18:39,220
+Con la base real son novecientos setenta y dos mil ciento ochenta.
+
+361
+00:18:39,340 --> 00:18:42,320
+La conclusión no cambia: edad no separa nada.
+
+362
+00:18:42,440 --> 00:18:44,817
+El error típico: olvidar la ponderación y
+
+363
+00:18:44,817 --> 00:18:47,600
+promediar los dos Gini como si pesaran lo mismo.
+
+364
+00:18:47,720 --> 00:18:51,404
+Con reclamos daría cero coma tres siete cero más cero coma uno
+
+365
+00:18:51,404 --> 00:18:54,790
+siete nueve, dividido en dos: cero coma dos siete cuatro.
+
+366
+00:18:54,910 --> 00:18:55,910
+¡Más que el padre!
+
+367
+00:18:56,030 --> 00:18:59,380
+Una «ganancia» negativa, que no tiene sentido.
+
+368
+00:18:59,500 --> 00:19:01,960
+El grupo chico pesaría igual que el grande.
+
+369
+00:19:02,080 --> 00:19:04,760
+Piensa un segundo, con el ejemplo del apunte.
+
+370
+00:19:04,880 --> 00:19:09,220
+Un padre de cien clientes con veinte fugas: Gini cero coma tres dos.
+
+371
+00:19:09,340 --> 00:19:13,860
+El corte parte en cuarenta clientes con dieciséis fugas, y sesenta con cuatro.
+
+372
+00:19:13,980 --> 00:19:15,130
+¿Cuál es la ganancia?
+
+373
+00:19:15,850 --> 00:19:20,330
+Izquierda: pe igual a cero coma cuatro, Gini cero coma cuatro ocho.
+
+374
+00:19:20,450 --> 00:19:25,380
+Derecha: pe cero coma cero seis seis siete, Gini cero coma uno dos cuatro.
+
+375
+00:19:25,500 --> 00:19:29,777
+Ponderado: cero coma cuatro por cero coma cuatro ocho, más cero coma seis
+
+376
+00:19:29,777 --> 00:19:33,410
+por cero coma uno dos cuatro cuatro: cero coma dos seis siete.
+
+377
+00:19:33,530 --> 00:19:36,969
+Ganancia: cero coma tres dos menos cero coma dos seis
+
+378
+00:19:36,969 --> 00:19:39,630
+siete, igual a cero coma cero cinco tres.
+
+379
+00:19:39,750 --> 00:19:42,475
+Para llevarte: ganancia es impureza del padre
+
+380
+00:19:42,475 --> 00:19:45,140
+menos la de los hijos, ponderada por tamaño.
+
+381
+00:19:45,260 --> 00:19:48,453
+Reclamos gana con cero coma cero seis nueve; edad no
+
+382
+00:19:48,453 --> 00:19:51,400
+gana nada, porque sus hijos se parecen al padre.
+
+383
+00:19:51,520 --> 00:19:56,560
+Y siempre, en cuatro pasos: proporción, Gini, ponderar, restar.
+
+384
+00:19:56,680 --> 00:20:01,140
+Siguiente parada: el árbol no prueba dos candidatos, prueba cientos.
+
+385
+00:20:01,260 --> 00:20:04,710
+Veamos el barrido completo, y por qué se le llama voraz.
+
+386
+00:20:05,610 --> 00:20:06,530
+Quinta parada.
+
+387
+00:20:06,650 --> 00:20:10,930
+El árbol no prueba dos candidatos: prueba cientos, en cada nodo.
+
+388
+00:20:11,050 --> 00:20:14,920
+Hoy ves el barrido completo, y entiendes por qué se le llama voraz.
+
+389
+00:20:15,040 --> 00:20:17,860
+En el video anterior comparaste dos cortes a mano.
+
+390
+00:20:17,980 --> 00:20:21,327
+Para elegir la primera pregunta, el notebook de la clase evalúa
+
+391
+00:20:21,327 --> 00:20:24,620
+trescientas setenta y ocho combinaciones de variable y umbral.
+
+392
+00:20:24,740 --> 00:20:28,110
+Y ese barrido completo se repite en cada nodo del árbol.
+
+393
+00:20:28,230 --> 00:20:30,040
+¿De dónde salen los umbrales?
+
+394
+00:20:30,160 --> 00:20:32,630
+Se ordenan los valores distintos de la variable.
+
+395
+00:20:32,750 --> 00:20:36,960
+Y se prueba un corte en el punto medio entre cada par de valores consecutivos.
+
+396
+00:20:37,080 --> 00:20:42,316
+Por ejemplo, con edades de veintidós, veinticinco, treinta y uno y cuarenta, los cortes
+
+397
+00:20:42,316 --> 00:20:47,070
+candidatos son veintitrés coma cinco, veintiocho, y treinta y cinco coma cinco.
+
+398
+00:20:47,190 --> 00:20:51,631
+Segundos tiene mil setecientos cuarenta y cinco valores distintos: serían mil
+
+399
+00:20:51,631 --> 00:20:55,150
+setecientos cuarenta y cuatro cortes, solo para esa variable.
+
+400
+00:20:55,270 --> 00:20:58,027
+El notebook de la clase simplifica: prueba sesenta
+
+401
+00:20:58,027 --> 00:21:01,170
+percentiles, entre el dos y el noventa y ocho por ciento.
+
+402
+00:21:01,290 --> 00:21:04,525
+Y descarta cualquier corte que deje menos de sesenta clientes
+
+403
+00:21:04,525 --> 00:21:07,230
+en un lado, el mismo criterio que min_samples_leaf.
+
+404
+00:21:07,350 --> 00:21:10,390
+Así salen las trescientas setenta y ocho combinaciones.
+
+405
+00:21:10,510 --> 00:21:13,727
+Este es el resultado del barrido en la raíz: el mejor
+
+406
+00:21:13,727 --> 00:21:16,520
+corte de cada variable, ordenado por ganancia.
+
+407
+00:21:16,640 --> 00:21:21,010
+Reclamos, arriba de todo, con cero coma cero seis nueve tres.
+
+408
+00:21:21,130 --> 00:21:25,087
+Después vienen estado, frecuencia de llamadas, ce ele ve y
+
+409
+00:21:25,087 --> 00:21:28,430
+segundos, todas cerca de cero coma cero dos seis.
+
+410
+00:21:28,550 --> 00:21:31,860
+Y al fondo, número de fallas y edad: casi nada.
+
+411
+00:21:31,980 --> 00:21:33,600
+¿Cuánto más gana reclamos?
+
+412
+00:21:33,720 --> 00:21:37,101
+Cero coma cero seis nueve tres, dividido en cero coma
+
+413
+00:21:37,101 --> 00:21:40,100
+cero dos siete: dos coma seis veces la segunda.
+
+414
+00:21:40,220 --> 00:21:41,420
+No hay competencia.
+
+415
+00:21:41,540 --> 00:21:45,000
+Por eso reclamos queda en la raíz en todas las corridas de la clase.
+
+416
+00:21:45,120 --> 00:21:47,310
+Ahora la palabra clave: voraz.
+
+417
+00:21:47,430 --> 00:21:50,990
+Imagina a un excursionista en la niebla que quiere llegar a la cumbre.
+
+418
+00:21:51,110 --> 00:21:54,700
+En cada paso, sube por donde la pendiente es más empinada.
+
+419
+00:21:54,820 --> 00:21:58,000
+Avanza rápido, pero puede terminar en un cerro chico,
+
+420
+00:21:58,000 --> 00:22:00,700
+sin saber que la montaña alta estaba al lado.
+
+421
+00:22:00,820 --> 00:22:02,020
+El árbol es igual.
+
+422
+00:22:02,140 --> 00:22:06,540
+En cada nodo elige el mejor corte ahora, sin mirar dos pasos adelante.
+
+423
+00:22:06,660 --> 00:22:09,360
+Y nunca vuelve atrás a revisar un corte anterior.
+
+424
+00:22:09,480 --> 00:22:14,520
+Por eso no garantiza el árbol óptimo: solo uno bueno, y rápido de construir.
+
+425
+00:22:14,640 --> 00:22:18,164
+Una vez elegido reclamos, el algoritmo repite el barrido
+
+426
+00:22:18,164 --> 00:22:20,870
+completo dentro de cada hijo, por separado.
+
+427
+00:22:20,990 --> 00:22:24,900
+Entre los que reclamaron, el Gini del nodo es cero coma tres siete.
+
+428
+00:22:25,020 --> 00:22:27,909
+Frecuencia de llamadas gana con claridad: cero
+
+429
+00:22:27,909 --> 00:22:30,610
+coma cero siete uno, el doble que segundos.
+
+430
+00:22:30,730 --> 00:22:34,590
+Entre los que no reclamaron, en cambio, pasa algo interesante.
+
+431
+00:22:34,710 --> 00:22:37,670
+Segundos gana con cero coma cero dos tres dos.
+
+432
+00:22:37,790 --> 00:22:41,067
+Pero frecuencia de llamadas da cero coma cero dos dos
+
+433
+00:22:41,067 --> 00:22:43,850
+seis, y ce ele ve cero coma cero dos dos uno.
+
+434
+00:22:43,970 --> 00:22:47,590
+Es casi un empate: una diferencia de seis diezmilésimas.
+
+435
+00:22:47,710 --> 00:22:49,700
+Guarda este dato para el video nueve.
+
+436
+00:22:49,820 --> 00:22:52,130
+Y mira lo que pasa con número de fallas.
+
+437
+00:22:52,250 --> 00:22:56,540
+En la raíz ganaba apenas cero coma cero cero uno uno: casi nada.
+
+438
+00:22:56,660 --> 00:23:00,338
+Pero en el tercer nivel, entre los que reclamaron y usan poco, separa
+
+439
+00:23:00,338 --> 00:23:03,270
+noventa y cuatro por ciento de fuga de sesenta y siete.
+
+440
+00:23:03,390 --> 00:23:05,090
+Calculemos su ganancia ahí.
+
+441
+00:23:05,210 --> 00:23:10,030
+El nodo tiene doscientos dieciséis clientes, con Gini cero coma dos cuatro seis.
+
+442
+00:23:10,150 --> 00:23:14,350
+Los sin fallas son sesenta y siete, con Gini cero coma cuatro cuatro uno.
+
+443
+00:23:14,470 --> 00:23:19,180
+Los con fallas, ciento cuarenta y nueve, con Gini cero coma uno uno cuatro.
+
+444
+00:23:19,300 --> 00:23:21,830
+Ponderado: cero coma dos uno cinco.
+
+445
+00:23:21,950 --> 00:23:24,540
+Ganancia: cero coma cero tres uno.
+
+446
+00:23:24,660 --> 00:23:27,060
+Veintiocho veces lo que ganaba en la raíz.
+
+447
+00:23:27,180 --> 00:23:29,330
+¿Y si en vez de Gini usas entropía?
+
+448
+00:23:29,450 --> 00:23:32,792
+El notebook de la clase dice que dan árboles casi idénticos,
+
+449
+00:23:32,792 --> 00:23:35,410
+y en clase se dijo que no hay tanta diferencia.
+
+450
+00:23:35,530 --> 00:23:37,270
+Como regla general es cierto.
+
+451
+00:23:37,390 --> 00:23:41,434
+Pero con estos datos, un árbol de profundidad cinco da cero coma nueve
+
+452
+00:23:41,434 --> 00:23:44,900
+cero seis con Gini, y cero coma nueve dos cero con entropía.
+
+453
+00:23:45,020 --> 00:23:46,800
+Uno coma cuatro puntos de AUC.
+
+454
+00:23:46,920 --> 00:23:50,090
+La lección: criterion es un hiperparámetro más.
+
+455
+00:23:50,210 --> 00:23:55,010
+No lo decidas por costumbre: pruébalo con validación cruzada, como la profundidad.
+
+456
+00:23:55,130 --> 00:23:57,520
+El error típico: creer que el árbol que te
+
+457
+00:23:57,520 --> 00:23:59,910
+entrega sklearn es el mejor árbol posible.
+
+458
+00:24:00,030 --> 00:24:00,940
+No lo es.
+
+459
+00:24:01,060 --> 00:24:04,170
+Es el resultado de una cadena de decisiones voraces.
+
+460
+00:24:04,290 --> 00:24:07,410
+Un corte malo arriba condiciona todo lo que viene abajo.
+
+461
+00:24:07,530 --> 00:24:08,750
+Piensa un segundo.
+
+462
+00:24:08,870 --> 00:24:12,840
+Entre los que no reclamaron, segundos ganó por seis diezmilésimas.
+
+463
+00:24:12,960 --> 00:24:15,776
+Si reentrenas el árbol con otra muestra de clientes,
+
+464
+00:24:15,776 --> 00:24:18,050
+¿qué crees que pasa con ese segundo nivel?
+
+465
+00:24:18,770 --> 00:24:23,240
+Con un empate así, basta mover unos pocos clientes para que gane otra variable.
+
+466
+00:24:23,360 --> 00:24:27,700
+Y como el algoritmo es voraz, ese cambio arrastra todo lo que cuelga debajo.
+
+467
+00:24:27,820 --> 00:24:30,070
+Eso tiene nombre: inestabilidad.
+
+468
+00:24:30,190 --> 00:24:32,000
+La vas a medir en el video nueve.
+
+469
+00:24:32,120 --> 00:24:35,440
+Para llevarte: el árbol prueba todas las variables y todos
+
+470
+00:24:35,440 --> 00:24:38,130
+los umbrales, y se queda con la mayor ganancia.
+
+471
+00:24:38,250 --> 00:24:42,130
+Lo repite en cada nodo, sin mirar adelante ni volver atrás.
+
+472
+00:24:42,250 --> 00:24:45,600
+Y una variable débil en la raíz puede ser fuerte más abajo.
+
+473
+00:24:45,720 --> 00:24:48,480
+Siguiente parada: el gran peligro del árbol.
+
+474
+00:24:48,600 --> 00:24:52,090
+El sobreajuste, y cómo medirlo con validación cruzada.
+
+475
+00:24:52,970 --> 00:24:55,980
+Sexta parada, y la más importante de la clase.
+
+476
+00:24:56,100 --> 00:24:58,050
+El árbol sobreajusta muchísimo.
+
+477
+00:24:58,170 --> 00:25:03,050
+Hoy aprendes a medirlo sin engañarte, y a ver exactamente dónde empieza a memorizar.
+
+478
+00:25:03,170 --> 00:25:07,790
+El profesor fue enfático: esta metodología sobreajusta, de sobremanera.
+
+479
+00:25:07,910 --> 00:25:11,250
+Un árbol sin límites sigue partiendo hasta que cada hoja es pura.
+
+480
+00:25:11,370 --> 00:25:14,092
+Acierta el cien por ciento de sus propios datos,
+
+481
+00:25:14,092 --> 00:25:16,190
+y en datos nuevos no sirve para nada.
+
+482
+00:25:16,310 --> 00:25:19,940
+Piensa en un estudiante que se prepara con una sola prueba de práctica.
+
+483
+00:25:20,060 --> 00:25:23,860
+En vez de entender la materia, memoriza las respuestas de esa prueba.
+
+484
+00:25:23,980 --> 00:25:26,550
+En la prueba de práctica saca nota perfecta.
+
+485
+00:25:26,670 --> 00:25:29,970
+En el examen real, con preguntas nuevas, reprueba.
+
+486
+00:25:30,090 --> 00:25:31,470
+Eso es sobreajustar.
+
+487
+00:25:31,590 --> 00:25:34,370
+La defensa es medir sobre datos que el modelo no vio.
+
+488
+00:25:34,490 --> 00:25:37,609
+La validación cruzada parte a los tres mil ciento cincuenta
+
+489
+00:25:37,609 --> 00:25:40,200
+clientes en cinco bloques de seiscientos treinta.
+
+490
+00:25:40,320 --> 00:25:44,151
+Entrena con cuatro bloques, dos mil quinientos veinte clientes, y
+
+491
+00:25:44,151 --> 00:25:47,570
+mide el AUC en el bloque restante, que el árbol nunca vio.
+
+492
+00:25:47,690 --> 00:25:48,990
+Eso da un número.
+
+493
+00:25:49,110 --> 00:25:52,720
+Después se rota qué bloque mide, y se repite cinco veces.
+
+494
+00:25:52,840 --> 00:25:57,070
+Cada cliente sirve para medir exactamente una vez, y para entrenar cuatro.
+
+495
+00:25:57,190 --> 00:26:01,390
+Ahora los cinco resultados reales, con un árbol de profundidad cinco.
+
+496
+00:26:01,510 --> 00:26:04,770
+Ronda uno: cero coma nueve cero cero cinco.
+
+497
+00:26:04,890 --> 00:26:07,910
+Ronda dos: cero coma nueve dos cero cuatro.
+
+498
+00:26:08,030 --> 00:26:11,230
+Ronda tres: cero coma nueve uno cero siete.
+
+499
+00:26:11,350 --> 00:26:14,670
+Ronda cuatro: cero coma nueve uno siete cinco.
+
+500
+00:26:14,790 --> 00:26:18,130
+Y ronda cinco: cero coma ocho siete nueve nueve.
+
+501
+00:26:18,250 --> 00:26:19,070
+El promedio.
+
+502
+00:26:19,190 --> 00:26:21,340
+Suman cuatro coma cinco dos nueve.
+
+503
+00:26:21,460 --> 00:26:24,720
+Entre cinco: cero coma nueve cero cinco ocho.
+
+504
+00:26:24,840 --> 00:26:28,020
+Y el desvío entre rondas es cero coma cero uno cinco.
+
+505
+00:26:28,140 --> 00:26:32,328
+El desvío importa tanto como el promedio: si las rondas dieran cero coma
+
+506
+00:26:32,328 --> 00:26:36,050
+siete y cero coma nueve cinco, un promedio no significaría nada.
+
+507
+00:26:36,170 --> 00:26:38,270
+Dos detalles que no son detalles.
+
+508
+00:26:38,390 --> 00:26:43,470
+Primero, estratificar: cada bloque conserva el quince coma siete por ciento de fuga.
+
+509
+00:26:43,590 --> 00:26:47,370
+Noventa y nueve fugados de seiscientos treinta, en los cinco bloques.
+
+510
+00:26:47,490 --> 00:26:50,579
+Al azar puro, algún bloque podría quedar casi sin
+
+511
+00:26:50,579 --> 00:26:53,290
+fugados, y su AUC no se podría interpretar.
+
+512
+00:26:53,410 --> 00:26:54,990
+Segundo, el azar.
+
+513
+00:26:55,110 --> 00:26:59,042
+El profesor contó un error que ve en la práctica: tomar el entrenamiento
+
+514
+00:26:59,042 --> 00:27:02,100
+de una fecha a otra, y probar con las fechas que quedan.
+
+515
+00:27:02,220 --> 00:27:04,410
+«Es un error gravísimo, pero pasa».
+
+516
+00:27:04,530 --> 00:27:07,230
+La muestra de entrenamiento tiene que ser aleatoria.
+
+517
+00:27:07,350 --> 00:27:11,603
+Un matiz: cuando el modelo se va a usar en el futuro, además conviene una
+
+518
+00:27:11,603 --> 00:27:15,390
+prueba fuera de tiempo, pero como chequeo extra, no en reemplazo.
+
+519
+00:27:15,510 --> 00:27:18,060
+Ahora sí, la curva del sobreajuste.
+
+520
+00:27:18,180 --> 00:27:22,669
+Para cada profundidad máxima, dos números: el AUC en los mismos datos de
+
+521
+00:27:22,669 --> 00:27:26,160
+entrenamiento, y el AUC honesto, con validación cruzada.
+
+522
+00:27:26,280 --> 00:27:27,780
+Mira las dos líneas.
+
+523
+00:27:27,900 --> 00:27:31,204
+La de entrenamiento sube siempre, hasta llegar a 1.000: el
+
+524
+00:27:31,204 --> 00:27:34,110
+árbol termina sabiéndose de memoria a cada cliente.
+
+525
+00:27:34,230 --> 00:27:37,960
+La de validación sube hasta profundidad seis, y después baja.
+
+526
+00:27:38,080 --> 00:27:42,190
+Ese punto de quiebre es el ajuste adecuado del que hablaba la clase treinta y uno.
+
+527
+00:27:42,310 --> 00:27:46,710
+Sin límite, el árbol tiene doscientas veinticuatro hojas y veintiún niveles.
+
+528
+00:27:46,830 --> 00:27:50,450
+Y pasa de cero coma nueve uno uno a cero coma ocho dos siete:
+
+529
+00:27:50,450 --> 00:27:53,240
+perdió más de ocho puntos de AUC por memorizar.
+
+530
+00:27:53,360 --> 00:27:57,140
+Midamos la brecha entre entrenamiento y validación, en puntos de AUC.
+
+531
+00:27:57,260 --> 00:28:00,684
+Con profundidad tres: cero coma ocho cinco cinco menos
+
+532
+00:28:00,684 --> 00:28:03,600
+cero coma ocho cinco cero, apenas medio punto.
+
+533
+00:28:03,720 --> 00:28:07,558
+Con profundidad seis, la mejor: cero coma nueve cuatro cero
+
+534
+00:28:07,558 --> 00:28:10,680
+menos cero coma nueve uno uno, casi tres puntos.
+
+535
+00:28:10,800 --> 00:28:15,260
+Y sin límite: uno menos cero coma ocho dos siete, diecisiete puntos.
+
+536
+00:28:15,380 --> 00:28:18,308
+El profesor dio su regla práctica: como mucho unos dos
+
+537
+00:28:18,308 --> 00:28:21,020
+puntos de diferencia entre entrenamiento y prueba.
+
+538
+00:28:21,140 --> 00:28:26,469
+Fíjate en el matiz: con esa regla, la profundidad cinco queda en dos coma dos, y la
+
+539
+00:28:26,469 --> 00:28:30,770
+seis, que tiene el mejor AUC de validación, ya pasa los dos puntos.
+
+540
+00:28:30,890 --> 00:28:34,890
+No hay número mágico: es un criterio para decidir, no una ley.
+
+541
+00:28:35,010 --> 00:28:36,800
+Y una tensión que conviene ver.
+
+542
+00:28:36,920 --> 00:28:40,553
+El profesor dijo que en la industria, un AUC de cero coma ocho uno
+
+543
+00:28:40,553 --> 00:28:43,470
+a cero coma ocho cinco en fuga ya es un buen trabajo.
+
+544
+00:28:43,590 --> 00:28:46,514
+Y que si pasa de cero coma nueve, algo malo está
+
+545
+00:28:46,514 --> 00:28:48,950
+pasando: quizás una variable del futuro.
+
+546
+00:28:49,070 --> 00:28:52,360
+Pero el árbol de la clase llega a cero coma nueve uno uno.
+
+547
+00:28:52,480 --> 00:28:55,840
+La explicación la dio él mismo: estos datos son de libro.
+
+548
+00:28:55,960 --> 00:28:59,530
+En datos reales, un número así se revisa antes de celebrarlo.
+
+549
+00:28:59,650 --> 00:29:02,649
+El error típico de esta parte: elegir la profundidad
+
+550
+00:29:02,649 --> 00:29:05,590
+mirando el AUC de entrenamiento, o mirando el test.
+
+551
+00:29:05,710 --> 00:29:08,985
+La complejidad se elige con validación cruzada sobre el
+
+552
+00:29:08,985 --> 00:29:12,320
+entrenamiento, y el test se toca una sola vez, al final.
+
+553
+00:29:12,440 --> 00:29:13,660
+Piensa un segundo.
+
+554
+00:29:13,780 --> 00:29:16,250
+Tu árbol logra cero coma noventa y nueve en
+
+555
+00:29:16,250 --> 00:29:19,180
+entrenamiento, y cero coma setenta y uno en prueba.
+
+556
+00:29:19,300 --> 00:29:21,180
+¿Qué haces, y en qué orden?
+
+557
+00:29:21,900 --> 00:29:25,592
+Primero, regularizar: bajar la profundidad y subir el mínimo de
+
+558
+00:29:25,592 --> 00:29:29,050
+clientes por hoja, mirando la curva con validación cruzada.
+
+559
+00:29:29,170 --> 00:29:31,650
+Después, podar con un alfa validado.
+
+560
+00:29:31,770 --> 00:29:34,840
+Y solo si todavía no alcanza, pasar a un bosque.
+
+561
+00:29:34,960 --> 00:29:39,330
+La respuesta incompleta es «cambio a Random Forest» sin diagnosticar.
+
+562
+00:29:39,450 --> 00:29:42,215
+Para llevarte: el AUC de entrenamiento siempre
+
+563
+00:29:42,215 --> 00:29:44,800
+sube, el de validación sube y después baja.
+
+564
+00:29:44,920 --> 00:29:48,960
+Se elige la profundidad donde la validación es máxima, aquí seis.
+
+565
+00:29:49,080 --> 00:29:51,452
+Y la validación cruzada es aleatoria,
+
+566
+00:29:51,452 --> 00:29:54,081
+estratificada, y se mira el promedio y el
+
+567
+00:29:54,081 --> 00:29:54,530
+desvío.
+
+568
+00:29:54,650 --> 00:29:57,180
+Siguiente parada: cómo frenar al árbol.
+
+569
+00:29:57,300 --> 00:29:59,840
+Antes de crecer, o después: la poda.
+
+570
+00:30:00,730 --> 00:30:01,890
+Séptima parada.
+
+571
+00:30:02,010 --> 00:30:04,540
+Ya sabes que el árbol sin límites memoriza.
+
+572
+00:30:04,660 --> 00:30:09,520
+Hoy aprendes las dos formas de frenarlo: antes de crecer, o después, podando.
+
+573
+00:30:09,640 --> 00:30:11,790
+Piensa en un jardinero con un arbusto.
+
+574
+00:30:11,910 --> 00:30:15,200
+Puede ponerle un tutor y limitar cuánto crece desde el principio.
+
+575
+00:30:15,320 --> 00:30:19,520
+O puede dejarlo crecer libre, y después cortar las ramas que no aportan.
+
+576
+00:30:19,640 --> 00:30:24,320
+Con los árboles de decisión pasa exactamente lo mismo: pre-poda, o post-poda.
+
+577
+00:30:24,440 --> 00:30:26,860
+La pre-poda pone límites antes de entrenar.
+
+578
+00:30:26,980 --> 00:30:28,300
+Profundidad máxima.
+
+579
+00:30:28,420 --> 00:30:30,040
+Mínimo de clientes por hoja.
+
+580
+00:30:30,160 --> 00:30:32,690
+Mínimo de clientes para intentar partir un nodo.
+
+581
+00:30:32,810 --> 00:30:34,730
+Y cantidad máxima de hojas.
+
+582
+00:30:34,850 --> 00:30:37,615
+El profesor dio un consejo práctico: no pongas
+
+583
+00:30:37,615 --> 00:30:40,380
+profundidad uno, porque queda un árbol pelado.
+
+584
+00:30:40,500 --> 00:30:41,910
+Parte con tres o cuatro.
+
+585
+00:30:42,030 --> 00:30:45,880
+Y el mínimo de casos por hoja depende de lo que investigas: si las
+
+586
+00:30:45,880 --> 00:30:49,380
+hojas son campañas, cada hoja necesita clientes suficientes.
+
+587
+00:30:49,500 --> 00:30:51,490
+La pre-poda es rápida y directa.
+
+588
+00:30:51,610 --> 00:30:55,660
+Su riesgo: un corte pobre arriba puede esconder uno muy bueno debajo.
+
+589
+00:30:55,780 --> 00:30:59,530
+La post-poda deja crecer el árbol completo, y después recorta.
+
+590
+00:30:59,650 --> 00:31:03,025
+El criterio es el costo-complejidad: el costo de un árbol
+
+591
+00:31:03,025 --> 00:31:05,690
+es su error, más alfa por el número de hojas.
+
+592
+00:31:05,810 --> 00:31:07,770
+Alfa es cuánto cobra cada hoja.
+
+593
+00:31:07,890 --> 00:31:10,140
+En sklearn se llama ccp_alpha.
+
+594
+00:31:10,260 --> 00:31:15,260
+Con alfa igual a cero, ninguna hoja cuesta nada, y sobrevive el árbol completo.
+
+595
+00:31:15,380 --> 00:31:18,184
+Al subir alfa, cada hoja tiene que justificar su
+
+596
+00:31:18,184 --> 00:31:21,280
+existencia, reduciendo el error más de lo que cuesta.
+
+597
+00:31:21,400 --> 00:31:24,760
+Para cada alfa hay un único subárbol que minimiza el costo.
+
+598
+00:31:24,880 --> 00:31:27,700
+Y la validación cruzada elige cuál alfa usar.
+
+599
+00:31:27,820 --> 00:31:30,460
+Hagámoslo a mano, con el ejemplo del apunte.
+
+600
+00:31:30,580 --> 00:31:35,280
+Un árbol grande, T uno: error cero coma diez, con veinte hojas.
+
+601
+00:31:35,400 --> 00:31:40,060
+Un árbol chico, T dos: error cero coma trece, con cinco hojas.
+
+602
+00:31:40,180 --> 00:31:40,990
+¿Cuál gana?
+
+603
+00:31:41,110 --> 00:31:45,239
+Con alfa igual a cero coma cero cero uno: T uno cuesta cero coma diez
+
+604
+00:31:45,239 --> 00:31:48,590
+más cero coma cero dos, igual a cero coma ciento veinte.
+
+605
+00:31:48,710 --> 00:31:51,636
+T dos, cero coma trece más cero coma cero cero
+
+606
+00:31:51,636 --> 00:31:54,180
+cinco: cero coma ciento treinta y cinco.
+
+607
+00:31:54,300 --> 00:31:55,450
+Gana el grande.
+
+608
+00:31:55,570 --> 00:32:00,060
+Con alfa igual a cero coma cero cero cinco: T uno cuesta cero coma dos.
+
+609
+00:32:00,180 --> 00:32:02,900
+T dos, cero coma ciento cincuenta y cinco.
+
+610
+00:32:03,020 --> 00:32:04,510
+Ahora gana el chico.
+
+611
+00:32:04,630 --> 00:32:05,570
+¿Dónde empatan?
+
+612
+00:32:05,690 --> 00:32:10,150
+Cuando cero coma diez más veinte alfa es igual a cero coma trece más cinco alfa.
+
+613
+00:32:10,270 --> 00:32:15,520
+Quince alfa es igual a cero coma cero tres: alfa igual a cero coma cero cero dos.
+
+614
+00:32:15,640 --> 00:32:18,530
+Por encima de eso, conviene el árbol podado.
+
+615
+00:32:18,650 --> 00:32:20,460
+Ahora con los datos de la clase.
+
+616
+00:32:20,580 --> 00:32:24,136
+Con alfa cero, el árbol completo: doscientas veinticuatro
+
+617
+00:32:24,136 --> 00:32:27,380
+hojas, y AUC de validación cero coma ocho dos siete.
+
+618
+00:32:27,500 --> 00:32:30,718
+Con alfa cero coma cero cero cero cinco quedan ciento
+
+619
+00:32:30,718 --> 00:32:34,240
+dieciséis hojas, y el AUC sube a cero coma ocho cinco uno.
+
+620
+00:32:34,360 --> 00:32:37,977
+Con alfa cero coma cero cero uno, cuarenta y dos hojas,
+
+621
+00:32:37,977 --> 00:32:40,870
+y cero coma nueve cero cero: el punto dulce.
+
+622
+00:32:40,990 --> 00:32:44,080
+Y si sigues subiendo alfa, el árbol se queda corto.
+
+623
+00:32:44,200 --> 00:32:48,760
+Con cero coma cero cero dos, quince hojas y cero coma ocho ocho tres.
+
+624
+00:32:48,880 --> 00:32:51,960
+Con cero coma cero cero cinco, cinco hojas.
+
+625
+00:32:52,080 --> 00:32:57,700
+Con cero coma cero uno, apenas tres hojas, y el AUC cae a cero coma ocho cero cinco.
+
+626
+00:32:57,820 --> 00:32:59,680
+Podar de más también es un error.
+
+627
+00:32:59,800 --> 00:33:02,700
+El profesor lo planteó como una decisión de negocio.
+
+628
+00:33:02,820 --> 00:33:07,310
+Con quince hojas, un AUC de cero coma ocho ocho, fácil de explicar.
+
+629
+00:33:07,430 --> 00:33:12,080
+Con cuarenta y dos hojas, más AUC, pero quizás demasiadas reglas para explicar.
+
+630
+00:33:12,200 --> 00:33:16,760
+Y con cinco hojas, poco, pero quizás suficiente para una encuesta pequeña.
+
+631
+00:33:16,880 --> 00:33:19,040
+Según el problema, tú decides.
+
+632
+00:33:19,160 --> 00:33:21,020
+Pero alfa no se elige a ojo.
+
+633
+00:33:21,140 --> 00:33:24,868
+Primero, sklearn calcula los alfas donde el árbol óptimo
+
+634
+00:33:24,868 --> 00:33:27,730
+cambia: con estos datos, ciento diez alfas.
+
+635
+00:33:27,850 --> 00:33:31,566
+El notebook toma uno de cada cinco, veintidós candidatos, y
+
+636
+00:33:31,566 --> 00:33:34,590
+GridSearchCV los compara con validación cruzada.
+
+637
+00:33:34,710 --> 00:33:35,630
+¿El resultado?
+
+638
+00:33:35,750 --> 00:33:38,710
+El mejor alfa es cero coma cero cero uno tres.
+
+639
+00:33:38,830 --> 00:33:41,665
+Deja un árbol de treinta y seis hojas, con AUC de
+
+640
+00:33:41,665 --> 00:33:44,500
+validación cruzada de cero coma nueve cero nueve.
+
+641
+00:33:44,620 --> 00:33:46,880
+Ahora, una alerta del material.
+
+642
+00:33:47,000 --> 00:33:52,257
+La diapositiva diecinueve muestra como resultado de ese código: alfa cero coma cero
+
+643
+00:33:52,257 --> 00:33:56,690
+cero uno, AUC cero coma ocho nueve nueve seis, y cuarenta y dos hojas.
+
+644
+00:33:56,810 --> 00:34:02,068
+Corrí ese mismo código, tal cual está en la diapositiva: elige alfa cero coma cero
+
+645
+00:34:02,068 --> 00:34:06,620
+cero uno tres, con treinta y seis hojas, y AUC cero coma ocho ocho uno.
+
+646
+00:34:06,740 --> 00:34:11,284
+El cero coma ocho nueve nueve seis no sale de ese código: es la fila de alfa
+
+647
+00:34:11,284 --> 00:34:15,110
+cero coma cero cero uno de la tabla de la diapositiva dieciocho.
+
+648
+00:34:15,230 --> 00:34:19,440
+El error típico: elegir alfa a ojo, o mirando el AUC del test.
+
+649
+00:34:19,560 --> 00:34:23,520
+Eso es ajustar al test, y el número que reportas queda optimista.
+
+650
+00:34:23,640 --> 00:34:26,135
+Alfa se elige con validación cruzada sobre el
+
+651
+00:34:26,135 --> 00:34:28,630
+entrenamiento, como cualquier hiperparámetro.
+
+652
+00:34:28,750 --> 00:34:31,430
+Piensa un segundo, con el ejemplo del apunte.
+
+653
+00:34:31,550 --> 00:34:37,256
+Si alfa vale cero coma cero cero tres, ¿qué árbol gana: T uno, con error cero coma
+
+654
+00:34:37,256 --> 00:34:41,710
+diez y veinte hojas, o T dos, con cero coma trece y cinco hojas?
+
+655
+00:34:42,430 --> 00:34:47,060
+T uno cuesta cero coma diez más cero coma cero seis: cero coma dieciséis.
+
+656
+00:34:47,180 --> 00:34:50,151
+T dos cuesta cero coma trece más cero coma cero uno
+
+657
+00:34:50,151 --> 00:34:52,540
+cinco: cero coma ciento cuarenta y cinco.
+
+658
+00:34:52,660 --> 00:34:53,780
+Gana el chico.
+
+659
+00:34:53,900 --> 00:34:58,740
+Tenía que ser así: tres milésimas está por encima del empate en dos milésimas.
+
+660
+00:34:58,860 --> 00:35:01,863
+Para llevarte: pre-poda es poner límites antes de
+
+661
+00:35:01,863 --> 00:35:04,620
+crecer; post-poda es dejar crecer y recortar.
+
+662
+00:35:04,740 --> 00:35:09,040
+ccp_alpha es el precio de cada hoja: más alto, menos hojas.
+
+663
+00:35:09,160 --> 00:35:11,590
+Y alfa se elige con validación cruzada.
+
+664
+00:35:11,710 --> 00:35:14,823
+Aquí, cero coma cero cero uno tres, treinta y
+
+665
+00:35:14,823 --> 00:35:17,660
+seis hojas, y cero coma nueve cero nueve.
+
+666
+00:35:17,780 --> 00:35:21,050
+Siguiente parada: ¿qué variables importan en un árbol?
+
+667
+00:35:21,170 --> 00:35:24,160
+Dos maneras de medirlo, y una de ellas engaña.
+
+668
+00:35:25,050 --> 00:35:26,110
+Octava parada.
+
+669
+00:35:26,230 --> 00:35:28,960
+¿Qué variables importan en un modelo de árboles?
+
+670
+00:35:29,080 --> 00:35:32,410
+Hay dos maneras de medirlo, y dan respuestas distintas.
+
+671
+00:35:32,530 --> 00:35:34,100
+Hoy aprendes cuál creerle.
+
+672
+00:35:34,220 --> 00:35:39,010
+El árbol de profundidad tres usó seis variables de doce: eso ya es selección.
+
+673
+00:35:39,130 --> 00:35:42,910
+Pero para un bosque de trescientos árboles necesitas un número por variable.
+
+674
+00:35:43,030 --> 00:35:46,250
+sklearn te lo da en una línea: feature_importances_.
+
+675
+00:35:46,370 --> 00:35:50,310
+El problema es que ese número engaña, de una forma muy precisa.
+
+676
+00:35:50,430 --> 00:35:52,810
+Primero, la importancia por impureza.
+
+677
+00:35:52,930 --> 00:35:56,685
+Suma, para cada variable, la ganancia de todos los cortes donde
+
+678
+00:35:56,685 --> 00:36:00,500
+participó, ponderada por cuántos clientes pasaban por cada nodo.
+
+679
+00:36:00,620 --> 00:36:02,930
+Y se normaliza para que todas sumen uno.
+
+680
+00:36:03,050 --> 00:36:05,010
+Su sesgo se llama cardinalidad.
+
+681
+00:36:05,130 --> 00:36:09,270
+Una variable con muchos valores distintos ofrece muchos umbrales para probar.
+
+682
+00:36:09,390 --> 00:36:13,302
+Es como una lotería: quien compra dos mil seiscientos boletos gana más
+
+683
+00:36:13,302 --> 00:36:16,320
+seguido que quien compra dos, aunque no sea más hábil.
+
+684
+00:36:16,440 --> 00:36:19,584
+Por puro azar, alguno de tantos cortes reduce algo la
+
+685
+00:36:19,584 --> 00:36:22,550
+impureza, y la importancia por impureza lo premia.
+
+686
+00:36:22,670 --> 00:36:25,380
+La alternativa es la importancia por permutación.
+
+687
+00:36:25,500 --> 00:36:27,300
+Tomas datos que el modelo no vio.
+
+688
+00:36:27,420 --> 00:36:32,010
+Desordenas al azar una sola columna, como si esa variable se volviera ruido.
+
+689
+00:36:32,130 --> 00:36:33,850
+Y mides cuánto cae el AUC.
+
+690
+00:36:33,970 --> 00:36:37,550
+Si el modelo necesitaba esa variable, el AUC cae mucho.
+
+691
+00:36:37,670 --> 00:36:39,270
+Si no, casi nada.
+
+692
+00:36:39,390 --> 00:36:40,740
+Un ejemplo del apunte.
+
+693
+00:36:40,860 --> 00:36:43,010
+El modelo tiene AUC cero coma nueve.
+
+694
+00:36:43,130 --> 00:36:46,723
+Desordenas reclamos, y el AUC baja a cero coma ocho seis
+
+695
+00:36:46,723 --> 00:36:49,610
+cinco: importancia cero coma cero tres cinco.
+
+696
+00:36:49,730 --> 00:36:53,394
+Desordenas una variable ruidosa, y baja a cero coma ocho
+
+697
+00:36:53,394 --> 00:36:56,600
+nueve nueve: importancia cero coma cero cero uno.
+
+698
+00:36:56,720 --> 00:36:58,500
+El modelo casi no la usaba.
+
+699
+00:36:58,620 --> 00:37:03,420
+Una regla sin excepciones: la permutación se mide sobre datos que el modelo no vio.
+
+700
+00:37:03,540 --> 00:37:06,565
+Sobre el entrenamiento, hereda el sobreajuste:
+
+701
+00:37:06,565 --> 00:37:09,130
+mide memoria, no capacidad de predecir.
+
+702
+00:37:09,250 --> 00:37:12,364
+Es más lenta, porque repite el desorden veinte veces,
+
+703
+00:37:12,364 --> 00:37:14,950
+pero mide lo que uno cree que está midiendo.
+
+704
+00:37:15,070 --> 00:37:18,647
+Ahora con los datos de la clase: un Random Forest de trescientos
+
+705
+00:37:18,647 --> 00:37:22,279
+árboles, entrenado con el setenta y cinco por ciento, y medido en
+
+706
+00:37:22,279 --> 00:37:24,850
+setecientos ochenta y ocho clientes de prueba.
+
+707
+00:37:24,970 --> 00:37:27,590
+A la izquierda, la importancia por impureza.
+
+708
+00:37:27,710 --> 00:37:29,750
+A la derecha, por permutación.
+
+709
+00:37:29,870 --> 00:37:31,370
+Mira tres variables.
+
+710
+00:37:31,490 --> 00:37:36,160
+Ce ele ve: quinta por impureza, con cero coma uno cero nueve.
+
+711
+00:37:36,280 --> 00:37:40,540
+Por permutación cae al séptimo lugar, con cero coma cero uno cuatro.
+
+712
+00:37:40,660 --> 00:37:44,434
+Estado, que es binaria: décima por impureza, y sexta
+
+713
+00:37:44,434 --> 00:37:47,410
+por permutación, por encima de ce ele ve.
+
+714
+00:37:47,530 --> 00:37:50,410
+Y número de fallas sube del octavo al quinto lugar.
+
+715
+00:37:50,530 --> 00:37:52,620
+Hagamos la cuenta que delata el sesgo.
+
+716
+00:37:52,740 --> 00:37:57,944
+Por impureza, ce ele ve vale cero coma uno cero nueve, y estado cero coma cero
+
+717
+00:37:57,944 --> 00:38:02,480
+cuatro cinco: ce ele ve parece dos coma cuatro veces más importante.
+
+718
+00:38:02,600 --> 00:38:08,176
+Por permutación, ce ele ve vale cero coma cero uno cuatro, y estado cero coma cero uno
+
+719
+00:38:08,176 --> 00:38:12,520
+ocho cinco: ahora estado vale uno coma tres veces lo que ce ele ve.
+
+720
+00:38:12,640 --> 00:38:14,010
+El orden se dio vuelta.
+
+721
+00:38:14,130 --> 00:38:16,130
+Una alerta pequeña del material.
+
+722
+00:38:16,250 --> 00:38:19,044
+El notebook de la clase dice que ce ele ve tiene la
+
+723
+00:38:19,044 --> 00:38:21,290
+cuarta importancia por impureza más alta.
+
+724
+00:38:21,410 --> 00:38:26,100
+Es la quinta: antigüedad está por encima, con cero coma uno uno tres.
+
+725
+00:38:26,220 --> 00:38:29,990
+Pasa porque la tabla de la diapositiva veintiuno no muestra antigüedad.
+
+726
+00:38:30,110 --> 00:38:31,590
+La conclusión no cambia.
+
+727
+00:38:31,710 --> 00:38:36,170
+El error típico: reportar feature_importances_ como «lo que más importa».
+
+728
+00:38:36,290 --> 00:38:39,104
+Tiene dos problemas: premia la cardinalidad, y
+
+729
+00:38:39,104 --> 00:38:41,490
+además no dice la dirección del efecto.
+
+730
+00:38:41,610 --> 00:38:45,290
+Una importancia alta no dice si la variable sube o baja la fuga.
+
+731
+00:38:45,410 --> 00:38:50,200
+Usa permutación sobre el test, y para la dirección, lee las reglas del árbol.
+
+732
+00:38:50,320 --> 00:38:51,540
+Piensa un segundo.
+
+733
+00:38:51,660 --> 00:38:56,534
+Agregas al modelo una columna con el número de identificación de cada cliente: tres mil
+
+734
+00:38:56,534 --> 00:39:00,400
+ciento cincuenta valores distintos, sin ninguna relación con la fuga.
+
+735
+00:39:00,520 --> 00:39:02,370
+¿Qué le pasa en cada importancia?
+
+736
+00:39:03,090 --> 00:39:06,596
+Por impureza puede salir sorprendentemente alta: tiene miles
+
+737
+00:39:06,596 --> 00:39:09,460
+de cortes para probar, y alguno acierta por azar.
+
+738
+00:39:09,580 --> 00:39:12,830
+Por permutación, cerca de cero: desordenarla en el
+
+739
+00:39:12,830 --> 00:39:15,560
+test no cambia nada, porque nunca predijo.
+
+740
+00:39:15,680 --> 00:39:18,470
+Es la prueba más clara del sesgo por cardinalidad.
+
+741
+00:39:18,590 --> 00:39:21,025
+Para llevarte: la importancia por impureza
+
+742
+00:39:21,025 --> 00:39:23,460
+premia a las variables con muchos valores.
+
+743
+00:39:23,580 --> 00:39:27,457
+La importancia por permutación mide cuánto cae el AUC si la variable se
+
+744
+00:39:27,457 --> 00:39:30,570
+vuelve ruido, y se calcula siempre sobre datos no vistos.
+
+745
+00:39:30,690 --> 00:39:34,040
+Siguiente parada: las fortalezas y los límites del árbol.
+
+746
+00:39:34,160 --> 00:39:38,700
+Lo que no le importa, como escalar, y lo que sí le duele, la inestabilidad.
+
+747
+00:39:39,570 --> 00:39:40,690
+Novena parada.
+
+748
+00:39:40,810 --> 00:39:43,606
+El árbol tiene virtudes que ningún otro modelo de la
+
+749
+00:39:43,606 --> 00:39:46,080
+carpeta tiene, y defectos que hay que conocer.
+
+750
+00:39:46,200 --> 00:39:48,000
+Hoy las comprobamos con números.
+
+751
+00:39:48,120 --> 00:39:52,130
+En la clase treinta y dos insistimos en escalar las variables antes de modelar.
+
+752
+00:39:52,250 --> 00:39:54,480
+Con un árbol, eso no hace falta.
+
+753
+00:39:54,600 --> 00:39:57,800
+Y no es una opinión: lo vamos a comprobar con un número.
+
+754
+00:39:57,920 --> 00:40:02,230
+La razón: el árbol solo pregunta si x es menor o igual que un umbral.
+
+755
+00:40:02,350 --> 00:40:07,860
+Si aplicas una transformación que respeta el orden, como un logaritmo o una raíz, x menor o
+
+756
+00:40:07,860 --> 00:40:12,280
+igual que u ocurre exactamente cuando g de x es menor o igual que g de u.
+
+757
+00:40:12,400 --> 00:40:17,050
+El umbral cambia de número, pero los clientes que quedan a cada lado son los mismos.
+
+758
+00:40:17,170 --> 00:40:18,820
+El experimento del notebook.
+
+759
+00:40:18,940 --> 00:40:23,040
+Aplica logaritmo a segundos, y raíz cuadrada a ce ele ve.
+
+760
+00:40:23,160 --> 00:40:27,512
+El umbral de segundos, novecientos treinta y cuatro, pasa a ser el logaritmo
+
+761
+00:40:27,512 --> 00:40:31,120
+de uno más novecientos treinta y cuatro: seis coma ocho cuatro.
+
+762
+00:40:31,240 --> 00:40:34,287
+Y el de ce ele ve, sesenta y uno coma tres
+
+763
+00:40:34,287 --> 00:40:37,480
+cinco, pasa a su raíz: siete coma ocho tres.
+
+764
+00:40:37,600 --> 00:40:39,560
+¿Cambió quién cae en cada hoja?
+
+765
+00:40:39,680 --> 00:40:42,489
+No: los tres mil ciento cincuenta clientes caen
+
+766
+00:40:42,489 --> 00:40:44,820
+exactamente en la misma hoja que antes.
+
+767
+00:40:44,940 --> 00:40:49,905
+Y el AUC con validación cruzada de un árbol de profundidad cinco: cero coma nueve
+
+768
+00:40:49,905 --> 00:40:53,890
+cero cinco ocho antes, y cero coma nueve cero cinco ocho después.
+
+769
+00:40:54,010 --> 00:40:56,350
+Diferencia: exactamente cero.
+
+770
+00:40:56,470 --> 00:40:59,803
+La logística, en cambio, pasa de cero coma nueve uno
+
+771
+00:40:59,803 --> 00:41:02,560
+nueve nueve a cero coma nueve dos tres uno.
+
+772
+00:41:02,680 --> 00:41:05,310
+Ahora lo que sí le duele: la inestabilidad.
+
+773
+00:41:05,430 --> 00:41:08,031
+El notebook entrena seis árboles con seis muestras
+
+774
+00:41:08,031 --> 00:41:10,580
+distintas del setenta por ciento de los clientes.
+
+775
+00:41:10,700 --> 00:41:14,480
+En las seis, la raíz es reclamos: su ventaja es enorme.
+
+776
+00:41:14,600 --> 00:41:18,800
+Pero mira lo que elige justo debajo, en la rama de los que no reclamaron.
+
+777
+00:41:18,920 --> 00:41:21,300
+Semilla cero: ce ele ve.
+
+778
+00:41:21,420 --> 00:41:23,470
+Semilla uno: segundos.
+
+779
+00:41:23,590 --> 00:41:26,430
+Semilla dos: ce ele ve otra vez.
+
+780
+00:41:26,550 --> 00:41:29,230
+Semilla tres: frecuencia de llamadas.
+
+781
+00:41:29,350 --> 00:41:33,159
+Semillas cuatro y cinco: segundos, pero con umbrales distintos:
+
+782
+00:41:33,159 --> 00:41:37,210
+novecientos treinta y cinco y medio, y quinientos setenta y cuatro.
+
+783
+00:41:37,330 --> 00:41:38,240
+¿Por qué pasa?
+
+784
+00:41:38,360 --> 00:41:42,431
+Acuérdate del video cinco: en ese nodo, segundos, frecuencia
+
+785
+00:41:42,431 --> 00:41:45,620
+de llamadas y ce ele ve estaban casi empatadas.
+
+786
+00:41:45,740 --> 00:41:49,490
+Con otra muestra gana otra, y todo lo que cuelga debajo cambia.
+
+787
+00:41:49,610 --> 00:41:53,337
+El profesor lo llevó al negocio: con reentrenamientos trimestrales,
+
+788
+00:41:53,337 --> 00:41:56,230
+cada vez le explicas a la empresa un árbol distinto.
+
+789
+00:41:56,350 --> 00:41:57,800
+Otros dos límites.
+
+790
+00:41:57,920 --> 00:42:00,500
+Primero, solo corta en ángulo recto.
+
+791
+00:42:00,620 --> 00:42:04,543
+Si dos clases están separadas por una diagonal, el árbol necesita una
+
+792
+00:42:04,543 --> 00:42:08,410
+escalera de muchos cortes para aproximarla, y aun así queda dentada.
+
+793
+00:42:08,530 --> 00:42:11,820
+Segundo, predice una constante en cada región.
+
+794
+00:42:11,940 --> 00:42:16,510
+Por eso no extrapola: nunca predice algo fuera de lo que vio en el entrenamiento.
+
+795
+00:42:16,630 --> 00:42:19,325
+Y el límite más incómodo: un árbol solo suele
+
+796
+00:42:19,325 --> 00:42:22,320
+predecir peor que una logística bien especificada.
+
+797
+00:42:22,440 --> 00:42:25,598
+Aquí, el mejor árbol da cero coma nueve uno uno,
+
+798
+00:42:25,598 --> 00:42:28,230
+y la logística cero coma nueve dos cero.
+
+799
+00:42:28,350 --> 00:42:31,680
+Un último punto que el profesor recalcó: reclamos domina.
+
+800
+00:42:31,800 --> 00:42:37,160
+Sola, como un árbol de un solo corte, ya da un AUC de cero coma seis nueve nueve.
+
+801
+00:42:37,280 --> 00:42:40,614
+Y si la sacas, el árbol de profundidad cinco cae de cero
+
+802
+00:42:40,614 --> 00:42:43,590
+coma nueve cero seis a cero coma ocho seis cuatro.
+
+803
+00:42:43,710 --> 00:42:48,060
+Su pregunta fue directa: ¿qué pasa si mañana no tengo la variable de reclamos?
+
+804
+00:42:48,180 --> 00:42:50,020
+¿Se sostiene el modelo en el tiempo?
+
+805
+00:42:50,140 --> 00:42:52,670
+Y dio un consejo que vale para cualquier modelo.
+
+806
+00:42:52,790 --> 00:42:56,320
+Cuando una sola variable explica casi todo, no aplaudas.
+
+807
+00:42:56,440 --> 00:42:58,590
+Quizás la población no es homogénea.
+
+808
+00:42:58,710 --> 00:43:01,826
+Considera separar el problema en submodelos por segmento, por
+
+809
+00:43:01,826 --> 00:43:04,840
+ejemplo uno para los que reclamaron y otro para los que no.
+
+810
+00:43:04,960 --> 00:43:05,960
+Estratifica.
+
+811
+00:43:06,080 --> 00:43:08,540
+Junta todo en una lista de fortalezas.
+
+812
+00:43:08,660 --> 00:43:11,870
+Se dibuja y se explica a alguien que no sabe estadística.
+
+813
+00:43:11,990 --> 00:43:15,530
+Captura no linealidad e interacciones sin que nadie las escriba.
+
+814
+00:43:15,650 --> 00:43:16,810
+No hay que escalar.
+
+815
+00:43:16,930 --> 00:43:19,430
+Mezcla variables continuas y discretas.
+
+816
+00:43:19,550 --> 00:43:21,780
+Y selecciona variables mientras se entrena.
+
+817
+00:43:21,900 --> 00:43:24,458
+El error típico: escalar o transformar las
+
+818
+00:43:24,458 --> 00:43:27,260
+variables para un árbol, esperando que mejore.
+
+819
+00:43:27,380 --> 00:43:29,230
+Acabas de ver que no cambia nada.
+
+820
+00:43:29,350 --> 00:43:33,140
+Ese tiempo úsalo en lo que sí importa: la poda y la validación.
+
+821
+00:43:33,260 --> 00:43:34,480
+Piensa un segundo.
+
+822
+00:43:34,600 --> 00:43:39,730
+Si a la antigüedad, que nunca es negativa, la elevas al cuadrado, ¿cambia el árbol?
+
+823
+00:43:39,850 --> 00:43:43,210
+¿Y si a segundos le restas su promedio y divides por su desvío?
+
+824
+00:43:43,930 --> 00:43:45,580
+En los dos casos, no.
+
+825
+00:43:45,700 --> 00:43:48,740
+Elevar al cuadrado números positivos respeta el orden.
+
+826
+00:43:48,860 --> 00:43:53,590
+Y estandarizar es restar y dividir por un número positivo: también respeta el orden.
+
+827
+00:43:53,710 --> 00:43:56,110
+Mismas particiones, mismo árbol.
+
+828
+00:43:56,230 --> 00:43:58,480
+Solo cambian los números de los umbrales.
+
+829
+00:43:58,600 --> 00:44:00,811
+Para llevarte: el árbol es invariante a
+
+830
+00:44:00,811 --> 00:44:03,646
+transformaciones que respetan el orden: no hay que
+
+831
+00:44:03,646 --> 00:44:04,100
+escalar.
+
+832
+00:44:04,220 --> 00:44:08,840
+Es inestable: la raíz se repite, pero los niveles de abajo cambian con la muestra.
+
+833
+00:44:08,960 --> 00:44:12,090
+Y solo, suele predecir peor que una logística.
+
+834
+00:44:12,210 --> 00:44:15,490
+Se elige cuando la explicación vale más que el punto de AUC.
+
+835
+00:44:15,610 --> 00:44:17,952
+Siguiente parada: si el problema es la
+
+836
+00:44:17,952 --> 00:44:20,787
+inestabilidad, la solución es promediar muchos
+
+837
+00:44:20,787 --> 00:44:21,280
+árboles.
+
+838
+00:44:21,400 --> 00:44:22,630
+El salto al bosque.
+
+839
+00:44:23,530 --> 00:44:24,650
+Décima parada.
+
+840
+00:44:24,770 --> 00:44:29,140
+Si el problema del árbol es la inestabilidad, la solución es promediar muchos.
+
+841
+00:44:29,260 --> 00:44:33,750
+Hoy entiendes por qué el bosque predice tanto mejor, y qué se pierde en el camino.
+
+842
+00:44:33,870 --> 00:44:38,180
+El profesor lo dijo sin rodeos: hoy es lo mismo hacer un árbol que un bosque.
+
+843
+00:44:38,300 --> 00:44:41,990
+Técnicamente no demora nada, es una línea más de Python.
+
+844
+00:44:42,110 --> 00:44:43,840
+«Yo prefiero que hagan un bosque».
+
+845
+00:44:43,960 --> 00:44:47,550
+Porque mirar un solo árbol es como mirar una sola arista del problema.
+
+846
+00:44:47,670 --> 00:44:49,600
+Piensa en un diagnóstico difícil.
+
+847
+00:44:49,720 --> 00:44:52,495
+Un solo médico, que vio un grupo particular de
+
+848
+00:44:52,495 --> 00:44:55,150
+pacientes, puede equivocarse por sus manías.
+
+849
+00:44:55,270 --> 00:44:58,646
+Ahora pregúntale a trescientos médicos, cada uno formado
+
+850
+00:44:58,646 --> 00:45:01,660
+con pacientes distintos, y promedia sus opiniones.
+
+851
+00:45:01,780 --> 00:45:05,570
+Las manías de cada uno se cancelan, y queda lo que todos ven.
+
+852
+00:45:05,690 --> 00:45:08,720
+La receta de un Random Forest tiene tres pasos.
+
+853
+00:45:08,840 --> 00:45:12,249
+Uno: para cada árbol, se sortean tres mil ciento cincuenta
+
+854
+00:45:12,249 --> 00:45:15,600
+clientes de los tres mil ciento cincuenta, con reemplazo.
+
+855
+00:45:15,720 --> 00:45:18,710
+Algunos entran varias veces, y otros no entran.
+
+856
+00:45:18,830 --> 00:45:20,210
+Eso se llama bootstrap.
+
+857
+00:45:20,330 --> 00:45:21,650
+¿Cuántos quedan afuera?
+
+858
+00:45:21,770 --> 00:45:25,168
+La probabilidad de que un cliente no salga en ninguno de los
+
+859
+00:45:25,168 --> 00:45:28,000
+sorteos es uno menos uno sobre ene, elevado a ene.
+
+860
+00:45:28,120 --> 00:45:30,773
+Con tres mil ciento cincuenta clientes da cero
+
+861
+00:45:30,773 --> 00:45:33,080
+coma tres seis ocho: cerca de un tercio.
+
+862
+00:45:33,200 --> 00:45:35,680
+Ese tercio se llama out-of-bag, y sirve para
+
+863
+00:45:35,680 --> 00:45:38,160
+estimar el error sin separar un test aparte.
+
+864
+00:45:38,280 --> 00:45:41,352
+Dos: en cada corte, el árbol solo puede mirar
+
+865
+00:45:41,352 --> 00:45:44,560
+algunas variables, sorteadas de nuevo cada vez.
+
+866
+00:45:44,680 --> 00:45:49,410
+Por defecto, la raíz cuadrada del total: con doce variables, tres.
+
+867
+00:45:49,530 --> 00:45:52,540
+Así ningún árbol puede apoyarse siempre en reclamos.
+
+868
+00:45:52,660 --> 00:45:55,516
+Y tres: se entrenan cientos de árboles así, y la
+
+869
+00:45:55,516 --> 00:45:58,730
+predicción final es el promedio de sus probabilidades.
+
+870
+00:45:58,850 --> 00:45:59,890
+¿Por qué funciona?
+
+871
+00:46:00,010 --> 00:46:03,798
+Cada árbol sobreajusta, pero cada uno sobreajusta a un ruido
+
+872
+00:46:03,798 --> 00:46:07,080
+distinto, porque vio otra muestra y otras variables.
+
+873
+00:46:07,200 --> 00:46:11,719
+Hay una fórmula: si promedias B árboles con varianza sigma al cuadrado, y
+
+874
+00:46:11,719 --> 00:46:15,866
+correlación ro entre ellos, la varianza del promedio es ro sigma al
+
+875
+00:46:15,866 --> 00:46:19,270
+cuadrado, más uno menos ro, sigma al cuadrado, sobre B.
+
+876
+00:46:19,390 --> 00:46:22,810
+Ejemplo del apunte, con sigma al cuadrado igual a uno.
+
+877
+00:46:22,930 --> 00:46:26,773
+Con ro cero coma tres y diez árboles: cero coma tres más cero coma
+
+878
+00:46:26,773 --> 00:46:29,800
+siete sobre diez, igual a cero coma treinta y siete.
+
+879
+00:46:29,920 --> 00:46:32,810
+Con cien árboles: cero coma trescientos siete.
+
+880
+00:46:32,930 --> 00:46:35,230
+Casi no baja más: el piso es ro.
+
+881
+00:46:35,350 --> 00:46:38,346
+Pero si los árboles no estuvieran correlacionados, con
+
+882
+00:46:38,346 --> 00:46:41,120
+cien árboles la varianza sería cero coma cero uno.
+
+883
+00:46:41,240 --> 00:46:45,390
+Por eso el paso dos, que descorrelaciona los árboles, es esencial.
+
+884
+00:46:45,510 --> 00:46:48,880
+Con los datos de la clase: ¿cuántos árboles hacen falta?
+
+885
+00:46:49,000 --> 00:46:53,920
+Un solo árbol del bosque da cero coma siete nueve siete: peor que el árbol podado.
+
+886
+00:46:54,040 --> 00:46:57,040
+Con cinco árboles, cero coma nueve tres uno.
+
+887
+00:46:57,160 --> 00:46:59,980
+Con veinticinco, cero coma nueve seis ocho.
+
+888
+00:47:00,100 --> 00:47:02,733
+Y con cien y con trescientos, cero coma nueve
+
+889
+00:47:02,733 --> 00:47:05,190
+siete tres y cero coma nueve siete cuatro.
+
+890
+00:47:05,310 --> 00:47:06,540
+Dos lecciones.
+
+891
+00:47:06,660 --> 00:47:11,490
+La ganancia no está en los árboles, que solos son peores: está en promediarlos.
+
+892
+00:47:11,610 --> 00:47:13,940
+Y se estabiliza cerca de cien árboles.
+
+893
+00:47:14,060 --> 00:47:16,920
+Agregar más no empeora, solo cuesta tiempo.
+
+894
+00:47:17,040 --> 00:47:18,910
+¿Qué aporta cada fuente de azar?
+
+895
+00:47:19,030 --> 00:47:24,350
+Solo bootstrap, con todas las variables en cada corte: cero coma nueve seis nueve.
+
+896
+00:47:24,470 --> 00:47:29,770
+Bootstrap más el subconjunto de variables: cero coma nueve siete cuatro, la mejor.
+
+897
+00:47:29,890 --> 00:47:34,770
+Y solo el subconjunto de variables, sin bootstrap: cero coma nueve seis ocho.
+
+898
+00:47:34,890 --> 00:47:36,770
+Las dos fuentes juntas ganan.
+
+899
+00:47:36,890 --> 00:47:41,050
+La comparación final de la clase, todos con la misma validación cruzada.
+
+900
+00:47:41,170 --> 00:47:44,780
+Árbol de profundidad tres: cero coma ocho cinco cero.
+
+901
+00:47:44,900 --> 00:47:48,210
+Profundidad cinco: cero coma nueve cero seis.
+
+902
+00:47:48,330 --> 00:47:51,240
+Árbol podado: cero coma nueve cero nueve.
+
+903
+00:47:51,360 --> 00:47:54,100
+Logística: cero coma nueve dos cero.
+
+904
+00:47:54,220 --> 00:47:57,040
+Y el bosque: cero coma nueve siete cuatro.
+
+905
+00:47:57,160 --> 00:47:59,500
+Ahora, una aclaración del material.
+
+906
+00:47:59,620 --> 00:48:04,353
+La diapositiva veinticinco dice que el mejor árbol llega a cero coma nueve uno uno,
+
+907
+00:48:04,353 --> 00:48:08,060
+y la veintisiete dice que solo llega a cero coma nueve cero seis.
+
+908
+00:48:08,180 --> 00:48:12,483
+No se contradicen: cero coma nueve uno uno es el árbol de profundidad
+
+909
+00:48:12,483 --> 00:48:16,100
+seis, y cero coma nueve cero seis el de profundidad cinco.
+
+910
+00:48:16,220 --> 00:48:19,510
+Contra el mejor árbol, el bosque gana seis puntos de AUC.
+
+911
+00:48:19,630 --> 00:48:21,170
+Pero el bosque tiene un precio.
+
+912
+00:48:21,290 --> 00:48:24,251
+El árbol de profundidad tres cabe en una lámina, y se
+
+913
+00:48:24,251 --> 00:48:26,820
+convierte en siete reglas para el call center.
+
+914
+00:48:26,940 --> 00:48:29,770
+Un bosque de trescientos árboles no se puede dibujar.
+
+915
+00:48:29,890 --> 00:48:33,110
+Ganamos seis puntos de AUC, y perdimos la explicación.
+
+916
+00:48:33,230 --> 00:48:36,370
+Es el mismo trade-off de la clase treinta y dos con PCA.
+
+917
+00:48:36,490 --> 00:48:40,351
+Y una tensión que ya viste en el video seis: el profesor dijo que un
+
+918
+00:48:40,351 --> 00:48:43,530
+AUC sobre cero coma nueve en datos reales es sospechoso.
+
+919
+00:48:43,650 --> 00:48:48,450
+El bosque da cero coma nueve siete cuatro, con una base que él mismo llamó de libro.
+
+920
+00:48:48,570 --> 00:48:51,963
+Disfruta el número para aprender, pero en tu trabajo, un cero
+
+921
+00:48:51,963 --> 00:48:54,800
+coma nueve siete se investiga antes de presentarlo.
+
+922
+00:48:54,920 --> 00:48:56,760
+Entonces, ¿cuál gana?
+
+923
+00:48:56,880 --> 00:49:01,330
+La pregunta correcta no es cuál número se ve más alto, sino para qué es el modelo.
+
+924
+00:49:01,450 --> 00:49:04,591
+Si hay que explicarle la decisión a un cliente, a un
+
+925
+00:49:04,591 --> 00:49:07,370
+regulador o a marketing, un árbol podado gana.
+
+926
+00:49:07,490 --> 00:49:09,920
+Si solo importa predecir, el bosque.
+
+927
+00:49:10,040 --> 00:49:14,741
+Y el profesor confesó su favorito entre los modelos clásicos: el Gradient Boosting,
+
+928
+00:49:14,741 --> 00:49:18,480
+árboles que se corrigen uno tras otro, que vas a ver más adelante.
+
+929
+00:49:18,600 --> 00:49:22,470
+El error típico: elegir el modelo solo por el número más alto.
+
+930
+00:49:22,590 --> 00:49:26,920
+O al revés: usar un bosque cuando el negocio necesita reglas que pueda auditar.
+
+931
+00:49:27,040 --> 00:49:30,810
+Primero define para qué es el modelo; después compara números.
+
+932
+00:49:30,930 --> 00:49:32,150
+Piensa un segundo.
+
+933
+00:49:32,270 --> 00:49:37,100
+Un solo árbol del bosque da cero coma siete nueve siete, peor que el árbol podado.
+
+934
+00:49:37,220 --> 00:49:39,629
+¿Cómo puede ser que trescientos de esos árboles
+
+935
+00:49:39,629 --> 00:49:41,680
+juntos den cero coma nueve siete cuatro?
+
+936
+00:49:42,400 --> 00:49:46,960
+Cada árbol del bosque crece profundo y sobreajusta, por eso solo rinde poco.
+
+937
+00:49:47,080 --> 00:49:52,070
+Pero como cada uno vio otra muestra y otras variables, sus errores son distintos.
+
+938
+00:49:52,190 --> 00:49:56,180
+Al promediar, los errores se cancelan, y la señal común se suma.
+
+939
+00:49:56,300 --> 00:49:59,315
+Para llevarte: un Random Forest promedia cientos de
+
+940
+00:49:59,315 --> 00:50:02,390
+árboles, cada uno con bootstrap y variables al azar.
+
+941
+00:50:02,510 --> 00:50:05,984
+Con trescientos árboles llega a cero coma nueve siete cuatro,
+
+942
+00:50:05,984 --> 00:50:08,660
+contra cero coma nueve uno uno del mejor árbol.
+
+943
+00:50:08,780 --> 00:50:11,910
+Y pierde lo que hacía especial al árbol: la explicación.
+
+944
+00:50:12,030 --> 00:50:14,560
+La decisión depende de para qué es el modelo.
+
+945
+00:50:14,680 --> 00:50:19,540
+Última parada: el repaso final de la clase, con el checklist para entrenar un árbol.
+
+946
+00:50:20,410 --> 00:50:22,690
+Repaso final de la clase treinta y cuatro.
+
+947
+00:50:22,810 --> 00:50:26,765
+Las ideas clave, los números que conviene recordar, el checklist para
+
+948
+00:50:26,765 --> 00:50:29,860
+entrenar un árbol, y cómo saber si ya dominas el tema.
+
+949
+00:50:29,980 --> 00:50:32,180
+Repasemos la clase en seis ideas.
+
+950
+00:50:32,300 --> 00:50:35,919
+Uno: un árbol parte el espacio con preguntas de sí o no, y
+
+951
+00:50:35,919 --> 00:50:38,790
+cada hoja predice la tasa de fuga de su grupo.
+
+952
+00:50:38,910 --> 00:50:41,963
+Dos: elige cada corte con la impureza, Gini o
+
+953
+00:50:41,963 --> 00:50:44,880
+entropía, y se queda con la mayor ganancia.
+
+954
+00:50:45,000 --> 00:50:49,170
+Tres: es voraz, elige lo mejor ahora sin mirar adelante.
+
+955
+00:50:49,290 --> 00:50:52,207
+Cuatro: sin límites memoriza; se controla con la
+
+956
+00:50:52,207 --> 00:50:54,880
+curva de profundidad y con la poda validada.
+
+957
+00:50:55,000 --> 00:50:57,650
+Cinco: la importancia por impureza premia la
+
+958
+00:50:57,650 --> 00:51:00,300
+cardinalidad; usa permutación sobre el test.
+
+959
+00:51:00,420 --> 00:51:03,560
+Y seis: el árbol es explicable pero inestable;
+
+960
+00:51:03,560 --> 00:51:07,110
+promediar muchos, en un bosque, predice mucho mejor.
+
+961
+00:51:07,230 --> 00:51:09,650
+Los números de la clase que conviene recordar.
+
+962
+00:51:09,770 --> 00:51:14,381
+El árbol de profundidad tres tiene siete hojas, y la más roja, ciento cuarenta y
+
+963
+00:51:14,381 --> 00:51:18,530
+nueve clientes con noventa y cuatro por ciento de fuga: un lift de seis.
+
+964
+00:51:18,650 --> 00:51:22,808
+En la raíz, el Gini es cero coma dos seis cinco, y reclamos gana con
+
+965
+00:51:22,808 --> 00:51:26,110
+cero coma cero seis nueve, mientras edad no gana nada.
+
+966
+00:51:26,230 --> 00:51:30,030
+La mejor profundidad es seis, con cero coma nueve uno uno.
+
+967
+00:51:30,150 --> 00:51:33,320
+Sin límite, doscientas veinticuatro hojas: 1.000 en
+
+968
+00:51:33,320 --> 00:51:36,800
+entrenamiento, y cero coma ocho dos siete en validación.
+
+969
+00:51:36,920 --> 00:51:42,080
+La poda validada elige alfa cero coma cero cero uno tres, con treinta y seis hojas.
+
+970
+00:51:42,200 --> 00:51:46,449
+Y al final: árbol podado cero coma nueve cero nueve, logística cero
+
+971
+00:51:46,449 --> 00:51:50,190
+coma nueve dos cero, y bosque cero coma nueve siete cuatro.
+
+972
+00:51:50,310 --> 00:51:53,170
+El checklist para entrenar un árbol, en ocho pasos.
+
+973
+00:51:53,290 --> 00:51:56,570
+Separa entrenamiento y prueba al azar, y estratificado.
+
+974
+00:51:56,690 --> 00:51:59,260
+Fija el mínimo de clientes por hoja con criterio.
+
+975
+00:51:59,380 --> 00:52:01,130
+Traza la curva de profundidad.
+
+976
+00:52:01,250 --> 00:52:03,060
+Y poda con un alfa validado.
+
+977
+00:52:03,180 --> 00:52:06,430
+Revisa el desvío entre folds, no solo el promedio.
+
+978
+00:52:06,550 --> 00:52:09,620
+Mide la importancia por permutación, sobre el test.
+
+979
+00:52:09,740 --> 00:52:13,300
+Traduce las hojas a reglas, con tamaño, tasa y lift.
+
+980
+00:52:13,420 --> 00:52:18,110
+Y compara con una logística y un bosque, y decide según para qué es el modelo.
+
+981
+00:52:18,230 --> 00:52:20,750
+Las alertas del material que viste en la serie.
+
+982
+00:52:20,870 --> 00:52:23,760
+La nota de la diapositiva trece y sus conteos.
+
+983
+00:52:23,880 --> 00:52:26,340
+El resultado de la diapositiva diecinueve.
+
+984
+00:52:26,460 --> 00:52:30,370
+La regla del noventa y cuatro por ciento con dos preguntas en vez de tres.
+
+985
+00:52:30,490 --> 00:52:34,180
+Gini contra entropía, y el redondeo de la diapositiva once.
+
+986
+00:52:34,300 --> 00:52:36,510
+Tres preguntas rápidas para comprobarte.
+
+987
+00:52:36,630 --> 00:52:39,330
+Uno: ¿por qué se dice que el árbol es voraz?
+
+988
+00:52:39,450 --> 00:52:44,060
+Dos: ¿cuánto vale el Gini de un nodo con quince de una clase y cinco de otra?
+
+989
+00:52:44,180 --> 00:52:48,000
+Tres: ¿por qué no hace falta escalar las variables para un árbol?
+
+990
+00:52:48,720 --> 00:52:49,700
+Respuestas.
+
+991
+00:52:49,820 --> 00:52:53,404
+Uno: porque elige el mejor corte en cada nodo sin mirar los
+
+992
+00:52:53,404 --> 00:52:56,380
+siguientes, así que no garantiza el árbol óptimo.
+
+993
+00:52:56,500 --> 00:53:01,682
+Dos: pe igual a cero coma setenta y cinco, y Gini uno menos cero coma cinco seis dos
+
+994
+00:53:01,682 --> 00:53:06,000
+cinco menos cero coma cero seis dos cinco: cero coma tres siete cinco.
+
+995
+00:53:06,120 --> 00:53:09,559
+Tres: porque solo pregunta si x está bajo un umbral, y una
+
+996
+00:53:09,559 --> 00:53:13,650
+transformación que respeta el orden mueve el umbral, no la partición.
+
+997
+00:53:13,770 --> 00:53:15,830
+¿Cómo sabes si ya dominas la clase?
+
+998
+00:53:15,950 --> 00:53:19,730
+Si calculas a mano Gini, entropía y la ganancia de un corte.
+
+999
+00:53:19,850 --> 00:53:22,290
+Si lees un árbol y lo traduces a reglas.
+
+1000
+00:53:22,410 --> 00:53:25,081
+Si diagnosticas el sobreajuste con la curva de
+
+1001
+00:53:25,081 --> 00:53:27,520
+profundidad, y podas con un alfa validado.
+
+1002
+00:53:27,640 --> 00:53:31,070
+Y si puedes explicar por qué usas importancia por permutación.
+
+1003
+00:53:31,190 --> 00:53:33,300
+Y el consejo con que cerró el profesor.
+
+1004
+00:53:33,420 --> 00:53:37,405
+Hay cosas que se hacen siempre: estadística descriptiva, y validación
+
+1005
+00:53:37,405 --> 00:53:40,640
+cruzada, o al menos separar bien entrenamiento y prueba.
+
+1006
+00:53:40,760 --> 00:53:42,460
+Lo demás depende del problema.
+
+1007
+00:53:42,580 --> 00:53:46,520
+Parte siempre por el modelo más simple, y sofistícalo con lo que tengas.
+
+1008
+00:53:46,640 --> 00:53:50,244
+Y usa los asistentes de inteligencia artificial, pero con mucho
+
+1009
+00:53:50,244 --> 00:53:53,790
+contexto, guiándolos, no pidiéndoles que hagan la pega por ti.
+
+1010
+00:53:53,910 --> 00:53:57,695
+Para pensar antes de la próxima clase: ¿en qué problema de tu trabajo
+
+1011
+00:53:57,695 --> 00:54:01,590
+preferirías un árbol de ocho reglas, antes que un modelo con mejor AUC?
+
+1012
+00:54:01,710 --> 00:54:04,830
+Gracias por acompañar la serie de la clase treinta y cuatro.

@@ -1,0 +1,688 @@
+Vamos a ver esta sesión, es continuar, digamos, profundizando con la sesión un poco más
+tensa que tuvimos la semana pasada, el martes pasado. Si bien el martes pasado vimos un
+poco la matemática y la teoría que está detrás, la idea de lo que vamos a hacer ahora
+es ver cómo son las generalizaciones o las mejoras, comillas, variantes de ese mismo
+proceso, ya el mismo proceso de estimar o aproximar los pesos, ya, y cómo lo podemos
+utilizar, como cómo se va a usar. La sesión pasada fue relevante porque entendimos cómo
+el proceso general y lo que vamos a hacer ahora es ver pequeñas variantes pero no nos vamos a
+concentrar tanto en la matemática porque es la misma matemática y vamos a ver por qué es eso
+que yo ya les comenté un poco cuando les hablé de lo que era deep learning, que en esencia era
+simplemente poner más de estas capas, se guardan que nosotros tenemos la capa de entrada, teníamos
+una primera transformación con pesos y luego hacíamos una capa de salida. Cuando agregamos
+más de esas capas intermedia, y son muchas, con muchas neuronas artificiales, entonces hablamos
+de DeepLens. Nosotros en la sesión pasada lo que hicimos fue trabajar con una red para clasificar
+los dígitos. Entonces la imagen entraba, la red calculaba estos pesos con estos
+sesgo y calculaba una salida y esa salida era un número entre 0 y 10 para la clasificación
+de la imagen particular ya entonces en ese proceso de entrenamiento
+se corregían los pesos digamos con esta retro propagación ya ahora esa idea la vamos a seguir
+porque es la misma idea que vamos a seguir constante, la misma idea de todo lo que vamos a ver que tenga que ver con redes.
+Lo que nosotros queremos expandir ahora es que la red, digamos, resume una imagen.
+En la anterior nosotros teníamos una red que quería que clasificaba imágenes.
+Ahora quiero ver qué resume. Vamos a ver qué entiendo por resumen.
+resumir y que luego de resumirla de algún sentido la intente recuperar.
+Entonces vamos a seguir ese recorrido con las imágenes
+digamos que entra, que contiene el resumen y qué va a salir.
+Y vamos a aprender digamos todos los procedimientos que están dentro
+este este mismo metodología entonces vimos lo que es a las redes neuronales
+vamos a un poco un poco formalizar que es una este concepto de deep learning
+o aprendizaje profundo entonces recuerden que nosotros teníamos una capa y esa
+capa combinaba pesos y le sumaba un sesgo y luego es lo que nosotros
+lo llamamos el A, aplicaba una activación ya entonces tenía una combinación, una suma de pesos
+por las entradas, le sumaba un sesgo y esa esa cantidad iba a una función de activación que
+podía ser distinta ya nosotros vimos la relus, softmax y otras ya y comentaba que habían varias más
+la estrategia típica ectólica y así sumisí.
+Y que era importante ese tipo de funciones de activación
+para los distintos objetivos que nosotros queremos obtener.
+O que queremos realizar las distintas tareas y hacer clasificación,
+predicción cuantitativa, etc.
+Entonces, nosotros habíamos visto que tenía una entrada,
+una primera capa y luego la salida.
+Ahora, esa la salida de la capa intermedia, es decir, lo que salía, lo que sale más
+bien de la función de activación, no tiene necesariamente que mapear su salida a un número
+entre 0 y 10, contextualizando en la clasificación de los números, sino que puede ser la entrada
+de otra capa. Por ejemplo, recuerden que teníamos 32 funciones de activación. Esas 32 funciones
+de activación podrían ir en una capa que tenga otra dimensión. Por ejemplo, 16 neuronas
+o funciones de activación. No necesariamente tiene que haber solo una capa antes de la
+salida o entre la entrada y la salida, o sea se puede alimentar esa capa.
+Entonces, si lo ven acá en la figura,
+tenemos digamos los pixeles que eran la entrada de las de las imágenes, que una
+primera transformación que era la de la primera capa y luego puedo poner una
+segunda transformación que si se fijan tienen como insumo la salida de la
+primera capa y luego puedo poner la salida que va a depender de alguna
+tarea en el caso de la categorización o la clasificación de las imágenes
+vendría siendo una clasificación.
+Nosotros vamos a llamar aprendizaje profundo deep learning
+al aprendizaje que utilizan redes que componen varias capas de
+transformación es decir en este caso sigue siendo relativamente no profundo
+porque es una capa, dos capas, pero yo puedo poner múltiples capas de...
+antes de llegar a la salida, es decir, yo voy a definir una red profunda cuando
+tiene muchas capas intermedias. Ahora, no hay un número en el cual después de ese
+número de capas se vuelve profunda, pero se entiende que a mayor cantidad es más
+profundo. Entonces, todo lo que está dentro es la complejidad en principio que va a tener la red.
+Nosotros podemos, si se fijan cuando tengo más capas interiores, yo voy a poder tener, primero,
+muchos parámetros, porque vimos y nosotros hicimos la cuantificación de cuántos parámetros
+tenemos que obtener y yo cuando hago más capas voy a ir multiplicando y sumando más el número de
+parámetros, entonces la complejidad computacional le aumenta, pero también la flexibilidad en cuanto
+a el modelamiento, porque voy a tener distintas configuraciones, puedo tener más o menos neuronas,
+puedo tener distintas funciones de activación en las distintas capas que en conjunto pueden
+modelar de mejor manera la dinámica que estoy tratando de modelar o de entender con esta función
+de reino neuronales entonces me da mucha más flexibilidad y también tengo otros problemas
+digamos más allá del costo computacional es que puede aprender tan rápido que en esencia eso se
+resume en esta flexibilidad se tiende se ve reflejado en que la red va a aprender de mejor
+manera que puede pasar que la red aprenda demasiado y en realidad llega sobre ajustar los datos
+Entonces, eso es lo que es el concepto de red neuronal, o sea, de aprendizaje profundo.
+Es simplemente una red neuronal que tiene una profundidad mayor y la profundidad entendemos
+como muchas capas intermedias.
+de los conceptos que vamos a ver es
+es lo que es un autoencoder y ahora vamos a ver, entonces dijimos
+dijimos que una deep learning que simplemente es una red profunda, es decir
+una red normal que tiene muchas capas intermedias, un autoencoder
+es una red tal como una red normal, si se fijan por eso esa sesión fue
+poquito más tensa porque vamos a hacer referencia mucho a esa sesión porque es la base de todo
+todo el resto de metodologías son pequeñas variantes o alguna alternativa respecto de
+esas. Entonces una Ableton Core es simplemente una red entrenada, con conjunto a dos, para producir
+una aproximación de su propia entrada ya puede ser algo algo algo
+enredado porque si yo tengo mis imágenes lo que estoy diciendo en el
+contexto de los números que tengo mi número mis imágenes y quiero
+aproximar mis propias imágenes preocupé como entrar y las tengo entonces por qué
+quisies hacer eso entonces una red una topcoder es una red entrenada para
+aproximar su propia entrada, digamos, a través de una respuesta o una representación más bien,
+que se acuerdan que nosotros comentamos que la representación de cosas en términos numéricos
+es bastante importante mediante una interpretación, o sea, una representación intermedia. Entonces,
+si se fijan acá, tengo mi entrada x, tengo mi encoder, que lo voy a llamar en español mi
+codificador, que simplemente una función con parametrizada dentro de mis datos,
+por eso tengo un subteta, eso me va a entregar un vector latente, así le voy a
+llamar, un H, y después voy a tener un decodificador que me va a pasar ese
+vector latente a una aproximación de mi entrada.
+entonces tengo mis datos, los codifico y luego los reconstruyo, porque si se fijan
+acá, si lo vemos en términos funcionales, si tengo esta función f y g es la inversa de f
+entonces podría tener que esta aproximación va a ser exacta, cierto? si multiplico los números por
+dos y después lo divido por dos entonces puede llegar al mismo número que tenía inicialmente
+sí pero acá no estamos ocupando el mismo modelo porque es una aproximación no tiene una aproximación
+exacta ya entonces la primera la primera función que es el encoder o codificador recibe x y calcula
+h con este f ese h es lo que nosotros llamamos el vector latente latente simplemente no no si
+alguien tiene otros conceptos dentro de esta ischia que también pasa con
+latente aquí simplemente hacemos referencia latente porque está interno
+digamos está interno en el sentido dentro de las capas intermedias ya y la
+calcula el mismo modelo ya y el decoder lo que hace es pasar ese
+ese latente digamos es el vector latente a una aproximación de mitados
+nada me asegura que estas cosas sean exactamente iguales esperamos que sea una aproximación
+lo suficientemente bueno y vamos a ver para qué queremos usarlo ya
+porque porque quisiese aproximar mi propia entrada ya haciendo que yo ya tengo mi clasificación por
+ejemplo uno podría pensar en no tengo las imágenes no están del todo clasificadas
+Entonces pudiese tratar de aproximar mi entrada para poder clasificarlo de manera no supervisada.
+Pues se puede buscar, por ejemplo, cómo se vería el número 3 promedio que está en el conjunto de datos.
+Entonces, tenemos varias aplicaciones que les vamos a ir mencionando.
+entonces
+veámosla acá, entonces imaginemos que Claudia, que pique le levantas la mano
+buenas tardes profesor, podría explicar de nuevo lo que es o que trata el encode
+no me quedo muy guay, ahora lo vamos a ver, tú tienes una entrada
+cierto en una red, tienes una entrada, haces funciones y tiene una salida
+por ejemplo en el objetivo que hicimos el martes pasado teníamos nuestros
+números y nuestro objetivo era clasificar esos números en etiquetas entre 0 y 10
+eso es lo que hicimos el martes pasado con una red de nole
+lo que hace en autoencoder es que la salida de esa red sea una aproximación de la entrada eso es todo
+Entonces, por ejemplo, meto una imagen número 3 y quiero que la salida sea una reconstrucción de S3, una aproximación sin ser exactamente el número.
+Pero piensen que estas imágenes podrían ser vectores también.
+Ahora a ver, vamos a ver cómo especificar en esta slide para qué nos puede servir esa metodología y esta reconstrucción.
+Entonces imaginemos que tenemos archivos escaneados y queremos encontrar formas parecidas sin
+revisar cada imagen a mano porque recuerden que nosotros porque las imágenes que teníamos
+de los números estaban etiquetadas, alguien vio y le clasificó como un 3 cada imagen
+por separado. Entonces, si fijan acá,
+tenemos un banco de imágenes y entra
+en una imagen de consulta. Entonces, yo tengo este 3
+y yo no quiero, digamos, revisarlo automáticamente, por eso estoy haciendo
+un autoencoder ya y lo que hace el autoencoder si se fijan en una red de una herramienta lo que va a
+obtener es su resumen el resumen de todo acá y lo compara con los resúmenes del archivo si entonces
+por ejemplo tengo este número 3 de imagen el autoencoder lo resume y yo puedo comparar ese
+resumen con otros imágenes del archivo y bajo cierta similitud yo lo puedo
+autoclasificar y si fijan eso me permite que no hay una persona clasificando
+exactamente
+cada uno de los números entonces yo le puedo dar referencias y les puedo decir
+un 3 debiese verse así y le da imágenes de un 3 entonces el auto encoder resume
+y ocupa como referencia ese 3, que yo lo escribí y se lo di. Entonces, automáticamente va a clasificar
+y voy a evitar este etiquetado que tendría que hacerlo manual en la metodología anterior que
+vimos. Entonces, se fijan acá, en la derecha de este número propuesto, o sea, de esta consulta
+tener un vecino propuesto ya que en esencia es una cercanía por términos
+por un otro imagen que se parece ya la idea es en este contexto
+que sería la utilidad sería ordenar los posibles candidatos
+para una distinta búsqueda decir
+yo quiero imágenes que son parecidas a esta, lo resumo, lo comparo y luego busco imágenes
+parecidas a esta, que de hecho si lo fijan eso lo que uno hace cuando busca imagen en
+principio o busquea digamos por texto, de escrito digamos, también se puede matematizar
+bajo cierta representación. Entonces es tanto un coder me permite hacer ese match,
+Si se fijan acá, en esta segunda, tercera y cuarta columna que es el segundo panel
+es otro problema, digamos, tengo una medición y una imagen que llega con un ruido, si se
+fijan este 3 que está a la izquierda es como un 3 bastante nítido, entonces yo puedo resumirlo
+fácilmente no obstante el 3 que está al el tercero es con algo de ruido
+hay una hay una pregunta que deje de hacer ese profesor vez de tener que leer la
+imagen del 3 o un número tenga que leer un texto u otra figura dentro del
+imagen el entrenamiento sería similar y que tenga que leer un texto u otra figura
+dentro de la imagen sin ver de tener que no entiendo bien la planta sin ver de
+tener que leer la imagen del 3 o un número tenga que leer un texto u otra
+figura dentro de la imagen no lo entiendo del todo lo que te refiero o sea se
+entiende que si por ejemplo yo quiero tener como insumo algo que está dentro
+de otro yo lo puedo pretratar ya por ejemplo si quiero el primer párrafo de una carta voy a
+querer que el input sea sólo la primera el primer párrafo no la carta entera si
+o sea en ese sentido piensa que todas estas cosas son números no solamente tiene que ser
+imágenes ya ahora que no sé si entiendo bien tu pregunta la verdad
+la podría contar como otra manera y te la podría responder con más con más
+calma ya pero sigamos en el segundo panel si se fijan llega a ese 3 pero
+llega con un ruido digamos es un podemos verlo como humano digamos podemos
+entender se refiere un 3 y es un 3 escrito pero pero hay digamos cierto
+cierto ruido en los bordes que para una máquina o una red neuronal podrían
+confundirlo y bajar el nivel de predicción o de clasificación que
+nosotros tenemos. Entonces tenemos esta imagen con ruido
+porque de cierta manera vamos a decir que está alterada en algún sentido
+y yo quiero un objetivo limpio. Entonces yo puedo tener
+en este resumen una noción de reducir ese ruido que no corresponde al resumen
+claro de la imagen. Entonces para aprender eso digamos tenemos que aprender esa
+tarea de reducir el ruido vamos a tener que entrenar con el auto uncover con
+pares entre entrada la real y la alterada para
+para simular, digamos, estos ruidos que tenemos. Por ejemplo, tendría que tener
+para entrenar este autoencoder el objetivo limpio y el objetivo con ruido.
+Entonces, el autoencoder, que nuevamente es una red simplemente, puede aprender
+cómo sacar ese ruido. Si se fijan, para aprender a sacar el ruido tengo que
+pasarle imágenes que estén con ruidos y que estén con ruido y además su versión limpia.
+Entonces, ¿qué se hace ahí? Se hacen imágenes limpias y se le agrega un ruido plausible y luego
+se entrenan con esa imagen. En el tercer panel, si se fijan, tenemos otro tipo de problema donde
+encoder podría ser útil. Entonces pensemos en tipos de fotografías, fotografías de algún
+producto o algo de ese estilo. Podemos aprender a reconstruir imágenes, digamos que representan
+el funcionamiento habitual. Entonces y ante una nueva imagen vamos a observar dónde se concentra
+el error ya por ejemplo si yo tengo los distintos tipos de tres y si lo ven acá cuando uno se
+equivoca en el 3 uno puede clasificarlo más el error usualmente está cuando hago pasado la primera
+vueltita hago la primera vueltita y ahí tengo un error y si fijan eso hace referencia al error en
+en el cual yo o los sectores de errores en los cuales la clasificación tiende a ser
+o tiende a suceder. Entonces si en ese sector que yo lo puedo optimar, digamos con esto
+de un toncoder, si en ese sector es grande, o hay un error grande en esa sección, podemos
+digamos priorizar una revisión manual ya porque ese defecto podría causar
+otras cosas sobre todo en otros contextos que no necesariamente en
+términos de imágenes porque aquí lo estamos particularizando en
+fotografía pero la idea es la misma es tengo una entrada y quiero reconstruir en
+términos de resumen ya la misma entrada entonces
+eso es lo que nosotros vamos a tener un auto encoder pero nuevamente está dentro del mismo contexto
+que es una red de honor al solo que nuestra tarea final y nuestra capa de salida va a ser
+la misma entrada si entonces tenemos los contextos en los cuales podemos ocupar el autocoder pero
+logísticos y donde siguen siendo los mismos aprender a reconstruir lo que tenemos como entrada
+Entonces, ¿qué tendemos por reconstruir?
+Porque también hay otro concepto, tenemos algo de entrada, tengo una red, tal como lo
+vimos acá, tengo una entrada, una codificación, algo latente, lo decodifico y luego una aproximación
+de la entrada.
+Entonces, esto en esencia yo podría decir una reconstrucción, estoy tratando de reconstruir
+esto.
+imaginemos que tengo nuevamente este número 3.
+Entonces, en el mismo contexto de las imágenes que hemos visto antes, que son
+los números 8x8, ¿cierto? 8 píxeles para la izquierda, o sea, 8
+píxeles para la derecha, 8 píxeles para abajo, 64 píxeles en total,
+con las intensidades que nosotros vimos que llegan entre 0 y 16, 0 siendo el 0,
+16 siendo el negro más oscuro y pasado digamos normalizado dividido 16 para que
+pasen un número entre 0 y 1. Entonces
+aquí nosotros dibujamos el 0 como blanco cierto y el 1 como negro por la
+intensidad cuando están estandarizados y los valores intermedios van a ser
+algún tipo de grid ya sea más tirado al blanco más tirado al negro
+Entonces, la forma de simplemente el dígito va a ser una combinación de esa
+intensidad, porque en esencia estamos representando en términos vectoriales
+esa imagen. Eso es lo que estamos haciendo y es lo que pasa en nuestra
+entrada de la red general. Entonces, ¿qué significa reconstruir?
+significa en este contexto digo significa calcular otra estimación para cada una de
+esas 60 para cada uno esos 64 píxeles sí porque tengo 64
+64 píxeles ya con las distintas intensidades por ejemplo acá el xj que
+está cuadrícula en particular es una es un valor y la reconstrucción es una
+aproximación de esto si se fijan en este caso es 0.4
+y simplemente estimar nuevamente ya ahora
+e lo queremos hacer para todos los números en todo caso en este caso para
+los 64 y se fijan si yo a la derecha nuevamente
+e dibujo ese nuevo 3 y trato de que se parezca y nunca va a ser la misma
+intensidades, la intensidad promedio podría tener incluso ruido
+voy a terminar una pequeña sección y respondo tu pregunta a Gonzalo
+ya entonces
+tengo la imagen sabemos cuál es su número termina su de intensidad y yo
+estoy tratando de buscar otra estimación. Entonces la derecha que tenemos acá, esta imagen,
+vamos a tratar de volver a calcularse un número tratando de que se parezca
+en la misma cuadrícula. Porque no es que estoy trabajando en 8x8, bajo el mismo contexto,
+lo que sale es la misma entrada, solo que es aproximado de manera distinta. La salida que
+va a tener acá sigue siendo del mismo tamaño y tenemos el mismo significado, es decir,
+cada número que está en cada uno de esos pixeles sigue siendo un número digamos entre
+o esperamos que sea un número y además cada uno de los pixeles es una intensidad ya entonces
+sigamos ese ese número ese cuadradito digamos en arrancos ya tengo la fila
+3 4 y esa intensidad es 0 8 125 mismas posiciones ya aquí misma fila misma columna pero
+lo estoy aproximando con este auto coder de manera distinta entonces el auto coder tiene que mantener
+una misma forma y tiene que ser reconocible si se fijan esto es
+el sigue siendo un tres pero no tiene la misma intensidad ya aquí aquí en un negro muy
+oscuro y aquí un gris bastante más tenue
+eso es lo que nosotros preferimos con reconstruir en particular reconstruir una imagen pero sabemos
+que una imagen es un vector, ya, y un número de un vector es, o sea, una
+dimensión de un vector es un número. Entonces, este mismo concepto
+también se aplica para predicciones, digamos, para acciones numéricas, porque eso es, en
+principio, lo que estamos haciendo cuando vemos autoencoder para imágenes.
+Entonces, en la anterior, si se fijaban, no eran exactamente las mismas
+intensidades y aún así podríamos
+la idea de que tenemos las capas intermedias de resumir lo que efectivamente me hace reconocer
+que es el número en ese contexto.
+Entonces, veamos acá la diferencia entre lo que es clasificar y reconstruir en el objetivo que
+teníamos en la sesión pasada nosotros teníamos las imágenes y queríamos
+clasificar o poner una etiqueta a cada una de las imágenes es decir que tenemos
+unas imágenes con el etiquetado de referencia que lo ocupamos en el
+conjunto de entrenamiento queremos que esa red aprenda a pasar a mapear una
+imagen a algún número en tercero y 10
+y ese era nuestro objetivo y es por definición una tarea de clasificación
+la pregunta era entonces, ¿cuál es la diferencia de reconstruir? porque igual
+estoy clasificándolo de alguna manera al reconstruirlo en alguno de los
+tres números, o sea de uno de los diez números, entonces además en ambos casos cuando
+intento reconstruir intento clasificar la entrada es la misma, es decir, entra la
+misma imagen, que en este caso sería el número 3.
+Ahora, si se pica en la K, yo tengo la imagen de entrada y yo,
+por el proceso de metodología en términos de la red neural,
+yo voy a definir probabilidades para cada uno de los dígitos.
+Y voy a escoger quién tiene necesariamente una,
+No necesariamente la probabilidad mayor,
+pero sí la menor pérdida.
+Pero en general están, digamos, relacionadas.
+Ahora, tenemos las clases.
+Por odia de razones, esa imagen va a tener una probabilidad
+muy, muy alta de que sea clasificado como un 3, ¿ya?
+Y, por consecuencia, está clasificada como un 3.
+Entonces, en la imagen de la derecha, si se fijan,
+vendría siendo la salida de esa reconstrucción de S3,
+porque fue clasificado como 3 también.
+Tengo 64 intensidades en esa salida,
+porque son los 64 pixeles, que las va a producir como salida
+el autocoder.
+Es decir, si se fijan, para una misma entrada,
+esta es la salida de una red con tarea de clasificación y esta
+una salida de una red que tiene el objetivo de reconstruir que es el autónomía entonces
+son objetivos distintos por debajo por dentro las capas intermedias también tengo las mismas
+las mismas ideas se fijan cuando nosotros vimos acá uno puede hacer un paralelismo con esto es
+decir entra la entra la imagen y aplica una función y esta función podría ser en principio
+el producto suma, más un sesgo, que utilizábamos cuando hacíamos un RER.
+Entonces podría ocupar lo mismo, lo que es distinto a este decodificador.
+Que también podría uno decir que bueno, es otra capa, digamos.
+Porque al final todos son RER meronales, solo que con distintos, digamos, sabores distintos, digamos.
+Pero siguen por debajo siendo la misma metodología de buscar esta relación no lineales, pero con funciones distintas.
+recuerden que lo que estamos haciendo acá es cambiar el espacio en el
+cual me muevo tal que yo pueda hacer o pueda ser operatoria que los espacios
+normales por ejemplo de la entrada no puedan ser realizados ya sobre todo en
+clasificación te acuerdan ese ejemplo de que si si lo tengo en el dominio en el
+espacio normal no puedo separarlos correctamente pero si los transformo si
+los puedo separar ese mismo concepto se aplica a un
+un fin de otras de otras de otros objetivos entonces la gran gran diferencia
+entre la red normal normal que lo utilizamos para clasificar y para
+reconstruir es el tipo de salida es el tipo de salida porque uno intenta
+reconstruir en las mismas dimensiones lo que de lo que era la entrada y la y
+usualmente la clasificación son un número bastante menor el de salida
+en el caso 0, si se fijan acá, esto tiene una entrada de dimensión 64 y me la lleva a algo que tiene una dimensión 10
+y este, en el caso de la reconstrucción, tiene una entrada de 64 y una salida de la misma dimensión
+Entonces, mantengo esas dimensiones en términos de entrada y salida
+Entonces, tengo el proceso general, ya, sigamos esta entrada, sigamos el plugo.
+Tengo la entrada, que es nuestro caso, de la imagen, y voy a tener un modelo, un modelo que va a ser
+y voy a ver que es el caso de la salida de la entrada
+y por eso tengo una salida aproximada
+y
+y
+y
+y
+y
+y
+y una vez que tengo esa salida aproximada yo la voy a querer comparar
+pixel a pixel que en esencia es ver los valores cada uno de los valores que
+están en la imagen que son 64 los voy a querer comparar con el valor real si se
+fijan aquí lo aproximé y lo quiero comparar con la entrada para cuantificar
+qué tan parecidos son en algún sentido ya y voy a llegar a una métrica de un error de construcción
+ya yo podría tener una reconstrucción perfecta y en esencia x y x estimado sería en los mismos
+valores y porque son pues se lo tendría errores entonces tengo una reconstrucción perfecta
+entonces eso vendría siendo en el flujo de la entrada para la derecha si
+entra la imagen, se aprenden los parámetros, se ajustan los pesos, los sesgos y produce una aproximación
+una salida calculada, una salida que está aproximada, que tiene coherencia con el primero.
+Ahora si vemos la línea abajo, que es para la misma imagen, yo voy a ocupar este x, que es,
+pensemos en el número 3, la imagen del número 3, como referencia para evaluar la salida,
+sí, entonces, voy a ocupar como referencia para la salida aproximada, sí, entonces,
+si se fijan acá, siempre voy a ocupar una aproximación con una etiqueta,
+antes cuando hacíamos, por ejemplo, utilizábamos reenormar en el caso o los modelos normales de
+de regresión, ya para predicción o modelamiento cuantitativo, nosotros teníamos el valor predicho
+y lo que efectivamente fue observado, entonces podíamos saltar una noción de distancia y ver
+cuánto nos equivocamos y en este sentido podemos hacer lo mismo. Tengo, si se fijan, el modelo
+intenta aproximarse a la realidad de los modelos cuantitativos, entonces tengo lo que yo predigo
+y lo que efectivamente vi y por consecuencia he tratado de aproximar eso y aquí estoy haciendo
+lo mismo trato de aproximarlo y quiero cuantificar cuánto me equivoqué por
+consecuencia utilizo lo que se pasó que es la referencia y es que a su vez es la
+entrada
+como insumo para calcular algún tipo de métrica y a mí le llamaré ahora por
+ahora el error de construcción y ahora tenemos varias opciones
+fíjense en todo esto, esta imagen no tiene por qué saber que es un 3,
+porque a ellos podría pasar esto vectorizado y a priori no sabrían, si lo ven simplemente un
+vector con 64 dimensiones, no van a darse cuenta el tiro si es que qué número representa. Pero
+para la red neuronal que nosotros teníamos con el objetivo de clasificarnos, nos necesitábamos
+como una dimensión más, necesitábamos los 64 valores de los pixeles y la clasificación de esa
+imagen. En este flujo no necesito saber cuál es la etiqueta que está asociada a
+ese número. Entonces, si se fijan, yo puedo entrenar esta red con
+autoencoders en muchos
+en muchas imágenes y por consecuencia van a aprender a resumir imágenes que son parecidas,
+porque van a tener similares errores de reconstrucción.
+Entonces, me vuelvo al objetivo de buscar cosas que sean similares y tratar de ver una noción de similitud entre sí.
+ya ahora
+sigamos veamos ahora que es
+que es digamos un el encoder ya se fija la cara
+es parte del primer etapado la primera de la información que nosotros hacemos
+cuando tenemos una entrada
+Entonces, veamos la figura. Tengo algo que pareciera un 8, pero uno podría decir, bueno, quizá un 3 bien raro, ¿sí?
+Pero tengo una imagen, digamos. Tengo una imagen, misma dimensión, misma intensidad, valores plausibles de la intensidad,
+y todo indica, bueno, que este me va ciego, pero es un 8, ¿cierto?
+esa imagen me va a entregar un vector de 64 valores
+que son los 64 pixeles que están en esa imagen
+el encoder me va a calcular esta función
+o sea este valor H
+la función vale la redundancia
+a esta F
+Entonces este X hace referencia a los 64 valores que están
+en cada uno de los pixeles de la imagen.
+Y ese encoder lo que me va a entregar es un vector latente y acá en el vector
+del latente tiene ocho números entonces de alguna manera
+lo resumió porque antes tenía 64 números y después de aplicar el encoder pasé a tener 8 números
+ahora o más bien que reducirlo o sea más bien que resumirlos lo redujo y nosotros esperamos que esa
+reducción resuma ya que no son lo mismo porque yo puedo tener un vector de 64 y escojo los 8 primeros
+y eso me quedó y no estoy resumiendo nada simplemente estoy sacando datos no estoy perdiendo
+cosas. Entonces me lo resumió de alguna manera y lo que nosotros creamos a un vector latente,
+porque está interno, que tiene ocho números. Si fijan en la figura del medio lo que está
+representado son ocho números, está representado en términos de colores para hacerlo un poquito
+más didáctico y no tenga un gráfico con distintas distintas digamos disquemas en términos del eje y
+y cada color representa una de las coordenadas de ese vector latente
+tengo los rojizos son los rojos rojizos son valores negativos y la verdad es que no tengo
+número azul, es que ya lo más tengo algo muy cercano a blanco y este número 3 pareciera ser
+muy muy levemente azul. Ahora, uno preguntaría naturalmente por qué
+8 es la dimensión de ese vector latente. Y como mucho de estas metodologías es
+debido a que yo arbitrariamente escogí 8. Uno podría poner otro.
+Esto puede ser visto como una capa, como una capa intermedia. Nosotros
+dijimos que cuando cuando por ejemplo cuando vimos el acapo intermedia de una
+red oral nosotros dijimos bueno voy a ocupar 32
+neuronas y por qué porque porque sí porque esas le un hiperparámetro un
+hiperparámetro que tengo que definir de antemano no lo puedo estimar a menos y
+bueno no puedo estimar pero sí puedo probarlo muchas veces y puedo probar
+distintas configuraciones y esa esa esa tónica digamos se va a estar dando
+acá aquí cuando yo digo porque tiene 8 unidades ese vector latente bueno es un
+hiperparámetro yo escogí 8
+cada una de esas 8 unidades que están en el vector latente me va
+va a calcular digamos una función de activación tal como una capa normal si
+no es nada distinto simplemente una capa intermedia de 8 neuronas
+o de 8 funciones de activación más que nada. Entonces, por cada imagen voy a tener 8 valores
+o cada imagen va a tener un vector latente de 8 de dimensión. Es un hiperparámetro,
+que lo tengo que decidir antes de hacer esta cosa. Entonces, cuando uno hace el código
+o uno quiere hacer una red oral, se definen todos los hiperparámetros que voy a utilizar
+para hacer este tipo de metodología, lo cual eleva mucho el tipo de configuraciones que yo puedo realizar.
+Entonces, tengo el número, los 64 vectores, aplico el encoder, me entrega un vector latente de dimensión
+arbitraria, en este caso es 8 y eso va a ser una entrada al
+al decoder. Juan Víchez pregunta cómo esos valores resumen los 64
+píxeles. Nosotros esperamos que lo resumen, uno puede hacer encoder bien
+malos que no resumen nada.
+todo eso todo lo que está ese resumen está concentrado en la función h la
+función h es lo que va a aproximar ahora la forma funcional de h es
+múltiple si no no se puede definir de antemano
+cuál va a ser la buena la buena función de h que te va a
+se va a lograr. Ahora podemos poner nuevamente cuál va a ser la función inicial pero
+entenderán que esto es un proceso iterativo tal como lo hacemos antes. Entonces, entre el modelo,
+aproximo, salida, veo, si se fijan lo que hace acá es simplemente un error, una pérdida logarítmica,
+veo el error de reconstrucción, hago retro propagación, me devuelvo,
+actualizo los pesos tal que disminuya en este error de construcción y en ese esos pesos ya
+en vez de decirle peso y se asco le voy a decir que estoy modificando la función si entonces la
+misma metodología de reo neuronal es aplica la forma en que se decide ese f o sea h perdón es
+de la misma manera que escogíamos y actualizábamos los pesos y los sesgos.
+Si se fijan, cuando hacíamos la multiplicación de pesos por números
+más el sesgo y lo actualizo, lo que estoy haciendo es cambiar la función.
+Es porque le estoy dando un número distinto. Entonces, es la misma metodología.
+desde este vector latente de dimensión 8, eso va a ser la entrada de lo que yo voy a llamar el decodificador o el decoder
+va a recibir 8, ya no va a recibir 64, entonces de alguna manera está recibiendo menos información
+y por eso, por esa menos información, es que no reconstruye perfectamente, porque si reconstruyera perfectamente
+sería la función inversa directa. Entonces, con sus propios pesos, esta función que está acá,
+si se fijan aquí, esto para pasar de aquí a acá, aplicó ciertos pesos y para pasar de acá
+al decoder va a tener otros pesos, porque va a tener ese G va a tener pesos y esa F va a tener
+pesos ya distintos parámetros si se fijan en la clase pasada a este teta
+nosotros le llamamos W, W1, W2 así y acá como tengo dos pesos distintos aquí
+tengo teta y aquí tengo el C entonces va a tener sus propios pesos y esos propios
+pesos están lecidos también ya que van a ser entrenados y ajustados va a
+calcular la aproximación de los 64 valores y recuerden acá que tiene que
+tener la misma dimensión que la entrada, entonces por eso calcula 64. Entonces intenta
+de alguna manera que a partir de esos ocho números del factor latente
+intenta reproducir ya o aproximar esas 64 intensidades
+intensidades digamos del imagen y se fijan cuando lo ven acá
+todos los números contiguos a todos los colores contiguos de esta imagen tienden
+a ser similares ya no hay en ningún lado un negro que pase algo muy blanco
+porque se entiende, dado que pierde información de manera un poquito más conservadora, trata de que
+no hay una gran discrepancia en términos de la intensidad. Esto también se puede ajustar,
+pero en las primeras iteraciones siempre hace eso, aproximar de manera un poco más conservadora.
+entonces fija ese g no es la función inversa del h ya porque aprende otra transformación con
+sus propios pesos porque si fuese exactamente eso ya tampoco lo podría hacer uno porque lo
+reduje sí y poder tener un problema identificabilidad y que no se va a volver pero
+lo principal es que yo quiero aproximarlo no quiero que sea el mismo porque si quiero que
+sea el mismo entonces nunca tuve que hacer esto porque la entrada es la misma
+que la salía entonces todo lo que está al medio es simplemente redundante no
+hace nada
+entonces se entiende la idea que entra entra en la imagen se aplica una función
+que en general tiende a resumir o nosotros queremos que ese vector
+latente resuma o me sirva como el sumo para poder hacerle una decodificación y
+que lo aproxime correctamente ya o de manera buena el
+la imagen inicial la entrada en sus mismas dimensiones
+entonces
+veámonos dentro de vamos a vámonos dentro de ese vector latente ya ese vector
+latente de 8 de dimensión. Entonces tengo las 8 dimensiones ya y fijan acá el eje horizontal
+digamos el eje x es las 8 unidades del vector y el eje y es la activación misma, el valor
+de h porque si fijan h puede ser visto como una función de activación también. Entonces
+una encoder es una red neural entonces los mismos conceptos aplicados
+entonces y la barra obviamente el valor para esa imagen en particular que es ese
+8 ahora recuerden que habíamos dicho que el azulito era positivo y el resto era
+negativo entonces cuando lo vemos en un término de un gráfico de barra
+levemente tengo algo positivo para el vector de h y para el resto casi todos
+negativos. Entonces, acá la función de activación para obtener estos datos, para obtener estos gráficos más bien, y este autocoder en particular,
+nosotros ocupamos una tarjeta hiperbólica, o como función de activación, en la capa del vector latente, cuando va a salir, no va a avanzar el vector latente.
+Y como lo habíamos visto la sesión pasada, la fusión de activación de tarjeta hiperbólica
+me lleva los números al dominio entre menos 1 y 1 y por eso está acá como bordes del
+H el menos 1 y 1 porque el H representa la tarjeta hiperbólica.
+Entonces cuando es negativa está bien definida y positivo también está definido.
+son probabilidades, no tienen que sumar
+de activación. Otra, si se fijan cuando vimos el martes pasado, el relu lo vimos con una buena
+utilidad y lo ocupamos en las softmax también para las probabilidades, pero la TGT hiperbólica
+no la habíamos dejado un poco de lado y ahí no le hemos dicho cuál era su gran utilidad. Entonces,
+esto no significa que en ningún caso que hace correlación con el dígito con el cual se está
+tratando de predecir, simplemente son valores intermedios que utiliza el
+Autoencoder para hacer, digamos, su función, su tarea.
+Entonces, si por ejemplo yo meto otra imagen al modelo,
+los pesos se van a mantener, pero
+los pesos de la función anterior se van a tener, pero estos valores van a
+cambiar, porque ahora los insumos, que van a ser la intensidad de esa nueva
+imagen van a ser distintos entonces estos números van a cambiar y con estos
+números entonces yo voy a poder reconstruir que van a ser distintos para
+cada imagen entonces eso es lo que me hace este vector
+latente pero resumen de alguna manera nosotros esperamos que estos números de
+acá resumieron el valor de sumer la imagen nada nos va a decir no no no no
+asegura digamos que eso va a estar hecho correctamente para la tarea que nosotros
+creamos. Este entonces después va como entrada al decodificador, que va de
+alguna manera combinar estos valores, porque es una función,
+y va a tratar de utilizarlo para reconstruir.
+No tenemos por qué sobre explicar, digamos, cada uno de estos ocho
+dimensiones del vector latente o algún nombre o alguna interpretación muy
+rimbombante digamos para las formas de reconstrucción simplemente es aplica una
+función y la salida de eso entra a otra función que intenta reproducir lo que
+estaba en un inicio esto no está cada una de estos vectores no va a tener
+mayor importancia que otro en particular o a priori ya tal como por ejemplo con
+Cuando vieron análisis de componentes principales nos va a tener esa noción.
+En el caso de componentes principales sí tiene una interpretación.
+La primera componente es más importante que el resto.
+Y así, en este caso, el vector latente simplemente es la salida de una función bajo cierta especificación.
+Que nosotros queremos que sirva, digamos.
+pero tenemos que tener, digamos, reoficiación con sobre explicarla o darle alguna intención
+como se llama esto más un significado distinto al que es que simplemente una salida de esta
+función que tenemos H ya que tiene pesos y se hace con asociados.
+en esta en esta tabla que tenemos acá se fijan yo voy a tener distintas decisiones digamos que a
+veces se pudiesen confundir porque se fijan todas estas cosas tienen muchos hiperparámetros porque
+nuevamente estamos dentro de una red neuronal. Al estar dentro de una red neuronal tenemos muchos
+tipos de configuraciones que podemos tener. Por ejemplo, si tengo una restricción de
+tener un vector latente pequeño, como el caso de pasar de 64 a 8, simplemente esta restricción
+va a controlar, digamos, una cantidad de coordenadas que yo le estoy dando. No significa que yo
+quiero reducir y aproximar o reducir por ejemplo el tamaño de la imagen.
+Si tengo una restricción de ancho y profundidad, voy a tener digamos
+cierta flexibilidad del encoder y decoder. No tienen que ver una de las cosas
+porque nuevamente las funciones aplican punto a punto o intensidad a intensidad.
+Y si tengo algún tipo de restricción en términos de la regularización, eso me
+va a controlar tal como lo hicimos con, por ejemplo, se hizo rich o lazo, va a
+cambiar el valor en términos de las preferencias.
+Tampoco hay una equivalencia entre el número de coordenadas del vector latente
+a cómo se guarda computacionalmente,
+pero tenemos que, digamos, pre-especificar todas estas cosas. Nosotros vamos
+con un poco más adelante ir dando ciertas recomendaciones pero es un poco
+difícil de dar una recomendación a priori porque va a depender mucho de los
+datos con los que está trabajando y cuál es el insumo, o sea, los datos que se está
+trabajando y cuál es la tarea que se tiene en particular. En general, las
+mayores decisiones que más importan son las cuales son las funciones de
+que se deben utilizar para las distintas tareas. Entonces, tener esa precaución en cuanto a esto,
+mucho de las cosas de los resultados que nosotros tenemos son muy dependientes de la configuración
+que tenemos en la red neural, o la autocode que sigue siendo un caso particular. Entonces, yo les
+comentaba que este vector latente intenta resumir. Entonces vamos a hacer un caso bien simple para que
+las cálculos sean bien sencillos. Voy a hacer un ejemplo con dos posiciones simplemente para que vean
+cómo se puede perder información. Si se fijan, la primera entrada es
+porque para abajo son pilas, 0208 y la segunda es 0802.
+Son los mismos valores pero de distinto orden.
+Entonces la imagen van a ser distintas. Entonces uno podría poner un, son una
+imagen de 2. En la primera va a ser un número, un color muy cercano a blanco y
+y en el segundo pixel un color cercano a negro y después al revés.
+El encoder en este ejemplo va a guardar únicamente el promedio, entonces estoy pasando de dos valores de la imagen a uno.
+Y si yo por ejemplo tengo el promedio, entonces voy a tener que el h va a ser el promedio.
+Entonces, la primera imagen lo va a sacar el primer valor promedio y el segundo imagen lo va a sacar el segundo valor promedio.
+Y sabemos que aquí es una imagen con algo muy cercano a blanco y algo muy cercano a negro y algo muy cercano a negro y algo muy cercano a blanco.
+Entonces, cuando el encoder lo define en términos funcionales con el H, que es el que está acá, que es el promedio, es decir,
+decir primera y segunda cantidad dividido 2 entonces el promedio entre 0 2 y 0 8 0 5 que
+tal a su vez también es el promedio entre 0 8 0 2 entonces se fijan de aquí para acá
+aplique h y h es el promedio ahora yo voy a querer definir el decoder o el decodificado
+lo importante es que el h me llevó dos preimágenes si se guardan algo de
+función cálculo dos preimágenes que son 0 5 0 2 0 5 0 2 0 8 perdón y 0 8 0 2
+al mismo al mismo valor ya
+en cambio cuando contengo eso y aplica ahora el decodificador el decodificador
+lo que va a hacer es
+va a tratar de reconstruirlo, va a tratar de re aproximarlo
+no va a mostrar ahí cuál es el decoder pero porque simplemente va a
+ser una regla, una regla digamos que está acá definida de antemano
+no lo hemos aprendido con los distintos datos pero la idea acá es que yo
+dependiendo de qué valores me entrega el vector latente, la reconstrucción
+pudiese ser bastante mala. Entonces algo que era
+una imagen de dos pixeles algo muy blanco, algo muy negro, lo pasó a dos
+pixeles muy grises en general. Entonces
+¿Qué tenemos que pensar aquí? Entonces, si dos entradas distintas, por ejemplo, es 0.2.0.8 y 0.8.0.2,
+producen exactamente el mismo vector latente, porque esto, si bien es un número,
+ahora para entenderlo bien, el vector no es el vector como columna, el vector es para la derecha,
+una fila, en este caso, el vector es sólo un número, porque el H
+me entrega ese un solo número entonces si dos imágenes en este caso o entradas me producen
+exactamente el mismo vector latente el mismo decoder va a producir la misma reconstrucción
+ya se fijan esto eran dos cosas distintas en el vector en el vector digamos latente o los
+vector latente me entregó los mismos números entonces la reconstrucción si es el mismo de
+coder me va a entregar el mismo la misma salida entonces me lo va a tratar de reconstruir de manera
+igual ya tenemos que tener cuidado entonces si se puede perder información cuando se hace estas
+cosas porque estoy tratando de resumir y generar cuando resumo voy a tratar de perder información
+voy a perder información, pero a la verdad que se pierda la menor información posible.
+Entonces, se fijan, entrada, decoder, vector latente, ahora lo tengo que hacer una decodificación,
+pero si se fijan acá, yo cómo puedo entonces, cuando tenía una reconstrucción, cómo por
+ejemplo en este caso se podría recuperar el orden porque si yo recuperase el orden la media no me
+recupera el orden o podría en este caso ya la respuesta es que no podría en este caso porque
+el decoder que estoy utilizando me hace perder información ya ese resumen que utilicé me me hizo
+perder demasiada información al punto de que no pudo discernir entre las pequeñas diferencias que
+que son sustanciales en este caso en términos de los colores de la intensidad
+ya
+porque me permitieran aproximar correctamente entonces tiene un error
+grande entonces de cierta manera vamos a necesitar
+cuantificar cuánto se aleja a comillas la reconstrucción que yo estoy haciendo
+de la entrada porque recuerden que nosotros hicimos esto tenemos esta
+entrada, ahí hicimos el vector latente, la reconstrucción y ahora lo que debíamos
+hacer es comparar estas salidas que son las aproximaciones con esta entrada
+entonces ¿cómo lo aproximo? Nosotros dijimos que vamos a poner una función L
+ya
+o L la verdad, entre X que es la entrada y X estimado, pero no definimos lo que era
+L, lo que vamos a utilizar acá como función esta función L
+y que a toda esa opción le va a llamar el error cuadrático de construcción.
+Entonces, vamos a necesitar alguna medida para comparar la imagen aproximada y la imagen de
+entrada. Entonces, para cada una de las posiciones, en el caso del ejemplo, que son dos, la primera
+posición y la segunda posición de cada imagen, vamos a tener que comparar la intensidad. La
+salida era 0.5, guarden, porque lo homogéneisó. La vamos a elevar al cuadrado
+y bueno vamos a hacer esta forma, digamos. Y si se fijan acá son los 64,
+pensémos ahora en las imágenes de los números que son 8x8, para una forma más
+general. Voy a tener una aproximación, le voy a restar el valor original, entonces
+pixel a pixel, si pique saca esto indexado y j a la aproximación pixel a pixel
+le voy a dar una intensidad, lo de cuadrado y lo de 64 y si se fijan eso me está diciendo la discrepancia cuadrática
+de error, promedio, de todo lo de todos los pixels dentro de una misma imagen
+imagen. O sea, para una imagen porque son 64 pixeles y luego voy a sacar el promedio a través de todas las imágenes.
+Entonces, si te fijan acá en el gráfico tengo la diferencia de reconstrucción menos referencia. Si estoy en el 0, estoy reconstruyendo perfectamente
+o la aproximación está reconstruyendo perfectamente
+la imagen inicial. Yo tengo dos formas de equivocar,
+o sea, le puedo dar más intensidad, aproximar con más intensidad
+cuando era menos intenso, digamos, la imagen original,
+o al revés, ya.
+Cuando era...
+Un pixel lo puse más negro cuando era más gris,
+o un pixel lo puse más blanco cuando era gris más o menos estándar.
+Entonces, tengo dos formas de equivocarme, porque cuando veo por ejemplo el caso 0,3
+y pongo que el valor era 0, entonces voy a tener que en términos de esta métrica de
+error de reoximación, de reconstrucción, van a ser numéricamente los mismos. Entonces,
+tengo que tener un poco de cuidado con eso porque al alejarnos, para cualquiera de los dos lados, el error va a aumentar
+tengo que tener ese centro que vendría siendo el de referencia
+Entonces, ahora, con eso simplemente podemos cuantificar si es que la aproximación se
+parecía o se parece, digamos, al original. Veámoslo en el caso del ejemplo de dos píxeles,
+¿cierto? Nosotros vimos que el L, que es esta fórmula, digamos, para los píxeles 8x8,
+voy a tener que 0,5 era la reconstrucción que hizo el decoder 0,5 0,5 0,5
+en la primera imagen era 0,2 el original entonces estaba la diferencia
+el cuadrado en la segunda componente 0,5 menos 0,8 cuadrado medios saque el valor
+0,09 más 0,09 medios eso me entrega entonces 0,09 entonces si se fijan acá
+para el primer valor 0 2 0 8 si fuese ese es el valor de referencia de la de
+referencia porque es el valor que tenía la imagen primera ya 0 2 en su primera
+coordenada 0 8 en el segundo coordenada como intensidad dentro de esa
+de cada uno de esos píxeles si yo pusiese una reconstrucción 0 3 0 7
+entonces su error cuadrático medio vendría siendo 001, si fuese el 0505 que es el que estudimos
+entonces tendría un error cuadrático medio muy muy distinto entonces si se fijan acá
+son tres tipos de reconstrucción la primera no me sirve mucho porque estoy aproximando o sea
+estoy reconstruyendo perfectamente. Entonces, aquí hice toda la red si
+simplemente tengo la misma entrada. En cambio, 0307 parecerá ser una buena
+propuesta de reconstrucción porque sabemos que 0505 no lo podemos distinguir
+porque si lo tomamos coloré no sabríamos
+en qué píxel estaba el valor más negro y en qué píxel estaría el valor más blanco.
+Tenemos entonces que ver cómo ese decoder está, cómo tenemos esas distintas propuestas de aproximación.
+Entonces, yo le hago una pregunta. Solo con el error cuadrático medio,
+¿vamos a poder distinguir cuál va a ser el signo del error?
+no vamos a poder porque no sabemos si lo está aproximando más, por ejemplo el 001
+se está equivocando más en la parte blanca que lo está tirando más negro
+o está el negro tirándolo más blanco
+con ese puro número no podemos saber, sabemos que se va a parecer probablemente más que este 0909
+pero no sabemos cómo se está equivocando, sólo lo podemos cuantificar en esa manera
+eso es porque simplemente nosotros le vamos al cuadrado esa expresión y ahí perdimos esa noción de cómo se está equivocando sino que lo estamos cuantificando y ese cuadrado viene para penalizar errores grandes, nada, ahí viene.
+Entonces, si se fijan acá, la propuesta de 0208 pareciera que es, pareciera a priori, digamos que es buena, porque me reconstruye perfectamente la imagen original,
+pero de igual tenemos que preguntarnos qué es la representación que produce, porque al final es la imagen original, ¿ya?
+Entonces, vendés en una copia, ¿ya? que es perfecta de la entrada, ¿ya?
+entonces
+vamos a perder digamos
+la aproximación que nosotros estamos teniendo
+y vuelve en esencia una aproximación sin errores de
+lo original que es la misma entonces es una copia porque se entiende que dentro de la salida
+hay un sesgo que no existe
+eso lo que hace es
+reconstruir perfectamente la imagen original pero no va a resumir los datos, no lo está resumiendo,
+no está resumiendo ninguna de las intensidades que nosotros estamos utilizando. Entonces,
+el objetivo que nosotros queremos cuando queremos reconstruir se debe acompañar con algún tipo de
+restricción, que tenga algo de sentido para la utilidad o el uso que le va a mudar el vector
+latente por ejemplo yo quiero aproximarlo pero
+que utilicen que tenga menos ruido por ejemplo que el caso que nosotros vimos es
+decir que sea un vector que tenga
+valores muy cercanos a ceros ya y que en el ruido uno podría decir bueno como
+tiene estos tipos de manchas, como lo vimos acá, hay muy pocas intensidades que son prácticamente
+cero, no hay cero porque tiene un ruido de por medio, entonces yo le quiero sacar ese
+ruido, entonces cuando quiero hacer este decoding o este encoder quiero que tener ciertas restricciones
+que me van a imponer que no tenga una copia perfecta ya entonces
+y se dice aquí en acá
+te fijan acá entonces si yo hago simplemente la reconstrucción perfecta
+simplemente voy a tener lo que tuve en inicio entonces no ven en la si tuve porque
+para que hice una red si tengo las imágenes originales
+si conserva todos los detalles puede no resumir nada también porque yo quiero
+que esta aproximación me sirve y me resuma entonces nuevamente el concepto
+de la salida del vector latente va a tomar el precio de relevancia
+y un vector latente relativamente pequeño ya puede pasar que puede
+memorizar con suficiente flexibilidad para que nosotros tengamos una aproximación
+razonable de nuestra entrada. Entonces necesitamos restricciones que sean
+relativamente flexibles y adecuadas para la tarea que nosotros tenemos ya y que
+entreguen buenos resultados cuando hagamos predicción digamos evaluación
+con error cuadrático medio en términos de las intensidades, pixel a pixel en
+este caso
+ahora vamos a hacer una pequeña pausa con el break, yo creo que vamos a volver a las
+8, 11 minutos, 12 minutos más o menos por ahora, les parece?
+volvemos a las 8

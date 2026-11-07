@@ -1,0 +1,3612 @@
+{
+ "clase": "Clase 31",
+ "titulo": "Clasificación: la regresión logística",
+ "cabecera": "Clase 31  ·  Clasificación: la regresión logística",
+ "profesora": "Prof. Laura Sánchez",
+ "voz": "es-MX-DaliaNeural",
+ "rate": "+0%",
+ "fps": 25,
+ "beats": [
+  {
+   "seccion": "Introducción",
+   "say": "Clasificación y regresión logística. Cómo un modelo decide si un cliente cancela o se queda.",
+   "acciones": [
+    {
+     "id": "t_fondo",
+     "tipo": "caja",
+     "x": 960,
+     "y": 540,
+     "w": 1920,
+     "h": 1080,
+     "radio": 0,
+     "relleno": "navy",
+     "entrada": "ninguna"
+    },
+    {
+     "id": "t_franja",
+     "tipo": "caja",
+     "x": 12,
+     "y": 540,
+     "w": 24,
+     "h": 1080,
+     "radio": 0,
+     "relleno": "teal",
+     "entrada": "ninguna"
+    },
+    {
+     "id": "t_clase",
+     "tipo": "texto",
+     "texto": "CLASE 31  ·  INTRODUCCIÓN AL MACHINE LEARNING",
+     "x": 140,
+     "y": 330,
+     "ancla": "lm",
+     "tam": 40,
+     "peso": "b",
+     "color": "#96D6DC",
+     "entrada": "subir"
+    },
+    {
+     "id": "t_tit",
+     "tipo": "texto",
+     "texto": "Clasificación: la regresión logística",
+     "x": 140,
+     "y": 450,
+     "ancla": "lm",
+     "tam": 84,
+     "peso": "b",
+     "color": "blanco",
+     "entrada": "subir",
+     "t": 0.1
+    },
+    {
+     "id": "t_lin",
+     "tipo": "caja",
+     "x0": 140,
+     "y0": 540,
+     "x1": 420,
+     "y1": 548,
+     "radio": 0,
+     "relleno": "teal",
+     "desde": {
+      "x1": 140
+     },
+     "t": 0.2
+    },
+    {
+     "id": "t_sub",
+     "tipo": "texto",
+     "texto": "Del puntaje a la probabilidad, y de la probabilidad a la decisión",
+     "x": 140,
+     "y": 610,
+     "ancla": "lm",
+     "tam": 46,
+     "color": "#E2EAF4",
+     "entrada": "subir",
+     "t": 0.25
+    },
+    {
+     "id": "t_pie",
+     "tipo": "texto",
+     "texto": "Diplomado Data Science UC 2026  ·  Prof. Laura Sánchez",
+     "x": 140,
+     "y": 960,
+     "ancla": "lm",
+     "tam": 32,
+     "color": "#96AAC8",
+     "t": 0.3
+    }
+   ]
+  },
+  {
+   "seccion": "1. Un puntaje que se vuelve probabilidad",
+   "say": "Imagina que tienes que adivinar quién va a cancelar su suscripción. [[a]]No quieres un «tal vez». [[b]]Quieres un sí o un no. Pero antes de decidir, el modelo calcula algo más fino.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "¿cancela?",
+     "x": 960,
+     "y": 330,
+     "tam": 90,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e1",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "sí",
+     "x": 700,
+     "y": 600,
+     "tam": 80,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e2",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "no",
+     "x": 1220,
+     "y": 600,
+     "tam": 80,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "fondo_txt": "verdeclaro",
+     "id": "e3",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "antes de decidir, calcula algo más fino",
+     "x": 960,
+     "y": 850,
+     "tam": 48,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e4",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.8
+    }
+   ]
+  },
+  {
+   "say": "Calcula una probabilidad. [[a]]Por ejemplo, este cliente tiene setenta por ciento de probabilidad de cancelar. [[b]]Y luego una regla simple, el umbral, convierte esa probabilidad en una decisión.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x": 560,
+     "y": 480,
+     "w": 620,
+     "h": 360,
+     "radio": 30,
+     "relleno": "blanco",
+     "borde": "violeta",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e5",
+     "entrada": "subir",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "probabilidad de cancelar",
+     "x": 560,
+     "y": 340,
+     "tam": 40,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e6",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "numero",
+     "valor": 70,
+     "fmt": "{:.0f}",
+     "sufijo": " %",
+     "prefijo": "",
+     "x": 560,
+     "y": 480,
+     "tam": 150,
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e7",
+     "entrada": "fade",
+     "en": "a",
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "linea",
+     "x0": 900,
+     "y0": 480,
+     "x1": 1080,
+     "y1": 480,
+     "color": "gris",
+     "grosor": 8,
+     "punta": true,
+     "guion": false,
+     "id": "e8",
+     "entrada": "ninguna",
+     "en": "b",
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "caja",
+     "x": 1400,
+     "y": 480,
+     "w": 520,
+     "h": 360,
+     "radio": 30,
+     "relleno": "blanco",
+     "borde": "teal",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e9",
+     "entrada": "subir",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "umbral 0.5",
+     "x": 1400,
+     "y": 380,
+     "tam": 48,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e10",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "decisión: cancela",
+     "x": 1400,
+     "y": 540,
+     "tam": 44,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e11",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.5
+    }
+   ]
+  },
+  {
+   "say": "Como en las clases diecisiete a veintiuno, aquí la regresión logística aparece como un modelo de clasificación. [[a]]La pregunta es cómo pasa de las variables de un cliente a esa probabilidad.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "variables del cliente",
+     "x": 480,
+     "y": 480,
+     "tam": 48,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e12",
+     "entrada": "subir",
+     "t": 0.2
+    },
+    {
+     "tipo": "linea",
+     "x0": 760,
+     "y0": 480,
+     "x1": 1000,
+     "y1": 480,
+     "color": "gris",
+     "grosor": 8,
+     "punta": true,
+     "guion": false,
+     "id": "e13",
+     "entrada": "ninguna",
+     "en": "a",
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "probabilidad",
+     "x": 1380,
+     "y": 480,
+     "tam": 48,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e14",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "?",
+     "x": 1000,
+     "y": 400,
+     "tam": 90,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e15",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.2
+    }
+   ]
+  },
+  {
+   "say": "Primero calcula un puntaje, que se llama logit. [[a]]Es una suma ponderada: un punto de partida, [[b]]más cada variable multiplicada por su coeficiente.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "z  =  b₀  +  b₁·x₁  +  b₂·x₂  +  …",
+     "x": 960,
+     "y": 330,
+     "tam": 70,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "fz",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "punto de partida",
+     "x": 420,
+     "y": 520,
+     "tam": 40,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "fondo_txt": "linea",
+     "id": "e16",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "linea",
+     "x0": 420,
+     "y0": 475,
+     "x1": 520,
+     "y1": 375,
+     "color": "gris",
+     "grosor": 4,
+     "punta": true,
+     "guion": false,
+     "id": "e17",
+     "entrada": "ninguna",
+     "en": "a",
+     "t": 0.2,
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "cada variable × su coeficiente",
+     "x": 1300,
+     "y": 520,
+     "tam": 40,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e18",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "linea",
+     "x0": 1300,
+     "y0": 475,
+     "x1": 1260,
+     "y1": 375,
+     "color": "violeta",
+     "grosor": 4,
+     "punta": true,
+     "guion": false,
+     "id": "e19",
+     "entrada": "ninguna",
+     "en": "b",
+     "t": 0.2,
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    }
+   ]
+  },
+  {
+   "say": "Es como un termómetro de riesgo. [[a]]Cada queja de soporte sube la temperatura. [[b]]Cada mes de antigüedad la baja.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 520,
+     "w": 300,
+     "h": 560,
+     "radio": 40,
+     "relleno": "blanco",
+     "borde": "grisclaro",
+     "grosor": 5,
+     "id": "e20",
+     "entrada": "subir",
+     "t": 0.2
+    },
+    {
+     "tipo": "caja",
+     "x0": 910,
+     "y0": 620,
+     "x1": 1010,
+     "y1": 780,
+     "radio": 20,
+     "relleno": "rojoclaro",
+     "borde": "rojo",
+     "grosor": 3,
+     "id": "term",
+     "entrada": "subir",
+     "t": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "riesgo",
+     "x": 960,
+     "y": 195,
+     "tam": 44,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e21",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "queja de soporte",
+     "x": 1500,
+     "y": 400,
+     "tam": 42,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e22",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "↑",
+     "x": 1250,
+     "y": 400,
+     "tam": 80,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e23",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "y0": 470,
+     "id": "term",
+     "en": "a",
+     "dur": 1.0
+    },
+    {
+     "tipo": "texto",
+     "texto": "mes de antigüedad",
+     "x": 1500,
+     "y": 640,
+     "tam": 42,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "fondo_txt": "verdeclaro",
+     "id": "e24",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "↓",
+     "x": 1250,
+     "y": 640,
+     "tam": 80,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "id": "e25",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.2
+    },
+    {
+     "y0": 660,
+     "id": "term",
+     "en": "b",
+     "dur": 1.0
+    }
+   ]
+  },
+  {
+   "say": "Pero un puntaje puede valer cualquier cosa: [[a]]menos cinco, cero, o diez. [[b]]Una probabilidad, en cambio, tiene que estar siempre entre cero y uno. Necesitamos un traductor.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "puntaje:  −5   0   10",
+     "x": 960,
+     "y": 350,
+     "tam": 80,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e26",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "probabilidad: entre 0 y 1",
+     "x": 960,
+     "y": 520,
+     "tam": 80,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e27",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "necesitamos un traductor",
+     "x": 960,
+     "y": 800,
+     "tam": 56,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e28",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.8
+    }
+   ]
+  },
+  {
+   "seccion": "2. La sigmoide",
+   "say": "Ese traductor es la función sigmoide. [[a]]Toma cualquier puntaje, y lo aprieta entre cero y uno. [[b]]La fórmula es uno, dividido por uno más e elevado a menos z.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "grafico",
+     "x0": 240,
+     "y0": 200,
+     "x1": 1280,
+     "y1": 820,
+     "xmin": -6,
+     "xmax": 6,
+     "ymin": 0,
+     "ymax": 1,
+     "series": [
+      {
+       "xs": [
+        -6.0,
+        -5.5,
+        -5.0,
+        -4.5,
+        -4.0,
+        -3.5,
+        -3.0,
+        -2.5,
+        -2.0,
+        -1.5,
+        -1.0,
+        -0.5,
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        2.5,
+        3.0,
+        3.5,
+        4.0,
+        4.5,
+        5.0,
+        5.5,
+        6.0
+       ],
+       "ys": [
+        0.0024726231566347743,
+        0.004070137715896128,
+        0.0066928509242848554,
+        0.01098694263059318,
+        0.01798620996209156,
+        0.02931223075135632,
+        0.04742587317756678,
+        0.07585818002124355,
+        0.11920292202211755,
+        0.18242552380635635,
+        0.2689414213699951,
+        0.3775406687981454,
+        0.5,
+        0.6224593312018546,
+        0.7310585786300049,
+        0.8175744761936437,
+        0.8807970779778823,
+        0.9241418199787566,
+        0.9525741268224334,
+        0.9706877692486436,
+        0.9820137900379085,
+        0.9890130573694068,
+        0.9933071490757153,
+        0.995929862284104,
+        0.9975273768433653
+       ],
+       "color": "violeta",
+       "grosor": 8,
+       "revela": 0.0,
+       "lapiz": true
+      }
+     ],
+     "xticks": [
+      -4,
+      -2,
+      0,
+      2,
+      4
+     ],
+     "yticks": [
+      0,
+      0.5,
+      1
+     ],
+     "yfmt": "{:g}",
+     "xlabel": "puntaje z (logit)",
+     "id": "sg",
+     "entrada": "fade",
+     "en": "a",
+     "dur": 0.7
+    },
+    {
+     "series.0.revela": 1.0,
+     "id": "sg",
+     "en": "a",
+     "dur": 2.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "p = 1 / (1 + e^(−z))",
+     "x": 1600,
+     "y": 420,
+     "tam": 64,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e29",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "Mira lo que hace. [[a]]Con puntaje cero, la probabilidad es justo cero coma cinco. [[b]]Con un puntaje muy alto, se acerca a uno. [[c]]Y con uno muy negativo, se acerca a cero.",
+   "acciones": [
+    {
+     "tipo": "linea",
+     "x0": 760.0,
+     "y0": 820,
+     "x1": 760.0,
+     "y1": 510.0,
+     "color": "ambar",
+     "grosor": 5,
+     "punta": false,
+     "guion": true,
+     "id": "v0",
+     "entrada": "ninguna",
+     "en": "a",
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "linea",
+     "x0": 760.0,
+     "y0": 510.0,
+     "x1": 240.0,
+     "y1": 510.0,
+     "color": "ambar",
+     "grosor": 5,
+     "punta": false,
+     "guion": true,
+     "id": "h0",
+     "entrada": "ninguna",
+     "en": "a",
+     "t": 0.4,
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "z = 0  →  p = 0.5",
+     "x": 1600,
+     "y": 560,
+     "tam": 40,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "ancho_max": 560,
+     "id": "e30",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "anillo",
+     "x": 1193.3333333333333,
+     "y": 206.20000000000005,
+     "w": 150,
+     "h": 110,
+     "radio": 30,
+     "color": "verde",
+     "grosor": 6,
+     "pulso": true,
+     "id": "ra",
+     "entrada": "fade",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "z alto  →  p cerca de 1",
+     "x": 1600,
+     "y": 660,
+     "tam": 38,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "fondo_txt": "verdeclaro",
+     "ancho_max": 560,
+     "id": "e31",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "quitar": [
+      "ra"
+     ],
+     "en": "c",
+     "dur": 0.3
+    },
+    {
+     "tipo": "anillo",
+     "x": 326.66666666666663,
+     "y": 813.8,
+     "w": 150,
+     "h": 110,
+     "radio": 30,
+     "color": "rojo",
+     "grosor": 6,
+     "pulso": true,
+     "id": "rb",
+     "entrada": "fade",
+     "en": "c"
+    },
+    {
+     "tipo": "texto",
+     "texto": "z muy negativo  →  p cerca de 0",
+     "x": 1600,
+     "y": 760,
+     "tam": 38,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "ancho_max": 560,
+     "id": "e32",
+     "entrada": "pop",
+     "en": "c"
+    }
+   ]
+  },
+  {
+   "say": "Y esto conecta con el umbral. [[a]]Con umbral cero coma cinco, el modelo dice «cancela» justo cuando el puntaje es mayor que cero.",
+   "acciones": [
+    {
+     "quitar": [
+      "rb"
+     ],
+     "dur": 0.3
+    },
+    {
+     "tipo": "anillo",
+     "x": 760.0,
+     "y": 510.0,
+     "w": 120,
+     "h": 120,
+     "radio": 30,
+     "color": "violeta",
+     "grosor": 6,
+     "pulso": true,
+     "id": "rz",
+     "entrada": "fade",
+     "en": "a"
+    },
+    {
+     "quitar": [
+      "e30",
+      "e31",
+      "e32"
+     ],
+     "dur": 0.3
+    },
+    {
+     "quitar": [
+      "e29"
+     ],
+     "dur": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "p > 0.5  ⇔  z > 0",
+     "x": 1600,
+     "y": 480,
+     "tam": 54,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e33",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "cancela",
+     "x": 1000,
+     "y": 330,
+     "tam": 40,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e34",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "se queda",
+     "x": 480,
+     "y": 700,
+     "tam": 40,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "fondo_txt": "verdeclaro",
+     "id": "e35",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    }
+   ]
+  },
+  {
+   "seccion": "3. Un ejemplo resuelto a mano",
+   "say": "Hagamos una cuenta completa, con la que usa el apunte. [[a]]El puntaje es menos uno, más uno coma cinco por las quejas, menos cero coma dos por el uso.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "z = −1.0 + 1.5·quejas − 0.2·uso",
+     "x": 960,
+     "y": 250,
+     "tam": 64,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "fe",
+     "entrada": "subir",
+     "t": 0.2
+    }
+   ]
+  },
+  {
+   "say": "Cliente uno: dos quejas y seis usos al mes. [[a]]Menos uno, más uno coma cinco por dos, menos cero coma dos por seis. [[b]]Menos uno, más tres, menos uno coma dos: da cero coma ocho.",
+   "acciones": [
+    {
+     "tipo": "caja",
+     "x": 560,
+     "y": 560,
+     "w": 760,
+     "h": 480,
+     "radio": 30,
+     "relleno": "blanco",
+     "borde": "violeta",
+     "grosor": 5,
+     "sombra": true,
+     "id": "c1",
+     "entrada": "subir",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "Cliente 1",
+     "x": 560,
+     "y": 380,
+     "tam": 46,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e36",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "2 quejas · 6 usos",
+     "x": 560,
+     "y": 450,
+     "tam": 36,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e37",
+     "entrada": "pop",
+     "t": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "−1.0 + 1.5·2 − 0.2·6",
+     "x": 560,
+     "y": 560,
+     "tam": 48,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e38",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "−1.0 + 3.0 − 1.2",
+     "x": 560,
+     "y": 650,
+     "tam": 48,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e39",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "z = 0.8",
+     "x": 560,
+     "y": 750,
+     "tam": 70,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e40",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.5
+    }
+   ]
+  },
+  {
+   "say": "Ahora la sigmoide. [[a]]Uno, dividido por uno más e elevado a menos cero coma ocho. [[b]]La exponencial vale 0.449, así que queda uno entre 1.449. [[c]]La probabilidad de cancelar es cero coma sesenta y nueve.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "p = 1 / (1 + e^(−0.8))",
+     "x": 1400,
+     "y": 400,
+     "tam": 48,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e41",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "= 1 / (1 + 0.449)",
+     "x": 1400,
+     "y": 500,
+     "tam": 48,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e42",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "p = 0.690",
+     "x": 1400,
+     "y": 620,
+     "tam": 80,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e43",
+     "entrada": "pop",
+     "en": "c"
+    },
+    {
+     "tipo": "texto",
+     "texto": "69 % de probabilidad",
+     "x": 1400,
+     "y": 760,
+     "tam": 40,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e44",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.5
+    }
+   ]
+  },
+  {
+   "say": "Cliente dos: cero quejas y ocho usos. [[a]]Menos uno, más cero, menos uno coma seis: el puntaje es menos dos coma seis. [[b]]Y la probabilidad baja a cero coma cero sesenta y nueve.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5,
+     "mantener": [
+      "fe"
+     ]
+    },
+    {
+     "tipo": "caja",
+     "x": 560,
+     "y": 580,
+     "w": 760,
+     "h": 480,
+     "radio": 30,
+     "relleno": "blanco",
+     "borde": "teal",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e45",
+     "entrada": "subir",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "Cliente 2",
+     "x": 560,
+     "y": 400,
+     "tam": 46,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e46",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "0 quejas · 8 usos",
+     "x": 560,
+     "y": 470,
+     "tam": 36,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e47",
+     "entrada": "pop",
+     "t": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "−1.0 + 0 − 0.2·8",
+     "x": 560,
+     "y": 580,
+     "tam": 48,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e48",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "z = −2.6",
+     "x": 560,
+     "y": 690,
+     "tam": 70,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e49",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "p = 1 / (1 + e^2.6)",
+     "x": 1400,
+     "y": 430,
+     "tam": 48,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e50",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "p = 0.069",
+     "x": 1400,
+     "y": 570,
+     "tam": 90,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e51",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "casi no cancela",
+     "x": 1400,
+     "y": 720,
+     "tam": 40,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e52",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.8
+    }
+   ]
+  },
+  {
+   "say": "¿Y qué pasa si el cliente tiene una queja más? [[a]]Cada queja multiplica las odds, que son la probabilidad dividida por su complemento, [[b]]por e elevado a uno coma cinco. Eso es cuatro coma cuarenta y ocho veces.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "odds = p / (1 − p)",
+     "x": 960,
+     "y": 300,
+     "tam": 60,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e53",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "+1 queja",
+     "x": 560,
+     "y": 560,
+     "tam": 64,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e54",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "linea",
+     "x0": 760,
+     "y0": 560,
+     "x1": 1000,
+     "y1": 560,
+     "color": "gris",
+     "grosor": 8,
+     "punta": true,
+     "guion": false,
+     "id": "e55",
+     "entrada": "ninguna",
+     "en": "b",
+     "t": 0.2,
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "odds × e^1.5",
+     "x": 1360,
+     "y": 500,
+     "tam": 60,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e56",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.3
+    },
+    {
+     "tipo": "numero",
+     "valor": 4.48,
+     "fmt": "{:.2f}",
+     "sufijo": "",
+     "prefijo": "× ",
+     "x": 1360,
+     "y": 640,
+     "tam": 110,
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e57",
+     "entrada": "fade",
+     "en": "b",
+     "t": 0.5,
+     "dur": 0.9,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    }
+   ]
+  },
+  {
+   "say": "Piensa un segundo: [[a]]el cliente uno tiene probabilidad cero coma sesenta y nueve. ¿Cancela con umbral cero coma cinco? ¿Y con umbral cero coma siete?",
+   "pausa": 0.6,
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.69,
+     "fmt": "{:.2f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 960,
+     "y": 330,
+     "tam": 150,
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e58",
+     "entrada": "fade",
+     "en": "a",
+     "dur": 0.8,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "umbral 0.5  →  ?",
+     "x": 700,
+     "y": 640,
+     "tam": 60,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "id": "e59",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "umbral 0.7  →  ?",
+     "x": 1280,
+     "y": 640,
+     "tam": 60,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e60",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.8
+    }
+   ]
+  },
+  {
+   "say": "Con cero coma cinco, sí cancela: [[a]]cero coma sesenta y nueve pasa el umbral. [[b]]Con cero coma siete, ya no: se queda por muy poco.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "0.5  →  cancela",
+     "x": 700,
+     "y": 800,
+     "tam": 54,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e61",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "marca",
+     "x": 700,
+     "y": 900,
+     "tam": 60,
+     "forma": "check",
+     "color": "rojo",
+     "id": "e62",
+     "entrada": "ninguna",
+     "en": "a",
+     "t": 0.2,
+     "dur": 0.5,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "0.7  →  se queda",
+     "x": 1280,
+     "y": 800,
+     "tam": 54,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "fondo_txt": "verdeclaro",
+     "id": "e63",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "marca",
+     "x": 1280,
+     "y": 900,
+     "tam": 60,
+     "forma": "cruz",
+     "color": "verde",
+     "id": "e64",
+     "entrada": "ninguna",
+     "en": "b",
+     "t": 0.2,
+     "dur": 0.5,
+     "desde": {
+      "progreso": 0
+     }
+    }
+   ]
+  },
+  {
+   "seccion": "4. El caso Club Activo",
+   "say": "Ahora, el caso de la clase: Club Activo, con ochocientos clientes. [[a]]Se dividen en entrenamiento y prueba, de forma estratificada, como en la clase treinta. [[b]]Quinientos sesenta para aprender, y doscientos cuarenta para probar.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "puntos",
+     "grupos": [
+      {
+       "n": 560,
+       "rect": [
+        160,
+        380,
+        1180,
+        700
+       ],
+       "color": "azul"
+      },
+      {
+       "n": 240,
+       "rect": [
+        1260,
+        380,
+        1760,
+        700
+       ],
+       "color": "ambar"
+      }
+     ],
+     "radio": 7,
+     "id": "pdiv",
+     "entrada": "fade",
+     "en": "a",
+     "dur": 0.8
+    },
+    {
+     "tipo": "texto",
+     "texto": "entrenamiento",
+     "x": 670,
+     "y": 780,
+     "tam": 46,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e65",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "numero",
+     "valor": 560,
+     "fmt": "{:.0f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 670,
+     "y": 860,
+     "tam": 80,
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e66",
+     "entrada": "fade",
+     "en": "b",
+     "dur": 0.8,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "prueba",
+     "x": 1510,
+     "y": 780,
+     "tam": 46,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e67",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "numero",
+     "valor": 240,
+     "fmt": "{:.0f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 1510,
+     "y": 860,
+     "tam": 80,
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e68",
+     "entrada": "fade",
+     "en": "b",
+     "dur": 0.8,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    }
+   ]
+  },
+  {
+   "say": "Todo va dentro de un Pipeline: [[a]]primero se imputan los faltantes, [[b]]luego se estandarizan las variables, [[c]]y al final se ajusta la regresión logística. [[d]]Y el fit se hace solo con el entrenamiento.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x": 320,
+     "y": 480,
+     "w": 380,
+     "h": 200,
+     "radio": 28,
+     "relleno": "blanco",
+     "borde": "teal",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e69",
+     "entrada": "subir",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "imputar",
+     "x": 320,
+     "y": 480,
+     "tam": 44,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "ancho_max": 320,
+     "id": "e70",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "caja",
+     "x": 800,
+     "y": 480,
+     "w": 380,
+     "h": 200,
+     "radio": 28,
+     "relleno": "blanco",
+     "borde": "azul",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e71",
+     "entrada": "subir",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "estandarizar",
+     "x": 800,
+     "y": 480,
+     "tam": 44,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "ancho_max": 320,
+     "id": "e72",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.1
+    },
+    {
+     "tipo": "caja",
+     "x": 1280,
+     "y": 480,
+     "w": 380,
+     "h": 200,
+     "radio": 28,
+     "relleno": "blanco",
+     "borde": "violeta",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e73",
+     "entrada": "subir",
+     "en": "c"
+    },
+    {
+     "tipo": "texto",
+     "texto": "regresión logística",
+     "x": 1280,
+     "y": 480,
+     "tam": 44,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "ancho_max": 320,
+     "id": "e74",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.1
+    },
+    {
+     "tipo": "linea",
+     "x0": 520,
+     "y0": 480,
+     "x1": 600,
+     "y1": 480,
+     "color": "gris",
+     "grosor": 6,
+     "punta": true,
+     "guion": false,
+     "id": "e75",
+     "entrada": "ninguna",
+     "en": "b",
+     "t": 0.1,
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "linea",
+     "x0": 1000,
+     "y0": 480,
+     "x1": 1080,
+     "y1": 480,
+     "color": "gris",
+     "grosor": 6,
+     "punta": true,
+     "guion": false,
+     "id": "e76",
+     "entrada": "ninguna",
+     "en": "c",
+     "t": 0.1,
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "anillo",
+     "x": 800,
+     "y": 480,
+     "w": 1400,
+     "h": 290,
+     "radio": 40,
+     "color": "teal",
+     "grosor": 6,
+     "pulso": true,
+     "id": "rp",
+     "entrada": "fade",
+     "en": "c",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "Pipeline",
+     "x": 800,
+     "y": 290,
+     "tam": 50,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e77",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "fit solo con entrenamiento",
+     "x": 1640,
+     "y": 480,
+     "tam": 40,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "ancho_max": 420,
+     "id": "e78",
+     "entrada": "pop",
+     "en": "d"
+    }
+   ]
+  },
+  {
+   "say": "Con las variables ya estandarizadas, los coeficientes se pueden comparar. [[a]]Las quejas empujan el riesgo hacia arriba: más uno coma cero ocho. [[b]]La antigüedad lo baja: menos cero coma ochenta. [[c]]El uso lo baja un poco: menos cero coma veintidós. [[d]]Y la edad casi no pesa.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "quejas",
+     "x": 740,
+     "y": 380,
+     "tam": 46,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "e79",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "caja",
+     "x0": 1100,
+     "y0": 353,
+     "x1": 1532.0,
+     "y1": 407,
+     "radio": 8,
+     "relleno": "rojo",
+     "borde": null,
+     "grosor": 0,
+     "id": "e80",
+     "en": "a",
+     "t": 0.1,
+     "dur": 0.7,
+     "desde": {
+      "x1": 1100
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "+1.08",
+     "x": 1622.0,
+     "y": 380,
+     "tam": 40,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e81",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "antigüedad",
+     "x": 740,
+     "y": 500,
+     "tam": 46,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "e82",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "caja",
+     "x0": 780.0,
+     "y0": 473,
+     "x1": 1100,
+     "y1": 527,
+     "radio": 8,
+     "relleno": "verde",
+     "borde": null,
+     "grosor": 0,
+     "id": "e83",
+     "entrada": "fade",
+     "en": "b",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "−0.80",
+     "x": 690.0,
+     "y": 500,
+     "tam": 40,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "id": "e84",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "uso",
+     "x": 740,
+     "y": 620,
+     "tam": 46,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "e85",
+     "entrada": "pop",
+     "en": "c"
+    },
+    {
+     "tipo": "caja",
+     "x0": 1012.0,
+     "y0": 593,
+     "x1": 1100,
+     "y1": 647,
+     "radio": 8,
+     "relleno": "verde",
+     "borde": null,
+     "grosor": 0,
+     "id": "e86",
+     "entrada": "fade",
+     "en": "c",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "−0.22",
+     "x": 922.0,
+     "y": 620,
+     "tam": 40,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "id": "e87",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "edad",
+     "x": 740,
+     "y": 740,
+     "tam": 46,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "e88",
+     "entrada": "pop",
+     "en": "d"
+    },
+    {
+     "tipo": "caja",
+     "x0": 1100,
+     "y0": 713,
+     "x1": 1132.0,
+     "y1": 767,
+     "radio": 8,
+     "relleno": "gris",
+     "borde": null,
+     "grosor": 0,
+     "id": "e89",
+     "en": "d",
+     "t": 0.1,
+     "dur": 0.7,
+     "desde": {
+      "x1": 1100
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "+0.08",
+     "x": 1222.0,
+     "y": 740,
+     "tam": 40,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e90",
+     "entrada": "pop",
+     "en": "d",
+     "t": 0.5
+    },
+    {
+     "tipo": "linea",
+     "x0": 1100,
+     "y0": 320,
+     "x1": 1100,
+     "y1": 800,
+     "color": "tinta",
+     "grosor": 4,
+     "punta": false,
+     "guion": false,
+     "id": "e91",
+     "entrada": "ninguna",
+     "en": "a",
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "sube el riesgo →",
+     "x": 1600,
+     "y": 320,
+     "tam": 34,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e92",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "← baja el riesgo",
+     "x": 600,
+     "y": 320,
+     "tam": 34,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e93",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "intercepto: −0.39",
+     "x": 960,
+     "y": 900,
+     "tam": 36,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e94",
+     "entrada": "pop",
+     "en": "d"
+    }
+   ]
+  },
+  {
+   "say": "Con ese modelo, evaluamos en la prueba, que el modelo nunca vio. [[a]]Y ahí viene una decisión importante: el peso de las clases.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "evaluar en datos nunca vistos",
+     "x": 960,
+     "y": 400,
+     "tam": 58,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e95",
+     "entrada": "subir",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "el peso de las clases",
+     "x": 960,
+     "y": 640,
+     "tam": 66,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e96",
+     "entrada": "pop",
+     "en": "a"
+    }
+   ]
+  },
+  {
+   "seccion": "5. El peso de las clases",
+   "say": "Solo uno de cada cinco clientes cancela. [[a]]Si el modelo cuenta todos los errores igual, aprende a decir que casi nadie cancela, [[b]]porque así se equivoca poco.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "puntos",
+     "grupos": [
+      {
+       "n": 79,
+       "rect": [
+        300,
+        360,
+        1100,
+        640
+       ],
+       "color": "#94A3B8"
+      },
+      {
+       "n": 21,
+       "rect": [
+        1180,
+        360,
+        1500,
+        640
+       ],
+       "color": "rojo"
+      }
+     ],
+     "radio": 12,
+     "ent": "fade",
+     "id": "p100",
+     "entrada": "fade",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "1 de cada 5 cancela",
+     "x": 960,
+     "y": 760,
+     "tam": 52,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e97",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "aprende a decir «nadie cancela»",
+     "x": 960,
+     "y": 900,
+     "tam": 48,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e98",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "La opción balanced le da más peso a la clase rara. [[a]]Pondera cada clase al revés de su frecuencia: cero coma sesenta y tres para quien se queda, [[b]]y dos coma treinta y nueve para quien cancela.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x": 560,
+     "y": 480,
+     "w": 640,
+     "h": 400,
+     "radio": 30,
+     "relleno": "blanco",
+     "borde": "verde",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e99",
+     "entrada": "subir",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "se queda",
+     "x": 560,
+     "y": 360,
+     "tam": 48,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "id": "e100",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.63,
+     "fmt": "{:.2f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 560,
+     "y": 500,
+     "tam": 140,
+     "color": "verde",
+     "ancla": "mm",
+     "id": "e101",
+     "entrada": "fade",
+     "en": "a",
+     "dur": 0.9,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "caja",
+     "x": 1360,
+     "y": 480,
+     "w": 640,
+     "h": 400,
+     "radio": 30,
+     "relleno": "blanco",
+     "borde": "rojo",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e102",
+     "entrada": "subir",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "cancela",
+     "x": 1360,
+     "y": 360,
+     "tam": 48,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e103",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.1
+    },
+    {
+     "tipo": "numero",
+     "valor": 2.39,
+     "fmt": "{:.2f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 1360,
+     "y": 500,
+     "tam": 140,
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e104",
+     "entrada": "fade",
+     "en": "b",
+     "t": 0.2,
+     "dur": 0.9,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "class_weight = 'balanced'",
+     "x": 960,
+     "y": 860,
+     "tam": 46,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e105",
+     "entrada": "pop",
+     "t": 0.5
+    }
+   ]
+  },
+  {
+   "say": "Cada cliente que cancela y se pasa de largo pesa casi cuatro veces más que uno que se queda. [[a]]El modelo se vuelve alarmista. [[b]]Gana recall, pero pierde precisión.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "modelo alarmista",
+     "x": 960,
+     "y": 820,
+     "tam": 56,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e106",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "gana recall · pierde precisión",
+     "x": 960,
+     "y": 940,
+     "tam": 50,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e107",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "Mira la diferencia. [[a]]Sin ponderar, la precisión es sesenta y nueve por ciento, pero el recall solo dieciocho. [[b]]Con balanced, la precisión baja a treinta y nueve, y el recall sube a cincuenta y dos.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x": 560,
+     "y": 500,
+     "w": 700,
+     "h": 520,
+     "radio": 30,
+     "relleno": "blanco",
+     "borde": "grisclaro",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e108",
+     "entrada": "subir",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "sin ponderar",
+     "x": 560,
+     "y": 290,
+     "tam": 46,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e109",
+     "entrada": "pop"
+    },
+    {
+     "tipo": "texto",
+     "texto": "precisión",
+     "x": 560,
+     "y": 380,
+     "tam": 34,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e110",
+     "entrada": "pop"
+    },
+    {
+     "tipo": "numero",
+     "valor": 69.2,
+     "fmt": "{:.1f}",
+     "sufijo": " %",
+     "prefijo": "",
+     "x": 560,
+     "y": 450,
+     "tam": 90,
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e111",
+     "entrada": "fade",
+     "en": "a",
+     "dur": 0.9,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "recall",
+     "x": 560,
+     "y": 560,
+     "tam": 34,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e112",
+     "entrada": "pop"
+    },
+    {
+     "tipo": "numero",
+     "valor": 18.0,
+     "fmt": "{:.1f}",
+     "sufijo": " %",
+     "prefijo": "",
+     "x": 560,
+     "y": 630,
+     "tam": 90,
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e113",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.3,
+     "dur": 0.9,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "caja",
+     "x": 1360,
+     "y": 500,
+     "w": 700,
+     "h": 520,
+     "radio": 30,
+     "relleno": "violetaclaro",
+     "borde": "violeta",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e114",
+     "entrada": "subir",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "balanced",
+     "x": 1360,
+     "y": 290,
+     "tam": 46,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e115",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "precisión",
+     "x": 1360,
+     "y": 380,
+     "tam": 34,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e116",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.2
+    },
+    {
+     "tipo": "numero",
+     "valor": 39.4,
+     "fmt": "{:.1f}",
+     "sufijo": " %",
+     "prefijo": "",
+     "x": 1360,
+     "y": 450,
+     "tam": 90,
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e117",
+     "entrada": "fade",
+     "en": "b",
+     "t": 0.3,
+     "dur": 0.9,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "recall",
+     "x": 1360,
+     "y": 560,
+     "tam": 34,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e118",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.4
+    },
+    {
+     "tipo": "numero",
+     "valor": 52.0,
+     "fmt": "{:.1f}",
+     "sufijo": " %",
+     "prefijo": "",
+     "x": 1360,
+     "y": 630,
+     "tam": 90,
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e119",
+     "entrada": "fade",
+     "en": "b",
+     "t": 0.5,
+     "dur": 0.9,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "una decisión de modelado, no un arreglo gratuito",
+     "x": 960,
+     "y": 960,
+     "tam": 38,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e120",
+     "entrada": "pop"
+    }
+   ]
+  },
+  {
+   "seccion": "6. El umbral es una decisión de negocio",
+   "say": "Hay otra decisión de negocio: el umbral. [[a]]Estos puntos son una muestra de los clientes de prueba, ubicados sobre la sigmoide. [[b]]Los grises se quedaron, los ámbar cancelaron. El color no se usó para ubicarlos.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "grafico",
+     "x0": 240,
+     "y0": 200,
+     "x1": 1280,
+     "y1": 820,
+     "xmin": -6,
+     "xmax": 6,
+     "ymin": 0,
+     "ymax": 1,
+     "series": [
+      {
+       "xs": [
+        -6.0,
+        -5.5,
+        -5.0,
+        -4.5,
+        -4.0,
+        -3.5,
+        -3.0,
+        -2.5,
+        -2.0,
+        -1.5,
+        -1.0,
+        -0.5,
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        2.5,
+        3.0,
+        3.5,
+        4.0,
+        4.5,
+        5.0,
+        5.5,
+        6.0
+       ],
+       "ys": [
+        0.0024726231566347743,
+        0.004070137715896128,
+        0.0066928509242848554,
+        0.01098694263059318,
+        0.01798620996209156,
+        0.02931223075135632,
+        0.04742587317756678,
+        0.07585818002124355,
+        0.11920292202211755,
+        0.18242552380635635,
+        0.2689414213699951,
+        0.3775406687981454,
+        0.5,
+        0.6224593312018546,
+        0.7310585786300049,
+        0.8175744761936437,
+        0.8807970779778823,
+        0.9241418199787566,
+        0.9525741268224334,
+        0.9706877692486436,
+        0.9820137900379085,
+        0.9890130573694068,
+        0.9933071490757153,
+        0.995929862284104,
+        0.9975273768433653
+       ],
+       "color": "violeta",
+       "grosor": 6
+      },
+      {
+       "xs": [
+        -4.03,
+        -3.88,
+        -3.76,
+        -3.63,
+        -2.11,
+        -1.75,
+        -1.7,
+        -1.68,
+        -1.57,
+        -1.54,
+        -1.38,
+        -1.33,
+        -1.18,
+        -1.17,
+        -1.17,
+        -1.07,
+        -1.04,
+        -1.02,
+        -0.98,
+        -0.97,
+        -0.91,
+        -0.89,
+        -0.83,
+        -0.77,
+        -0.77,
+        -0.73,
+        -0.67,
+        -0.63,
+        -0.61,
+        -0.61,
+        -0.56,
+        -0.54,
+        -0.52,
+        -0.51,
+        -0.51,
+        -0.48,
+        -0.38,
+        -0.37,
+        -0.27,
+        -0.26,
+        -0.23,
+        -0.22,
+        -0.12,
+        -0.07,
+        -0.03,
+        -0.01,
+        0.11,
+        0.22,
+        0.39,
+        0.73,
+        0.81,
+        0.82,
+        0.95,
+        1.24,
+        1.33,
+        1.73,
+        1.75,
+        1.9
+       ],
+       "ys": [
+        0.017,
+        0.02,
+        0.023,
+        0.026,
+        0.108,
+        0.149,
+        0.154,
+        0.158,
+        0.172,
+        0.177,
+        0.201,
+        0.209,
+        0.234,
+        0.236,
+        0.237,
+        0.255,
+        0.26,
+        0.265,
+        0.273,
+        0.275,
+        0.288,
+        0.291,
+        0.304,
+        0.316,
+        0.317,
+        0.326,
+        0.338,
+        0.347,
+        0.351,
+        0.352,
+        0.364,
+        0.368,
+        0.373,
+        0.374,
+        0.375,
+        0.383,
+        0.407,
+        0.407,
+        0.432,
+        0.436,
+        0.443,
+        0.445,
+        0.47,
+        0.482,
+        0.492,
+        0.498,
+        0.527,
+        0.554,
+        0.596,
+        0.676,
+        0.692,
+        0.695,
+        0.722,
+        0.775,
+        0.791,
+        0.849,
+        0.853,
+        0.87
+       ],
+       "color": "#94A3B8",
+       "linea": false,
+       "marcadores": 9
+      },
+      {
+       "xs": [
+        -2.23,
+        -1.65,
+        -0.73,
+        -0.63,
+        -0.53,
+        -0.47,
+        -0.42,
+        0.66,
+        0.71,
+        0.84,
+        0.85,
+        1.87
+       ],
+       "ys": [
+        0.097,
+        0.161,
+        0.324,
+        0.348,
+        0.371,
+        0.384,
+        0.396,
+        0.659,
+        0.67,
+        0.698,
+        0.7,
+        0.867
+       ],
+       "color": "ambar",
+       "linea": false,
+       "marcadores": 9
+      }
+     ],
+     "xticks": [
+      -4,
+      -2,
+      0,
+      2,
+      4
+     ],
+     "yticks": [
+      0,
+      0.5,
+      1
+     ],
+     "yfmt": "{:g}",
+     "xlabel": "puntaje z (logit)",
+     "id": "sg2",
+     "entrada": "fade",
+     "t": 0.2,
+     "dur": 0.7
+    },
+    {
+     "tipo": "texto",
+     "texto": "probabilidad de cancelar",
+     "x": 240,
+     "y": 150,
+     "tam": 34,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "lm",
+     "id": "e121",
+     "entrada": "pop",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "se quedaron",
+     "x": 1620,
+     "y": 360,
+     "tam": 38,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "fondo_txt": "linea",
+     "id": "e122",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "cancelaron",
+     "x": 1620,
+     "y": 460,
+     "tam": 38,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e123",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "Con umbral cero coma cinco, el modelo marca a sesenta y seis clientes como «cancela». [[a]]Detecta a la mitad, el cincuenta y dos por ciento. [[b]]Pero solo cuatro de cada diez alertas son aciertos: precisión treinta y nueve.",
+   "acciones": [
+    {
+     "tipo": "linea",
+     "x0": 760.0,
+     "y0": 200,
+     "x1": 760.0,
+     "y1": 820,
+     "color": "tinta",
+     "grosor": 5,
+     "punta": false,
+     "guion": true,
+     "id": "um",
+     "entrada": "ninguna",
+     "t": 0.2,
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "umbral 0.5",
+     "x": 1620,
+     "y": 600,
+     "tam": 40,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "ut",
+     "entrada": "pop",
+     "t": 0.2
+    },
+    {
+     "tipo": "numero",
+     "valor": 66,
+     "fmt": "{:.0f}",
+     "sufijo": " alertas",
+     "prefijo": "",
+     "x": 1620,
+     "y": 700,
+     "tam": 90,
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "nal",
+     "entrada": "fade",
+     "t": 0.3,
+     "dur": 0.8,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "recall 52 %",
+     "x": 1620,
+     "y": 820,
+     "tam": 40,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "pr1",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "precisión 39 %",
+     "x": 1620,
+     "y": 910,
+     "tam": 40,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "pr2",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "Si bajas el umbral a cero coma tres, el modelo avisa más seguido. [[a]]Detecta al ochenta y dos por ciento, [[b]]pero la mayoría de las alertas son falsas: precisión veintisiete por ciento.",
+   "acciones": [
+    {
+     "x0": 686.5675187664424,
+     "x1": 686.5675187664424,
+     "id": "um",
+     "dur": 1.0
+    },
+    {
+     "valor": 153,
+     "id": "nal",
+     "dur": 0.9
+    },
+    {
+     "texto": "umbral 0.3",
+     "id": "ut"
+    },
+    {
+     "texto": "recall 82 %",
+     "id": "pr1",
+     "en": "a"
+    },
+    {
+     "texto": "precisión 27 %",
+     "id": "pr2",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "Y si lo subes a cero coma siete, el modelo avisa poco. [[a]]La precisión sube a cincuenta por ciento, [[b]]pero el recall cae a veinte. Se escapan cuatro de cada cinco.",
+   "acciones": [
+    {
+     "x0": 833.4324812335576,
+     "x1": 833.4324812335576,
+     "id": "um",
+     "dur": 1.0
+    },
+    {
+     "valor": 20,
+     "id": "nal",
+     "dur": 0.9
+    },
+    {
+     "texto": "umbral 0.7",
+     "id": "ut"
+    },
+    {
+     "texto": "precisión 50 %",
+     "id": "pr2",
+     "en": "a"
+    },
+    {
+     "texto": "recall 20 %",
+     "id": "pr1",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "Fíjate: el umbral no cambia el modelo. [[a]]Cambia dónde pones el corte. Y dónde cortar depende de cuánto cuesta cada error.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "sube el umbral: más precisión, menos recall",
+     "x": 960,
+     "y": 960,
+     "tam": 40,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "ancho_max": 1400,
+     "id": "e124",
+     "entrada": "pop",
+     "en": "a"
+    }
+   ]
+  },
+  {
+   "say": "Piensa un segundo: si perder un cliente cuesta mucho más que molestar con una oferta de más, [[a]]¿subirías o bajarías el umbral?",
+   "pausa": 0.6,
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "perder un cliente  >>  molestar con una oferta",
+     "x": 960,
+     "y": 400,
+     "tam": 60,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e125",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "¿umbral más alto o más bajo?",
+     "x": 960,
+     "y": 600,
+     "tam": 72,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e126",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.5
+    }
+   ]
+  },
+  {
+   "say": "Lo bajarías. [[a]]Prefieres algunas falsas alarmas antes que dejar escapar clientes. Ganas recall, y aceptas menos precisión.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "bajar el umbral",
+     "x": 960,
+     "y": 400,
+     "tam": 76,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "fondo_txt": "verdeclaro",
+     "id": "e127",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "texto",
+     "texto": "↑ recall    ↓ precisión",
+     "x": 960,
+     "y": 620,
+     "tam": 64,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e128",
+     "entrada": "pop",
+     "en": "a"
+    }
+   ]
+  },
+  {
+   "seccion": "7. Resultado, error típico y para llevar",
+   "say": "Resumamos el resultado, con el umbral de cero coma cinco. [[a]]Accuracy, setenta y tres coma tres por ciento. [[b]]Precisión, treinta y nueve coma cuatro. [[c]]Recall, cincuenta y dos. [[d]]Y F1, cuarenta y cuatro coma ocho.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x": 260,
+     "y": 480,
+     "w": 380,
+     "h": 290,
+     "radio": 28,
+     "relleno": "blanco",
+     "borde": "violeta",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e129",
+     "entrada": "subir",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "accuracy",
+     "x": 260,
+     "y": 380,
+     "tam": 40,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e130",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "numero",
+     "valor": 73.3,
+     "fmt": "{:.1f}",
+     "sufijo": " %",
+     "prefijo": "",
+     "x": 260,
+     "y": 520,
+     "tam": 90,
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e131",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.2,
+     "dur": 0.9,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "caja",
+     "x": 740,
+     "y": 480,
+     "w": 380,
+     "h": 290,
+     "radio": 28,
+     "relleno": "blanco",
+     "borde": "azul",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e132",
+     "entrada": "subir",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "precisión",
+     "x": 740,
+     "y": 380,
+     "tam": 40,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e133",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.1
+    },
+    {
+     "tipo": "numero",
+     "valor": 39.4,
+     "fmt": "{:.1f}",
+     "sufijo": " %",
+     "prefijo": "",
+     "x": 740,
+     "y": 520,
+     "tam": 90,
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e134",
+     "entrada": "fade",
+     "en": "b",
+     "t": 0.2,
+     "dur": 0.9,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "caja",
+     "x": 1220,
+     "y": 480,
+     "w": 380,
+     "h": 290,
+     "radio": 28,
+     "relleno": "blanco",
+     "borde": "ambar",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e135",
+     "entrada": "subir",
+     "en": "c"
+    },
+    {
+     "tipo": "texto",
+     "texto": "recall",
+     "x": 1220,
+     "y": 380,
+     "tam": 40,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e136",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.1
+    },
+    {
+     "tipo": "numero",
+     "valor": 52.0,
+     "fmt": "{:.1f}",
+     "sufijo": " %",
+     "prefijo": "",
+     "x": 1220,
+     "y": 520,
+     "tam": 90,
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e137",
+     "entrada": "fade",
+     "en": "c",
+     "t": 0.2,
+     "dur": 0.9,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "caja",
+     "x": 1700,
+     "y": 480,
+     "w": 380,
+     "h": 290,
+     "radio": 28,
+     "relleno": "blanco",
+     "borde": "verde",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e138",
+     "entrada": "subir",
+     "en": "d"
+    },
+    {
+     "tipo": "texto",
+     "texto": "F1",
+     "x": 1700,
+     "y": 380,
+     "tam": 40,
+     "peso": "b",
+     "color": "verde",
+     "ancla": "mm",
+     "id": "e139",
+     "entrada": "pop",
+     "en": "d",
+     "t": 0.1
+    },
+    {
+     "tipo": "numero",
+     "valor": 44.8,
+     "fmt": "{:.1f}",
+     "sufijo": " %",
+     "prefijo": "",
+     "x": 1700,
+     "y": 520,
+     "tam": 90,
+     "color": "verde",
+     "ancla": "mm",
+     "id": "e140",
+     "entrada": "fade",
+     "en": "d",
+     "t": 0.2,
+     "dur": 0.9,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    }
+   ]
+  },
+  {
+   "say": "Y el área bajo la curva, el A U C, es cero coma seiscientos ochenta y cinco. [[a]]Un modelo al azar da cero coma cinco. [[b]]Así que es un modelo modesto: mejor que el azar, pero lejos de excelente.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "AUC",
+     "x": 960,
+     "y": 330,
+     "tam": 60,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e141",
+     "entrada": "pop"
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.685,
+     "fmt": "{:.3f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 960,
+     "y": 470,
+     "tam": 190,
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e142",
+     "entrada": "fade",
+     "t": 0.2,
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "azar = 0.5",
+     "x": 560,
+     "y": 760,
+     "tam": 48,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "fondo_txt": "linea",
+     "id": "e143",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "este modelo = 0.685",
+     "x": 1360,
+     "y": 760,
+     "tam": 48,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e144",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "modesto: ni moneda ni excelente",
+     "x": 960,
+     "y": 900,
+     "tam": 46,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e145",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.6
+    }
+   ]
+  },
+  {
+   "say": "Este es el error típico. En clase se dijo que una precisión de cincuenta y uno por ciento es como lanzar una moneda. [[a]]Pero la moneda no es el cincuenta por ciento. [[b]]Un clasificador al azar tiene una precisión igual a la prevalencia, que aquí es veinte coma ocho por ciento. [[c]]Y este logra treinta y nueve.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "«es como lanzar una moneda»",
+     "x": 960,
+     "y": 280,
+     "tam": 54,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e146",
+     "entrada": "subir",
+     "t": 0.2
+    },
+    {
+     "tipo": "marca",
+     "x": 1560,
+     "y": 280,
+     "tam": 80,
+     "forma": "cruz",
+     "color": "rojo",
+     "id": "e147",
+     "entrada": "ninguna",
+     "en": "a",
+     "dur": 0.5,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "caja",
+     "x": 560,
+     "y": 620,
+     "w": 640,
+     "h": 340,
+     "radio": 30,
+     "relleno": "blanco",
+     "borde": "gris",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e148",
+     "entrada": "subir",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "al azar",
+     "x": 560,
+     "y": 500,
+     "tam": 46,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e149",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.1
+    },
+    {
+     "tipo": "numero",
+     "valor": 20.8,
+     "fmt": "{:.1f}",
+     "sufijo": " %",
+     "prefijo": "",
+     "x": 560,
+     "y": 630,
+     "tam": 110,
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e150",
+     "entrada": "fade",
+     "en": "b",
+     "t": 0.2,
+     "dur": 0.9,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "caja",
+     "x": 1360,
+     "y": 620,
+     "w": 640,
+     "h": 340,
+     "radio": 30,
+     "relleno": "blanco",
+     "borde": "azul",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e151",
+     "entrada": "subir",
+     "en": "c"
+    },
+    {
+     "tipo": "texto",
+     "texto": "este modelo",
+     "x": 1360,
+     "y": 500,
+     "tam": 46,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e152",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.1
+    },
+    {
+     "tipo": "numero",
+     "valor": 39.4,
+     "fmt": "{:.1f}",
+     "sufijo": " %",
+     "prefijo": "",
+     "x": 1360,
+     "y": 630,
+     "tam": 110,
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e153",
+     "entrada": "fade",
+     "en": "c",
+     "t": 0.2,
+     "dur": 0.9,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    }
+   ]
+  },
+  {
+   "say": "Y un detalle de la frontera: con solo dos variables, [[a]]antigüedad y quejas, la frontera de decisión es una recta, [[b]]porque el puntaje es una suma lineal.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 520,
+     "w": 900,
+     "h": 540,
+     "radio": 24,
+     "relleno": "blanco",
+     "borde": "grisclaro",
+     "grosor": 5,
+     "id": "e154",
+     "entrada": "subir",
+     "t": 0.2
+    },
+    {
+     "tipo": "puntos",
+     "grupos": [
+      {
+       "n": 40,
+       "rect": [
+        560,
+        330,
+        920,
+        640
+       ],
+       "color": "#94A3B8"
+      },
+      {
+       "n": 14,
+       "rect": [
+        1040,
+        330,
+        1300,
+        640
+       ],
+       "color": "rojo"
+      }
+     ],
+     "radio": 9,
+     "id": "pf",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "linea",
+     "x0": 1000,
+     "y0": 290,
+     "x1": 965,
+     "y1": 760,
+     "color": "violeta",
+     "grosor": 8,
+     "punta": false,
+     "guion": false,
+     "id": "e155",
+     "entrada": "ninguna",
+     "en": "b",
+     "dur": 0.7,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "antigüedad  →",
+     "x": 960,
+     "y": 790,
+     "tam": 34,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e156",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "frontera: una recta",
+     "x": 1500,
+     "y": 520,
+     "tam": 44,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "ancho_max": 400,
+     "id": "e157",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "say": "Para llevarte: [[a]]la logística calcula un puntaje, la sigmoide lo vuelve probabilidad, y el umbral decide. [[b]]Balanced gana recall y pierde precisión. [[c]]Y el umbral se elige según el costo de cada error.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "puntaje  →  probabilidad  →  decisión",
+     "x": 960,
+     "y": 330,
+     "tam": 54,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e158",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "balanced: ↑ recall, ↓ precisión",
+     "x": 960,
+     "y": 540,
+     "tam": 54,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e159",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "el umbral lo decide el costo del error",
+     "x": 960,
+     "y": 750,
+     "tam": 54,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e160",
+     "entrada": "pop",
+     "en": "c"
+    }
+   ]
+  },
+  {
+   "seccion": "8. Siguiente parada",
+   "say": "Vamos con la tercera parada: [[a]]la regresión, para predecir un número.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 480,
+     "w": 620,
+     "h": 260,
+     "radio": 40,
+     "relleno": "azulclaro",
+     "borde": "azul",
+     "grosor": 6,
+     "id": "p1",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "3",
+     "x": 720,
+     "y": 480,
+     "tam": 120,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e161",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "Regresión: predecir un número",
+     "x": 1040,
+     "y": 480,
+     "tam": 44,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "ancho_max": 420,
+     "id": "e162",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.15
+    }
+   ]
+  }
+ ]
+}

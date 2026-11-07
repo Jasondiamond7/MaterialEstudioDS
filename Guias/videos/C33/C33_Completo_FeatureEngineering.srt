@@ -1,0 +1,3715 @@
+1
+00:00:00,250 --> 00:00:00,710
+Hola.
+
+2
+00:00:00,830 --> 00:00:03,704
+Bienvenido a la serie de videos de la clase treinta
+
+3
+00:00:03,704 --> 00:00:06,070
+y tres, con el profesor Eduardo Rodríguez.
+
+4
+00:00:06,190 --> 00:00:08,882
+Hoy vas a aprender a decidir con qué variables se
+
+5
+00:00:08,882 --> 00:00:11,410
+queda tu modelo, y a hacerlo sin hacer trampa.
+
+6
+00:00:11,530 --> 00:00:13,790
+Imagina que eres entrenador de fútbol.
+
+7
+00:00:13,910 --> 00:00:18,180
+Tienes cincuenta jugadores convocados, pero solo once entran a la cancha.
+
+8
+00:00:18,300 --> 00:00:21,124
+Si eliges a los once que mejor juegan solos, puedes
+
+9
+00:00:21,124 --> 00:00:23,450
+terminar con cuatro arqueros en el equipo.
+
+10
+00:00:23,570 --> 00:00:26,190
+Cada jugador es bueno, pero el equipo es malo.
+
+11
+00:00:26,310 --> 00:00:29,650
+Elegir variables para un modelo es exactamente lo mismo.
+
+12
+00:00:29,770 --> 00:00:33,290
+No buscas las mejores de a una: buscas el mejor conjunto.
+
+13
+00:00:33,410 --> 00:00:37,070
+La gran idea de hoy: más variables no es un mejor modelo.
+
+14
+00:00:37,190 --> 00:00:40,946
+El trabajo real, que según el profesor es el setenta a ochenta por
+
+15
+00:00:40,946 --> 00:00:44,817
+ciento de un proyecto, es limpiar con criterio de negocio, construir
+
+16
+00:00:44,817 --> 00:00:47,890
+variables con sentido, y seleccionar sin hacer trampa.
+
+17
+00:00:48,010 --> 00:00:49,990
+Y la trampa más común es invisible.
+
+18
+00:00:50,110 --> 00:00:53,344
+Si una selección mira el target fuera de la validación
+
+19
+00:00:53,344 --> 00:00:55,860
+cruzada, el AUC que reportas es inventado.
+
+20
+00:00:55,980 --> 00:00:57,160
+¿De dónde venimos?
+
+21
+00:00:57,280 --> 00:01:00,390
+La clase treinta preguntó si los datos eran confiables.
+
+22
+00:01:00,510 --> 00:01:03,110
+La treinta y uno, cómo aprende un modelo.
+
+23
+00:01:03,230 --> 00:01:06,190
+La treinta y dos, en qué forma se los entregamos.
+
+24
+00:01:06,310 --> 00:01:09,800
+Y hoy, la treinta y tres pregunta: ¿con cuáles me quedo?
+
+25
+00:01:09,920 --> 00:01:12,920
+La clase treinta y dos dejó dos caminos abiertos.
+
+26
+00:01:13,040 --> 00:01:18,300
+Uno, extraer: combinar variables en componentes nuevos, como PCA.
+
+27
+00:01:18,420 --> 00:01:21,490
+El otro, seleccionar: quedarse con algunas de las
+
+28
+00:01:21,490 --> 00:01:24,310
+variables originales, que se pueden explicar.
+
+29
+00:01:24,430 --> 00:01:26,210
+Hoy tomamos el segundo camino.
+
+30
+00:01:26,330 --> 00:01:29,198
+Los datos son los mismos de las clases anteriores:
+
+31
+00:01:29,198 --> 00:01:31,550
+la base de fuga de clientes de una telco.
+
+32
+00:01:31,670 --> 00:01:36,232
+Tres mil ciento cincuenta clientes, doce variables predictoras, y cuatrocientos
+
+33
+00:01:36,232 --> 00:01:39,870
+noventa y cinco que se fueron: el quince coma siete por ciento.
+
+34
+00:01:39,990 --> 00:01:42,460
+Con tan poca fuga, ojo con la métrica.
+
+35
+00:01:42,580 --> 00:01:45,703
+Un modelo que dice «nadie se va» acierta el ochenta y
+
+36
+00:01:45,703 --> 00:01:48,650
+cuatro coma tres por ciento, y no sirve para nada.
+
+37
+00:01:48,770 --> 00:01:54,190
+Por eso toda la clase mide con AUC: cero coma cinco es azar, y uno es perfecto.
+
+38
+00:01:54,310 --> 00:01:56,200
+La ruta de hoy, en números.
+
+39
+00:01:56,320 --> 00:02:00,560
+Primero, limpiar: la base trae cuarenta y tres valores imposibles.
+
+40
+00:02:00,680 --> 00:02:05,450
+Después, construir: de doce columnas pasamos a cincuenta candidatas.
+
+41
+00:02:05,570 --> 00:02:07,320
+Y al final, seleccionar.
+
+42
+00:02:07,440 --> 00:02:09,660
+Y el final de la clase es una sorpresa.
+
+43
+00:02:09,780 --> 00:02:13,779
+Con cien clientes y mil variables de puro ruido, una selección mal
+
+44
+00:02:13,779 --> 00:02:16,870
+ubicada da AUC cero coma ochocientos ochenta y dos.
+
+45
+00:02:16,990 --> 00:02:18,770
+La verdad es cero coma cinco.
+
+46
+00:02:18,890 --> 00:02:20,810
+Treinta y ocho puntos inventados.
+
+47
+00:02:20,930 --> 00:02:25,470
+Antes de seguir, el primer error típico: confundir limpiar con seleccionar.
+
+48
+00:02:25,590 --> 00:02:28,850
+Si una variable trae una edad de doscientos treinta y
+
+49
+00:02:28,850 --> 00:02:31,740
+tres años, eso es calidad de datos, y va antes.
+
+50
+00:02:31,860 --> 00:02:34,518
+Si mezclas las dos cosas, terminas descartando
+
+51
+00:02:34,518 --> 00:02:37,060
+variables buenas solo porque estaban sucias.
+
+52
+00:02:37,180 --> 00:02:38,400
+Piensa un segundo.
+
+53
+00:02:38,520 --> 00:02:41,887
+Tienes cincuenta candidatas, y te quedas con las cuatro que
+
+54
+00:02:41,887 --> 00:02:44,570
+más información aportan, cada una por separado.
+
+55
+00:02:44,690 --> 00:02:46,550
+¿Es ese el mejor equipo de cuatro?
+
+56
+00:02:47,270 --> 00:02:47,690
+No.
+
+57
+00:02:47,810 --> 00:02:51,630
+Las cuatro mejores de a una dan AUC cero coma ochocientos cuatro.
+
+58
+00:02:51,750 --> 00:02:56,090
+Cuatro elegidas evitando redundancia dan cero coma ochocientos noventa y tres.
+
+59
+00:02:56,210 --> 00:02:59,560
+Igual que los cuatro arqueros: lo verás en el video siete.
+
+60
+00:02:59,680 --> 00:03:01,450
+Este es el mapa de la serie.
+
+61
+00:03:01,570 --> 00:03:04,410
+Después de esta introducción vienen nueve paradas.
+
+62
+00:03:04,530 --> 00:03:05,920
+Limpiar y construir.
+
+63
+00:03:06,040 --> 00:03:08,640
+Los tres motivos por los que una variable sobra.
+
+64
+00:03:08,760 --> 00:03:10,660
+Filtros, wrapper y embedded.
+
+65
+00:03:10,780 --> 00:03:13,400
+Y al final, la trampa, y el repaso.
+
+66
+00:03:13,520 --> 00:03:16,259
+Para llevarte de esta introducción: se busca el
+
+67
+00:03:16,259 --> 00:03:18,590
+mejor conjunto, no las mejores de a una.
+
+68
+00:03:18,710 --> 00:03:22,870
+Primero se limpia, después se construye, y recién ahí se selecciona.
+
+69
+00:03:22,990 --> 00:03:26,010
+Y todo lo que mira el target va dentro de la validación.
+
+70
+00:03:26,130 --> 00:03:29,630
+Vamos con la primera parada: limpiar con criterio de negocio.
+
+71
+00:03:30,530 --> 00:03:33,450
+Primera parada: limpiar con criterio de negocio.
+
+72
+00:03:33,570 --> 00:03:37,170
+Antes de elegir variables, tienes que poder confiar en ellas.
+
+73
+00:03:37,290 --> 00:03:39,330
+Imagina un termómetro de horno.
+
+74
+00:03:39,450 --> 00:03:42,685
+Marca ciento ochenta, ciento ochenta y dos, ciento
+
+75
+00:03:42,685 --> 00:03:46,050
+setenta y nueve, y de pronto, menos cuarenta grados.
+
+76
+00:03:46,170 --> 00:03:48,990
+El horno no se congeló: el termómetro falló.
+
+77
+00:03:49,110 --> 00:03:52,755
+Si promedias esa lectura, la media cae a ciento veinticinco
+
+78
+00:03:52,755 --> 00:03:55,720
+coma veinticinco grados, y tu receta sale cruda.
+
+79
+00:03:55,840 --> 00:04:01,130
+La mediana, en cambio, queda en ciento setenta y nueve coma cinco: casi no se mueve.
+
+80
+00:04:01,250 --> 00:04:02,900
+Con los datos pasa lo mismo.
+
+81
+00:04:03,020 --> 00:04:06,354
+Si una variable tiene registros corruptos, su media, su
+
+82
+00:04:06,354 --> 00:04:09,870
+varianza y su correlación con la fuga quedan contaminadas.
+
+83
+00:04:09,990 --> 00:04:13,270
+Y cualquier ranking que construyas sobre ella va a estar mal.
+
+84
+00:04:13,390 --> 00:04:17,540
+El primer diagnóstico es describe: mínimos y máximos de cada columna.
+
+85
+00:04:17,660 --> 00:04:21,620
+Segundos tiene un mínimo de menos catorce mil seiscientos cuarenta y cinco.
+
+86
+00:04:21,740 --> 00:04:24,960
+Frecuencia de llamadas, menos ciento setenta y seis.
+
+87
+00:04:25,080 --> 00:04:29,460
+Antigüedad, menos cuarenta meses, y los mensajes, menos nueve.
+
+88
+00:04:29,580 --> 00:04:31,600
+Una llamada negativa no existe.
+
+89
+00:04:31,720 --> 00:04:32,550
+¿Cuántas son?
+
+90
+00:04:32,670 --> 00:04:37,159
+Dieciocho en segundos, doce en llamadas, nueve en antigüedad, una en
+
+91
+00:04:37,159 --> 00:04:40,790
+mensajes, y tres edades: una negativa y dos sobre cien.
+
+92
+00:04:40,910 --> 00:04:43,880
+En total, cuarenta y tres valores imposibles.
+
+93
+00:04:44,000 --> 00:04:45,320
+Y hay más que revisar.
+
+94
+00:04:45,440 --> 00:04:50,090
+Ochenta y tres nulos repartidos en seis columnas: cuarenta solo en segundos.
+
+95
+00:04:50,210 --> 00:04:52,240
+Y diecinueve filas duplicadas.
+
+96
+00:04:52,360 --> 00:04:54,970
+Todo eso se mira antes de pensar en seleccionar.
+
+97
+00:04:55,090 --> 00:04:56,440
+Ahora, la edad.
+
+98
+00:04:56,560 --> 00:05:00,760
+La regla de la clase es: edad válida entre quince y cien años.
+
+99
+00:05:00,880 --> 00:05:02,870
+Ese umbral no sale de los datos.
+
+100
+00:05:02,990 --> 00:05:05,379
+Sale de saber que una telco no contrata a un
+
+101
+00:05:05,379 --> 00:05:07,660
+cliente de doscientos treinta y tres años.
+
+102
+00:05:07,780 --> 00:05:09,100
+Pero mira el desglose.
+
+103
+00:05:09,220 --> 00:05:14,120
+Los casos claramente imposibles son solo tres: una edad negativa y dos sobre cien.
+
+104
+00:05:14,240 --> 00:05:18,085
+El rango, en cambio, deja fuera a ciento ocho clientes de cero a
+
+105
+00:05:18,085 --> 00:05:21,630
+catorce años: el tres coma cuatro por ciento de la cartera.
+
+106
+00:05:21,750 --> 00:05:25,360
+¿Son errores de carga, o planes contratados a nombre de un menor?
+
+107
+00:05:25,480 --> 00:05:26,780
+El dato no lo dice.
+
+108
+00:05:26,900 --> 00:05:30,500
+Esta decisión no se resuelve con estadística: se le pregunta al
+
+109
+00:05:30,500 --> 00:05:33,300
+dueño del proceso, y mientras tanto se documenta.
+
+110
+00:05:33,420 --> 00:05:35,470
+¿Y qué haces con un valor imposible?
+
+111
+00:05:35,590 --> 00:05:40,350
+Lo marcas como NaN: no sabes el valor real, y poner un cero sería inventar.
+
+112
+00:05:40,470 --> 00:05:41,850
+Después lo imputas.
+
+113
+00:05:41,970 --> 00:05:46,940
+Y lo más importante, la advertencia que más repite el profesor: no borres la fila.
+
+114
+00:05:47,060 --> 00:05:49,846
+Si el problema está en una sola columna, borrar la
+
+115
+00:05:49,846 --> 00:05:52,410
+fila elimina la información de las otras once.
+
+116
+00:05:52,530 --> 00:05:54,300
+Hagamos un ejemplo del apunte.
+
+117
+00:05:54,420 --> 00:06:00,022
+Cinco clientes con sus segundos: tres mil, tres mil doscientos, dos mil novecientos, tres
+
+118
+00:06:00,022 --> 00:06:04,680
+mil cien, y uno imposible: menos catorce mil seiscientos cuarenta y cinco.
+
+119
+00:06:04,800 --> 00:06:07,620
+Paso uno, la media con el error incluido.
+
+120
+00:06:07,740 --> 00:06:10,330
+Los cuatro buenos suman doce mil doscientos.
+
+121
+00:06:10,450 --> 00:06:13,182
+Menos catorce mil seiscientos cuarenta y cinco, da
+
+122
+00:06:13,182 --> 00:06:15,640
+menos dos mil cuatrocientos cuarenta y cinco.
+
+123
+00:06:15,760 --> 00:06:19,620
+Dividido en cinco: menos cuatrocientos ochenta y nueve segundos.
+
+124
+00:06:19,740 --> 00:06:21,110
+Una media negativa.
+
+125
+00:06:21,230 --> 00:06:24,060
+Paso dos, la mediana con el error incluido.
+
+126
+00:06:24,180 --> 00:06:28,590
+Ordenamos: el imposible queda al principio, y el del medio es tres mil.
+
+127
+00:06:28,710 --> 00:06:29,810
+Casi no se movió.
+
+128
+00:06:29,930 --> 00:06:32,555
+Paso tres: marcamos el imposible como NaN, y
+
+129
+00:06:32,555 --> 00:06:35,360
+calculamos la mediana de los cuatro que quedan.
+
+130
+00:06:35,480 --> 00:06:39,700
+Tres mil más tres mil cien, dividido en dos: tres mil cincuenta.
+
+131
+00:06:39,820 --> 00:06:41,600
+Con ese valor se imputa el NaN.
+
+132
+00:06:41,720 --> 00:06:44,660
+En la base real pasa lo mismo, a otra escala.
+
+133
+00:06:44,780 --> 00:06:47,757
+Con los negativos y los nulos marcados, la mediana de
+
+134
+00:06:47,757 --> 00:06:50,340
+segundos es tres mil treinta y uno coma cinco.
+
+135
+00:06:50,460 --> 00:06:53,850
+Ese es el valor que reciben los cincuenta y ocho casos marcados.
+
+136
+00:06:53,970 --> 00:06:57,430
+Y así se ve en código, como en la diapositiva de la clase.
+
+137
+00:06:57,550 --> 00:06:59,610
+Primero, los negativos a NaN.
+
+138
+00:06:59,730 --> 00:07:02,970
+Después, la edad fuera de rango, también a NaN.
+
+139
+00:07:03,090 --> 00:07:06,120
+Y al final, imputar cada columna con su mediana.
+
+140
+00:07:06,240 --> 00:07:09,136
+El error típico: ver un valor raro y borrarlo, o
+
+141
+00:07:09,136 --> 00:07:11,670
+reemplazarlo sin preguntar de dónde viene.
+
+142
+00:07:11,790 --> 00:07:14,847
+El profesor lo ilustró con una anécdota: un pájaro
+
+143
+00:07:14,847 --> 00:07:17,720
+posado sobre un sensor genera un outlier falso.
+
+144
+00:07:17,840 --> 00:07:23,040
+Un fraude, en cambio, genera un outlier real, y es justo lo que quieres detectar.
+
+145
+00:07:23,160 --> 00:07:25,593
+Por eso la pregunta antes de tocar un valor es
+
+146
+00:07:25,593 --> 00:07:27,920
+siempre la misma: ¿de dónde viene este dato?
+
+147
+00:07:28,040 --> 00:07:29,260
+Piensa un segundo.
+
+148
+00:07:29,380 --> 00:07:32,240
+Un cliente tiene antigüedad menos cuarenta meses.
+
+149
+00:07:32,360 --> 00:07:35,480
+¿Lo pones en cero, borras la fila, o qué haces?
+
+150
+00:07:36,200 --> 00:07:37,390
+Ni cero ni borrar.
+
+151
+00:07:37,510 --> 00:07:40,182
+Lo marcas como NaN y lo imputas con la mediana,
+
+152
+00:07:40,182 --> 00:07:42,570
+que en esta base es treinta y cinco meses.
+
+153
+00:07:42,690 --> 00:07:46,790
+Un detalle para más adelante: la mediana usa todo el conjunto, así que
+
+154
+00:07:46,790 --> 00:07:50,070
+en el modelo final la imputación va dentro de cada fold.
+
+155
+00:07:50,190 --> 00:07:51,780
+Lo vemos en el video nueve.
+
+156
+00:07:51,900 --> 00:07:55,000
+Para llevarte: la limpieza va antes de la selección.
+
+157
+00:07:55,120 --> 00:07:58,140
+El umbral lo pone el negocio, no la estadística.
+
+158
+00:07:58,260 --> 00:08:02,290
+Imposible pasa a NaN y se imputa con la mediana, sin borrar la fila.
+
+159
+00:08:02,410 --> 00:08:06,420
+Siguiente parada: construir variables, de doce a cincuenta.
+
+160
+00:08:07,290 --> 00:08:09,980
+Segunda parada: construir variables.
+
+161
+00:08:10,100 --> 00:08:14,960
+Con doce columnas no hay nada que seleccionar: primero hay que fabricar candidatas.
+
+162
+00:08:15,080 --> 00:08:16,920
+Mira a estos dos clientes.
+
+163
+00:08:17,040 --> 00:08:19,140
+Los dos hicieron sesenta llamadas.
+
+164
+00:08:19,260 --> 00:08:23,310
+Pero uno lleva veinte meses con la empresa, y el otro, solo dos.
+
+165
+00:08:23,430 --> 00:08:24,460
+¿Son iguales?
+
+166
+00:08:24,580 --> 00:08:25,000
+No.
+
+167
+00:08:25,120 --> 00:08:28,840
+Sesenta entre veinte: el cliente A llama tres veces al mes.
+
+168
+00:08:28,960 --> 00:08:32,820
+Sesenta entre dos: el cliente B llama treinta veces al mes.
+
+169
+00:08:32,940 --> 00:08:36,810
+Lo que distingue a estos clientes no es la variable cruda: es el ratio.
+
+170
+00:08:36,930 --> 00:08:39,900
+Un ratio normaliza una magnitud por su exposición.
+
+171
+00:08:40,020 --> 00:08:44,780
+Llamadas por mes, valor del cliente por mes de antigüedad, segundos por llamada.
+
+172
+00:08:44,900 --> 00:08:48,047
+En la experiencia del profesor, los ratios son algo bien
+
+173
+00:08:48,047 --> 00:08:50,800
+potente: discriminan mejor que la variable cruda.
+
+174
+00:08:50,920 --> 00:08:52,090
+¿Por qué construir?
+
+175
+00:08:52,210 --> 00:08:55,680
+Porque seleccionar entre doce variables es un ejercicio de juguete.
+
+176
+00:08:55,800 --> 00:08:59,336
+El problema real aparece con cincuenta, doscientas o dos mil
+
+177
+00:08:59,336 --> 00:09:02,400
+candidatas, cuando hay que justificar cada descarte.
+
+178
+00:09:02,520 --> 00:09:06,520
+Hoy aplicamos la misma lógica de la clase treinta y dos, pero en serio.
+
+179
+00:09:06,640 --> 00:09:09,170
+Se conservan diez variables originales.
+
+180
+00:09:09,290 --> 00:09:12,993
+Se agregan trece ratios y tres interacciones, efectos que solo
+
+181
+00:09:12,993 --> 00:09:15,860
+existen combinados, como reclamo por antigüedad.
+
+182
+00:09:15,980 --> 00:09:19,150
+Cinco logaritmos, para aplastar colas largas.
+
+183
+00:09:19,270 --> 00:09:23,140
+Cinco indicadores binarios, como tiene reclamo o cliente nuevo.
+
+184
+00:09:23,260 --> 00:09:27,480
+Doce columnas de cuartiles, de edad, antigüedad y valor del cliente.
+
+185
+00:09:27,600 --> 00:09:30,550
+Y dos one-hot: plan dos y estado dos.
+
+186
+00:09:30,670 --> 00:09:37,380
+Sumemos: diez, más trece, más tres, más cinco, más cinco, más doce, más dos.
+
+187
+00:09:37,500 --> 00:09:39,080
+Cincuenta candidatas.
+
+188
+00:09:39,200 --> 00:09:41,680
+¿Y por qué diez originales, y no doce?
+
+189
+00:09:41,800 --> 00:09:44,582
+Porque tipo de plan y estado se reemplazan por
+
+190
+00:09:44,582 --> 00:09:46,940
+sus indicadores, plan dos y estado dos.
+
+191
+00:09:47,060 --> 00:09:48,690
+Las dos originales se van.
+
+192
+00:09:48,810 --> 00:09:51,590
+Por eso quedan cincuenta, y no cincuenta y dos.
+
+193
+00:09:51,710 --> 00:09:54,900
+Ahora, un detalle técnico que salva pipelines.
+
+194
+00:09:55,020 --> 00:09:57,549
+Todo ratio se calcula con un épsilon en el
+
+195
+00:09:57,549 --> 00:10:00,440
+denominador: x dividido en y más un millonésimo.
+
+196
+00:10:00,560 --> 00:10:01,850
+Tres casos del apunte.
+
+197
+00:10:01,970 --> 00:10:05,620
+Veinte meses y sesenta llamadas: tres llamadas por mes.
+
+198
+00:10:05,740 --> 00:10:08,043
+Sesenta llamadas y cuatro mil quinientos
+
+199
+00:10:08,043 --> 00:10:10,750
+segundos: setenta y cinco segundos por llamada.
+
+200
+00:10:10,870 --> 00:10:14,630
+Y un cliente nuevo, con cero meses: sesenta millones.
+
+201
+00:10:14,750 --> 00:10:18,060
+Sin el épsilon, esa tercera fila daría infinito.
+
+202
+00:10:18,180 --> 00:10:21,626
+Y un solo infinito rompe el escalado, el modelo, y todo
+
+203
+00:10:21,626 --> 00:10:24,320
+el pipeline de selección que viene después.
+
+204
+00:10:24,440 --> 00:10:27,740
+Ojo también con que el resultado es gigante: esos casos
+
+205
+00:10:27,740 --> 00:10:30,980
+conviene revisarlos, por ejemplo con un log o un tope.
+
+206
+00:10:31,100 --> 00:10:32,170
+¿Y en nuestra base?
+
+207
+00:10:32,290 --> 00:10:35,904
+Después de limpiar, ningún cliente tiene antigüedad cero, y el
+
+208
+00:10:35,904 --> 00:10:38,760
+máximo de llamadas por mes es veintidós coma uno.
+
+209
+00:10:38,880 --> 00:10:41,180
+Se verificó: cero infinitos.
+
+210
+00:10:41,300 --> 00:10:44,910
+Pero el código tiene que estar listo para el cliente nuevo que llegue mañana.
+
+211
+00:10:45,030 --> 00:10:47,650
+Las otras familias, con números de la base.
+
+212
+00:10:47,770 --> 00:10:52,873
+El log de uno más x aplasta las colas largas: el valor del cliente va de cero a dos mil
+
+213
+00:10:52,873 --> 00:10:57,330
+ciento sesenta y cinco, y su logaritmo, de cero a siete coma sesenta y ocho.
+
+214
+00:10:57,450 --> 00:11:01,800
+La mediana, doscientos veintiocho, queda en cinco coma cuarenta y cuatro.
+
+215
+00:11:01,920 --> 00:11:05,142
+Las binarias marcan una condición de negocio: tiene
+
+216
+00:11:05,142 --> 00:11:08,300
+reclamo, o cliente nuevo, con menos de doce meses.
+
+217
+00:11:08,420 --> 00:11:11,039
+Los cuartiles parten una variable en cuatro
+
+218
+00:11:11,039 --> 00:11:13,780
+tramos, para capturar relaciones no lineales.
+
+219
+00:11:13,900 --> 00:11:17,490
+Y las interacciones multiplican dos variables que actúan juntas.
+
+220
+00:11:17,610 --> 00:11:19,020
+En código se ve así.
+
+221
+00:11:19,140 --> 00:11:20,520
+Un ratio con épsilon.
+
+222
+00:11:20,640 --> 00:11:22,390
+El logaritmo con log uno pe.
+
+223
+00:11:22,510 --> 00:11:24,200
+Y los cuartiles con qcut.
+
+224
+00:11:24,320 --> 00:11:25,570
+¿Y sirvió construir?
+
+225
+00:11:25,690 --> 00:11:28,932
+Con las doce originales, la regresión logística llega
+
+226
+00:11:28,932 --> 00:11:31,440
+a un AUC de cero coma novecientos veinte.
+
+227
+00:11:31,560 --> 00:11:35,400
+Con las cincuenta candidatas, a cero coma novecientos cuarenta y uno.
+
+228
+00:11:35,520 --> 00:11:36,820
+Dos puntos más.
+
+229
+00:11:36,940 --> 00:11:41,280
+Pero aquí viene el error típico: creer que basta con crear variables.
+
+230
+00:11:41,400 --> 00:11:44,120
+Construir genera redundancia por construcción.
+
+231
+00:11:44,240 --> 00:11:48,028
+Tiene reclamo y reclamos tienen correlación uno: como reclamos ya
+
+232
+00:11:48,028 --> 00:11:51,350
+vale cero o uno, es la misma información con otro nombre.
+
+233
+00:11:51,470 --> 00:11:53,773
+Entre las cincuenta candidatas hay once pares
+
+234
+00:11:53,773 --> 00:11:55,820
+con correlación sobre cero coma noventa.
+
+235
+00:11:55,940 --> 00:11:59,990
+Crear variables sin seleccionar después no mejora el modelo: lo infla.
+
+236
+00:12:00,110 --> 00:12:04,030
+Por eso el siguiente paso de la clase es justamente decidir cuáles sobran.
+
+237
+00:12:04,150 --> 00:12:05,370
+Piensa un segundo.
+
+238
+00:12:05,490 --> 00:12:08,950
+Construir un ratio o un logaritmo, ¿mira la columna fuga?
+
+239
+00:12:09,070 --> 00:12:11,870
+¿Puede hacerse antes de separar entrenamiento y prueba?
+
+240
+00:12:12,590 --> 00:12:16,470
+No miran la fuga: son fórmulas fijas, fila por fila.
+
+241
+00:12:16,590 --> 00:12:18,310
+Por eso pueden ir antes del split.
+
+242
+00:12:18,430 --> 00:12:23,051
+Pero ojo con la ventana temporal: una variable construida con información posterior
+
+243
+00:12:23,051 --> 00:12:26,670
+al momento de predecir es leakage, aunque no use la columna fuga.
+
+244
+00:12:26,790 --> 00:12:31,410
+Para llevarte: los ratios normalizan por exposición, y siempre llevan épsilon.
+
+245
+00:12:31,530 --> 00:12:35,781
+Construir llevó la base de doce a cincuenta candidatas, y el AUC de cero
+
+246
+00:12:35,781 --> 00:12:39,500
+coma novecientos veinte a cero coma novecientos cuarenta y uno.
+
+247
+00:12:39,620 --> 00:12:43,000
+Pero también fabricó redundancia: ahora hay que seleccionar.
+
+248
+00:12:43,120 --> 00:12:45,920
+Siguiente parada: por qué una variable sobra.
+
+249
+00:12:46,040 --> 00:12:49,510
+Irrelevante, redundante, o útil solo en conjunto.
+
+250
+00:12:50,410 --> 00:12:53,137
+Tercera parada: los tres motivos por los que una
+
+251
+00:12:53,137 --> 00:12:55,580
+variable puede sobrar, o parecer que sobra.
+
+252
+00:12:55,700 --> 00:12:58,140
+Y cada uno pide una decisión distinta.
+
+253
+00:12:58,260 --> 00:13:00,050
+Piensa en una banda de música.
+
+254
+00:13:00,170 --> 00:13:03,240
+Un músico que no toca nada: sobra, se va.
+
+255
+00:13:03,360 --> 00:13:07,750
+Dos guitarristas tocando exactamente las mismas notas: con uno basta.
+
+256
+00:13:07,870 --> 00:13:10,510
+Y el bajista: solo, suena raro.
+
+257
+00:13:10,630 --> 00:13:12,720
+Pero con la banda, sostiene todo.
+
+258
+00:13:12,840 --> 00:13:14,640
+Con las variables pasa lo mismo.
+
+259
+00:13:14,760 --> 00:13:18,240
+Irrelevante: no aporta, ni sola ni acompañada.
+
+260
+00:13:18,360 --> 00:13:19,310
+Se descarta.
+
+261
+00:13:19,430 --> 00:13:22,200
+Redundante: repite la información de otra.
+
+262
+00:13:22,320 --> 00:13:23,530
+Se conserva una.
+
+263
+00:13:23,650 --> 00:13:28,320
+Y útil solo en conjunto: sola parece ruido, acompañada aporta.
+
+264
+00:13:28,440 --> 00:13:30,520
+Los filtros univariados la matan.
+
+265
+00:13:30,640 --> 00:13:34,730
+La herramienta básica es la correlación de cada variable original con la fuga.
+
+266
+00:13:34,850 --> 00:13:38,240
+Reclamos es la más fuerte, con cero coma cincuenta y uno.
+
+267
+00:13:38,360 --> 00:13:40,910
+Estado dos, cero coma treinta y dos.
+
+268
+00:13:41,030 --> 00:13:46,110
+Llamadas, segundos y valor del cliente, alrededor de menos cero coma veintinueve.
+
+269
+00:13:46,230 --> 00:13:50,669
+Y al final de la lista, tres quedan prácticamente en cero: antigüedad,
+
+270
+00:13:50,669 --> 00:13:54,600
+edad, y número de fallas, con menos cero coma cero cero nueve.
+
+271
+00:13:54,720 --> 00:13:56,000
+¿Son irrelevantes?
+
+272
+00:13:56,120 --> 00:13:58,900
+Antes de descartarlas, una segunda opinión.
+
+273
+00:13:59,020 --> 00:14:02,424
+Pearson solo mide relación lineal, así que miramos también la
+
+274
+00:14:02,424 --> 00:14:05,270
+información mutua, que capta cualquier dependencia.
+
+275
+00:14:05,390 --> 00:14:10,160
+Número de fallas: información mutua cero, y p-valor cero coma sesenta.
+
+276
+00:14:10,280 --> 00:14:13,310
+Edad: cero, y p-valor cero coma treinta.
+
+277
+00:14:13,430 --> 00:14:16,920
+Para un filtro univariado, número de fallas es ruido puro.
+
+278
+00:14:17,040 --> 00:14:21,130
+Correlación casi cero, información mutua cero, p-valor alto.
+
+279
+00:14:21,250 --> 00:14:22,800
+Cualquiera la descartaría.
+
+280
+00:14:22,920 --> 00:14:25,990
+Pero hagamos la prueba correcta: medirla acompañada.
+
+281
+00:14:26,110 --> 00:14:28,870
+La prueba de la clase usa regresión logística,
+
+282
+00:14:28,870 --> 00:14:31,150
+con validación cruzada de cinco folds.
+
+283
+00:14:31,270 --> 00:14:35,220
+Número de fallas sola: AUC cero coma cinco dos seis.
+
+284
+00:14:35,340 --> 00:14:36,610
+Prácticamente azar.
+
+285
+00:14:36,730 --> 00:14:40,035
+Ahora, una base de cinco variables: reclamos,
+
+286
+00:14:40,035 --> 00:14:43,780
+segundos, llamadas, estado dos y valor del cliente.
+
+287
+00:14:43,900 --> 00:14:46,180
+Da cero coma nueve cero seis nueve.
+
+288
+00:14:46,300 --> 00:14:50,750
+Le sumamos número de fallas: sube a cero coma nueve uno cero dos.
+
+289
+00:14:50,870 --> 00:14:54,070
+Y con monto, a cero coma nueve uno siete uno.
+
+290
+00:14:54,190 --> 00:14:56,460
+Inútil sola, útil acompañada.
+
+291
+00:14:56,580 --> 00:14:59,750
+Y no es un ejemplo de libro: está en nuestros datos.
+
+292
+00:14:59,870 --> 00:15:03,408
+En el video ocho vas a ver que el Lasso le da a número de fallas el
+
+293
+00:15:03,408 --> 00:15:06,470
+cuarto coeficiente más grande de las cincuenta candidatas.
+
+294
+00:15:06,590 --> 00:15:09,344
+La frase que hay que llevarse es esta: un p-valor
+
+295
+00:15:09,344 --> 00:15:11,760
+alto no significa que la variable no sirve.
+
+296
+00:15:11,880 --> 00:15:13,710
+Significa que no sirve sola.
+
+297
+00:15:13,830 --> 00:15:15,840
+Y aquí hay una alerta del material.
+
+298
+00:15:15,960 --> 00:15:18,638
+La diapositiva de los tres motivos pone a número de
+
+299
+00:15:18,638 --> 00:15:21,210
+fallas y a la edad como ejemplos de irrelevantes.
+
+300
+00:15:21,330 --> 00:15:26,220
+Dos diapositivas después, la misma clase demuestra que número de fallas no lo es.
+
+301
+00:15:26,340 --> 00:15:30,380
+Los apuntes lo dicen mejor: en esta base no hay una irrelevante clara.
+
+302
+00:15:30,500 --> 00:15:32,560
+El segundo motivo es la redundancia.
+
+303
+00:15:32,680 --> 00:15:36,350
+Para encontrarla, se mira la correlación entre las candidatas.
+
+304
+00:15:36,470 --> 00:15:39,285
+Pero la matriz es simétrica, y tiene unos en la
+
+305
+00:15:39,285 --> 00:15:41,740
+diagonal: dos de cada tres celdas sobran.
+
+306
+00:15:41,860 --> 00:15:44,130
+Con tres variables quedan tres pares.
+
+307
+00:15:44,250 --> 00:15:47,523
+Con cincuenta, quedan cincuenta por cuarenta y nueve,
+
+308
+00:15:47,523 --> 00:15:50,610
+dividido en dos: mil doscientos veinticinco pares.
+
+309
+00:15:50,730 --> 00:15:55,940
+En código es una sola línea: el triángulo superior con np.triu, y después stack.
+
+310
+00:15:56,060 --> 00:15:57,020
+¿Qué aparece?
+
+311
+00:15:57,140 --> 00:15:59,170
+Once pares sobre cero coma noventa.
+
+312
+00:15:59,290 --> 00:16:02,424
+Varios los fabricamos nosotros: valor alto y cuarto
+
+313
+00:16:02,424 --> 00:16:05,190
+cuartil del valor del cliente, uno coma cero.
+
+314
+00:16:05,310 --> 00:16:07,990
+Reclamos y tiene reclamo, uno coma cero.
+
+315
+00:16:08,110 --> 00:16:12,475
+Y otros venían en la base: segundos y llamadas, cero coma nueve tres
+
+316
+00:16:12,475 --> 00:16:16,520
+cinco; mensajes y valor del cliente, cero coma nueve dos cinco.
+
+317
+00:16:16,640 --> 00:16:18,560
+Detectar el par no es decidir.
+
+318
+00:16:18,680 --> 00:16:23,120
+La clase desempata así: se queda la de mayor información mutua con la fuga.
+
+319
+00:16:23,240 --> 00:16:28,370
+Segundos tiene cero coma uno tres uno; llamadas, cero coma cero nueve uno.
+
+320
+00:16:28,490 --> 00:16:29,850
+Se queda segundos.
+
+321
+00:16:29,970 --> 00:16:32,563
+Y si la señal es pareja, se queda la más simple
+
+322
+00:16:32,563 --> 00:16:34,770
+de explicar y de mantener en producción.
+
+323
+00:16:34,890 --> 00:16:36,660
+Una precisión que vale la pena.
+
+324
+00:16:36,780 --> 00:16:42,039
+Reclamos y tiene reclamo son columnas idénticas, y aun así la información mutua les da
+
+325
+00:16:42,039 --> 00:16:46,380
+valores distintos: cero coma cero ocho cuatro y cero coma uno cero dos.
+
+326
+00:16:46,500 --> 00:16:48,040
+Es ruido de la estimación.
+
+327
+00:16:48,160 --> 00:16:53,510
+Con dos columnas idénticas, decide el segundo criterio: la más simple, reclamos.
+
+328
+00:16:53,630 --> 00:16:55,370
+Y otra alerta del material.
+
+329
+00:16:55,490 --> 00:17:00,254
+La diapositiva de redundancia se titula «once pares con correlación sobre cero coma
+
+330
+00:17:00,254 --> 00:17:04,960
+noventa», pero en su tabla pone llamadas y contactos, con cero coma setenta y dos.
+
+331
+00:17:05,080 --> 00:17:06,690
+Ese par no pasa el umbral.
+
+332
+00:17:06,810 --> 00:17:09,852
+Y donde dice cero coma nueve cero siete para segundos y
+
+333
+00:17:09,852 --> 00:17:12,230
+llamadas, es el valor con los datos crudos.
+
+334
+00:17:12,350 --> 00:17:15,450
+Después de limpiar, es cero coma nueve tres cinco.
+
+335
+00:17:15,570 --> 00:17:19,600
+El error típico con la redundancia: quedarse con la primera de la lista.
+
+336
+00:17:19,720 --> 00:17:24,390
+Como dice la clase, ese criterio es el orden alfabético disfrazado de método.
+
+337
+00:17:24,510 --> 00:17:25,730
+Piensa un segundo.
+
+338
+00:17:25,850 --> 00:17:29,890
+Mensajes y valor del cliente tienen correlación cero coma nueve dos cinco.
+
+339
+00:17:30,010 --> 00:17:32,110
+¿Con cuál te quedas, y por qué?
+
+340
+00:17:32,830 --> 00:17:34,220
+Con el valor del cliente.
+
+341
+00:17:34,340 --> 00:17:37,880
+Su información mutua con la fuga es cero coma uno cero dos,
+
+342
+00:17:37,880 --> 00:17:40,820
+contra cero coma cero cinco ocho de los mensajes.
+
+343
+00:17:40,940 --> 00:17:45,740
+Y si hubieran salido parejas, decidiría cuál es más fácil de explicar y de mantener.
+
+344
+00:17:45,860 --> 00:17:49,754
+Para llevarte: irrelevante se descarta, redundante deja una,
+
+345
+00:17:49,754 --> 00:17:52,870
+y la útil en conjunto no se mata por un p-valor.
+
+346
+00:17:52,990 --> 00:17:58,290
+Número de fallas lo demostró: sola, azar; acompañada, sube el modelo.
+
+347
+00:17:58,410 --> 00:18:01,092
+Y un par redundante se desempata por información
+
+348
+00:18:01,092 --> 00:18:03,550
+mutua y por simplicidad, nunca por la lista.
+
+349
+00:18:03,670 --> 00:18:07,980
+Siguiente parada: el caso extremo de la variable útil solo en conjunto.
+
+350
+00:18:08,100 --> 00:18:08,990
+El XOR.
+
+351
+00:18:09,890 --> 00:18:14,080
+Cuarta parada: el caso extremo de la variable útil solo en conjunto.
+
+352
+00:18:14,200 --> 00:18:17,700
+Se llama XOR, y rompe a los filtros univariados.
+
+353
+00:18:17,820 --> 00:18:20,480
+Imagina una caja fuerte con dos perillas.
+
+354
+00:18:20,600 --> 00:18:23,860
+Si estudias solo la primera, ninguna posición la abre.
+
+355
+00:18:23,980 --> 00:18:26,410
+Si estudias solo la segunda, tampoco.
+
+356
+00:18:26,530 --> 00:18:29,450
+Pero la combinación correcta de las dos la abre siempre.
+
+357
+00:18:29,570 --> 00:18:30,850
+Eso es un XOR.
+
+358
+00:18:30,970 --> 00:18:34,426
+Dos variables que, cada una por separado, no tienen ninguna
+
+359
+00:18:34,426 --> 00:18:38,000
+relación con el target, pero que juntas lo predicen perfecto.
+
+360
+00:18:38,120 --> 00:18:40,760
+Hagamos el ejemplo del apunte con cuatro puntos.
+
+361
+00:18:40,880 --> 00:18:42,760
+A está en más uno, más uno.
+
+362
+00:18:42,880 --> 00:18:45,230
+B, en más uno, menos uno.
+
+363
+00:18:45,350 --> 00:18:47,730
+C, en menos uno, más uno.
+
+364
+00:18:47,850 --> 00:18:50,370
+Y D, en menos uno, menos uno.
+
+365
+00:18:50,490 --> 00:18:54,090
+La clase es uno cuando los signos son distintos: B y C.
+
+366
+00:18:54,210 --> 00:18:55,710
+A y D son clase cero.
+
+367
+00:18:55,830 --> 00:18:57,570
+Ahora mira solo x1.
+
+368
+00:18:57,690 --> 00:19:00,450
+Con más uno hay un cero y un uno: A y B.
+
+369
+00:19:00,570 --> 00:19:03,290
+Con menos uno, también: C y D.
+
+370
+00:19:03,410 --> 00:19:05,300
+x1 sola no dice nada.
+
+371
+00:19:05,420 --> 00:19:07,960
+Y con x2 pasa exactamente lo mismo.
+
+372
+00:19:08,080 --> 00:19:09,620
+Pero multiplica las dos.
+
+373
+00:19:09,740 --> 00:19:12,370
+A: más uno por más uno, más uno.
+
+374
+00:19:12,490 --> 00:19:15,480
+B: más uno por menos uno, menos uno.
+
+375
+00:19:15,600 --> 00:19:17,090
+C, menos uno.
+
+376
+00:19:17,210 --> 00:19:20,270
+Y D, menos uno por menos uno, más uno.
+
+377
+00:19:20,390 --> 00:19:23,020
+El producto vale más uno en las clases cero y
+
+378
+00:19:23,020 --> 00:19:25,650
+menos uno en las clases uno: separa perfecto.
+
+379
+00:19:25,770 --> 00:19:27,890
+El notebook de la clase lo hace en grande.
+
+380
+00:19:28,010 --> 00:19:32,470
+Cinco mil puntos, con x1 y x2 normales e independientes.
+
+381
+00:19:32,590 --> 00:19:36,070
+El target es uno cuando exactamente una de las dos es positiva.
+
+382
+00:19:36,190 --> 00:19:38,620
+Mira el patrón: un tablero de ajedrez.
+
+383
+00:19:38,740 --> 00:19:41,753
+Si proyectas los puntos sobre un solo eje, a cada
+
+384
+00:19:41,753 --> 00:19:44,520
+lado del cero hay mitad azules y mitad rojos.
+
+385
+00:19:44,640 --> 00:19:48,000
+Ninguna recta horizontal ni vertical separa los colores.
+
+386
+00:19:48,120 --> 00:19:51,000
+¿Qué ve un filtro univariado, como ANOVA F?
+
+387
+00:19:51,120 --> 00:19:56,630
+Para x1, F igual a uno coma dos uno dos, y p-valor cero coma dos siete uno.
+
+388
+00:19:56,750 --> 00:20:02,470
+Para x2, F igual a cuatro coma tres uno dos, y p-valor cero coma cero tres ocho.
+
+389
+00:20:02,590 --> 00:20:05,590
+El notebook concluye: ninguna de las dos sirve.
+
+390
+00:20:05,710 --> 00:20:07,720
+Y aquí hay una alerta del material.
+
+391
+00:20:07,840 --> 00:20:13,110
+El p-valor de x2 es cero coma cero tres ocho: está bajo cero coma cero cinco.
+
+392
+00:20:13,230 --> 00:20:16,140
+Un filtro al cinco por ciento la habría dejado pasar.
+
+393
+00:20:16,260 --> 00:20:19,750
+Pero por construcción, x2 es independiente del target.
+
+394
+00:20:19,870 --> 00:20:24,170
+Es un falso positivo por azar, justo el fenómeno que mide el video nueve.
+
+395
+00:20:24,290 --> 00:20:27,470
+Ahora, los modelos, con validación cruzada.
+
+396
+00:20:27,590 --> 00:20:32,610
+Una regresión logística con x1 y x2 da AUC cero coma cinco uno.
+
+397
+00:20:32,730 --> 00:20:33,690
+No ve nada.
+
+398
+00:20:33,810 --> 00:20:39,170
+La misma logística, agregando el producto x1 por x2: AUC uno.
+
+399
+00:20:39,290 --> 00:20:43,630
+Y un Random Forest, con las dos variables originales: también uno.
+
+400
+00:20:43,750 --> 00:20:45,460
+La señal siempre estuvo ahí.
+
+401
+00:20:45,580 --> 00:20:48,730
+Lo que faltaba era una representación que la dejara visible.
+
+402
+00:20:48,850 --> 00:20:52,364
+Por eso construimos interacciones en el bloque dos: si sospechas
+
+403
+00:20:52,364 --> 00:20:55,769
+que dos variables actúan juntas, la forma más segura de que un
+
+404
+00:20:55,769 --> 00:20:58,240
+modelo lineal lo vea es escribir el producto.
+
+405
+00:20:58,360 --> 00:21:01,044
+Un detalle que suele sorprender: un árbol de
+
+406
+00:21:01,044 --> 00:21:03,910
+decisión poco profundo también falla en el XOR.
+
+407
+00:21:04,030 --> 00:21:09,180
+Es voraz: evalúa un corte a la vez, y ningún corte individual mejora nada.
+
+408
+00:21:09,300 --> 00:21:12,097
+El Random Forest lo logra porque promedia muchos
+
+409
+00:21:12,097 --> 00:21:14,370
+árboles con cortes iniciales distintos.
+
+410
+00:21:14,490 --> 00:21:16,440
+Lo verás en la clase treinta y cuatro.
+
+411
+00:21:16,560 --> 00:21:19,720
+El error típico: concluir que no hay señal porque el
+
+412
+00:21:19,720 --> 00:21:22,820
+filtro, o una logística sin interacción, no la ven.
+
+413
+00:21:22,940 --> 00:21:26,130
+Cero coma cinco uno no significa «no hay nada».
+
+414
+00:21:26,250 --> 00:21:30,520
+Significa «este modelo, con esta representación, no ve nada».
+
+415
+00:21:30,640 --> 00:21:31,860
+Piensa un segundo.
+
+416
+00:21:31,980 --> 00:21:36,040
+Sospechas que reclamar pesa distinto en un cliente nuevo que en uno antiguo.
+
+417
+00:21:36,160 --> 00:21:39,680
+¿Qué variable le agregas a tu regresión logística para que lo pueda ver?
+
+418
+00:21:40,400 --> 00:21:42,820
+La interacción: reclamos por antigüedad.
+
+419
+00:21:42,940 --> 00:21:46,050
+Justo una de las tres interacciones que construyó la clase.
+
+420
+00:21:46,170 --> 00:21:49,485
+Y fíjate en lo que ya vimos: reclamo por antigüedad tiene
+
+421
+00:21:49,485 --> 00:21:52,510
+correlación cero coma nueve cinco ocho con reclamos.
+
+422
+00:21:52,630 --> 00:21:55,210
+Ayuda, pero también trae redundancia.
+
+423
+00:21:55,330 --> 00:21:58,642
+Para llevarte: en un XOR, cada variable sola no
+
+424
+00:21:58,642 --> 00:22:01,250
+dice nada, y juntas separan perfecto.
+
+425
+00:22:01,370 --> 00:22:06,220
+Los filtros univariados no lo ven, y una logística tampoco, sin el producto.
+
+426
+00:22:06,340 --> 00:22:10,730
+Y un p-valor bajo tampoco prueba nada: x2 pasó el filtro por azar.
+
+427
+00:22:10,850 --> 00:22:15,260
+Siguiente parada: las tres familias de selección, y los métodos de filtro.
+
+428
+00:22:16,130 --> 00:22:19,569
+Quinta parada: las tres familias de métodos de selección de
+
+429
+00:22:19,569 --> 00:22:22,250
+variables, y la primera de ellas, los filtros.
+
+430
+00:22:22,370 --> 00:22:25,680
+Imagina que una empresa recibe cinco mil postulaciones.
+
+431
+00:22:25,800 --> 00:22:30,280
+Primero filtra por currículum: rápido y barato, sin entrevistar a nadie.
+
+432
+00:22:30,400 --> 00:22:32,380
+Después entrevista a doscientos.
+
+433
+00:22:32,500 --> 00:22:36,020
+Y solo a los últimos treinta los pone a prueba en el trabajo real.
+
+434
+00:22:36,140 --> 00:22:39,330
+La selección de variables funciona igual: es un embudo.
+
+435
+00:22:39,450 --> 00:22:42,778
+Filtro para bajar de cinco mil a doscientas, embedded para
+
+436
+00:22:42,778 --> 00:22:45,590
+bajar a treinta, y wrapper solo si sobra cómputo.
+
+437
+00:22:45,710 --> 00:22:47,840
+No compiten: son etapas.
+
+438
+00:22:47,960 --> 00:22:49,360
+Las tres familias.
+
+439
+00:22:49,480 --> 00:22:54,010
+Filter mide cada variable con una métrica estadística, sin entrenar el modelo.
+
+440
+00:22:54,130 --> 00:22:57,740
+Es barato, pero si es univariado, no ve el conjunto.
+
+441
+00:22:57,860 --> 00:23:01,370
+Wrapper entrena el modelo con distintos subconjuntos y compara.
+
+442
+00:23:01,490 --> 00:23:03,520
+Ve el conjunto, pero es caro.
+
+443
+00:23:03,640 --> 00:23:06,690
+Y embedded selecciona mientras entrena, como el Lasso.
+
+444
+00:23:06,810 --> 00:23:07,730
+Costo medio.
+
+445
+00:23:07,850 --> 00:23:10,750
+¿Cuánto cuesta cada una, en modelos entrenados?
+
+446
+00:23:10,870 --> 00:23:12,380
+Un filtro, cero.
+
+447
+00:23:12,500 --> 00:23:13,840
+Un embedded, uno.
+
+448
+00:23:13,960 --> 00:23:17,665
+Un RFE que elimina de a una, p menos k: con cincuenta
+
+449
+00:23:17,665 --> 00:23:20,950
+variables, hasta doce, treinta y ocho por fold.
+
+450
+00:23:21,070 --> 00:23:25,290
+Y probar todos los subconjuntos, dos elevado a p, menos uno.
+
+451
+00:23:25,410 --> 00:23:27,570
+Eso lo calculamos en el video ocho.
+
+452
+00:23:27,690 --> 00:23:29,690
+Un matiz sobre la tabla de la clase.
+
+453
+00:23:29,810 --> 00:23:32,920
+Dice que wrapper y embedded «sí ven interacciones».
+
+454
+00:23:33,040 --> 00:23:38,490
+Más preciso: ven el conjunto, como número de fallas, que solo aporta acompañada.
+
+455
+00:23:38,610 --> 00:23:44,066
+Pero si el modelo de adentro es una logística, tampoco ven un XOR sin el producto: en
+
+456
+00:23:44,066 --> 00:23:48,430
+el video anterior, la logística con x1 y x2 dio cero coma cinco uno.
+
+457
+00:23:48,550 --> 00:23:51,100
+Ahora, los filtros, uno por uno.
+
+458
+00:23:51,220 --> 00:23:53,020
+El primero: la varianza.
+
+459
+00:23:53,140 --> 00:23:56,089
+Una variable casi constante no puede explicar nada,
+
+460
+00:23:56,089 --> 00:23:58,980
+porque vale lo mismo para casi todos los clientes.
+
+461
+00:23:59,100 --> 00:24:04,290
+Para una binaria, con una proporción pi de unos, la varianza es pi por uno menos pi.
+
+462
+00:24:04,410 --> 00:24:08,400
+Con un umbral de cero coma cero uno, hagamos tres casos del apunte.
+
+463
+00:24:08,520 --> 00:24:12,130
+Medio por ciento de unos: cero coma cero cero cinco.
+
+464
+00:24:12,250 --> 00:24:13,040
+No pasa.
+
+465
+00:24:13,160 --> 00:24:16,440
+Uno por ciento: cero coma cero cero noventa y nueve.
+
+466
+00:24:16,560 --> 00:24:18,340
+No pasa, por muy poco.
+
+467
+00:24:18,460 --> 00:24:21,070
+Diez por ciento: cero coma cero nueve.
+
+468
+00:24:21,190 --> 00:24:21,700
+Pasa.
+
+469
+00:24:21,820 --> 00:24:23,130
+¿Y en la base de la clase?
+
+470
+00:24:23,250 --> 00:24:27,940
+El filtro de varianza, sobre las cincuenta candidatas, no descarta ninguna.
+
+471
+00:24:28,060 --> 00:24:32,640
+Es un filtro de higiene: barato, y casi nunca decide nada importante.
+
+472
+00:24:32,760 --> 00:24:35,480
+El segundo filtro: la correlación de Pearson.
+
+473
+00:24:35,600 --> 00:24:38,520
+Su punto ciego: solo mide relación lineal.
+
+474
+00:24:38,640 --> 00:24:41,790
+Mira esta U perfecta: y igual a x al cuadrado.
+
+475
+00:24:41,910 --> 00:24:48,840
+Los puntos menos dos, menos uno, cero, uno y dos dan cuatro, uno, cero, uno, cuatro.
+
+476
+00:24:48,960 --> 00:24:52,710
+La dependencia es total, y la correlación da exactamente cero.
+
+477
+00:24:52,830 --> 00:24:54,850
+Por eso existe la información mutua.
+
+478
+00:24:54,970 --> 00:24:58,820
+Mide cuánta incertidumbre sobre la fuga desaparece al conocer la variable.
+
+479
+00:24:58,940 --> 00:25:02,031
+Es mayor o igual que cero, y vale cero solo si son
+
+480
+00:25:02,031 --> 00:25:05,740
+independientes: detecta cualquier dependencia, también la U.
+
+481
+00:25:05,860 --> 00:25:07,520
+Dos cuidados prácticos.
+
+482
+00:25:07,640 --> 00:25:10,930
+No tiene techo: sirve para ordenar variables dentro de
+
+483
+00:25:10,930 --> 00:25:13,610
+un dataset, no para comparar entre datasets.
+
+484
+00:25:13,730 --> 00:25:17,700
+Y sklearn la estima con vecinos más cercanos, con algo de azar.
+
+485
+00:25:17,820 --> 00:25:20,910
+Sin fijar random state, cambia en cada corrida.
+
+486
+00:25:21,030 --> 00:25:23,120
+El tercer filtro: ANOVA F.
+
+487
+00:25:23,240 --> 00:25:26,337
+Compara cuánto se separan las medias de los grupos, contra
+
+488
+00:25:26,337 --> 00:25:28,740
+cuánto varían los datos dentro de cada grupo.
+
+489
+00:25:28,860 --> 00:25:32,340
+Aquí los grupos son dos: los que se fugan, y los que no.
+
+490
+00:25:32,460 --> 00:25:33,610
+Un ejemplo chico.
+
+491
+00:25:33,730 --> 00:25:37,825
+Una variable vale dos, cuatro y seis en los que se fugan, media
+
+492
+00:25:37,825 --> 00:25:41,790
+cuatro, y ocho, diez y doce en los que se quedan, media diez.
+
+493
+00:25:41,910 --> 00:25:43,390
+La media global es siete.
+
+494
+00:25:43,510 --> 00:25:47,043
+Cuadrado medio entre: tres por cuatro menos siete al cuadrado,
+
+495
+00:25:47,043 --> 00:25:50,348
+más tres por diez menos siete al cuadrado: veintisiete más
+
+496
+00:25:50,348 --> 00:25:53,140
+veintisiete, cincuenta y cuatro, dividido en uno.
+
+497
+00:25:53,260 --> 00:25:57,385
+Cuadrado medio dentro: las desviaciones al cuadrado dentro de cada
+
+498
+00:25:57,385 --> 00:26:01,010
+grupo suman dieciséis, dividido en seis menos dos: cuatro.
+
+499
+00:26:01,130 --> 00:26:04,720
+F igual a cincuenta y cuatro entre cuatro: trece coma cinco.
+
+500
+00:26:04,840 --> 00:26:09,230
+Su punto ciego es el mismo de Pearson: solo mira diferencias de medias.
+
+501
+00:26:09,350 --> 00:26:13,660
+Con una U, las medias de los grupos pueden coincidir y F da casi cero.
+
+502
+00:26:13,780 --> 00:26:17,910
+Y una alerta de la presentación complementaria de la carpeta: dice que ANOVA
+
+503
+00:26:17,910 --> 00:26:21,170
+compara medias del target entre categorías de la predictora.
+
+504
+00:26:21,290 --> 00:26:22,580
+Eso es en regresión.
+
+505
+00:26:22,700 --> 00:26:26,101
+En clasificación, como aquí, es al revés: compara la
+
+506
+00:26:26,101 --> 00:26:29,240
+media de la variable entre fugados y no fugados.
+
+507
+00:26:29,360 --> 00:26:32,750
+Ahora sí, los filtros sobre las cincuenta candidatas.
+
+508
+00:26:32,870 --> 00:26:36,420
+Este es el top doce, ordenado por información mutua.
+
+509
+00:26:36,540 --> 00:26:39,960
+Primero, segundos, con cero coma uno tres uno.
+
+510
+00:26:40,080 --> 00:26:44,390
+Segundo, el logaritmo de segundos, con cero coma uno dos nueve.
+
+511
+00:26:44,510 --> 00:26:47,690
+Y siguen contactos por mes, logaritmo del valor del
+
+512
+00:26:47,690 --> 00:26:50,620
+cliente, valor por antigüedad, y tiene reclamo.
+
+513
+00:26:50,740 --> 00:26:52,270
+Fíjate en dos cosas.
+
+514
+00:26:52,390 --> 00:26:55,190
+Información mutua y F no dan el mismo orden.
+
+515
+00:26:55,310 --> 00:26:58,315
+Intensidad de contacto está décima en información
+
+516
+00:26:58,315 --> 00:27:00,830
+mutua, pero tiene F cinco coma ocho ocho.
+
+517
+00:27:00,950 --> 00:27:05,660
+Cuando difieren tanto, la relación no es lineal, y eso ya es información útil.
+
+518
+00:27:05,780 --> 00:27:10,820
+Y segundos y su logaritmo ocupan los dos primeros lugares: son la misma información.
+
+519
+00:27:10,940 --> 00:27:12,360
+Una nota del material.
+
+520
+00:27:12,480 --> 00:27:16,154
+El ranking de la diapositiva difiere un poco del notebook: por
+
+521
+00:27:16,154 --> 00:27:19,946
+ejemplo, ahí llamadas por mes aparece con cero coma uno cero dos
+
+522
+00:27:19,946 --> 00:27:22,850
+tres, y aquí con cero coma cero nueve ocho siete.
+
+523
+00:27:22,970 --> 00:27:26,288
+No es un error: la información mutua se estima con azar, y
+
+524
+00:27:26,288 --> 00:27:29,320
+cambia con la semilla y con el orden de las columnas.
+
+525
+00:27:29,440 --> 00:27:33,490
+En el video siete verás que ese detalle cambia una conclusión de la clase.
+
+526
+00:27:33,610 --> 00:27:36,741
+El error típico con los filtros: leer el ranking como
+
+527
+00:27:36,741 --> 00:27:39,400
+si fuera exacto, y quedarse con los primeros.
+
+528
+00:27:39,520 --> 00:27:44,040
+Un filtro ordena bien las variables de a una, pero no sabe nada del conjunto.
+
+529
+00:27:44,160 --> 00:27:47,600
+Ya lo viste: número de fallas y el XOR se le escapan.
+
+530
+00:27:47,720 --> 00:27:48,940
+Piensa un segundo.
+
+531
+00:27:49,060 --> 00:27:53,220
+Tiene reclamo tiene F de mil ciento quince, el más alto de la lista.
+
+532
+00:27:53,340 --> 00:27:55,730
+Pero en información mutua aparece sexta.
+
+533
+00:27:55,850 --> 00:28:00,090
+Y reclamos, su gemela idéntica, ni siquiera entra al top doce.
+
+534
+00:28:00,210 --> 00:28:01,920
+¿Qué te dice eso de un ranking?
+
+535
+00:28:02,640 --> 00:28:05,210
+Que depende de la métrica, y de la estimación.
+
+536
+00:28:05,330 --> 00:28:08,540
+Dos métricas razonables ordenan distinto, y dos columnas
+
+537
+00:28:08,540 --> 00:28:11,120
+idénticas pueden quedar en lugares distintos.
+
+538
+00:28:11,240 --> 00:28:15,460
+Un ranking univariado es un punto de partida, nunca la última palabra.
+
+539
+00:28:15,580 --> 00:28:20,740
+Para llevarte: filter, wrapper y embedded son etapas de un embudo, no rivales.
+
+540
+00:28:20,860 --> 00:28:26,220
+Los filtros miden de a una: varianza, correlación, información mutua y ANOVA F.
+
+541
+00:28:26,340 --> 00:28:31,110
+Y su punto ciego es el conjunto: lo que solo aporta acompañado, se les escapa.
+
+542
+00:28:31,230 --> 00:28:33,860
+Siguiente parada: el clímax de la clase.
+
+543
+00:28:33,980 --> 00:28:36,280
+Cuatro variables contra cuatro variables.
+
+544
+00:28:37,170 --> 00:28:39,780
+Sexta parada: el clímax de la clase.
+
+545
+00:28:39,900 --> 00:28:42,200
+Cuatro variables contra cuatro variables.
+
+546
+00:28:42,320 --> 00:28:44,670
+¿Te acuerdas del entrenador del primer video?
+
+547
+00:28:44,790 --> 00:28:49,450
+Elegía a los once que mejor jugaban solos, y terminaba con cuatro arqueros.
+
+548
+00:28:49,570 --> 00:28:53,060
+Hoy lo vamos a ver pasar con variables reales, y con números.
+
+549
+00:28:53,180 --> 00:28:58,670
+El experimento: el mismo modelo, los mismos datos, y el mismo número de variables.
+
+550
+00:28:58,790 --> 00:28:59,320
+Cuatro.
+
+551
+00:28:59,440 --> 00:29:03,210
+Equipo uno: las cuatro primeras del ranking de información mutua.
+
+552
+00:29:03,330 --> 00:29:06,404
+Segundos, logaritmo de segundos, contactos por
+
+553
+00:29:06,404 --> 00:29:09,010
+mes, y logaritmo del valor del cliente.
+
+554
+00:29:09,130 --> 00:29:13,180
+Equipo dos: cuatro elegidas a mano, evitando redundancia.
+
+555
+00:29:13,300 --> 00:29:17,400
+Reclamos, segundos, estado dos, y número de fallas.
+
+556
+00:29:17,520 --> 00:29:19,900
+Antes de medir, mira el equipo uno.
+
+557
+00:29:20,020 --> 00:29:22,965
+Segundos y su logaritmo son la misma información con
+
+558
+00:29:22,965 --> 00:29:25,570
+otra escala: una es función exacta de la otra.
+
+559
+00:29:25,690 --> 00:29:28,400
+Su correlación de Pearson es solo cero coma seis
+
+560
+00:29:28,400 --> 00:29:30,940
+tres cuatro, porque el log curva la relación.
+
+561
+00:29:31,060 --> 00:29:33,250
+Pero no aportan nada nuevo entre sí.
+
+562
+00:29:33,370 --> 00:29:38,170
+Midamos la redundancia de cada equipo: la correlación media entre sus seis pares.
+
+563
+00:29:38,290 --> 00:29:42,310
+Equipo uno: cero coma seis tres cuatro, cero coma cinco cero
+
+564
+00:29:42,310 --> 00:29:46,463
+cinco, cero coma cinco dos cuatro, cero coma cuatro seis, cero
+
+565
+00:29:46,463 --> 00:29:49,880
+coma siete nueve ocho, y cero coma tres nueve tres.
+
+566
+00:29:50,000 --> 00:29:51,960
+Suman tres coma tres uno cuatro.
+
+567
+00:29:52,080 --> 00:29:54,760
+Entre seis: cero coma cincuenta y cinco.
+
+568
+00:29:54,880 --> 00:29:55,880
+Equipo dos.
+
+569
+00:29:56,000 --> 00:29:58,650
+Los seis pares suman uno coma tres dos cuatro.
+
+570
+00:29:58,770 --> 00:30:01,180
+Entre seis: cero coma veintidós.
+
+571
+00:30:01,300 --> 00:30:03,170
+Menos de la mitad de redundancia.
+
+572
+00:30:03,290 --> 00:30:07,490
+Ahora sí, el resultado, con validación cruzada de cinco folds.
+
+573
+00:30:07,610 --> 00:30:12,290
+El top cuatro por información mutua: AUC cero coma ocho cero cuatro.
+
+574
+00:30:12,410 --> 00:30:16,050
+Las cuatro sin redundancia: cero coma ocho nueve tres.
+
+575
+00:30:16,170 --> 00:30:20,870
+Casi nueve puntos de AUC de diferencia, con la misma cantidad de variables.
+
+576
+00:30:20,990 --> 00:30:22,820
+El mecanismo está a la vista.
+
+577
+00:30:22,940 --> 00:30:26,610
+El top cuatro gasta dos de sus cuatro cupos en la misma variable.
+
+578
+00:30:26,730 --> 00:30:30,413
+Y no incluye nada de reclamos, que es el predictor individual más
+
+579
+00:30:30,413 --> 00:30:33,870
+fuerte de la base, con correlación cero coma cincuenta y uno.
+
+580
+00:30:33,990 --> 00:30:36,570
+Cada variable está bien elegida por separado.
+
+581
+00:30:36,690 --> 00:30:38,040
+El conjunto es malo.
+
+582
+00:30:38,160 --> 00:30:41,120
+Un número que aparece una sola vez no es un resultado.
+
+583
+00:30:41,240 --> 00:30:45,850
+Primera verificación: ¿depende de la semilla con que se estima la información mutua?
+
+584
+00:30:45,970 --> 00:30:50,046
+Con cinco semillas distintas, el AUC del top cuatro se mueve entre
+
+585
+00:30:50,046 --> 00:30:53,320
+cero coma ocho cero cuatro y cero coma ocho uno cero.
+
+586
+00:30:53,440 --> 00:30:58,600
+Y en las cinco, segundos y su logaritmo ocupan dos cupos, y no hay ningún reclamo.
+
+587
+00:30:58,720 --> 00:31:02,960
+Segunda verificación: ¿qué pasa cuando crece el presupuesto de variables?
+
+588
+00:31:03,080 --> 00:31:06,418
+La clase compara el top k contra una selección automática
+
+589
+00:31:06,418 --> 00:31:09,170
+que evita redundancia, para k de cuatro a doce.
+
+590
+00:31:09,290 --> 00:31:13,002
+Con cuatro, evitar redundancia gana siete puntos: cero coma
+
+591
+00:31:13,002 --> 00:31:16,210
+ocho siete cinco contra cero coma ocho cero cuatro.
+
+592
+00:31:16,330 --> 00:31:19,060
+Pero con seis o más, la ventaja se da vuelta.
+
+593
+00:31:19,180 --> 00:31:21,970
+La lección no es «los filtros son malos».
+
+594
+00:31:22,090 --> 00:31:25,237
+Es más precisa: el costo de ignorar la redundancia crece
+
+595
+00:31:25,237 --> 00:31:27,710
+cuando el presupuesto de variables es chico.
+
+596
+00:31:27,830 --> 00:31:31,140
+Si te quedas con treinta de cincuenta, el ranking alcanza.
+
+597
+00:31:31,260 --> 00:31:34,800
+Si tienes que llegar a cinco porque el modelo va a un comité, no.
+
+598
+00:31:34,920 --> 00:31:37,180
+Ahora, una alerta del material.
+
+599
+00:31:37,300 --> 00:31:42,689
+La diapositiva veintitrés compara seis contra seis: el top seis da cero coma ocho uno
+
+600
+00:31:42,689 --> 00:31:47,000
+cero cinco, y seis elegidas a mano, cero coma nueve cero cuatro uno.
+
+601
+00:31:47,120 --> 00:31:52,060
+Los reproduje con la base: las dos cifras son correctas, para esas dos listas.
+
+602
+00:31:52,180 --> 00:31:55,440
+Pero el top seis de la diapositiva no es el del notebook.
+
+603
+00:31:55,560 --> 00:31:59,000
+En la diapositiva, el sexto lugar es llamadas por mes.
+
+604
+00:31:59,120 --> 00:32:01,000
+En el notebook es tiene reclamo.
+
+605
+00:32:01,120 --> 00:32:04,229
+Las dos tenían información mutua casi empatada, cero
+
+606
+00:32:04,229 --> 00:32:06,680
+coma uno cero dos tres en la diapositiva.
+
+607
+00:32:06,800 --> 00:32:11,330
+Con tiene reclamo dentro, el top seis sube a cero coma ocho nueve siete.
+
+608
+00:32:11,450 --> 00:32:15,150
+Y la ventaja de elegir a mano baja de nueve puntos a menos de uno.
+
+609
+00:32:15,270 --> 00:32:19,971
+El error típico, entonces: elegir el top k de un ranking univariado cuando el
+
+610
+00:32:19,971 --> 00:32:24,000
+presupuesto es chico, sin mirar la correlación entre las elegidas.
+
+611
+00:32:24,120 --> 00:32:27,269
+La corrección es simple: antes de aceptar el top, revisa
+
+612
+00:32:27,269 --> 00:32:29,800
+la matriz de correlación de las que elegiste.
+
+613
+00:32:29,920 --> 00:32:31,140
+Piensa un segundo.
+
+614
+00:32:31,260 --> 00:32:36,151
+Con k igual a doce, el top doce por información mutua da cero coma nueve cero
+
+615
+00:32:36,151 --> 00:32:40,090
+uno, y la selección sin redundancia, cero coma ocho ocho seis.
+
+616
+00:32:40,210 --> 00:32:41,930
+¿Por qué ahora gana el ranking?
+
+617
+00:32:42,650 --> 00:32:46,543
+Porque con doce cupos, el ranking termina incluyendo por su cuenta a las
+
+618
+00:32:46,543 --> 00:32:49,950
+variables fuertes, como tiene reclamo y reclamo por antigüedad.
+
+619
+00:32:50,070 --> 00:32:52,460
+Los cupos repetidos ya no le cuestan tanto.
+
+620
+00:32:52,580 --> 00:32:55,350
+La redundancia duele cuando sobran pocas sillas.
+
+621
+00:32:55,470 --> 00:32:59,666
+Para llevarte: cuatro contra cuatro, el ranking ingenuo pierde casi
+
+622
+00:32:59,666 --> 00:33:03,110
+nueve puntos de AUC, porque gasta cupos en redundantes.
+
+623
+00:33:03,230 --> 00:33:06,560
+Es estable ante la semilla, pero se diluye cuando crece k.
+
+624
+00:33:06,680 --> 00:33:10,890
+Y un ranking por información mutua puede cambiar por un empate en la cuarta cifra.
+
+625
+00:33:11,010 --> 00:33:14,390
+Siguiente parada: los métodos que sí miran el conjunto.
+
+626
+00:33:14,510 --> 00:33:17,330
+Wrapper y embedded: RFE y Lasso.
+
+627
+00:33:18,210 --> 00:33:20,580
+Séptima parada: wrapper y embedded.
+
+628
+00:33:20,700 --> 00:33:23,520
+Los métodos que sí miran el conjunto de variables.
+
+629
+00:33:23,640 --> 00:33:27,680
+Imagina que tienes diez prendas y quieres el mejor conjunto para una entrevista.
+
+630
+00:33:27,800 --> 00:33:31,560
+Cada prenda entra o no entra: dos posibilidades por prenda.
+
+631
+00:33:31,680 --> 00:33:34,030
+Dos elevado a diez son mil veinticuatro.
+
+632
+00:33:34,150 --> 00:33:37,780
+Menos el conjunto vacío: mil veintitrés combinaciones.
+
+633
+00:33:37,900 --> 00:33:40,554
+Un wrapper hace eso con variables: entrena el
+
+634
+00:33:40,554 --> 00:33:43,150
+modelo con distintos subconjuntos y compara.
+
+635
+00:33:43,270 --> 00:33:48,120
+Con p variables hay dos elevado a p, menos uno, subconjuntos posibles.
+
+636
+00:33:48,240 --> 00:33:49,590
+Y el número explota.
+
+637
+00:33:49,710 --> 00:33:53,030
+Supongamos un computador que entrena mil modelos por segundo.
+
+638
+00:33:53,150 --> 00:33:56,690
+Con diez variables: mil veintitrés modelos, un segundo.
+
+639
+00:33:56,810 --> 00:34:00,600
+Con veinte: un millón cuarenta y ocho mil, diecisiete minutos.
+
+640
+00:34:00,720 --> 00:34:03,560
+Con treinta: mil millones, doce días.
+
+641
+00:34:03,680 --> 00:34:08,320
+Y con nuestras cincuenta candidatas: treinta y cinco mil setecientos dos años.
+
+642
+00:34:08,440 --> 00:34:10,730
+Por eso nadie hace búsqueda exhaustiva.
+
+643
+00:34:10,850 --> 00:34:13,280
+Todos los métodos prácticos son atajos.
+
+644
+00:34:13,400 --> 00:34:17,800
+El más conocido es RFE: eliminación recursiva de variables.
+
+645
+00:34:17,920 --> 00:34:20,360
+RFE es literalmente recursivo.
+
+646
+00:34:20,480 --> 00:34:23,560
+Uno: entrena el modelo con todas las variables.
+
+647
+00:34:23,680 --> 00:34:28,920
+Dos: ordena las variables por el tamaño de su coeficiente, y encuentra la más débil.
+
+648
+00:34:29,040 --> 00:34:31,670
+Tres: la elimina, y vuelve a entrenar.
+
+649
+00:34:31,790 --> 00:34:34,930
+Cuatro: repite, hasta llegar al mínimo pedido.
+
+650
+00:34:35,050 --> 00:34:40,461
+La versión con validación cruzada, RFECV, hace todo ese proceso dentro de cada
+
+651
+00:34:40,461 --> 00:34:45,040
+fold, y elige el número de variables que maximiza el AUC promedio.
+
+652
+00:34:45,160 --> 00:34:50,140
+Con las cincuenta candidatas de la clase, RFECV se queda con cuarenta y dos.
+
+653
+00:34:50,260 --> 00:34:52,780
+Un detalle clave: hay que escalar antes.
+
+654
+00:34:52,900 --> 00:34:55,920
+RFE ordena por el tamaño de los coeficientes.
+
+655
+00:34:56,040 --> 00:34:58,596
+El valor del cliente llega a dos mil ciento
+
+656
+00:34:58,596 --> 00:35:01,390
+sesenta y cinco; tiene reclamo vale cero o uno.
+
+657
+00:35:01,510 --> 00:35:05,067
+Sin escalar, el coeficiente del valor del cliente sale diminuto
+
+658
+00:35:05,067 --> 00:35:08,060
+por la unidad de medida, no por falta de importancia.
+
+659
+00:35:08,180 --> 00:35:11,020
+Por eso el StandardScaler va dentro del pipeline.
+
+660
+00:35:11,140 --> 00:35:15,330
+Ahora, embedded: la selección ocurre mientras el modelo se entrena.
+
+661
+00:35:15,450 --> 00:35:19,555
+El ejemplo clásico es el Lasso: una regresión logística con penalización
+
+662
+00:35:19,555 --> 00:35:23,090
+ele uno, la suma de los valores absolutos de los coeficientes.
+
+663
+00:35:23,210 --> 00:35:26,630
+Esa penalización empuja coeficientes a exactamente cero.
+
+664
+00:35:26,750 --> 00:35:29,490
+Y una variable con coeficiente cero queda fuera.
+
+665
+00:35:29,610 --> 00:35:32,020
+¿Y Ridge, la penalización ele dos?
+
+666
+00:35:32,140 --> 00:35:35,730
+Achica los coeficientes, pero casi nunca los lleva a cero.
+
+667
+00:35:35,850 --> 00:35:38,150
+Por eso Ridge no sirve para seleccionar.
+
+668
+00:35:38,270 --> 00:35:39,200
+El Lasso sí.
+
+669
+00:35:39,320 --> 00:35:43,340
+Y una trampa de sklearn: C no es la fuerza de la penalización.
+
+670
+00:35:43,460 --> 00:35:48,310
+Es su inverso: en la fórmula, C multiplica al error, no a la penalización.
+
+671
+00:35:48,430 --> 00:35:54,070
+C chico: el error pesa poco, la penalización manda, y sobreviven menos variables.
+
+672
+00:35:54,190 --> 00:35:57,740
+Y ojo: el Lasso necesita solver liblinear o saga.
+
+673
+00:35:57,860 --> 00:36:00,450
+El solver por defecto no admite ele uno.
+
+674
+00:36:00,570 --> 00:36:01,970
+Con los datos de la clase.
+
+675
+00:36:02,090 --> 00:36:05,640
+C igual a cero coma cero uno deja trece variables vivas.
+
+676
+00:36:05,760 --> 00:36:08,120
+Cero coma cero cinco, veintisiete.
+
+677
+00:36:08,240 --> 00:36:10,440
+Cero coma uno, treinta y tres.
+
+678
+00:36:10,560 --> 00:36:12,870
+Cero coma cinco, cuarenta y dos.
+
+679
+00:36:12,990 --> 00:36:15,270
+Y C igual a uno, cuarenta y cinco.
+
+680
+00:36:15,390 --> 00:36:18,352
+Con C igual a cero coma cero cinco, el valor de la
+
+681
+00:36:18,352 --> 00:36:20,900
+clase, sobreviven veintisiete de cincuenta.
+
+682
+00:36:21,020 --> 00:36:25,892
+Los coeficientes más grandes: llamadas, monto, cliente nuevo, y en cuarto
+
+683
+00:36:25,892 --> 00:36:29,830
+lugar, número de fallas, con más cero coma cinco uno siete.
+
+684
+00:36:29,950 --> 00:36:32,230
+La variable que el filtro llamaba ruido.
+
+685
+00:36:32,350 --> 00:36:37,320
+Más abajo, reclamos y tiene reclamo sobreviven las dos, aunque son idénticas.
+
+686
+00:36:37,440 --> 00:36:39,670
+Y aquí, una alerta del material.
+
+687
+00:36:39,790 --> 00:36:44,306
+La diapositiva veinticinco dice «veinticinco de cincuenta sobreviven», y la
+
+688
+00:36:44,306 --> 00:36:48,160
+veintiséis, cero coma nueve tres ocho con veinticinco variables.
+
+689
+00:36:48,280 --> 00:36:51,508
+El notebook ejecutado da veintisiete de cincuenta,
+
+690
+00:36:51,508 --> 00:36:54,090
+con AUC cero coma nueve tres nueve seis.
+
+691
+00:36:54,210 --> 00:36:57,850
+Lo reproduje con la base: el valor correcto es el del notebook.
+
+692
+00:36:57,970 --> 00:36:59,810
+¿Qué logramos con cada estrategia?
+
+693
+00:36:59,930 --> 00:37:02,060
+AUC con validación cruzada.
+
+694
+00:37:02,180 --> 00:37:05,120
+Las doce originales, cero coma nueve dos.
+
+695
+00:37:05,240 --> 00:37:08,630
+Las cincuenta candidatas, cero coma nueve cuatro uno.
+
+696
+00:37:08,750 --> 00:37:12,170
+El Lasso, con veintisiete, cero coma nueve tres nueve
+
+697
+00:37:12,170 --> 00:37:15,460
+seis: casi lo mismo, con la mitad de las variables.
+
+698
+00:37:15,580 --> 00:37:18,560
+El top cuatro, cero coma ocho cero cuatro.
+
+699
+00:37:18,680 --> 00:37:22,110
+Y cuatro sin redundancia, cero coma ocho nueve tres.
+
+700
+00:37:22,230 --> 00:37:25,691
+Pero hay una pregunta incómoda: si repites el Lasso con otra
+
+701
+00:37:25,691 --> 00:37:28,690
+partición de los datos, ¿salen las mismas variables?
+
+702
+00:37:28,810 --> 00:37:31,800
+La clase lo probó con cinco particiones distintas.
+
+703
+00:37:31,920 --> 00:37:34,340
+Dieciséis variables aparecen en las cinco.
+
+704
+00:37:34,460 --> 00:37:36,690
+Diecinueve aparecen solo en algunas.
+
+705
+00:37:36,810 --> 00:37:38,490
+Y quince, en ninguna.
+
+706
+00:37:38,610 --> 00:37:43,310
+Las inestables son casi todas variables construidas, y correlacionadas entre sí.
+
+707
+00:37:43,430 --> 00:37:48,010
+Cuando dos variables llevan la misma información, el Lasso elige una casi al azar.
+
+708
+00:37:48,130 --> 00:37:52,160
+Una variable que aparece en cinco de cinco es defendible ante un comité.
+
+709
+00:37:52,280 --> 00:37:54,600
+Una que aparece en dos de cinco, no.
+
+710
+00:37:54,720 --> 00:37:58,393
+El error típico con el Lasso: leer C como si fuera la fuerza de
+
+711
+00:37:58,393 --> 00:38:01,250
+la penalización, y subirlo para quitar variables.
+
+712
+00:38:01,370 --> 00:38:04,710
+Es al revés: subir C deja más variables vivas.
+
+713
+00:38:04,830 --> 00:38:06,050
+Piensa un segundo.
+
+714
+00:38:06,170 --> 00:38:09,800
+Con C igual a cero coma cero cinco quedan veintisiete variables.
+
+715
+00:38:09,920 --> 00:38:13,490
+Si cambias a C igual a cero coma cinco, ¿quedan más o menos?
+
+716
+00:38:14,210 --> 00:38:15,950
+Más: cuarenta y dos.
+
+717
+00:38:16,070 --> 00:38:18,915
+C subió diez veces, así que la penalización
+
+718
+00:38:18,915 --> 00:38:21,760
+bajó, y sobrevivieron quince variables más.
+
+719
+00:38:21,880 --> 00:38:25,174
+Para llevarte: el wrapper prueba subconjuntos; la
+
+720
+00:38:25,174 --> 00:38:28,670
+búsqueda exhaustiva es imposible, y RFE es el atajo.
+
+721
+00:38:28,790 --> 00:38:33,970
+El Lasso selecciona al entrenar, y en sklearn, C chico deja menos variables.
+
+722
+00:38:34,090 --> 00:38:36,150
+Siempre con variables escaladas.
+
+723
+00:38:36,270 --> 00:38:41,120
+Y mide la estabilidad: solo dieciséis variables aparecen en las cinco particiones.
+
+724
+00:38:41,240 --> 00:38:43,270
+Siguiente parada: la trampa.
+
+725
+00:38:43,390 --> 00:38:47,040
+Todo lo que hicimos hasta aquí tiene un problema, y lo vamos a medir.
+
+726
+00:38:47,930 --> 00:38:49,930
+Octava parada: la trampa.
+
+727
+00:38:50,050 --> 00:38:53,280
+Todo lo que hicimos hoy tiene un problema, y lo vamos a medir.
+
+728
+00:38:53,400 --> 00:38:56,675
+Imagina un profesor que arma la prueba final eligiendo justo las
+
+729
+00:38:56,675 --> 00:38:59,540
+preguntas que sus alumnos ya respondieron bien en clase.
+
+730
+00:38:59,660 --> 00:39:01,220
+El curso saca un siete.
+
+731
+00:39:01,340 --> 00:39:05,350
+¿Aprendieron, o el profesor eligió las preguntas mirando las respuestas?
+
+732
+00:39:05,470 --> 00:39:07,560
+Eso mismo hicimos toda la clase.
+
+733
+00:39:07,680 --> 00:39:12,041
+La clase treinta y dos dejó escrita esta regla: el escalador se ajusta solo
+
+734
+00:39:12,041 --> 00:39:15,820
+con entrenamiento; ajustarlo con todos los datos es data leakage.
+
+735
+00:39:15,940 --> 00:39:20,450
+Si eso vale para el escalador, ¿por qué no valdría para la selección de variables?
+
+736
+00:39:20,570 --> 00:39:25,981
+Toda esta clase seleccionamos mirando las tres mil ciento cincuenta filas: el filtro de
+
+737
+00:39:25,981 --> 00:39:30,770
+información mutua, el desempate de los pares redundantes, el RFE, y el Lasso.
+
+738
+00:39:30,890 --> 00:39:34,270
+Y después medimos el desempeño sobre esas mismas filas.
+
+739
+00:39:34,390 --> 00:39:36,880
+Todos esos AUC están inflados.
+
+740
+00:39:37,000 --> 00:39:38,360
+La pregunta es cuánto.
+
+741
+00:39:38,480 --> 00:39:42,690
+Para medirlo, la clase arma un caso donde sabemos la respuesta de antemano.
+
+742
+00:39:42,810 --> 00:39:45,813
+Cien observaciones, mil variables generadas al
+
+743
+00:39:45,813 --> 00:39:48,490
+azar, y un target lanzado a cara o sello.
+
+744
+00:39:48,610 --> 00:39:53,640
+No hay ninguna señal: cualquier medición honesta tiene que dar AUC cero coma cinco.
+
+745
+00:39:53,760 --> 00:39:58,257
+El procedimiento que casi todos escriben: calcular el estadístico F de las mil
+
+746
+00:39:58,257 --> 00:40:02,466
+variables contra el target, quedarse con las veinte mejores, y recién ahí
+
+747
+00:40:02,466 --> 00:40:05,810
+hacer validación cruzada de cinco folds sobre esas veinte.
+
+748
+00:40:05,930 --> 00:40:09,670
+Resultado: AUC cero coma ochocientos ochenta y dos.
+
+749
+00:40:09,790 --> 00:40:12,320
+Con datos que no contienen absolutamente nada.
+
+750
+00:40:12,440 --> 00:40:16,618
+El procedimiento correcto: armar un Pipeline que encadene la selección y
+
+751
+00:40:16,618 --> 00:40:20,100
+el modelo, y pasarle el pipeline completo a cross val score.
+
+752
+00:40:20,220 --> 00:40:23,140
+Así, en cada fold, las veinte variables se eligen
+
+753
+00:40:23,140 --> 00:40:25,940
+usando solo los ochenta casos de entrenamiento.
+
+754
+00:40:26,060 --> 00:40:28,330
+Los veinte de validación no participan.
+
+755
+00:40:28,450 --> 00:40:31,270
+Resultado: cero coma quinientos catorce.
+
+756
+00:40:31,390 --> 00:40:32,060
+La verdad.
+
+757
+00:40:32,180 --> 00:40:35,410
+Mismo dato, mismo modelo, misma validación.
+
+758
+00:40:35,530 --> 00:40:38,150
+Lo único que cambió es dónde vive la selección.
+
+759
+00:40:38,270 --> 00:40:42,519
+Cero coma ochocientos ochenta y dos menos cero coma cinco: treinta y ocho
+
+760
+00:40:42,519 --> 00:40:46,360
+puntos de AUC inventados, a partir de datos que no contienen nada.
+
+761
+00:40:46,480 --> 00:40:47,380
+¿Por qué pasa?
+
+762
+00:40:47,500 --> 00:40:49,839
+Con mil variables de ruido, algunas van a
+
+763
+00:40:49,839 --> 00:40:52,350
+coincidir con el target por pura casualidad.
+
+764
+00:40:52,470 --> 00:40:55,183
+Si usas un test al cinco por ciento, el número
+
+765
+00:40:55,183 --> 00:40:57,720
+esperado de falsos positivos es alfa por p.
+
+766
+00:40:57,840 --> 00:40:59,140
+Tres casos del apunte.
+
+767
+00:40:59,260 --> 00:41:03,330
+Mil variables al cinco por ciento: cincuenta falsos positivos.
+
+768
+00:41:03,450 --> 00:41:06,040
+Doscientas al cinco por ciento: diez.
+
+769
+00:41:06,160 --> 00:41:08,670
+Mil al uno por ciento: también diez.
+
+770
+00:41:08,790 --> 00:41:10,920
+¿Y en los datos de ruido del notebook?
+
+771
+00:41:11,040 --> 00:41:11,950
+Lo verifiqué.
+
+772
+00:41:12,070 --> 00:41:15,582
+Cincuenta y siete de las mil variables tienen p-valor bajo cero
+
+773
+00:41:15,582 --> 00:41:18,370
+coma cero cinco: cerca de los cincuenta esperados.
+
+774
+00:41:18,490 --> 00:41:21,810
+Y diez bajo cero coma cero uno: justo lo esperado.
+
+775
+00:41:21,930 --> 00:41:26,340
+Elegimos las veinte que mejor coincidieron en estas cien observaciones concretas.
+
+776
+00:41:26,460 --> 00:41:29,936
+Después validamos sobre esas mismas cien: el fold de validación
+
+777
+00:41:29,936 --> 00:41:33,080
+contiene justo los casos que las hicieron parecer buenas.
+
+778
+00:41:33,200 --> 00:41:35,660
+El modelo no generaliza: recuerda.
+
+779
+00:41:35,780 --> 00:41:38,568
+Y la validación cruzada no lo detecta, porque la
+
+780
+00:41:38,568 --> 00:41:40,950
+trampa ocurrió antes de partir los datos.
+
+781
+00:41:41,070 --> 00:41:45,640
+La regla de oro: si la decisión mira el target, va dentro de cada fold.
+
+782
+00:41:45,760 --> 00:41:49,649
+Borrar una edad imposible, construir ratios y logaritmos,
+
+783
+00:41:49,649 --> 00:41:52,720
+y el one-hot, no miran nada: pueden ir antes.
+
+784
+00:41:52,840 --> 00:41:55,813
+Escalar e imputar no miran el target, pero usan la
+
+785
+00:41:55,813 --> 00:41:58,430
+media y la mediana del conjunto: van dentro.
+
+786
+00:41:58,550 --> 00:42:02,050
+Y el filtro de información mutua, el desempate, el
+
+787
+00:42:02,050 --> 00:42:05,130
+RFE y el Lasso, miran el target: van dentro.
+
+788
+00:42:05,250 --> 00:42:10,140
+Regla de bolsillo del apunte: si un paso necesita fit, va dentro del Pipeline.
+
+789
+00:42:10,260 --> 00:42:14,240
+Si es una fórmula fija, fila por fila, puede ir antes.
+
+790
+00:42:14,360 --> 00:42:17,892
+Y una precisión sobre el propio notebook: los cuartiles, y los
+
+791
+00:42:17,892 --> 00:42:21,595
+indicadores que usan la mediana o el percentil setenta y cinco de
+
+792
+00:42:21,595 --> 00:42:24,330
+toda la base, sí usan estadísticas del conjunto.
+
+793
+00:42:24,450 --> 00:42:27,640
+Por la misma regla, en rigor, van dentro del fold.
+
+794
+00:42:27,760 --> 00:42:31,000
+Aquí no medimos cuánto cambia, pero la regla es la regla.
+
+795
+00:42:31,120 --> 00:42:34,240
+Ahora, rehacer la clase entera, esta vez bien.
+
+796
+00:42:34,360 --> 00:42:39,188
+Un Pipeline con cuatro pasos, en este orden: imputar con la mediana, escalar,
+
+797
+00:42:39,188 --> 00:42:43,890
+seleccionar doce variables por información mutua, y la regresión logística.
+
+798
+00:42:44,010 --> 00:42:46,347
+Todo dentro del mismo objeto, para que la
+
+799
+00:42:46,347 --> 00:42:49,140
+validación cruzada lo repita entero en cada fold.
+
+800
+00:42:49,260 --> 00:42:53,391
+El resultado del notebook, fold por fold: cero coma ocho nueve
+
+801
+00:42:53,391 --> 00:42:57,455
+cinco, cero coma nueve uno cuatro, cero coma ocho nueve, cero
+
+802
+00:42:57,455 --> 00:43:00,720
+coma nueve dos tres, y cero coma ocho ocho siete.
+
+803
+00:43:00,840 --> 00:43:03,450
+Promedio: cero coma nueve cero uno.
+
+804
+00:43:03,570 --> 00:43:07,384
+Al repetirlo da lo mismo hasta la tercera cifra: la información mutua
+
+805
+00:43:07,384 --> 00:43:10,700
+dentro del pipeline no tiene semilla, y cambia en la cuarta.
+
+806
+00:43:10,820 --> 00:43:13,260
+¿Y cuánto inflaba la trampa con la base real?
+
+807
+00:43:13,380 --> 00:43:16,460
+Lo medí con la misma selección, y la misma semilla.
+
+808
+00:43:16,580 --> 00:43:21,210
+Seleccionando las doce afuera del CV: cero coma nueve cero uno tres.
+
+809
+00:43:21,330 --> 00:43:25,080
+Adentro del pipeline: cero coma ocho nueve nueve seis.
+
+810
+00:43:25,200 --> 00:43:27,912
+Con tres mil filas y señal fuerte, la trampa
+
+811
+00:43:27,912 --> 00:43:30,500
+infla poco: menos de dos décimas de punto.
+
+812
+00:43:30,620 --> 00:43:33,950
+Con cien filas y mil variables, treinta y ocho puntos.
+
+813
+00:43:34,070 --> 00:43:38,500
+La regla es la misma; el daño depende de cuántas variables tengas por fila.
+
+814
+00:43:38,620 --> 00:43:41,470
+Dos decisiones del pipeline, explicadas.
+
+815
+00:43:41,590 --> 00:43:45,878
+StratifiedKFold conserva el quince coma siete por ciento de fuga en cada
+
+816
+00:43:45,878 --> 00:43:49,750
+fold; una partición simple podría dejar un fold casi sin fugados.
+
+817
+00:43:49,870 --> 00:43:54,278
+Y el AUC: decir «nadie se va» acierta el ochenta y cuatro coma
+
+818
+00:43:54,278 --> 00:43:57,690
+tres por ciento, pero su AUC es cero coma cinco.
+
+819
+00:43:57,810 --> 00:44:01,460
+Y la trampa que ningún pipeline detecta: la ventana temporal.
+
+820
+00:44:01,580 --> 00:44:06,220
+Si quieres predecir la fuga de agosto, las variables se miden de junio hacia atrás.
+
+821
+00:44:06,340 --> 00:44:09,600
+Una variable como «llamó para dar de baja el servicio» casi
+
+822
+00:44:09,600 --> 00:44:12,860
+siempre ocurre después de la decisión que quieres predecir.
+
+823
+00:44:12,980 --> 00:44:15,790
+Es leakage, aunque no uses la columna fuga.
+
+824
+00:44:15,910 --> 00:44:20,215
+Por eso el profesor advierte: en la industria, un AUC de cero coma ochenta y
+
+825
+00:44:20,215 --> 00:44:24,180
+cuatro a cero coma ochenta y cinco en fuga ya es extremadamente bueno.
+
+826
+00:44:24,300 --> 00:44:28,170
+Un número demasiado bueno, de libro, suele esconder leakage.
+
+827
+00:44:28,290 --> 00:44:30,640
+Desconfía de las métricas perfectas.
+
+828
+00:44:30,760 --> 00:44:33,432
+El error típico de esta parada: elegir las
+
+829
+00:44:33,432 --> 00:44:36,550
+variables con todos los datos, y después validar.
+
+830
+00:44:36,670 --> 00:44:39,380
+La validación sale preciosa, y es mentira.
+
+831
+00:44:39,500 --> 00:44:42,130
+La selección tiene que vivir dentro del Pipeline.
+
+832
+00:44:42,250 --> 00:44:43,470
+Piensa un segundo.
+
+833
+00:44:43,590 --> 00:44:48,100
+Imputas los nulos con la mediana de toda la base, antes de la validación cruzada.
+
+834
+00:44:48,220 --> 00:44:49,540
+No miraste la fuga.
+
+835
+00:44:49,660 --> 00:44:50,490
+¿Hay leakage?
+
+836
+00:44:51,210 --> 00:44:52,840
+Sí, aunque sea leve.
+
+837
+00:44:52,960 --> 00:44:56,060
+La mediana se calculó también con los casos de validación.
+
+838
+00:44:56,180 --> 00:45:00,103
+La solución es la misma de siempre: SimpleImputer dentro del Pipeline,
+
+839
+00:45:00,103 --> 00:45:03,410
+para que cada fold use solo la mediana de su entrenamiento.
+
+840
+00:45:03,530 --> 00:45:07,026
+Para llevarte: toda decisión que mire el target, o que use
+
+841
+00:45:07,026 --> 00:45:10,040
+estadísticas del conjunto, va dentro de cada fold.
+
+842
+00:45:10,160 --> 00:45:14,560
+Con ruido puro, seleccionar afuera inventó treinta y ocho puntos de AUC.
+
+843
+00:45:14,680 --> 00:45:18,740
+Y además del pipeline, cuida la ventana temporal: nada del futuro.
+
+844
+00:45:18,860 --> 00:45:22,990
+Última parada: el repaso de la clase, y el checklist del proyecto.
+
+845
+00:45:23,890 --> 00:45:26,230
+Repaso final de la clase treinta y tres.
+
+846
+00:45:26,350 --> 00:45:30,147
+Las seis ideas, los números que conviene recordar, el checklist
+
+847
+00:45:30,147 --> 00:45:33,100
+del proyecto, y cómo saber si ya dominas el tema.
+
+848
+00:45:33,220 --> 00:45:35,420
+Repasemos la clase en seis ideas.
+
+849
+00:45:35,540 --> 00:45:39,790
+Una: limpiar primero, con reglas de negocio, sin borrar filas.
+
+850
+00:45:39,910 --> 00:45:44,790
+Dos: construir variables con sentido, y con épsilon en los denominadores.
+
+851
+00:45:44,910 --> 00:45:47,539
+Tres: una variable sobra por tres razones
+
+852
+00:45:47,539 --> 00:45:50,680
+distintas, y cada una pide una decisión distinta.
+
+853
+00:45:50,800 --> 00:45:55,610
+Cuatro: filter, wrapper y embedded son etapas de un embudo, no rivales.
+
+854
+00:45:55,730 --> 00:45:59,300
+Cinco: todo lo que mira el target va dentro de cada fold.
+
+855
+00:45:59,420 --> 00:46:02,880
+Y seis: desconfía de un AUC demasiado bueno.
+
+856
+00:46:03,000 --> 00:46:06,980
+Los números que conviene recordar, todos de la base real o del notebook.
+
+857
+00:46:07,100 --> 00:46:08,770
+Cuarenta y tres imposibles.
+
+858
+00:46:08,890 --> 00:46:12,057
+De doce a cincuenta variables, con el AUC de cero
+
+859
+00:46:12,057 --> 00:46:14,900
+coma nueve dos a cero coma nueve cuatro uno.
+
+860
+00:46:15,020 --> 00:46:18,470
+Número de fallas: azar sola, útil acompañada.
+
+861
+00:46:18,590 --> 00:46:22,640
+El XOR: cero coma cinco uno sin el producto, uno con él.
+
+862
+00:46:22,760 --> 00:46:27,700
+Cuatro contra cuatro: cero coma ocho cero cuatro contra cero coma ocho nueve tres.
+
+863
+00:46:27,820 --> 00:46:30,150
+El Lasso: veintisiete de cincuenta.
+
+864
+00:46:30,270 --> 00:46:33,438
+Y el ruido puro: cero coma ochocientos ochenta y dos
+
+865
+00:46:33,438 --> 00:46:36,180
+afuera, cero coma quinientos catorce adentro.
+
+866
+00:46:36,300 --> 00:46:40,450
+El entregable conceptual de la clase es este checklist, en diez pasos.
+
+867
+00:46:40,570 --> 00:46:42,460
+Limpiar con criterio de negocio.
+
+868
+00:46:42,580 --> 00:46:44,460
+Separar el test antes de todo.
+
+869
+00:46:44,580 --> 00:46:46,170
+Construir candidatas.
+
+870
+00:46:46,290 --> 00:46:47,340
+Un filtro base.
+
+871
+00:46:47,460 --> 00:46:50,700
+Y detectar la redundancia, desempatando con criterio.
+
+872
+00:46:50,820 --> 00:46:53,550
+No descartar por p-valor sin probar en conjunto.
+
+873
+00:46:53,670 --> 00:46:56,650
+Un método multivariado, RFE o Lasso.
+
+874
+00:46:56,770 --> 00:46:58,990
+Todo dentro de un pipeline validado.
+
+875
+00:46:59,110 --> 00:47:00,420
+Medir la estabilidad.
+
+876
+00:47:00,540 --> 00:47:02,860
+Y documentar por qué quedó cada variable.
+
+877
+00:47:02,980 --> 00:47:08,150
+Fíjate en los que marqué en ámbar: los pasos uno, dos y diez no son estadísticos.
+
+878
+00:47:08,270 --> 00:47:11,280
+Según el profesor, son los que más modelos salvan.
+
+879
+00:47:11,400 --> 00:47:13,990
+Y las alertas del material que vimos en la serie.
+
+880
+00:47:14,110 --> 00:47:16,340
+Número de fallas no es irrelevante.
+
+881
+00:47:16,460 --> 00:47:19,060
+El Lasso deja veintisiete, no veinticinco.
+
+882
+00:47:19,180 --> 00:47:21,530
+El seis contra seis depende de un empate.
+
+883
+00:47:21,650 --> 00:47:24,760
+Y en el XOR, x2 pasa el filtro por azar.
+
+884
+00:47:24,880 --> 00:47:28,340
+La tabla de pares mete uno de cero coma setenta y dos, y
+
+885
+00:47:28,340 --> 00:47:31,120
+los cuartiles, en rigor, van dentro del fold.
+
+886
+00:47:31,240 --> 00:47:34,762
+Un adelanto que el profesor pidió anotar, y que no se calcula
+
+887
+00:47:34,762 --> 00:47:38,342
+en esta clase: el Weight of Evidence, que se usa en banca para
+
+888
+00:47:38,342 --> 00:47:40,940
+discretizar variables antes de una logística.
+
+889
+00:47:41,060 --> 00:47:43,795
+Se parte la variable en tramos, y en cada tramo se
+
+890
+00:47:43,795 --> 00:47:46,420
+compara la proporción de buenos con la de malos.
+
+891
+00:47:46,540 --> 00:47:51,320
+El ejemplo del apunte: ochocientos buenos y doscientos malos, en dos tramos.
+
+892
+00:47:51,440 --> 00:47:55,717
+Tramo A: quinientos de ochocientos buenos, sesenta y dos coma cinco por
+
+893
+00:47:55,717 --> 00:47:59,210
+ciento; y sesenta de doscientos malos, treinta por ciento.
+
+894
+00:47:59,330 --> 00:48:02,616
+WOE: logaritmo de cero coma seis dos cinco entre cero
+
+895
+00:48:02,616 --> 00:48:05,220
+coma treinta, cero coma siete tres cuatro.
+
+896
+00:48:05,340 --> 00:48:08,650
+Aporte al IV: cero coma tres dos cinco por cero coma
+
+897
+00:48:08,650 --> 00:48:11,450
+siete tres cuatro, cero coma dos tres nueve.
+
+898
+00:48:11,570 --> 00:48:14,711
+Tramo B: treinta y siete coma cinco por ciento de los
+
+899
+00:48:14,711 --> 00:48:17,200
+buenos, y setenta por ciento de los malos.
+
+900
+00:48:17,320 --> 00:48:19,970
+WOE: menos cero coma seis dos cuatro.
+
+901
+00:48:20,090 --> 00:48:22,660
+Aporte: cero coma dos cero tres.
+
+902
+00:48:22,780 --> 00:48:26,270
+El IV suma los aportes: cero coma cuarenta y cuatro.
+
+903
+00:48:26,390 --> 00:48:27,850
+Poder predictivo fuerte.
+
+904
+00:48:27,970 --> 00:48:30,790
+Piensa un segundo: dos preguntas rápidas.
+
+905
+00:48:30,910 --> 00:48:33,610
+Una variable tiene p-valor cero coma sesenta.
+
+906
+00:48:33,730 --> 00:48:34,790
+¿La descartas?
+
+907
+00:48:34,910 --> 00:48:38,770
+Y en sklearn, ¿un C chico en el Lasso deja más o menos variables?
+
+908
+00:48:39,490 --> 00:48:42,560
+Uno: no, sin antes probarla en conjunto.
+
+909
+00:48:42,680 --> 00:48:46,450
+Número de fallas tenía cero coma sesenta, y subía el modelo.
+
+910
+00:48:46,570 --> 00:48:47,930
+Dos: menos.
+
+911
+00:48:48,050 --> 00:48:51,392
+C es el inverso de la penalización: con C igual a cero
+
+912
+00:48:51,392 --> 00:48:54,300
+coma cero uno, solo trece variables sobreviven.
+
+913
+00:48:54,420 --> 00:48:56,390
+¿Cómo sabes si ya dominas el tema?
+
+914
+00:48:56,510 --> 00:48:59,480
+Detectas valores imposibles y justificas tu regla.
+
+915
+00:48:59,600 --> 00:49:01,500
+Construyes ratios con épsilon.
+
+916
+00:49:01,620 --> 00:49:05,090
+Distingues los tres motivos, con un ejemplo de cada uno.
+
+917
+00:49:05,210 --> 00:49:07,130
+Explicas las tres familias.
+
+918
+00:49:07,250 --> 00:49:09,620
+Armas un Pipeline con la selección adentro.
+
+919
+00:49:09,740 --> 00:49:13,060
+Y resuelves el cuaderno con ochenta por ciento de aciertos.
+
+920
+00:49:13,180 --> 00:49:13,950
+¿Qué viene?
+
+921
+00:49:14,070 --> 00:49:16,890
+La clase treinta y cuatro: árboles de decisión.
+
+922
+00:49:17,010 --> 00:49:20,304
+Un modelo que hace su propia selección de variables mientras se
+
+923
+00:49:20,304 --> 00:49:23,754
+entrena, y que elige sus cortes con la ganancia de información: la
+
+924
+00:49:23,754 --> 00:49:26,420
+misma información mutua que usamos hoy como filtro.
+
+925
+00:49:26,540 --> 00:49:29,640
+Y vas a ver por qué reclamos siempre queda arriba de todo.
+
+926
+00:49:29,760 --> 00:49:33,165
+Y una pregunta para pensar antes de esa clase: si tuvieras que
+
+927
+00:49:33,165 --> 00:49:36,734
+explicarle a un gerente comercial por qué se fuga un cliente, ¿le
+
+928
+00:49:36,734 --> 00:49:39,700
+mostrarías doce coeficientes, o preferirías otra cosa?
+
+929
+00:49:39,820 --> 00:49:41,740
+Nos vemos en la clase treinta y cuatro.

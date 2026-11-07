@@ -1,0 +1,307 @@
+1
+00:00:00,250 --> 00:00:05,000
+Clase treinta y siete: máquinas de vectores de soporte y clasificadores clásicos.
+
+2
+00:00:05,120 --> 00:00:07,452
+Empezamos por lo básico: qué significa
+
+3
+00:00:07,452 --> 00:00:09,785
+clasificar, y contra qué regla hay que
+
+4
+00:00:09,785 --> 00:00:10,460
+compararse.
+
+5
+00:00:10,580 --> 00:00:12,620
+Una biopsia llega al laboratorio.
+
+6
+00:00:12,740 --> 00:00:16,890
+Se miden las células: su tamaño, su textura, su forma.
+
+7
+00:00:17,010 --> 00:00:19,440
+Y hay que decidir: ¿benigno o maligno?
+
+8
+00:00:19,560 --> 00:00:24,400
+Un clasificador hace exactamente eso: recibe mediciones y devuelve una clase.
+
+9
+00:00:24,520 --> 00:00:26,250
+Piensa en un detector de humo.
+
+10
+00:00:26,370 --> 00:00:30,000
+Mide partículas en el aire y decide: alarma o silencio.
+
+11
+00:00:30,120 --> 00:00:33,870
+Si suena sin fuego, es una molestia: una falsa alarma.
+
+12
+00:00:33,990 --> 00:00:36,950
+Si se queda callado con fuego, es una tragedia.
+
+13
+00:00:37,070 --> 00:00:40,740
+Clasificar es decidir, y los dos errores no cuestan lo mismo.
+
+14
+00:00:40,860 --> 00:00:45,100
+La diapositiva dos lo dice así: observamos pares, x e y.
+
+15
+00:00:45,220 --> 00:00:49,530
+x son los predictores; y es la etiqueta conocida, cero o uno.
+
+16
+00:00:49,650 --> 00:00:53,530
+Con esos ejemplos etiquetados se ajusta una regla, g(x).
+
+17
+00:00:53,650 --> 00:00:58,270
+Y el objetivo no es acertar en esos ejemplos, sino en casos que el modelo nunca vio.
+
+18
+00:00:58,390 --> 00:01:01,718
+Un detalle importante: que la clase se escriba con un cero y
+
+19
+00:01:01,718 --> 00:01:04,380
+un uno no la convierte en una variable continua.
+
+20
+00:01:04,500 --> 00:01:08,500
+Uno no es el doble de cero: son solo nombres para dos grupos.
+
+21
+00:01:08,620 --> 00:01:12,110
+El caso de trabajo es la base de cáncer de mama de Wisconsin.
+
+22
+00:01:12,230 --> 00:01:19,870
+Tiene 569 muestras: 357 benignas, en azul, y 212 malignas, en rojo.
+
+23
+00:01:19,990 --> 00:01:24,520
+El uno significa maligno: es la clase positiva, la que queremos detectar.
+
+24
+00:01:24,640 --> 00:01:28,543
+Se usan cuatro de las treinta mediciones originales: radio,
+
+25
+00:01:28,543 --> 00:01:31,850
+textura, suavidad y concavidad, todas en promedio.
+
+26
+00:01:31,970 --> 00:01:36,470
+Y una advertencia de la diapositiva cuatro: es una base histórica para enseñar.
+
+27
+00:01:36,590 --> 00:01:41,120
+No representa a la población chilena, ni es una herramienta clínica validada.
+
+28
+00:01:41,240 --> 00:01:44,850
+La partición ya viene en el archivo, en la columna conjunto.
+
+29
+00:01:44,970 --> 00:01:50,750
+398 casos para entrenar: 250 benignos y 148 malignos.
+
+30
+00:01:50,870 --> 00:01:55,900
+Y 171 para la prueba: 107 benignos y 64 malignos.
+
+31
+00:01:56,020 --> 00:01:59,659
+Es estratificada: cerca de un setenta y un treinta por ciento,
+
+32
+00:01:59,659 --> 00:02:02,770
+con la misma proporción de malignos en los dos lados.
+
+33
+00:02:02,890 --> 00:02:06,860
+La regla de oro: todo lo que el modelo aprende sale del entrenamiento.
+
+34
+00:02:06,980 --> 00:02:11,440
+La prueba se guarda, y se usa una sola vez, al final, para evaluar.
+
+35
+00:02:11,560 --> 00:02:13,870
+Una precisión sobre la grabación de la clase.
+
+36
+00:02:13,990 --> 00:02:18,700
+Se dijo: «con la base de 357 vamos a dividir en 70 y 30».
+
+37
+00:02:18,820 --> 00:02:21,850
+Pero 357 son solo los benignos.
+
+38
+00:02:21,970 --> 00:02:29,030
+Lo que se divide es la base completa, de 569 casos: 398 más 171.
+
+39
+00:02:29,150 --> 00:02:32,170
+Ahora, qué entrega cada modelo de esta clase.
+
+40
+00:02:32,290 --> 00:02:36,182
+La regresión logística entrega una probabilidad, p(x), y
+
+41
+00:02:36,182 --> 00:02:39,170
+clasifica como uno si supera un umbral, te.
+
+42
+00:02:39,290 --> 00:02:43,096
+La SVM entrega un puntaje, f(x), y clasifica como uno
+
+43
+00:02:43,096 --> 00:02:46,040
+si ese puntaje es mayor o igual que cero.
+
+44
+00:02:46,160 --> 00:02:50,626
+Y la diapositiva insiste en algo que vamos a repetir muchas veces: el
+
+45
+00:02:50,626 --> 00:02:54,250
+puntaje de una SVM no es, por sí solo, una probabilidad.
+
+46
+00:02:54,370 --> 00:02:57,690
+Un puntaje de dos no significa doscientos por ciento de nada.
+
+47
+00:02:57,810 --> 00:03:01,013
+Antes de entrenar nada, probemos la regla más simple
+
+48
+00:03:01,013 --> 00:03:03,970
+posible: decir siempre benigno, a todo el mundo.
+
+49
+00:03:04,090 --> 00:03:07,390
+En la prueba hay 107 benignos de 171.
+
+50
+00:03:07,510 --> 00:03:12,540
+Exactitud: 107 sobre 171, 0.626.
+
+51
+00:03:12,660 --> 00:03:16,200
+¡Un 62.6 por ciento sin mirar ni un solo dato!
+
+52
+00:03:16,320 --> 00:03:17,350
+¿Es un buen modelo?
+
+53
+00:03:17,470 --> 00:03:22,200
+Mira los malignos: son 64, y la regla no detecta ni uno.
+
+54
+00:03:22,320 --> 00:03:26,020
+Sensibilidad: cero sobre 64, igual a cero.
+
+55
+00:03:26,140 --> 00:03:30,530
+Una exactitud que parece alta puede esconder que una clase nunca se identifica.
+
+56
+00:03:30,650 --> 00:03:32,130
+Otra precisión de la clase.
+
+57
+00:03:32,250 --> 00:03:37,570
+Se dijo: «clasificamos todos como uno», y que así se aciertan 107 casos.
+
+58
+00:03:37,690 --> 00:03:41,200
+Pero con uno igual a maligno, decir siempre uno
+
+59
+00:03:41,200 --> 00:03:44,860
+acierta solo los 64 malignos: un 37.4 por ciento.
+
+60
+00:03:44,980 --> 00:03:48,910
+Los 107 aciertos son de la regla contraria, siempre benigno.
+
+61
+00:03:49,030 --> 00:03:51,090
+La diapositiva siete lo tiene bien.
+
+62
+00:03:51,210 --> 00:03:55,760
+El error típico: celebrar una exactitud alta sin compararla con la línea base.
+
+63
+00:03:55,880 --> 00:03:59,905
+El profesor lo ilustró con un banco: si solo el uno por ciento de
+
+64
+00:03:59,905 --> 00:04:04,116
+los clientes son malos pagadores, decir siempre «buen pagador» da un
+
+65
+00:04:04,116 --> 00:04:07,150
+99 por ciento de exactitud, y no sirve para nada.
+
+66
+00:04:07,270 --> 00:04:08,490
+Piensa un segundo.
+
+67
+00:04:08,610 --> 00:04:12,292
+Si en la prueba hubiera 150 benignos y 21 malignos, ¿qué
+
+68
+00:04:12,292 --> 00:04:15,120
+exactitud tendría la regla siempre benigno?
+
+69
+00:04:15,240 --> 00:04:16,400
+¿Y qué sensibilidad?
+
+70
+00:04:17,120 --> 00:04:24,240
+Exactitud: 150 sobre 171, 0.877, casi un 88 por ciento.
+
+71
+00:04:24,360 --> 00:04:26,460
+Y la sensibilidad sigue siendo cero.
+
+72
+00:04:26,580 --> 00:04:30,470
+Mientras más desbalanceada es la base, más engaña la exactitud.
+
+73
+00:04:30,590 --> 00:04:35,400
+Para llevarte: clasificar es decidir una clase, y los errores no cuestan lo mismo.
+
+74
+00:04:35,520 --> 00:04:42,070
+La base tiene 569 casos, con una partición fija de 398 y 171.
+
+75
+00:04:42,190 --> 00:04:46,240
+Y todo modelo se compara con la línea base: siempre benigno,
+
+76
+00:04:46,240 --> 00:04:49,750
+62.6 por ciento de exactitud y cero de sensibilidad.
+
+77
+00:04:49,870 --> 00:04:54,330
+Siguiente parada: la matriz de confusión, y las métricas que salen de ella.

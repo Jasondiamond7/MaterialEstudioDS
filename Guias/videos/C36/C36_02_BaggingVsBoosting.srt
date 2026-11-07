@@ -1,0 +1,315 @@
+1
+00:00:00,250 --> 00:00:02,770
+Segunda parada: bagging frente a boosting.
+
+2
+00:00:02,890 --> 00:00:06,610
+Los dos combinan árboles, pero resuelven problemas distintos.
+
+3
+00:00:06,730 --> 00:00:11,420
+En la clase anterior armamos un Random Forest: trescientos árboles promediados.
+
+4
+00:00:11,540 --> 00:00:14,010
+Boosting también combina muchos árboles.
+
+5
+00:00:14,130 --> 00:00:15,990
+Entonces, ¿no es lo mismo?
+
+6
+00:00:16,110 --> 00:00:16,530
+No.
+
+7
+00:00:16,650 --> 00:00:20,490
+Usan los mismos ingredientes, pero con filosofías opuestas.
+
+8
+00:00:20,610 --> 00:00:21,780
+Una analogía.
+
+9
+00:00:21,900 --> 00:00:25,629
+Bagging es como un comité de expertos que trabajan por separado:
+
+10
+00:00:25,629 --> 00:00:28,950
+cada uno opina sin mirar al otro, y al final se promedia.
+
+11
+00:00:29,070 --> 00:00:32,322
+Boosting es como un grupo de estudio en cadena: cada estudiante
+
+12
+00:00:32,322 --> 00:00:35,110
+revisa los errores del anterior y se concentra en eso.
+
+13
+00:00:35,230 --> 00:00:38,240
+El comité funciona en paralelo, todos a la vez.
+
+14
+00:00:38,360 --> 00:00:40,971
+El grupo de estudio, en secuencia: el segundo no
+
+15
+00:00:40,971 --> 00:00:43,310
+puede empezar hasta que el primero termine.
+
+16
+00:00:43,430 --> 00:00:46,320
+La diapositiva cuatro lo resume en dos columnas.
+
+17
+00:00:46,440 --> 00:00:49,789
+Bagging: modelos en paralelo, cada uno con una muestra
+
+18
+00:00:49,789 --> 00:00:52,890
+distinta, y las predicciones se promedian o votan.
+
+19
+00:00:53,010 --> 00:00:56,108
+Boosting: modelos en secuencia, cada etapa usa el
+
+20
+00:00:56,108 --> 00:00:59,080
+error acumulado, y las contribuciones se suman.
+
+21
+00:00:59,200 --> 00:01:03,090
+Y el objetivo típico de cada uno: bagging reduce la varianza.
+
+22
+00:01:03,210 --> 00:01:06,320
+Boosting reduce el sesgo, y el error en general.
+
+23
+00:01:06,440 --> 00:01:08,490
+¿Qué significan varianza y sesgo?
+
+24
+00:01:08,610 --> 00:01:09,780
+Piensa en dardos.
+
+25
+00:01:09,900 --> 00:01:12,834
+Un modelo con varianza alta tira dardos que caen
+
+26
+00:01:12,834 --> 00:01:15,340
+alrededor del centro, pero muy dispersos.
+
+27
+00:01:15,460 --> 00:01:19,790
+Un modelo con sesgo alto tira dardos muy juntos, pero lejos del centro.
+
+28
+00:01:19,910 --> 00:01:23,553
+Bagging arregla el primer problema: si promedias muchos tiros
+
+29
+00:01:23,553 --> 00:01:26,420
+dispersos, el promedio cae muy cerca del centro.
+
+30
+00:01:26,540 --> 00:01:30,840
+Boosting arregla el segundo: cada corrección empuja el grupo hacia el centro.
+
+31
+00:01:30,960 --> 00:01:33,580
+Por eso cada familia usa un árbol distinto.
+
+32
+00:01:33,700 --> 00:01:36,999
+El bosque usa árboles profundos: poco sesgo, mucha
+
+33
+00:01:36,999 --> 00:01:39,770
+varianza, y el promedio calma la varianza.
+
+34
+00:01:39,890 --> 00:01:43,946
+Boosting usa árboles chicos, de profundidad dos a seis: mucho
+
+35
+00:01:43,946 --> 00:01:47,470
+sesgo, poca varianza, y la suma va quitando el sesgo.
+
+36
+00:01:47,590 --> 00:01:52,810
+Veámoslo con datos reales: Ames, error de validación según el número de árboles.
+
+37
+00:01:52,930 --> 00:01:59,080
+Un solo árbol de profundidad tres, como referencia, se equivoca en 41 200 dólares.
+
+38
+00:01:59,200 --> 00:02:03,590
+Un Random Forest con un árbol profundo, en 39 300.
+
+39
+00:02:03,710 --> 00:02:07,220
+Con cien árboles baja a 23 100, y ahí se estanca.
+
+40
+00:02:07,340 --> 00:02:11,670
+Ahora boosting, con árboles de profundidad tres y eta 0.1.
+
+41
+00:02:11,790 --> 00:02:15,170
+Con un árbol, el error es enorme: 69 000.
+
+42
+00:02:15,290 --> 00:02:19,360
+Pero sigue bajando, árbol tras árbol, y pasa por debajo del bosque.
+
+43
+00:02:19,480 --> 00:02:22,610
+Con trescientos árboles llega a 21 800.
+
+44
+00:02:22,730 --> 00:02:23,950
+Piensa un segundo.
+
+45
+00:02:24,070 --> 00:02:29,390
+¿Por qué boosting con un solo árbol se equivoca en 69 000 dólares, mucho peor que
+
+46
+00:02:29,390 --> 00:02:33,790
+un árbol suelto de la misma profundidad, que se equivoca en 41 200?
+
+47
+00:02:34,510 --> 00:02:35,340
+Por eta.
+
+48
+00:02:35,460 --> 00:02:38,755
+Boosting parte del promedio, y al primer árbol lo suma
+
+49
+00:02:38,755 --> 00:02:42,660
+multiplicado por 0.1: solo avanza un diez por ciento del camino.
+
+50
+00:02:42,780 --> 00:02:44,580
+Es un paso chico a propósito.
+
+51
+00:02:44,700 --> 00:02:48,680
+El árbol suelto, en cambio, da el paso completo de una vez.
+
+52
+00:02:48,800 --> 00:02:53,070
+Boosting lo alcanza y lo supera después, sumando muchos pasos chicos.
+
+53
+00:02:53,190 --> 00:02:54,900
+La secuencia tiene un costo.
+
+54
+00:02:55,020 --> 00:02:58,280
+Imagina mil árboles y un computador con diez núcleos.
+
+55
+00:02:58,400 --> 00:03:01,625
+En bagging, los diez núcleos entrenan diez árboles a la
+
+56
+00:03:01,625 --> 00:03:04,380
+vez: el tiempo es como el de unos cien árboles.
+
+57
+00:03:04,500 --> 00:03:08,187
+En boosting, el árbol dos necesita el resultado del árbol uno:
+
+58
+00:03:08,187 --> 00:03:11,220
+se entrenan de a uno, y el tiempo es el de los mil.
+
+59
+00:03:11,340 --> 00:03:15,201
+Un matiz importante: XGBoost y LightGBM sí paralelizan,
+
+60
+00:03:15,201 --> 00:03:18,570
+pero dentro de cada árbol, al buscar los cortes.
+
+61
+00:03:18,690 --> 00:03:21,630
+Lo que no se puede paralelizar es la cadena de árboles.
+
+62
+00:03:21,750 --> 00:03:24,825
+El error típico: creer que, como en el bosque,
+
+63
+00:03:24,825 --> 00:03:27,700
+agregar árboles a boosting nunca hace daño.
+
+64
+00:03:27,820 --> 00:03:31,100
+En el bosque es cierto: la curva se aplana y no sube.
+
+65
+00:03:31,220 --> 00:03:34,256
+En boosting, cada árbol nuevo sigue ajustando los
+
+66
+00:03:34,256 --> 00:03:36,920
+residuos, y puede terminar ajustando ruido.
+
+67
+00:03:37,040 --> 00:03:40,408
+En Ames, el mínimo llegó a los 250 árboles, y a los
+
+68
+00:03:40,408 --> 00:03:43,380
+trescientos el error ya había subido un poco.
+
+69
+00:03:43,500 --> 00:03:48,174
+Y la diapositiva cuatro advierte algo más: la secuencia hace a boosting más sensible
+
+70
+00:03:48,174 --> 00:03:51,790
+a los hiperparámetros, al ruido y a la filtración de información.
+
+71
+00:03:51,910 --> 00:03:54,737
+Una etiqueta mal puesta se convierte en el caso más
+
+72
+00:03:54,737 --> 00:03:57,120
+difícil, y el modelo se obsesiona con ella.
+
+73
+00:03:57,240 --> 00:04:00,332
+Para llevarte: bagging, en paralelo, con árboles
+
+74
+00:04:00,332 --> 00:04:03,230
+profundos que se promedian: baja la varianza.
+
+75
+00:04:03,350 --> 00:04:08,040
+Boosting, en secuencia, con árboles chicos que se suman: baja el sesgo.
+
+76
+00:04:08,160 --> 00:04:11,164
+Boosting da pasos chicos, puede superar al bosque, y
+
+77
+00:04:11,164 --> 00:04:13,590
+necesita que alguien le diga cuándo parar.
+
+78
+00:04:13,710 --> 00:04:17,568
+Siguiente parada: el primer algoritmo de la familia, AdaBoost,
+
+79
+00:04:17,568 --> 00:04:20,680
+y cómo usa pesos para señalar los casos difíciles.

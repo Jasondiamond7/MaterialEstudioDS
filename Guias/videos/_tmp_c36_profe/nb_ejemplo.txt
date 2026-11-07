@@ -1,0 +1,707 @@
+##### [0] markdown
+# Ejercicios de modelos de boosting
+
+## AdaBoost, Gradient Boosting, XGBoost y LightGBM
+
+En este notebook los cuatro modelos compiten en dos problemas:
+
+1. **Clasificación:** detección de enfermedad cardíaca con `Heart.xlsx`.
+2. **Regresión:** estimación del precio de viviendas con `ames_housing.csv`.
+
+El flujo de cada caso incluye un EDA breve, preprocesamiento, modelos base, evaluación en test y optimización de hiperparámetros.
+
+> El conjunto de test se mantiene separado durante la optimización. GridSearchCV y RandomizedSearchCV trabajan solamente con los datos de entrenamiento.
+##### [1] markdown
+## 1. Preparación
+
+Si alguna biblioteca no está instalada, ejecuta una vez:
+
+```python
+%pip install pandas numpy matplotlib seaborn scikit-learn openpyxl xgboost lightgbm
+```
+
+`FAST_MODE=True` utiliza modelos y búsquedas pequeñas para una demostración en clase. Cambia el valor a `False` para explorar más combinaciones con validación cruzada más exigente.
+##### [2] code
+from pathlib import Path
+from time import perf_counter
+import warnings
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from IPython.display import display
+from sklearn.base import clone
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.model_selection import train_test_split, StratifiedKFold, KFold
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
+from sklearn.metrics import (
+    accuracy_score, balanced_accuracy_score, precision_score, recall_score,
+    f1_score, roc_auc_score, ConfusionMatrixDisplay,
+    mean_absolute_error, mean_squared_error, r2_score,
+)
+from sklearn.ensemble import (
+    AdaBoostClassifier, GradientBoostingClassifier,
+    AdaBoostRegressor, GradientBoostingRegressor,
+)
+from xgboost import XGBClassifier, XGBRegressor
+from lightgbm import LGBMClassifier, LGBMRegressor
+
+warnings.filterwarnings('ignore', category=FutureWarning)
+sns.set_theme(style='whitegrid', context='notebook')
+RANDOM_STATE = 42
+FAST_MODE = True
+N_JOBS = -1
+
+# Presupuesto de cómputo controlado desde un solo lugar.
+CV_CLASS_SPLITS = 3 if FAST_MODE else 5
+CV_REG_SPLITS = 3 if FAST_MODE else 5
+N_ITER_RANDOM = 6 if FAST_MODE else 20
+
+N_ESTIMATORS_CLASS = 100 if FAST_MODE else 250
+N_ESTIMATORS_REG = 150 if FAST_MODE else 350
+
+ADA_GRID_ESTIMATORS = [50, 150] if FAST_MODE else [50, 150, 300]
+ADA_GRID_LEARNING_RATE = [0.05, 0.20] if FAST_MODE else [0.03, 0.10, 0.30]
+
+GBR_GRID_ESTIMATORS = [120, 220] if FAST_MODE else [120, 220, 350]
+GBR_GRID_LEARNING_RATE = [0.05, 0.12] if FAST_MODE else [0.03, 0.07, 0.12]
+GBR_GRID_DEPTH = [2, 3] if FAST_MODE else [2, 3, 4]
+GBR_GRID_MIN_LEAF = [5, 10] if FAST_MODE else [3, 8, 15]
+
+print('pandas:', pd.__version__)
+import sklearn, xgboost, lightgbm
+print('scikit-learn:', sklearn.__version__)
+print('xgboost:', xgboost.__version__)
+print('lightgbm:', lightgbm.__version__)
+print('FAST_MODE:', FAST_MODE)
+print('Iteraciones de RandomizedSearchCV:', N_ITER_RANDOM)
+##### [3] code
+# El notebook busca los archivos en la carpeta original y en ubicaciones relativas comunes.
+data_candidates = [
+    Path('/Users/usuario/Desktop/UC/Random Forest y Boosting/Data'),
+    Path.cwd() / 'Data',
+    Path.cwd().parent / 'Data',
+    Path.cwd(),
+]
+
+DATA_DIR = next(
+    (p for p in data_candidates
+     if (p / 'Heart.xlsx').exists() and (p / 'ames_housing.csv').exists()),
+    None,
+)
+
+if DATA_DIR is None:
+    raise FileNotFoundError(
+        'No se encontraron Heart.xlsx y ames_housing.csv. '
+        'Actualiza la lista data_candidates con la ubicación de la carpeta Data.'
+    )
+
+HEART_PATH = DATA_DIR / 'Heart.xlsx'
+AMES_PATH = DATA_DIR / 'ames_housing.csv'
+print('Carpeta de datos:', DATA_DIR)
+##### [4] markdown
+## 2. Funciones auxiliares
+
+El preprocesamiento se aprende dentro de cada pipeline para evitar filtración de información durante la validación cruzada.
+##### [5] code
+def make_preprocessor(X):
+    numeric_features = X.select_dtypes(include=np.number).columns.tolist()
+    categorical_features = X.select_dtypes(exclude=np.number).columns.tolist()
+
+    numeric_pipe = Pipeline([
+        ('imputer', SimpleImputer(strategy='median')),
+    ])
+    categorical_pipe = Pipeline([
+        ('imputer', SimpleImputer(strategy='most_frequent')),
+        ('onehot', OneHotEncoder(handle_unknown='ignore', sparse_output=False)),
+    ])
+
+    return ColumnTransformer([
+        ('num', numeric_pipe, numeric_features),
+        ('cat', categorical_pipe, categorical_features),
+    ], remainder='drop')
+
+
+def evaluate_classifier(name, pipeline, X_train, y_train, X_test, y_test):
+    model = clone(pipeline)
+    start = perf_counter()
+    model.fit(X_train, y_train)
+    elapsed = perf_counter() - start
+
+    pred_train = model.predict(X_train)
+    pred_test = model.predict(X_test)
+    proba_test = model.predict_proba(X_test)[:, 1]
+
+    result = {
+        'Modelo': name,
+        'Accuracy train': accuracy_score(y_train, pred_train),
+        'Accuracy test': accuracy_score(y_test, pred_test),
+        'Balanced accuracy': balanced_accuracy_score(y_test, pred_test),
+        'Precision': precision_score(y_test, pred_test, zero_division=0),
+        'Recall': recall_score(y_test, pred_test, zero_division=0),
+        'F1': f1_score(y_test, pred_test, zero_division=0),
+        'ROC AUC': roc_auc_score(y_test, proba_test),
+        'Tiempo (s)': elapsed,
+    }
+    return model, result
+
+
+def evaluate_regressor(name, pipeline, X_train, y_train, X_test, y_test):
+    model = clone(pipeline)
+    start = perf_counter()
+    model.fit(X_train, y_train)
+    elapsed = perf_counter() - start
+
+    pred_train = model.predict(X_train)
+    pred_test = model.predict(X_test)
+
+    result = {
+        'Modelo': name,
+        'RMSE train': mean_squared_error(y_train, pred_train) ** 0.5,
+        'RMSE test': mean_squared_error(y_test, pred_test) ** 0.5,
+        'MAE test': mean_absolute_error(y_test, pred_test),
+        'R² test': r2_score(y_test, pred_test),
+        'Tiempo (s)': elapsed,
+    }
+    return model, result
+##### [6] markdown
+# Parte I. Clasificación con Heart
+
+La variable objetivo es `AHD`:
+
+- `No`: ausencia de enfermedad cardíaca.
+- `Yes`: presencia de enfermedad cardíaca.
+##### [7] code
+heart = pd.read_excel(HEART_PATH)
+print('Dimensiones:', heart.shape)
+display(heart.head())
+display(heart.dtypes.rename('Tipo').to_frame())
+##### [8] markdown
+## 3. EDA breve de Heart
+##### [9] code
+heart_summary = pd.DataFrame({
+    'Tipo': heart.dtypes.astype(str),
+    'Faltantes': heart.isna().sum(),
+    'Únicos': heart.nunique(dropna=True),
+}).sort_values(['Faltantes', 'Únicos'], ascending=[False, True])
+display(heart_summary)
+##### [10] code
+fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+
+heart['AHD'].value_counts().plot.bar(ax=axes[0], color=['#17B6B0', '#D25757'])
+axes[0].set_title('Distribución de AHD')
+axes[0].set_xlabel('Clase')
+axes[0].set_ylabel('Observaciones')
+axes[0].tick_params(axis='x', rotation=0)
+
+sns.histplot(data=heart, x='Age', hue='AHD', bins=12, multiple='layer', ax=axes[1])
+axes[1].set_title('Edad según AHD')
+
+sns.boxplot(data=heart, x='AHD', y='MaxHR', ax=axes[2], palette=['#17B6B0', '#D25757'])
+axes[2].set_title('Frecuencia cardíaca máxima')
+
+plt.tight_layout()
+plt.show()
+##### [11] markdown
+### Preguntas para discutir
+
+1. ¿La clase positiva está fuertemente desbalanceada?
+2. ¿Qué variables contienen datos faltantes?
+3. ¿Accuracy sería suficiente si el costo de un falso negativo fuera alto?
+##### [12] markdown
+## 4. Separación de entrenamiento y test
+##### [13] code
+X_heart = heart.drop(columns='AHD')
+y_heart = heart['AHD'].map({'No': 0, 'Yes': 1})
+
+Xh_train, Xh_test, yh_train, yh_test = train_test_split(
+    X_heart, y_heart,
+    test_size=0.25,
+    stratify=y_heart,
+    random_state=RANDOM_STATE,
+)
+
+print('Entrenamiento:', Xh_train.shape)
+print('Test:', Xh_test.shape)
+print('Proporción positiva train:', yh_train.mean().round(3))
+print('Proporción positiva test:', yh_test.mean().round(3))
+##### [14] markdown
+## 5. Modelos base de clasificación
+##### [15] code
+heart_preprocessor = make_preprocessor(Xh_train)
+
+classification_estimators = {
+    'AdaBoost': AdaBoostClassifier(
+        n_estimators=N_ESTIMATORS_CLASS, learning_rate=0.05,
+        random_state=RANDOM_STATE,
+    ),
+    'Gradient Boosting': GradientBoostingClassifier(
+        n_estimators=N_ESTIMATORS_CLASS, learning_rate=0.05, max_depth=2,
+        random_state=RANDOM_STATE,
+    ),
+    'XGBoost': XGBClassifier(
+        n_estimators=N_ESTIMATORS_CLASS, learning_rate=0.05, max_depth=3,
+        subsample=0.8, colsample_bytree=0.8,
+        eval_metric='logloss', n_jobs=N_JOBS,
+        random_state=RANDOM_STATE,
+    ),
+    'LightGBM': LGBMClassifier(
+        n_estimators=N_ESTIMATORS_CLASS, learning_rate=0.05, num_leaves=15,
+        max_depth=-1, subsample=0.8, colsample_bytree=0.8,
+        verbosity=-1, n_jobs=N_JOBS,
+        random_state=RANDOM_STATE,
+    ),
+}
+
+classification_pipelines = {
+    name: Pipeline([
+        ('preprocessor', clone(heart_preprocessor)),
+        ('model', estimator),
+    ])
+    for name, estimator in classification_estimators.items()
+}
+##### [16] code
+fitted_classifiers = {}
+classification_results = []
+
+for name, pipeline in classification_pipelines.items():
+    fitted, result = evaluate_classifier(
+        name, pipeline, Xh_train, yh_train, Xh_test, yh_test
+    )
+    fitted_classifiers[name] = fitted
+    classification_results.append(result)
+
+classification_results = (
+    pd.DataFrame(classification_results)
+    .sort_values('ROC AUC', ascending=False)
+    .reset_index(drop=True)
+)
+display(classification_results.style.format({
+    c: '{:.3f}' for c in classification_results.columns if c != 'Modelo'
+}))
+##### [17] code
+fig, axes = plt.subplots(1, 2, figsize=(13, 4.5))
+
+classification_results.set_index('Modelo')[['F1', 'ROC AUC']].plot.bar(
+    ax=axes[0], color=['#17B6B0', '#F4B64E']
+)
+axes[0].set_ylim(0, 1)
+axes[0].set_title('Desempeño en test')
+axes[0].tick_params(axis='x', rotation=20)
+
+classification_results.set_index('Modelo')[['Accuracy train', 'Accuracy test']].plot.bar(
+    ax=axes[1], color=['#2D789B', '#D25757']
+)
+axes[1].set_ylim(0, 1)
+axes[1].set_title('Brecha entre entrenamiento y test')
+axes[1].tick_params(axis='x', rotation=20)
+
+plt.tight_layout()
+plt.show()
+##### [18] code
+fig, axes = plt.subplots(2, 2, figsize=(10, 9))
+for ax, (name, model) in zip(axes.ravel(), fitted_classifiers.items()):
+    ConfusionMatrixDisplay.from_estimator(
+        model, Xh_test, yh_test,
+        display_labels=['No', 'Yes'], cmap='Blues', colorbar=False, ax=ax
+    )
+    ax.set_title(name)
+plt.tight_layout()
+plt.show()
+##### [19] markdown
+### Ejercicio 1
+
+Compara `Accuracy train` con `Accuracy test`.
+
+- ¿Qué modelo presenta la mayor brecha?
+- ¿Esa brecha sugiere sobreajuste?
+- Si el objetivo fuera detectar la mayor cantidad posible de pacientes con AHD, ¿qué métrica priorizarías?
+##### [20] markdown
+## 6. Optimización en clasificación
+
+Usaremos dos estrategias para mostrar sus diferencias:
+
+- **GridSearchCV:** prueba todas las combinaciones definidas para AdaBoost.
+- **RandomizedSearchCV:** evalúa una muestra de combinaciones para XGBoost.
+
+Ambas búsquedas usan únicamente el conjunto de entrenamiento.
+##### [21] code
+cv_classification = StratifiedKFold(
+    n_splits=CV_CLASS_SPLITS, shuffle=True, random_state=RANDOM_STATE
+)
+
+ada_grid = GridSearchCV(
+    estimator=classification_pipelines['AdaBoost'],
+    param_grid={
+        'model__n_estimators': ADA_GRID_ESTIMATORS,
+        'model__learning_rate': ADA_GRID_LEARNING_RATE,
+    },
+    scoring='roc_auc',
+    cv=cv_classification,
+    n_jobs=N_JOBS,
+    return_train_score=True,
+)
+
+ada_grid.fit(Xh_train, yh_train)
+print('Mejores parámetros:', ada_grid.best_params_)
+print('ROC AUC promedio en validación:', round(ada_grid.best_score_, 3))
+##### [22] code
+xgb_search_pipeline = Pipeline([
+    ('preprocessor', clone(heart_preprocessor)),
+    ('model', XGBClassifier(
+        eval_metric='logloss', n_jobs=1,
+        random_state=RANDOM_STATE,
+    )),
+])
+
+xgb_random = RandomizedSearchCV(
+    estimator=xgb_search_pipeline,
+    param_distributions={
+        'model__n_estimators': [80, 150, 250, 400],
+        'model__learning_rate': [0.02, 0.05, 0.10, 0.20],
+        'model__max_depth': [1, 2, 3, 4],
+        'model__subsample': [0.65, 0.80, 1.0],
+        'model__colsample_bytree': [0.65, 0.80, 1.0],
+        'model__min_child_weight': [1, 3, 5],
+    },
+    n_iter=N_ITER_RANDOM,
+    scoring='roc_auc',
+    cv=cv_classification,
+    random_state=RANDOM_STATE,
+    n_jobs=N_JOBS,
+    return_train_score=True,
+)
+
+xgb_random.fit(Xh_train, yh_train)
+print('Mejores parámetros:', xgb_random.best_params_)
+print('ROC AUC promedio en validación:', round(xgb_random.best_score_, 3))
+##### [23] code
+def final_classification_metrics(name, model):
+    pred = model.predict(Xh_test)
+    proba = model.predict_proba(Xh_test)[:, 1]
+    return {
+        'Modelo': name,
+        'Accuracy test': accuracy_score(yh_test, pred),
+        'Recall': recall_score(yh_test, pred),
+        'F1': f1_score(yh_test, pred),
+        'ROC AUC': roc_auc_score(yh_test, proba),
+    }
+
+tuned_classification = pd.DataFrame([
+    final_classification_metrics('AdaBoost optimizado', ada_grid.best_estimator_),
+    final_classification_metrics('XGBoost optimizado', xgb_random.best_estimator_),
+])
+display(tuned_classification.style.format({
+    c: '{:.3f}' for c in tuned_classification.columns if c != 'Modelo'
+}))
+##### [24] markdown
+### Ejercicio 2
+
+Optimiza `Gradient Boosting` o `LightGBM` usando una de las búsquedas anteriores.
+
+Sugerencias:
+
+- Gradient Boosting: `n_estimators`, `learning_rate`, `max_depth` y `min_samples_leaf`.
+- LightGBM: `n_estimators`, `learning_rate`, `num_leaves` y `min_child_samples`.
+##### [25] code
+# Escribe aquí tu búsqueda.
+# Mantén scoring='roc_auc' para que la comparación sea consistente.
+##### [26] markdown
+# Parte II. Regresión con Ames Housing
+
+El objetivo es predecir `Sale_Price`. El dataset contiene variables numéricas y categóricas, por lo que mantendremos el mismo principio de preprocesamiento dentro del pipeline.
+##### [27] code
+ames = pd.read_csv(AMES_PATH)
+ames = ames.drop(columns=['Unnamed: 0'], errors='ignore')
+
+print('Dimensiones:', ames.shape)
+display(ames.head())
+##### [28] markdown
+## 7. EDA breve de Ames
+##### [29] code
+ames_overview = pd.DataFrame({
+    'Tipo': ames.dtypes.astype(str),
+    'Faltantes': ames.isna().sum(),
+    'Únicos': ames.nunique(dropna=True),
+}).sort_values('Faltantes', ascending=False)
+
+display(ames_overview.head(15))
+print('Variables numéricas:', ames.select_dtypes(include=np.number).shape[1])
+print('Variables categóricas:', ames.select_dtypes(exclude=np.number).shape[1])
+##### [30] code
+fig, axes = plt.subplots(1, 3, figsize=(16, 4.5))
+
+sns.histplot(ames['Sale_Price'], bins=35, ax=axes[0], color='#2D789B')
+axes[0].set_title('Distribución de Sale_Price')
+
+sns.scatterplot(data=ames, x='Gr_Liv_Area', y='Sale_Price', alpha=0.55, ax=axes[1])
+axes[1].set_title('Precio y superficie habitable')
+
+sns.boxplot(data=ames, x='Overall_Qual', y='Sale_Price', ax=axes[2], color='#55D9D2')
+axes[2].set_title('Precio según calidad general')
+axes[2].tick_params(axis='x', rotation=65)
+
+plt.tight_layout()
+plt.show()
+##### [31] markdown
+### Preguntas para discutir
+
+1. ¿La distribución de precios es simétrica?
+2. ¿Qué observaciones parecen atípicas en la relación entre superficie y precio?
+3. ¿Por qué conviene incluir variables categóricas en lugar de trabajar solo con columnas numéricas?
+##### [32] markdown
+## 8. Separación de entrenamiento y test
+##### [33] code
+X_ames = ames.drop(columns='Sale_Price')
+y_ames = ames['Sale_Price']
+
+Xa_train, Xa_test, ya_train, ya_test = train_test_split(
+    X_ames, y_ames,
+    test_size=0.20,
+    random_state=RANDOM_STATE,
+)
+
+print('Entrenamiento:', Xa_train.shape)
+print('Test:', Xa_test.shape)
+print('Precio mediano train:', f'${ya_train.median():,.0f}')
+print('Precio mediano test:', f'${ya_test.median():,.0f}')
+##### [34] markdown
+## 9. Modelos base de regresión
+##### [35] code
+ames_preprocessor = make_preprocessor(Xa_train)
+
+regression_estimators = {
+    'AdaBoost': AdaBoostRegressor(
+        n_estimators=N_ESTIMATORS_REG, learning_rate=0.05,
+        random_state=RANDOM_STATE,
+    ),
+    'Gradient Boosting': GradientBoostingRegressor(
+        n_estimators=N_ESTIMATORS_REG, learning_rate=0.05, max_depth=2,
+        loss='huber', random_state=RANDOM_STATE,
+    ),
+    'XGBoost': XGBRegressor(
+        n_estimators=N_ESTIMATORS_REG, learning_rate=0.05, max_depth=3,
+        subsample=0.8, colsample_bytree=0.8,
+        objective='reg:squarederror', n_jobs=N_JOBS,
+        random_state=RANDOM_STATE,
+    ),
+    'LightGBM': LGBMRegressor(
+        n_estimators=N_ESTIMATORS_REG, learning_rate=0.05, num_leaves=31,
+        subsample=0.8, colsample_bytree=0.8,
+        verbosity=-1, n_jobs=N_JOBS,
+        random_state=RANDOM_STATE,
+    ),
+}
+
+regression_pipelines = {
+    name: Pipeline([
+        ('preprocessor', clone(ames_preprocessor)),
+        ('model', estimator),
+    ])
+    for name, estimator in regression_estimators.items()
+}
+##### [36] code
+fitted_regressors = {}
+regression_results = []
+
+for name, pipeline in regression_pipelines.items():
+    fitted, result = evaluate_regressor(
+        name, pipeline, Xa_train, ya_train, Xa_test, ya_test
+    )
+    fitted_regressors[name] = fitted
+    regression_results.append(result)
+
+regression_results = (
+    pd.DataFrame(regression_results)
+    .sort_values('RMSE test')
+    .reset_index(drop=True)
+)
+display(regression_results.style.format({
+    'RMSE train': '${:,.0f}',
+    'RMSE test': '${:,.0f}',
+    'MAE test': '${:,.0f}',
+    'R² test': '{:.3f}',
+    'Tiempo (s)': '{:.3f}',
+}))
+##### [37] code
+fig, axes = plt.subplots(1, 2, figsize=(13, 4.5))
+
+regression_results.set_index('Modelo')[['RMSE train', 'RMSE test']].plot.bar(
+    ax=axes[0], color=['#2D789B', '#D25757']
+)
+axes[0].set_title('RMSE en entrenamiento y test')
+axes[0].set_ylabel('RMSE ($)')
+axes[0].tick_params(axis='x', rotation=20)
+
+regression_results.set_index('Modelo')['R² test'].plot.bar(
+    ax=axes[1], color='#17B6B0'
+)
+axes[1].set_ylim(0, 1)
+axes[1].set_title('R² en test')
+axes[1].tick_params(axis='x', rotation=20)
+
+plt.tight_layout()
+plt.show()
+##### [38] code
+fig, axes = plt.subplots(2, 2, figsize=(11, 9))
+
+for ax, (name, model) in zip(axes.ravel(), fitted_regressors.items()):
+    pred = model.predict(Xa_test)
+    ax.scatter(ya_test, pred, alpha=0.45, s=20)
+    low = min(ya_test.min(), pred.min())
+    high = max(ya_test.max(), pred.max())
+    ax.plot([low, high], [low, high], '--', color='#D25757')
+    ax.set_title(name)
+    ax.set_xlabel('Precio real')
+    ax.set_ylabel('Precio predicho')
+
+plt.tight_layout()
+plt.show()
+##### [39] markdown
+### Ejercicio 3
+
+Analiza la brecha entre `RMSE train` y `RMSE test`.
+
+- ¿Qué modelo ajusta con mayor fuerza los datos de entrenamiento?
+- ¿Cuál generaliza mejor al conjunto de test?
+- ¿MAE y RMSE conducen a la misma conclusión?
+##### [40] markdown
+## 10. Optimización en regresión
+
+Aplicaremos GridSearchCV a Gradient Boosting y RandomizedSearchCV a LightGBM. Las búsquedas minimizan RMSE mediante validación cruzada.
+##### [41] code
+cv_regression = KFold(
+    n_splits=CV_REG_SPLITS, shuffle=True, random_state=RANDOM_STATE
+)
+
+gbr_grid = GridSearchCV(
+    estimator=regression_pipelines['Gradient Boosting'],
+    param_grid={
+        'model__n_estimators': GBR_GRID_ESTIMATORS,
+        'model__learning_rate': GBR_GRID_LEARNING_RATE,
+        'model__max_depth': GBR_GRID_DEPTH,
+        'model__min_samples_leaf': GBR_GRID_MIN_LEAF,
+    },
+    scoring='neg_root_mean_squared_error',
+    cv=cv_regression,
+    n_jobs=N_JOBS,
+    return_train_score=True,
+)
+
+gbr_grid.fit(Xa_train, ya_train)
+print('Mejores parámetros:', gbr_grid.best_params_)
+print('RMSE promedio en validación:', f'${-gbr_grid.best_score_:,.0f}')
+##### [42] code
+lgbm_search_pipeline = Pipeline([
+    ('preprocessor', clone(ames_preprocessor)),
+    ('model', LGBMRegressor(
+        verbosity=-1, n_jobs=1,
+        random_state=RANDOM_STATE,
+    )),
+])
+
+lgbm_random = RandomizedSearchCV(
+    estimator=lgbm_search_pipeline,
+    param_distributions={
+        'model__n_estimators': [120, 220, 350, 500],
+        'model__learning_rate': [0.02, 0.04, 0.07, 0.12],
+        'model__num_leaves': [12, 20, 31, 48],
+        'model__max_depth': [-1, 3, 5, 7],
+        'model__min_child_samples': [10, 20, 35, 50],
+        'model__subsample': [0.70, 0.85, 1.0],
+        'model__colsample_bytree': [0.70, 0.85, 1.0],
+    },
+    n_iter=N_ITER_RANDOM,
+    scoring='neg_root_mean_squared_error',
+    cv=cv_regression,
+    random_state=RANDOM_STATE,
+    n_jobs=N_JOBS,
+    return_train_score=True,
+)
+
+lgbm_random.fit(Xa_train, ya_train)
+print('Mejores parámetros:', lgbm_random.best_params_)
+print('RMSE promedio en validación:', f'${-lgbm_random.best_score_:,.0f}')
+##### [43] code
+def final_regression_metrics(name, model):
+    pred = model.predict(Xa_test)
+    return {
+        'Modelo': name,
+        'RMSE test': mean_squared_error(ya_test, pred) ** 0.5,
+        'MAE test': mean_absolute_error(ya_test, pred),
+        'R² test': r2_score(ya_test, pred),
+    }
+
+tuned_regression = pd.DataFrame([
+    final_regression_metrics('Gradient Boosting optimizado', gbr_grid.best_estimator_),
+    final_regression_metrics('LightGBM optimizado', lgbm_random.best_estimator_),
+])
+
+display(tuned_regression.style.format({
+    'RMSE test': '${:,.0f}',
+    'MAE test': '${:,.0f}',
+    'R² test': '{:.3f}',
+}))
+##### [44] markdown
+### Ejercicio 4
+
+Optimiza XGBoost y compáralo con LightGBM.
+
+Mantén el mismo objeto `cv_regression` y `scoring='neg_root_mean_squared_error'`. Limita la búsqueda a un presupuesto razonable, por ejemplo 10 o 15 combinaciones.
+##### [45] code
+# Escribe aquí una búsqueda aleatoria para XGBoost.
+# Parámetros sugeridos: n_estimators, learning_rate, max_depth,
+# min_child_weight, subsample y colsample_bytree.
+##### [46] markdown
+## 11. Importancia de variables
+
+La importancia por ganancia o impureza ayuda a describir el modelo, pero no demuestra causalidad. También puede favorecer variables con más posibilidades de división.
+##### [47] code
+def plot_feature_importance(fitted_pipeline, title, top_n=15):
+    preprocessor = fitted_pipeline.named_steps['preprocessor']
+    estimator = fitted_pipeline.named_steps['model']
+    feature_names = preprocessor.get_feature_names_out()
+    importance = pd.Series(
+        estimator.feature_importances_, index=feature_names
+    ).sort_values(ascending=False).head(top_n).sort_values()
+
+    ax = importance.plot.barh(figsize=(9, 5), color='#17B6B0')
+    ax.set_title(title)
+    ax.set_xlabel('Importancia del modelo')
+    plt.tight_layout()
+    plt.show()
+
+plot_feature_importance(
+    fitted_classifiers['XGBoost'],
+    'Variables más utilizadas por XGBoost en Heart'
+)
+
+plot_feature_importance(
+    fitted_regressors['LightGBM'],
+    'Variables más utilizadas por LightGBM en Ames'
+)
+##### [48] markdown
+### Ejercicio 5
+
+Reemplaza la importancia interna por **importancia por permutación** sobre el conjunto de test.
+
+Preguntas:
+
+1. ¿Cambian las variables más importantes?
+2. ¿Qué métrica usarías para la permutación en clasificación?
+3. ¿Por qué la importancia no debe interpretarse como un efecto causal?
+##### [49] markdown
+## 12. Conclusiones esperadas
+
+- AdaBoost ofrece una línea base clara y rápida, pero puede ser sensible a observaciones difíciles o ruidosas.
+- Gradient Boosting permite controlar explícitamente la pérdida y la complejidad de los árboles.
+- XGBoost incorpora regularización y submuestreo, por lo que suele entregar resultados competitivos en datos tabulares.
+- LightGBM suele entrenar rápidamente, aunque el crecimiento por hojas requiere controlar la complejidad.
+- La elección final debe considerar validación, desempeño en test, tiempo de entrenamiento y estabilidad.
+
+La comparación de una sola partición no determina un ganador universal. Para una evaluación más sólida, repite el experimento con validación cruzada anidada o con varias semillas.

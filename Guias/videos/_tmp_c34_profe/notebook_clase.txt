@@ -1,0 +1,686 @@
+##### [0] markdown
+# Sesión 34 — Árboles de decisión
+
+**Diplomado en Data Science UC · Facultad de Matemáticas**
+Profesor: Eduardo Rodríguez Faúndez
+
+---
+
+## Qué vamos a hacer
+
+Seguimos con la misma base de churn de la Sesión 33: **3.150 clientes y 12 variables**.
+En la sesión anterior el modelo era una regresión logística y el trabajo consistía en
+elegir bien las columnas. Hoy el modelo cambia, y con él cambia todo lo que hay que
+cuidar.
+
+| Bloque | Tema |
+|---|---|
+| 1 | Cómo parte el espacio un árbol |
+| 2 | El criterio de corte: Gini y entropía |
+| 3 | Sobreajuste y poda |
+| 4 | Interpretar: reglas e importancia de variables |
+| 5 | Fortalezas, límites y el salto al bosque |
+
+## Tres cosas de la Sesión 33 que hoy se explican solas
+
+1. Usamos la **ganancia de información** como filtro. Es exactamente el criterio con que
+   un árbol elige cada corte: hoy lo vemos desde adentro del modelo.
+2. Hablamos de la **importancia de árboles** como método *embedded*. Un árbol selecciona
+   variables mientras se entrena: las que no aparecen en ningún corte fueron descartadas
+   por el propio algoritmo.
+3. Vimos que **`reclamos`** era la variable más fuerte. Hoy vamos a ver por qué queda
+   siempre arriba de todo, y qué pasa justo debajo de ella.
+
+Y una cuarta, de la Sesión 32: los árboles **no necesitan que escalemos** las variables.
+Lo vamos a comprobar con un número.
+##### [1] code
+# --- Carga y limpieza (igual que en la Sesión 33) ----------------------
+import pandas as pd, numpy as np
+import warnings; warnings.filterwarnings("ignore")
+import matplotlib.pyplot as plt
+
+RUTA_DRIVE = '/content/drive/My Drive/Clases diplomado UC/2026/churn_telco.csv'
+RUTA_LOCAL = 'churn_telco.csv'
+try:
+    from google.colab import drive
+    drive.mount('/content/drive')
+    df = pd.read_csv(RUTA_DRIVE)
+except Exception:
+    df = pd.read_csv(RUTA_LOCAL)
+
+# Un negativo en estas variables es imposible: es error de captura
+for c in ["segundos", "frec_llamadas", "frec_sms", "antiguedad", "n_contactos"]:
+    df.loc[df[c] < 0, c] = np.nan
+# Rango admisible de edad, por criterio de negocio
+df.loc[(df.edad < 15) | (df.edad > 100), "edad"] = np.nan
+# Imputación por mediana (robusta a las colas)
+for c in df.columns:
+    if df[c].isna().any():
+        df[c] = df[c].fillna(df[c].median())
+
+y = df.pop("fuga")     # variable objetivo: 1 = se fugó
+X = df                 # las 12 variables ORIGINALES, sin construir nada
+
+print("Clientes:", X.shape[0], " Variables:", X.shape[1])
+print("Tasa de fuga:", round(y.mean(), 4))
+##### [2] markdown
+**Nota sobre por qué acá NO construimos las 50 variables de la Sesión 33.**
+
+Un árbol captura no linealidades e interacciones por su cuenta: no necesita que le
+demos `log_segundos` ni `reclamo_x_antig` porque puede llegar a lo mismo partiendo el
+espacio. Trabajar con las 12 originales hace además que el árbol sea legible, que es
+justamente la razón por la que uno elige un árbol.
+##### [3] markdown
+---
+# Bloque 1 · Cómo parte el espacio un árbol
+
+## La diferencia con la regresión logística
+
+Una **regresión logística** ajusta un único plano que separa todo el espacio. Cada
+variable tiene un peso $\beta_j$ que vale igual en todas partes:
+
+$$\log\left(\frac{p}{1-p}\right) = \beta_0 + \beta_1 x_1 + \dots + \beta_p x_p$$
+
+Un **árbol** no ajusta ninguna fórmula. Divide el espacio en regiones rectangulares y
+dentro de cada una predice un valor constante:
+
+$$\hat{p}(x) = \sum_{m=1}^{M} c_m \cdot \mathbb{1}\{x \in R_m\}$$
+
+donde $R_1, \dots, R_M$ son las regiones (las hojas), $c_m$ la proporción de fuga
+observada en la región $m$, y $\mathbb{1}\{\cdot\}$ vale 1 si la observación cae ahí y 0
+si no.
+
+Las tres consecuencias de partir en rectángulos:
+
+- **Captura no linealidad sola**, sin que nadie construya un logaritmo ni un cuadrado.
+- **Captura interacciones solas**: una rama puede usar variables distintas de la otra.
+- **Pero solo corta perpendicular a los ejes.** Una frontera diagonal necesita muchos
+  escalones para aproximarse.
+##### [4] code
+from sklearn.tree import DecisionTreeClassifier, plot_tree, export_text
+
+# max_depth=3        -> como máximo 3 preguntas encadenadas
+# min_samples_leaf=60 -> ninguna hoja con menos de 60 clientes, para que
+#                        las tasas que leamos no sean ruido de muestra chica
+# random_state=0      -> reproducible: ante empates elige siempre igual
+arbol = DecisionTreeClassifier(
+    criterion="gini",        # o "entropy": dan árboles casi idénticos
+    max_depth=3,
+    min_samples_leaf=60,
+    random_state=0,
+).fit(X, y)
+
+print("Hojas:", arbol.get_n_leaves(), " Profundidad:", arbol.get_depth())
+##### [5] code
+# El diagrama, con etiquetas propias en castellano.
+# plot_tree por defecto muestra 'samples' y 'value', que cuesta leer:
+# lo reescribimos como n de clientes y tasa de fuga.
+tr = arbol.tree_
+N  = int(tr.n_node_samples[0])
+
+def etiqueta(i):
+    n = int(tr.n_node_samples[i])
+    v = tr.value[i][0]                      # [n_clase0, n_clase1] del nodo
+    tasa = v[1] / v.sum()                   # proporción de fuga
+    cab = f"n = {n:,}".replace(",", ".") + f"  ({100*n/N:.1f} %)"
+    if tr.children_left[i] == -1:           # -1 significa que es hoja
+        return f"{cab}\nfuga = {100*tasa:.1f} %"
+    var = X.columns[tr.feature[i]]
+    umb = tr.threshold[i]
+    return f"{var} <= {umb:.1f}\n{cab}\nfuga = {100*tasa:.1f} %"
+
+# Recorro los nodos en el mismo orden en que plot_tree los dibuja
+orden = []
+def dfs(i):
+    orden.append(i)
+    if tr.children_left[i] != -1:
+        dfs(tr.children_left[i]); dfs(tr.children_right[i])
+dfs(0)
+
+fig, ax = plt.subplots(figsize=(20, 8))
+anot = plot_tree(arbol, feature_names=list(X.columns), filled=True,
+                 rounded=True, impurity=False, fontsize=10, ax=ax)
+# plot_tree intercala las etiquetas "True"/"False" de las aristas
+nodos = [a for a in anot if a.get_text().strip() not in ("True", "False")]
+for a, i in zip(nodos, orden):
+    a.set_text(etiqueta(i))
+plt.show()
+##### [6] code
+# Las mismas reglas en texto, con la tasa real de cada hoja.
+# arbol.apply(X) devuelve, para cada cliente, el ID de la hoja donde cae.
+hoja = arbol.apply(X)
+resumen = (pd.DataFrame({"hoja": hoja, "fuga": y})
+           .groupby("hoja")
+           .agg(clientes=("fuga", "size"), tasa_fuga=("fuga", "mean"))
+           .sort_values("tasa_fuga", ascending=False))
+resumen["tasa_fuga"] = (100 * resumen.tasa_fuga).round(1)
+display(resumen)
+
+print(export_text(arbol, feature_names=list(X.columns), decimals=1))
+##### [7] markdown
+### Lo que un árbol da y una logística no
+
+La hoja de arriba concentra clientes con una tasa de fuga del 94 %. Eso no es un
+coeficiente: es un **segmento** al que se le puede mandar una campaña mañana. La regla
+que lo define se dice en una frase: *reclamó, usa poco el servicio y tuvo fallas
+técnicas*.
+
+Esa es la razón por la que en muchos contextos se elige un árbol aunque prediga algo
+peor.
+##### [8] markdown
+---
+# Bloque 2 · El criterio de corte
+
+## Impureza: qué tan mezclado está un nodo
+
+Sea $p_i$ la **proporción de la clase $i$ dentro del nodo**. Con dos clases,
+$p_0 + p_1 = 1$. Las dos medidas habituales son:
+
+$$\text{Gini} = 1 - \sum_{i} p_i^2 \qquad\qquad \text{Entropía} = -\sum_{i} p_i \log_2 p_i$$
+
+Las dos valen $0$ cuando el nodo es puro y alcanzan su máximo con las clases al 50/50
+(Gini $= 0{,}5$; entropía $= 1$).
+
+**De dónde salen los $p_i$**: se recalculan en cada nodo con los clientes que caen ahí.
+En la raíz hay 3.150 clientes y 495 se fugan, entonces
+
+$$p_{\text{queda}} = \frac{2.655}{3.150} = 0{,}843 \qquad p_{\text{fuga}} = \frac{495}{3.150} = 0{,}157$$
+
+$$\text{Gini}_{\text{raíz}} = 1 - 0{,}843^2 - 0{,}157^2 = 0{,}265$$
+
+## Cómo se elige el corte
+
+Para cada variable y cada umbral posible, el algoritmo calcula la **ganancia**: cuánto
+baja la impureza al partir.
+
+$$\text{ganancia} = \text{Imp}(\text{padre}) - \left[\frac{n_{\text{izq}}}{n}\text{Imp}(\text{izq}) + \frac{n_{\text{der}}}{n}\text{Imp}(\text{der})\right]$$
+
+Los hijos se ponderan por su tamaño: partir en dos grupos de 1.575 no es lo mismo que
+partir en uno de 3.100 y otro de 50.
+
+Se queda con el corte de mayor ganancia y **repite el mismo barrido dentro de cada
+hijo**. Es un algoritmo **voraz**: elige lo mejor ahora, sin mirar dos pasos adelante.
+Por eso no garantiza el árbol óptimo, solo uno bueno y rápido de construir.
+##### [9] code
+# ═══ Reproducimos a mano el barrido completo de la raíz ═══
+# Objetivo: entender POR QUÉ el algoritmo elige 'reclamos' y no otra.
+# No hay magia: prueba todas las variables y todos los umbrales.
+
+def gini(v):
+    """Impureza de Gini de un vector de 0 y 1.
+    Con dos clases: Gini = 1 - p0² - p1², donde p1 = proporción de unos."""
+    if len(v) == 0:
+        return 0.0            # un nodo vacío no tiene mezcla
+    p = v.mean()              # p = proporción de la clase 1 (fuga)
+    return 1 - p**2 - (1 - p)**2
+
+yv = y.values                 # a numpy: el bucle de abajo se hace miles de veces
+G0 = gini(yv)                 # impureza del nodo padre, o sea la raíz
+n  = len(yv)
+print(f"Gini de la raíz: {G0:.4f}   (3.150 clientes, 495 fugas)\n")
+
+filas = []
+for c in X.columns:                          # ── para CADA variable
+    v = X[c].values
+
+    # Los umbrales candidatos. En teoría son todos los puntos medios entre
+    # valores consecutivos distintos; acá tomamos 60 percentiles entre el 2
+    # y el 98 para no probar miles de cortes casi idénticos. El resultado es
+    # el mismo y corre mucho más rápido.
+    candidatos = np.unique(np.quantile(v, np.linspace(0.02, 0.98, 60)))
+
+    mejor = None
+    for u in candidatos:                     # ── para CADA umbral
+        izq = v <= u                         # máscara: quiénes van al hijo izquierdo
+        der = ~izq                           # el resto va al derecho
+
+        # Descartamos cortes que dejan un hijo demasiado chico. Es el mismo
+        # criterio que min_samples_leaf: sin esto el algoritmo aislaría 3
+        # clientes purísimos y creería haber encontrado algo.
+        if izq.sum() < 60 or der.sum() < 60:
+            continue
+
+        # Impureza de los hijos, PONDERADA por cuántos casos recibe cada uno.
+        # La ponderación es esencial: un hijo puro con 2 clientes no vale lo
+        # mismo que un hijo puro con 2.000.
+        gp = izq.mean() * gini(yv[izq]) + der.mean() * gini(yv[der])
+
+        # Ganancia = cuánto bajó la impureza respecto del padre
+        ganancia = G0 - gp
+
+        if mejor is None or ganancia > mejor[2]:
+            mejor = (u, gp, ganancia, int(izq.sum()), int(der.sum()))
+
+    if mejor:
+        filas.append([c, *mejor])
+
+# Ordenamos por ganancia: el primero de la lista es el corte que elige el árbol
+barrido = (pd.DataFrame(filas, columns=["variable", "umbral", "gini_ponderado",
+                                        "ganancia", "n_izq", "n_der"])
+           .sort_values("ganancia", ascending=False)
+           .set_index("variable").round(4))
+display(barrido)
+
+print(f"Combinaciones evaluadas para elegir UNA sola pregunta: "
+      f"{sum(len(np.unique(np.quantile(X[c].values, np.linspace(.02,.98,60)))) for c in X.columns)}")
+print("\\nY este barrido completo se repite en CADA nodo del árbol.")
+##### [10] markdown
+`reclamos` gana con una ganancia de 0,069: **más del doble que la segunda**. No hay
+competencia, y de ahí que sea la raíz en todas las corridas.
+
+En el otro extremo, `edad` aporta 0,0005. Su mejor corte parte la población en dos
+grupos con casi la misma tasa de fuga que el original, así que la impureza no baja. Eso
+es justamente lo que vimos en la Sesión 33: `edad` tenía información mutua nula.
+
+**Un ejercicio para la clase**: verificar a mano el candidato ganador.
+
+- Sí reclamó: 278 clientes, 211 se fugan → $p = 0{,}759$, Gini $= 0{,}366$
+- No reclamó: 2.872 clientes, 284 se fugan → $p = 0{,}099$, Gini $= 0{,}178$
+- Ponderado: $\frac{278}{3150}(0{,}366) + \frac{2872}{3150}(0{,}178) = 0{,}196$
+- Ganancia: $0{,}265 - 0{,}196 = 0{,}069$ ✓
+##### [11] code
+# Verificación numérica del cálculo anterior
+for nombre, mask in [("Sí reclamó", X.reclamos > 0), ("No reclamó", X.reclamos == 0)]:
+    v = yv[mask.values]
+    print(f"{nombre:12s} n = {len(v):>5}  fugados = {int(v.sum()):>4}  "
+          f"p = {v.mean():.3f}  Gini = {gini(v):.3f}")
+
+m = (X.reclamos > 0).values
+gp = m.mean()*gini(yv[m]) + (~m).mean()*gini(yv[~m])
+print(f"\nGini ponderado: {gp:.4f}")
+print(f"Ganancia      : {G0 - gp:.4f}")
+##### [12] code
+# ¿Gini o entropía? En la práctica dan casi lo mismo.
+from sklearn.model_selection import cross_val_score, StratifiedKFold
+cv = StratifiedKFold(5, shuffle=True, random_state=1)
+
+for crit in ["gini", "entropy"]:
+    a = cross_val_score(DecisionTreeClassifier(criterion=crit, max_depth=5,
+                                               random_state=0),
+                        X, y, cv=cv, scoring="roc_auc").mean()
+    print(f"criterion = {crit:8s} AUC {a:.4f}")
+##### [13] markdown
+---
+# Bloque 3 · Sobreajuste y poda
+
+## Antes: qué es la validación cruzada
+
+Si medimos el desempeño sobre los mismos datos con que entrenamos, el número siempre
+sale bien. Un árbol sin límites acierta el 100 % en sus propios datos y no sirve para
+nada.
+
+La validación cruzada de $k$ pliegues resuelve eso así:
+
+1. Partir los 3.150 clientes en $k=5$ bloques de 630.
+2. Entrenar con 4 bloques (2.520 clientes) y medir el AUC sobre el bloque restante
+   (630 clientes que el modelo nunca vio).
+3. Rotar cuál bloque se usa para medir, y repetir cinco veces.
+
+$$\text{AUC}_{\text{CV}} = \frac{1}{k}\sum_{f=1}^{k} \text{AUC}_f$$
+
+Cada cliente sirvió para medir exactamente una vez y para entrenar cuatro. Y el
+**desvío** de esos cinco números importa tanto como el promedio: si fueran 0,70 y 0,95,
+el promedio de 0,82 no significaría nada.
+
+Usamos `StratifiedKFold` para que cada bloque conserve el 15,7 % de fuga. Con una
+partición al azar, un bloque podría quedar casi sin casos positivos y su AUC no sería
+interpretable.
+##### [14] code
+# Los 5 AUC, uno por ronda
+s = cross_val_score(DecisionTreeClassifier(max_depth=5, random_state=0),
+                    X, y, cv=cv, scoring="roc_auc")
+for i, a in enumerate(s, 1):
+    print(f"  ronda {i}: {a:.4f}")
+print(f"\n  promedio: {s.mean():.4f}")
+print(f"  desvío  : {s.std():.4f}")
+print(f"\n  cada bloque: {len(X)//5} clientes | entrena con {len(X) - len(X)//5}")
+##### [15] markdown
+## La curva del sobreajuste
+
+Comparemos el AUC en los propios datos de entrenamiento contra el AUC de validación
+cruzada, a medida que dejamos crecer el árbol.
+##### [16] code
+# ═══ La curva del sobreajuste ═══
+# Comparamos el AUC medido en los MISMOS datos de entrenamiento contra el
+# AUC medido honestamente con validación cruzada, a medida que dejamos
+# crecer el árbol. Es el experimento que muestra el sobreajuste.
+from sklearn.metrics import roc_auc_score
+
+filas = []
+for d in [1, 2, 3, 4, 5, 6, 8, 10, 15, None]:   # None = sin límite de profundidad
+    m = DecisionTreeClassifier(max_depth=d, random_state=0)
+
+    # (a) AUC honesto: el modelo se reentrena en cada fold y se mide sobre
+    #     el bloque que no vio
+    auc_cv = cross_val_score(m, X, y, cv=cv, scoring="roc_auc").mean()
+
+    # (b) AUC engañoso: entrenamos con TODO y medimos sobre lo mismo
+    m.fit(X, y)
+    auc_tr = roc_auc_score(y, m.predict_proba(X)[:, 1])
+
+    filas.append({"profundidad": d if d else "sin límite",
+                  "AUC train": round(auc_tr, 4),
+                  "AUC validación": round(auc_cv, 4),
+                  "hojas": m.get_n_leaves()})
+
+curva = pd.DataFrame(filas)
+display(curva)
+
+# El punto donde la validación alcanza su máximo es el "ajuste adecuado"
+mejor = curva["AUC validación"].idxmax()
+print(f"Mejor profundidad: {curva.profundidad[mejor]} "
+      f"con AUC {curva['AUC validación'][mejor]:.4f}")
+print(f"Sin límite el árbol tiene {curva.hojas.iloc[-1]} hojas y cae a "
+      f"{curva['AUC validación'].iloc[-1]:.4f}: memorizó.")
+
+fig, ax = plt.subplots(figsize=(9, 4.5))
+xs = range(len(curva))
+ax.plot(xs, curva["AUC train"], "o-", color="#C0392B", lw=2,
+        label="AUC en entrenamiento")
+ax.plot(xs, curva["AUC validación"], "o-", color="#307FE2", lw=2,
+        label="AUC en validación cruzada")
+ax.axvline(mejor, color="grey", ls=":", lw=1)      # marca el punto de quiebre
+ax.set_xticks(list(xs)); ax.set_xticklabels(curva["profundidad"])
+ax.set_xlabel("Profundidad máxima del árbol"); ax.set_ylabel("AUC")
+ax.legend(); ax.grid(alpha=.3); plt.tight_layout(); plt.show()
+##### [17] markdown
+**Cómo leer la curva.** El AUC de entrenamiento sube monótonamente hasta llegar a 1,000:
+el árbol termina con prácticamente una hoja por cliente y los "predice" todos bien de
+memoria. El AUC de validación sube hasta profundidad 6 y después **baja**.
+
+Ese punto de quiebre es el «ajuste adecuado» del que hablaba la Sesión 31. Sin límites,
+el árbol pasa de 0,911 a 0,827: **perdió 8 puntos por memorizar**.
+
+## Dos formas de controlarlo
+
+**Pre-poda**: poner límites antes de entrenar (`max_depth`, `min_samples_leaf`,
+`min_samples_split`, `max_leaf_nodes`). Rápido y directo. El riesgo es que un corte
+pobre esconda uno muy bueno debajo.
+
+**Post-poda**: dejar crecer y recortar las ramas que no pagan. Se controla con
+`ccp_alpha`, que es el **precio de cada hoja**:
+
+$$\text{costo}_\alpha(T) = \text{error}(T) + \alpha \cdot |\text{hojas}(T)|$$
+
+Con $\alpha = 0$ no hay penalización y sobrevive el árbol completo. Al subir $\alpha$,
+cada hoja tiene que justificar su existencia reduciendo el error más de lo que cuesta.
+Para cada $\alpha$ existe un **único** subárbol que minimiza ese costo, y la validación
+cruzada elige cuál.
+##### [18] code
+from sklearn.model_selection import GridSearchCV
+
+# 1. sklearn calcula los alphas donde el árbol óptimo cambia
+base = DecisionTreeClassifier(random_state=0)
+alphas = base.cost_complexity_pruning_path(X, y).ccp_alphas[:-1]
+print(f"Alphas relevantes: {len(alphas)}  (de {alphas.min():.5f} a {alphas.max():.5f})")
+
+# 2. Elegir alpha con validación cruzada, no a ojo
+grid = GridSearchCV(
+    DecisionTreeClassifier(random_state=0),
+    {"ccp_alpha": alphas[::5]},          # cada 5 para no tardar
+    cv=cv, scoring="roc_auc", n_jobs=-1,
+).fit(X, y)
+
+mejor = grid.best_estimator_
+print(f"\nMejor ccp_alpha: {grid.best_params_['ccp_alpha']:.5f}")
+print(f"AUC en CV      : {grid.best_score_:.4f}")
+print(f"Hojas          : {mejor.get_n_leaves()}")
+##### [19] code
+# Cada alpha, su árbol: el trade-off entre tamaño y desempeño
+for a in [0.0, 0.0005, 0.001, 0.002, 0.005, 0.01]:
+    t = DecisionTreeClassifier(random_state=0, ccp_alpha=a)
+    auc_ = cross_val_score(t, X, y, cv=cv, scoring="roc_auc").mean()
+    t.fit(X, y)
+    print(f"  alpha = {a:<7} hojas = {t.get_n_leaves():>3}   AUC = {auc_:.4f}")
+##### [20] markdown
+---
+# Bloque 4 · Interpretar el árbol
+
+## La importancia por impureza engaña
+
+`feature_importances_` suma, para cada variable, la ganancia de impureza de todos los
+cortes donde participó, ponderada por el tamaño del nodo:
+
+$$\text{imp}(X_j) = \sum_{\text{nodos que usan } X_j} \frac{n_{\text{nodo}}}{n} \cdot \text{ganancia}$$
+
+El problema es que **premia la cardinalidad**. Una variable con muchos valores distintos
+ofrece más umbrales posibles, así que por puro azar alguno reduce algo la impureza.
+
+La alternativa es la **importancia por permutación**: se desordena al azar una columna y
+se mide cuánto empeora el modelo.
+
+$$\text{imp}_{\text{perm}}(X_j) = \text{AUC}(\text{datos originales}) - \mathbb{E}\big[\text{AUC}(\text{datos con } X_j \text{ permutada})\big]$$
+
+Es más lenta, pero mide lo que uno cree que está midiendo: cuánto empeora el modelo si
+esa variable se vuelve ruido. **Y hay que calcularla sobre datos que el modelo no vio.**
+##### [21] code
+# ═══ Importancia por impureza vs por permutación ═══
+# Las dos dicen "cuánto importa cada variable", pero miden cosas distintas
+# y una de las dos engaña sistemáticamente.
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.inspection import permutation_importance
+from sklearn.model_selection import train_test_split
+
+# Separamos un test: la importancia por permutación DEBE medirse sobre datos
+# que el modelo no vio, o mide memoria en vez de capacidad predictiva
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.25,
+                                      stratify=y, random_state=42)
+
+rf = RandomForestClassifier(n_estimators=300, random_state=0,
+                            n_jobs=-1).fit(Xtr, ytr)
+
+# (a) SESGADA: suma la ganancia de impureza de cada variable en el
+#     entrenamiento. Premia a las variables con muchos valores distintos,
+#     porque ofrecen más cortes posibles y alguno acierta por azar.
+imp_gini = pd.Series(rf.feature_importances_, index=X.columns)
+
+# (b) CORRECTA: desordena una variable al azar y mide cuánto empeora el AUC.
+#     n_repeats=20 porque la permutación es aleatoria: un solo intento
+#     podría dar un número afortunado.
+pi = permutation_importance(rf, Xte, yte, n_repeats=20,
+                            random_state=0, scoring="roc_auc")
+imp_perm = pd.Series(pi.importances_mean, index=X.columns)
+
+# La tercera columna es la que explica el sesgo: la cardinalidad
+comp = pd.DataFrame({
+    "por impureza":    imp_gini,
+    "por permutación": imp_perm,
+    "valores únicos":  X.nunique(),
+}).sort_values("por impureza", ascending=False)
+display(comp.round(4))
+
+print("Mirá clv: 2.654 valores distintos, impureza alta, permutación baja.")
+print("Y estado, que es binaria: impureza baja, permutación parecida a clv.")
+print("La impureza premió la cardinalidad, no el poder predictivo.")
+##### [22] markdown
+Mirá `clv`: tiene 2.654 valores distintos, una importancia por impureza de 0,109 —la
+cuarta más alta— y por permutación solo 0,014. Y al revés, `estado` es binaria, con
+impureza 0,045 y permutación 0,019.
+
+**La conclusión práctica**: usá siempre importancia por permutación, y si vas a reportar
+la otra, mirá primero la cardinalidad de cada variable.
+##### [23] markdown
+---
+# Bloque 5 · Fortalezas, límites y el salto al bosque
+
+## Los árboles no necesitan que escalemos
+
+Un árbol solo pregunta «¿está por encima o por debajo de este umbral?». Cualquier
+transformación $g$ que **respete el orden** —monótona creciente— mueve el umbral pero no
+cambia qué observaciones caen de cada lado:
+
+$$x_i \leq u \iff g(x_i) \leq g(u)$$
+
+El resultado no es parecido: es **idéntico**. Comprobémoslo.
+##### [24] code
+# ═══ ¿Importa escalar las variables en un árbol? ═══
+# Aplicamos dos transformaciones MONÓTONAS (que respetan el orden) y
+# comparamos. Si el árbol es invariante, el AUC debe ser idéntico.
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+
+X2 = X.copy()
+X2["segundos"] = np.log1p(X2["segundos"].clip(lower=0))  # log: monótona creciente
+X2["clv"]      = np.sqrt(X2["clv"])                      # raíz: monótona creciente
+
+def auc_cv(modelo, datos):
+    """AUC promedio con la validación cruzada estratificada de 5 bloques."""
+    return cross_val_score(modelo, datos, y, cv=cv, scoring="roc_auc").mean()
+
+# El árbol solo pregunta "¿x <= t?". Si g respeta el orden, entonces
+#     x <= t   <=>   g(x) <= g(t)
+# o sea que las particiones son las MISMAS y solo cambia el número del umbral.
+arb = DecisionTreeClassifier(max_depth=5, random_state=0)
+
+# La logística, en cambio, multiplica el valor por un coeficiente: si cambia
+# la escala de la variable, cambia todo el ajuste.
+log = Pipeline([("sc", StandardScaler()),
+                ("clf", LogisticRegression(max_iter=3000))])
+
+print(f"{'':28s} {'original':>10} {'log y raíz':>12} {'diferencia':>12}")
+for nombre, m in [("Árbol (profundidad 5)", arb), ("Regresión logística", log)]:
+    a1, a2 = auc_cv(m, X), auc_cv(m, X2)
+    print(f"{nombre:28s} {a1:>10.4f} {a2:>12.4f} {a2-a1:>+12.4f}")
+
+print("\\nEl árbol da exactamente el mismo número. La logística cambia.")
+print("Corolario práctico: con árboles no hace falta escalar, y tampoco")
+print("sirve de nada hacerlo.")
+##### [25] markdown
+El árbol da **exactamente** el mismo número. La logística cambia. Esa es la razón por la
+que con árboles no hace falta el `StandardScaler` que la Sesión 32 insistía en usar.
+
+## Lo que sí les molesta: la inestabilidad
+
+Un árbol es un modelo de **alta varianza**: cambiar unas pocas observaciones puede
+cambiar los cortes. Veamos qué elige justo debajo de la raíz según la muestra.
+##### [26] code
+# ═══ ¿Qué tan estable es la estructura del árbol? ═══
+# Entrenamos seis árboles con seis muestras distintas del 70 % de los datos
+# y miramos si eligen los mismos cortes. Un árbol es un modelo de ALTA
+# VARIANZA: un corte distinto arriba arrastra todo lo que viene abajo.
+
+for semilla in range(6):
+    # Cada semilla da una muestra distinta del 70 %, estratificada para que
+    # todas conserven el 15,7 % de fuga
+    Xs, _, ys, _ = train_test_split(X, y, test_size=0.3,
+                                    stratify=y, random_state=semilla)
+
+    t = DecisionTreeClassifier(max_depth=4, random_state=0).fit(Xs, ys)
+    e = t.tree_                          # estructura interna del árbol
+
+    # e.feature[i] = índice de la variable que corta el nodo i
+    # e.children_left[0] = id del hijo izquierdo de la raíz
+    raiz     = X.columns[e.feature[0]]
+    nodo_izq = e.children_left[0]
+    izq      = X.columns[e.feature[nodo_izq]]
+    umbral   = e.threshold[nodo_izq]
+
+    print(f"  semilla {semilla}:  raíz = {raiz:<12}"
+          f"   debajo a la izquierda = {izq:<15} (umbral {umbral:>8.1f})")
+
+print("\\nLa raíz no se mueve: reclamos gana por demasiada distancia.")
+print("Pero el nivel siguiente cambia según la muestra. Con reentrenamientos")
+print("trimestrales, eso significa explicarle al negocio un árbol distinto")
+print("cada vez — y ese es el problema que el bosque viene a resolver.")
+##### [27] markdown
+La raíz es siempre `reclamos`, porque su ventaja es enorme. Pero **el nivel siguiente
+cambia**: a veces `clv`, a veces `segundos`, a veces `frec_llamadas`. Con reentrenamientos
+trimestrales, eso significa explicarle al negocio un árbol distinto cada vez.
+
+## El salto al bosque: Random Forest
+
+Si el problema es la varianza, la solución es **promediar muchos árboles**. La receta
+tiene tres pasos:
+
+**1. Bootstrap.** Para cada árbol se sortean $n$ observaciones de las $n$ originales
+**con reemplazo**. Algunos clientes entran varias veces y aproximadamente un tercio no
+entra. La probabilidad de que un cliente quede afuera es
+
+$$\left(1 - \frac{1}{n}\right)^{n} \xrightarrow[n \to \infty]{} e^{-1} \approx 0{,}368$$
+
+Ese tercio se llama **out-of-bag** y sirve para estimar el error sin separar un test.
+
+**2. Subconjunto aleatorio de variables.** En cada nodo el árbol solo puede mirar
+$\sqrt{p}$ variables, sorteadas de nuevo en cada corte. Con $p=12$ son 3. Así ningún
+árbol puede apoyarse siempre en `reclamos`, y los árboles se **descorrelacionan** entre
+sí.
+
+**3. Promediar.** La predicción final es el promedio de las probabilidades de todos los
+árboles.
+
+**Por qué funciona.** Si promediamos $B$ estimadores con varianza $\sigma^2$ y
+correlación $\rho$ entre pares, la varianza del promedio es
+
+$$\operatorname{Var}\left(\frac{1}{B}\sum_{b=1}^{B} \hat{f}_b\right) = \rho\,\sigma^2 + \frac{1-\rho}{B}\,\sigma^2$$
+
+El segundo término se va a cero al agregar árboles. El primero **no**: queda acotado por
+la correlación entre ellos. De ahí que el paso 2 sea esencial — bajar $\rho$ es lo que
+permite que promediar sirva de verdad.
+##### [28] code
+# ¿Cuántos árboles hacen falta?
+for nt in [1, 5, 25, 100, 300]:
+    a = cross_val_score(RandomForestClassifier(n_estimators=nt, random_state=0,
+                                               n_jobs=-1),
+                        X, y, cv=cv, scoring="roc_auc").mean()
+    print(f"  {nt:>3} árboles: AUC {a:.4f}")
+##### [29] markdown
+Un solo árbol del bosque rinde 0,797, **peor** que el árbol podado. La ganancia no está
+en los árboles: está en promediarlos. Y se estabiliza cerca de 100 — agregar más no
+empeora, solo cuesta tiempo.
+##### [30] code
+# ¿Cuánto aporta cada fuente de azar por separado?
+configs = [
+    ("solo bootstrap (todas las variables por corte)", dict(max_features=None)),
+    ("bootstrap + subconjunto de variables (default)", dict(max_features="sqrt")),
+    ("sin bootstrap, solo subconjunto de variables",   dict(bootstrap=False,
+                                                            max_features="sqrt")),
+]
+for nom, kw in configs:
+    a = cross_val_score(RandomForestClassifier(n_estimators=200, random_state=0,
+                                               n_jobs=-1, **kw),
+                        X, y, cv=cv, scoring="roc_auc").mean()
+    print(f"  {nom:48s} AUC {a:.4f}")
+print(f"\n  variables por corte con sqrt: {int(np.sqrt(X.shape[1]))} de {X.shape[1]}")
+##### [31] code
+# Comparación final de todo lo que vimos
+modelos = {
+    "Árbol profundidad 3":  DecisionTreeClassifier(max_depth=3, random_state=0),
+    "Árbol profundidad 5":  DecisionTreeClassifier(max_depth=5, random_state=0),
+    "Árbol podado (CV)":    grid.best_estimator_,
+    "Regresión logística":  Pipeline([("sc", StandardScaler()),
+                                      ("clf", LogisticRegression(max_iter=3000))]),
+    "Random Forest (300)":  RandomForestClassifier(n_estimators=300, random_state=0,
+                                                   n_jobs=-1),
+}
+res = pd.DataFrame([
+    {"modelo": k,
+     "AUC": cross_val_score(v, X, y, cv=cv, scoring="roc_auc").mean()}
+    for k, v in modelos.items()
+]).round(4)
+display(res.sort_values("AUC", ascending=False))
+##### [32] markdown
+---
+# Lo que nos llevamos
+
+1. Un árbol **parte el espacio en rectángulos** y predice una constante en cada uno.
+2. Elige cada corte maximizando la **reducción de impureza** — la misma ganancia de
+   información que en la Sesión 33 usamos como filtro.
+3. Es **voraz**: prueba todos los umbrales de todas las variables y se queda con el
+   mejor *ahora*, sin mirar dos pasos adelante.
+4. Sin poda **memoriza**: 1,000 en entrenamiento y 0,827 en validación.
+5. La importancia por impureza **premia la cardinalidad**; usá permutación.
+6. Es **invariante a transformaciones monótonas**: no hace falta escalar.
+7. Es **inestable**: la raíz se repite, pero los niveles de abajo cambian con la muestra.
+8. El bosque cambia inestabilidad por desempeño, y desempeño por **explicabilidad**.
+
+## La pregunta con la que cerramos
+
+En este dataset la logística da 0,920 y el mejor árbol individual 0,906. Si lo único que
+importara fuera predecir, el árbol pierde.
+
+> Se elige un árbol cuando la explicación vale más que el punto de AUC.
+
+**Para pensar antes de la próxima clase**: ¿en qué problema de tu trabajo preferirías un
+árbol de 8 reglas antes que un modelo con mejor AUC?

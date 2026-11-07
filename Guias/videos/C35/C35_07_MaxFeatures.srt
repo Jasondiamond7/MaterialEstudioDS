@@ -1,0 +1,283 @@
+1
+00:00:00,250 --> 00:00:03,400
+Séptima parada: max_features con datos reales.
+
+2
+00:00:03,520 --> 00:00:06,185
+Vas a ver dónde está el punto óptimo, cuándo no
+
+3
+00:00:06,185 --> 00:00:08,850
+importa, y un error en el notebook de la clase.
+
+4
+00:00:08,970 --> 00:00:13,150
+Ya sabes que max_features controla cuántas variables compiten en cada nodo.
+
+5
+00:00:13,270 --> 00:00:16,240
+Pocas: árboles distintos, pero malos.
+
+6
+00:00:16,360 --> 00:00:19,350
+Todas: árboles buenos, pero parecidos.
+
+7
+00:00:19,470 --> 00:00:20,960
+¿Dónde está el punto justo?
+
+8
+00:00:21,080 --> 00:00:22,140
+Hoy lo medimos.
+
+9
+00:00:22,260 --> 00:00:23,870
+Es como la sal en la comida.
+
+10
+00:00:23,990 --> 00:00:25,920
+Sin sal, queda insípida.
+
+11
+00:00:26,040 --> 00:00:28,190
+Con demasiada, no se puede comer.
+
+12
+00:00:28,310 --> 00:00:32,980
+Hay un punto intermedio, y depende del plato: no hay una cantidad universal.
+
+13
+00:00:33,100 --> 00:00:36,400
+Con max_features pasa lo mismo: depende de los datos.
+
+14
+00:00:36,520 --> 00:00:41,440
+Ames: después del one-hot, cada casa tiene 341 columnas.
+
+15
+00:00:41,560 --> 00:00:46,696
+Entrenamos bosques de trescientos árboles, variando max_features desde el 1 % de las
+
+16
+00:00:46,696 --> 00:00:51,160
+columnas hasta el 100 %, y medimos el error en un conjunto de validación.
+
+17
+00:00:51,280 --> 00:00:56,180
+Con el 1 % de las columnas, el error es 27 700 dólares.
+
+18
+00:00:56,300 --> 00:01:01,950
+Al subir, el error baja rápido: con el 5 %, 23 600.
+
+19
+00:01:02,070 --> 00:01:07,160
+Y el mínimo está en el 10 % de las columnas: 22 500 dólares.
+
+20
+00:01:07,280 --> 00:01:11,651
+Después vuelve a subir: con un tercio, 23 100; y con
+
+21
+00:01:11,651 --> 00:01:15,770
+todas las columnas, es decir con bagging, 24 300.
+
+22
+00:01:15,890 --> 00:01:18,916
+La forma es la que predice la teoría: a la izquierda,
+
+23
+00:01:18,916 --> 00:01:21,600
+árboles tan malos que el promedio no los salva.
+
+24
+00:01:21,720 --> 00:01:25,970
+A la derecha, árboles tan parecidos que el promedio no los descorrelaciona.
+
+25
+00:01:26,090 --> 00:01:29,940
+El óptimo de estos datos está en medio, cerca del 10 %.
+
+26
+00:01:30,060 --> 00:01:32,370
+¿Cuántas columnas son esos porcentajes?
+
+27
+00:01:32,490 --> 00:01:36,400
+Hagamos la cuenta como la hace scikit-learn, que corta hacia abajo.
+
+28
+00:01:36,520 --> 00:01:42,490
+El 10 % de 341 es 34.1: treinta y cuatro candidatas por nodo.
+
+29
+00:01:42,610 --> 00:01:50,060
+La raíz cuadrada de 341 es 18.47: dieciocho candidatas, cerca del 5 %.
+
+30
+00:01:50,180 --> 00:01:55,180
+Y un tercio de 341 es 113.67: ciento trece.
+
+31
+00:01:55,300 --> 00:01:58,020
+Ahora Heart, con sus 18 columnas.
+
+32
+00:01:58,140 --> 00:02:02,670
+Medimos el AUC con validación cruzada repetida.
+
+33
+00:02:02,790 --> 00:02:06,520
+Con una sola candidata por nodo, 0.904.
+
+34
+00:02:06,640 --> 00:02:09,250
+Con tres, 0.902.
+
+35
+00:02:09,370 --> 00:02:13,510
+Con las 18, es decir bagging, 0.882.
+
+36
+00:02:13,630 --> 00:02:17,448
+Parece que menos es mejor, pero ojo con la escala: toda la curva se
+
+37
+00:02:17,448 --> 00:02:20,866
+mueve en dos centésimas, y el desvío entre particiones de la
+
+38
+00:02:20,866 --> 00:02:24,000
+validación cruzada es de unas tres o cuatro centésimas.
+
+39
+00:02:24,120 --> 00:02:27,250
+En Heart, la diferencia es indistinguible del ruido.
+
+40
+00:02:27,370 --> 00:02:29,990
+En Ames, en cambio, era clarísima.
+
+41
+00:02:30,110 --> 00:02:32,560
+Y ahora un error en el notebook de la clase.
+
+42
+00:02:32,680 --> 00:02:36,045
+Para la regresión de Ames, el modelo llamado Random Forest
+
+43
+00:02:36,045 --> 00:02:39,120
+base se crea con max_features igual a uno punto cero.
+
+44
+00:02:39,240 --> 00:02:44,310
+Uno punto cero significa el 100 % de las columnas: todas compiten en cada nodo.
+
+45
+00:02:44,430 --> 00:02:49,100
+Como vimos en el video anterior, eso no es un Random Forest: es un bagging.
+
+46
+00:02:49,220 --> 00:02:51,940
+Lo comprobamos replicando las celdas del notebook.
+
+47
+00:02:52,060 --> 00:02:56,420
+El BaggingRegressor da un error de prueba de 29 300 dólares.
+
+48
+00:02:56,540 --> 00:03:01,360
+El supuesto Random Forest, 29 100: prácticamente lo mismo.
+
+49
+00:03:01,480 --> 00:03:06,610
+Con un tercio de las columnas, el mismo bosque baja a 26 700 dólares.
+
+50
+00:03:06,730 --> 00:03:10,902
+Por qué pasa: en scikit-learn, el valor por defecto de max_features para
+
+51
+00:03:10,902 --> 00:03:14,320
+el Random Forest de regresión es justamente uno punto cero.
+
+52
+00:03:14,440 --> 00:03:18,130
+Si no lo cambias, tu Random Forest de regresión es un bagging.
+
+53
+00:03:18,250 --> 00:03:23,330
+Para regresión, prueba valores entre 0.1 y 0.5, y valida.
+
+54
+00:03:23,450 --> 00:03:27,500
+El error típico: recitar un valor de max_features en vez de validarlo.
+
+55
+00:03:27,620 --> 00:03:31,940
+La raíz cuadrada es un buen punto de partida para clasificar, no una ley.
+
+56
+00:03:32,060 --> 00:03:37,380
+En Ames, el óptimo fue el 10 %; en Heart, casi cualquier valor da lo mismo.
+
+57
+00:03:37,500 --> 00:03:41,200
+Se valida con validación cruzada u OOB.
+
+58
+00:03:41,320 --> 00:03:42,540
+Piensa un segundo.
+
+59
+00:03:42,660 --> 00:03:44,630
+En Heart, la curva es plana.
+
+60
+00:03:44,750 --> 00:03:48,480
+¿Qué valor de max_features eliges, y dónde pones tu esfuerzo?
+
+61
+00:03:49,200 --> 00:03:53,184
+Te quedas con el valor por defecto, la raíz cuadrada, que además es rápido,
+
+62
+00:03:53,184 --> 00:03:56,850
+porque optimizar un parámetro que no mueve la aguja es perder tiempo.
+
+63
+00:03:56,970 --> 00:03:59,850
+Tu esfuerzo va a lo que sí importa: la métrica
+
+64
+00:03:59,850 --> 00:04:02,980
+correcta, una validación honesta, y mejores datos.
+
+65
+00:04:03,100 --> 00:04:08,536
+Para llevarte: max_features tiene un punto intermedio: en Ames, el 10 %
+
+66
+00:04:08,536 --> 00:04:12,900
+de las columnas bajó el error de 24 300 a 22 500 dólares.
+
+67
+00:04:13,020 --> 00:04:16,060
+En otros datos, como Heart, casi no importa.
+
+68
+00:04:16,180 --> 00:04:19,572
+Y cuidado con max_features igual a uno punto cero: eso es
+
+69
+00:04:19,572 --> 00:04:22,190
+un bagging, como en el notebook de la clase.
+
+70
+00:04:22,310 --> 00:04:25,522
+Siguiente parada: cuántos árboles usar, y cómo ajustar
+
+71
+00:04:25,522 --> 00:04:28,080
+los demás hiperparámetros sin hacer trampa.

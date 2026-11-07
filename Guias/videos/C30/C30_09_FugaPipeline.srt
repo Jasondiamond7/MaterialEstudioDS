@@ -1,0 +1,383 @@
+1
+00:00:00,250 --> 00:00:01,970
+Fuga de datos y Pipeline.
+
+2
+00:00:02,090 --> 00:00:04,765
+Es el error más común cuando empiezas con Machine
+
+3
+00:00:04,765 --> 00:00:06,840
+Learning, y también el más silencioso.
+
+4
+00:00:06,960 --> 00:00:09,770
+Imagina que estudias con el examen final en la mano.
+
+5
+00:00:09,890 --> 00:00:10,990
+Sacas un siete.
+
+6
+00:00:11,110 --> 00:00:12,420
+¿Eso dice que sabes?
+
+7
+00:00:12,540 --> 00:00:14,920
+No: dice que viste las respuestas.
+
+8
+00:00:15,040 --> 00:00:17,880
+A eso se le llama fuga de datos, o data leakage.
+
+9
+00:00:18,000 --> 00:00:21,104
+Es usar, directa o indirectamente, información de la
+
+10
+00:00:21,104 --> 00:00:23,970
+prueba o de la validación durante el desarrollo.
+
+11
+00:00:24,090 --> 00:00:27,930
+Ocurre cuando imputas, escalas, seleccionas variables, o eliges
+
+12
+00:00:27,930 --> 00:00:31,830
+hiperparámetros, usando datos que no eran solo de entrenamiento.
+
+13
+00:00:31,950 --> 00:00:34,550
+El resultado se ve mejor de lo que será de verdad.
+
+14
+00:00:34,670 --> 00:00:38,890
+Una nota inflada, que no se repite cuando el modelo llega al mundo real.
+
+15
+00:00:39,010 --> 00:00:42,770
+Para evitarla, necesitas entender tres verbos de scikit-learn.
+
+16
+00:00:42,890 --> 00:00:45,110
+Fit, transform, y predict.
+
+17
+00:00:45,230 --> 00:00:47,600
+Fit significa aprender de los datos.
+
+18
+00:00:47,720 --> 00:00:51,650
+Por ejemplo, calcular una media, o los coeficientes de un modelo.
+
+19
+00:00:51,770 --> 00:00:54,370
+Transform significa aplicar lo aprendido.
+
+20
+00:00:54,490 --> 00:00:57,400
+Por ejemplo, restar esa media a otros datos.
+
+21
+00:00:57,520 --> 00:01:01,230
+Y predict significa predecir con un modelo que ya está ajustado.
+
+22
+00:01:01,350 --> 00:01:03,450
+Piénsalo así: fit es estudiar.
+
+23
+00:01:03,570 --> 00:01:05,970
+Transform y predict son dar el examen.
+
+24
+00:01:06,090 --> 00:01:07,910
+¿Con qué datos se usa cada uno?
+
+25
+00:01:08,030 --> 00:01:10,210
+Fit, solo con el entrenamiento.
+
+26
+00:01:10,330 --> 00:01:13,770
+Transform, con entrenamiento, validación y prueba.
+
+27
+00:01:13,890 --> 00:01:18,490
+Fit transform, que hace las dos cosas seguidas, solo con el entrenamiento.
+
+28
+00:01:18,610 --> 00:01:22,290
+Y predict, con validación, prueba y datos nuevos.
+
+29
+00:01:22,410 --> 00:01:26,530
+La regla de oro es una sola: fit, solo con el entrenamiento.
+
+30
+00:01:26,650 --> 00:01:28,920
+Veamos cómo la fuga esconde un problema.
+
+31
+00:01:29,040 --> 00:01:33,150
+El entrenamiento tiene tres valores: diez, doce y catorce.
+
+32
+00:01:33,270 --> 00:01:38,160
+Su media es doce, y su desviación estándar, uno coma seiscientos treinta y tres.
+
+33
+00:01:38,280 --> 00:01:40,090
+En la prueba aparece un treinta.
+
+34
+00:01:40,210 --> 00:01:42,760
+Un valor muy alejado de todo lo que vimos.
+
+35
+00:01:42,880 --> 00:01:47,956
+Con los estadísticos del entrenamiento, que es lo correcto, el puntaje z de treinta es
+
+36
+00:01:47,956 --> 00:01:51,970
+treinta menos doce, entre uno coma seiscientos treinta y tres: once.
+
+37
+00:01:52,090 --> 00:01:53,540
+Ahora, la fuga.
+
+38
+00:01:53,660 --> 00:01:56,443
+Calculamos la media y la desviación con las cuatro
+
+39
+00:01:56,443 --> 00:01:58,670
+filas, incluido el treinta de la prueba.
+
+40
+00:01:58,790 --> 00:02:03,580
+La media sube a dieciséis coma cinco, y la desviación a siete coma noventa y dos.
+
+41
+00:02:03,700 --> 00:02:06,715
+Con esos números, el z de treinta es treinta menos
+
+42
+00:02:06,715 --> 00:02:09,910
+dieciséis coma cinco, entre siete coma noventa y dos.
+
+43
+00:02:10,030 --> 00:02:11,580
+Da uno coma setenta.
+
+44
+00:02:11,700 --> 00:02:12,620
+¡Parece normal!
+
+45
+00:02:12,740 --> 00:02:17,230
+Compáralos: once con el método correcto, uno coma setenta con la fuga.
+
+46
+00:02:17,350 --> 00:02:19,140
+La fuga escondió el atípico.
+
+47
+00:02:19,260 --> 00:02:23,660
+Piensa un segundo: ¿por qué, con la fuga, el treinta pareció normal?
+
+48
+00:02:24,280 --> 00:02:28,560
+Porque el propio treinta ayudó a calcular la media y la desviación, y las infló.
+
+49
+00:02:28,680 --> 00:02:32,150
+Es como corregir un examen con el criterio del alumno que lo hizo.
+
+50
+00:02:32,270 --> 00:02:34,440
+Un experimento lo muestra con claridad.
+
+51
+00:02:34,560 --> 00:02:37,186
+Tomamos mil columnas de puro ruido, sin ninguna
+
+52
+00:02:37,186 --> 00:02:39,310
+relación con lo que queremos predecir.
+
+53
+00:02:39,430 --> 00:02:42,920
+Entonces ningún modelo puede acertar más de cincuenta por ciento.
+
+54
+00:02:43,040 --> 00:02:44,950
+Es como adivinar a cara o cruz.
+
+55
+00:02:45,070 --> 00:02:48,834
+Primero, hacerlo mal: seleccionas las diez mejores columnas
+
+56
+00:02:48,834 --> 00:02:51,960
+usando todas las filas, y recién después validas.
+
+57
+00:02:52,080 --> 00:02:55,130
+La exactitud sale cerca de cero coma setenta y nueve.
+
+58
+00:02:55,250 --> 00:02:57,110
+Como si el modelo supiera algo.
+
+59
+00:02:57,230 --> 00:03:01,240
+Ahora, hacerlo bien: la selección va dentro de un Pipeline.
+
+60
+00:03:01,360 --> 00:03:04,430
+La exactitud sale cerca de cero coma cincuenta y uno.
+
+61
+00:03:04,550 --> 00:03:06,430
+Es azar, y es lo honesto.
+
+62
+00:03:06,550 --> 00:03:09,600
+La diferencia entre esos dos números es toda la fuga.
+
+63
+00:03:09,720 --> 00:03:12,990
+Y repetimos el experimento cuarenta veces para confirmarlo.
+
+64
+00:03:13,110 --> 00:03:15,530
+La solución práctica se llama Pipeline.
+
+65
+00:03:15,650 --> 00:03:19,565
+Encadena varios pasos, por ejemplo estandarizar y luego modelar, y
+
+66
+00:03:19,565 --> 00:03:22,650
+hace fit de cada paso solo con los datos que recibe.
+
+67
+00:03:22,770 --> 00:03:27,800
+En código, es una línea: make pipeline, el estandarizador, y el modelo.
+
+68
+00:03:27,920 --> 00:03:29,790
+Y se ajusta con el entrenamiento.
+
+69
+00:03:29,910 --> 00:03:34,614
+Dentro de K-Fold, el Pipeline repite el proceso completo en cada pliegue: aprende
+
+70
+00:03:34,614 --> 00:03:38,330
+con los pliegues de entrenamiento, y aplica en el de validación.
+
+71
+00:03:38,450 --> 00:03:41,712
+Y se usa así: cross val score, con el Pipeline,
+
+72
+00:03:41,712 --> 00:03:44,280
+los datos de desarrollo, y el K-Fold.
+
+73
+00:03:44,400 --> 00:03:47,059
+Cuando tus columnas son de distinto tipo, usas
+
+74
+00:03:47,059 --> 00:03:50,180
+ColumnTransformer: un tratamiento por tipo de columna.
+
+75
+00:03:50,300 --> 00:03:52,610
+A las numéricas se les imputa y se escalan.
+
+76
+00:03:52,730 --> 00:03:56,610
+A las categóricas, se les pone la moda y se les aplica one-hot.
+
+77
+00:03:56,730 --> 00:04:00,905
+Al final, cuando ya decidiste todo, ajustas con entrenamiento más
+
+78
+00:04:00,905 --> 00:04:04,310
+validación, y predices sobre la prueba, una sola vez.
+
+79
+00:04:04,430 --> 00:04:06,400
+Un checklist para no equivocarte.
+
+80
+00:04:06,520 --> 00:04:11,590
+Uno: divide primero, antes de imputar, escalar, codificar o seleccionar.
+
+81
+00:04:11,710 --> 00:04:17,170
+Dos: usa un Pipeline, así cada pliegue de K-Fold re-aprende sus propios pasos.
+
+82
+00:04:17,290 --> 00:04:20,200
+Tres: estratifica si hay clases raras.
+
+83
+00:04:20,320 --> 00:04:24,190
+Cuatro: elige los hiperparámetros con la validación o con K-Fold.
+
+84
+00:04:24,310 --> 00:04:28,610
+Cinco: mira la prueba una sola vez, con el modelo ya decidido.
+
+85
+00:04:28,730 --> 00:04:31,470
+Y seis: reporta varias métricas, porque el
+
+86
+00:04:31,470 --> 00:04:34,340
+accuracy no basta con clases desbalanceadas.
+
+87
+00:04:34,460 --> 00:04:37,719
+Piensa un segundo: imputas con la mediana calculada con
+
+88
+00:04:37,719 --> 00:04:40,800
+todas las filas, y recién después divides los datos.
+
+89
+00:04:40,920 --> 00:04:41,640
+¿Hay fuga?
+
+90
+00:04:42,260 --> 00:04:42,730
+Sí.
+
+91
+00:04:42,850 --> 00:04:46,310
+La mediana ya incluye información de la validación y de la prueba.
+
+92
+00:04:46,430 --> 00:04:51,040
+Lo correcto es dividir primero, y calcular la mediana solo con el entrenamiento.
+
+93
+00:04:51,160 --> 00:04:53,808
+Para llevarte: la fuga es usar información de la
+
+94
+00:04:53,808 --> 00:04:56,070
+prueba o de la validación al desarrollar.
+
+95
+00:04:56,190 --> 00:04:58,370
+Fit, solo con el entrenamiento.
+
+96
+00:04:58,490 --> 00:05:00,250
+Y el Pipeline lo hace por ti.

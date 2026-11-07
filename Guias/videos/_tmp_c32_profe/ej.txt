@@ -1,0 +1,165 @@
+ Ejercicios para el cuaderno · Clase 32 · Reducción de
+ dimensionalidad
+
+ Para resolver en papel, con calculadora · soluciones paso a paso al final
+
+ Cómo usar esta guía
+ • Escribe el número del bloque y del ejercicio, y tu desarrollo completo.
+ • Fórmulas: varianza explicada = λⱼ/Σλ · [[1, r], [r, 1]] tiene λ = 1 ± r, vectores (1, ±1)/√2 · puntaje = v · z · correlación = carga
+
+     · √λ · VIF = 1/(1 − R²).
+ • Nivel: ★ directo · ★★ 2 o 3 pasos · ★★★ integra varios conceptos.
+
+Bloque 1 Varianza explicada desde los valores propios ★
+
+Seis variables estandarizadas; los valores propios son 2.7, 1.5, 0.8, 0.5, 0.3 y 0.2.
+1 Comprueba que suman p y calcula la varianza explicada y la acumulada de cada componente.
+2 ¿Cuántos componentes necesitas para al menos 80 % y para 90 %? ¿Y según Kaiser (λ > 1)?
+
+Bloque 2 Elegir el número de componentes ★★
+
+Ocho variables estandarizadas; λ = 3.2, 1.6, 1.1, 0.8, 0.6, 0.4, 0.2, 0.1.
+1 Calcula la acumulada y el k para 80 % y 90 %.
+2 Con validación cruzada obtienes AUC 0.71 (k = 2), 0.78 (4), 0.79 (5) y 0.79 (8). ¿Qué k elegirías y por qué?
+
+Bloque 3 PCA a mano con 2 variables ★★★
+
+Matriz de correlación [[1, 0.8], [0.8, 1]].
+1 Calcula los valores propios, los vectores propios y la varianza explicada de cada componente.
+2 Proyecta z = (1.2, 0.8) en PC1 y PC2. Reconstruye con solo PC1 y calcula el error.
+3 Sin estandarizar, la covarianza es [[400, 20], [20, 4]] (valores propios 401.0 y 3.0). ¿Qué fracción explica PC1 y
+
+        qué variable domina? ¿Por qué se estandariza?
+
+Bloque 4 Leer cargas ★★
+
+PC1 con λ = 2.5. Cargas (A, B, C, D, E) = (0.48, 0.46, 0.45, 0.05, −0.59).
+1 ¿Qué variables definen PC1 y qué significa el signo de E? Verifica que la norma sea aproximadamente 1.
+2 Calcula la correlación de A y E con PC1, y el puntaje de un cliente z = (1, 2, 0.5, −1, −0.5).
+3 Un colega dice «PC1 es la variable más importante para predecir la fuga». ¿Qué le respondes?
+
+Bloque 5 Elegir la codificación ★★
+
+1 Elige ordinal, one-hot, target/frequency o numérica: (a) tipo de plan (2 categorías), (b) nivel educativo (básico,
+        medio, superior), (c) región (5 sin orden), (d) comuna (300 categorías), (e) monto 0 a 9.
+
+2 La comuna B tiene 10 clientes y 4 fugas; la tasa global es 0.15. Calcula la tasa cruda y la suavizada con m = 20,
+        y explica por qué la cruda es riesgosa.
+
+3 ¿Por qué la media del target calculada con todas las filas es fuga de datos?
+
+Ejercicios para el cuaderno · Clase 32                                                                                                   1
+Bloque 6 Dimensiones después de codificar ★★
+
+8 variables numéricas; categóricas: plan (2), región (5), estado civil (4), canal (6); nivel (ordinal con 3 niveles) y 2 variables
+construidas.
+1 ¿Cuántas columnas hay con one-hot sin drop (nivel ordinal en 1 columna)? ¿Y con drop = 'first'?
+
+2 Si PCA conserva 90 % con 9 componentes, ¿qué fracción de columnas se ahorra con el esquema drop =
+        'first'?
+
+Bloque 7 Pipeline, fuga y técnica adecuada ★★★
+
+1 ¿Fuga o no? (a) StandardScaler ajustado con todas las filas, luego dividir; (b) PCA dentro de un Pipeline
+        evaluado con K-Fold; (c) elegir k mirando la prueba; (d) crear duracion_prom_llamada antes de dividir.
+
+2 Elige PCA, t-SNE, selección o feature engineering: (a) modelo liviano con seis variables de uso
+        correlacionadas, (b) ver estructura local no lineal, (c) una columna sin información, (d) distinguir llamadas
+        largas de cortas.
+
+3 Explica por qué t-SNE no sirve como paso de un modelo en producción (dos razones).
+
+Ejercicios para el cuaderno · Clase 32                                                                                              2
+   Soluciones paso a paso
+
+   Revisa el desarrollo, no solo el número final
+
+Bloque 1
+
+#  Solución
+
+1  Σλ = 2.7 + 1.5 + 0.8 + 0.5 + 0.3 + 0.2 = 6.0 = p. Varianza: 45.0, 25.0, 13.3, 8.3, 5.0, 3.3 %. Acumulada: 45.0, 70.0, 83.3,
+
+   91.7, 96.7, 100 %.
+
+2  80 %: k = 3 (83.3). 90 %: k = 4 (91.7). Kaiser (λ > 1): k = 2.
+
+Bloque 2
+
+#  Solución
+
+1  Σλ = 8. Acumulada: 40.0, 60.0, 73.8, 83.8, 91.3, 96.3, 98.8, 100 %. 80 %: k = 4. 90 %: k = 5.
+
+2  k = 4: ya llega a 0.78 y 5 o 8 casi no mejoran (+0.01). Se elige el más pequeño que rinde igual (parsimonia), y se
+
+   compara dentro del Pipeline.
+
+Bloque 3
+
+#  Solución
+
+1  λ = 1 + 0.8 = 1.8 y 1 − 0.8 = 0.2. Vectores (0.707, 0.707) y (0.707, −0.707). Varianza explicada: 1.8/2 = 90 % y 10 %.
+
+2  PC1 = (1.2 + 0.8)/√2 = 1.414 · PC2 = (1.2 − 0.8)/√2 = 0.283. Reconstrucción con PC1: 1.414·(0.707, 0.707) = (1.0, 1.0).
+
+   Error: (0.2² + 0.2²) = 0.08 (= 0.283²).
+
+3  PC1 explica 401.0/404 = 99.3 % y casi coincide con la variable de varianza 400 (carga ≈ 0.999). Es un efecto de la
+
+   unidad: se estandariza para que cada variable pese igual.
+
+Bloque 4
+
+#  Solución
+
+1  A, B y C (≈ 0.46) definen PC1; E pesa −0.59: cuando A, B y C suben, E baja. Norma² = 0.2304 + 0.2116 + 0.2025 + 0.0025
+
+   + 0.3481 = 0.995 ≈ 1.
+
+2  √2.5 = 1.581: A: 0.48·1.581 = 0.76; E: −0.59·1.581 = −0.93. Puntaje = 0.48 + 0.92 + 0.225 − 0.05 + 0.295 = 1.87.
+
+3  PCA no usa la etiqueta: PC1 es la dirección de mayor varianza, no necesariamente la que predice. Hay que contrastar
+
+   con la fuga (aquí PC3, no PC1, es la que más se correlaciona).
+
+Bloque 5
+
+#  Solución
+
+1  (a) one-hot con drop if_binary (una columna 0/1) · (b) ordinal · (c) one-hot · (d) target/frequency con validación interna ·
+
+   (e) ya es ordinal numérica: se deja como número (o se estandariza).
+
+2  Cruda: 4/10 = 0.40. Suavizada: (4 + 20·0.15)/(10 + 20) = 7/30 = 0.233. Con 10 clientes la cruda es muy ruidosa y el
+
+   modelo la memorizaría; la suavizada se acerca a la tasa global.
+
+3  Porque usa la etiqueta de las filas de prueba para construir una variable de entrada; el modelo «ve» la respuesta. Debe
+
+   calcularse con entrenamiento (idealmente con validación cruzada interna).
+
+Bloque 6
+
+#  Solución
+
+1  Sin drop: 8 + (2 + 5 + 4 + 6) + 1 + 2 = 28. Con drop = 'first': 8 + (1 + 4 + 3 + 5) + 1 + 2 = 24.
+
+2  Con 24 columnas y 9 componentes: 9/24 = 37.5 % de las columnas; se ahorra 62.5 %. (Con las 28 columnas: 9/28 = 32
+
+   %; se ahorra 68 %.)
+
+Ejercicios para el cuaderno · Clase 32                                                                                           3
+Bloque 7
+
+#  Solución
+
+1  (a) fuga · (b) no · (c) fuga · (d) no (es una operación fila a fila que no aprende nada del conjunto).
+
+2  (a) PCA (o seleccionar una) · (b) t-SNE · (c) selección · (d) feature engineering (segundos / frec_llamadas).
+
+3  (1) No tiene transform: no proyecta clientes nuevos sin recalcular todo. (2) No es determinista y es costoso; el resultado
+
+   cambia con la semilla.
+
+Ejercicios para el cuaderno · Clase 32                                                                                         4
+

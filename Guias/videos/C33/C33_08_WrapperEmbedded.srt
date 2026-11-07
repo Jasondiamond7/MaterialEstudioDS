@@ -1,0 +1,395 @@
+1
+00:00:00,250 --> 00:00:02,620
+Séptima parada: wrapper y embedded.
+
+2
+00:00:02,740 --> 00:00:05,560
+Los métodos que sí miran el conjunto de variables.
+
+3
+00:00:05,680 --> 00:00:09,720
+Imagina que tienes diez prendas y quieres el mejor conjunto para una entrevista.
+
+4
+00:00:09,840 --> 00:00:13,600
+Cada prenda entra o no entra: dos posibilidades por prenda.
+
+5
+00:00:13,720 --> 00:00:16,070
+Dos elevado a diez son mil veinticuatro.
+
+6
+00:00:16,190 --> 00:00:19,820
+Menos el conjunto vacío: mil veintitrés combinaciones.
+
+7
+00:00:19,940 --> 00:00:22,594
+Un wrapper hace eso con variables: entrena el
+
+8
+00:00:22,594 --> 00:00:25,190
+modelo con distintos subconjuntos y compara.
+
+9
+00:00:25,310 --> 00:00:30,160
+Con p variables hay dos elevado a p, menos uno, subconjuntos posibles.
+
+10
+00:00:30,280 --> 00:00:31,630
+Y el número explota.
+
+11
+00:00:31,750 --> 00:00:35,070
+Supongamos un computador que entrena mil modelos por segundo.
+
+12
+00:00:35,190 --> 00:00:38,730
+Con diez variables: mil veintitrés modelos, un segundo.
+
+13
+00:00:38,850 --> 00:00:42,640
+Con veinte: un millón cuarenta y ocho mil, diecisiete minutos.
+
+14
+00:00:42,760 --> 00:00:45,600
+Con treinta: mil millones, doce días.
+
+15
+00:00:45,720 --> 00:00:50,360
+Y con nuestras cincuenta candidatas: treinta y cinco mil setecientos dos años.
+
+16
+00:00:50,480 --> 00:00:52,770
+Por eso nadie hace búsqueda exhaustiva.
+
+17
+00:00:52,890 --> 00:00:55,320
+Todos los métodos prácticos son atajos.
+
+18
+00:00:55,440 --> 00:00:59,840
+El más conocido es RFE: eliminación recursiva de variables.
+
+19
+00:00:59,960 --> 00:01:02,400
+RFE es literalmente recursivo.
+
+20
+00:01:02,520 --> 00:01:05,600
+Uno: entrena el modelo con todas las variables.
+
+21
+00:01:05,720 --> 00:01:10,960
+Dos: ordena las variables por el tamaño de su coeficiente, y encuentra la más débil.
+
+22
+00:01:11,080 --> 00:01:13,710
+Tres: la elimina, y vuelve a entrenar.
+
+23
+00:01:13,830 --> 00:01:16,970
+Cuatro: repite, hasta llegar al mínimo pedido.
+
+24
+00:01:17,090 --> 00:01:22,501
+La versión con validación cruzada, RFECV, hace todo ese proceso dentro de cada
+
+25
+00:01:22,501 --> 00:01:27,080
+fold, y elige el número de variables que maximiza el AUC promedio.
+
+26
+00:01:27,200 --> 00:01:32,180
+Con las cincuenta candidatas de la clase, RFECV se queda con cuarenta y dos.
+
+27
+00:01:32,300 --> 00:01:34,820
+Un detalle clave: hay que escalar antes.
+
+28
+00:01:34,940 --> 00:01:37,960
+RFE ordena por el tamaño de los coeficientes.
+
+29
+00:01:38,080 --> 00:01:40,636
+El valor del cliente llega a dos mil ciento
+
+30
+00:01:40,636 --> 00:01:43,430
+sesenta y cinco; tiene reclamo vale cero o uno.
+
+31
+00:01:43,550 --> 00:01:47,107
+Sin escalar, el coeficiente del valor del cliente sale diminuto
+
+32
+00:01:47,107 --> 00:01:50,100
+por la unidad de medida, no por falta de importancia.
+
+33
+00:01:50,220 --> 00:01:53,060
+Por eso el StandardScaler va dentro del pipeline.
+
+34
+00:01:53,180 --> 00:01:57,370
+Ahora, embedded: la selección ocurre mientras el modelo se entrena.
+
+35
+00:01:57,490 --> 00:02:01,595
+El ejemplo clásico es el Lasso: una regresión logística con penalización
+
+36
+00:02:01,595 --> 00:02:05,130
+ele uno, la suma de los valores absolutos de los coeficientes.
+
+37
+00:02:05,250 --> 00:02:08,670
+Esa penalización empuja coeficientes a exactamente cero.
+
+38
+00:02:08,790 --> 00:02:11,530
+Y una variable con coeficiente cero queda fuera.
+
+39
+00:02:11,650 --> 00:02:14,060
+¿Y Ridge, la penalización ele dos?
+
+40
+00:02:14,180 --> 00:02:17,770
+Achica los coeficientes, pero casi nunca los lleva a cero.
+
+41
+00:02:17,890 --> 00:02:20,190
+Por eso Ridge no sirve para seleccionar.
+
+42
+00:02:20,310 --> 00:02:21,240
+El Lasso sí.
+
+43
+00:02:21,360 --> 00:02:25,380
+Y una trampa de sklearn: C no es la fuerza de la penalización.
+
+44
+00:02:25,500 --> 00:02:30,350
+Es su inverso: en la fórmula, C multiplica al error, no a la penalización.
+
+45
+00:02:30,470 --> 00:02:36,110
+C chico: el error pesa poco, la penalización manda, y sobreviven menos variables.
+
+46
+00:02:36,230 --> 00:02:39,780
+Y ojo: el Lasso necesita solver liblinear o saga.
+
+47
+00:02:39,900 --> 00:02:42,490
+El solver por defecto no admite ele uno.
+
+48
+00:02:42,610 --> 00:02:44,010
+Con los datos de la clase.
+
+49
+00:02:44,130 --> 00:02:47,680
+C igual a cero coma cero uno deja trece variables vivas.
+
+50
+00:02:47,800 --> 00:02:50,160
+Cero coma cero cinco, veintisiete.
+
+51
+00:02:50,280 --> 00:02:52,480
+Cero coma uno, treinta y tres.
+
+52
+00:02:52,600 --> 00:02:54,910
+Cero coma cinco, cuarenta y dos.
+
+53
+00:02:55,030 --> 00:02:57,310
+Y C igual a uno, cuarenta y cinco.
+
+54
+00:02:57,430 --> 00:03:00,392
+Con C igual a cero coma cero cinco, el valor de la
+
+55
+00:03:00,392 --> 00:03:02,940
+clase, sobreviven veintisiete de cincuenta.
+
+56
+00:03:03,060 --> 00:03:07,932
+Los coeficientes más grandes: llamadas, monto, cliente nuevo, y en cuarto
+
+57
+00:03:07,932 --> 00:03:11,870
+lugar, número de fallas, con más cero coma cinco uno siete.
+
+58
+00:03:11,990 --> 00:03:14,270
+La variable que el filtro llamaba ruido.
+
+59
+00:03:14,390 --> 00:03:19,360
+Más abajo, reclamos y tiene reclamo sobreviven las dos, aunque son idénticas.
+
+60
+00:03:19,480 --> 00:03:21,710
+Y aquí, una alerta del material.
+
+61
+00:03:21,830 --> 00:03:26,346
+La diapositiva veinticinco dice «veinticinco de cincuenta sobreviven», y la
+
+62
+00:03:26,346 --> 00:03:30,200
+veintiséis, cero coma nueve tres ocho con veinticinco variables.
+
+63
+00:03:30,320 --> 00:03:33,548
+El notebook ejecutado da veintisiete de cincuenta,
+
+64
+00:03:33,548 --> 00:03:36,130
+con AUC cero coma nueve tres nueve seis.
+
+65
+00:03:36,250 --> 00:03:39,890
+Lo reproduje con la base: el valor correcto es el del notebook.
+
+66
+00:03:40,010 --> 00:03:41,850
+¿Qué logramos con cada estrategia?
+
+67
+00:03:41,970 --> 00:03:44,100
+AUC con validación cruzada.
+
+68
+00:03:44,220 --> 00:03:47,160
+Las doce originales, cero coma nueve dos.
+
+69
+00:03:47,280 --> 00:03:50,670
+Las cincuenta candidatas, cero coma nueve cuatro uno.
+
+70
+00:03:50,790 --> 00:03:54,210
+El Lasso, con veintisiete, cero coma nueve tres nueve
+
+71
+00:03:54,210 --> 00:03:57,500
+seis: casi lo mismo, con la mitad de las variables.
+
+72
+00:03:57,620 --> 00:04:00,600
+El top cuatro, cero coma ocho cero cuatro.
+
+73
+00:04:00,720 --> 00:04:04,150
+Y cuatro sin redundancia, cero coma ocho nueve tres.
+
+74
+00:04:04,270 --> 00:04:07,731
+Pero hay una pregunta incómoda: si repites el Lasso con otra
+
+75
+00:04:07,731 --> 00:04:10,730
+partición de los datos, ¿salen las mismas variables?
+
+76
+00:04:10,850 --> 00:04:13,840
+La clase lo probó con cinco particiones distintas.
+
+77
+00:04:13,960 --> 00:04:16,380
+Dieciséis variables aparecen en las cinco.
+
+78
+00:04:16,500 --> 00:04:18,730
+Diecinueve aparecen solo en algunas.
+
+79
+00:04:18,850 --> 00:04:20,530
+Y quince, en ninguna.
+
+80
+00:04:20,650 --> 00:04:25,350
+Las inestables son casi todas variables construidas, y correlacionadas entre sí.
+
+81
+00:04:25,470 --> 00:04:30,050
+Cuando dos variables llevan la misma información, el Lasso elige una casi al azar.
+
+82
+00:04:30,170 --> 00:04:34,200
+Una variable que aparece en cinco de cinco es defendible ante un comité.
+
+83
+00:04:34,320 --> 00:04:36,640
+Una que aparece en dos de cinco, no.
+
+84
+00:04:36,760 --> 00:04:40,433
+El error típico con el Lasso: leer C como si fuera la fuerza de
+
+85
+00:04:40,433 --> 00:04:43,290
+la penalización, y subirlo para quitar variables.
+
+86
+00:04:43,410 --> 00:04:46,750
+Es al revés: subir C deja más variables vivas.
+
+87
+00:04:46,870 --> 00:04:48,090
+Piensa un segundo.
+
+88
+00:04:48,210 --> 00:04:51,840
+Con C igual a cero coma cero cinco quedan veintisiete variables.
+
+89
+00:04:51,960 --> 00:04:55,530
+Si cambias a C igual a cero coma cinco, ¿quedan más o menos?
+
+90
+00:04:56,250 --> 00:04:57,990
+Más: cuarenta y dos.
+
+91
+00:04:58,110 --> 00:05:00,955
+C subió diez veces, así que la penalización
+
+92
+00:05:00,955 --> 00:05:03,800
+bajó, y sobrevivieron quince variables más.
+
+93
+00:05:03,920 --> 00:05:07,214
+Para llevarte: el wrapper prueba subconjuntos; la
+
+94
+00:05:07,214 --> 00:05:10,710
+búsqueda exhaustiva es imposible, y RFE es el atajo.
+
+95
+00:05:10,830 --> 00:05:16,010
+El Lasso selecciona al entrenar, y en sklearn, C chico deja menos variables.
+
+96
+00:05:16,130 --> 00:05:18,190
+Siempre con variables escaladas.
+
+97
+00:05:18,310 --> 00:05:23,160
+Y mide la estabilidad: solo dieciséis variables aparecen en las cinco particiones.
+
+98
+00:05:23,280 --> 00:05:25,310
+Siguiente parada: la trampa.
+
+99
+00:05:25,430 --> 00:05:29,080
+Todo lo que hicimos hasta aquí tiene un problema, y lo vamos a medir.

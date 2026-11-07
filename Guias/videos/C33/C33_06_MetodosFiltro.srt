@@ -1,0 +1,463 @@
+1
+00:00:00,250 --> 00:00:03,689
+Quinta parada: las tres familias de métodos de selección de
+
+2
+00:00:03,689 --> 00:00:06,370
+variables, y la primera de ellas, los filtros.
+
+3
+00:00:06,490 --> 00:00:09,800
+Imagina que una empresa recibe cinco mil postulaciones.
+
+4
+00:00:09,920 --> 00:00:14,400
+Primero filtra por currículum: rápido y barato, sin entrevistar a nadie.
+
+5
+00:00:14,520 --> 00:00:16,500
+Después entrevista a doscientos.
+
+6
+00:00:16,620 --> 00:00:20,140
+Y solo a los últimos treinta los pone a prueba en el trabajo real.
+
+7
+00:00:20,260 --> 00:00:23,450
+La selección de variables funciona igual: es un embudo.
+
+8
+00:00:23,570 --> 00:00:26,898
+Filtro para bajar de cinco mil a doscientas, embedded para
+
+9
+00:00:26,898 --> 00:00:29,710
+bajar a treinta, y wrapper solo si sobra cómputo.
+
+10
+00:00:29,830 --> 00:00:31,960
+No compiten: son etapas.
+
+11
+00:00:32,080 --> 00:00:33,480
+Las tres familias.
+
+12
+00:00:33,600 --> 00:00:38,130
+Filter mide cada variable con una métrica estadística, sin entrenar el modelo.
+
+13
+00:00:38,250 --> 00:00:41,860
+Es barato, pero si es univariado, no ve el conjunto.
+
+14
+00:00:41,980 --> 00:00:45,490
+Wrapper entrena el modelo con distintos subconjuntos y compara.
+
+15
+00:00:45,610 --> 00:00:47,640
+Ve el conjunto, pero es caro.
+
+16
+00:00:47,760 --> 00:00:50,810
+Y embedded selecciona mientras entrena, como el Lasso.
+
+17
+00:00:50,930 --> 00:00:51,850
+Costo medio.
+
+18
+00:00:51,970 --> 00:00:54,870
+¿Cuánto cuesta cada una, en modelos entrenados?
+
+19
+00:00:54,990 --> 00:00:56,500
+Un filtro, cero.
+
+20
+00:00:56,620 --> 00:00:57,960
+Un embedded, uno.
+
+21
+00:00:58,080 --> 00:01:01,785
+Un RFE que elimina de a una, p menos k: con cincuenta
+
+22
+00:01:01,785 --> 00:01:05,070
+variables, hasta doce, treinta y ocho por fold.
+
+23
+00:01:05,190 --> 00:01:09,410
+Y probar todos los subconjuntos, dos elevado a p, menos uno.
+
+24
+00:01:09,530 --> 00:01:11,690
+Eso lo calculamos en el video ocho.
+
+25
+00:01:11,810 --> 00:01:13,810
+Un matiz sobre la tabla de la clase.
+
+26
+00:01:13,930 --> 00:01:17,040
+Dice que wrapper y embedded «sí ven interacciones».
+
+27
+00:01:17,160 --> 00:01:22,610
+Más preciso: ven el conjunto, como número de fallas, que solo aporta acompañada.
+
+28
+00:01:22,730 --> 00:01:28,186
+Pero si el modelo de adentro es una logística, tampoco ven un XOR sin el producto: en
+
+29
+00:01:28,186 --> 00:01:32,550
+el video anterior, la logística con x1 y x2 dio cero coma cinco uno.
+
+30
+00:01:32,670 --> 00:01:35,220
+Ahora, los filtros, uno por uno.
+
+31
+00:01:35,340 --> 00:01:37,140
+El primero: la varianza.
+
+32
+00:01:37,260 --> 00:01:40,209
+Una variable casi constante no puede explicar nada,
+
+33
+00:01:40,209 --> 00:01:43,100
+porque vale lo mismo para casi todos los clientes.
+
+34
+00:01:43,220 --> 00:01:48,410
+Para una binaria, con una proporción pi de unos, la varianza es pi por uno menos pi.
+
+35
+00:01:48,530 --> 00:01:52,520
+Con un umbral de cero coma cero uno, hagamos tres casos del apunte.
+
+36
+00:01:52,640 --> 00:01:56,250
+Medio por ciento de unos: cero coma cero cero cinco.
+
+37
+00:01:56,370 --> 00:01:57,160
+No pasa.
+
+38
+00:01:57,280 --> 00:02:00,560
+Uno por ciento: cero coma cero cero noventa y nueve.
+
+39
+00:02:00,680 --> 00:02:02,460
+No pasa, por muy poco.
+
+40
+00:02:02,580 --> 00:02:05,190
+Diez por ciento: cero coma cero nueve.
+
+41
+00:02:05,310 --> 00:02:05,820
+Pasa.
+
+42
+00:02:05,940 --> 00:02:07,250
+¿Y en la base de la clase?
+
+43
+00:02:07,370 --> 00:02:12,060
+El filtro de varianza, sobre las cincuenta candidatas, no descarta ninguna.
+
+44
+00:02:12,180 --> 00:02:16,760
+Es un filtro de higiene: barato, y casi nunca decide nada importante.
+
+45
+00:02:16,880 --> 00:02:19,600
+El segundo filtro: la correlación de Pearson.
+
+46
+00:02:19,720 --> 00:02:22,640
+Su punto ciego: solo mide relación lineal.
+
+47
+00:02:22,760 --> 00:02:25,910
+Mira esta U perfecta: y igual a x al cuadrado.
+
+48
+00:02:26,030 --> 00:02:32,960
+Los puntos menos dos, menos uno, cero, uno y dos dan cuatro, uno, cero, uno, cuatro.
+
+49
+00:02:33,080 --> 00:02:36,830
+La dependencia es total, y la correlación da exactamente cero.
+
+50
+00:02:36,950 --> 00:02:38,970
+Por eso existe la información mutua.
+
+51
+00:02:39,090 --> 00:02:42,940
+Mide cuánta incertidumbre sobre la fuga desaparece al conocer la variable.
+
+52
+00:02:43,060 --> 00:02:46,151
+Es mayor o igual que cero, y vale cero solo si son
+
+53
+00:02:46,151 --> 00:02:49,860
+independientes: detecta cualquier dependencia, también la U.
+
+54
+00:02:49,980 --> 00:02:51,640
+Dos cuidados prácticos.
+
+55
+00:02:51,760 --> 00:02:55,050
+No tiene techo: sirve para ordenar variables dentro de
+
+56
+00:02:55,050 --> 00:02:57,730
+un dataset, no para comparar entre datasets.
+
+57
+00:02:57,850 --> 00:03:01,820
+Y sklearn la estima con vecinos más cercanos, con algo de azar.
+
+58
+00:03:01,940 --> 00:03:05,030
+Sin fijar random state, cambia en cada corrida.
+
+59
+00:03:05,150 --> 00:03:07,240
+El tercer filtro: ANOVA F.
+
+60
+00:03:07,360 --> 00:03:10,457
+Compara cuánto se separan las medias de los grupos, contra
+
+61
+00:03:10,457 --> 00:03:12,860
+cuánto varían los datos dentro de cada grupo.
+
+62
+00:03:12,980 --> 00:03:16,460
+Aquí los grupos son dos: los que se fugan, y los que no.
+
+63
+00:03:16,580 --> 00:03:17,730
+Un ejemplo chico.
+
+64
+00:03:17,850 --> 00:03:21,945
+Una variable vale dos, cuatro y seis en los que se fugan, media
+
+65
+00:03:21,945 --> 00:03:25,910
+cuatro, y ocho, diez y doce en los que se quedan, media diez.
+
+66
+00:03:26,030 --> 00:03:27,510
+La media global es siete.
+
+67
+00:03:27,630 --> 00:03:31,163
+Cuadrado medio entre: tres por cuatro menos siete al cuadrado,
+
+68
+00:03:31,163 --> 00:03:34,468
+más tres por diez menos siete al cuadrado: veintisiete más
+
+69
+00:03:34,468 --> 00:03:37,260
+veintisiete, cincuenta y cuatro, dividido en uno.
+
+70
+00:03:37,380 --> 00:03:41,505
+Cuadrado medio dentro: las desviaciones al cuadrado dentro de cada
+
+71
+00:03:41,505 --> 00:03:45,130
+grupo suman dieciséis, dividido en seis menos dos: cuatro.
+
+72
+00:03:45,250 --> 00:03:48,840
+F igual a cincuenta y cuatro entre cuatro: trece coma cinco.
+
+73
+00:03:48,960 --> 00:03:53,350
+Su punto ciego es el mismo de Pearson: solo mira diferencias de medias.
+
+74
+00:03:53,470 --> 00:03:57,780
+Con una U, las medias de los grupos pueden coincidir y F da casi cero.
+
+75
+00:03:57,900 --> 00:04:02,030
+Y una alerta de la presentación complementaria de la carpeta: dice que ANOVA
+
+76
+00:04:02,030 --> 00:04:05,290
+compara medias del target entre categorías de la predictora.
+
+77
+00:04:05,410 --> 00:04:06,700
+Eso es en regresión.
+
+78
+00:04:06,820 --> 00:04:10,221
+En clasificación, como aquí, es al revés: compara la
+
+79
+00:04:10,221 --> 00:04:13,360
+media de la variable entre fugados y no fugados.
+
+80
+00:04:13,480 --> 00:04:16,870
+Ahora sí, los filtros sobre las cincuenta candidatas.
+
+81
+00:04:16,990 --> 00:04:20,540
+Este es el top doce, ordenado por información mutua.
+
+82
+00:04:20,660 --> 00:04:24,080
+Primero, segundos, con cero coma uno tres uno.
+
+83
+00:04:24,200 --> 00:04:28,510
+Segundo, el logaritmo de segundos, con cero coma uno dos nueve.
+
+84
+00:04:28,630 --> 00:04:31,810
+Y siguen contactos por mes, logaritmo del valor del
+
+85
+00:04:31,810 --> 00:04:34,740
+cliente, valor por antigüedad, y tiene reclamo.
+
+86
+00:04:34,860 --> 00:04:36,390
+Fíjate en dos cosas.
+
+87
+00:04:36,510 --> 00:04:39,310
+Información mutua y F no dan el mismo orden.
+
+88
+00:04:39,430 --> 00:04:42,435
+Intensidad de contacto está décima en información
+
+89
+00:04:42,435 --> 00:04:44,950
+mutua, pero tiene F cinco coma ocho ocho.
+
+90
+00:04:45,070 --> 00:04:49,780
+Cuando difieren tanto, la relación no es lineal, y eso ya es información útil.
+
+91
+00:04:49,900 --> 00:04:54,940
+Y segundos y su logaritmo ocupan los dos primeros lugares: son la misma información.
+
+92
+00:04:55,060 --> 00:04:56,480
+Una nota del material.
+
+93
+00:04:56,600 --> 00:05:00,274
+El ranking de la diapositiva difiere un poco del notebook: por
+
+94
+00:05:00,274 --> 00:05:04,066
+ejemplo, ahí llamadas por mes aparece con cero coma uno cero dos
+
+95
+00:05:04,066 --> 00:05:06,970
+tres, y aquí con cero coma cero nueve ocho siete.
+
+96
+00:05:07,090 --> 00:05:10,408
+No es un error: la información mutua se estima con azar, y
+
+97
+00:05:10,408 --> 00:05:13,440
+cambia con la semilla y con el orden de las columnas.
+
+98
+00:05:13,560 --> 00:05:17,610
+En el video siete verás que ese detalle cambia una conclusión de la clase.
+
+99
+00:05:17,730 --> 00:05:20,861
+El error típico con los filtros: leer el ranking como
+
+100
+00:05:20,861 --> 00:05:23,520
+si fuera exacto, y quedarse con los primeros.
+
+101
+00:05:23,640 --> 00:05:28,160
+Un filtro ordena bien las variables de a una, pero no sabe nada del conjunto.
+
+102
+00:05:28,280 --> 00:05:31,720
+Ya lo viste: número de fallas y el XOR se le escapan.
+
+103
+00:05:31,840 --> 00:05:33,060
+Piensa un segundo.
+
+104
+00:05:33,180 --> 00:05:37,340
+Tiene reclamo tiene F de mil ciento quince, el más alto de la lista.
+
+105
+00:05:37,460 --> 00:05:39,850
+Pero en información mutua aparece sexta.
+
+106
+00:05:39,970 --> 00:05:44,210
+Y reclamos, su gemela idéntica, ni siquiera entra al top doce.
+
+107
+00:05:44,330 --> 00:05:46,040
+¿Qué te dice eso de un ranking?
+
+108
+00:05:46,760 --> 00:05:49,330
+Que depende de la métrica, y de la estimación.
+
+109
+00:05:49,450 --> 00:05:52,660
+Dos métricas razonables ordenan distinto, y dos columnas
+
+110
+00:05:52,660 --> 00:05:55,240
+idénticas pueden quedar en lugares distintos.
+
+111
+00:05:55,360 --> 00:05:59,580
+Un ranking univariado es un punto de partida, nunca la última palabra.
+
+112
+00:05:59,700 --> 00:06:04,860
+Para llevarte: filter, wrapper y embedded son etapas de un embudo, no rivales.
+
+113
+00:06:04,980 --> 00:06:10,340
+Los filtros miden de a una: varianza, correlación, información mutua y ANOVA F.
+
+114
+00:06:10,460 --> 00:06:15,230
+Y su punto ciego es el conjunto: lo que solo aporta acompañado, se les escapa.
+
+115
+00:06:15,350 --> 00:06:17,980
+Siguiente parada: el clímax de la clase.
+
+116
+00:06:18,100 --> 00:06:20,400
+Cuatro variables contra cuatro variables.

@@ -1,0 +1,3751 @@
+1
+00:00:00,250 --> 00:00:00,710
+Hola.
+
+2
+00:00:00,830 --> 00:00:03,850
+Bienvenido a la serie de videos de la clase treinta y uno.
+
+3
+00:00:03,970 --> 00:00:08,900
+Aquí vas a ver, paso a paso, qué es el Machine Learning y cómo se usa con criterio.
+
+4
+00:00:09,020 --> 00:00:11,720
+Esta clase gira en torno a tres preguntas.
+
+5
+00:00:11,840 --> 00:00:14,160
+Primera: ¿qué tipo de problema tengo?
+
+6
+00:00:14,280 --> 00:00:16,080
+Segunda: ¿qué datos tengo?
+
+7
+00:00:16,200 --> 00:00:18,960
+Y tercera: ¿cómo sabré que el modelo sirve?
+
+8
+00:00:19,080 --> 00:00:23,060
+Si respondes bien esas tres, ya tienes la mitad del trabajo hecho.
+
+9
+00:00:23,180 --> 00:00:27,630
+La otra mitad es elegir una herramienta, y eso casi siempre es lo más fácil.
+
+10
+00:00:27,750 --> 00:00:29,880
+La gran idea de la clase es simple.
+
+11
+00:00:30,000 --> 00:00:33,650
+Antes, un programador escribía a mano las reglas de decisión.
+
+12
+00:00:33,770 --> 00:00:36,689
+Ahora le entregas ejemplos a un modelo, y es el modelo
+
+13
+00:00:36,689 --> 00:00:39,500
+quien ajusta sus parámetros para encontrar la regla.
+
+14
+00:00:39,620 --> 00:00:42,260
+Y esos ejemplos pueden venir de tres formas.
+
+15
+00:00:42,380 --> 00:00:45,570
+Con la respuesta correcta: es aprendizaje supervisado.
+
+16
+00:00:45,690 --> 00:00:48,020
+Sin respuesta: es no supervisado.
+
+17
+00:00:48,140 --> 00:00:52,460
+O con un entorno que da premios y castigos: es aprendizaje por refuerzo.
+
+18
+00:00:52,580 --> 00:00:57,900
+Y el ciclo siempre es el mismo: datos, modelo, evaluar el error, y mejorar.
+
+19
+00:00:58,020 --> 00:00:59,300
+Y vuelta a empezar.
+
+20
+00:00:59,420 --> 00:01:02,380
+Antes de seguir, una advertencia de la profesora.
+
+21
+00:01:02,500 --> 00:01:05,150
+No siempre se necesita inteligencia artificial.
+
+22
+00:01:05,270 --> 00:01:08,490
+Hay gente que quiere un Ferrari para ir a comprar pan a la esquina.
+
+23
+00:01:08,610 --> 00:01:11,387
+Si una resta o una tabla de reglas ya resuelve el
+
+24
+00:01:11,387 --> 00:01:13,710
+problema, no hace falta Machine Learning.
+
+25
+00:01:13,830 --> 00:01:16,700
+Piensa un segundo: ¿cuándo sí vale la pena usarlo?
+
+26
+00:01:17,420 --> 00:01:20,635
+Cuando las reglas son difíciles de escribir, cambian con el
+
+27
+00:01:20,635 --> 00:01:23,250
+tiempo, o dependen de muchas variables a la vez.
+
+28
+00:01:23,370 --> 00:01:26,830
+En esos casos, los ejemplos hablan mejor que las reglas.
+
+29
+00:01:26,950 --> 00:01:28,680
+Este es el mapa de la clase.
+
+30
+00:01:28,800 --> 00:01:32,230
+Son siete paradas, y cada una tiene su propio video.
+
+31
+00:01:32,350 --> 00:01:33,900
+Al final, un repaso.
+
+32
+00:01:34,020 --> 00:01:38,350
+Primero, cómo pasar de un problema real a una tarea de Machine Learning.
+
+33
+00:01:38,470 --> 00:01:43,230
+Después, los dos grandes modelos supervisados: clasificación y regresión.
+
+34
+00:01:43,350 --> 00:01:46,160
+Luego, qué se hace cuando no hay etiquetas.
+
+35
+00:01:46,280 --> 00:01:49,800
+Cómo saber si un modelo aprendió demasiado poco, o demasiado.
+
+36
+00:01:49,920 --> 00:01:52,030
+Y por qué el accuracy puede engañarte.
+
+37
+00:01:52,150 --> 00:01:54,723
+Para cerrar, cómo elegir el enfoque según el
+
+38
+00:01:54,723 --> 00:01:57,180
+problema, y cuándo conviene Deep Learning.
+
+39
+00:01:57,300 --> 00:01:59,660
+Esta clase usa piezas que ya conoces.
+
+40
+00:01:59,780 --> 00:02:05,305
+La regresión lineal y la logística, de las clases diecisiete a veintiuna, y todo lo de la
+
+41
+00:02:05,305 --> 00:02:09,960
+clase treinta: dividir los datos, el Pipeline, Ridge, Lasso y las métricas.
+
+42
+00:02:10,080 --> 00:02:12,605
+Y lo que sigue: la clase treinta y dos explica
+
+43
+00:02:12,605 --> 00:02:14,910
+con calma la reducción de dimensionalidad.
+
+44
+00:02:15,030 --> 00:02:18,110
+Aquí solo usaremos PCA para mirar los datos.
+
+45
+00:02:18,230 --> 00:02:21,940
+Para practicar, la profesora usó dos conjuntos de datos.
+
+46
+00:02:22,060 --> 00:02:25,051
+Primero, Club Activo: ochocientos clientes de un
+
+47
+00:02:25,051 --> 00:02:27,980
+gimnasio, simulados dentro del propio cuaderno.
+
+48
+00:02:28,100 --> 00:02:30,310
+Un veinte coma nueve por ciento canceló.
+
+49
+00:02:30,430 --> 00:02:32,932
+Segundo, una base real de tres mil ciento
+
+50
+00:02:32,932 --> 00:02:35,740
+cincuenta clientes, de la actividad de repaso.
+
+51
+00:02:35,860 --> 00:02:38,640
+Aquí la fuga es de quince coma siete por ciento.
+
+52
+00:02:38,760 --> 00:02:42,560
+Sirve para el desafío de decidir si un problema es supervisado o no.
+
+53
+00:02:42,680 --> 00:02:43,770
+Fíjate en algo.
+
+54
+00:02:43,890 --> 00:02:47,110
+En los dos casos, el cliente que se va es la minoría.
+
+55
+00:02:47,230 --> 00:02:51,080
+Eso va a complicar la forma de medir un modelo, y lo veremos con calma.
+
+56
+00:02:51,200 --> 00:02:53,300
+Cada video sigue la misma receta.
+
+57
+00:02:53,420 --> 00:02:55,050
+Primero, una pregunta.
+
+58
+00:02:55,170 --> 00:02:57,070
+Después, una analogía.
+
+59
+00:02:57,190 --> 00:02:59,360
+Luego, un ejemplo con números.
+
+60
+00:02:59,480 --> 00:03:02,880
+Y al final, el error típico y una frase para llevarte.
+
+61
+00:03:03,000 --> 00:03:07,441
+Mi consejo: míralos con la guía al lado, pausa cuando algo no quede claro, y
+
+62
+00:03:07,441 --> 00:03:11,240
+cuando te haga una pregunta, piensa tu respuesta antes de seguir.
+
+63
+00:03:11,360 --> 00:03:12,300
+Probemos una.
+
+64
+00:03:12,420 --> 00:03:15,630
+Un modelo acierta el setenta y tres por ciento de las veces.
+
+65
+00:03:15,750 --> 00:03:20,320
+Otro, que siempre responde «nadie cancela», acierta el setenta y nueve.
+
+66
+00:03:20,440 --> 00:03:22,550
+Piensa un segundo: ¿cuál es mejor?
+
+67
+00:03:23,270 --> 00:03:24,860
+Todavía no lo sabemos.
+
+68
+00:03:24,980 --> 00:03:28,237
+El que siempre dice «nadie cancela» gana en accuracy,
+
+69
+00:03:28,237 --> 00:03:30,880
+pero no detecta a ningún cliente que se va.
+
+70
+00:03:31,000 --> 00:03:34,890
+Por eso el accuracy no basta, y de eso trata uno de los videos.
+
+71
+00:03:35,010 --> 00:03:37,563
+Vamos con la primera parada: cómo pasar de un
+
+72
+00:03:37,563 --> 00:03:39,890
+problema a una tarea de Machine Learning.
+
+73
+00:03:40,770 --> 00:03:43,260
+Del problema a la tarea de Machine Learning.
+
+74
+00:03:43,380 --> 00:03:46,930
+Antes de elegir un modelo, hay que saber qué problema tienes.
+
+75
+00:03:47,050 --> 00:03:50,408
+Empecemos por una pregunta que la profesora hizo en clase: ¿qué
+
+76
+00:03:50,408 --> 00:03:53,340
+decisión toma tu empresa hoy basándose en reglas fijas?
+
+77
+00:03:53,460 --> 00:03:56,710
+Una regla fija es una condición que alguien escribió a mano.
+
+78
+00:03:56,830 --> 00:03:59,780
+Si el pedido pasa de cierto monto, se revisa.
+
+79
+00:03:59,900 --> 00:04:02,700
+Si la nota es menor que la mínima, se reprueba.
+
+80
+00:04:02,820 --> 00:04:04,750
+Siempre igual, para todos.
+
+81
+00:04:04,870 --> 00:04:07,660
+Y funcionan muy bien, cuando la regla es clara.
+
+82
+00:04:07,780 --> 00:04:11,234
+El problema aparece cuando las variables son difíciles de medir con
+
+83
+00:04:11,234 --> 00:04:14,430
+exactitud, o cuando el mundo cambia y la regla se queda vieja.
+
+84
+00:04:14,550 --> 00:04:17,410
+Es como una receta que escribiste hace diez años.
+
+85
+00:04:17,530 --> 00:04:21,570
+Si cambió el horno, el ingrediente o el gusto de la gente, la receta ya
+
+86
+00:04:21,570 --> 00:04:24,700
+no sale igual, y alguien tiene que reescribirla a mano.
+
+87
+00:04:24,820 --> 00:04:29,414
+El Machine Learning propone otra cosa: en lugar de escribir la regla, le muestras
+
+88
+00:04:29,414 --> 00:04:33,270
+ejemplos al modelo, y él descubre la regla ajustando sus parámetros.
+
+89
+00:04:33,390 --> 00:04:35,560
+Veámoslo con un ejemplo muy simple.
+
+90
+00:04:35,680 --> 00:04:39,730
+Estos puntos son los datos: cada uno es un caso con su resultado.
+
+91
+00:04:39,850 --> 00:04:43,050
+El modelo parte con una recta cualquiera, casi plana.
+
+92
+00:04:43,170 --> 00:04:47,140
+Ahora mide el error: qué tan lejos queda cada punto de la recta.
+
+93
+00:04:47,260 --> 00:04:50,980
+El error cuadrático medio de esta recta es 4.22.
+
+94
+00:04:51,100 --> 00:04:51,900
+Muy alto.
+
+95
+00:04:52,020 --> 00:04:55,598
+Entonces el modelo ajusta sus parámetros, la pendiente y el
+
+96
+00:04:55,598 --> 00:04:58,690
+punto de partida, y la recta se acerca a los datos.
+
+97
+00:04:58,810 --> 00:05:01,150
+El error baja a 2.42.
+
+98
+00:05:01,270 --> 00:05:04,280
+Sigue ajustando, hasta que casi no puede mejorar.
+
+99
+00:05:04,400 --> 00:05:06,660
+Ahora el error es 0.04.
+
+100
+00:05:06,780 --> 00:05:09,520
+Esa es la recta que mejor describe los ejemplos.
+
+101
+00:05:09,640 --> 00:05:11,680
+Fíjate que nadie le dijo la regla.
+
+102
+00:05:11,800 --> 00:05:14,320
+Solo vio ejemplos y fue corrigiendo su error.
+
+103
+00:05:14,440 --> 00:05:16,690
+Eso es aprender, en Machine Learning.
+
+104
+00:05:16,810 --> 00:05:19,540
+Ese ciclo de ajustar y medir se repite siempre.
+
+105
+00:05:19,660 --> 00:05:21,280
+Primero, los datos.
+
+106
+00:05:21,400 --> 00:05:24,180
+Luego, el modelo hace sus predicciones.
+
+107
+00:05:24,300 --> 00:05:25,560
+Se mide el error.
+
+108
+00:05:25,680 --> 00:05:26,980
+Y el modelo mejora.
+
+109
+00:05:27,100 --> 00:05:28,770
+Después, otra vuelta.
+
+110
+00:05:28,890 --> 00:05:32,986
+Piensa un segundo: en este ciclo, ¿con qué datos conviene medir el error
+
+111
+00:05:32,986 --> 00:05:36,570
+final, con los mismos que el modelo ya vio, o con otros nuevos?
+
+112
+00:05:37,290 --> 00:05:38,540
+Con datos nuevos.
+
+113
+00:05:38,660 --> 00:05:42,030
+Si mides con los mismos, solo compruebas que se los aprendió.
+
+114
+00:05:42,150 --> 00:05:45,570
+Esto lo vimos en la clase treinta y lo vamos a usar todo el rato.
+
+115
+00:05:45,690 --> 00:05:49,350
+Según los datos que tengas, el problema cae en una familia.
+
+116
+00:05:49,470 --> 00:05:53,190
+Si tienes la respuesta correcta para cada ejemplo, es supervisado.
+
+117
+00:05:53,310 --> 00:05:55,730
+Si no la tienes, es no supervisado.
+
+118
+00:05:55,850 --> 00:05:58,960
+Y si hay un entorno que da recompensas, es refuerzo.
+
+119
+00:05:59,080 --> 00:06:01,804
+En el supervisado, si la respuesta es una
+
+120
+00:06:01,804 --> 00:06:05,060
+categoría, como spam o no spam, es clasificación.
+
+121
+00:06:05,180 --> 00:06:09,020
+Si es un número, como cuánto gastará un cliente, es regresión.
+
+122
+00:06:09,140 --> 00:06:12,160
+En clase, la profesora lo explicó con los captcha.
+
+123
+00:06:12,280 --> 00:06:15,324
+Cuando marcas cuáles imágenes tienen un semáforo, le estás
+
+124
+00:06:15,324 --> 00:06:18,000
+dando al modelo ejemplos con la respuesta correcta.
+
+125
+00:06:18,120 --> 00:06:20,150
+Eso es aprendizaje supervisado.
+
+126
+00:06:20,270 --> 00:06:23,810
+Sin respuesta correcta, el modelo busca patrones ocultos.
+
+127
+00:06:23,930 --> 00:06:28,790
+Por ejemplo, agrupar clientes parecidos, o resumir muchas variables en pocas.
+
+128
+00:06:28,910 --> 00:06:32,870
+Es como ordenar un cajón de calcetines sin que nadie te diga qué grupos hay.
+
+129
+00:06:32,990 --> 00:06:35,340
+Y el refuerzo es como entrenar a un perrito.
+
+130
+00:06:35,460 --> 00:06:38,490
+Haces una acción, recibes un premio o un castigo,
+
+131
+00:06:38,490 --> 00:06:40,840
+y ajustas lo que haces la próxima vez.
+
+132
+00:06:40,960 --> 00:06:45,400
+Y un sistema de recomendación, como el de Netflix, mezcla familias.
+
+133
+00:06:45,520 --> 00:06:48,571
+Una parte usa etiquetas, lo que tú eliges, y otra
+
+134
+00:06:48,571 --> 00:06:51,000
+descubre grupos de películas parecidas.
+
+135
+00:06:51,120 --> 00:06:53,280
+Por eso se dice que es un modelo mixto.
+
+136
+00:06:53,400 --> 00:06:56,490
+Pongamos todo a prueba con cuatro situaciones de una tienda.
+
+137
+00:06:56,610 --> 00:07:00,900
+Primera: saber si una compra online es fraude, y hay historial marcado.
+
+138
+00:07:01,020 --> 00:07:04,180
+Hay etiqueta, y es sí o no: clasificación.
+
+139
+00:07:04,300 --> 00:07:07,670
+Segunda: estimar cuánto gastará un cliente en diciembre.
+
+140
+00:07:07,790 --> 00:07:10,760
+Hay etiqueta, pero es un número: regresión.
+
+141
+00:07:10,880 --> 00:07:15,040
+Tercera: descubrir tipos de clientes, sin categorías previas.
+
+142
+00:07:15,160 --> 00:07:18,820
+No hay etiqueta, y queremos formar grupos: clustering.
+
+143
+00:07:18,940 --> 00:07:22,550
+Y cuarta: un sistema prueba precios y aprende de las ventas.
+
+144
+00:07:22,670 --> 00:07:25,730
+Acción, recompensa y ajuste: refuerzo.
+
+145
+00:07:25,850 --> 00:07:26,690
+Ahora tú.
+
+146
+00:07:26,810 --> 00:07:31,021
+Piensa un segundo: resumir cuarenta indicadores de una encuesta en tres
+
+147
+00:07:31,021 --> 00:07:34,520
+factores, para poder graficarlos, ¿qué tipo de problema es?
+
+148
+00:07:35,240 --> 00:07:37,010
+Es reducción de dimensionalidad.
+
+149
+00:07:37,130 --> 00:07:41,410
+No hay etiqueta, y lo que buscamos es resumir muchas variables en pocas.
+
+150
+00:07:41,530 --> 00:07:44,675
+El error típico: elegir primero el algoritmo, y recién
+
+151
+00:07:44,675 --> 00:07:47,180
+después preguntarse qué se quiere predecir.
+
+152
+00:07:47,300 --> 00:07:48,160
+Al revés.
+
+153
+00:07:48,280 --> 00:07:50,590
+Primero el problema, luego la herramienta.
+
+154
+00:07:50,710 --> 00:07:53,558
+Una pregunta práctica: ¿qué etiqueta tendrías que
+
+155
+00:07:53,558 --> 00:07:56,580
+registrar hoy, para poder entrenar un modelo mañana?
+
+156
+00:07:56,700 --> 00:07:59,580
+Si no la guardas, no habrá ejemplos con respuesta.
+
+157
+00:07:59,700 --> 00:08:02,900
+Para llevarte: el tipo de problema decide el modelo.
+
+158
+00:08:03,020 --> 00:08:05,520
+Etiqueta categórica, clasificación.
+
+159
+00:08:05,640 --> 00:08:07,750
+Etiqueta numérica, regresión.
+
+160
+00:08:07,870 --> 00:08:10,330
+Sin etiqueta, clustering o reducción.
+
+161
+00:08:10,450 --> 00:08:12,430
+Y con recompensas, refuerzo.
+
+162
+00:08:12,550 --> 00:08:17,110
+Vamos con la segunda parada: la clasificación, con la regresión logística.
+
+163
+00:08:18,010 --> 00:08:20,280
+Clasificación y regresión logística.
+
+164
+00:08:20,400 --> 00:08:23,530
+Cómo un modelo decide si un cliente cancela o se queda.
+
+165
+00:08:23,650 --> 00:08:27,090
+Imagina que tienes que adivinar quién va a cancelar su suscripción.
+
+166
+00:08:27,210 --> 00:08:28,880
+No quieres un «tal vez».
+
+167
+00:08:29,000 --> 00:08:30,330
+Quieres un sí o un no.
+
+168
+00:08:30,450 --> 00:08:33,920
+Pero antes de decidir, el modelo calcula algo más fino.
+
+169
+00:08:34,040 --> 00:08:35,720
+Calcula una probabilidad.
+
+170
+00:08:35,840 --> 00:08:40,250
+Por ejemplo, este cliente tiene setenta por ciento de probabilidad de cancelar.
+
+171
+00:08:40,370 --> 00:08:45,380
+Y luego una regla simple, el umbral, convierte esa probabilidad en una decisión.
+
+172
+00:08:45,500 --> 00:08:48,789
+Como en las clases diecisiete a veintiuno, aquí la regresión
+
+173
+00:08:48,789 --> 00:08:51,530
+logística aparece como un modelo de clasificación.
+
+174
+00:08:51,650 --> 00:08:55,570
+La pregunta es cómo pasa de las variables de un cliente a esa probabilidad.
+
+175
+00:08:55,690 --> 00:08:58,520
+Primero calcula un puntaje, que se llama logit.
+
+176
+00:08:58,640 --> 00:09:01,805
+Es una suma ponderada: un punto de partida, más cada
+
+177
+00:09:01,805 --> 00:09:04,300
+variable multiplicada por su coeficiente.
+
+178
+00:09:04,420 --> 00:09:06,320
+Es como un termómetro de riesgo.
+
+179
+00:09:06,440 --> 00:09:08,910
+Cada queja de soporte sube la temperatura.
+
+180
+00:09:09,030 --> 00:09:10,780
+Cada mes de antigüedad la baja.
+
+181
+00:09:10,900 --> 00:09:15,560
+Pero un puntaje puede valer cualquier cosa: menos cinco, cero, o diez.
+
+182
+00:09:15,680 --> 00:09:19,950
+Una probabilidad, en cambio, tiene que estar siempre entre cero y uno.
+
+183
+00:09:20,070 --> 00:09:21,710
+Necesitamos un traductor.
+
+184
+00:09:21,830 --> 00:09:23,930
+Ese traductor es la función sigmoide.
+
+185
+00:09:24,050 --> 00:09:27,290
+Toma cualquier puntaje, y lo aprieta entre cero y uno.
+
+186
+00:09:27,410 --> 00:09:31,430
+La fórmula es uno, dividido por uno más e elevado a menos z.
+
+187
+00:09:31,550 --> 00:09:32,600
+Mira lo que hace.
+
+188
+00:09:32,720 --> 00:09:36,440
+Con puntaje cero, la probabilidad es justo cero coma cinco.
+
+189
+00:09:36,560 --> 00:09:39,350
+Con un puntaje muy alto, se acerca a uno.
+
+190
+00:09:39,470 --> 00:09:42,310
+Y con uno muy negativo, se acerca a cero.
+
+191
+00:09:42,430 --> 00:09:44,150
+Y esto conecta con el umbral.
+
+192
+00:09:44,270 --> 00:09:47,595
+Con umbral cero coma cinco, el modelo dice «cancela»
+
+193
+00:09:47,595 --> 00:09:50,280
+justo cuando el puntaje es mayor que cero.
+
+194
+00:09:50,400 --> 00:09:53,550
+Hagamos una cuenta completa, con la que usa el apunte.
+
+195
+00:09:53,670 --> 00:09:56,521
+El puntaje es menos uno, más uno coma cinco por
+
+196
+00:09:56,521 --> 00:09:59,130
+las quejas, menos cero coma dos por el uso.
+
+197
+00:09:59,250 --> 00:10:02,280
+Cliente uno: dos quejas y seis usos al mes.
+
+198
+00:10:02,400 --> 00:10:07,030
+Menos uno, más uno coma cinco por dos, menos cero coma dos por seis.
+
+199
+00:10:07,150 --> 00:10:11,910
+Menos uno, más tres, menos uno coma dos: da cero coma ocho.
+
+200
+00:10:12,030 --> 00:10:13,320
+Ahora la sigmoide.
+
+201
+00:10:13,440 --> 00:10:17,280
+Uno, dividido por uno más e elevado a menos cero coma ocho.
+
+202
+00:10:17,400 --> 00:10:23,610
+La exponencial vale 0.449, así que queda uno entre 1.449.
+
+203
+00:10:23,730 --> 00:10:26,740
+La probabilidad de cancelar es cero coma sesenta y nueve.
+
+204
+00:10:26,860 --> 00:10:29,690
+Cliente dos: cero quejas y ocho usos.
+
+205
+00:10:29,810 --> 00:10:35,470
+Menos uno, más cero, menos uno coma seis: el puntaje es menos dos coma seis.
+
+206
+00:10:35,590 --> 00:10:38,800
+Y la probabilidad baja a cero coma cero sesenta y nueve.
+
+207
+00:10:38,920 --> 00:10:41,420
+¿Y qué pasa si el cliente tiene una queja más?
+
+208
+00:10:41,540 --> 00:10:45,319
+Cada queja multiplica las odds, que son la probabilidad dividida
+
+209
+00:10:45,319 --> 00:10:48,330
+por su complemento, por e elevado a uno coma cinco.
+
+210
+00:10:48,450 --> 00:10:50,770
+Eso es cuatro coma cuarenta y ocho veces.
+
+211
+00:10:50,890 --> 00:10:55,440
+Piensa un segundo: el cliente uno tiene probabilidad cero coma sesenta y nueve.
+
+212
+00:10:55,560 --> 00:10:57,740
+¿Cancela con umbral cero coma cinco?
+
+213
+00:10:57,860 --> 00:10:59,650
+¿Y con umbral cero coma siete?
+
+214
+00:11:00,370 --> 00:11:05,040
+Con cero coma cinco, sí cancela: cero coma sesenta y nueve pasa el umbral.
+
+215
+00:11:05,160 --> 00:11:08,670
+Con cero coma siete, ya no: se queda por muy poco.
+
+216
+00:11:08,790 --> 00:11:13,410
+Ahora, el caso de la clase: Club Activo, con ochocientos clientes.
+
+217
+00:11:13,530 --> 00:11:16,204
+Se dividen en entrenamiento y prueba, de forma
+
+218
+00:11:16,204 --> 00:11:18,530
+estratificada, como en la clase treinta.
+
+219
+00:11:18,650 --> 00:11:22,300
+Quinientos sesenta para aprender, y doscientos cuarenta para probar.
+
+220
+00:11:22,420 --> 00:11:26,619
+Todo va dentro de un Pipeline: primero se imputan los faltantes, luego se
+
+221
+00:11:26,619 --> 00:11:30,760
+estandarizan las variables, y al final se ajusta la regresión logística.
+
+222
+00:11:30,880 --> 00:11:33,350
+Y el fit se hace solo con el entrenamiento.
+
+223
+00:11:33,470 --> 00:11:37,480
+Con las variables ya estandarizadas, los coeficientes se pueden comparar.
+
+224
+00:11:37,600 --> 00:11:41,700
+Las quejas empujan el riesgo hacia arriba: más uno coma cero ocho.
+
+225
+00:11:41,820 --> 00:11:44,820
+La antigüedad lo baja: menos cero coma ochenta.
+
+226
+00:11:44,940 --> 00:11:48,290
+El uso lo baja un poco: menos cero coma veintidós.
+
+227
+00:11:48,410 --> 00:11:49,980
+Y la edad casi no pesa.
+
+228
+00:11:50,100 --> 00:11:54,090
+Con ese modelo, evaluamos en la prueba, que el modelo nunca vio.
+
+229
+00:11:54,210 --> 00:11:58,050
+Y ahí viene una decisión importante: el peso de las clases.
+
+230
+00:11:58,170 --> 00:12:00,790
+Solo uno de cada cinco clientes cancela.
+
+231
+00:12:00,910 --> 00:12:04,392
+Si el modelo cuenta todos los errores igual, aprende a decir
+
+232
+00:12:04,392 --> 00:12:07,410
+que casi nadie cancela, porque así se equivoca poco.
+
+233
+00:12:07,530 --> 00:12:10,390
+La opción balanced le da más peso a la clase rara.
+
+234
+00:12:10,510 --> 00:12:14,495
+Pondera cada clase al revés de su frecuencia: cero coma sesenta y tres para
+
+235
+00:12:14,495 --> 00:12:17,790
+quien se queda, y dos coma treinta y nueve para quien cancela.
+
+236
+00:12:17,910 --> 00:12:20,532
+Cada cliente que cancela y se pasa de largo pesa
+
+237
+00:12:20,532 --> 00:12:22,880
+casi cuatro veces más que uno que se queda.
+
+238
+00:12:23,000 --> 00:12:24,840
+El modelo se vuelve alarmista.
+
+239
+00:12:24,960 --> 00:12:27,350
+Gana recall, pero pierde precisión.
+
+240
+00:12:27,470 --> 00:12:28,730
+Mira la diferencia.
+
+241
+00:12:28,850 --> 00:12:31,638
+Sin ponderar, la precisión es sesenta y nueve por
+
+242
+00:12:31,638 --> 00:12:33,800
+ciento, pero el recall solo dieciocho.
+
+243
+00:12:33,920 --> 00:12:36,505
+Con balanced, la precisión baja a treinta y
+
+244
+00:12:36,505 --> 00:12:39,030
+nueve, y el recall sube a cincuenta y dos.
+
+245
+00:12:39,150 --> 00:12:41,660
+Hay otra decisión de negocio: el umbral.
+
+246
+00:12:41,780 --> 00:12:46,180
+Estos puntos son una muestra de los clientes de prueba, ubicados sobre la sigmoide.
+
+247
+00:12:46,300 --> 00:12:49,110
+Los grises se quedaron, los ámbar cancelaron.
+
+248
+00:12:49,230 --> 00:12:51,390
+El color no se usó para ubicarlos.
+
+249
+00:12:51,510 --> 00:12:54,242
+Con umbral cero coma cinco, el modelo marca a
+
+250
+00:12:54,242 --> 00:12:56,610
+sesenta y seis clientes como «cancela».
+
+251
+00:12:56,730 --> 00:12:59,710
+Detecta a la mitad, el cincuenta y dos por ciento.
+
+252
+00:12:59,830 --> 00:13:04,420
+Pero solo cuatro de cada diez alertas son aciertos: precisión treinta y nueve.
+
+253
+00:13:04,540 --> 00:13:08,640
+Si bajas el umbral a cero coma tres, el modelo avisa más seguido.
+
+254
+00:13:08,760 --> 00:13:12,200
+Detecta al ochenta y dos por ciento, pero la mayoría de las
+
+255
+00:13:12,200 --> 00:13:15,290
+alertas son falsas: precisión veintisiete por ciento.
+
+256
+00:13:15,410 --> 00:13:18,780
+Y si lo subes a cero coma siete, el modelo avisa poco.
+
+257
+00:13:18,900 --> 00:13:22,880
+La precisión sube a cincuenta por ciento, pero el recall cae a veinte.
+
+258
+00:13:23,000 --> 00:13:24,980
+Se escapan cuatro de cada cinco.
+
+259
+00:13:25,100 --> 00:13:27,680
+Fíjate: el umbral no cambia el modelo.
+
+260
+00:13:27,800 --> 00:13:29,500
+Cambia dónde pones el corte.
+
+261
+00:13:29,620 --> 00:13:32,390
+Y dónde cortar depende de cuánto cuesta cada error.
+
+262
+00:13:32,510 --> 00:13:36,409
+Piensa un segundo: si perder un cliente cuesta mucho más que molestar
+
+263
+00:13:36,409 --> 00:13:39,460
+con una oferta de más, ¿subirías o bajarías el umbral?
+
+264
+00:13:40,180 --> 00:13:41,200
+Lo bajarías.
+
+265
+00:13:41,320 --> 00:13:44,910
+Prefieres algunas falsas alarmas antes que dejar escapar clientes.
+
+266
+00:13:45,030 --> 00:13:47,660
+Ganas recall, y aceptas menos precisión.
+
+267
+00:13:47,780 --> 00:13:51,310
+Resumamos el resultado, con el umbral de cero coma cinco.
+
+268
+00:13:51,430 --> 00:13:54,360
+Accuracy, setenta y tres coma tres por ciento.
+
+269
+00:13:54,480 --> 00:13:56,860
+Precisión, treinta y nueve coma cuatro.
+
+270
+00:13:56,980 --> 00:13:58,750
+Recall, cincuenta y dos.
+
+271
+00:13:58,870 --> 00:14:01,520
+Y F1, cuarenta y cuatro coma ocho.
+
+272
+00:14:01,640 --> 00:14:06,460
+Y el área bajo la curva, el A U C, es cero coma seiscientos ochenta y cinco.
+
+273
+00:14:06,580 --> 00:14:08,930
+Un modelo al azar da cero coma cinco.
+
+274
+00:14:09,050 --> 00:14:13,720
+Así que es un modelo modesto: mejor que el azar, pero lejos de excelente.
+
+275
+00:14:13,840 --> 00:14:15,540
+Este es el error típico.
+
+276
+00:14:15,660 --> 00:14:18,213
+En clase se dijo que una precisión de cincuenta y
+
+277
+00:14:18,213 --> 00:14:20,350
+uno por ciento es como lanzar una moneda.
+
+278
+00:14:20,470 --> 00:14:22,860
+Pero la moneda no es el cincuenta por ciento.
+
+279
+00:14:22,980 --> 00:14:25,927
+Un clasificador al azar tiene una precisión igual a la
+
+280
+00:14:25,927 --> 00:14:28,820
+prevalencia, que aquí es veinte coma ocho por ciento.
+
+281
+00:14:28,940 --> 00:14:30,590
+Y este logra treinta y nueve.
+
+282
+00:14:30,710 --> 00:14:35,172
+Y un detalle de la frontera: con solo dos variables, antigüedad y quejas, la
+
+283
+00:14:35,172 --> 00:14:39,400
+frontera de decisión es una recta, porque el puntaje es una suma lineal.
+
+284
+00:14:39,520 --> 00:14:42,613
+Para llevarte: la logística calcula un puntaje, la
+
+285
+00:14:42,613 --> 00:14:45,830
+sigmoide lo vuelve probabilidad, y el umbral decide.
+
+286
+00:14:45,950 --> 00:14:48,230
+Balanced gana recall y pierde precisión.
+
+287
+00:14:48,350 --> 00:14:51,300
+Y el umbral se elige según el costo de cada error.
+
+288
+00:14:51,420 --> 00:14:55,440
+Vamos con la tercera parada: la regresión, para predecir un número.
+
+289
+00:14:56,330 --> 00:14:57,140
+Regresión.
+
+290
+00:14:57,260 --> 00:15:01,100
+Cómo predecir un número, y cómo saber cuánto se equivoca tu modelo.
+
+291
+00:15:01,220 --> 00:15:03,410
+Un cliente nuevo se une al gimnasio.
+
+292
+00:15:03,530 --> 00:15:05,220
+No te preguntas si cancelará.
+
+293
+00:15:05,340 --> 00:15:07,560
+Te preguntas cuánto va a gastar al mes.
+
+294
+00:15:07,680 --> 00:15:10,470
+La respuesta ya no es sí o no: es un número.
+
+295
+00:15:10,590 --> 00:15:14,520
+Cuando lo que predices es un valor continuo, el problema es de regresión.
+
+296
+00:15:14,640 --> 00:15:17,248
+Es como estimar el precio de un taxi: depende de
+
+297
+00:15:17,248 --> 00:15:19,530
+los kilómetros y de los minutos de espera.
+
+298
+00:15:19,650 --> 00:15:24,790
+En el caso de Club Activo, se predice el gasto mensual, en miles de pesos chilenos.
+
+299
+00:15:24,910 --> 00:15:29,670
+Con dos variables: la antigüedad, en meses, y el uso mensual del gimnasio.
+
+300
+00:15:29,790 --> 00:15:32,690
+El modelo ajusta una función de esas variables.
+
+301
+00:15:32,810 --> 00:15:37,340
+Un punto de partida, más un peso por la antigüedad, más un peso por el uso.
+
+302
+00:15:37,460 --> 00:15:40,140
+Y aquí hay un detalle curioso de este ejemplo.
+
+303
+00:15:40,260 --> 00:15:44,000
+Los datos no son reales: se generaron con una regla oculta.
+
+304
+00:15:44,120 --> 00:15:47,165
+El gasto es veinticinco, más cero coma nueve por la
+
+305
+00:15:47,165 --> 00:15:50,270
+antigüedad, más tres coma dos por el uso, más ruido.
+
+306
+00:15:50,390 --> 00:15:52,867
+El ruido es lo que hace distintos a dos clientes
+
+307
+00:15:52,867 --> 00:15:54,880
+con la misma antigüedad y el mismo uso.
+
+308
+00:15:55,000 --> 00:15:58,910
+Aquí, el ruido tiene desviación estándar de doce mil pesos.
+
+309
+00:15:59,030 --> 00:16:03,570
+Después de aprender, el modelo descubre los pesos, sin que nadie se los diga.
+
+310
+00:16:03,690 --> 00:16:08,070
+El punto de partida: veintiséis coma ocho, contra veinticinco real.
+
+311
+00:16:08,190 --> 00:16:12,270
+Antigüedad: cero coma noventa y tres, contra cero coma nueve.
+
+312
+00:16:12,390 --> 00:16:16,200
+Y uso: dos coma noventa y ocho, contra tres coma dos.
+
+313
+00:16:16,320 --> 00:16:17,470
+Se parecen mucho.
+
+314
+00:16:17,590 --> 00:16:20,539
+Pero ojo: «redescubrir» la fórmula solo es posible
+
+315
+00:16:20,539 --> 00:16:22,840
+porque los datos se simularon con ella.
+
+316
+00:16:22,960 --> 00:16:26,590
+En un caso real no existe una fórmula verdadera con la que comparar.
+
+317
+00:16:26,710 --> 00:16:29,080
+¿Y cómo sabemos si el modelo predice bien?
+
+318
+00:16:29,200 --> 00:16:32,570
+Mirando el error: la diferencia entre lo real y lo predicho.
+
+319
+00:16:32,690 --> 00:16:35,620
+Un error negativo significa que predijo de más.
+
+320
+00:16:35,740 --> 00:16:38,190
+Uno positivo, que predijo de menos.
+
+321
+00:16:38,310 --> 00:16:41,610
+Si sumas errores con signo, unos cancelan a otros.
+
+322
+00:16:41,730 --> 00:16:44,710
+Por eso se elevan al cuadrado, y luego se promedian.
+
+323
+00:16:44,830 --> 00:16:48,050
+Eso es el error cuadrático medio, el MSE.
+
+324
+00:16:48,170 --> 00:16:50,750
+Su raíz cuadrada es el RMSE.
+
+325
+00:16:50,870 --> 00:16:53,974
+Y tiene una ventaja: está en las mismas unidades
+
+326
+00:16:53,974 --> 00:16:56,560
+del gasto, en este caso, miles de pesos.
+
+327
+00:16:56,680 --> 00:16:58,580
+Se lee como el error típico.
+
+328
+00:16:58,700 --> 00:16:59,980
+Y el R cuadrado.
+
+329
+00:17:00,100 --> 00:17:03,770
+Compara tu error contra el que tendrías si siempre predijeras el promedio.
+
+330
+00:17:03,890 --> 00:17:07,020
+Es uno menos el error del modelo, entre el error total.
+
+331
+00:17:07,140 --> 00:17:09,610
+Es la proporción de la variación que se explica.
+
+332
+00:17:09,730 --> 00:17:12,230
+R cuadrado igual a uno sería perfecto.
+
+333
+00:17:12,350 --> 00:17:14,810
+Cero significa que no mejoras al promedio.
+
+334
+00:17:14,930 --> 00:17:18,950
+Y puede ser negativo, si tu modelo es peor que predecir el promedio.
+
+335
+00:17:19,070 --> 00:17:21,341
+Hagamos un ejemplo pequeño, con cuatro
+
+336
+00:17:21,341 --> 00:17:24,090
+clientes, y números inventados para practicar.
+
+337
+00:17:24,210 --> 00:17:28,480
+Los valores reales: cincuenta, sesenta, setenta y ochenta.
+
+338
+00:17:28,600 --> 00:17:34,110
+Las predicciones: cincuenta y dos, sesenta y tres, sesenta y ocho y ochenta y tres.
+
+339
+00:17:34,230 --> 00:17:40,430
+Los errores, real menos predicho, son: menos dos, menos tres, dos y menos tres.
+
+340
+00:17:40,550 --> 00:17:43,970
+Al cuadrado: cuatro, nueve, cuatro y nueve.
+
+341
+00:17:44,090 --> 00:17:47,450
+La suma, el SSE, es veintiséis.
+
+342
+00:17:47,570 --> 00:17:51,240
+El MSE es veintiséis entre cuatro: seis coma cinco.
+
+343
+00:17:51,360 --> 00:17:56,090
+El RMSE es la raíz de seis coma cinco: dos coma cincuenta y cinco.
+
+344
+00:17:56,210 --> 00:18:00,140
+En promedio, el modelo se equivoca en unos dos coma seis puntos.
+
+345
+00:18:00,260 --> 00:18:03,330
+Para el R cuadrado, necesitamos el error total.
+
+346
+00:18:03,450 --> 00:18:05,860
+El promedio de los reales es sesenta y cinco.
+
+347
+00:18:05,980 --> 00:18:08,580
+Las distancias al cuadrado suman quinientos.
+
+348
+00:18:08,700 --> 00:18:11,623
+Entonces R cuadrado es uno menos veintiséis entre
+
+349
+00:18:11,623 --> 00:18:13,890
+quinientos: cero coma noventa y cinco.
+
+350
+00:18:14,010 --> 00:18:17,677
+Piensa un segundo: si el modelo siempre predijera sesenta y
+
+351
+00:18:17,677 --> 00:18:20,660
+cinco, el promedio, ¿cuánto sería el R cuadrado?
+
+352
+00:18:21,380 --> 00:18:21,990
+Cero.
+
+353
+00:18:22,110 --> 00:18:24,796
+Porque entonces el error del modelo es igual al
+
+354
+00:18:24,796 --> 00:18:26,910
+error total, y uno menos uno da cero.
+
+355
+00:18:27,030 --> 00:18:28,460
+Volvamos a Club Activo.
+
+356
+00:18:28,580 --> 00:18:31,701
+Se entrenó con una parte de los clientes, y se evaluó con
+
+357
+00:18:31,701 --> 00:18:34,330
+otros doscientos cuarenta, que el modelo no vio.
+
+358
+00:18:34,450 --> 00:18:37,370
+Estos puntos comparan el gasto real con el predicho.
+
+359
+00:18:37,490 --> 00:18:40,390
+Si fuera perfecto, caerían sobre la diagonal.
+
+360
+00:18:40,510 --> 00:18:44,860
+Los puntos se reparten alrededor de la diagonal, pero con bastante dispersión.
+
+361
+00:18:44,980 --> 00:18:48,559
+El error cuadrático medio es ciento cuarenta y cuatro
+
+362
+00:18:48,559 --> 00:18:51,800
+coma nueve, y el RMSE, doce coma cero mil pesos.
+
+363
+00:18:51,920 --> 00:18:54,960
+El gasto medio es sesenta y tres coma dos mil pesos.
+
+364
+00:18:55,080 --> 00:18:59,670
+Así que un error típico de doce es cerca del diecinueve por ciento del gasto medio.
+
+365
+00:18:59,790 --> 00:19:03,400
+Y el R cuadrado en la prueba es cero coma quinientos cuarenta y ocho.
+
+366
+00:19:03,520 --> 00:19:07,450
+En entrenamiento fue cero coma quinientos setenta y dos, casi igual.
+
+367
+00:19:07,570 --> 00:19:09,540
+Eso indica que no hay sobreajuste.
+
+368
+00:19:09,660 --> 00:19:13,170
+¿Es poco, un R cuadrado de cero coma cincuenta y cinco?
+
+369
+00:19:13,290 --> 00:19:14,600
+No necesariamente.
+
+370
+00:19:14,720 --> 00:19:17,496
+El ruido que pusimos tiene desviación de doce, y
+
+371
+00:19:17,496 --> 00:19:19,810
+el gasto tiene desviación de diecinueve.
+
+372
+00:19:19,930 --> 00:19:24,100
+Con tanto ruido, el techo del R cuadrado ronda cero coma sesenta.
+
+373
+00:19:24,220 --> 00:19:27,520
+Y mira los residuos, que son los errores de cada cliente.
+
+374
+00:19:27,640 --> 00:19:29,430
+Se centran alrededor de cero.
+
+375
+00:19:29,550 --> 00:19:34,020
+Tienen una desviación estándar cercana a doce, justo el ruido que pusimos.
+
+376
+00:19:34,140 --> 00:19:37,640
+El error típico en regresión es dejarse llevar por un solo número.
+
+377
+00:19:37,760 --> 00:19:39,720
+Un R cuadrado alto no basta.
+
+378
+00:19:39,840 --> 00:19:43,113
+Mira también el error en las unidades del problema: ¿doce
+
+379
+00:19:43,113 --> 00:19:45,640
+mil pesos es mucho o poco para este negocio?
+
+380
+00:19:45,760 --> 00:19:49,630
+Y la buena noticia: el flujo es el mismo que en clasificación.
+
+381
+00:19:49,750 --> 00:19:52,815
+Dividir en entrenamiento y prueba, ajustar solo con
+
+382
+00:19:52,815 --> 00:19:55,460
+el entrenamiento, y evaluar en datos nuevos.
+
+383
+00:19:55,580 --> 00:19:57,100
+Solo cambia la métrica.
+
+384
+00:19:57,220 --> 00:20:00,060
+Para llevarte: regresión es predecir un número.
+
+385
+00:20:00,180 --> 00:20:04,500
+El RMSE te dice el error típico, en las unidades del problema.
+
+386
+00:20:04,620 --> 00:20:08,600
+Y un R cuadrado moderado no es una falla, si el ruido es grande.
+
+387
+00:20:08,720 --> 00:20:14,240
+Vamos con la cuarta parada: qué pasa cuando no hay etiquetas, con K-Means y PCA.
+
+388
+00:20:15,130 --> 00:20:16,980
+Aprendizaje no supervisado.
+
+389
+00:20:17,100 --> 00:20:20,790
+Cómo encontrar grupos y resumir variables cuando no hay etiquetas.
+
+390
+00:20:20,910 --> 00:20:23,800
+Imagina que heredas una biblioteca sin catálogo.
+
+391
+00:20:23,920 --> 00:20:26,150
+Nadie te dice qué libros son de qué tema.
+
+392
+00:20:26,270 --> 00:20:30,000
+Tu trabajo es ordenarlos en estantes, mirando cuáles se parecen.
+
+393
+00:20:30,120 --> 00:20:32,440
+Eso es el aprendizaje no supervisado.
+
+394
+00:20:32,560 --> 00:20:34,630
+No hay respuesta correcta que adivinar.
+
+395
+00:20:34,750 --> 00:20:39,620
+Lo que se busca es estructura: grupos, o una forma más simple de mirar los datos.
+
+396
+00:20:39,740 --> 00:20:42,070
+En esta parada vemos dos herramientas.
+
+397
+00:20:42,190 --> 00:20:44,820
+K-Means forma grupos alrededor de centros.
+
+398
+00:20:44,940 --> 00:20:48,160
+Y PCA resume variables parecidas en pocas.
+
+399
+00:20:48,280 --> 00:20:51,260
+Importante: PCA no forma grupos.
+
+400
+00:20:51,380 --> 00:20:53,350
+Veamos K-Means paso a paso.
+
+401
+00:20:53,470 --> 00:20:58,250
+Uno: eliges cuántos grupos quieres, k, y pones k centros al azar.
+
+402
+00:20:58,370 --> 00:21:01,680
+Dos: cada punto se asigna al centro más cercano.
+
+403
+00:21:01,800 --> 00:21:04,860
+Tres: cada centro se mueve al promedio de su grupo.
+
+404
+00:21:04,980 --> 00:21:07,900
+Y cuatro: repites, hasta que nada cambie.
+
+405
+00:21:08,020 --> 00:21:10,890
+Es como repartir niños en dos equipos para un juego.
+
+406
+00:21:11,010 --> 00:21:12,540
+Dos capitanes se ubican.
+
+407
+00:21:12,660 --> 00:21:15,430
+Cada niño se va con el capitán que tiene más cerca.
+
+408
+00:21:15,550 --> 00:21:20,080
+Luego cada capitán se mueve al centro de su equipo, y los niños vuelven a elegir.
+
+409
+00:21:20,200 --> 00:21:22,300
+Hagámoslo con seis puntos del apunte.
+
+410
+00:21:22,420 --> 00:21:24,700
+Cada punto tiene una antigüedad y un uso.
+
+411
+00:21:24,820 --> 00:21:29,577
+A es uno y dos, B es dos y uno, C es dos y cuatro, D es siete
+
+412
+00:21:29,577 --> 00:21:33,320
+y siete, E es ocho y nueve, y F es nueve y seis.
+
+413
+00:21:33,440 --> 00:21:34,830
+Queremos dos grupos.
+
+414
+00:21:34,950 --> 00:21:37,350
+Los centros iniciales son los puntos A y F.
+
+415
+00:21:37,470 --> 00:21:40,230
+El centro uno, en azul, empieza en A.
+
+416
+00:21:40,350 --> 00:21:43,180
+El centro dos, en ámbar, empieza en F.
+
+417
+00:21:43,300 --> 00:21:44,760
+Ahora asignamos.
+
+418
+00:21:44,880 --> 00:21:48,510
+Para cada punto medimos la distancia al cuadrado hasta cada centro.
+
+419
+00:21:48,630 --> 00:21:52,660
+El punto B está a dos del centro uno, y a setenta y cuatro del dos.
+
+420
+00:21:52,780 --> 00:21:53,820
+Gana el uno.
+
+421
+00:21:53,940 --> 00:21:58,080
+El punto C está a cinco del centro uno, y a cincuenta y tres del dos.
+
+422
+00:21:58,200 --> 00:21:59,610
+También se va con el uno.
+
+423
+00:21:59,730 --> 00:22:01,550
+Con D y E pasa lo contrario.
+
+424
+00:22:01,670 --> 00:22:05,310
+D está a sesenta y uno del centro uno, y a cinco del dos.
+
+425
+00:22:05,430 --> 00:22:08,570
+E, a noventa y ocho del uno, y a diez del dos.
+
+426
+00:22:08,690 --> 00:22:10,700
+Los dos se van con el centro dos.
+
+427
+00:22:10,820 --> 00:22:15,970
+Quedan dos grupos: A, B y C con el uno, y D, E y F con el dos.
+
+428
+00:22:16,090 --> 00:22:19,952
+Antes de mover nada, la inercia, que es la suma de las distancias
+
+429
+00:22:19,952 --> 00:22:23,160
+al cuadrado de cada punto a su centro, vale veintidós.
+
+430
+00:22:23,280 --> 00:22:26,670
+Segundo paso: mover cada centro al promedio de su grupo.
+
+431
+00:22:26,790 --> 00:22:31,550
+Para el uno: uno, dos y dos, entre tres, es uno coma sesenta y siete.
+
+432
+00:22:31,670 --> 00:22:35,910
+Y dos, uno y cuatro, entre tres, es dos coma treinta y tres.
+
+433
+00:22:36,030 --> 00:22:39,740
+Para el dos: ocho en x, y siete coma treinta y tres en y.
+
+434
+00:22:39,860 --> 00:22:42,840
+Con los nuevos centros, ¿cambia alguna asignación?
+
+435
+00:22:42,960 --> 00:22:45,840
+No: cada punto sigue más cerca de su centro.
+
+436
+00:22:45,960 --> 00:22:47,270
+El algoritmo terminó.
+
+437
+00:22:47,390 --> 00:22:49,710
+Y la inercia bajó de veintidós a doce.
+
+438
+00:22:49,830 --> 00:22:54,560
+Piensa un segundo: si las asignaciones hubieran cambiado, ¿qué tendrías que hacer?
+
+439
+00:22:55,280 --> 00:22:57,760
+Volver a mover los centros, y repetir.
+
+440
+00:22:57,880 --> 00:22:59,940
+Se continúa hasta que nada cambie.
+
+441
+00:23:00,060 --> 00:23:03,089
+En un caso real, se hace varias veces con distintos
+
+442
+00:23:03,089 --> 00:23:05,880
+puntos de partida, y se queda la mejor inercia.
+
+443
+00:23:06,000 --> 00:23:08,960
+Un detalle crucial: K-Means usa distancias.
+
+444
+00:23:09,080 --> 00:23:13,971
+Imagina que la antigüedad se mide en días, de trescientos sesenta y cinco a tres mil
+
+445
+00:23:13,971 --> 00:23:17,930
+seiscientos cincuenta, y el uso, en veces al mes, de cero a treinta.
+
+446
+00:23:18,050 --> 00:23:21,240
+La variable con números enormes domina toda la distancia.
+
+447
+00:23:21,360 --> 00:23:25,600
+El agrupamiento solo reflejaría la antigüedad, y el uso ni se notaría.
+
+448
+00:23:25,720 --> 00:23:30,330
+La solución es estandarizar antes, para que todas las variables pesen parecido.
+
+449
+00:23:30,450 --> 00:23:32,300
+Así lo hicimos con Club Activo.
+
+450
+00:23:32,420 --> 00:23:35,750
+Sin estandarizar, los segmentos cambian: la coincidencia con
+
+451
+00:23:35,750 --> 00:23:38,580
+los estandarizados es de cero coma treinta y nueve.
+
+452
+00:23:38,700 --> 00:23:43,350
+Ese número se llama ARI, y mide qué tan parecidas son dos formas de agrupar.
+
+453
+00:23:43,470 --> 00:23:46,510
+Con cero coma treinta y nueve son bastante distintas.
+
+454
+00:23:46,630 --> 00:23:49,580
+Escalar no es un detalle: cambia tus segmentos.
+
+455
+00:23:49,700 --> 00:23:51,280
+¿Y cuántos grupos elegir?
+
+456
+00:23:51,400 --> 00:23:53,030
+No existe un k verdadero.
+
+457
+00:23:53,150 --> 00:23:56,599
+Se mira el codo de la inercia, la silueta, y sobre todo,
+
+458
+00:23:56,599 --> 00:23:59,370
+si los grupos tienen sentido para el negocio.
+
+459
+00:23:59,490 --> 00:24:01,990
+La inercia siempre baja al agregar grupos.
+
+460
+00:24:02,110 --> 00:24:04,890
+Se busca el codo: donde dejar de ganar mucho.
+
+461
+00:24:05,010 --> 00:24:07,660
+En Club Activo, el codo no es nítido.
+
+462
+00:24:07,780 --> 00:24:10,690
+La silueta mide qué tan separados están los grupos.
+
+463
+00:24:10,810 --> 00:24:13,760
+Más alta es mejor, y va de menos uno a uno.
+
+464
+00:24:13,880 --> 00:24:18,314
+Con k igual a dos da cero coma trescientos cuarenta y ocho, con tres, cero coma
+
+465
+00:24:18,314 --> 00:24:22,580
+trescientos treinta y ocho, y con cuatro, cero coma trescientos veintisiete.
+
+466
+00:24:22,700 --> 00:24:24,170
+Casi no hay diferencia.
+
+467
+00:24:24,290 --> 00:24:26,960
+Sin un k claro, decidimos con el negocio.
+
+468
+00:24:27,080 --> 00:24:31,580
+Tres segmentos son fáciles de leer y de actuar, así que se usa k igual a tres.
+
+469
+00:24:31,700 --> 00:24:33,650
+Veamos los clientes de Club Activo.
+
+470
+00:24:33,770 --> 00:24:38,390
+Se agrupan con tres variables estandarizadas: antigüedad, uso y gasto.
+
+471
+00:24:38,510 --> 00:24:42,970
+Aquí se muestran dos de las tres, y una muestra de ciento sesenta clientes.
+
+472
+00:24:43,090 --> 00:24:47,096
+K-Means los reparte en tres segmentos, de doscientos cincuenta y dos,
+
+473
+00:24:47,096 --> 00:24:50,290
+cuatrocientos treinta y nueve, y ciento nueve clientes.
+
+474
+00:24:50,410 --> 00:24:53,540
+Los círculos oscuros grandes son los centros de cada grupo.
+
+475
+00:24:53,660 --> 00:24:57,288
+Fíjate en el segmento dos, en verde azulado: son los clientes
+
+476
+00:24:57,288 --> 00:25:00,738
+más antiguos, a casi dos desviaciones sobre el promedio, y
+
+477
+00:25:00,738 --> 00:25:03,890
+también los de mayor gasto, uno coma cuarenta y ocho.
+
+478
+00:25:04,010 --> 00:25:07,140
+Los segmentos cero y uno se separan sobre todo por el uso.
+
+479
+00:25:07,260 --> 00:25:10,990
+El cero usa más que el promedio: más cero coma noventa y nueve.
+
+480
+00:25:11,110 --> 00:25:14,720
+El uno, menos: menos cero coma cincuenta y seis.
+
+481
+00:25:14,840 --> 00:25:16,570
+Y ahora, la validación.
+
+482
+00:25:16,690 --> 00:25:19,230
+La variable cancelo no se usó para agrupar.
+
+483
+00:25:19,350 --> 00:25:22,430
+Aun así, el segmento dos tiene solo siete por ciento de
+
+484
+00:25:22,430 --> 00:25:25,790
+cancelación, frente a veintiuno y veinticuatro de los otros.
+
+485
+00:25:25,910 --> 00:25:28,380
+Eso demuestra que los grupos tienen sentido.
+
+486
+00:25:28,500 --> 00:25:31,013
+Pero ojo: en el notebook se esperaba que el
+
+487
+00:25:31,013 --> 00:25:33,410
+segmento dos fuera el de más cancelación.
+
+488
+00:25:33,530 --> 00:25:34,790
+Ocurre lo contrario.
+
+489
+00:25:34,910 --> 00:25:39,616
+Y se decía que el gasto era la variable que más lo distingue, pero es la antigüedad,
+
+490
+00:25:39,616 --> 00:25:43,650
+con uno coma noventa y nueve, contra uno coma cuarenta y ocho del gasto.
+
+491
+00:25:43,770 --> 00:25:46,120
+Los grupos de K-Means no traen nombre.
+
+492
+00:25:46,240 --> 00:25:50,880
+Tú los lees mirando el perfil de cada uno, y les pones el nombre que tenga sentido.
+
+493
+00:25:51,000 --> 00:25:56,360
+Por ejemplo: «antiguos y de alto gasto», «usuarios frecuentes» y «de poco uso».
+
+494
+00:25:56,480 --> 00:25:58,490
+Ahora, PCA.
+
+495
+00:25:58,610 --> 00:26:02,260
+Es la técnica para resumir variables correlacionadas en pocas.
+
+496
+00:26:02,380 --> 00:26:05,310
+Como una foto en dos dimensiones de un objeto de
+
+497
+00:26:05,310 --> 00:26:07,690
+tres: eliges el ángulo que muestra más.
+
+498
+00:26:07,810 --> 00:26:11,680
+Cada componente es un eje nuevo, que mezcla las tres variables.
+
+499
+00:26:11,800 --> 00:26:15,430
+El primero captura cincuenta y ocho coma dos por ciento de la varianza.
+
+500
+00:26:15,550 --> 00:26:18,070
+El segundo, treinta y tres coma seis.
+
+501
+00:26:18,190 --> 00:26:20,510
+Juntos, noventa y uno coma ocho.
+
+502
+00:26:20,630 --> 00:26:23,200
+Fíjate que dije varianza, no información.
+
+503
+00:26:23,320 --> 00:26:26,016
+Noventa y uno coma ocho por ciento de la varianza no
+
+504
+00:26:26,016 --> 00:26:28,350
+es noventa y uno coma ocho de la información.
+
+505
+00:26:28,470 --> 00:26:31,149
+Y eliminar componentes no es quitar ruido: es
+
+506
+00:26:31,149 --> 00:26:33,530
+descartar direcciones de poca variación.
+
+507
+00:26:33,650 --> 00:26:37,510
+Aquí están los mismos clientes, proyectados con PCA.
+
+508
+00:26:37,630 --> 00:26:39,580
+Los colores vienen de K-Means.
+
+509
+00:26:39,700 --> 00:26:41,330
+PCA no los formó.
+
+510
+00:26:41,450 --> 00:26:44,260
+Solo cambió los ejes, para mirarlos mejor.
+
+511
+00:26:44,380 --> 00:26:48,290
+Es un error común decir «PCA separa tres clústeres».
+
+512
+00:26:48,410 --> 00:26:50,550
+Los clústeres los formó K-Means.
+
+513
+00:26:50,670 --> 00:26:54,746
+La Clase treinta y dos explica PCA en profundidad: cómo se
+
+514
+00:26:54,746 --> 00:26:58,400
+calcula, cuántos componentes elegir, y qué es t-SNE.
+
+515
+00:26:58,520 --> 00:26:59,780
+Una última nota.
+
+516
+00:26:59,900 --> 00:27:05,062
+Con la base real de tres mil ciento cincuenta clientes, y seis variables de uso, K-Means con k
+
+517
+00:27:05,062 --> 00:27:09,070
+igual a tres tiene una silueta de cero coma cuatrocientos setenta y tres.
+
+518
+00:27:09,190 --> 00:27:12,465
+Y la fuga en la prueba fue de veinticuatro coma siete por
+
+519
+00:27:12,465 --> 00:27:15,740
+ciento, cero, y dos coma tres por ciento, según el grupo.
+
+520
+00:27:15,860 --> 00:27:18,786
+Para llevarte: K-Means asigna cada punto al centro
+
+521
+00:27:18,786 --> 00:27:21,420
+más cercano, y mueve los centros al promedio.
+
+522
+00:27:21,540 --> 00:27:23,350
+Estandariza antes de agrupar.
+
+523
+00:27:23,470 --> 00:27:26,480
+No hay un k verdadero: decide con el negocio.
+
+524
+00:27:26,600 --> 00:27:28,690
+Y los grupos se interpretan con su perfil.
+
+525
+00:27:28,810 --> 00:27:33,730
+Vamos con la quinta parada: el subajuste, el sobreajuste y la regularización.
+
+526
+00:27:34,610 --> 00:27:37,540
+Subajuste, sobreajuste y regularización.
+
+527
+00:27:37,660 --> 00:27:41,820
+Cómo saber si un modelo aprendió de verdad, o solo se memorizó los datos.
+
+528
+00:27:41,940 --> 00:27:44,370
+Dos estudiantes se preparan para un examen.
+
+529
+00:27:44,490 --> 00:27:46,180
+Uno no estudia casi nada.
+
+530
+00:27:46,300 --> 00:27:50,860
+El otro se memoriza las respuestas del examen del año pasado, palabra por palabra.
+
+531
+00:27:50,980 --> 00:27:53,100
+¿Cuál de los dos va a tener problemas?
+
+532
+00:27:53,220 --> 00:27:54,050
+Los dos.
+
+533
+00:27:54,170 --> 00:27:56,580
+El primero, porque no aprendió nada.
+
+534
+00:27:56,700 --> 00:27:57,930
+Eso es subajuste.
+
+535
+00:27:58,050 --> 00:28:02,480
+El segundo, porque le va bien con lo conocido, y mal con preguntas nuevas.
+
+536
+00:28:02,600 --> 00:28:03,950
+Eso es sobreajuste.
+
+537
+00:28:04,070 --> 00:28:06,000
+En un modelo, se ve así.
+
+538
+00:28:06,120 --> 00:28:10,330
+El subajuste es cuando funciona mal, incluso con los datos de entrenamiento.
+
+539
+00:28:10,450 --> 00:28:15,410
+El sobreajuste, cuando funciona muy bien en entrenamiento, y mucho peor en prueba.
+
+540
+00:28:15,530 --> 00:28:18,176
+La causa de fondo es la complejidad del modelo,
+
+541
+00:28:18,176 --> 00:28:20,540
+frente a la cantidad de datos disponibles.
+
+542
+00:28:20,660 --> 00:28:24,010
+Poca complejidad, y no alcanza para capturar el patrón.
+
+543
+00:28:24,130 --> 00:28:27,150
+Demasiada, y el modelo se ajusta hasta al ruido.
+
+544
+00:28:27,270 --> 00:28:28,710
+Veámoslo con datos.
+
+545
+00:28:28,830 --> 00:28:32,115
+Esta es una nube de sesenta puntos, cuarenta y dos para
+
+546
+00:28:32,115 --> 00:28:35,460
+entrenar, en violeta, y dieciocho para probar, en ámbar.
+
+547
+00:28:35,580 --> 00:28:38,300
+Son datos simulados de la clase, con ruido.
+
+548
+00:28:38,420 --> 00:28:42,180
+Primero, un modelo muy simple: una recta, grado uno.
+
+549
+00:28:42,300 --> 00:28:43,970
+No sigue la forma de la nube.
+
+550
+00:28:44,090 --> 00:28:46,460
+Falla incluso con los puntos de entrenamiento.
+
+551
+00:28:46,580 --> 00:28:49,175
+El R cuadrado es cero coma cincuenta y dos en
+
+552
+00:28:49,175 --> 00:28:52,000
+entrenamiento, y apenas cero coma diez en prueba.
+
+553
+00:28:52,120 --> 00:28:55,770
+Ahora, un polinomio de grado dos, una curva suave.
+
+554
+00:28:55,890 --> 00:28:57,980
+Sigue la tendencia sin forzar nada.
+
+555
+00:28:58,100 --> 00:29:00,468
+El R cuadrado sube a cero coma ochenta en
+
+556
+00:29:00,468 --> 00:29:03,530
+entrenamiento, y cero coma cincuenta y uno en prueba.
+
+557
+00:29:03,650 --> 00:29:08,240
+Y con grado quince, la curva se retuerce para pasar por casi todos los puntos.
+
+558
+00:29:08,360 --> 00:29:12,050
+En entrenamiento, el R cuadrado llega a cero coma noventa.
+
+559
+00:29:12,170 --> 00:29:14,813
+Pero en prueba cae a menos cuatro coma setenta y
+
+560
+00:29:14,813 --> 00:29:16,850
+nueve: peor que predecir el promedio.
+
+561
+00:29:16,970 --> 00:29:18,700
+Fíjate qué engañoso es esto.
+
+562
+00:29:18,820 --> 00:29:21,940
+El grado quince tiene el mejor resultado en entrenamiento.
+
+563
+00:29:22,060 --> 00:29:24,750
+Si solo miraras ese número, lo elegirías.
+
+564
+00:29:24,870 --> 00:29:26,090
+Y sería un error.
+
+565
+00:29:26,210 --> 00:29:29,405
+Piensa un segundo: si el R cuadrado de entrenamiento es
+
+566
+00:29:29,405 --> 00:29:32,020
+alto y el de prueba es muy bajo, ¿qué tienes?
+
+567
+00:29:32,740 --> 00:29:33,830
+Sobreajuste.
+
+568
+00:29:33,950 --> 00:29:36,630
+La brecha entre entrenamiento y prueba es el síntoma.
+
+569
+00:29:36,750 --> 00:29:41,120
+Para detectarlo, se compara entrenamiento y prueba, al subir la complejidad.
+
+570
+00:29:41,240 --> 00:29:44,510
+En entrenamiento, el R cuadrado casi siempre sube.
+
+571
+00:29:44,630 --> 00:29:47,650
+En prueba, sube un poco, y luego se cae.
+
+572
+00:29:47,770 --> 00:29:49,690
+La brecha crece con la complejidad.
+
+573
+00:29:49,810 --> 00:29:52,837
+Con grados trece a quince, el R cuadrado de prueba
+
+574
+00:29:52,837 --> 00:29:55,380
+baja de menos dos, y se sale de la escala.
+
+575
+00:29:55,500 --> 00:29:57,660
+Por eso no se elige el grado de mayor
+
+576
+00:29:57,660 --> 00:30:00,111
+entrenamiento, sino uno sencillo con buena
+
+577
+00:30:00,111 --> 00:30:00,520
+prueba.
+
+578
+00:30:00,640 --> 00:30:03,765
+El grado dos da cero coma cincuenta y uno en prueba, y
+
+579
+00:30:03,765 --> 00:30:06,370
+algunos grados intermedios dan algo parecido.
+
+580
+00:30:06,490 --> 00:30:09,780
+Con tan pocos puntos de prueba, se prefiere el más simple.
+
+581
+00:30:09,900 --> 00:30:12,000
+Hay un detalle del notebook de la clase.
+
+582
+00:30:12,120 --> 00:30:15,664
+Con grado quince, sin escalar los datos, el R cuadrado de
+
+583
+00:30:15,664 --> 00:30:18,960
+entrenamiento no fue altísimo: fue cero coma treinta.
+
+584
+00:30:19,080 --> 00:30:21,860
+Menor que el cero coma ochenta del grado dos.
+
+585
+00:30:21,980 --> 00:30:25,360
+Eso no es solo sobreajuste: es un problema numérico.
+
+586
+00:30:25,480 --> 00:30:28,040
+Elevar números a la quince produce columnas
+
+587
+00:30:28,040 --> 00:30:30,660
+enormes, y la matriz queda mal condicionada.
+
+588
+00:30:30,780 --> 00:30:34,612
+Escalando los datos, vuelve a verse el patrón: cero coma noventa en
+
+589
+00:30:34,612 --> 00:30:38,100
+entrenamiento, y menos cuatro coma setenta y nueve en prueba.
+
+590
+00:30:38,220 --> 00:30:39,920
+¿Cómo frenar el sobreajuste?
+
+591
+00:30:40,040 --> 00:30:41,930
+Una forma es la regularización.
+
+592
+00:30:42,050 --> 00:30:45,850
+Le agrega al error una penalización por tener coeficientes grandes.
+
+593
+00:30:45,970 --> 00:30:48,240
+Es como un impuesto a los coeficientes.
+
+594
+00:30:48,360 --> 00:30:50,520
+Cada coeficiente grande paga más.
+
+595
+00:30:50,640 --> 00:30:54,440
+Así el modelo solo los mantiene si de verdad ayudan a reducir el error.
+
+596
+00:30:54,560 --> 00:30:55,760
+Hay dos sabores.
+
+597
+00:30:55,880 --> 00:30:59,630
+Ridge, o L dos, suma el cuadrado de los coeficientes.
+
+598
+00:30:59,750 --> 00:31:03,330
+Lasso, o L uno, suma sus valores absolutos.
+
+599
+00:31:03,450 --> 00:31:04,940
+Y se comportan distinto.
+
+600
+00:31:05,060 --> 00:31:08,910
+Ridge encoge todos los coeficientes, pero rara vez los anula.
+
+601
+00:31:09,030 --> 00:31:12,230
+Lasso puede llevar a cero los coeficientes poco útiles.
+
+602
+00:31:12,350 --> 00:31:14,800
+Es una selección automática de variables.
+
+603
+00:31:14,920 --> 00:31:17,340
+Veamos las cuentas con el ejemplo del apunte.
+
+604
+00:31:17,460 --> 00:31:22,990
+Tres coeficientes sin penalizar: cinco, menos uno coma cuatro, y cero coma seis.
+
+605
+00:31:23,110 --> 00:31:24,560
+Con alfa igual a uno.
+
+606
+00:31:24,680 --> 00:31:29,460
+Ridge, en este caso simple, divide cada coeficiente entre uno más alfa.
+
+607
+00:31:29,580 --> 00:31:31,200
+Es decir, entre dos.
+
+608
+00:31:31,320 --> 00:31:35,600
+Quedan dos coma cinco, menos cero coma siete, y cero coma tres.
+
+609
+00:31:35,720 --> 00:31:36,920
+Ninguno se anula.
+
+610
+00:31:37,040 --> 00:31:42,230
+Lasso, en cambio, le resta alfa a cada valor absoluto, y no baja de cero.
+
+611
+00:31:42,350 --> 00:31:44,230
+Cinco menos uno: cuatro.
+
+612
+00:31:44,350 --> 00:31:48,730
+Uno coma cuatro menos uno: cero coma cuatro, con su signo negativo.
+
+613
+00:31:48,850 --> 00:31:53,550
+Y cero coma seis menos uno daría menos cero coma cuatro, así que queda en cero.
+
+614
+00:31:53,670 --> 00:31:56,020
+Mira la suma de los valores absolutos.
+
+615
+00:31:56,140 --> 00:31:57,840
+Sin penalizar: siete.
+
+616
+00:31:57,960 --> 00:31:59,790
+Con Ridge: tres coma cinco.
+
+617
+00:31:59,910 --> 00:32:03,490
+Con Lasso: cuatro coma cuatro, y una variable menos.
+
+618
+00:32:03,610 --> 00:32:07,492
+Piensa un segundo: si el coeficiente de x tres fuera cero coma
+
+619
+00:32:07,492 --> 00:32:10,560
+seis, y alfa fuera uno, ¿en cuánto lo deja Lasso?
+
+620
+00:32:11,280 --> 00:32:12,080
+En cero.
+
+621
+00:32:12,200 --> 00:32:16,060
+Porque su valor absoluto, cero coma seis, es menor que alfa.
+
+622
+00:32:16,180 --> 00:32:19,010
+Lasso solo conserva lo que supera la penalización.
+
+623
+00:32:19,130 --> 00:32:21,130
+Ahora, el caso de la clase.
+
+624
+00:32:21,250 --> 00:32:23,750
+Se predice el gasto con seis variables.
+
+625
+00:32:23,870 --> 00:32:26,290
+Dos son reales, antigüedad y uso.
+
+626
+00:32:26,410 --> 00:32:28,900
+Dos aportan poco, edad y quejas.
+
+627
+00:32:29,020 --> 00:32:32,690
+Y dos son puro ruido, que la profesora agregó a propósito.
+
+628
+00:32:32,810 --> 00:32:35,910
+Primero, la regresión sin penalizar, en gris.
+
+629
+00:32:36,030 --> 00:32:38,620
+Los dos reales tienen coeficientes grandes.
+
+630
+00:32:38,740 --> 00:32:42,170
+Pero incluso el ruido recibe un coeficiente, aunque pequeño.
+
+631
+00:32:42,290 --> 00:32:44,860
+Ahora agrega Ridge, con alfa cinco.
+
+632
+00:32:44,980 --> 00:32:48,440
+Casi no cambia nada: apenas encoge los coeficientes.
+
+633
+00:32:48,560 --> 00:32:49,930
+El ruido sigue ahí.
+
+634
+00:32:50,050 --> 00:32:52,770
+Y ahora Lasso, con alfa cero coma cinco.
+
+635
+00:32:52,890 --> 00:32:55,040
+Anula las quejas y los dos ruidos.
+
+636
+00:32:55,160 --> 00:32:57,450
+Y deja la edad en cero coma veintidós.
+
+637
+00:32:57,570 --> 00:33:02,630
+Lasso hizo una selección automática: dejó lo importante, y descartó el ruido.
+
+638
+00:33:02,750 --> 00:33:06,864
+Y el R cuadrado de prueba no empeoró: pasó de cero coma quinientos cuarenta
+
+639
+00:33:06,864 --> 00:33:10,100
+y cuatro, a cero coma quinientos cincuenta y dos con Lasso.
+
+640
+00:33:10,220 --> 00:33:11,330
+Cuidado con alfa.
+
+641
+00:33:11,450 --> 00:33:14,597
+Si lo subes demasiado, los dos métodos encogen tanto los
+
+642
+00:33:14,597 --> 00:33:18,250
+coeficientes, que el modelo termina prediciendo siempre la media.
+
+643
+00:33:18,370 --> 00:33:20,460
+El R cuadrado se acerca a cero.
+
+644
+00:33:20,580 --> 00:33:22,670
+Y un recordatorio de la clase treinta.
+
+645
+00:33:22,790 --> 00:33:26,830
+Ridge y Lasso penalizan por tamaño, así que hay que estandarizar antes.
+
+646
+00:33:26,950 --> 00:33:30,220
+Y alfa se elige con la validación, nunca con la prueba.
+
+647
+00:33:30,340 --> 00:33:33,500
+Dentro de un Pipeline, para no filtrar información.
+
+648
+00:33:33,620 --> 00:33:37,370
+Para llevarte: subajuste es fallar incluso en entrenamiento.
+
+649
+00:33:37,490 --> 00:33:40,660
+Sobreajuste es brillar en entrenamiento y caer en prueba.
+
+650
+00:33:40,780 --> 00:33:43,110
+Ridge encoge, y Lasso puede anular.
+
+651
+00:33:43,230 --> 00:33:45,780
+Y la brecha entre entrenamiento y prueba te avisa.
+
+652
+00:33:45,900 --> 00:33:48,960
+Vamos con la sexta parada: la trampa del accuracy.
+
+653
+00:33:49,850 --> 00:33:51,300
+La trampa del accuracy.
+
+654
+00:33:51,420 --> 00:33:55,250
+Por qué un porcentaje alto de aciertos puede esconder un modelo que no sirve.
+
+655
+00:33:55,370 --> 00:33:58,168
+Un hospital quiere detectar una enfermedad rara, que
+
+656
+00:33:58,168 --> 00:34:00,750
+tiene solo el cinco por ciento de los pacientes.
+
+657
+00:34:00,870 --> 00:34:05,830
+Alguien propone un modelo muy simple: siempre responde «este paciente está sano».
+
+658
+00:34:05,950 --> 00:34:09,100
+Sobre mil casos, acierta novecientos cincuenta.
+
+659
+00:34:09,220 --> 00:34:11,790
+Su accuracy es de noventa y cinco por ciento.
+
+660
+00:34:11,910 --> 00:34:13,960
+Y no detecta ni un solo enfermo.
+
+661
+00:34:14,080 --> 00:34:15,380
+Ese es el problema.
+
+662
+00:34:15,500 --> 00:34:18,870
+Con clases desbalanceadas, el accuracy es engañoso.
+
+663
+00:34:18,990 --> 00:34:22,190
+Un modelo perezoso saca nota alta, y es inútil.
+
+664
+00:34:22,310 --> 00:34:25,400
+La herramienta para ver los errores es la matriz de confusión.
+
+665
+00:34:25,520 --> 00:34:27,520
+Las filas son lo que realmente pasó.
+
+666
+00:34:27,640 --> 00:34:30,100
+Las columnas, lo que el modelo predijo.
+
+667
+00:34:30,220 --> 00:34:32,000
+Así se ordena en scikit-learn.
+
+668
+00:34:32,120 --> 00:34:35,660
+Arriba a la izquierda, el verdadero negativo, VN.
+
+669
+00:34:35,780 --> 00:34:39,060
+Era un cliente que se queda, y el modelo dijo que se queda.
+
+670
+00:34:39,180 --> 00:34:40,070
+Un acierto.
+
+671
+00:34:40,190 --> 00:34:43,630
+Abajo a la derecha, el verdadero positivo, VP.
+
+672
+00:34:43,750 --> 00:34:46,740
+Era un cliente que cancela, y el modelo lo detectó.
+
+673
+00:34:46,860 --> 00:34:47,920
+Otro acierto.
+
+674
+00:34:48,040 --> 00:34:51,480
+Arriba a la derecha, el falso positivo, FP.
+
+675
+00:34:51,600 --> 00:34:54,330
+Se quedaba, pero el modelo dijo que cancela.
+
+676
+00:34:54,450 --> 00:34:55,790
+Es una falsa alarma.
+
+677
+00:34:55,910 --> 00:34:59,530
+Y abajo a la izquierda, el falso negativo, FN.
+
+678
+00:34:59,650 --> 00:35:01,960
+Cancelaba, pero el modelo no lo vio.
+
+679
+00:35:02,080 --> 00:35:03,460
+Es un caso que se escapó.
+
+680
+00:35:03,580 --> 00:35:06,910
+Ahora con los doscientos cuarenta clientes de prueba de Club Activo.
+
+681
+00:35:07,030 --> 00:35:09,390
+Ciento cincuenta verdaderos negativos.
+
+682
+00:35:09,510 --> 00:35:11,330
+Cuarenta falsos positivos.
+
+683
+00:35:11,450 --> 00:35:13,440
+Veinticuatro falsos negativos.
+
+684
+00:35:13,560 --> 00:35:15,760
+Y veintiséis verdaderos positivos.
+
+685
+00:35:15,880 --> 00:35:18,110
+El accuracy es el total de aciertos.
+
+686
+00:35:18,230 --> 00:35:21,640
+Veintiséis más ciento cincuenta, entre doscientos cuarenta.
+
+687
+00:35:21,760 --> 00:35:23,940
+Da setenta y tres coma tres por ciento.
+
+688
+00:35:24,060 --> 00:35:27,338
+La precisión pregunta: de todos los que el modelo marcó
+
+689
+00:35:27,338 --> 00:35:30,080
+como «cancela», ¿cuántos realmente cancelaban?
+
+690
+00:35:30,200 --> 00:35:33,150
+Marcó sesenta y seis, y acertó veintiséis.
+
+691
+00:35:33,270 --> 00:35:35,480
+Es treinta y nueve coma cuatro por ciento.
+
+692
+00:35:35,600 --> 00:35:40,240
+El recall pregunta: de todos los que realmente cancelaban, ¿cuántos detectó?
+
+693
+00:35:40,360 --> 00:35:43,270
+Cancelaban cincuenta, y detectó veintiséis.
+
+694
+00:35:43,390 --> 00:35:44,990
+Es cincuenta y dos por ciento.
+
+695
+00:35:45,110 --> 00:35:46,450
+Mira lo que comparten.
+
+696
+00:35:46,570 --> 00:35:49,150
+El numerador es el mismo: veintiséis.
+
+697
+00:35:49,270 --> 00:35:51,510
+Solo cambia el total por el que divides.
+
+698
+00:35:51,630 --> 00:35:55,517
+Es como una red de pesca: la precisión mide cuántos peces había en
+
+699
+00:35:55,517 --> 00:35:58,520
+la red, y el recall, cuántos peces del mar sacaste.
+
+700
+00:35:58,640 --> 00:36:01,820
+El F1 combina las dos, con la media armónica.
+
+701
+00:36:01,940 --> 00:36:04,440
+Dos por precisión por recall, entre su suma.
+
+702
+00:36:04,560 --> 00:36:06,970
+Da cero coma cuarenta y cuatro, ocho.
+
+703
+00:36:07,090 --> 00:36:11,421
+Piensa un segundo: si hubiera mil casos más, y el modelo siguiera con el mismo
+
+704
+00:36:11,421 --> 00:36:15,530
+patrón, ¿qué métrica te avisa que se escapan la mitad de los que cancelan?
+
+705
+00:36:16,250 --> 00:36:17,010
+El recall.
+
+706
+00:36:17,130 --> 00:36:20,470
+Es del cincuenta y dos por ciento: casi la mitad se escapa.
+
+707
+00:36:20,590 --> 00:36:23,560
+El accuracy de setenta y tres por ciento no te lo diría.
+
+708
+00:36:23,680 --> 00:36:25,900
+Un ejemplo del apunte, con quinientas
+
+709
+00:36:25,900 --> 00:36:28,780
+transacciones, de las cuales veinte son fraudes.
+
+710
+00:36:28,900 --> 00:36:33,085
+El modelo detecta doce, deja escapar ocho, marca treinta falsas alarmas,
+
+711
+00:36:33,085 --> 00:36:36,340
+y acierta cuatrocientos cincuenta de las que están bien.
+
+712
+00:36:36,460 --> 00:36:40,400
+El accuracy: doce más cuatrocientos cincuenta, entre quinientos.
+
+713
+00:36:40,520 --> 00:36:42,560
+Noventa y dos coma cuatro por ciento.
+
+714
+00:36:42,680 --> 00:36:46,890
+La precisión: doce entre cuarenta y dos, veintiocho coma seis.
+
+715
+00:36:47,010 --> 00:36:50,340
+El recall: doce entre veinte, sesenta por ciento.
+
+716
+00:36:50,460 --> 00:36:53,428
+Y el F1: dos por cero coma doscientos ochenta y
+
+717
+00:36:53,428 --> 00:36:56,080
+seis por cero coma sesenta, entre su suma.
+
+718
+00:36:56,200 --> 00:36:58,370
+Cero coma trescientos ochenta y siete.
+
+719
+00:36:58,490 --> 00:37:02,340
+Ahora la línea base: un modelo que dice siempre «no hay fraude».
+
+720
+00:37:02,460 --> 00:37:06,520
+Acierta cuatrocientos ochenta de quinientos: noventa y seis por ciento.
+
+721
+00:37:06,640 --> 00:37:07,760
+Con recall de cero.
+
+722
+00:37:07,880 --> 00:37:13,020
+Mira lo curioso: el modelo pierde en accuracy, noventa y dos contra noventa y seis.
+
+723
+00:37:13,140 --> 00:37:15,330
+Pero es el único que detecta fraudes.
+
+724
+00:37:15,450 --> 00:37:17,830
+Siempre hay que comparar contra la línea base.
+
+725
+00:37:17,950 --> 00:37:19,780
+En Club Activo pasa lo mismo.
+
+726
+00:37:19,900 --> 00:37:22,450
+Un modelo que dijera siempre «nadie cancela»
+
+727
+00:37:22,450 --> 00:37:25,290
+acertaría el setenta y nueve coma dos por ciento.
+
+728
+00:37:25,410 --> 00:37:28,880
+Nuestro modelo saca setenta y tres coma tres: menos.
+
+729
+00:37:29,000 --> 00:37:30,720
+¿Entonces el modelo es peor?
+
+730
+00:37:30,840 --> 00:37:31,260
+No.
+
+731
+00:37:31,380 --> 00:37:34,360
+La línea base nunca detecta a nadie que cancele.
+
+732
+00:37:34,480 --> 00:37:36,460
+Nuestro modelo detecta a la mitad.
+
+733
+00:37:36,580 --> 00:37:39,650
+Se compara con el accuracy, y también con el recall.
+
+734
+00:37:39,770 --> 00:37:44,720
+En la base real de la actividad de repaso, tres mil ciento cincuenta clientes, un modelo
+
+735
+00:37:44,720 --> 00:37:48,770
+que dice «nadie se fuga» ya logra ochenta y cuatro coma tres por ciento.
+
+736
+00:37:48,890 --> 00:37:52,860
+Así que un ochenta y ocho coma cinco no es tan impresionante como parece.
+
+737
+00:37:52,980 --> 00:37:55,707
+Esa logística tiene precisión de setenta y uno coma
+
+738
+00:37:55,707 --> 00:37:58,380
+cuatro, y recall de cuarenta y cuatro coma cuatro.
+
+739
+00:37:58,500 --> 00:38:01,210
+F1 de cero coma quinientos cuarenta y siete.
+
+740
+00:38:01,330 --> 00:38:04,573
+Con balanced, el accuracy baja a ochenta y dos coma uno,
+
+741
+00:38:04,573 --> 00:38:07,410
+pero el recall sube a ochenta y siete coma nueve.
+
+742
+00:38:07,530 --> 00:38:10,770
+La balanceada pierde accuracy, pero gana mucho recall.
+
+743
+00:38:10,890 --> 00:38:12,490
+Y su F1 es mayor.
+
+744
+00:38:12,610 --> 00:38:17,197
+Aun así, su capacidad de ordenar casos es casi la misma: el área bajo la curva
+
+745
+00:38:17,197 --> 00:38:20,960
+es cero coma novecientos ocho contra cero coma novecientos diez.
+
+746
+00:38:21,080 --> 00:38:24,270
+Cambia el punto de operación, no la capacidad de ordenar.
+
+747
+00:38:24,390 --> 00:38:26,530
+Entonces, ¿qué métrica elegir?
+
+748
+00:38:26,650 --> 00:38:28,810
+Depende de cuál error cuesta más.
+
+749
+00:38:28,930 --> 00:38:32,300
+Si dejar escapar un caso cuesta mucho, prioriza el recall.
+
+750
+00:38:32,420 --> 00:38:35,830
+Si las falsas alarmas son lo caro, prioriza la precisión.
+
+751
+00:38:35,950 --> 00:38:37,580
+Y acepta menos de la otra.
+
+752
+00:38:37,700 --> 00:38:42,180
+Por eso, el accuracy y el F1 no se pueden leer como un ranking único.
+
+753
+00:38:42,300 --> 00:38:44,820
+Un modelo puede ganar en uno y perder en otro.
+
+754
+00:38:44,940 --> 00:38:47,890
+Lo importante es qué error te duele más en tu negocio.
+
+755
+00:38:48,010 --> 00:38:51,110
+Ahora, algunas confusiones que aparecieron en la clase.
+
+756
+00:38:51,230 --> 00:38:54,990
+Se dijo «esto es ciento cuarenta y nueve verdaderos positivos».
+
+757
+00:38:55,110 --> 00:38:58,072
+Pero la celda de arriba a la izquierda en scikit-learn
+
+758
+00:38:58,072 --> 00:39:00,650
+son los verdaderos negativos: ciento cincuenta.
+
+759
+00:39:00,770 --> 00:39:03,240
+Los verdaderos positivos son veintiséis.
+
+760
+00:39:03,360 --> 00:39:06,860
+Otra: se dijo que quitar las quejas desbalanceó el modelo.
+
+761
+00:39:06,980 --> 00:39:11,030
+No cambia el balance de clases, que sigue en veinte coma ocho por ciento.
+
+762
+00:39:11,150 --> 00:39:15,076
+Lo que sí cambia es el rendimiento: el accuracy baja de setenta y tres a
+
+763
+00:39:15,076 --> 00:39:19,111
+cincuenta y dos coma cinco, la precisión de treinta y nueve a veinticuatro
+
+764
+00:39:19,111 --> 00:39:23,255
+coma seis, el recall sube de cincuenta y dos a sesenta y dos, y el área bajo
+
+765
+00:39:23,255 --> 00:39:26,090
+la curva cae a cero coma quinientos setenta y cinco.
+
+766
+00:39:26,210 --> 00:39:30,930
+Y otra más: se dijo que un diez por ciento de prueba corre riesgo de sobreajuste.
+
+767
+00:39:31,050 --> 00:39:34,530
+No: el sobreajuste depende de la complejidad del modelo.
+
+768
+00:39:34,650 --> 00:39:38,230
+Un diez por ciento de prueba da una estimación más ruidosa del error.
+
+769
+00:39:38,350 --> 00:39:42,040
+Para llevarte: todas las métricas salen de la matriz de confusión.
+
+770
+00:39:42,160 --> 00:39:44,640
+El accuracy engaña cuando una clase domina.
+
+771
+00:39:44,760 --> 00:39:46,680
+Compara siempre con la línea base.
+
+772
+00:39:46,800 --> 00:39:49,670
+Y elige la métrica según el costo de cada error.
+
+773
+00:39:49,790 --> 00:39:54,810
+Vamos con la séptima parada: cómo elegir el enfoque, y cómo armar un flujo honesto.
+
+774
+00:39:55,690 --> 00:39:58,942
+Cómo elegir el enfoque, la diferencia entre Machine Learning
+
+775
+00:39:58,942 --> 00:40:01,490
+y Deep Learning, y cómo armar un flujo honesto.
+
+776
+00:40:01,610 --> 00:40:04,710
+Recuerdas la advertencia del Ferrari para ir a comprar pan.
+
+777
+00:40:04,830 --> 00:40:07,790
+La forma de no caer en eso es un orden de preguntas.
+
+778
+00:40:07,910 --> 00:40:09,080
+Primero el problema.
+
+779
+00:40:09,200 --> 00:40:10,540
+Después el algoritmo.
+
+780
+00:40:10,660 --> 00:40:12,490
+La tabla de decisión es esta.
+
+781
+00:40:12,610 --> 00:40:14,930
+¿Tienes ejemplos con la respuesta correcta?
+
+782
+00:40:15,050 --> 00:40:17,590
+Si es una categoría, clasificación.
+
+783
+00:40:17,710 --> 00:40:19,650
+Si es un número, regresión.
+
+784
+00:40:19,770 --> 00:40:21,110
+¿No tienes etiquetas?
+
+785
+00:40:21,230 --> 00:40:23,730
+Si quieres descubrir grupos, clustering.
+
+786
+00:40:23,850 --> 00:40:27,750
+Si quieres simplificar muchas variables, reducción de dimensionalidad.
+
+787
+00:40:27,870 --> 00:40:30,220
+¿Hay decisiones secuenciales con un entorno?
+
+788
+00:40:30,340 --> 00:40:33,150
+Ensayo y error con recompensa: refuerzo.
+
+789
+00:40:33,270 --> 00:40:36,520
+¿Imágenes, audio, texto, gran volumen?
+
+790
+00:40:36,640 --> 00:40:38,870
+Datos complejos: Deep Learning.
+
+791
+00:40:38,990 --> 00:40:40,080
+Fíjate en algo.
+
+792
+00:40:40,200 --> 00:40:42,730
+Un problema puede encajar en más de un enfoque.
+
+793
+00:40:42,850 --> 00:40:47,244
+La función de la profesora que devuelve un solo enfoque lo trata como si fueran
+
+794
+00:40:47,244 --> 00:40:50,970
+excluyentes, pero no lo son: un sistema real puede combinar varios.
+
+795
+00:40:51,090 --> 00:40:54,540
+Pongámoslo a prueba con tres propuestas de la dirección de una empresa.
+
+796
+00:40:54,660 --> 00:40:59,590
+Primera: predecir las ventas semanales, con tres años de historia en una planilla.
+
+797
+00:40:59,710 --> 00:41:01,090
+¿Qué enfoque dirías?
+
+798
+00:41:01,710 --> 00:41:05,250
+Es un valor continuo, con pocos miles de filas tabulares.
+
+799
+00:41:05,370 --> 00:41:07,440
+Regresión, o series de tiempo.
+
+800
+00:41:07,560 --> 00:41:09,330
+El ML clásico basta.
+
+801
+00:41:09,450 --> 00:41:13,010
+Segunda: clasificar dos millones de fotos de productos.
+
+802
+00:41:13,130 --> 00:41:15,700
+Son datos complejos, con gran volumen.
+
+803
+00:41:15,820 --> 00:41:17,590
+Ahí sí conviene Deep Learning.
+
+804
+00:41:17,710 --> 00:41:21,590
+Tercera: calcular un descuento fijo según una tabla de reglas.
+
+805
+00:41:21,710 --> 00:41:23,730
+Una regla ya resuelve el problema.
+
+806
+00:41:23,850 --> 00:41:25,810
+No hace falta Machine Learning.
+
+807
+00:41:25,930 --> 00:41:29,099
+Piensa un segundo: si una empresa propone Deep Learning para
+
+808
+00:41:29,099 --> 00:41:32,268
+predecir la demanda de quinientos productos con tres años de
+
+809
+00:41:32,268 --> 00:41:35,120
+historia semanal en una planilla, ¿qué le recomiendas?
+
+810
+00:41:35,840 --> 00:41:37,020
+Que no lo necesita.
+
+811
+00:41:37,140 --> 00:41:40,206
+Con datos tabulares y una historia corta, conviene
+
+812
+00:41:40,206 --> 00:41:43,210
+regresión, series de tiempo o modelos de árboles.
+
+813
+00:41:43,330 --> 00:41:47,550
+Y como línea base, la demanda de la semana anterior, o un promedio móvil.
+
+814
+00:41:47,670 --> 00:41:50,320
+El modelo debe superarla en el error de prueba.
+
+815
+00:41:50,440 --> 00:41:53,310
+Hablemos de Machine Learning clásico y Deep Learning.
+
+816
+00:41:53,430 --> 00:41:56,030
+El Deep Learning es un subconjunto del Machine
+
+817
+00:41:56,030 --> 00:41:58,460
+Learning, basado en redes con varias capas.
+
+818
+00:41:58,580 --> 00:42:01,549
+Aprende representaciones directamente de datos
+
+819
+00:42:01,549 --> 00:42:04,130
+complejos, como imágenes, audio o texto.
+
+820
+00:42:04,250 --> 00:42:06,400
+Se diferencian en varios criterios.
+
+821
+00:42:06,520 --> 00:42:09,581
+El Machine Learning clásico suele bastar con miles de
+
+822
+00:42:09,581 --> 00:42:12,700
+registros, y el Deep Learning necesita muchísimos más.
+
+823
+00:42:12,820 --> 00:42:18,050
+El primero corre en una CPU estándar, el segundo frecuentemente en una GPU.
+
+824
+00:42:18,170 --> 00:42:23,330
+Los atributos, en el clásico, se construyen a mano, con conocimiento del negocio.
+
+825
+00:42:23,450 --> 00:42:26,230
+En el Deep Learning los aprenden las capas ocultas.
+
+826
+00:42:26,350 --> 00:42:28,800
+Y el clásico suele ser más interpretable.
+
+827
+00:42:28,920 --> 00:42:33,120
+Por eso, para datos tabulares y scoring, el clásico es lo normal.
+
+828
+00:42:33,240 --> 00:42:35,830
+El Deep Learning brilla en visión, audio,
+
+829
+00:42:35,830 --> 00:42:38,800
+lenguaje, e inteligencia artificial generativa.
+
+830
+00:42:38,920 --> 00:42:42,000
+Pero ojo: eso son tendencias, no reglas.
+
+831
+00:42:42,120 --> 00:42:44,620
+Un modelo de boosting no es una caja blanca.
+
+832
+00:42:44,740 --> 00:42:46,850
+Y existen redes con pocos datos.
+
+833
+00:42:46,970 --> 00:42:50,367
+Además, dividir en entrenamiento, validación y prueba
+
+834
+00:42:50,367 --> 00:42:53,380
+vale para cualquier modelo, no solo para redes.
+
+835
+00:42:53,500 --> 00:42:55,480
+Ahora, el flujo honesto.
+
+836
+00:42:55,600 --> 00:42:58,910
+Todo lo que aprende de los datos debe ir dentro de un Pipeline.
+
+837
+00:42:59,030 --> 00:43:02,840
+Imputar, estandarizar y ajustar el modelo, en ese orden.
+
+838
+00:43:02,960 --> 00:43:05,310
+Y el notebook de la clase tiene un detalle.
+
+839
+00:43:05,430 --> 00:43:09,670
+Imputa con media y mediana, y escala, antes de dividir los datos.
+
+840
+00:43:09,790 --> 00:43:12,990
+Es una fuga leve: la prueba influye en el promedio.
+
+841
+00:43:13,110 --> 00:43:17,080
+Dentro de un Pipeline, cada paso aprende solo con el entrenamiento.
+
+842
+00:43:17,200 --> 00:43:20,612
+Y las métricas de la clase no cambian: setenta y tres coma
+
+843
+00:43:20,612 --> 00:43:23,730
+tres, treinta y nueve coma cuatro, y cincuenta y dos.
+
+844
+00:43:23,850 --> 00:43:26,690
+Resumamos el flujo en una lista de verificación.
+
+845
+00:43:26,810 --> 00:43:29,840
+Defino qué quiero predecir, y qué decisión mejora.
+
+846
+00:43:29,960 --> 00:43:32,770
+Divido antes de imputar, escalar o ajustar.
+
+847
+00:43:32,890 --> 00:43:34,910
+Y comparo contra una línea base.
+
+848
+00:43:35,030 --> 00:43:38,080
+Sigue con elegir la métrica según el costo del error.
+
+849
+00:43:38,200 --> 00:43:41,160
+Escalar antes de usar distancias o penalizaciones.
+
+850
+00:43:41,280 --> 00:43:43,420
+E interpretar los segmentos con su perfil.
+
+851
+00:43:43,540 --> 00:43:45,250
+Un último error del material.
+
+852
+00:43:45,370 --> 00:43:48,419
+El cierre del notebook dice que la próxima sesión,
+
+853
+00:43:48,419 --> 00:43:50,920
+la treinta y dos, es de redes neuronales.
+
+854
+00:43:51,040 --> 00:43:56,220
+Pero la Clase treinta y dos es reducción de dimensionalidad: PCA y t-SNE.
+
+855
+00:43:56,340 --> 00:43:59,700
+Para llevarte: primero el problema, luego el algoritmo.
+
+856
+00:43:59,820 --> 00:44:03,330
+Para datos tabulares, el ML clásico suele bastar.
+
+857
+00:44:03,450 --> 00:44:06,211
+Y todo lo que aprende de los datos va dentro de un
+
+858
+00:44:06,211 --> 00:44:08,640
+Pipeline, con una línea base de comparación.
+
+859
+00:44:08,760 --> 00:44:10,940
+Con esto cerramos las siete paradas.
+
+860
+00:44:11,060 --> 00:44:13,870
+Ahora, un repaso final para conectar todo.
+
+861
+00:44:14,770 --> 00:44:16,950
+Repaso final de la clase treinta y uno.
+
+862
+00:44:17,070 --> 00:44:19,610
+Vamos a conectar todo en un solo recorrido.
+
+863
+00:44:19,730 --> 00:44:21,940
+Volvamos a las tres preguntas de la clase.
+
+864
+00:44:22,060 --> 00:44:23,630
+¿Qué tipo de problema es?
+
+865
+00:44:23,750 --> 00:44:24,790
+¿Qué datos tengo?
+
+866
+00:44:24,910 --> 00:44:26,790
+¿Cómo sabré que el modelo sirve?
+
+867
+00:44:26,910 --> 00:44:29,050
+Las seis ideas que siguen las responden.
+
+868
+00:44:29,170 --> 00:44:31,980
+Uno: el tipo de problema decide el modelo.
+
+869
+00:44:32,100 --> 00:44:34,160
+Categoría, clasificación.
+
+870
+00:44:34,280 --> 00:44:35,770
+Número, regresión.
+
+871
+00:44:35,890 --> 00:44:38,350
+Sin etiqueta, clustering o reducción.
+
+872
+00:44:38,470 --> 00:44:40,320
+Con recompensas, refuerzo.
+
+873
+00:44:40,440 --> 00:44:43,843
+Dos: la logística calcula un puntaje, la sigmoide lo
+
+874
+00:44:43,843 --> 00:44:46,460
+vuelve probabilidad, y el umbral decide.
+
+875
+00:44:46,580 --> 00:44:49,870
+Con puntaje cero, la probabilidad es cero coma cinco.
+
+876
+00:44:49,990 --> 00:44:53,060
+Tres: siempre se mide el error en datos nuevos.
+
+877
+00:44:53,180 --> 00:44:56,050
+Todo lo que se aprende, solo con el entrenamiento.
+
+878
+00:44:56,170 --> 00:44:58,974
+Cuatro: K-Means asigna cada punto al centro más
+
+879
+00:44:58,974 --> 00:45:01,420
+cercano, y mueve cada centro al promedio.
+
+880
+00:45:01,540 --> 00:45:03,120
+Se estandariza antes.
+
+881
+00:45:03,240 --> 00:45:06,280
+Cinco: demasiada complejidad memoriza ruido.
+
+882
+00:45:06,400 --> 00:45:09,930
+Ridge encoge los coeficientes, y Lasso puede anularlos.
+
+883
+00:45:10,050 --> 00:45:12,250
+Y seis: el accuracy no basta.
+
+884
+00:45:12,370 --> 00:45:17,220
+Se mira la matriz de confusión, el recall, la precisión, y una línea base.
+
+885
+00:45:17,340 --> 00:45:19,820
+Y estos son los números que conviene recordar.
+
+886
+00:45:19,940 --> 00:45:24,570
+En Club Activo, ochocientos clientes, y veinte coma nueve por ciento cancela.
+
+887
+00:45:24,690 --> 00:45:28,144
+En la prueba: accuracy setenta y tres coma tres, precisión
+
+888
+00:45:28,144 --> 00:45:31,240
+treinta y nueve coma cuatro, recall cincuenta y dos.
+
+889
+00:45:31,360 --> 00:45:35,983
+En regresión: error cuadrático medio ciento cuarenta y cuatro coma nueve,
+
+890
+00:45:35,983 --> 00:45:39,720
+RMSE doce, R cuadrado cero coma quinientos cuarenta y ocho.
+
+891
+00:45:39,840 --> 00:45:42,766
+K-Means: segmentos de doscientos cincuenta y dos,
+
+892
+00:45:42,766 --> 00:45:45,990
+cuatrocientos treinta y nueve y ciento nueve clientes.
+
+893
+00:45:46,110 --> 00:45:48,560
+El segundo cancela solo siete por ciento.
+
+894
+00:45:48,680 --> 00:45:52,293
+Con grado quince, el entrenamiento llega a cero coma noventa, y
+
+895
+00:45:52,293 --> 00:45:55,160
+la prueba cae a menos cuatro coma setenta y nueve.
+
+896
+00:45:55,280 --> 00:45:58,421
+Y la línea base, «nadie cancela», acierta setenta
+
+897
+00:45:58,421 --> 00:46:01,050
+y nueve coma dos, más que nuestro modelo.
+
+898
+00:46:01,170 --> 00:46:02,680
+Pero no detecta a nadie.
+
+899
+00:46:02,800 --> 00:46:04,560
+Fíjate cómo se conecta todo.
+
+900
+00:46:04,680 --> 00:46:05,970
+Defines el problema.
+
+901
+00:46:06,090 --> 00:46:08,000
+Preparas los datos y divides.
+
+902
+00:46:08,120 --> 00:46:09,410
+Ajustas el modelo.
+
+903
+00:46:09,530 --> 00:46:13,060
+Y evalúas con la métrica correcta, contra una línea base.
+
+904
+00:46:13,180 --> 00:46:15,210
+Todo, dentro de un Pipeline.
+
+905
+00:46:15,330 --> 00:46:20,267
+Piensa un segundo: un modelo de fraude tiene noventa y ocho por ciento de accuracy, y
+
+906
+00:46:20,267 --> 00:46:24,100
+una línea base que siempre dice «no fraude» tiene noventa y siete.
+
+907
+00:46:24,220 --> 00:46:25,700
+¿Qué miras antes de aplaudir?
+
+908
+00:46:26,420 --> 00:46:28,310
+La matriz de confusión y el recall.
+
+909
+00:46:28,430 --> 00:46:30,910
+La diferencia con la línea base es de un punto.
+
+910
+00:46:31,030 --> 00:46:33,880
+Hay que ver si el modelo realmente detecta casos.
+
+911
+00:46:34,000 --> 00:46:37,430
+Antes de cerrar, cuatro ideas de la clase que conviene corregir.
+
+912
+00:46:37,550 --> 00:46:41,390
+Una precisión de cincuenta y uno por ciento no es una moneda: el azar
+
+913
+00:46:41,390 --> 00:46:44,450
+tiene la precisión de la prevalencia, veinte coma ocho.
+
+914
+00:46:44,570 --> 00:46:48,590
+Y los verdaderos positivos son veintiséis, no ciento cuarenta y nueve.
+
+915
+00:46:48,710 --> 00:46:51,793
+PCA no separa clústeres: los formó K-Means, y
+
+916
+00:46:51,793 --> 00:46:54,670
+noventa y uno coma ocho es de la varianza.
+
+917
+00:46:54,790 --> 00:46:58,307
+Y predecir cuántos meses le quedan a un cliente antes de cancelar
+
+918
+00:46:58,307 --> 00:47:01,823
+no es sin más una regresión lineal: es análisis de supervivencia,
+
+919
+00:47:01,823 --> 00:47:04,420
+porque los que aún no cancelan están censurados.
+
+920
+00:47:04,540 --> 00:47:08,520
+Para pasar a la siguiente clase, deberías poder hacer cinco cosas.
+
+921
+00:47:08,640 --> 00:47:10,740
+Clasificar un problema en su familia.
+
+922
+00:47:10,860 --> 00:47:15,550
+Calcular a mano una probabilidad con la sigmoide, y una iteración de K-Means.
+
+923
+00:47:15,670 --> 00:47:19,530
+Leer una curva de entrenamiento y prueba, y explicar Ridge y Lasso.
+
+924
+00:47:19,650 --> 00:47:25,000
+Calcular accuracy, precisión, recall y F1, y compararlos con la línea base.
+
+925
+00:47:25,120 --> 00:47:28,014
+Y resolver los bloques uno a siete del cuaderno, con
+
+926
+00:47:28,014 --> 00:47:30,240
+al menos ochenta por ciento de aciertos.
+
+927
+00:47:30,360 --> 00:47:31,750
+¿En qué orden estudiar?
+
+928
+00:47:31,870 --> 00:47:33,580
+Primero, los apuntes.
+
+929
+00:47:33,700 --> 00:47:38,360
+Luego, los bloques uno a cuatro del cuaderno, y las partes A a C del notebook.
+
+930
+00:47:38,480 --> 00:47:41,860
+Después, los bloques cinco a siete, y la parte D.
+
+931
+00:47:41,980 --> 00:47:44,190
+Y al final, el ejercicio de cierre.
+
+932
+00:47:44,310 --> 00:47:47,591
+Y si te trabas más de diez minutos, mira la solución,
+
+933
+00:47:47,591 --> 00:47:50,130
+entiéndela, y vuelve a hacerlo sin mirar.
+
+934
+00:47:50,250 --> 00:47:51,230
+Eso es todo.
+
+935
+00:47:51,350 --> 00:47:56,420
+Ya sabes elegir el tipo de problema, construir un modelo, y medirlo con honestidad.
+
+936
+00:47:56,540 --> 00:47:59,906
+En la próxima clase, la treinta y dos, veremos
+
+937
+00:47:59,906 --> 00:48:02,980
+reducción de dimensionalidad: PCA y t-SNE.
+
+938
+00:48:03,100 --> 00:48:04,770
+Mucho éxito con tu estudio.

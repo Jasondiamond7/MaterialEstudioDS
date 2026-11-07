@@ -1,0 +1,334 @@
+DIPLOMADO EN DATA SCIENCE UC — FACULTAD DE MATEMÁTICAS
+SESIÓN 32: REDUCCIÓN DE DIMENSIONALIDAD Y REPRESENTACIÓN DE VARIABLES
+Profesora: Laura Sánchez Fernández
+
+Reducción de dimensionalidad y representación de
+variables
+
+Sesión 32 — Apunte de estudio
+
+Esta sesión continua el recorrido de las dos clases anteriores. En la Sesión 30 trabajamos la calidad y la división de
+los datos; en la Sesión 31 vimos cómo un modelo aprende y distinguimos aprendizaje supervisado, no
+supervisado y por refuerzo.
+
+Ahora damos un paso previo al modelado que suele decidir gran parte del resultado: cómo representar las
+variables y cómo resumirlas cuando tenemos demasiadas.
+
+El caso práctico vuelve al problema de churn: predecir si un cliente de una telco cancelará su suscripción. La
+práctica utiliza por defecto un dataset sintético reproducible de 1.500 clientes y desarrolla cuatro bloques: alta
+dimensionalidad, representación de variables, PCA y t-SNE.
+
+1. El problema de la dimensionalidad
+
+Tener más columnas no significa automáticamente tener más información útil. A medida que crece el número de
+variables pueden aparecer costos e inestabilidades que dificultan tanto el aprendizaje como la puesta en
+producción.
+
+Problema             Qué ocurre
+
+Costo computacional  Más columnas implican más tiempo de
+                     procesamiento y entrenamiento.
+
+Multicolinealidad    Variables muy correlacionadas contienen información
+                     redundante y pueden generar inestabilidad.
+
+Variables ruido      Algunas columnas no aportan señal real y pueden
+                     distraer al modelo.
+
+Sesgo vs. varianza   Con pocas observaciones, agregar variables puede
+                     aumentar la varianza de las predicciones y favorecer
+                     el sobreajuste.
+
+Reducir dimensiones puede hacer el entrenamiento más eficiente, facilitar la depuración y comprensión,
+eliminar redundancia y producir soluciones más simples de mantener. Pero reducir no es gratis: debemos
+decidir qué información conservar y cuánto desempeño estamos dispuestos a ceder.
+
+Definición de manifold y por qué es útil.
+
+Usemos la analogía de un globo terráqueo: una superficie 3D puede representarse en un mapa 2D conservando
+relaciones esenciales. Un manifold es esa estructura de menor dimensión que está “doblada” dentro de un
+espacio de más dimensiones. Reducir dimensionalidad busca encontrar una representación más pequeña que
+preserve la estructura relevante.
+
+                                        Sesión 32 · Apunte de estudio | Diplomado en Data Science UC · Facultad de Matemáticas
+DIPLOMADO EN DATA SCIENCE UC — FACULTAD DE MATEMÁTICAS
+SESIÓN 32: REDUCCIÓN DE DIMENSIONALIDAD Y REPRESENTACIÓN DE VARIABLES
+Profesora: Laura Sánchez Fernández
+
+Dos caminos para reducir   Qué hacemos                                 Ventaja principal
+                                                                       Mayor interpretabilidad.
+ Camino                    Eliminamos columnas redundantes
+ Selección de variables    o poco informativas y conservamos           Mayor compresión; PCA es el
+                           variables originales.                       ejemplo central de la sesión.
+ Extracción / creación
+                           Combinamos variables en nuevas
+                           representaciones que resumen la
+                           información original.
+
+2. Diferencias entre calidad de datos y representación.
+
+En la Sesión 30 la pregunta era “¿son datos confiables?”. En esta sesión la pregunta cambia a “¿en qué forma se
+los entrego al modelo?”. Un dato puede ser correcto y completo, pero estar representado de una manera que
+distorsione distancias, varianzas o relaciones.
+
+Situación                  Problema para el modelo                     Respuesta
+
+Escalas distintas          Una variable que llega a miles              Escalar o estandarizar.
+
+                           puede dominar a otra que vale 0/1.
+
+Texto o categorías         El algoritmo necesita una                   Codificar categorías.
+                           representación numérica.
+
+Información implícita      La señal útil puede estar en una            Feature engineering.
+                           combinación de columnas.
+
+Idea clave: PCA y t-SNE trabajan con distancias y/o varianzas. Si las variables están mal representadas, el
+algoritmo puede resumir una distorsión en lugar de información útil.
+
+3. Escalamiento y estandarización
+
+Antes de aplicar PCA, t-SNE o métodos basados en distancias, las variables numéricas deben quedar en escalas
+comparables.
+
+Técnica                    Qué hace                                    Uso destacado en clase
+
+Estandarización (z-score)  Centra las variables en 0 y expresa         Es el estándar utilizado para PCA y
+                           los valores en desviaciones típicas         t-SNE.
+                           respecto de la media.
+
+Normalización (min-max)    Lleva los valores a un rango entre 0        Útil cuando se requieren límites
+                           y 1 conservando el orden.                   fijos, por ejemplo, en algunas redes
+                                                                       neuronales.
+
+                       Sesión 32 · Apunte de estudio | Diplomado en Data Science UC · Facultad de Matemáticas
+DIPLOMADO EN DATA SCIENCE UC — FACULTAD DE MATEMÁTICAS
+SESIÓN 32: REDUCCIÓN DE DIMENSIONALIDAD Y REPRESENTACIÓN DE VARIABLES
+Profesora: Laura Sánchez Fernández
+
+En Python se trabajó con StandardScaler y se reforzó una regla de la Sesión 30: el escalador se ajusta (fit)
+únicamente con entrenamiento y luego se aplica (transform) a test. Ajustarlo con todos los datos produciría Data
+Leakage.
+
+Actividad de repaso — ¿Por qué importa la escala?
+
+Supongan que una variable mide segundos de llamada y toma valores de miles, mientras reclamos vale 0 o 1.
+¿Qué puede ocurrir si aplicamos PCA directamente sin escalar?
+Respuesta
+
+La variable de mayor magnitud puede dominar la varianza y, por tanto, los componentes.
+
+No significa necesariamente que “segundos” sea más importante: parte del efecto proviene de la unidad de
+medida. Por eso estandarizamos antes de PCA.
+
+4. Codificación de variables categóricas
+
+Asignar números a categorías no siempre convierte una variable en una magnitud válida. La codificación debe
+respetar el significado de la variable.
+
+Técnica                      Cuándo usarla                             Ejemplo
+
+Ordinal encoding             Existe un orden real entre                Nivel bajo → alto.
+                             categorías.
+
+One-hot encoding             Las categorías no tienen un orden         tipo_plan → columnas binarias.
+                             cuantitativo.
+
+Target / frequency encoding  Hay muchas categorías y se                comuna → frecuencia o tasa
+                             necesita una representación               histórica.
+                             compacta.
+
+En el caso churn, tipo_plan y estado venían como enteros 1-2. Eso puede funcionar directamente en modelos de
+árbol, pero para PCA/t-SNE se transformaron a one-hot porque estos métodos interpretan diferencias numéricas
+como distancias.
+
+5. Feature engineering: construir la variable que falta
+
+A veces la variable más informativa no existe como columna cruda. Feature engineering consiste en construir
+variables que expresen mejor un comportamiento o concepto a partir de datos ya disponibles. En la práctica se
+crearon tres ejemplos antes de escalar y reducir:
+
+Variable creada      Construcción                 Lectura
+
+duracion_prom_llamada segundos ÷ frec_llamadas    Distingue muchas llamadas cortas de pocas llamadas
+                                                  largas.
+
+sms_por_antiguedad   frec_sms ÷ antiguedad        Normaliza el uso de SMS por el tiempo que el cliente lleva
+                                                  en la compañía.
+
+intensidad_contacto  n_contactos ÷ frec_llamadas  Aproxima cuán concentrada está la actividad en pocos
+                                                  contactos.
+
+                     Sesión 32 · Apunte de estudio | Diplomado en Data Science UC · Facultad de Matemáticas
+DIPLOMADO EN DATA SCIENCE UC — FACULTAD DE MATEMÁTICAS
+SESIÓN 32: REDUCCIÓN DE DIMENSIONALIDAD Y REPRESENTACIÓN DE VARIABLES
+Profesora: Laura Sánchez Fernández
+
+Estas variables se agregan antes del escalamiento y de la reducción dimensional. Representar mejor los datos es
+un paso previo; PCA y t-SNE no sustituyen el feature engineering.
+
+6. PCA: resumir muchas variables en componentes
+
+Análisis de Componentes Principales (PCA) toma varias variables y las resume en nuevas variables llamadas
+componentes principales, tratando de perder la menor cantidad posible de información. Es una técnica no
+supervisada: la variable objetivo no se utiliza para construir los componentes.
+
+La intuición detrás de PCA
+
+1. Busca la dirección en la que los datos varían más: allí encuentra el primer patrón principal.
+2. Esa dirección se convierte en PC1. PC2 busca la siguiente dirección más informativa sin repetir lo ya explicado
+por PC1.
+3. El proceso continúa: cada componente captura el patrón más fuerte que todavía no había sido explicado.
+Cada componente es una “receta”: una combinación de las variables originales. Por eso PCA reduce el número de
+columnas, pero sacrifica parte de la interpretabilidad directa de cada variable original.
+
+7. PCA aplicado al caso de churn
+
+La práctica trabaja con 1.500 clientes. La variable objetivo es fuga (1 = abandonó, 0 = activo), pero se deja fuera
+del PCA y se utiliza solo después para colorear o evaluar resultados. Antes del análisis se mantienen las reglas de
+calidad de la Sesión 30 y se revisan correlaciones.
+
+La matriz de correlación mostró una señal clara de redundancia: segundos, frecuencia de llamadas, contactos,
+SMS, monto y CLV están fuertemente relacionados. PCA puede condensar buena parte de esa información
+común en menos componentes.
+
+¿Cuántas componentes elegimos?
+
+El scree plot muestra la varianza explicada por cada componente y su acumulado. En el notebook, 8
+componentes alcanzan al menos el 80% de la varianza total. La lógica no es buscar un número mágico, sino
+detectar el punto donde agregar otra componente aporta cada vez menos información nueva.
+
+¿Qué significan PC1 y PC2?
+
+Componente  Lectura del caso
+
+PC1 Agrupa principalmente el uso general del servicio: segundos, llamadas, contactos, SMS,
+                         monto y CLV. Un PC1 mayor se asocia a mayor uso.
+
+PC2 Mezcla señales como fallas técnicas y reclamos; un valor alto se interpreta como mayor
+                         fricción o insatisfacción con el servicio.
+
+El círculo de correlaciones ayuda a interpretar estas recetas: las flechas muestran cuánto pesa y en qué
+dirección se relaciona cada variable con las primeras componentes.
+
+            Sesión 32 · Apunte de estudio | Diplomado en Data Science UC · Facultad de Matemáticas
+DIPLOMADO EN DATA SCIENCE UC — FACULTAD DE MATEMÁTICAS
+SESIÓN 32: REDUCCIÓN DE DIMENSIONALIDAD Y REPRESENTACIÓN DE VARIABLES
+Profesora: Laura Sánchez Fernández
+
+8. El trade-off real: simplificar vs. conservar desempeño
+
+La clase compara una regresión logística con las variables representadas originales frente al mismo modelo
+usando PCA. El objetivo es medir qué se pierde al simplificar aplicando PCA.
+
+Modelo                N.º F1-score MCC
+                      variables/componentes
+
+Variables originales  15   0.270                                       0.265
+
+PCA                   8    0.267                                       0.252
+
+Lectura: con 8 componentes en lugar de 15 columnas, el desempeño baja solo un poco. Ese es el trade-off: ceder
+algo de capacidad predictiva a cambio de un modelo más compacto, liviano y fácil de mantener. La decisión
+depende del problema; PCA no es automáticamente mejor ni “gratis”.
+
+9. t-SNE: un mapa no lineal para explorar estructura
+
+t-Distributed Stochastic Neighbor Embedding (t-SNE) busca una representación en 2D o 3D que mantenga cerca,
+a los puntos que eran vecinos en el espacio original. A diferencia de PCA, no busca conservar la varianza global,
+sino las relaciones de vecindad local.
+
+Cómo funciona, sin fórmulas
+
+1. Mide quién se parece a quién en el espacio original de muchas variables.
+2. Dibuja los puntos en 2D y los va moviendo hasta que las vecindades del mapa se parezcan a las originales.
+3. El proceso es iterativo; por eso puede tardar y el resultado puede cambiar ligeramente entre corridas.
+
+Perplexity, el hiperparámetro clave en t-SNE.
+
+En lenguaje coloquial, perplexity indica aproximadamente a cuántos vecinos presta atención el algoritmo.
+Valores bajos enfatizan grupos pequeños y locales; valores altos entregan una visión más panorámica. La
+presentación recomienda probar habitualmente entre 5 y 50 y recuerda que debe ser menor que el número de
+observaciones.
+
+Consideraciones prácticas  Qué recordar
+
+ Aspecto                   Distintas corridas pueden variar; random_state ayuda a reproducir
+ No determinístico         resultados.
+
+ No es clustering          Los grupos visuales no deben interpretarse automáticamente como
+ Costo alto                clusters ni sus distancias como distancias reales.
+ Uso
+                           El costo computacional crece rápido con el número de observaciones.
+
+                           Está pensado principalmente para explorar y visualizar, no como
+                           transformación estándar de producción.
+
+                      Sesión 32 · Apunte de estudio | Diplomado en Data Science UC · Facultad de Matemáticas
+DIPLOMADO EN DATA SCIENCE UC — FACULTAD DE MATEMÁTICAS
+SESIÓN 32: REDUCCIÓN DE DIMENSIONALIDAD Y REPRESENTACIÓN DE VARIABLES
+Profesora: Laura Sánchez Fernández
+
+10. PCA vs. t-SNE                PCA                                   t-SNE
+                                 Lineal                                No lineal
+ Criterio                        Varianza global                       Vecindades locales
+ Naturaleza                      Determinístico                        Puede variar entre corridas
+ Qué conserva                    Bajo / rápido                         Más alto
+ Resultado                                                             No está pensado para
+ Costo                           Permite transformarlos                transformarlos directamente
+
+ Nuevos datos                    Reducir antes de modelar /            Explorar y visualizar estructura
+                                 producción
+ Uso típico
+
+En la presentación mencionamos además otras alternativas de reducción a modo de tener un listado de técnicas
+disponibles que no veremos en estas sesiones: Análisis Factorial, Análisis Discriminante y SVD entre las lineales;
+Autoencoders, IsoMap, Local Linear Embedding y UMAP entre las no lineales.
+
+11. El hilo de las sesiones 30 → 31 → 32
+
+Sesión                           Condición que resolvimos
+
+30 · Calidad de datos            Diagnosticamos, imputamos y dividimos
+                                 honestamente el dataset.
+
+31 · Aprendizaje                 Entendimos el ciclo de ML y las familias supervisado /
+                                 no supervisado.
+
+32 · Representación y reducción  Escalamos, codificamos, construimos y resumimos
+                                 variables con PCA / t-SNE.
+
+RESUMIENDO: primero necesitamos datos confiables; después entendemos cómo aprende un modelo;
+finalmente decidimos en qué forma entregarle la información y cuánto podemos resumir sin perder lo que
+importa.
+
+12. Actividad de repaso-¿seleccionar, construir o extraer?
+
+Para cada situación, elige la acción principal: selección de variables, feature engineering, PCA o t-SNE.
+1. Tienen seis variables de uso muy correlacionadas y quieren un modelo más liviano para producción.
+2. Tienen segundos totales y número de llamadas, pero quieren distinguir llamadas largas de cortas.
+3. Quieren explorar visualmente si existen estructuras locales no lineales entre clientes.
+4. Una columna no aporta información y además complica la explicación del modelo.
+
+                                        Sesión 32 · Apunte de estudio | Diplomado en Data Science UC · Facultad de Matemáticas
+DIPLOMADO EN DATA SCIENCE UC — FACULTAD DE MATEMÁTICAS
+SESIÓN 32: REDUCCIÓN DE DIMENSIONALIDAD Y REPRESENTACIÓN DE VARIABLES
+Profesora: Laura Sánchez Fernández
+
+Respuesta
+1. PCA: puede resumir la redundancia en menos componentes.
+2. Feature engineering: construir duración promedio de llamada.
+3. t-SNE: está diseñado para visualizar vecindades y estructura no lineal.
+4. Selección: eliminar una variable poco informativa conserva interpretabilidad.
+
+Para pensar después de la clase
+
+              • ¿Cuáles de las variables de su proyecto cree que están altamente correlacionadas entre sí?
+              • ¿Qué variable nueva podría construir combinando dos columnas que ya tiene?
+              • Si tuviera que quedarse con la mitad de sus variables, ¿las eliminaría o las resumiría con PCA?
+              • ¿Cuándo preferiría un mapa t-SNE para explorar sus datos y cuándo un PCA para reducir antes de
+
+                   modelar?
+
+                                        Sesión 32 · Apunte de estudio | Diplomado en Data Science UC · Facultad de Matemáticas
+

@@ -1,0 +1,399 @@
+1
+00:00:00,250 --> 00:00:02,530
+Séptima parada: los kernels.
+
+2
+00:00:02,650 --> 00:00:06,456
+Vas a ver por qué un problema que no se separa con una recta se separa al
+
+3
+00:00:06,456 --> 00:00:09,740
+subirlo de dimensión, y vas a calcular el kernel radial a mano.
+
+4
+00:00:09,860 --> 00:00:14,870
+Mira estos puntos sobre una recta: rojos en el centro, azules en los extremos.
+
+5
+00:00:14,990 --> 00:00:16,990
+¿Puedes separarlos con un solo corte?
+
+6
+00:00:17,110 --> 00:00:20,370
+No: cualquier umbral deja azules de los dos lados.
+
+7
+00:00:20,490 --> 00:00:23,190
+Una frontera lineal, aquí, no sirve.
+
+8
+00:00:23,310 --> 00:00:27,870
+Piensa en monedas sobre una mesa: las rojas al centro, rodeadas de azules.
+
+9
+00:00:27,990 --> 00:00:30,990
+Sobre la mesa, ninguna línea recta las separa.
+
+10
+00:00:31,110 --> 00:00:34,984
+Pero si levantas las monedas del centro, si les agregas una altura, una
+
+11
+00:00:34,984 --> 00:00:38,040
+hoja horizontal pasa entre las dos alturas y las separa.
+
+12
+00:00:38,160 --> 00:00:41,160
+Subir a otra dimensión vuelve lineal lo que no lo era.
+
+13
+00:00:41,280 --> 00:00:42,810
+Hagámoslo con números.
+
+14
+00:00:42,930 --> 00:00:47,120
+A cada punto le agregamos una segunda coordenada: su valor al cuadrado.
+
+15
+00:00:47,240 --> 00:00:52,730
+Los azules, en menos dos y 1.6, pasan a cuatro y 2.56.
+
+16
+00:00:52,850 --> 00:00:59,720
+Los rojos, cerca de cero, quedan abajo: el mayor es 0.7 al cuadrado, 0.49.
+
+17
+00:00:59,840 --> 00:01:04,330
+Ahora una recta horizontal, a la altura uno, los separa perfectamente.
+
+18
+00:01:04,450 --> 00:01:07,907
+Y si volvemos a la recta original, esa frontera horizontal
+
+19
+00:01:07,907 --> 00:01:10,590
+se ve como dos cortes: en menos uno y en uno.
+
+20
+00:01:10,710 --> 00:01:14,960
+Una frontera lineal en el espacio nuevo es una frontera curva en el original.
+
+21
+00:01:15,080 --> 00:01:19,720
+El problema es que subir de dimensión puede ser carísimo: muchas coordenadas nuevas.
+
+22
+00:01:19,840 --> 00:01:23,160
+Aquí aparece el truco, de la diapositiva treinta y nueve.
+
+23
+00:01:23,280 --> 00:01:26,508
+Un kernel calcula directamente el producto interno entre
+
+24
+00:01:26,508 --> 00:01:29,160
+los puntos ya transformados, sin construirlos.
+
+25
+00:01:29,280 --> 00:01:33,039
+Los tres kernels de la clase: el lineal, equis por zeta; el
+
+26
+00:01:33,039 --> 00:01:37,181
+polinomial, equis por zeta más erre, elevado a de; y el radial, e
+
+27
+00:01:37,181 --> 00:01:40,430
+elevado a menos gamma por la distancia al cuadrado.
+
+28
+00:01:40,550 --> 00:01:43,730
+Sobre los hiperparámetros: el lineal no tiene gamma.
+
+29
+00:01:43,850 --> 00:01:47,220
+El polinomial tiene el grado, el desplazamiento erre, y en
+
+30
+00:01:47,220 --> 00:01:50,880
+scikit-learn también una gamma que multiplica a equis por zeta.
+
+31
+00:01:51,000 --> 00:01:52,500
+Y el radial tiene gamma.
+
+32
+00:01:52,620 --> 00:01:54,610
+Comprobemos el truco con números.
+
+33
+00:01:54,730 --> 00:01:58,957
+Tomemos x igual a uno, dos, y zeta igual a tres, uno, con el
+
+34
+00:01:58,957 --> 00:02:02,480
+kernel polinomial de grado dos y erre igual a uno.
+
+35
+00:02:02,600 --> 00:02:05,220
+Equis por zeta es tres más dos, cinco.
+
+36
+00:02:05,340 --> 00:02:06,920
+Más uno, seis.
+
+37
+00:02:07,040 --> 00:02:08,990
+Al cuadrado: treinta y seis.
+
+38
+00:02:09,110 --> 00:02:10,250
+Una sola cuenta.
+
+39
+00:02:10,370 --> 00:02:12,330
+Ahora, por el camino largo.
+
+40
+00:02:12,450 --> 00:02:17,306
+Ese kernel equivale a llevar cada punto a seis coordenadas: uno, raíz de dos por
+
+41
+00:02:17,306 --> 00:02:21,070
+cada coordenada, los cuadrados, y raíz de dos por el producto.
+
+42
+00:02:21,190 --> 00:02:26,456
+El producto interno de esos dos vectores de seis coordenadas es uno, más seis, más
+
+43
+00:02:26,456 --> 00:02:30,630
+cuatro, más nueve, más cuatro, más doce: otra vez treinta y seis.
+
+44
+00:02:30,750 --> 00:02:34,630
+El kernel llegó al mismo número sin construir las seis coordenadas.
+
+45
+00:02:34,750 --> 00:02:37,930
+Ahora el kernel radial, con la diapositiva cuarenta.
+
+46
+00:02:38,050 --> 00:02:40,519
+Dos puntos a distancia dos, en el espacio
+
+47
+00:02:40,519 --> 00:02:43,530
+estandarizado: la distancia al cuadrado es cuatro.
+
+48
+00:02:43,650 --> 00:02:52,240
+Con gamma igual a 0.1: e elevado a menos 0.1 por cuatro, e a la menos 0.4: 0.6703.
+
+49
+00:02:52,360 --> 00:02:54,250
+Todavía bastante parecidos.
+
+50
+00:02:54,370 --> 00:02:59,280
+Con gamma igual a uno: e a la menos cuatro, 0.0183.
+
+51
+00:02:59,400 --> 00:03:00,240
+Casi nada.
+
+52
+00:03:00,360 --> 00:03:02,110
+Otro, con coordenadas.
+
+53
+00:03:02,230 --> 00:03:06,110
+x igual a uno, dos, y zeta igual a dos, cero.
+
+54
+00:03:06,230 --> 00:03:11,680
+La diferencia es menos uno, dos; su norma al cuadrado, uno más cuatro, cinco.
+
+55
+00:03:11,800 --> 00:03:17,420
+Con gamma igual a 0.1, e a la menos 0.5: 0.607.
+
+56
+00:03:17,540 --> 00:03:22,340
+Con gamma igual a uno, e a la menos cinco: 0.0067.
+
+57
+00:03:22,460 --> 00:03:27,730
+Mira las curvas completas: similitud contra distancia, para cuatro valores de gamma.
+
+58
+00:03:27,850 --> 00:03:33,160
+Con gamma pequeña, en azul, la similitud decae lento: un punto influye lejos.
+
+59
+00:03:33,280 --> 00:03:36,454
+Con gamma grande, en rojo, se desploma enseguida:
+
+60
+00:03:36,454 --> 00:03:39,110
+cada punto influye solo en su vecindario.
+
+61
+00:03:39,230 --> 00:03:42,060
+Por eso gamma controla el alcance de la similitud.
+
+62
+00:03:42,180 --> 00:03:46,422
+Y así decide la SVM radial: el puntaje de un caso nuevo es una suma de
+
+63
+00:03:46,422 --> 00:03:50,180
+similitudes con los vectores de soporte, cada una con su peso.
+
+64
+00:03:50,300 --> 00:03:53,990
+Cada vector de soporte pone una pequeña colina alrededor de sí.
+
+65
+00:03:54,110 --> 00:03:57,040
+La frontera es donde la suma de colinas cruza el cero.
+
+66
+00:03:57,160 --> 00:03:59,620
+Con los datos reales, en dos variables.
+
+67
+00:03:59,740 --> 00:04:03,906
+Una SVM lineal, con C igual a uno, traza esta recta:
+
+68
+00:04:03,906 --> 00:04:07,110
+acierta el 88.3 por ciento de la prueba.
+
+69
+00:04:07,230 --> 00:04:12,470
+La SVM radial, con la configuración de la clase, C igual a diez y gamma
+
+70
+00:04:12,470 --> 00:04:16,750
+igual a 0.1, traza esta curva: acierta el 90.1 por ciento.
+
+71
+00:04:16,870 --> 00:04:19,460
+La curva se dobla donde las clases se mezclan.
+
+72
+00:04:19,580 --> 00:04:25,621
+En la figura de la guía, con C igual a uno, el kernel polinomial de grado tres
+
+73
+00:04:25,621 --> 00:04:30,500
+acierta el 88.9 por ciento, y el radial con gamma 0.5, el 90.1.
+
+74
+00:04:30,620 --> 00:04:34,670
+Con solo dos variables, las diferencias son de uno o dos casos.
+
+75
+00:04:34,790 --> 00:04:35,730
+En el código.
+
+76
+00:04:35,850 --> 00:04:39,328
+En R, la función svm con kernel igual a radial,
+
+77
+00:04:39,328 --> 00:04:42,140
+cost igual a diez y gamma igual a 0.1.
+
+78
+00:04:42,260 --> 00:04:49,680
+En Python, la clase SVC, con kernel igual a RBF, C igual a diez y gamma igual a 0.1.
+
+79
+00:04:49,800 --> 00:04:52,360
+Python llama RBF al kernel radial.
+
+80
+00:04:52,480 --> 00:04:57,070
+Las dos usan la misma fórmula: e a la menos gamma por la distancia al cuadrado.
+
+81
+00:04:57,190 --> 00:05:01,330
+El error típico al calcular a mano: olvidar el cuadrado de la distancia.
+
+82
+00:05:01,450 --> 00:05:05,647
+Con distancia dos y gamma 0.1, si alguien hace e
+
+83
+00:05:05,647 --> 00:05:08,970
+a la menos 0.1 por dos, obtiene 0.819.
+
+84
+00:05:09,090 --> 00:05:13,810
+Lo correcto es e a la menos 0.1 por cuatro: 0.670.
+
+85
+00:05:13,930 --> 00:05:16,270
+La fórmula usa la distancia al cuadrado.
+
+86
+00:05:16,390 --> 00:05:17,610
+Piensa un segundo.
+
+87
+00:05:17,730 --> 00:05:19,880
+Dos puntos están a distancia tres.
+
+88
+00:05:20,000 --> 00:05:23,030
+¿Cuánto vale el kernel radial con gamma 0.1?
+
+89
+00:05:23,150 --> 00:05:24,330
+¿Y con gamma uno?
+
+90
+00:05:25,050 --> 00:05:26,950
+La distancia al cuadrado es nueve.
+
+91
+00:05:27,070 --> 00:05:32,340
+Con gamma 0.1: e a la menos 0.9, 0.407.
+
+92
+00:05:32,460 --> 00:05:36,900
+Con gamma uno: e a la menos nueve, 0.0001.
+
+93
+00:05:37,020 --> 00:05:40,840
+Con gamma grande, a distancia tres ya no hay ninguna similitud.
+
+94
+00:05:40,960 --> 00:05:44,682
+Para llevarte: un kernel calcula la similitud entre puntos como si
+
+95
+00:05:44,682 --> 00:05:47,670
+estuvieran en un espacio más grande, sin construirlo.
+
+96
+00:05:47,790 --> 00:05:50,940
+El radial es e a la menos gamma por la distancia al cuadrado.
+
+97
+00:05:51,060 --> 00:05:55,248
+Y gamma controla el alcance: chica, influencia lejana y fronteras
+
+98
+00:05:55,248 --> 00:05:58,920
+suaves; grande, influencia local y fronteras irregulares.
+
+99
+00:05:59,040 --> 00:06:02,950
+Siguiente parada: C y gamma juntos, con datos reales.
+
+100
+00:06:03,070 --> 00:06:06,000
+Cuándo el modelo subajusta, y cuándo sobreajusta.

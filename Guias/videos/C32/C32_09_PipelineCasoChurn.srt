@@ -1,0 +1,459 @@
+1
+00:00:00,250 --> 00:00:03,617
+Octava parada: cómo armar todo esto sin hacer trampa, y
+
+2
+00:00:03,617 --> 00:00:06,250
+el caso aplicado con la base real de churn.
+
+3
+00:00:06,370 --> 00:00:09,991
+Imagina que un profesor arma la prueba, y antes de tomarla, deja
+
+4
+00:00:09,991 --> 00:00:12,820
+que los alumnos estudien con las mismas preguntas.
+
+5
+00:00:12,940 --> 00:00:14,150
+Todos sacan siete.
+
+6
+00:00:14,270 --> 00:00:15,990
+Pero la nota ya no mide nada.
+
+7
+00:00:16,110 --> 00:00:17,800
+Eso es la fuga de datos.
+
+8
+00:00:17,920 --> 00:00:21,017
+Y la regla para evitarla es una sola: todo lo que aprende
+
+9
+00:00:21,017 --> 00:00:23,680
+de los datos se ajusta solo con el entrenamiento.
+
+10
+00:00:23,800 --> 00:00:25,670
+Veamos qué aprende cada paso.
+
+11
+00:00:25,790 --> 00:00:28,290
+El imputador aprende la mediana o la moda.
+
+12
+00:00:28,410 --> 00:00:31,320
+El StandardScaler, la media y la desviación.
+
+13
+00:00:31,440 --> 00:00:34,420
+Los codificadores, la lista de categorías.
+
+14
+00:00:34,540 --> 00:00:38,205
+El TargetEncoder aprende la tasa de fuga por categoría: mira
+
+15
+00:00:38,205 --> 00:00:41,260
+la respuesta, así que necesita validación interna.
+
+16
+00:00:41,380 --> 00:00:45,240
+PCA aprende los componentes, y va después del escalador.
+
+17
+00:00:45,360 --> 00:00:49,490
+Y t-SNE no tiene transform: se queda afuera del modelo.
+
+18
+00:00:49,610 --> 00:00:51,590
+¿Qué tan grave es saltarse la regla?
+
+19
+00:00:51,710 --> 00:00:54,930
+La profesora hizo un experimento con datos de puro ruido.
+
+20
+00:00:55,050 --> 00:00:59,100
+Cien filas, mil columnas al azar, y etiquetas también al azar.
+
+21
+00:00:59,220 --> 00:01:03,960
+No hay nada que aprender: lo honesto es acertar la mitad, cincuenta por ciento.
+
+22
+00:01:04,080 --> 00:01:07,882
+Primero, la trampa: elegir las diez «mejores» columnas
+
+23
+00:01:07,882 --> 00:01:10,910
+mirando todas las filas, y después validar.
+
+24
+00:01:11,030 --> 00:01:13,640
+La exactitud sale cero coma setenta y nueve.
+
+25
+00:01:13,760 --> 00:01:16,733
+Dentro de un Pipeline, donde la selección se rehace
+
+26
+00:01:16,733 --> 00:01:19,240
+en cada pliegue: cero coma cincuenta y uno.
+
+27
+00:01:19,360 --> 00:01:20,030
+La verdad.
+
+28
+00:01:20,150 --> 00:01:21,450
+¿Y con PCA?
+
+29
+00:01:21,570 --> 00:01:24,558
+PCA ajustado afuera da cero coma cincuenta y
+
+30
+00:01:24,558 --> 00:01:27,410
+uno, y adentro, cero coma cincuenta y dos.
+
+31
+00:01:27,530 --> 00:01:30,750
+PCA no mira la etiqueta, así que no la filtra.
+
+32
+00:01:30,870 --> 00:01:34,540
+Pero igual es un mal hábito: la prueba influyó en los componentes.
+
+33
+00:01:34,660 --> 00:01:37,110
+Así se ve el Pipeline honesto de la clase.
+
+34
+00:01:37,230 --> 00:01:40,513
+Escalador, PCA con ocho componentes, y regresión
+
+35
+00:01:40,513 --> 00:01:44,070
+logística, ajustados con fit sobre el entrenamiento.
+
+36
+00:01:44,190 --> 00:01:47,831
+Y si usas GridSearchCV o cross val score, el escalador
+
+37
+00:01:47,831 --> 00:01:50,730
+y PCA se vuelven a ajustar en cada pliegue.
+
+38
+00:01:50,850 --> 00:01:53,020
+Así eliges k sin mirar la prueba.
+
+39
+00:01:53,140 --> 00:01:54,590
+El checklist del flujo.
+
+40
+00:01:54,710 --> 00:01:56,960
+Construyo variables antes de reducir.
+
+41
+00:01:57,080 --> 00:01:58,560
+Divido antes de escalar.
+
+42
+00:01:58,680 --> 00:02:00,950
+Estandarizo antes de PCA.
+
+43
+00:02:01,070 --> 00:02:03,410
+Elijo k con criterio y con validación.
+
+44
+00:02:03,530 --> 00:02:05,190
+Interpreto con las cargas.
+
+45
+00:02:05,310 --> 00:02:07,780
+Y uso t-SNE solo para explorar.
+
+46
+00:02:07,900 --> 00:02:11,500
+Ahora el caso aplicado de las sesiones treinta y uno y treinta y dos.
+
+47
+00:02:11,620 --> 00:02:15,757
+La base real: tres mil ciento cincuenta clientes de una telco, doce
+
+48
+00:02:15,757 --> 00:02:19,030
+variables, y un quince coma siete por ciento de fuga.
+
+49
+00:02:19,150 --> 00:02:20,320
+Desafío uno.
+
+50
+00:02:20,440 --> 00:02:22,960
+Retención quiere anticipar quién cancela, y
+
+51
+00:02:22,960 --> 00:02:25,480
+tiene el historial con la fuga, cero o uno.
+
+52
+00:02:25,600 --> 00:02:29,320
+Eso es supervisado: clasificación, con y igual a fuga.
+
+53
+00:02:29,440 --> 00:02:34,140
+Marketing quiere descubrir tipos de clientes, sin etiqueta: no supervisado.
+
+54
+00:02:34,260 --> 00:02:37,946
+Una precisión que ya vimos en la clase treinta y uno: el caso dice que
+
+55
+00:02:37,946 --> 00:02:41,210
+predecir cuántos meses le quedan a un cliente sería regresión.
+
+56
+00:02:41,330 --> 00:02:44,069
+En rigor es análisis de supervivencia, porque de los
+
+57
+00:02:44,069 --> 00:02:46,440
+que aún no cancelan no sabes cuándo lo harán.
+
+58
+00:02:46,560 --> 00:02:49,710
+Desafío dos: las correlaciones de la base real.
+
+59
+00:02:49,830 --> 00:02:52,490
+Segundos y llamadas, cero coma noventa.
+
+60
+00:02:52,610 --> 00:02:56,040
+Mensajes y valor del cliente, cero coma noventa y dos.
+
+61
+00:02:56,160 --> 00:02:59,280
+Contactos y llamadas, cero coma setenta y tres.
+
+62
+00:02:59,400 --> 00:03:02,110
+Fallas y monto, cero coma cincuenta y nueve.
+
+63
+00:03:02,230 --> 00:03:05,250
+Y estado con segundos, menos cero coma treinta.
+
+64
+00:03:05,370 --> 00:03:06,500
+¿Qué problema es?
+
+65
+00:03:06,620 --> 00:03:07,840
+Multicolinealidad.
+
+66
+00:03:07,960 --> 00:03:10,200
+¿Y qué hay que hacer antes de PCA?
+
+67
+00:03:10,320 --> 00:03:15,004
+Dos pasos: estandarizar, porque segundos llega a miles; y codificar con
+
+68
+00:03:15,004 --> 00:03:19,160
+one-hot el tipo de plan y el estado, que vienen como uno y dos.
+
+69
+00:03:19,280 --> 00:03:20,480
+Desafío tres.
+
+70
+00:03:20,600 --> 00:03:23,710
+Con quince columnas, PCA en la base real.
+
+71
+00:03:23,830 --> 00:03:27,259
+PC1 explica veintiséis coma tres por ciento, y se necesitan
+
+72
+00:03:27,259 --> 00:03:30,340
+siete componentes para llegar al ochenta coma cuatro.
+
+73
+00:03:30,460 --> 00:03:35,426
+Y la logística en la prueba: con las quince variables, F1 cero coma quinientos
+
+74
+00:03:35,426 --> 00:03:39,310
+setenta y cuatro, y MCC cero coma quinientos cuarenta y seis.
+
+75
+00:03:39,430 --> 00:03:42,459
+Con siete componentes, cero coma quinientos cuarenta y
+
+76
+00:03:42,459 --> 00:03:45,040
+ocho, y cero coma quinientos treinta y cuatro.
+
+77
+00:03:45,160 --> 00:03:49,850
+Aquí sí hay señal real: el F1 es más del doble que en los datos simulados.
+
+78
+00:03:49,970 --> 00:03:54,320
+Y el recorte cuesta algo: el F1 baja cero coma cero dos seis.
+
+79
+00:03:54,440 --> 00:03:55,150
+¿Conviene?
+
+80
+00:03:55,270 --> 00:03:59,780
+Depende del negocio: un modelo más simple, contra un poco de desempeño.
+
+81
+00:03:59,900 --> 00:04:04,310
+Y la decisión se confirma con validación cruzada, no con una sola partición.
+
+82
+00:04:04,430 --> 00:04:07,400
+La pregunta tres punto dos del caso dice: «fallas y
+
+83
+00:04:07,400 --> 00:04:10,370
+reclamos apuntan en dirección casi opuesta al uso».
+
+84
+00:04:10,490 --> 00:04:14,490
+Y propone: más fallas, menos uso, fuga silenciosa.
+
+85
+00:04:14,610 --> 00:04:16,380
+Comprobémoslo con los datos.
+
+86
+00:04:16,500 --> 00:04:20,460
+En la base real, las fallas se correlacionan positivamente con el uso.
+
+87
+00:04:20,580 --> 00:04:23,270
+Con segundos, más cero coma cuarenta y nueve.
+
+88
+00:04:23,390 --> 00:04:26,180
+Con llamadas, más cero coma cincuenta y siete.
+
+89
+00:04:26,300 --> 00:04:30,640
+Con monto, más cero coma cincuenta y nueve: el propio caso lo reporta.
+
+90
+00:04:30,760 --> 00:04:34,812
+Y su correlación con PC1 es más cero coma sesenta y uno, la misma
+
+91
+00:04:34,812 --> 00:04:38,240
+dirección que segundos, con cero coma ochenta y cuatro.
+
+92
+00:04:38,360 --> 00:04:43,190
+Solo los reclamos son levemente negativos: menos cero coma doce con segundos.
+
+93
+00:04:43,310 --> 00:04:47,430
+La interpretación «más fallas, menos uso» no se sostiene.
+
+94
+00:04:47,550 --> 00:04:51,400
+La lección: una interpretación bonita se comprueba con components_
+
+95
+00:04:51,400 --> 00:04:54,550
+y con las correlaciones, antes de llevarla al negocio.
+
+96
+00:04:54,670 --> 00:04:57,518
+Y otra alerta sobre la limpieza: el código de la
+
+97
+00:04:57,518 --> 00:05:00,070
+clase solo corrige la edad y los faltantes.
+
+98
+00:05:00,190 --> 00:05:04,222
+Quedan valores imposibles: segundos hasta menos catorce mil seiscientos
+
+99
+00:05:04,222 --> 00:05:07,800
+cuarenta y cinco, y llamadas hasta menos ciento setenta y seis.
+
+100
+00:05:07,920 --> 00:05:10,250
+Hay que limpiarlos antes de PCA.
+
+101
+00:05:10,370 --> 00:05:14,563
+El error típico de esta parada: ajustar el escalador, o el
+
+102
+00:05:14,563 --> 00:05:18,250
+PCA, con todas las filas, y recién después dividir.
+
+103
+00:05:18,370 --> 00:05:19,570
+Primero se divide.
+
+104
+00:05:19,690 --> 00:05:23,940
+Después, todo se ajusta con el entrenamiento, dentro de un Pipeline.
+
+105
+00:05:24,060 --> 00:05:26,090
+Piensa un segundo: ¿fuga o no?
+
+106
+00:05:26,210 --> 00:05:30,770
+Uno: imputar la mediana de la edad con todas las filas, antes de dividir.
+
+107
+00:05:30,890 --> 00:05:34,710
+Dos: calcular SMS por antigüedad antes de dividir.
+
+108
+00:05:35,630 --> 00:05:39,470
+La primera es fuga: la mediana se aprendió mirando también la prueba.
+
+109
+00:05:39,590 --> 00:05:44,900
+La segunda no: un cociente se calcula fila por fila, y no aprende nada del conjunto.
+
+110
+00:05:45,020 --> 00:05:47,831
+Para llevarte: todo lo que aprende de los datos se
+
+111
+00:05:47,831 --> 00:05:50,530
+ajusta con entrenamiento, dentro de un Pipeline.
+
+112
+00:05:50,650 --> 00:05:54,041
+En la base real, siete componentes conservan el ochenta
+
+113
+00:05:54,041 --> 00:05:57,000
+coma cuatro por ciento, y cuestan un poco de F1.
+
+114
+00:05:57,120 --> 00:05:59,790
+Y toda interpretación se comprueba con los datos.
+
+115
+00:05:59,910 --> 00:06:02,580
+Y ahora sí: el repaso final de la clase.

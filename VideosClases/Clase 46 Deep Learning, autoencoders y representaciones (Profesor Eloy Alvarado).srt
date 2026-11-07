@@ -1,0 +1,2752 @@
+1
+00:00:00,000 --> 00:00:06,360
+Vamos a ver esta sesión, es continuar, digamos, profundizando con la sesión un poco más
+
+2
+00:00:06,360 --> 00:00:12,880
+tensa que tuvimos la semana pasada, el martes pasado. Si bien el martes pasado vimos un
+
+3
+00:00:12,880 --> 00:00:19,400
+poco la matemática y la teoría que está detrás, la idea de lo que vamos a hacer ahora
+
+4
+00:00:19,400 --> 00:00:31,520
+es ver cómo son las generalizaciones o las mejoras, comillas, variantes de ese mismo
+
+5
+00:00:31,520 --> 00:00:43,240
+proceso, ya el mismo proceso de estimar o aproximar los pesos, ya, y cómo lo podemos
+
+6
+00:00:43,240 --> 00:00:49,380
+utilizar, como cómo se va a usar. La sesión pasada fue relevante porque entendimos cómo
+
+7
+00:00:49,380 --> 00:00:54,860
+el proceso general y lo que vamos a hacer ahora es ver pequeñas variantes pero no nos vamos a
+
+8
+00:00:54,860 --> 00:01:03,620
+concentrar tanto en la matemática porque es la misma matemática y vamos a ver por qué es eso
+
+9
+00:01:03,620 --> 00:01:11,760
+que yo ya les comenté un poco cuando les hablé de lo que era deep learning, que en esencia era
+
+10
+00:01:11,760 --> 00:01:17,340
+simplemente poner más de estas capas, se guardan que nosotros tenemos la capa de entrada, teníamos
+
+11
+00:01:17,340 --> 00:01:22,180
+una primera transformación con pesos y luego hacíamos una capa de salida. Cuando agregamos
+
+12
+00:01:22,180 --> 00:01:29,660
+más de esas capas intermedia, y son muchas, con muchas neuronas artificiales, entonces hablamos
+
+13
+00:01:29,660 --> 00:01:38,820
+de deep learning. Nosotros en la sesión pasada lo que hicimos fue trabajar con una red para clasificar
+
+14
+00:01:38,820 --> 00:01:47,080
+los dígitos. Entonces la imagen entraba, la red calculaba estos pesos con estos
+
+15
+00:01:47,080 --> 00:01:53,720
+sesgo y calculaba una salida y esa salida era un número entre 0 y 10 para la clasificación
+
+16
+00:01:53,720 --> 00:01:59,320
+de la imagen particular ya entonces en ese proceso de entrenamiento
+
+17
+00:02:01,800 --> 00:02:13,360
+se corregían los pesos digamos con esta retropropagación ya ahora esa idea la vamos a seguir
+
+18
+00:02:13,360 --> 00:02:20,360
+porque es la misma idea que vamos a seguir constante, la misma idea de todo lo que vamos a ver que tenga que ver con redes.
+
+19
+00:02:20,360 --> 00:02:30,360
+Lo que nosotros queremos expandir ahora es que la red, digamos, resume una imagen.
+
+20
+00:02:30,360 --> 00:02:36,360
+En la anterior nosotros teníamos una red que quería que clasificaba imágenes.
+
+21
+00:02:36,360 --> 00:02:40,360
+Ahora quiero ver qué resume. Vamos a ver qué entiendo por resumen.
+
+22
+00:02:40,360 --> 00:02:47,720
+resumir y que luego de resumirla de algún sentido la intente recuperar.
+
+23
+00:02:47,720 --> 00:02:53,520
+Entonces vamos a seguir ese recorrido con las imágenes
+
+24
+00:02:53,520 --> 00:02:59,800
+digamos que entra, que contiene el resumen y qué va a salir.
+
+25
+00:02:59,800 --> 00:03:04,680
+Y vamos a aprender digamos todos los procedimientos que están dentro
+
+26
+00:03:04,680 --> 00:03:12,480
+este este mismo metodología entonces vimos lo que es a las redes neuronales
+
+27
+00:03:12,480 --> 00:03:20,040
+vamos a un poco un poco formalizar que es una este concepto de deep learning
+
+28
+00:03:20,040 --> 00:03:25,120
+o aprendizaje profundo entonces recuerden que nosotros teníamos una capa y esa
+
+29
+00:03:25,120 --> 00:03:31,080
+capa combinaba pesos y le sumaba un sesgo y luego es lo que nosotros
+
+30
+00:03:31,080 --> 00:03:43,040
+lo llamamos el A, aplicaba una activación ya entonces tenía una combinación, una suma de pesos
+
+31
+00:03:43,040 --> 00:03:51,320
+por las entradas, le sumaba un sesgo y esa esa cantidad iba a una función de activación que
+
+32
+00:03:51,320 --> 00:04:00,280
+podía ser distinta ya nosotros vimos la ReLU, softmax y otras ya y comentaba que habían varias más
+
+33
+00:04:00,280 --> 00:04:02,880
+la tangente hiperbólica y así sucesivamente.
+
+34
+00:04:02,880 --> 00:04:07,880
+Y que era importante ese tipo de funciones de activación
+
+35
+00:04:07,880 --> 00:04:11,280
+para los distintos objetivos que nosotros queremos obtener.
+
+36
+00:04:11,280 --> 00:04:14,280
+O que queremos realizar las distintas tareas y hacer clasificación,
+
+37
+00:04:14,280 --> 00:04:17,280
+predicción cuantitativa, etc.
+
+38
+00:04:17,280 --> 00:04:22,280
+Entonces, nosotros habíamos visto que tenía una entrada,
+
+39
+00:04:22,280 --> 00:04:26,280
+una primera capa y luego la salida.
+
+40
+00:04:26,280 --> 00:04:34,680
+Ahora, esa la salida de la capa intermedia, es decir, lo que salía, lo que sale más
+
+41
+00:04:34,680 --> 00:04:40,240
+bien de la función de activación, no tiene necesariamente que mapear su salida a un número
+
+42
+00:04:40,240 --> 00:04:49,080
+entre 0 y 10, contextualizando en la clasificación de los números, sino que puede ser la entrada
+
+43
+00:04:49,080 --> 00:05:00,280
+de otra capa. Por ejemplo, recuerden que teníamos 32 funciones de activación. Esas 32 funciones
+
+44
+00:05:00,280 --> 00:05:09,320
+de activación podrían ir en una capa que tenga otra dimensión. Por ejemplo, 16 neuronas
+
+45
+00:05:09,320 --> 00:05:15,200
+o funciones de activación. No necesariamente tiene que haber solo una capa antes de la
+
+46
+00:05:15,200 --> 00:05:21,760
+salida o entre la entrada y la salida, o sea se puede alimentar esa capa.
+
+47
+00:05:21,760 --> 00:05:26,680
+Entonces, si lo ven acá en la figura,
+
+48
+00:05:26,880 --> 00:05:35,360
+tenemos digamos los pixeles que eran la entrada de las de las imágenes, que una
+
+49
+00:05:35,360 --> 00:05:39,400
+primera transformación que era la de la primera capa y luego puedo poner una
+
+50
+00:05:39,400 --> 00:05:43,240
+segunda transformación que si se fijan tienen como insumo la salida de la
+
+51
+00:05:43,240 --> 00:05:47,500
+primera capa y luego puedo poner la salida que va a depender de alguna
+
+52
+00:05:47,500 --> 00:05:53,560
+tarea en el caso de la categorización o la clasificación de las imágenes
+
+53
+00:05:53,560 --> 00:05:56,480
+vendría siendo una clasificación.
+
+54
+00:05:56,480 --> 00:06:00,760
+Nosotros vamos a llamar aprendizaje profundo deep learning
+
+55
+00:06:00,760 --> 00:06:07,640
+al aprendizaje que utilizan redes que componen varias capas de
+
+56
+00:06:07,640 --> 00:06:11,520
+transformación es decir en este caso sigue siendo relativamente no profundo
+
+57
+00:06:11,520 --> 00:06:17,760
+porque es una capa, dos capas, pero yo puedo poner múltiples capas de...
+
+58
+00:06:17,760 --> 00:06:24,040
+antes de llegar a la salida, es decir, yo voy a definir una red profunda cuando
+
+59
+00:06:24,040 --> 00:06:30,560
+tiene muchas capas intermedias. Ahora, no hay un número en el cual después de ese
+
+60
+00:06:30,560 --> 00:06:37,080
+número de capas se vuelve profunda, pero se entiende que a mayor cantidad es más
+
+61
+00:06:37,080 --> 00:06:47,400
+profundo. Entonces, todo lo que está dentro es la complejidad en principio que va a tener la red.
+
+62
+00:06:47,400 --> 00:06:54,040
+Nosotros podemos, si se fijan cuando tengo más capas interiores, yo voy a poder tener, primero,
+
+63
+00:06:54,040 --> 00:06:58,720
+muchos parámetros, porque vimos y nosotros hicimos la cuantificación de cuántos parámetros
+
+64
+00:06:58,720 --> 00:07:05,680
+tenemos que obtener y yo cuando hago más capas voy a ir multiplicando y sumando más el número de
+
+65
+00:07:05,680 --> 00:07:12,340
+parámetros, entonces la complejidad computacional le aumenta, pero también la flexibilidad en cuanto
+
+66
+00:07:12,340 --> 00:07:22,000
+a el modelamiento, porque voy a tener distintas configuraciones, puedo tener más o menos neuronas,
+
+67
+00:07:22,000 --> 00:07:27,080
+puedo tener distintas funciones de activación en las distintas capas que en conjunto pueden
+
+68
+00:07:27,080 --> 00:07:34,960
+modelar de mejor manera la dinámica que estoy tratando de modelar o de entender con esta función
+
+69
+00:07:34,960 --> 00:07:41,680
+de reino neuronales entonces me da mucha más flexibilidad y también tengo otros problemas
+
+70
+00:07:41,680 --> 00:07:46,480
+digamos más allá del costo computacional es que puede aprender tan rápido que en esencia eso se
+
+71
+00:07:46,480 --> 00:07:53,600
+resume en esta flexibilidad se tiende se ve reflejado en que la red va a aprender de mejor
+
+72
+00:07:53,600 --> 00:08:00,600
+manera que puede pasar que la red aprenda demasiado y en realidad llega sobre ajustar los datos
+
+73
+00:08:00,600 --> 00:08:14,600
+Entonces, eso es lo que es el concepto de red neuronal, o sea, de aprendizaje profundo.
+
+74
+00:08:14,600 --> 00:08:21,280
+Es simplemente una red neuronal que tiene una profundidad mayor y la profundidad entendemos
+
+75
+00:08:21,280 --> 00:08:27,080
+como muchas capas intermedias.
+
+76
+00:08:27,080 --> 00:08:30,360
+de los conceptos que vamos a ver es
+
+77
+00:08:32,080 --> 00:08:38,080
+es lo que es un autoencoder y ahora vamos a ver, entonces dijimos
+
+78
+00:08:38,080 --> 00:08:44,520
+dijimos que una deep learning que simplemente es una red profunda, es decir
+
+79
+00:08:44,520 --> 00:08:48,680
+una red normal que tiene muchas capas intermedias, un autoencoder
+
+80
+00:08:48,680 --> 00:08:54,120
+es una red tal como una red normal, si se fijan por eso esa sesión fue
+
+81
+00:08:54,120 --> 00:08:58,360
+poquito más tensa porque vamos a hacer referencia mucho a esa sesión porque es la base de todo
+
+82
+00:08:59,240 --> 00:09:06,880
+todo el resto de metodologías son pequeñas variantes o alguna alternativa respecto de
+
+83
+00:09:06,880 --> 00:09:16,120
+esas. Entonces un autoencoder es simplemente una red entrenada, con conjunto a dos, para producir
+
+84
+00:09:16,120 --> 00:09:24,040
+una aproximación de su propia entrada ya puede ser algo algo algo
+
+85
+00:09:24,040 --> 00:09:28,240
+enredado porque si yo tengo mis imágenes lo que estoy diciendo en el
+
+86
+00:09:28,240 --> 00:09:31,320
+contexto de los números que tengo mi número mis imágenes y quiero
+
+87
+00:09:31,320 --> 00:09:35,880
+aproximar mis propias imágenes preocupé como entrar y las tengo entonces por qué
+
+88
+00:09:35,880 --> 00:09:41,320
+quisies hacer eso entonces un autoencoder es una red entrenada para
+
+89
+00:09:41,320 --> 00:09:47,680
+aproximar su propia entrada, digamos, a través de una respuesta o una representación más bien,
+
+90
+00:09:47,680 --> 00:09:52,200
+que se acuerdan que nosotros comentamos que la representación de cosas en términos numéricos
+
+91
+00:09:52,200 --> 00:09:59,240
+es bastante importante mediante una interpretación, o sea, una representación intermedia. Entonces,
+
+92
+00:09:59,240 --> 00:10:07,440
+si se fijan acá, tengo mi entrada x, tengo mi encoder, que lo voy a llamar en español mi
+
+93
+00:10:07,440 --> 00:10:13,000
+codificador, que simplemente una función con parametrizada dentro de mis datos,
+
+94
+00:10:13,000 --> 00:10:19,480
+por eso tengo un sub theta, eso me va a entregar un vector latente, así le voy a
+
+95
+00:10:19,480 --> 00:10:26,600
+llamar, un H, y después voy a tener un decodificador que me va a pasar ese
+
+96
+00:10:26,600 --> 00:10:33,080
+vector latente a una aproximación de mi entrada.
+
+97
+00:10:33,080 --> 00:10:43,360
+entonces tengo mis datos, los codifico y luego los reconstruyo, porque si se fijan
+
+98
+00:10:43,360 --> 00:10:52,440
+acá, si lo vemos en términos funcionales, si tengo esta función f y g es la inversa de f
+
+99
+00:10:52,440 --> 00:11:01,040
+entonces podría tener que esta aproximación va a ser exacta, cierto? si multiplico los números por
+
+100
+00:11:01,040 --> 00:11:05,560
+dos y después lo divido por dos entonces puede llegar al mismo número que tenía inicialmente
+
+101
+00:11:05,560 --> 00:11:10,680
+sí pero acá no estamos ocupando el mismo modelo porque es una aproximación no tiene una aproximación
+
+102
+00:11:10,680 --> 00:11:20,120
+exacta ya entonces la primera la primera función que es el encoder o codificador recibe x y calcula
+
+103
+00:11:20,120 --> 00:11:30,000
+h con este f ese h es lo que nosotros llamamos el vector latente latente simplemente no no si
+
+104
+00:11:30,000 --> 00:11:34,680
+alguien tiene otros conceptos dentro de esta ischia que también pasa con
+
+105
+00:11:34,680 --> 00:11:37,760
+latente aquí simplemente hacemos referencia latente porque está interno
+
+106
+00:11:37,760 --> 00:11:43,240
+digamos está interno en el sentido dentro de las capas intermedias ya y la
+
+107
+00:11:43,240 --> 00:11:50,280
+calcula el mismo modelo ya y el decoder lo que hace es pasar ese
+
+108
+00:11:50,280 --> 00:11:58,320
+ese latente digamos es el vector latente a una aproximación de mi entrada
+
+109
+00:11:58,320 --> 00:12:03,440
+nada me asegura que estas cosas sean exactamente iguales esperamos que sea una aproximación
+
+110
+00:12:04,720 --> 00:12:08,160
+lo suficientemente bueno y vamos a ver para qué queremos usarlo ya
+
+111
+00:12:09,920 --> 00:12:16,280
+porque porque quisiese aproximar mi propia entrada ya haciendo que yo ya tengo mi clasificación por
+
+112
+00:12:16,280 --> 00:12:25,120
+ejemplo uno podría pensar en no tengo las imágenes no están del todo clasificadas
+
+113
+00:12:25,120 --> 00:12:32,800
+Entonces pudiese tratar de aproximar mi entrada para poder clasificarlo de manera no supervisada.
+
+114
+00:12:32,800 --> 00:12:42,960
+Pues se puede buscar, por ejemplo, cómo se vería el número 3 promedio que está en el conjunto de datos.
+
+115
+00:12:42,960 --> 00:12:47,360
+Entonces, tenemos varias aplicaciones que les vamos a ir mencionando.
+
+116
+00:12:47,360 --> 00:12:50,600
+entonces
+
+117
+00:12:50,600 --> 00:12:56,120
+veámosla acá, entonces imaginemos que Claudia, que pique le levantas la mano
+
+118
+00:12:56,120 --> 00:13:03,800
+buenas tardes profesor, podría explicar de nuevo lo que es o que trata el encode
+
+119
+00:13:03,800 --> 00:13:10,040
+no me quedo muy guay, ahora lo vamos a ver, tú tienes una entrada
+
+120
+00:13:10,040 --> 00:13:14,760
+cierto en una red, tienes una entrada, haces funciones y tiene una salida
+
+121
+00:13:14,760 --> 00:13:19,440
+por ejemplo en el objetivo que hicimos el martes pasado teníamos nuestros
+
+122
+00:13:19,440 --> 00:13:27,920
+números y nuestro objetivo era clasificar esos números en etiquetas entre 0 y 10
+
+123
+00:13:30,400 --> 00:13:34,920
+eso es lo que hicimos el martes pasado con una red neuronal
+
+124
+00:13:35,880 --> 00:13:44,160
+lo que hace en autoencoder es que la salida de esa red sea una aproximación de la entrada eso es todo
+
+125
+00:13:44,760 --> 00:13:56,680
+Entonces, por ejemplo, meto una imagen número 3 y quiero que la salida sea una reconstrucción de S3, una aproximación sin ser exactamente el número.
+
+126
+00:13:56,680 --> 00:14:01,800
+Pero piensen que estas imágenes podrían ser vectores también.
+
+127
+00:14:01,800 --> 00:14:10,520
+Ahora a ver, vamos a ver cómo especificar en esta slide para qué nos puede servir esa metodología y esta reconstrucción.
+
+128
+00:14:10,520 --> 00:14:22,360
+Entonces imaginemos que tenemos archivos escaneados y queremos encontrar formas parecidas sin
+
+129
+00:14:22,360 --> 00:14:26,860
+revisar cada imagen a mano porque recuerden que nosotros porque las imágenes que teníamos
+
+130
+00:14:26,860 --> 00:14:34,880
+de los números estaban etiquetadas, alguien vio y le clasificó como un 3 cada imagen
+
+131
+00:14:34,880 --> 00:14:39,880
+por separado. Entonces, si fijan acá,
+
+132
+00:14:40,920 --> 00:14:46,320
+tenemos un banco de imágenes y entra
+
+133
+00:14:46,760 --> 00:14:55,120
+en una imagen de consulta. Entonces, yo tengo este 3
+
+134
+00:14:55,120 --> 00:15:01,920
+y yo no quiero, digamos, revisarlo automáticamente, por eso estoy haciendo
+
+135
+00:15:01,920 --> 00:15:08,880
+un autoencoder ya y lo que hace el autoencoder si se fijan en una red de una herramienta lo que va a
+
+136
+00:15:08,880 --> 00:15:19,520
+obtener es su resumen el resumen de todo acá y lo compara con los resúmenes del archivo si entonces
+
+137
+00:15:19,520 --> 00:15:28,760
+por ejemplo tengo este número 3 de imagen el autoencoder lo resume y yo puedo comparar ese
+
+138
+00:15:28,760 --> 00:15:35,960
+resumen con otros imágenes del archivo y bajo cierta similitud yo lo puedo
+
+139
+00:15:35,960 --> 00:15:41,960
+autoclasificar y si fijan eso me permite que no hay una persona clasificando
+
+140
+00:15:41,960 --> 00:15:44,640
+exactamente
+
+141
+00:15:45,080 --> 00:15:49,400
+cada uno de los números entonces yo le puedo dar referencias y les puedo decir
+
+142
+00:15:49,400 --> 00:15:56,600
+un 3 debiese verse así y le da imágenes de un 3 entonces el auto encoder resume
+
+143
+00:15:56,600 --> 00:16:05,080
+y ocupa como referencia ese 3, que yo lo escribí y se lo di. Entonces, automáticamente va a clasificar
+
+144
+00:16:05,080 --> 00:16:11,300
+y voy a evitar este etiquetado que tendría que hacerlo manual en la metodología anterior que
+
+145
+00:16:11,300 --> 00:16:18,960
+vimos. Entonces, se fijan acá, en la derecha de este número propuesto, o sea, de esta consulta
+
+146
+00:16:18,960 --> 00:16:25,080
+tener un vecino propuesto ya que en esencia es una cercanía por términos
+
+147
+00:16:25,080 --> 00:16:32,920
+por un otro imagen que se parece ya la idea es en este contexto
+
+148
+00:16:32,920 --> 00:16:38,280
+que sería la utilidad sería ordenar los posibles candidatos
+
+149
+00:16:38,280 --> 00:16:41,880
+para una distinta búsqueda decir
+
+150
+00:16:41,880 --> 00:16:49,980
+yo quiero imágenes que son parecidas a esta, lo resumo, lo comparo y luego busco imágenes
+
+151
+00:16:49,980 --> 00:16:54,860
+parecidas a esta, que de hecho si lo fijan eso lo que uno hace cuando busca imagen en
+
+152
+00:16:54,860 --> 00:17:03,780
+principio o busquea digamos por texto, de escrito digamos, también se puede matematizar
+
+153
+00:17:03,780 --> 00:17:11,820
+bajo cierta representación. Entonces un autoencoder me permite hacer ese match,
+
+154
+00:17:11,820 --> 00:17:19,020
+Si se fijan acá, en esta segunda, tercera y cuarta columna que es el segundo panel
+
+155
+00:17:19,020 --> 00:17:28,280
+es otro problema, digamos, tengo una medición y una imagen que llega con un ruido, si se
+
+156
+00:17:28,280 --> 00:17:34,120
+fijan este 3 que está a la izquierda es como un 3 bastante nítido, entonces yo puedo resumirlo
+
+157
+00:17:34,120 --> 00:17:44,440
+fácilmente no obstante el 3 que está al el tercero es con algo de ruido
+
+158
+00:17:44,440 --> 00:17:48,720
+hay una hay una pregunta que deje de hacer ese profesor vez de tener que leer la
+
+159
+00:17:48,720 --> 00:17:54,020
+imagen del 3 o un número tenga que leer un texto u otra figura dentro del
+
+160
+00:17:54,020 --> 00:18:00,320
+imagen el entrenamiento sería similar y que tenga que leer un texto u otra figura
+
+161
+00:18:00,320 --> 00:18:04,920
+dentro de la imagen sin ver de tener que no entiendo bien la planta sin ver de
+
+162
+00:18:04,920 --> 00:18:11,320
+tener que leer la imagen del 3 o un número tenga que leer un texto u otra
+
+163
+00:18:11,320 --> 00:18:20,160
+figura dentro de la imagen no lo entiendo del todo lo que te refiero o sea se
+
+164
+00:18:20,160 --> 00:18:25,880
+entiende que si por ejemplo yo quiero tener como insumo algo que está dentro
+
+165
+00:18:25,880 --> 00:18:36,320
+de otro yo lo puedo pretratar ya por ejemplo si quiero el primer párrafo de una carta voy a
+
+166
+00:18:36,320 --> 00:18:42,440
+querer que el input sea sólo la primera el primer párrafo no la carta entera si
+
+167
+00:18:46,520 --> 00:18:50,560
+o sea en ese sentido piensa que todas estas cosas son números no solamente tiene que ser
+
+168
+00:18:50,560 --> 00:18:55,560
+imágenes ya ahora que no sé si entiendo bien tu pregunta la verdad
+
+169
+00:18:55,560 --> 00:19:00,400
+la podría contar como otra manera y te la podría responder con más con más
+
+170
+00:19:00,400 --> 00:19:06,920
+calma ya pero sigamos en el segundo panel si se fijan llega a ese 3 pero
+
+171
+00:19:06,920 --> 00:19:11,440
+llega con un ruido digamos es un podemos verlo como humano digamos podemos
+
+172
+00:19:11,440 --> 00:19:18,800
+entender se refiere un 3 y es un 3 escrito pero pero hay digamos cierto
+
+173
+00:19:18,800 --> 00:19:23,800
+cierto ruido en los bordes que para una máquina o una red neuronal podrían
+
+174
+00:19:23,800 --> 00:19:28,760
+confundirlo y bajar el nivel de predicción o de clasificación que
+
+175
+00:19:28,760 --> 00:19:33,640
+nosotros tenemos. Entonces tenemos esta imagen con ruido
+
+176
+00:19:34,640 --> 00:19:40,880
+porque de cierta manera vamos a decir que está alterada en algún sentido
+
+177
+00:19:40,880 --> 00:19:48,040
+y yo quiero un objetivo limpio. Entonces yo puedo tener
+
+178
+00:19:48,040 --> 00:19:56,660
+en este resumen una noción de reducir ese ruido que no corresponde al resumen
+
+179
+00:19:56,660 --> 00:20:02,900
+claro de la imagen. Entonces para aprender eso digamos tenemos que aprender esa
+
+180
+00:20:02,900 --> 00:20:10,020
+tarea de reducir el ruido vamos a tener que entrenar con el autoencoder con
+
+181
+00:20:10,020 --> 00:20:16,020
+pares entre entrada la real y la alterada para
+
+182
+00:20:16,020 --> 00:20:24,260
+para simular, digamos, estos ruidos que tenemos. Por ejemplo, tendría que tener
+
+183
+00:20:24,260 --> 00:20:28,900
+para entrenar este autoencoder el objetivo limpio y el objetivo con ruido.
+
+184
+00:20:28,900 --> 00:20:34,140
+Entonces, el autoencoder, que nuevamente es una red simplemente, puede aprender
+
+185
+00:20:34,140 --> 00:20:40,860
+cómo sacar ese ruido. Si se fijan, para aprender a sacar el ruido tengo que
+
+186
+00:20:40,860 --> 00:20:48,460
+pasarle imágenes que estén con ruidos y que estén con ruido y además su versión limpia.
+
+187
+00:20:48,460 --> 00:20:55,580
+Entonces, ¿qué se hace ahí? Se hacen imágenes limpias y se le agrega un ruido plausible y luego
+
+188
+00:20:55,580 --> 00:21:02,780
+se entrenan con esa imagen. En el tercer panel, si se fijan, tenemos otro tipo de problema donde
+
+189
+00:21:02,780 --> 00:21:10,900
+encoder podría ser útil. Entonces pensemos en tipos de fotografías, fotografías de algún
+
+190
+00:21:10,900 --> 00:21:20,900
+producto o algo de ese estilo. Podemos aprender a reconstruir imágenes, digamos que representan
+
+191
+00:21:20,900 --> 00:21:31,460
+el funcionamiento habitual. Entonces y ante una nueva imagen vamos a observar dónde se concentra
+
+192
+00:21:31,460 --> 00:21:38,380
+el error ya por ejemplo si yo tengo los distintos tipos de tres y si lo ven acá cuando uno se
+
+193
+00:21:38,380 --> 00:21:47,620
+equivoca en el 3 uno puede clasificarlo más el error usualmente está cuando hago pasado la primera
+
+194
+00:21:47,620 --> 00:21:53,620
+vueltita hago la primera vueltita y ahí tengo un error y si fijan eso hace referencia al error en
+
+195
+00:21:53,620 --> 00:22:03,460
+en el cual yo o los sectores de errores en los cuales la clasificación tiende a ser
+
+196
+00:22:03,460 --> 00:22:10,740
+o tiende a suceder. Entonces si en ese sector que yo lo puedo optimar, digamos con esto
+
+197
+00:22:10,740 --> 00:22:18,380
+de un autoencoder, si en ese sector es grande, o hay un error grande en esa sección, podemos
+
+198
+00:22:18,380 --> 00:22:25,540
+digamos priorizar una revisión manual ya porque ese defecto podría causar
+
+199
+00:22:25,540 --> 00:22:29,940
+otras cosas sobre todo en otros contextos que no necesariamente en
+
+200
+00:22:29,940 --> 00:22:32,940
+términos de imágenes porque aquí lo estamos particularizando en
+
+201
+00:22:32,940 --> 00:22:40,060
+fotografía pero la idea es la misma es tengo una entrada y quiero reconstruir en
+
+202
+00:22:40,060 --> 00:22:47,060
+términos de resumen ya la misma entrada entonces
+
+203
+00:22:47,060 --> 00:22:52,100
+eso es lo que nosotros vamos a tener un auto encoder pero nuevamente está dentro del mismo contexto
+
+204
+00:22:52,100 --> 00:22:58,060
+que es una red neuronal, solo que nuestra tarea final y nuestra capa de salida va a ser
+
+205
+00:23:00,740 --> 00:23:08,860
+la misma entrada si entonces tenemos los contextos en los cuales podemos ocupar el autocoder pero
+
+206
+00:23:08,860 --> 00:23:15,180
+logísticos y donde siguen siendo los mismos aprender a reconstruir lo que tenemos como entrada
+
+207
+00:23:17,060 --> 00:23:22,060
+Entonces, ¿qué tendemos por reconstruir?
+
+208
+00:23:22,060 --> 00:23:28,180
+Porque también hay otro concepto, tenemos algo de entrada, tengo una red, tal como lo
+
+209
+00:23:28,180 --> 00:23:34,820
+vimos acá, tengo una entrada, una codificación, algo latente, lo decodifico y luego una aproximación
+
+210
+00:23:34,820 --> 00:23:35,820
+de la entrada.
+
+211
+00:23:35,820 --> 00:23:40,700
+Entonces, esto en esencia yo podría decir una reconstrucción, estoy tratando de reconstruir
+
+212
+00:23:40,700 --> 00:23:41,700
+esto.
+
+213
+00:23:41,700 --> 00:23:46,700
+imaginemos que tengo nuevamente este número 3.
+
+214
+00:23:46,700 --> 00:23:52,260
+Entonces, en el mismo contexto de las imágenes que hemos visto antes, que son
+
+215
+00:23:52,260 --> 00:23:58,020
+los números 8x8, ¿cierto? 8 píxeles para la izquierda, o sea, 8
+
+216
+00:23:58,020 --> 00:24:02,900
+píxeles para la derecha, 8 píxeles para abajo, 64 píxeles en total,
+
+217
+00:24:02,900 --> 00:24:07,460
+con las intensidades que nosotros vimos que llegan entre 0 y 16, 0 siendo el 0,
+
+218
+00:24:07,460 --> 00:24:12,980
+16 siendo el negro más oscuro y pasado digamos normalizado dividido 16 para que
+
+219
+00:24:12,980 --> 00:24:17,620
+pasen un número entre 0 y 1. Entonces
+
+220
+00:24:18,220 --> 00:24:23,780
+aquí nosotros dibujamos el 0 como blanco cierto y el 1 como negro por la
+
+221
+00:24:23,780 --> 00:24:29,580
+intensidad cuando están estandarizados y los valores intermedios van a ser
+
+222
+00:24:29,580 --> 00:24:35,620
+algún tipo de grid ya sea más tirado al blanco más tirado al negro
+
+223
+00:24:35,620 --> 00:24:41,020
+Entonces, la forma de simplemente el dígito va a ser una combinación de esa
+
+224
+00:24:41,020 --> 00:24:46,780
+intensidad, porque en esencia estamos representando en términos vectoriales
+
+225
+00:24:46,780 --> 00:24:52,640
+esa imagen. Eso es lo que estamos haciendo y es lo que pasa en nuestra
+
+226
+00:24:52,640 --> 00:25:00,020
+entrada de la red general. Entonces, ¿qué significa reconstruir?
+
+227
+00:25:00,020 --> 00:25:08,260
+significa en este contexto digo significa calcular otra estimación para cada una de
+
+228
+00:25:08,260 --> 00:25:15,860
+esas 60 para cada uno esos 64 píxeles sí porque tengo 64
+
+229
+00:25:17,180 --> 00:25:22,940
+64 píxeles ya con las distintas intensidades por ejemplo acá el xj que
+
+230
+00:25:22,940 --> 00:25:29,220
+está cuadrícula en particular es una es un valor y la reconstrucción es una
+
+231
+00:25:29,220 --> 00:25:34,620
+aproximación de esto si se fijan en este caso es 0.4
+
+232
+00:25:34,620 --> 00:25:42,580
+y simplemente estimar nuevamente ya ahora
+
+233
+00:25:42,580 --> 00:25:47,140
+e lo queremos hacer para todos los números en todo caso en este caso para
+
+234
+00:25:47,140 --> 00:25:52,500
+los 64 y se fijan si yo a la derecha nuevamente
+
+235
+00:25:52,500 --> 00:25:58,920
+e dibujo ese nuevo 3 y trato de que se parezca y nunca va a ser la misma
+
+236
+00:25:58,920 --> 00:26:06,080
+intensidades, la intensidad promedio podría tener incluso ruido
+
+237
+00:26:12,480 --> 00:26:17,000
+voy a terminar una pequeña sección y respondo tu pregunta a Gonzalo
+
+238
+00:26:17,000 --> 00:26:19,800
+ya entonces
+
+239
+00:26:21,520 --> 00:26:26,880
+tengo la imagen sabemos cuál es su número termina su de intensidad y yo
+
+240
+00:26:26,880 --> 00:26:32,280
+estoy tratando de buscar otra estimación. Entonces la derecha que tenemos acá, esta imagen,
+
+241
+00:26:32,280 --> 00:26:36,520
+vamos a tratar de volver a calcularse un número tratando de que se parezca
+
+242
+00:26:38,640 --> 00:26:44,760
+en la misma cuadrícula. Porque no es que estoy trabajando en 8x8, bajo el mismo contexto,
+
+243
+00:26:44,760 --> 00:26:49,960
+lo que sale es la misma entrada, solo que es aproximado de manera distinta. La salida que
+
+244
+00:26:49,960 --> 00:26:55,320
+va a tener acá sigue siendo del mismo tamaño y tenemos el mismo significado, es decir,
+
+245
+00:26:55,320 --> 00:27:02,800
+cada número que está en cada uno de esos pixeles sigue siendo un número digamos entre
+
+246
+00:27:04,800 --> 00:27:11,280
+o esperamos que sea un número y además cada uno de los pixeles es una intensidad ya entonces
+
+247
+00:27:13,920 --> 00:27:18,680
+sigamos ese ese número ese cuadradito digamos en arrancos ya tengo la fila
+
+248
+00:27:18,680 --> 00:27:34,260
+3 4 y esa intensidad es 0.8125 mismas posiciones ya aquí misma fila misma columna pero
+
+249
+00:27:35,900 --> 00:27:43,380
+lo estoy aproximando con este auto coder de manera distinta entonces el auto coder tiene que mantener
+
+250
+00:27:43,380 --> 00:27:49,940
+una misma forma y tiene que ser reconocible si se fijan esto es
+
+251
+00:27:51,460 --> 00:27:59,260
+el sigue siendo un tres pero no tiene la misma intensidad ya aquí aquí en un negro muy
+
+252
+00:27:59,260 --> 00:28:01,300
+oscuro y aquí un gris bastante más tenue
+
+253
+00:28:03,300 --> 00:28:08,700
+eso es lo que nosotros preferimos con reconstruir en particular reconstruir una imagen pero sabemos
+
+254
+00:28:08,700 --> 00:28:14,580
+que una imagen es un vector, ya, y un número de un vector es, o sea, una
+
+255
+00:28:14,580 --> 00:28:18,500
+dimensión de un vector es un número. Entonces, este mismo concepto
+
+256
+00:28:18,500 --> 00:28:23,740
+también se aplica para predicciones, digamos, para acciones numéricas, porque eso es, en
+
+257
+00:28:23,740 --> 00:28:31,300
+principio, lo que estamos haciendo cuando vemos autoencoder para imágenes.
+
+258
+00:28:31,300 --> 00:28:37,380
+Entonces, en la anterior, si se fijaban, no eran exactamente las mismas
+
+259
+00:28:37,380 --> 00:28:42,140
+intensidades y aún así podríamos
+
+260
+00:28:42,140 --> 00:28:49,300
+la idea de que tenemos las capas intermedias de resumir lo que efectivamente me hace reconocer
+
+261
+00:28:49,300 --> 00:28:52,260
+que es el número en ese contexto.
+
+262
+00:28:56,260 --> 00:29:06,060
+Entonces, veamos acá la diferencia entre lo que es clasificar y reconstruir en el objetivo que
+
+263
+00:29:06,060 --> 00:29:12,100
+teníamos en la sesión pasada nosotros teníamos las imágenes y queríamos
+
+264
+00:29:12,100 --> 00:29:17,620
+clasificar o poner una etiqueta a cada una de las imágenes es decir que tenemos
+
+265
+00:29:17,620 --> 00:29:21,600
+unas imágenes con el etiquetado de referencia que lo ocupamos en el
+
+266
+00:29:21,600 --> 00:29:27,280
+conjunto de entrenamiento queremos que esa red aprenda a pasar a mapear una
+
+267
+00:29:27,280 --> 00:29:32,380
+imagen a algún número en tercero y 10
+
+268
+00:29:32,380 --> 00:29:38,780
+y ese era nuestro objetivo y es por definición una tarea de clasificación
+
+269
+00:29:38,780 --> 00:29:42,700
+la pregunta era entonces, ¿cuál es la diferencia de reconstruir? porque igual
+
+270
+00:29:42,700 --> 00:29:49,260
+estoy clasificándolo de alguna manera al reconstruirlo en alguno de los
+
+271
+00:29:49,260 --> 00:29:54,980
+tres números, o sea de uno de los diez números, entonces además en ambos casos cuando
+
+272
+00:29:54,980 --> 00:29:59,500
+intento reconstruir intento clasificar la entrada es la misma, es decir, entra la
+
+273
+00:29:59,500 --> 00:30:05,860
+misma imagen, que en este caso sería el número 3.
+
+274
+00:30:05,860 --> 00:30:12,940
+Ahora, si se pica en la K, yo tengo la imagen de entrada y yo,
+
+275
+00:30:12,940 --> 00:30:17,620
+por el proceso de metodología en términos de la red neural,
+
+276
+00:30:17,620 --> 00:30:23,740
+yo voy a definir probabilidades para cada uno de los dígitos.
+
+277
+00:30:23,740 --> 00:30:27,660
+Y voy a escoger quién tiene necesariamente una,
+
+278
+00:30:27,660 --> 00:30:29,540
+No necesariamente la probabilidad mayor,
+
+279
+00:30:29,540 --> 00:30:30,800
+pero sí la menor pérdida.
+
+280
+00:30:30,800 --> 00:30:37,900
+Pero en general están, digamos, relacionadas.
+
+281
+00:30:37,900 --> 00:30:41,140
+Ahora, tenemos las clases.
+
+282
+00:30:41,140 --> 00:30:45,500
+Por odia de razones, esa imagen va a tener una probabilidad
+
+283
+00:30:45,500 --> 00:30:52,700
+muy, muy alta de que sea clasificado como un 3, ¿ya?
+
+284
+00:30:52,700 --> 00:30:56,180
+Y, por consecuencia, está clasificada como un 3.
+
+285
+00:30:56,180 --> 00:31:00,980
+Entonces, en la imagen de la derecha, si se fijan,
+
+286
+00:31:00,980 --> 00:31:05,180
+vendría siendo la salida de esa reconstrucción de S3,
+
+287
+00:31:05,180 --> 00:31:08,300
+porque fue clasificado como 3 también.
+
+288
+00:31:08,300 --> 00:31:10,940
+Tengo 64 intensidades en esa salida,
+
+289
+00:31:10,940 --> 00:31:15,900
+porque son los 64 pixeles, que las va a producir como salida
+
+290
+00:31:15,900 --> 00:31:16,820
+el autocoder.
+
+291
+00:31:16,820 --> 00:31:20,120
+Es decir, si se fijan, para una misma entrada,
+
+292
+00:31:20,120 --> 00:31:24,660
+esta es la salida de una red con tarea de clasificación y esta
+
+293
+00:31:24,660 --> 00:31:32,760
+una salida de una red que tiene el objetivo de reconstruir que es el autónomía entonces
+
+294
+00:31:32,760 --> 00:31:40,920
+son objetivos distintos por debajo por dentro las capas intermedias también tengo las mismas
+
+295
+00:31:40,920 --> 00:31:47,000
+las mismas ideas se fijan cuando nosotros vimos acá uno puede hacer un paralelismo con esto es
+
+296
+00:31:47,000 --> 00:31:53,720
+decir entra la entra la imagen y aplica una función y esta función podría ser en principio
+
+297
+00:31:53,720 --> 00:32:01,720
+el producto suma, más un sesgo, que utilizábamos cuando hacíamos una red neuronal.
+
+298
+00:32:01,720 --> 00:32:05,720
+Entonces podría ocupar lo mismo, lo que es distinto a este decodificador.
+
+299
+00:32:05,720 --> 00:32:08,720
+Que también podría uno decir que bueno, es otra capa, digamos.
+
+300
+00:32:08,720 --> 00:32:15,720
+Porque al final todos son redes neuronales, solo que con distintos, digamos, sabores distintos, digamos.
+
+301
+00:32:15,720 --> 00:32:22,720
+Pero siguen por debajo siendo la misma metodología de buscar esta relación no lineales, pero con funciones distintas.
+
+302
+00:32:22,720 --> 00:32:27,360
+recuerden que lo que estamos haciendo acá es cambiar el espacio en el
+
+303
+00:32:27,360 --> 00:32:32,280
+cual me muevo tal que yo pueda hacer o pueda ser operatoria que los espacios
+
+304
+00:32:32,280 --> 00:32:37,940
+normales por ejemplo de la entrada no puedan ser realizados ya sobre todo en
+
+305
+00:32:37,940 --> 00:32:43,900
+clasificación te acuerdan ese ejemplo de que si si lo tengo en el dominio en el
+
+306
+00:32:43,900 --> 00:32:47,640
+espacio normal no puedo separarlos correctamente pero si los transformo si
+
+307
+00:32:47,640 --> 00:32:50,520
+los puedo separar ese mismo concepto se aplica a un
+
+308
+00:32:50,520 --> 00:32:57,160
+un fin de otras de otras de otros objetivos entonces la gran gran diferencia
+
+309
+00:32:57,160 --> 00:33:00,640
+entre la red normal normal que lo utilizamos para clasificar y para
+
+310
+00:33:00,640 --> 00:33:06,840
+reconstruir es el tipo de salida es el tipo de salida porque uno intenta
+
+311
+00:33:06,840 --> 00:33:10,800
+reconstruir en las mismas dimensiones lo que de lo que era la entrada y la y
+
+312
+00:33:10,800 --> 00:33:18,440
+usualmente la clasificación son un número bastante menor el de salida
+
+313
+00:33:18,440 --> 00:33:27,440
+en el caso 0, si se fijan acá, esto tiene una entrada de dimensión 64 y me la lleva a algo que tiene una dimensión 10
+
+314
+00:33:27,440 --> 00:33:34,440
+y este, en el caso de la reconstrucción, tiene una entrada de 64 y una salida de la misma dimensión
+
+315
+00:33:34,440 --> 00:33:43,440
+Entonces, mantengo esas dimensiones en términos de entrada y salida
+
+316
+00:33:43,440 --> 00:33:57,440
+Entonces, tengo el proceso general, ya, sigamos esta entrada, sigamos el plugo.
+
+317
+00:33:57,440 --> 00:34:03,440
+Tengo la entrada, que es nuestro caso, de la imagen, y voy a tener un modelo, un modelo que va a ser
+
+318
+00:34:03,440 --> 00:34:08,440
+y voy a ver que es el caso de la salida de la entrada
+
+319
+00:34:08,440 --> 00:34:11,440
+y por eso tengo una salida aproximada
+
+320
+00:34:11,440 --> 00:34:15,440
+y
+
+321
+00:34:15,440 --> 00:34:19,440
+y
+
+322
+00:34:19,440 --> 00:34:22,440
+y
+
+323
+00:34:22,440 --> 00:34:25,440
+y
+
+324
+00:34:25,440 --> 00:34:28,440
+y
+
+325
+00:34:28,440 --> 00:34:31,440
+y
+
+326
+00:34:31,440 --> 00:34:39,100
+y una vez que tengo esa salida aproximada yo la voy a querer comparar
+
+327
+00:34:39,100 --> 00:34:44,940
+pixel a pixel que en esencia es ver los valores cada uno de los valores que
+
+328
+00:34:44,940 --> 00:34:52,340
+están en la imagen que son 64 los voy a querer comparar con el valor real si se
+
+329
+00:34:52,340 --> 00:34:58,740
+fijan aquí lo aproximé y lo quiero comparar con la entrada para cuantificar
+
+330
+00:34:58,740 --> 00:35:06,840
+qué tan parecidos son en algún sentido ya y voy a llegar a una métrica de un error de reconstrucción
+
+331
+00:35:06,840 --> 00:35:14,240
+ya yo podría tener una reconstrucción perfecta y en esencia x y x estimado sería en los mismos
+
+332
+00:35:14,240 --> 00:35:18,640
+valores y porque son pues se lo tendría errores entonces tengo una reconstrucción perfecta
+
+333
+00:35:20,520 --> 00:35:26,640
+entonces eso vendría siendo en el flujo de la entrada para la derecha si
+
+334
+00:35:26,640 --> 00:35:36,080
+entra la imagen, se aprenden los parámetros, se ajustan los pesos, los sesgos y produce una aproximación
+
+335
+00:35:36,080 --> 00:35:42,960
+una salida calculada, una salida que está aproximada, que tiene coherencia con el primero.
+
+336
+00:35:42,960 --> 00:35:53,520
+Ahora si vemos la línea abajo, que es para la misma imagen, yo voy a ocupar este x, que es,
+
+337
+00:35:53,520 --> 00:36:00,160
+pensemos en el número 3, la imagen del número 3, como referencia para evaluar la salida,
+
+338
+00:36:00,160 --> 00:36:07,600
+sí, entonces, voy a ocupar como referencia para la salida aproximada, sí, entonces,
+
+339
+00:36:07,600 --> 00:36:12,680
+si se fijan acá, siempre voy a ocupar una aproximación con una etiqueta,
+
+340
+00:36:12,680 --> 00:36:19,320
+antes cuando hacíamos, por ejemplo, utilizábamos reenormar en el caso o los modelos normales de
+
+341
+00:36:19,320 --> 00:36:28,520
+de regresión, ya para predicción o modelamiento cuantitativo, nosotros teníamos el valor predicho
+
+342
+00:36:28,520 --> 00:36:32,840
+y lo que efectivamente fue observado, entonces podíamos saltar una noción de distancia y ver
+
+343
+00:36:32,840 --> 00:36:39,120
+cuánto nos equivocamos y en este sentido podemos hacer lo mismo. Tengo, si se fijan, el modelo
+
+344
+00:36:39,120 --> 00:36:44,520
+intenta aproximarse a la realidad de los modelos cuantitativos, entonces tengo lo que yo predigo
+
+345
+00:36:44,520 --> 00:36:48,600
+y lo que efectivamente vi y por consecuencia he tratado de aproximar eso y aquí estoy haciendo
+
+346
+00:36:48,600 --> 00:36:53,400
+lo mismo trato de aproximarlo y quiero cuantificar cuánto me equivoqué por
+
+347
+00:36:53,400 --> 00:36:59,480
+consecuencia utilizo lo que se pasó que es la referencia y es que a su vez es la
+
+348
+00:36:59,480 --> 00:37:01,880
+entrada
+
+349
+00:37:02,520 --> 00:37:10,920
+como insumo para calcular algún tipo de métrica y a mí le llamaré ahora por
+
+350
+00:37:10,920 --> 00:37:14,880
+ahora el error de reconstrucción y ahora tenemos varias opciones
+
+351
+00:37:14,880 --> 00:37:23,680
+fíjense en todo esto, esta imagen no tiene por qué saber que es un 3,
+
+352
+00:37:23,680 --> 00:37:29,520
+porque a ellos podría pasar esto vectorizado y a priori no sabrían, si lo ven simplemente un
+
+353
+00:37:29,520 --> 00:37:37,880
+vector con 64 dimensiones, no van a darse cuenta el tiro si es que qué número representa. Pero
+
+354
+00:37:37,880 --> 00:37:46,120
+para la red neuronal que nosotros teníamos con el objetivo de clasificarnos, nos necesitábamos
+
+355
+00:37:46,120 --> 00:37:54,440
+como una dimensión más, necesitábamos los 64 valores de los pixeles y la clasificación de esa
+
+356
+00:37:54,440 --> 00:38:08,560
+imagen. En este flujo no necesito saber cuál es la etiqueta que está asociada a
+
+357
+00:38:09,680 --> 00:38:14,360
+ese número. Entonces, si se fijan, yo puedo entrenar esta red con
+
+358
+00:38:14,360 --> 00:38:17,520
+autoencoders en muchos
+
+359
+00:38:17,520 --> 00:38:26,200
+en muchas imágenes y por consecuencia van a aprender a resumir imágenes que son parecidas,
+
+360
+00:38:26,200 --> 00:38:30,880
+porque van a tener similares errores de reconstrucción.
+
+361
+00:38:30,880 --> 00:38:43,080
+Entonces, me vuelvo al objetivo de buscar cosas que sean similares y tratar de ver una noción de similitud entre sí.
+
+362
+00:38:43,080 --> 00:38:47,080
+ya ahora
+
+363
+00:38:49,280 --> 00:38:55,080
+sigamos veamos ahora que es
+
+364
+00:38:55,640 --> 00:39:01,160
+que es digamos un el encoder ya se fija la cara
+
+365
+00:39:01,160 --> 00:39:05,400
+es parte del primer etapado la primera de la información que nosotros hacemos
+
+366
+00:39:05,400 --> 00:39:09,240
+cuando tenemos una entrada
+
+367
+00:39:09,240 --> 00:39:19,920
+Entonces, veamos la figura. Tengo algo que pareciera un 8, pero uno podría decir, bueno, quizá un 3 bien raro, ¿sí?
+
+368
+00:39:19,920 --> 00:39:31,480
+Pero tengo una imagen, digamos. Tengo una imagen, misma dimensión, misma intensidad, valores plausibles de la intensidad,
+
+369
+00:39:31,480 --> 00:39:38,680
+y todo indica, bueno, que este me va ciego, pero es un 8, ¿cierto?
+
+370
+00:39:38,680 --> 00:39:44,920
+esa imagen me va a entregar un vector de 64 valores
+
+371
+00:39:44,920 --> 00:39:48,440
+que son los 64 pixeles que están en esa imagen
+
+372
+00:39:48,440 --> 00:39:54,600
+el encoder me va a calcular esta función
+
+373
+00:39:54,600 --> 00:39:57,080
+o sea este valor H
+
+374
+00:39:57,080 --> 00:40:01,800
+la función vale la redundancia
+
+375
+00:40:01,800 --> 00:40:04,360
+a esta F
+
+376
+00:40:04,360 --> 00:40:12,040
+Entonces este X hace referencia a los 64 valores que están
+
+377
+00:40:12,040 --> 00:40:17,240
+en cada uno de los pixeles de la imagen.
+
+378
+00:40:17,240 --> 00:40:25,840
+Y ese encoder lo que me va a entregar es un vector latente y acá en el vector
+
+379
+00:40:25,840 --> 00:40:31,320
+del latente tiene ocho números entonces de alguna manera
+
+380
+00:40:31,320 --> 00:40:39,320
+lo resumió porque antes tenía 64 números y después de aplicar el encoder pasé a tener 8 números
+
+381
+00:40:40,360 --> 00:40:48,560
+ahora o más bien que reducirlo o sea más bien que resumirlos lo redujo y nosotros esperamos que esa
+
+382
+00:40:48,560 --> 00:40:55,680
+reducción resuma ya que no son lo mismo porque yo puedo tener un vector de 64 y escojo los 8 primeros
+
+383
+00:40:55,680 --> 00:41:00,480
+y eso me quedó y no estoy resumiendo nada simplemente estoy sacando datos no estoy perdiendo
+
+384
+00:41:00,480 --> 00:41:07,160
+cosas. Entonces me lo resumió de alguna manera y lo que nosotros creamos a un vector latente,
+
+385
+00:41:07,160 --> 00:41:16,000
+porque está interno, que tiene ocho números. Si fijan en la figura del medio lo que está
+
+386
+00:41:16,000 --> 00:41:21,400
+representado son ocho números, está representado en términos de colores para hacerlo un poquito
+
+387
+00:41:21,400 --> 00:41:29,920
+más didáctico y no tenga un gráfico con distintas distintas digamos disquemas en términos del eje y
+
+388
+00:41:29,920 --> 00:41:37,800
+y cada color representa una de las coordenadas de ese vector latente
+
+389
+00:41:39,640 --> 00:41:47,320
+tengo los rojizos son los rojos rojizos son valores negativos y la verdad es que no tengo
+
+390
+00:41:47,320 --> 00:41:53,600
+número azul, es que ya lo más tengo algo muy cercano a blanco y este número 3 pareciera ser
+
+391
+00:41:53,600 --> 00:42:01,680
+muy muy levemente azul. Ahora, uno preguntaría naturalmente por qué
+
+392
+00:42:01,680 --> 00:42:11,280
+8 es la dimensión de ese vector latente. Y como mucho de estas metodologías es
+
+393
+00:42:11,280 --> 00:42:17,520
+debido a que yo arbitrariamente escogí 8. Uno podría poner otro.
+
+394
+00:42:17,520 --> 00:42:21,920
+Esto puede ser visto como una capa, como una capa intermedia. Nosotros
+
+395
+00:42:21,920 --> 00:42:26,480
+dijimos que cuando cuando por ejemplo cuando vimos el acapo intermedia de una
+
+396
+00:42:26,480 --> 00:42:30,280
+red neuronal nosotros dijimos bueno voy a ocupar 32
+
+397
+00:42:30,280 --> 00:42:35,200
+neuronas y por qué porque porque sí porque esas le un hiperparámetro un
+
+398
+00:42:35,200 --> 00:42:39,680
+hiperparámetro que tengo que definir de antemano no lo puedo estimar a menos y
+
+399
+00:42:39,680 --> 00:42:42,680
+bueno no puedo estimar pero sí puedo probarlo muchas veces y puedo probar
+
+400
+00:42:42,680 --> 00:42:46,680
+distintas configuraciones y esa esa esa tónica digamos se va a estar dando
+
+401
+00:42:46,680 --> 00:42:52,440
+acá aquí cuando yo digo porque tiene 8 unidades ese vector latente bueno es un
+
+402
+00:42:52,440 --> 00:42:56,160
+hiperparámetro yo escogí 8
+
+403
+00:42:56,160 --> 00:43:02,720
+cada una de esas 8 unidades que están en el vector latente me va
+
+404
+00:43:02,720 --> 00:43:09,120
+va a calcular digamos una función de activación tal como una capa normal si
+
+405
+00:43:09,120 --> 00:43:16,040
+no es nada distinto simplemente una capa intermedia de 8 neuronas
+
+406
+00:43:16,040 --> 00:43:25,040
+o de 8 funciones de activación más que nada. Entonces, por cada imagen voy a tener 8 valores
+
+407
+00:43:25,040 --> 00:43:32,040
+o cada imagen va a tener un vector latente de 8 de dimensión. Es un hiperparámetro,
+
+408
+00:43:32,040 --> 00:43:37,040
+que lo tengo que decidir antes de hacer esta cosa. Entonces, cuando uno hace el código
+
+409
+00:43:37,040 --> 00:43:45,040
+o uno quiere hacer una red neuronal, se definen todos los hiperparámetros que voy a utilizar
+
+410
+00:43:45,040 --> 00:43:51,200
+para hacer este tipo de metodología, lo cual eleva mucho el tipo de configuraciones que yo puedo realizar.
+
+411
+00:43:53,200 --> 00:44:02,680
+Entonces, tengo el número, los 64 vectores, aplico el encoder, me entrega un vector latente de dimensión
+
+412
+00:44:02,680 --> 00:44:10,440
+arbitraria, en este caso es 8 y eso va a ser una entrada al
+
+413
+00:44:11,680 --> 00:44:20,660
+al decoder. Juan Víchez pregunta cómo esos valores resumen los 64
+
+414
+00:44:20,660 --> 00:44:25,040
+píxeles. Nosotros esperamos que lo resumen, uno puede hacer encoder bien
+
+415
+00:44:25,040 --> 00:44:28,440
+malos que no resumen nada.
+
+416
+00:44:28,440 --> 00:44:36,160
+todo eso todo lo que está ese resumen está concentrado en la función h la
+
+417
+00:44:36,160 --> 00:44:42,200
+función h es lo que va a aproximar ahora la forma funcional de h es
+
+418
+00:44:42,200 --> 00:44:49,000
+múltiple si no no se puede definir de antemano
+
+419
+00:44:49,000 --> 00:44:56,360
+cuál va a ser la buena la buena función de h que te va a
+
+420
+00:44:56,360 --> 00:45:03,720
+se va a lograr. Ahora podemos poner nuevamente cuál va a ser la función inicial pero
+
+421
+00:45:05,040 --> 00:45:10,680
+entenderán que esto es un proceso iterativo tal como lo hacemos antes. Entonces, entre el modelo,
+
+422
+00:45:10,680 --> 00:45:18,280
+aproximo, salida, veo, si se fijan lo que hace acá es simplemente un error, una pérdida logarítmica,
+
+423
+00:45:18,280 --> 00:45:27,000
+veo el error de reconstrucción, hago retropropagación, me devuelvo,
+
+424
+00:45:27,000 --> 00:45:34,240
+actualizo los pesos tal que disminuya en este error de reconstrucción y en ese esos pesos ya
+
+425
+00:45:34,240 --> 00:45:39,360
+en vez de decirle pesos y sesgos le voy a decir que estoy modificando la función si entonces la
+
+426
+00:45:39,360 --> 00:45:45,720
+misma metodología de red neuronal es aplica la forma en que se decide ese f o sea h perdón es
+
+427
+00:45:45,720 --> 00:45:52,080
+de la misma manera que escogíamos y actualizábamos los pesos y los sesgos.
+
+428
+00:45:52,080 --> 00:45:56,960
+Si se fijan, cuando hacíamos la multiplicación de pesos por números
+
+429
+00:45:56,960 --> 00:46:02,240
+más el sesgo y lo actualizo, lo que estoy haciendo es cambiar la función.
+
+430
+00:46:02,240 --> 00:46:10,080
+Es porque le estoy dando un número distinto. Entonces, es la misma metodología.
+
+431
+00:46:10,080 --> 00:46:22,080
+desde este vector latente de dimensión 8, eso va a ser la entrada de lo que yo voy a llamar el decodificador o el decoder
+
+432
+00:46:22,080 --> 00:46:28,080
+va a recibir 8, ya no va a recibir 64, entonces de alguna manera está recibiendo menos información
+
+433
+00:46:28,080 --> 00:46:37,080
+y por eso, por esa menos información, es que no reconstruye perfectamente, porque si reconstruyera perfectamente
+
+434
+00:46:37,080 --> 00:46:44,520
+sería la función inversa directa. Entonces, con sus propios pesos, esta función que está acá,
+
+435
+00:46:44,520 --> 00:46:54,800
+si se fijan aquí, esto para pasar de aquí a acá, aplicó ciertos pesos y para pasar de acá
+
+436
+00:46:54,800 --> 00:47:02,760
+al decoder va a tener otros pesos, porque va a tener ese G va a tener pesos y esa F va a tener
+
+437
+00:47:02,760 --> 00:47:07,800
+pesos ya distintos parámetros si se fijan en la clase pasada a este theta
+
+438
+00:47:07,800 --> 00:47:15,000
+nosotros le llamamos W, W1, W2 así y acá como tengo dos pesos distintos aquí
+
+439
+00:47:15,000 --> 00:47:21,040
+tengo theta y aquí tengo psi entonces va a tener sus propios pesos y esos propios
+
+440
+00:47:21,040 --> 00:47:26,640
+pesos están lecidos también ya que van a ser entrenados y ajustados va a
+
+441
+00:47:26,640 --> 00:47:35,040
+calcular la aproximación de los 64 valores y recuerden acá que tiene que
+
+442
+00:47:35,040 --> 00:47:41,960
+tener la misma dimensión que la entrada, entonces por eso calcula 64. Entonces intenta
+
+443
+00:47:41,960 --> 00:47:46,080
+de alguna manera que a partir de esos ocho números del factor latente
+
+444
+00:47:46,080 --> 00:47:55,200
+intenta reproducir ya o aproximar esas 64 intensidades
+
+445
+00:47:55,480 --> 00:48:02,440
+intensidades digamos del imagen y se fijan cuando lo ven acá
+
+446
+00:48:02,440 --> 00:48:07,560
+todos los números contiguos a todos los colores contiguos de esta imagen tienden
+
+447
+00:48:07,560 --> 00:48:15,560
+a ser similares ya no hay en ningún lado un negro que pase algo muy blanco
+
+448
+00:48:15,560 --> 00:48:24,800
+porque se entiende, dado que pierde información de manera un poquito más conservadora, trata de que
+
+449
+00:48:24,800 --> 00:48:30,920
+no hay una gran discrepancia en términos de la intensidad. Esto también se puede ajustar,
+
+450
+00:48:30,920 --> 00:48:36,840
+pero en las primeras iteraciones siempre hace eso, aproximar de manera un poco más conservadora.
+
+451
+00:48:36,840 --> 00:48:47,400
+entonces fija ese g no es la función inversa del h ya porque aprende otra transformación con
+
+452
+00:48:47,400 --> 00:48:53,680
+sus propios pesos porque si fuese exactamente eso ya tampoco lo podría hacer uno porque lo
+
+453
+00:48:53,680 --> 00:49:02,040
+reduje sí y poder tener un problema identificabilidad y que no se va a volver pero
+
+454
+00:49:02,040 --> 00:49:05,880
+lo principal es que yo quiero aproximarlo no quiero que sea el mismo porque si quiero que
+
+455
+00:49:05,880 --> 00:49:10,120
+sea el mismo entonces nunca tuve que hacer esto porque la entrada es la misma
+
+456
+00:49:10,120 --> 00:49:14,440
+que la salía entonces todo lo que está al medio es simplemente redundante no
+
+457
+00:49:14,440 --> 00:49:17,360
+hace nada
+
+458
+00:49:17,800 --> 00:49:24,960
+entonces se entiende la idea que entra entra en la imagen se aplica una función
+
+459
+00:49:24,960 --> 00:49:29,120
+que en general tiende a resumir o nosotros queremos que ese vector
+
+460
+00:49:29,120 --> 00:49:34,960
+latente resuma o me sirva como el sumo para poder hacerle una decodificación y
+
+461
+00:49:34,960 --> 00:49:42,200
+que lo aproxime correctamente ya o de manera buena el
+
+462
+00:49:42,200 --> 00:49:45,960
+la imagen inicial la entrada en sus mismas dimensiones
+
+463
+00:49:45,960 --> 00:49:48,280
+entonces
+
+464
+00:49:48,280 --> 00:49:56,160
+veámonos dentro de vamos a vámonos dentro de ese vector latente ya ese vector
+
+465
+00:49:56,160 --> 00:50:07,600
+latente de 8 de dimensión. Entonces tengo las 8 dimensiones ya y fijan acá el eje horizontal
+
+466
+00:50:07,600 --> 00:50:18,880
+digamos el eje x es las 8 unidades del vector y el eje y es la activación misma, el valor
+
+467
+00:50:18,880 --> 00:50:24,160
+de h porque si fijan h puede ser visto como una función de activación también. Entonces
+
+468
+00:50:24,160 --> 00:50:30,440
+una encoder es una red neural entonces los mismos conceptos aplicados
+
+469
+00:50:30,440 --> 00:50:37,100
+entonces y la barra obviamente el valor para esa imagen en particular que es ese
+
+470
+00:50:37,100 --> 00:50:44,600
+8 ahora recuerden que habíamos dicho que el azulito era positivo y el resto era
+
+471
+00:50:44,600 --> 00:50:47,280
+negativo entonces cuando lo vemos en un término de un gráfico de barra
+
+472
+00:50:47,280 --> 00:50:52,520
+levemente tengo algo positivo para el vector de h y para el resto casi todos
+
+473
+00:50:52,520 --> 00:51:03,320
+negativos. Entonces, acá la función de activación para obtener estos datos, para obtener estos gráficos más bien, y este autocoder en particular,
+
+474
+00:51:03,320 --> 00:51:18,520
+nosotros ocupamos una tangente hiperbólica, o como función de activación, en la capa del vector latente, cuando va a salir, no va a avanzar el vector latente.
+
+475
+00:51:18,520 --> 00:51:27,080
+Y como lo habíamos visto la sesión pasada, la fusión de activación de tangente hiperbólica
+
+476
+00:51:27,080 --> 00:51:34,440
+me lleva los números al dominio entre menos 1 y 1 y por eso está acá como bordes del
+
+477
+00:51:34,440 --> 00:51:40,200
+H el menos 1 y 1 porque el H representa la tangente hiperbólica.
+
+478
+00:51:40,200 --> 00:51:46,520
+Entonces cuando es negativa está bien definida y positivo también está definido.
+
+479
+00:51:46,520 --> 00:51:51,320
+no son probabilidades, no tienen que sumar
+
+480
+00:51:51,320 --> 00:51:57,560
+de activación. Otra, si se fijan cuando vimos el martes pasado, el relu lo vimos con una buena
+
+481
+00:51:57,560 --> 00:52:01,760
+utilidad y lo ocupamos en las softmax también para las probabilidades, pero la tangente hiperbólica
+
+482
+00:52:01,760 --> 00:52:08,000
+no la habíamos dejado un poco de lado y ahí no le hemos dicho cuál era su gran utilidad. Entonces,
+
+483
+00:52:10,720 --> 00:52:18,400
+esto no significa que en ningún caso que hace correlación con el dígito con el cual se está
+
+484
+00:52:18,400 --> 00:52:22,260
+tratando de predecir, simplemente son valores intermedios que utiliza el
+
+485
+00:52:22,260 --> 00:52:27,760
+Autoencoder para hacer, digamos, su función, su tarea.
+
+486
+00:52:27,760 --> 00:52:33,040
+Entonces, si por ejemplo yo meto otra imagen al modelo,
+
+487
+00:52:33,040 --> 00:52:37,840
+los pesos se van a mantener, pero
+
+488
+00:52:38,120 --> 00:52:42,360
+los pesos de la función anterior se van a tener, pero estos valores van a
+
+489
+00:52:42,360 --> 00:52:46,880
+cambiar, porque ahora los insumos, que van a ser la intensidad de esa nueva
+
+490
+00:52:46,880 --> 00:52:50,440
+imagen van a ser distintos entonces estos números van a cambiar y con estos
+
+491
+00:52:50,440 --> 00:52:53,680
+números entonces yo voy a poder reconstruir que van a ser distintos para
+
+492
+00:52:53,680 --> 00:52:58,760
+cada imagen entonces eso es lo que me hace este vector
+
+493
+00:52:58,760 --> 00:53:01,920
+latente pero resumen de alguna manera nosotros esperamos que estos números de
+
+494
+00:53:01,920 --> 00:53:07,560
+acá resumieron el valor de sumer la imagen nada nos va a decir no no no no
+
+495
+00:53:07,560 --> 00:53:13,440
+asegura digamos que eso va a estar hecho correctamente para la tarea que nosotros
+
+496
+00:53:13,440 --> 00:53:23,280
+creamos. Este entonces después va como entrada al decodificador, que va de
+
+497
+00:53:23,280 --> 00:53:29,000
+alguna manera combinar estos valores, porque es una función,
+
+498
+00:53:29,800 --> 00:53:36,120
+y va a tratar de utilizarlo para reconstruir.
+
+499
+00:53:36,120 --> 00:53:42,760
+No tenemos por qué sobre explicar, digamos, cada uno de estos ocho
+
+500
+00:53:42,760 --> 00:53:51,640
+dimensiones del vector latente o algún nombre o alguna interpretación muy
+
+501
+00:53:51,640 --> 00:53:56,720
+rimbombante digamos para las formas de reconstrucción simplemente es aplica una
+
+502
+00:53:56,720 --> 00:54:01,780
+función y la salida de eso entra a otra función que intenta reproducir lo que
+
+503
+00:54:01,780 --> 00:54:07,920
+estaba en un inicio esto no está cada una de estos vectores no va a tener
+
+504
+00:54:07,920 --> 00:54:12,560
+mayor importancia que otro en particular o a priori ya tal como por ejemplo con
+
+505
+00:54:12,560 --> 00:54:18,560
+Cuando vieron análisis de componentes principales no va a tener esa noción.
+
+506
+00:54:18,560 --> 00:54:22,960
+En el caso de componentes principales sí tiene una interpretación.
+
+507
+00:54:22,960 --> 00:54:25,960
+La primera componente es más importante que el resto.
+
+508
+00:54:25,960 --> 00:54:32,360
+Y así, en este caso, el vector latente simplemente es la salida de una función bajo cierta especificación.
+
+509
+00:54:32,360 --> 00:54:35,360
+Que nosotros queremos que sirva, digamos.
+
+510
+00:54:35,360 --> 00:54:43,360
+pero tenemos que tener, digamos, reoficiación con sobre explicarla o darle alguna intención
+
+511
+00:54:43,360 --> 00:54:50,640
+como se llama esto más un significado distinto al que es que simplemente una salida de esta
+
+512
+00:54:50,640 --> 00:54:57,880
+función que tenemos H ya que tiene pesos y se hace con asociados.
+
+513
+00:54:57,880 --> 00:55:09,760
+en esta en esta tabla que tenemos acá se fijan yo voy a tener distintas decisiones digamos que a
+
+514
+00:55:09,760 --> 00:55:15,000
+veces se pudiesen confundir porque se fijan todas estas cosas tienen muchos hiperparámetros porque
+
+515
+00:55:15,000 --> 00:55:21,400
+nuevamente estamos dentro de una red neuronal. Al estar dentro de una red neuronal tenemos muchos
+
+516
+00:55:21,400 --> 00:55:30,040
+tipos de configuraciones que podemos tener. Por ejemplo, si tengo una restricción de
+
+517
+00:55:30,040 --> 00:55:41,720
+tener un vector latente pequeño, como el caso de pasar de 64 a 8, simplemente esta restricción
+
+518
+00:55:41,720 --> 00:55:51,200
+va a controlar, digamos, una cantidad de coordenadas que yo le estoy dando. No significa que yo
+
+519
+00:55:51,200 --> 00:55:58,920
+quiero reducir y aproximar o reducir por ejemplo el tamaño de la imagen.
+
+520
+00:55:58,920 --> 00:56:03,600
+Si tengo una restricción de ancho y profundidad, voy a tener digamos
+
+521
+00:56:03,600 --> 00:56:09,240
+cierta flexibilidad del encoder y decoder. No tienen que ver una de las cosas
+
+522
+00:56:09,240 --> 00:56:15,280
+porque nuevamente las funciones aplican punto a punto o intensidad a intensidad.
+
+523
+00:56:15,280 --> 00:56:20,400
+Y si tengo algún tipo de restricción en términos de la regularización, eso me
+
+524
+00:56:20,400 --> 00:56:27,260
+va a controlar tal como lo hicimos con, por ejemplo, se hizo ridge o lasso, va a
+
+525
+00:56:27,260 --> 00:56:31,600
+cambiar el valor en términos de las preferencias.
+
+526
+00:56:31,600 --> 00:56:35,680
+Tampoco hay una equivalencia entre el número de coordenadas del vector latente
+
+527
+00:56:35,680 --> 00:56:39,480
+a cómo se guarda computacionalmente,
+
+528
+00:56:40,200 --> 00:56:45,640
+pero tenemos que, digamos, pre-especificar todas estas cosas. Nosotros vamos
+
+529
+00:56:45,640 --> 00:56:51,120
+con un poco más adelante ir dando ciertas recomendaciones pero es un poco
+
+530
+00:56:51,120 --> 00:56:54,360
+difícil de dar una recomendación a priori porque va a depender mucho de los
+
+531
+00:56:54,360 --> 00:57:01,320
+datos con los que está trabajando y cuál es el insumo, o sea, los datos que se está
+
+532
+00:57:01,320 --> 00:57:05,240
+trabajando y cuál es la tarea que se tiene en particular. En general, las
+
+533
+00:57:05,240 --> 00:57:09,920
+mayores decisiones que más importan son las cuales son las funciones de
+
+534
+00:57:09,920 --> 00:57:17,460
+que se deben utilizar para las distintas tareas. Entonces, tener esa precaución en cuanto a esto,
+
+535
+00:57:17,460 --> 00:57:25,600
+mucho de las cosas de los resultados que nosotros tenemos son muy dependientes de la configuración
+
+536
+00:57:25,600 --> 00:57:32,720
+que tenemos en la red neural, o la autocode que sigue siendo un caso particular. Entonces, yo les
+
+537
+00:57:32,720 --> 00:57:47,020
+comentaba que este vector latente intenta resumir. Entonces vamos a hacer un caso bien simple para que
+
+538
+00:57:47,020 --> 00:57:55,680
+las cálculos sean bien sencillos. Voy a hacer un ejemplo con dos posiciones simplemente para que vean
+
+539
+00:57:55,680 --> 00:58:00,880
+cómo se puede perder información. Si se fijan, la primera entrada es
+
+540
+00:58:00,880 --> 00:58:09,240
+porque para abajo son pilas, 0.2, 0.8 y la segunda es 0.8, 0.2.
+
+541
+00:58:09,240 --> 00:58:13,240
+Son los mismos valores pero de distinto orden.
+
+542
+00:58:13,240 --> 00:58:18,280
+Entonces la imagen van a ser distintas. Entonces uno podría poner un, son una
+
+543
+00:58:18,280 --> 00:58:25,160
+imagen de 2. En la primera va a ser un número, un color muy cercano a blanco y
+
+544
+00:58:25,160 --> 00:58:32,920
+y en el segundo pixel un color cercano a negro y después al revés.
+
+545
+00:58:32,920 --> 00:58:44,800
+El encoder en este ejemplo va a guardar únicamente el promedio, entonces estoy pasando de dos valores de la imagen a uno.
+
+546
+00:58:45,240 --> 00:58:51,520
+Y si yo por ejemplo tengo el promedio, entonces voy a tener que el h va a ser el promedio.
+
+547
+00:58:51,520 --> 00:58:58,520
+Entonces, la primera imagen lo va a sacar el primer valor promedio y el segundo imagen lo va a sacar el segundo valor promedio.
+
+548
+00:58:58,520 --> 00:59:07,520
+Y sabemos que aquí es una imagen con algo muy cercano a blanco y algo muy cercano a negro y algo muy cercano a negro y algo muy cercano a blanco.
+
+549
+00:59:07,520 --> 00:59:15,520
+Entonces, cuando el encoder lo define en términos funcionales con el H, que es el que está acá, que es el promedio, es decir,
+
+550
+00:59:15,520 --> 00:59:25,720
+decir primera y segunda cantidad dividido 2 entonces el promedio entre 0.2 y 0.8: 0.5, que
+
+551
+00:59:25,720 --> 00:59:30,240
+tal a su vez también es el promedio entre 0.8 y 0.2, entonces se fijan de aquí para acá
+
+552
+00:59:30,240 --> 00:59:39,020
+aplique h y h es el promedio ahora yo voy a querer definir el decoder o el decodificado
+
+553
+00:59:39,020 --> 00:59:46,100
+lo importante es que el h me llevó dos preimágenes si se guardan algo de
+
+554
+00:59:46,100 --> 00:59:55,380
+función cálculo dos preimágenes que son (0.2, 0.8) y (0.8, 0.2)
+
+555
+00:59:55,380 --> 00:59:59,740
+al mismo al mismo valor ya
+
+556
+00:59:59,740 --> 01:00:06,860
+en cambio cuando contengo eso y aplica ahora el decodificador el decodificador
+
+557
+01:00:06,860 --> 01:00:10,220
+lo que va a hacer es
+
+558
+01:00:10,220 --> 01:00:15,220
+va a tratar de reconstruirlo, va a tratar de re aproximarlo
+
+559
+01:00:15,220 --> 01:00:22,060
+no va a mostrar ahí cuál es el decoder pero porque simplemente va a
+
+560
+01:00:22,060 --> 01:00:28,060
+ser una regla, una regla digamos que está acá definida de antemano
+
+561
+01:00:28,060 --> 01:00:33,860
+no lo hemos aprendido con los distintos datos pero la idea acá es que yo
+
+562
+01:00:33,860 --> 01:00:41,860
+dependiendo de qué valores me entrega el vector latente, la reconstrucción
+
+563
+01:00:41,860 --> 01:00:47,620
+pudiese ser bastante mala. Entonces algo que era
+
+564
+01:00:47,620 --> 01:00:53,000
+una imagen de dos pixeles algo muy blanco, algo muy negro, lo pasó a dos
+
+565
+01:00:53,000 --> 01:00:59,420
+pixeles muy grises en general. Entonces
+
+566
+01:00:59,420 --> 01:01:07,300
+¿Qué tenemos que pensar aquí? Entonces, si dos entradas distintas, por ejemplo, es (0.2, 0.8) y (0.8, 0.2),
+
+567
+01:01:07,300 --> 01:01:13,900
+producen exactamente el mismo vector latente, porque esto, si bien es un número,
+
+568
+01:01:16,740 --> 01:01:22,020
+ahora para entenderlo bien, el vector no es el vector como columna, el vector es para la derecha,
+
+569
+01:01:22,020 --> 01:01:25,900
+una fila, en este caso, el vector es sólo un número, porque el H
+
+570
+01:01:25,900 --> 01:01:35,300
+me entrega ese un solo número entonces si dos imágenes en este caso o entradas me producen
+
+571
+01:01:35,300 --> 01:01:42,860
+exactamente el mismo vector latente el mismo decoder va a producir la misma reconstrucción
+
+572
+01:01:42,860 --> 01:01:49,420
+ya se fijan esto eran dos cosas distintas en el vector en el vector digamos latente o los
+
+573
+01:01:49,420 --> 01:01:55,140
+vector latente me entregó los mismos números entonces la reconstrucción si es el mismo de
+
+574
+01:01:55,140 --> 01:02:03,300
+coder me va a entregar el mismo la misma salida entonces me lo va a tratar de reconstruir de manera
+
+575
+01:02:03,300 --> 01:02:09,460
+igual ya tenemos que tener cuidado entonces si se puede perder información cuando se hace estas
+
+576
+01:02:09,460 --> 01:02:13,900
+cosas porque estoy tratando de resumir y generar cuando resumo voy a tratar de perder información
+
+577
+01:02:13,900 --> 01:02:20,260
+voy a perder información, pero a la verdad que se pierda la menor información posible.
+
+578
+01:02:20,260 --> 01:02:29,300
+Entonces, se fijan, entrada, decoder, vector latente, ahora lo tengo que hacer una decodificación,
+
+579
+01:02:29,300 --> 01:02:39,100
+pero si se fijan acá, yo cómo puedo entonces, cuando tenía una reconstrucción, cómo por
+
+580
+01:02:39,100 --> 01:02:46,060
+ejemplo en este caso se podría recuperar el orden porque si yo recuperase el orden la media no me
+
+581
+01:02:46,060 --> 01:02:52,420
+recupera el orden o podría en este caso ya la respuesta es que no podría en este caso porque
+
+582
+01:02:52,420 --> 01:02:58,820
+el decoder que estoy utilizando me hace perder información ya ese resumen que utilicé me me hizo
+
+583
+01:02:58,820 --> 01:03:04,580
+perder demasiada información al punto de que no pudo discernir entre las pequeñas diferencias que
+
+584
+01:03:04,580 --> 01:03:08,220
+que son sustanciales en este caso en términos de los colores de la intensidad
+
+585
+01:03:08,220 --> 01:03:11,220
+ya
+
+586
+01:03:11,580 --> 01:03:15,580
+porque me permitieran aproximar correctamente entonces tiene un error
+
+587
+01:03:15,580 --> 01:03:20,780
+grande entonces de cierta manera vamos a necesitar
+
+588
+01:03:20,780 --> 01:03:28,380
+cuantificar cuánto se aleja a comillas la reconstrucción que yo estoy haciendo
+
+589
+01:03:28,380 --> 01:03:32,220
+de la entrada porque recuerden que nosotros hicimos esto tenemos esta
+
+590
+01:03:32,220 --> 01:03:35,980
+entrada, ahí hicimos el vector latente, la reconstrucción y ahora lo que debíamos
+
+591
+01:03:35,980 --> 01:03:39,700
+hacer es comparar estas salidas que son las aproximaciones con esta entrada
+
+592
+01:03:39,700 --> 01:03:45,140
+entonces ¿cómo lo aproximo? Nosotros dijimos que vamos a poner una función L
+
+593
+01:03:45,140 --> 01:03:47,900
+ya
+
+594
+01:03:47,900 --> 01:03:54,580
+o L la verdad, entre X que es la entrada y X estimado, pero no definimos lo que era
+
+595
+01:03:54,580 --> 01:04:01,780
+L, lo que vamos a utilizar acá como función esta función L
+
+596
+01:04:01,780 --> 01:04:06,780
+y que a toda esa opción le va a llamar el error cuadrático de reconstrucción.
+
+597
+01:04:06,780 --> 01:04:16,020
+Entonces, vamos a necesitar alguna medida para comparar la imagen aproximada y la imagen de
+
+598
+01:04:16,020 --> 01:04:24,900
+entrada. Entonces, para cada una de las posiciones, en el caso del ejemplo, que son dos, la primera
+
+599
+01:04:24,900 --> 01:04:30,100
+posición y la segunda posición de cada imagen, vamos a tener que comparar la intensidad. La
+
+600
+01:04:30,100 --> 01:04:37,000
+salida era 0.5, guarden, porque lo homogéneisó. La vamos a elevar al cuadrado
+
+601
+01:04:38,260 --> 01:04:44,700
+y bueno vamos a hacer esta forma, digamos. Y si se fijan acá son los 64,
+
+602
+01:04:44,700 --> 01:04:50,820
+pensémos ahora en las imágenes de los números que son 8x8, para una forma más
+
+603
+01:04:50,820 --> 01:04:56,540
+general. Voy a tener una aproximación, le voy a restar el valor original, entonces
+
+604
+01:04:56,540 --> 01:05:02,540
+pixel a pixel, si pique saca esto indexado y j a la aproximación pixel a pixel
+
+605
+01:05:02,540 --> 01:05:11,540
+le voy a dar una intensidad, lo de cuadrado y lo de 64 y si se fijan eso me está diciendo la discrepancia cuadrática
+
+606
+01:05:11,540 --> 01:05:19,540
+de error, promedio, de todo lo de todos los pixels dentro de una misma imagen
+
+607
+01:05:19,540 --> 01:05:27,540
+imagen. O sea, para una imagen porque son 64 pixeles y luego voy a sacar el promedio a través de todas las imágenes.
+
+608
+01:05:27,540 --> 01:05:41,540
+Entonces, si te fijan acá en el gráfico tengo la diferencia de reconstrucción menos referencia. Si estoy en el 0, estoy reconstruyendo perfectamente
+
+609
+01:05:41,540 --> 01:05:44,900
+o la aproximación está reconstruyendo perfectamente
+
+610
+01:05:47,220 --> 01:05:50,020
+la imagen inicial. Yo tengo dos formas de equivocar,
+
+611
+01:05:50,020 --> 01:05:53,020
+o sea, le puedo dar más intensidad, aproximar con más intensidad
+
+612
+01:05:53,020 --> 01:05:56,900
+cuando era menos intenso, digamos, la imagen original,
+
+613
+01:05:56,900 --> 01:06:00,740
+o al revés, ya.
+
+614
+01:06:00,740 --> 01:06:03,780
+Cuando era...
+
+615
+01:06:03,980 --> 01:06:06,980
+Un pixel lo puse más negro cuando era más gris,
+
+616
+01:06:06,980 --> 01:06:11,260
+o un pixel lo puse más blanco cuando era gris más o menos estándar.
+
+617
+01:06:11,540 --> 01:06:24,260
+Entonces, tengo dos formas de equivocarme, porque cuando veo por ejemplo el caso 0,3
+
+618
+01:06:24,260 --> 01:06:33,940
+y pongo que el valor era 0, entonces voy a tener que en términos de esta métrica de
+
+619
+01:06:33,940 --> 01:06:41,460
+error de reoximación, de reconstrucción, van a ser numéricamente los mismos. Entonces,
+
+620
+01:06:41,460 --> 01:06:52,460
+tengo que tener un poco de cuidado con eso porque al alejarnos, para cualquiera de los dos lados, el error va a aumentar
+
+621
+01:06:52,460 --> 01:06:58,460
+tengo que tener ese centro que vendría siendo el de referencia
+
+622
+01:06:58,460 --> 01:07:09,700
+Entonces, ahora, con eso simplemente podemos cuantificar si es que la aproximación se
+
+623
+01:07:09,700 --> 01:07:20,780
+parecía o se parece, digamos, al original. Veámoslo en el caso del ejemplo de dos píxeles,
+
+624
+01:07:20,780 --> 01:07:28,420
+¿cierto? Nosotros vimos que el L, que es esta fórmula, digamos, para los píxeles 8x8,
+
+625
+01:07:28,420 --> 01:07:37,060
+voy a tener que 0,5 era la reconstrucción que hizo el decoder 0,5 0,5 0,5
+
+626
+01:07:37,060 --> 01:07:42,340
+en la primera imagen era 0,2 el original entonces estaba la diferencia
+
+627
+01:07:42,340 --> 01:07:49,060
+el cuadrado en la segunda componente 0,5 menos 0,8 cuadrado medios saque el valor
+
+628
+01:07:49,060 --> 01:07:57,340
+0,09 más 0,09 medios eso me entrega entonces 0,09 entonces si se fijan acá
+
+629
+01:07:58,420 --> 01:08:05,160
+para el primer valor 0.2, 0.8 si fuese ese es el valor de referencia de la de
+
+630
+01:08:05,160 --> 01:08:10,940
+referencia porque es el valor que tenía la imagen primera ya 0.2 en su primera
+
+631
+01:08:10,940 --> 01:08:15,900
+coordenada 0.8 en el segundo coordenada como intensidad dentro de esa
+
+632
+01:08:15,900 --> 01:08:22,380
+de cada uno de esos píxeles si yo pusiese una reconstrucción 0.3, 0.7
+
+633
+01:08:22,380 --> 01:08:31,580
+entonces su error cuadrático medio vendría siendo 0.01, si fuese el 0.5, 0.5 que es el que estudimos
+
+634
+01:08:34,380 --> 01:08:42,300
+entonces tendría un error cuadrático medio muy muy distinto entonces si se fijan acá
+
+635
+01:08:43,900 --> 01:08:48,660
+son tres tipos de reconstrucción la primera no me sirve mucho porque estoy aproximando o sea
+
+636
+01:08:48,660 --> 01:08:55,440
+estoy reconstruyendo perfectamente. Entonces, aquí hice toda la red si
+
+637
+01:08:55,440 --> 01:09:00,120
+simplemente tengo la misma entrada. En cambio, 0.3, 0.7 parecerá ser una buena
+
+638
+01:09:00,120 --> 01:09:04,840
+propuesta de reconstrucción porque sabemos que 0.5, 0.5 no lo podemos distinguir
+
+639
+01:09:04,840 --> 01:09:09,380
+porque si lo tomamos coloré no sabríamos
+
+640
+01:09:09,380 --> 01:09:16,400
+en qué píxel estaba el valor más negro y en qué píxel estaría el valor más blanco.
+
+641
+01:09:16,400 --> 01:09:28,640
+Tenemos entonces que ver cómo ese decoder está, cómo tenemos esas distintas propuestas de aproximación.
+
+642
+01:09:28,640 --> 01:09:36,440
+Entonces, yo le hago una pregunta. Solo con el error cuadrático medio,
+
+643
+01:09:36,440 --> 01:09:42,840
+¿vamos a poder distinguir cuál va a ser el signo del error?
+
+644
+01:09:42,840 --> 01:09:51,840
+no vamos a poder porque no sabemos si lo está aproximando más, por ejemplo el 0.01
+
+645
+01:09:51,840 --> 01:09:55,840
+se está equivocando más en la parte blanca que lo está tirando más negro
+
+646
+01:09:55,840 --> 01:09:59,840
+o está el negro tirándolo más blanco
+
+647
+01:09:59,840 --> 01:10:04,840
+con ese puro número no podemos saber, sabemos que se va a parecer probablemente más que este 0.09
+
+648
+01:10:04,840 --> 01:10:09,840
+pero no sabemos cómo se está equivocando, sólo lo podemos cuantificar en esa manera
+
+649
+01:10:09,840 --> 01:10:26,840
+eso es porque simplemente nosotros le vamos al cuadrado esa expresión y ahí perdimos esa noción de cómo se está equivocando sino que lo estamos cuantificando y ese cuadrado viene para penalizar errores grandes, nada, ahí viene.
+
+650
+01:10:26,840 --> 01:10:37,840
+Entonces, si se fijan acá, la propuesta de (0.2, 0.8) pareciera que es, pareciera a priori, digamos que es buena, porque me reconstruye perfectamente la imagen original,
+
+651
+01:10:37,840 --> 01:10:45,840
+pero de igual tenemos que preguntarnos qué es la representación que produce, porque al final es la imagen original, ¿ya?
+
+652
+01:10:45,840 --> 01:10:52,840
+Entonces, vendés en una copia, ¿ya? que es perfecta de la entrada, ¿ya?
+
+653
+01:10:52,840 --> 01:10:54,840
+entonces
+
+654
+01:10:57,920 --> 01:10:59,920
+vamos a perder digamos
+
+655
+01:11:01,680 --> 01:11:04,400
+la aproximación que nosotros estamos teniendo
+
+656
+01:11:05,200 --> 01:11:08,560
+y vuelve en esencia una aproximación sin errores de
+
+657
+01:11:09,040 --> 01:11:15,040
+lo original que es la misma entonces es una copia porque se entiende que dentro de la salida
+
+658
+01:11:15,520 --> 01:11:17,920
+hay un sesgo que no existe
+
+659
+01:11:19,520 --> 01:11:21,520
+eso lo que hace es
+
+660
+01:11:22,840 --> 01:11:29,400
+reconstruir perfectamente la imagen original pero no va a resumir los datos, no lo está resumiendo,
+
+661
+01:11:29,400 --> 01:11:33,680
+no está resumiendo ninguna de las intensidades que nosotros estamos utilizando. Entonces,
+
+662
+01:11:34,760 --> 01:11:41,120
+el objetivo que nosotros queremos cuando queremos reconstruir se debe acompañar con algún tipo de
+
+663
+01:11:41,120 --> 01:11:50,120
+restricción, que tenga algo de sentido para la utilidad o el uso que le va a mudar el vector
+
+664
+01:11:50,120 --> 01:11:55,160
+latente por ejemplo yo quiero aproximarlo pero
+
+665
+01:11:55,160 --> 01:12:02,760
+que utilicen que tenga menos ruido por ejemplo que el caso que nosotros vimos es
+
+666
+01:12:02,760 --> 01:12:08,520
+decir que sea un vector que tenga
+
+667
+01:12:08,520 --> 01:12:14,320
+valores muy cercanos a ceros ya y que en el ruido uno podría decir bueno como
+
+668
+01:12:14,320 --> 01:12:24,560
+tiene estos tipos de manchas, como lo vimos acá, hay muy pocas intensidades que son prácticamente
+
+669
+01:12:24,560 --> 01:12:28,880
+cero, no hay cero porque tiene un ruido de por medio, entonces yo le quiero sacar ese
+
+670
+01:12:28,880 --> 01:12:36,820
+ruido, entonces cuando quiero hacer este decoding o este encoder quiero que tener ciertas restricciones
+
+671
+01:12:36,820 --> 01:12:44,420
+que me van a imponer que no tenga una copia perfecta ya entonces
+
+672
+01:12:44,420 --> 01:12:48,940
+y se dice aquí en acá
+
+673
+01:12:51,380 --> 01:12:58,420
+te fijan acá entonces si yo hago simplemente la reconstrucción perfecta
+
+674
+01:12:58,420 --> 01:13:04,420
+simplemente voy a tener lo que tuve en inicio entonces no ven en la si tuve porque
+
+675
+01:13:04,420 --> 01:13:08,260
+para que hice una red si tengo las imágenes originales
+
+676
+01:13:08,260 --> 01:13:15,180
+si conserva todos los detalles puede no resumir nada también porque yo quiero
+
+677
+01:13:15,180 --> 01:13:19,660
+que esta aproximación me sirve y me resuma entonces nuevamente el concepto
+
+678
+01:13:19,660 --> 01:13:24,780
+de la salida del vector latente va a tomar el precio de relevancia
+
+679
+01:13:24,780 --> 01:13:31,140
+y un vector latente relativamente pequeño ya puede pasar que puede
+
+680
+01:13:31,140 --> 01:13:38,300
+memorizar con suficiente flexibilidad para que nosotros tengamos una aproximación
+
+681
+01:13:38,300 --> 01:13:42,940
+razonable de nuestra entrada. Entonces necesitamos restricciones que sean
+
+682
+01:13:42,940 --> 01:13:50,260
+relativamente flexibles y adecuadas para la tarea que nosotros tenemos ya y que
+
+683
+01:13:50,260 --> 01:13:54,460
+entreguen buenos resultados cuando hagamos predicción digamos evaluación
+
+684
+01:13:54,460 --> 01:13:59,700
+con error cuadrático medio en términos de las intensidades, pixel a pixel en
+
+685
+01:13:59,700 --> 01:14:02,260
+este caso
+
+686
+01:14:04,260 --> 01:14:10,100
+ahora vamos a hacer una pequeña pausa con el break, yo creo que vamos a volver a las
+
+687
+01:14:10,100 --> 01:14:18,820
+8, 11 minutos, 12 minutos más o menos por ahora, les parece?
+
+688
+01:14:19,980 --> 01:14:23,620
+volvemos a las 8
+

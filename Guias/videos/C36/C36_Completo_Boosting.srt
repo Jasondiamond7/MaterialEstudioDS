@@ -1,0 +1,3883 @@
+1
+00:00:00,250 --> 00:00:02,200
+Clase treinta y seis: boosting.
+
+2
+00:00:02,320 --> 00:00:05,923
+La idea es simple y poderosa: muchos modelos débiles, uno
+
+3
+00:00:05,923 --> 00:00:09,020
+detrás de otro, cada uno corrigiendo al anterior.
+
+4
+00:00:09,140 --> 00:00:11,473
+Un árbol de decisión con solo dos niveles
+
+5
+00:00:11,473 --> 00:00:13,920
+predice bastante mal el precio de una casa.
+
+6
+00:00:14,040 --> 00:00:16,700
+Pero imagina que entrenas un segundo árbol, que se
+
+7
+00:00:16,700 --> 00:00:19,360
+dedica solo a corregir lo que el primero hizo mal.
+
+8
+00:00:19,480 --> 00:00:22,310
+Y un tercero, que corrige lo que todavía queda.
+
+9
+00:00:22,430 --> 00:00:24,920
+Esa cadena de correcciones se llama boosting.
+
+10
+00:00:25,040 --> 00:00:26,170
+Piensa en el golf.
+
+11
+00:00:26,290 --> 00:00:28,290
+El hoyo está a doscientos metros.
+
+12
+00:00:28,410 --> 00:00:31,750
+Nadie intenta embocar desde la salida con un golpe perfecto.
+
+13
+00:00:31,870 --> 00:00:34,660
+El primer golpe deja la bola a cuarenta metros.
+
+14
+00:00:34,780 --> 00:00:37,770
+El segundo no vuelve a empezar: apunta solo a esos
+
+15
+00:00:37,770 --> 00:00:40,760
+cuarenta metros que faltan, y deja la bola a diez.
+
+16
+00:00:40,880 --> 00:00:44,990
+El tercer golpe apunta a esos diez metros, y deja la bola a dos.
+
+17
+00:00:45,110 --> 00:00:49,750
+Cada golpe es modesto, pero cada uno trabaja sobre el error que dejó el anterior.
+
+18
+00:00:49,870 --> 00:00:52,770
+Y la posición final es la suma de todos los golpes.
+
+19
+00:00:52,890 --> 00:00:56,083
+En boosting, el primer golpe es una predicción base:
+
+20
+00:00:56,083 --> 00:00:58,540
+por ejemplo, el promedio de los precios.
+
+21
+00:00:58,660 --> 00:01:00,430
+A eso lo llamamos efe cero.
+
+22
+00:01:00,550 --> 00:01:04,356
+Cada golpe siguiente es un árbol pequeño, hache uno, hache
+
+23
+00:01:04,356 --> 00:01:07,440
+dos, que apunta al error que queda: el residuo.
+
+24
+00:01:07,560 --> 00:01:09,390
+Y la predicción final es la suma.
+
+25
+00:01:09,510 --> 00:01:10,820
+¿Y esa letra griega?
+
+26
+00:01:10,940 --> 00:01:13,280
+Es eta, la tasa de aprendizaje.
+
+27
+00:01:13,400 --> 00:01:16,384
+Cada árbol no se suma completo: se suma solo una
+
+28
+00:01:16,384 --> 00:01:19,120
+fracción, por ejemplo un treinta por ciento.
+
+29
+00:01:19,240 --> 00:01:24,140
+La diapositiva tres lo dice así: eta controla cuánto aporta cada nuevo modelo.
+
+30
+00:01:24,260 --> 00:01:27,300
+Hagamos la suma a mano, con el ejemplo del apunte.
+
+31
+00:01:27,420 --> 00:01:31,420
+El precio base, efe cero, es 160 mil dólares.
+
+32
+00:01:31,540 --> 00:01:36,320
+Para una casa, los tres árboles predicen más 50, más 20 y menos 10.
+
+33
+00:01:36,440 --> 00:01:38,430
+Y eta vale 0.3.
+
+34
+00:01:38,550 --> 00:01:45,730
+Etapa uno: 160 más 0.3 por 50, o sea 160 más 15: 175.
+
+35
+00:01:45,850 --> 00:01:51,880
+Etapa dos: 175 más 0.3 por 20, más 6: 181.
+
+36
+00:01:52,000 --> 00:01:58,440
+Etapa tres: 181 más 0.3 por menos 10, menos 3: 178.
+
+37
+00:01:58,560 --> 00:02:00,090
+Fíjate en dos cosas.
+
+38
+00:02:00,210 --> 00:02:04,630
+Cada árbol aporta solo un treinta por ciento de lo que predice: pasos chicos.
+
+39
+00:02:04,750 --> 00:02:07,324
+Y el tercer árbol corrige hacia abajo: si los
+
+40
+00:02:07,324 --> 00:02:10,070
+anteriores se pasaron, el siguiente lo compensa.
+
+41
+00:02:10,190 --> 00:02:11,860
+Ahora con datos reales.
+
+42
+00:02:11,980 --> 00:02:16,000
+Tomamos las casas de Ames y una sola variable: la superficie habitable.
+
+43
+00:02:16,120 --> 00:02:23,490
+Predecir con el promedio deja un error típico, un RMSE, de 78 500 dólares.
+
+44
+00:02:23,610 --> 00:02:27,480
+Con un árbol, el error baja a 68 400.
+
+45
+00:02:27,600 --> 00:02:31,180
+Con cinco árboles, a 55 400.
+
+46
+00:02:31,300 --> 00:02:34,250
+Y con cincuenta, a 50 900.
+
+47
+00:02:34,370 --> 00:02:38,890
+Cada árbol trabajó sobre los residuos del anterior, y el error se fue achicando.
+
+48
+00:02:39,010 --> 00:02:40,530
+¿Y por qué no baja a cero?
+
+49
+00:02:40,650 --> 00:02:43,749
+Porque una sola variable no explica todo el precio: dos
+
+50
+00:02:43,749 --> 00:02:46,510
+casas del mismo tamaño pueden valer muy distinto.
+
+51
+00:02:46,630 --> 00:02:50,150
+Lo que queda es ruido, o información que no le dimos al modelo.
+
+52
+00:02:50,270 --> 00:02:53,395
+Todos los modelos de esta clase siguen el mismo ciclo
+
+53
+00:02:53,395 --> 00:02:55,930
+de cinco pasos, el de la diapositiva cinco.
+
+54
+00:02:56,050 --> 00:02:58,750
+Uno, inicializar con una predicción base.
+
+55
+00:02:58,870 --> 00:03:00,500
+Dos, medir el error.
+
+56
+00:03:00,620 --> 00:03:03,580
+Tres, ajustar un nuevo aprendiz a ese error.
+
+57
+00:03:03,700 --> 00:03:06,830
+Cuatro, actualizar, sumando su contribución.
+
+58
+00:03:06,950 --> 00:03:12,040
+Y cinco, detener: después de eme etapas, o cuando la validación deja de mejorar.
+
+59
+00:03:12,160 --> 00:03:15,720
+Y la diapositiva remata con la frase clave de toda la clase: la
+
+60
+00:03:15,720 --> 00:03:19,450
+definición exacta de error separa a AdaBoost de Gradient Boosting.
+
+61
+00:03:19,570 --> 00:03:22,160
+AdaBoost mide el error con pesos.
+
+62
+00:03:22,280 --> 00:03:24,370
+Gradient Boosting, con residuos.
+
+63
+00:03:24,490 --> 00:03:26,890
+La ruta de la clase tiene cuatro etapas.
+
+64
+00:03:27,010 --> 00:03:29,590
+Intuición: aprender de los errores.
+
+65
+00:03:29,710 --> 00:03:32,780
+Fundamentos: AdaBoost y los gradientes.
+
+66
+00:03:32,900 --> 00:03:36,830
+Implementaciones: XGBoost, LightGBM y CatBoost.
+
+67
+00:03:36,950 --> 00:03:39,250
+Y decisión: comparar y ajustar.
+
+68
+00:03:39,370 --> 00:03:43,701
+Y una pregunta guía para todo el recorrido: ¿cómo equilibramos capacidad
+
+69
+00:03:43,701 --> 00:03:47,370
+predictiva, velocidad, datos categóricos e interpretabilidad?
+
+70
+00:03:47,490 --> 00:03:50,337
+El error típico al empezar: pensar que boosting es
+
+71
+00:03:50,337 --> 00:03:53,240
+entrenar muchos árboles en paralelo y promediarlos.
+
+72
+00:03:53,360 --> 00:03:55,510
+Eso es bagging, la clase anterior.
+
+73
+00:03:55,630 --> 00:03:58,460
+En boosting, cada árbol depende del anterior, y
+
+74
+00:03:58,460 --> 00:04:01,110
+todos ven los mismos datos de entrenamiento.
+
+75
+00:04:01,230 --> 00:04:04,181
+Lo que cambia de un árbol a otro no es la muestra:
+
+76
+00:04:04,181 --> 00:04:06,600
+es el objetivo, los pesos o los residuos.
+
+77
+00:04:06,720 --> 00:04:07,940
+Piensa un segundo.
+
+78
+00:04:08,060 --> 00:04:12,373
+En el ejemplo de las tres etapas, ¿cuánto valdría la predicción si eta
+
+79
+00:04:12,373 --> 00:04:15,700
+fuera uno, es decir, si cada árbol se sumara completo?
+
+80
+00:04:16,420 --> 00:04:24,080
+Con eta igual a uno, sumas todo: 160 más 50, más 20, menos 10, igual a 220.
+
+81
+00:04:24,200 --> 00:04:27,670
+Con eta igual a 0.3 llegamos a 178.
+
+82
+00:04:27,790 --> 00:04:30,594
+Con eta igual a uno se avanza más rápido, pero
+
+83
+00:04:30,594 --> 00:04:32,910
+cada árbol se toma demasiado en serio.
+
+84
+00:04:33,030 --> 00:04:36,290
+Más adelante veremos por qué los pasos chicos suelen ganar.
+
+85
+00:04:36,410 --> 00:04:39,318
+Para llevarte: boosting entrena modelos simples en
+
+86
+00:04:39,318 --> 00:04:42,110
+secuencia, cada uno sobre el error del anterior.
+
+87
+00:04:42,230 --> 00:04:46,780
+La predicción final es una suma: efe cero, más eta por cada árbol.
+
+88
+00:04:46,900 --> 00:04:50,090
+Y la definición de error es lo que distingue a cada algoritmo.
+
+89
+00:04:50,210 --> 00:04:52,780
+Siguiente parada: boosting frente a bagging.
+
+90
+00:04:52,900 --> 00:04:55,740
+Mismos árboles, filosofías opuestas.
+
+91
+00:04:56,610 --> 00:04:59,130
+Segunda parada: bagging frente a boosting.
+
+92
+00:04:59,250 --> 00:05:02,970
+Los dos combinan árboles, pero resuelven problemas distintos.
+
+93
+00:05:03,090 --> 00:05:07,780
+En la clase anterior armamos un Random Forest: trescientos árboles promediados.
+
+94
+00:05:07,900 --> 00:05:10,370
+Boosting también combina muchos árboles.
+
+95
+00:05:10,490 --> 00:05:12,350
+Entonces, ¿no es lo mismo?
+
+96
+00:05:12,470 --> 00:05:12,890
+No.
+
+97
+00:05:13,010 --> 00:05:16,850
+Usan los mismos ingredientes, pero con filosofías opuestas.
+
+98
+00:05:16,970 --> 00:05:18,140
+Una analogía.
+
+99
+00:05:18,260 --> 00:05:21,989
+Bagging es como un comité de expertos que trabajan por separado:
+
+100
+00:05:21,989 --> 00:05:25,310
+cada uno opina sin mirar al otro, y al final se promedia.
+
+101
+00:05:25,430 --> 00:05:28,682
+Boosting es como un grupo de estudio en cadena: cada estudiante
+
+102
+00:05:28,682 --> 00:05:31,470
+revisa los errores del anterior y se concentra en eso.
+
+103
+00:05:31,590 --> 00:05:34,600
+El comité funciona en paralelo, todos a la vez.
+
+104
+00:05:34,720 --> 00:05:37,331
+El grupo de estudio, en secuencia: el segundo no
+
+105
+00:05:37,331 --> 00:05:39,670
+puede empezar hasta que el primero termine.
+
+106
+00:05:39,790 --> 00:05:42,680
+La diapositiva cuatro lo resume en dos columnas.
+
+107
+00:05:42,800 --> 00:05:46,149
+Bagging: modelos en paralelo, cada uno con una muestra
+
+108
+00:05:46,149 --> 00:05:49,250
+distinta, y las predicciones se promedian o votan.
+
+109
+00:05:49,370 --> 00:05:52,468
+Boosting: modelos en secuencia, cada etapa usa el
+
+110
+00:05:52,468 --> 00:05:55,440
+error acumulado, y las contribuciones se suman.
+
+111
+00:05:55,560 --> 00:05:59,450
+Y el objetivo típico de cada uno: bagging reduce la varianza.
+
+112
+00:05:59,570 --> 00:06:02,680
+Boosting reduce el sesgo, y el error en general.
+
+113
+00:06:02,800 --> 00:06:04,850
+¿Qué significan varianza y sesgo?
+
+114
+00:06:04,970 --> 00:06:06,140
+Piensa en dardos.
+
+115
+00:06:06,260 --> 00:06:09,194
+Un modelo con varianza alta tira dardos que caen
+
+116
+00:06:09,194 --> 00:06:11,700
+alrededor del centro, pero muy dispersos.
+
+117
+00:06:11,820 --> 00:06:16,150
+Un modelo con sesgo alto tira dardos muy juntos, pero lejos del centro.
+
+118
+00:06:16,270 --> 00:06:19,913
+Bagging arregla el primer problema: si promedias muchos tiros
+
+119
+00:06:19,913 --> 00:06:22,780
+dispersos, el promedio cae muy cerca del centro.
+
+120
+00:06:22,900 --> 00:06:27,200
+Boosting arregla el segundo: cada corrección empuja el grupo hacia el centro.
+
+121
+00:06:27,320 --> 00:06:29,940
+Por eso cada familia usa un árbol distinto.
+
+122
+00:06:30,060 --> 00:06:33,359
+El bosque usa árboles profundos: poco sesgo, mucha
+
+123
+00:06:33,359 --> 00:06:36,130
+varianza, y el promedio calma la varianza.
+
+124
+00:06:36,250 --> 00:06:40,306
+Boosting usa árboles chicos, de profundidad dos a seis: mucho
+
+125
+00:06:40,306 --> 00:06:43,830
+sesgo, poca varianza, y la suma va quitando el sesgo.
+
+126
+00:06:43,950 --> 00:06:49,170
+Veámoslo con datos reales: Ames, error de validación según el número de árboles.
+
+127
+00:06:49,290 --> 00:06:55,440
+Un solo árbol de profundidad tres, como referencia, se equivoca en 41 200 dólares.
+
+128
+00:06:55,560 --> 00:06:59,950
+Un Random Forest con un árbol profundo, en 39 300.
+
+129
+00:07:00,070 --> 00:07:03,580
+Con cien árboles baja a 23 100, y ahí se estanca.
+
+130
+00:07:03,700 --> 00:07:08,030
+Ahora boosting, con árboles de profundidad tres y eta 0.1.
+
+131
+00:07:08,150 --> 00:07:11,530
+Con un árbol, el error es enorme: 69 000.
+
+132
+00:07:11,650 --> 00:07:15,720
+Pero sigue bajando, árbol tras árbol, y pasa por debajo del bosque.
+
+133
+00:07:15,840 --> 00:07:18,970
+Con trescientos árboles llega a 21 800.
+
+134
+00:07:19,090 --> 00:07:20,310
+Piensa un segundo.
+
+135
+00:07:20,430 --> 00:07:25,750
+¿Por qué boosting con un solo árbol se equivoca en 69 000 dólares, mucho peor que
+
+136
+00:07:25,750 --> 00:07:30,150
+un árbol suelto de la misma profundidad, que se equivoca en 41 200?
+
+137
+00:07:30,870 --> 00:07:31,700
+Por eta.
+
+138
+00:07:31,820 --> 00:07:35,115
+Boosting parte del promedio, y al primer árbol lo suma
+
+139
+00:07:35,115 --> 00:07:39,020
+multiplicado por 0.1: solo avanza un diez por ciento del camino.
+
+140
+00:07:39,140 --> 00:07:40,940
+Es un paso chico a propósito.
+
+141
+00:07:41,060 --> 00:07:45,040
+El árbol suelto, en cambio, da el paso completo de una vez.
+
+142
+00:07:45,160 --> 00:07:49,430
+Boosting lo alcanza y lo supera después, sumando muchos pasos chicos.
+
+143
+00:07:49,550 --> 00:07:51,260
+La secuencia tiene un costo.
+
+144
+00:07:51,380 --> 00:07:54,640
+Imagina mil árboles y un computador con diez núcleos.
+
+145
+00:07:54,760 --> 00:07:57,985
+En bagging, los diez núcleos entrenan diez árboles a la
+
+146
+00:07:57,985 --> 00:08:00,740
+vez: el tiempo es como el de unos cien árboles.
+
+147
+00:08:00,860 --> 00:08:04,547
+En boosting, el árbol dos necesita el resultado del árbol uno:
+
+148
+00:08:04,547 --> 00:08:07,580
+se entrenan de a uno, y el tiempo es el de los mil.
+
+149
+00:08:07,700 --> 00:08:11,561
+Un matiz importante: XGBoost y LightGBM sí paralelizan,
+
+150
+00:08:11,561 --> 00:08:14,930
+pero dentro de cada árbol, al buscar los cortes.
+
+151
+00:08:15,050 --> 00:08:17,990
+Lo que no se puede paralelizar es la cadena de árboles.
+
+152
+00:08:18,110 --> 00:08:21,185
+El error típico: creer que, como en el bosque,
+
+153
+00:08:21,185 --> 00:08:24,060
+agregar árboles a boosting nunca hace daño.
+
+154
+00:08:24,180 --> 00:08:27,460
+En el bosque es cierto: la curva se aplana y no sube.
+
+155
+00:08:27,580 --> 00:08:30,616
+En boosting, cada árbol nuevo sigue ajustando los
+
+156
+00:08:30,616 --> 00:08:33,280
+residuos, y puede terminar ajustando ruido.
+
+157
+00:08:33,400 --> 00:08:36,768
+En Ames, el mínimo llegó a los 250 árboles, y a los
+
+158
+00:08:36,768 --> 00:08:39,740
+trescientos el error ya había subido un poco.
+
+159
+00:08:39,860 --> 00:08:44,534
+Y la diapositiva cuatro advierte algo más: la secuencia hace a boosting más sensible
+
+160
+00:08:44,534 --> 00:08:48,150
+a los hiperparámetros, al ruido y a la filtración de información.
+
+161
+00:08:48,270 --> 00:08:51,097
+Una etiqueta mal puesta se convierte en el caso más
+
+162
+00:08:51,097 --> 00:08:53,480
+difícil, y el modelo se obsesiona con ella.
+
+163
+00:08:53,600 --> 00:08:56,692
+Para llevarte: bagging, en paralelo, con árboles
+
+164
+00:08:56,692 --> 00:08:59,590
+profundos que se promedian: baja la varianza.
+
+165
+00:08:59,710 --> 00:09:04,400
+Boosting, en secuencia, con árboles chicos que se suman: baja el sesgo.
+
+166
+00:09:04,520 --> 00:09:07,524
+Boosting da pasos chicos, puede superar al bosque, y
+
+167
+00:09:07,524 --> 00:09:09,950
+necesita que alguien le diga cuándo parar.
+
+168
+00:09:10,070 --> 00:09:13,928
+Siguiente parada: el primer algoritmo de la familia, AdaBoost,
+
+169
+00:09:13,928 --> 00:09:17,040
+y cómo usa pesos para señalar los casos difíciles.
+
+170
+00:09:17,930 --> 00:09:19,920
+Tercera parada: AdaBoost.
+
+171
+00:09:20,040 --> 00:09:23,106
+Vas a hacer a mano una ronda completa: el error,
+
+172
+00:09:23,106 --> 00:09:25,470
+el peso del árbol y los nuevos pesos.
+
+173
+00:09:25,590 --> 00:09:29,020
+En boosting, cada árbol tiene que decirle algo al siguiente.
+
+174
+00:09:29,140 --> 00:09:32,349
+En AdaBoost, ese mensaje es muy concreto: fíjate
+
+175
+00:09:32,349 --> 00:09:34,890
+en estos casos, que yo clasifiqué mal.
+
+176
+00:09:35,010 --> 00:09:36,950
+¿Cómo se transmite ese mensaje?
+
+177
+00:09:37,070 --> 00:09:38,000
+Con pesos.
+
+178
+00:09:38,120 --> 00:09:41,090
+Piensa en un profesor que prepara ensayos para una prueba.
+
+179
+00:09:41,210 --> 00:09:44,430
+En el primer ensayo, todas las preguntas valen lo mismo.
+
+180
+00:09:44,550 --> 00:09:46,940
+Corrige, y ve en qué temas fallaste.
+
+181
+00:09:47,060 --> 00:09:50,640
+El siguiente ensayo trae más preguntas justo de esos temas.
+
+182
+00:09:50,760 --> 00:09:54,460
+No te hace estudiar todo de nuevo: te hace estudiar lo que te costó.
+
+183
+00:09:54,580 --> 00:09:57,470
+La diapositiva seis muestra el ciclo de AdaBoost.
+
+184
+00:09:57,590 --> 00:10:00,700
+Al inicio, todos los casos tienen el mismo peso.
+
+185
+00:10:00,820 --> 00:10:04,020
+El árbol uno falla, digamos, en tres casos.
+
+186
+00:10:04,140 --> 00:10:06,780
+Se reponderan: esos casos pesan más.
+
+187
+00:10:06,900 --> 00:10:09,010
+El árbol dos se concentra en ellos.
+
+188
+00:10:09,130 --> 00:10:13,150
+Y al final, un voto, donde cada árbol pesa según su calidad.
+
+189
+00:10:13,270 --> 00:10:14,970
+¿Qué árboles usa AdaBoost?
+
+190
+00:10:15,090 --> 00:10:19,970
+Normalmente, árboles de un solo corte, que se llaman stumps, tocones.
+
+191
+00:10:20,090 --> 00:10:23,110
+Por ejemplo: ¿la edad es menor que 55?
+
+192
+00:10:23,230 --> 00:10:25,830
+Sí, a un lado; no, al otro.
+
+193
+00:10:25,950 --> 00:10:28,360
+Un stump solo es un aprendiz muy débil.
+
+194
+00:10:28,480 --> 00:10:32,081
+Y en scikit-learn, el modelo base por defecto de AdaBoost
+
+195
+00:10:32,081 --> 00:10:35,050
+es justamente eso: un árbol de profundidad uno.
+
+196
+00:10:35,170 --> 00:10:38,850
+Primer ingrediente: el error del árbol, la letra épsilon.
+
+197
+00:10:38,970 --> 00:10:43,183
+No es la fracción de casos mal clasificados: es la suma de los pesos
+
+198
+00:10:43,183 --> 00:10:46,590
+de esos casos, dividida por la suma de todos los pesos.
+
+199
+00:10:46,710 --> 00:10:49,325
+Es un número entre cero y uno: cero si no se
+
+200
+00:10:49,325 --> 00:10:51,880
+equivoca nunca, uno si se equivoca en todo.
+
+201
+00:10:52,000 --> 00:10:56,560
+Segundo ingrediente: el peso del árbol en el voto final, la letra alfa.
+
+202
+00:10:56,680 --> 00:11:01,690
+Se calcula como un medio del logaritmo natural de uno menos épsilon, sobre épsilon.
+
+203
+00:11:01,810 --> 00:11:05,160
+Mira la curva: con error chico, alfa es grande.
+
+204
+00:11:05,280 --> 00:11:08,840
+Con error 0.5, el azar, alfa vale cero.
+
+205
+00:11:08,960 --> 00:11:12,470
+Y con error mayor que 0.5, alfa es negativo.
+
+206
+00:11:12,590 --> 00:11:18,560
+Algunos valores, para tener la escala: con error 0.1, alfa vale 1.10.
+
+207
+00:11:18,680 --> 00:11:21,920
+Con 0.3, vale 0.42.
+
+208
+00:11:22,040 --> 00:11:23,980
+Con 0.5, cero.
+
+209
+00:11:24,100 --> 00:11:28,990
+La diapositiva lo resume en una frase: mayor error del árbol, menor influencia.
+
+210
+00:11:29,110 --> 00:11:31,910
+Tercer ingrediente: actualizar los pesos.
+
+211
+00:11:32,030 --> 00:11:36,730
+Los casos mal clasificados multiplican su peso por e elevado a alfa: suben.
+
+212
+00:11:36,850 --> 00:11:40,890
+Los bien clasificados, por e elevado a menos alfa: bajan.
+
+213
+00:11:41,010 --> 00:11:45,060
+Y al final se normaliza, para que todos los pesos vuelvan a sumar uno.
+
+214
+00:11:45,180 --> 00:11:49,010
+Ahora, una ronda completa a mano, con el ejemplo del apunte.
+
+215
+00:11:49,130 --> 00:11:52,570
+Diez observaciones, todas con peso 0.1.
+
+216
+00:11:52,690 --> 00:11:54,780
+El stump falla en dos de ellas.
+
+217
+00:11:54,900 --> 00:12:01,650
+Paso uno, el error: los dos errores pesan 0.1 cada uno, así que épsilon es 0.2.
+
+218
+00:12:01,770 --> 00:12:05,744
+Paso dos, alfa: un medio del logaritmo de 0.8 sobre
+
+219
+00:12:05,744 --> 00:12:09,250
+0.2, o sea, un medio del logaritmo de cuatro.
+
+220
+00:12:09,370 --> 00:12:14,960
+El logaritmo de cuatro es 1.386, y la mitad: 0.693.
+
+221
+00:12:15,080 --> 00:12:16,970
+Paso tres, los factores.
+
+222
+00:12:17,090 --> 00:12:24,130
+e elevado a 0.693 es 2: los errores duplican su peso, de 0.1 a 0.2.
+
+223
+00:12:24,250 --> 00:12:32,540
+e elevado a menos 0.693 es 0.5: los aciertos lo reducen a la mitad, de 0.1 a 0.05.
+
+224
+00:12:32,660 --> 00:12:34,730
+Pero ahora los pesos ya no suman uno.
+
+225
+00:12:34,850 --> 00:12:42,550
+Suman dos por 0.2, más ocho por 0.05: 0.4 más 0.4, igual a 0.8.
+
+226
+00:12:42,670 --> 00:12:46,720
+Paso cuatro, normalizar: dividimos todo por 0.8.
+
+227
+00:12:46,840 --> 00:12:51,840
+Los errores quedan en 0.2 sobre 0.8, igual a 0.25.
+
+228
+00:12:51,960 --> 00:12:58,280
+Y los aciertos, en 0.05 sobre 0.8, igual a 0.0625.
+
+229
+00:12:58,400 --> 00:13:00,810
+Y ahora, el detalle más elegante.
+
+230
+00:13:00,930 --> 00:13:07,490
+Suma el peso de los dos errores: 0.25 más 0.25, igual a 0.5.
+
+231
+00:13:07,610 --> 00:13:10,910
+La mitad de todo el peso quedó en los casos que el árbol falló.
+
+232
+00:13:11,030 --> 00:13:15,139
+Esto pasa siempre, con cualquier épsilon: con los nuevos pesos,
+
+233
+00:13:15,139 --> 00:13:18,530
+el árbol anterior tiene exactamente un error de 0.5.
+
+234
+00:13:18,650 --> 00:13:20,520
+Es decir, es como el azar.
+
+235
+00:13:20,640 --> 00:13:21,800
+¿Para qué sirve eso?
+
+236
+00:13:21,920 --> 00:13:24,830
+Obliga al siguiente árbol a aprender algo distinto.
+
+237
+00:13:24,950 --> 00:13:27,880
+Si repitiera el mismo corte, no ganaría nada.
+
+238
+00:13:28,000 --> 00:13:30,890
+Por eso cada stump mira el problema desde otro ángulo.
+
+239
+00:13:31,010 --> 00:13:35,830
+El error típico: calcular épsilon contando casos, en vez de sumar pesos.
+
+240
+00:13:35,950 --> 00:13:37,630
+En la segunda ronda se nota.
+
+241
+00:13:37,750 --> 00:13:43,248
+Supón que el nuevo stump falla en uno de los dos casos difíciles, que
+
+242
+00:13:43,248 --> 00:13:47,550
+pesa 0.25, y en dos casos fáciles, de 0.0625 cada uno.
+
+243
+00:13:47,670 --> 00:13:51,400
+Contando casos, serían tres de diez: 0.3.
+
+244
+00:13:51,520 --> 00:13:57,420
+Pero el error ponderado es 0.25 más 0.125: 0.375.
+
+245
+00:13:57,540 --> 00:14:05,340
+Y con ese épsilon, alfa es un medio del logaritmo de 0.625 sobre 0.375, un medio
+
+246
+00:14:05,340 --> 00:14:11,580
+del logaritmo de 1.667, un medio de 0.511: aproximadamente 0.26.
+
+247
+00:14:11,700 --> 00:14:14,290
+Un árbol mucho menos influyente que el primero.
+
+248
+00:14:14,410 --> 00:14:15,630
+Piensa un segundo.
+
+249
+00:14:15,750 --> 00:14:18,650
+¿Qué alfa recibe un stump con error 0.5?
+
+250
+00:14:18,770 --> 00:14:20,680
+¿Y uno con error 0.8?
+
+251
+00:14:21,400 --> 00:14:25,540
+Con error 0.5: un medio del logaritmo de uno, cero.
+
+252
+00:14:25,660 --> 00:14:27,780
+El árbol no aporta nada al voto.
+
+253
+00:14:27,900 --> 00:14:33,428
+Con error 0.8: un medio del logaritmo de 0.2 sobre 0.8,
+
+254
+00:14:33,428 --> 00:14:37,850
+un medio del logaritmo de 0.25, menos 0.693.
+
+255
+00:14:37,970 --> 00:14:42,870
+Es peor que el azar, y su voto se invierte: equivale a predecir lo contrario.
+
+256
+00:14:42,990 --> 00:14:46,600
+Para llevarte: épsilon es la suma de los pesos de los errores.
+
+257
+00:14:46,720 --> 00:14:49,818
+Alfa, un medio del logaritmo de uno menos épsilon
+
+258
+00:14:49,818 --> 00:14:52,790
+sobre épsilon: menos error, más voz en el voto.
+
+259
+00:14:52,910 --> 00:14:55,666
+Y los errores multiplican su peso por e elevado a
+
+260
+00:14:55,666 --> 00:14:58,310
+alfa, hasta quedar con la mitad del peso total.
+
+261
+00:14:58,430 --> 00:15:01,239
+Siguiente parada: el voto final de AdaBoost, y
+
+262
+00:15:01,239 --> 00:15:03,620
+tres rondas con los pacientes de Heart.
+
+263
+00:15:04,490 --> 00:15:07,020
+Cuarta parada: el voto de AdaBoost.
+
+264
+00:15:07,140 --> 00:15:10,780
+Y tres rondas reales con setenta pacientes del dataset Heart.
+
+265
+00:15:10,900 --> 00:15:12,210
+Tres árboles votan.
+
+266
+00:15:12,330 --> 00:15:17,290
+El primero dice menos uno; el segundo, más uno; el tercero, más uno.
+
+267
+00:15:17,410 --> 00:15:19,590
+Por mayoría, ganaría más uno.
+
+268
+00:15:19,710 --> 00:15:22,190
+Pero AdaBoost puede decir menos uno.
+
+269
+00:15:22,310 --> 00:15:22,810
+¿Cómo?
+
+270
+00:15:22,930 --> 00:15:24,670
+Piensa en tres meteorólogos.
+
+271
+00:15:24,790 --> 00:15:29,460
+Uno acierta casi siempre; los otros dos, apenas más que tirar una moneda.
+
+272
+00:15:29,580 --> 00:15:33,530
+Si el bueno dice que llueve y los otros dos dicen que no, ¿a quién le crees?
+
+273
+00:15:33,650 --> 00:15:35,290
+Al que tiene mejor historial.
+
+274
+00:15:35,410 --> 00:15:36,880
+Su voto pesa más.
+
+275
+00:15:37,000 --> 00:15:40,260
+El voto final de AdaBoost hace exactamente eso.
+
+276
+00:15:40,380 --> 00:15:44,910
+Cada árbol vota más uno o menos uno, y su voto se multiplica por su alfa.
+
+277
+00:15:45,030 --> 00:15:48,585
+Se suma todo, y la clase final es el signo de esa
+
+278
+00:15:48,585 --> 00:15:51,850
+suma: positiva, más uno; negativa, menos uno.
+
+279
+00:15:51,970 --> 00:15:55,170
+Volvamos a los tres árboles, con el ejemplo del apunte.
+
+280
+00:15:55,290 --> 00:15:59,470
+Sus alfas son 0.9, 0.4 y 0.3.
+
+281
+00:15:59,590 --> 00:16:03,230
+El primero vota menos uno: aporta menos 0.9.
+
+282
+00:16:03,350 --> 00:16:09,260
+Los otros dos votan más uno: aportan 0.4 más 0.3, o sea 0.7.
+
+283
+00:16:09,380 --> 00:16:14,510
+La suma: menos 0.9 más 0.7, igual a menos 0.2.
+
+284
+00:16:14,630 --> 00:16:19,490
+Es negativa, así que gana menos uno, aunque haya más votos a favor de más uno.
+
+285
+00:16:19,610 --> 00:16:22,420
+Un árbol confiable puede ganarle a dos mediocres.
+
+286
+00:16:22,540 --> 00:16:24,210
+Ahora con datos reales.
+
+287
+00:16:24,330 --> 00:16:27,086
+Setenta pacientes del dataset Heart, con dos
+
+288
+00:16:27,086 --> 00:16:30,280
+variables: la edad y la frecuencia cardíaca máxima.
+
+289
+00:16:30,400 --> 00:16:34,520
+En rojo, los que tienen enfermedad cardíaca; en azul, los que no.
+
+290
+00:16:34,640 --> 00:16:37,880
+Todos empiezan con el mismo peso: uno sobre setenta.
+
+291
+00:16:38,000 --> 00:16:38,980
+Ronda uno.
+
+292
+00:16:39,100 --> 00:16:43,280
+El stump elige un corte: edad menor que 54.5.
+
+293
+00:16:43,400 --> 00:16:46,230
+Se equivoca en 19 de los 70 pacientes.
+
+294
+00:16:46,350 --> 00:16:51,860
+Como todos pesan lo mismo, épsilon es 19 sobre 70: 0.271.
+
+295
+00:16:51,980 --> 00:16:58,760
+Su alfa: uno menos épsilon, sobre épsilon, es 51 sobre 19: 2.684.
+
+296
+00:16:58,880 --> 00:17:04,910
+El logaritmo natural es 0.987, y la mitad: alrededor de 0.49.
+
+297
+00:17:05,030 --> 00:17:06,000
+Ronda dos.
+
+298
+00:17:06,120 --> 00:17:09,500
+Los 19 errores crecen, y los aciertos se achican.
+
+299
+00:17:09,620 --> 00:17:14,820
+El nuevo stump corta por la frecuencia cardíaca: menor que 147.5.
+
+300
+00:17:14,940 --> 00:17:16,760
+Falla en 21 pacientes.
+
+301
+00:17:16,880 --> 00:17:20,700
+Contando, serían 21 de 70, 0.3.
+
+302
+00:17:20,820 --> 00:17:25,690
+Pero el error ponderado es 0.338: falló en casos que pesaban más.
+
+303
+00:17:25,810 --> 00:17:28,260
+Su alfa baja a 0.34.
+
+304
+00:17:28,380 --> 00:17:32,307
+Ronda tres: los pesos se reacomodan otra vez, y el
+
+305
+00:17:32,307 --> 00:17:35,370
+stump corta en una frecuencia de 177.5.
+
+306
+00:17:35,490 --> 00:17:42,260
+Su error ya es 0.453, muy cerca de 0.5, y su alfa apenas 0.09.
+
+307
+00:17:42,380 --> 00:17:43,750
+El patrón es típico.
+
+308
+00:17:43,870 --> 00:17:49,530
+Error de 0.271, 0.338, 0.453.
+
+309
+00:17:49,650 --> 00:17:54,660
+Alfa de 0.49, 0.34, 0.09.
+
+310
+00:17:54,780 --> 00:17:58,517
+A medida que solo quedan casos difíciles, el error se
+
+311
+00:17:58,517 --> 00:18:01,760
+acerca a 0.5, y cada árbol nuevo aporta menos.
+
+312
+00:18:01,880 --> 00:18:08,850
+Con treinta stumps, el voto ponderado clasifica bien a 52 de los 70 pacientes: 0.74.
+
+313
+00:18:08,970 --> 00:18:13,105
+Y la frontera que dibuja ese voto es escalonada: cada stump aporta un
+
+314
+00:18:13,105 --> 00:18:16,640
+corte recto, y la suma de muchos cortes forma una escalera.
+
+315
+00:18:16,760 --> 00:18:19,070
+La diapositiva ocho hace el balance.
+
+316
+00:18:19,190 --> 00:18:24,346
+Ventajas: intuición clara y pocos hiperparámetros, buen desempeño con aprendices muy
+
+317
+00:18:24,346 --> 00:18:29,010
+simples, no exige escalar variables, y sirve para clasificación y regresión.
+
+318
+00:18:29,130 --> 00:18:33,158
+Limitaciones: es sensible al ruido y a las etiquetas incorrectas, el
+
+319
+00:18:33,158 --> 00:18:37,660
+entrenamiento es secuencial, y es menos flexible que las variantes modernas.
+
+320
+00:18:37,780 --> 00:18:40,970
+Y su consejo práctico: úsalo como línea base fuerte,
+
+321
+00:18:40,970 --> 00:18:43,730
+cuando los datos están relativamente limpios.
+
+322
+00:18:43,850 --> 00:18:47,103
+Ojo con el nombre: Ada viene de adaptive, adaptativo,
+
+323
+00:18:47,103 --> 00:18:49,680
+porque los pesos se adaptan en cada ronda.
+
+324
+00:18:49,800 --> 00:18:51,800
+¿Por qué el ruido le hace tanto daño?
+
+325
+00:18:51,920 --> 00:18:54,510
+Imagina un paciente con la etiqueta mal puesta.
+
+326
+00:18:54,630 --> 00:18:59,240
+Ningún árbol razonable lo clasifica bien, así que falla en todas las rondas.
+
+327
+00:18:59,360 --> 00:19:03,799
+Con alfa cerca de 0.49, cada ronda multiplica su
+
+328
+00:19:03,799 --> 00:19:07,960
+peso por e elevado a 0.49, alrededor de 1.63.
+
+329
+00:19:08,080 --> 00:19:12,068
+Tras cinco rondas, 1.63 elevado a cinco: su peso se
+
+330
+00:19:12,068 --> 00:19:15,900
+multiplicó por 11.5, sin contar la normalización.
+
+331
+00:19:16,020 --> 00:19:19,430
+El modelo se obsesiona con un caso que nunca va a poder acertar.
+
+332
+00:19:19,550 --> 00:19:23,160
+Por eso, antes de usar boosting, revisa las etiquetas.
+
+333
+00:19:23,280 --> 00:19:25,980
+En Python, AdaBoost es una línea.
+
+334
+00:19:26,100 --> 00:19:30,100
+El notebook usa cien árboles con un learning_rate de 0.05.
+
+335
+00:19:30,220 --> 00:19:34,080
+Por defecto son cincuenta árboles, y el modelo base es un stump.
+
+336
+00:19:34,200 --> 00:19:36,965
+El learning_rate achica el alfa de cada árbol:
+
+337
+00:19:36,965 --> 00:19:39,250
+igual que eta en el resto de la clase.
+
+338
+00:19:39,370 --> 00:19:42,464
+El error típico: codificar las clases como cero
+
+339
+00:19:42,464 --> 00:19:44,900
+y uno, y aplicar la fórmula del voto.
+
+340
+00:19:45,020 --> 00:19:48,343
+Con cero y uno, un árbol que vota cero no aporta nada,
+
+341
+00:19:48,343 --> 00:19:51,050
+y el signo de la suma siempre sale positivo.
+
+342
+00:19:51,170 --> 00:19:54,720
+La fórmula del voto necesita clases menos uno y más uno.
+
+343
+00:19:54,840 --> 00:19:59,010
+scikit-learn se encarga de eso por dentro; a mano, te toca a ti.
+
+344
+00:19:59,130 --> 00:20:02,080
+Piensa un segundo, con un ejercicio del cuaderno.
+
+345
+00:20:02,200 --> 00:20:07,977
+Cuatro stumps, con alfas 0.8, 0.5, 0.45 y 0.2, votan
+
+346
+00:20:07,977 --> 00:20:12,420
+más uno, menos uno, menos uno y más uno.
+
+347
+00:20:12,540 --> 00:20:14,080
+Hay empate dos a dos.
+
+348
+00:20:14,200 --> 00:20:15,060
+¿Quién gana?
+
+349
+00:20:15,780 --> 00:20:24,100
+Suma: 0.8 menos 0.5, menos 0.45, más 0.2, igual a más 0.05.
+
+350
+00:20:24,220 --> 00:20:29,520
+Gana más uno, por muy poco: el primer stump, el más confiable, desempata.
+
+351
+00:20:29,640 --> 00:20:32,581
+Para llevarte: el voto de AdaBoost es una suma
+
+352
+00:20:32,581 --> 00:20:35,650
+ponderada por alfa, no una votación por mayoría.
+
+353
+00:20:35,770 --> 00:20:40,720
+Con datos reales, el error de cada ronda sube hacia 0.5 y alfa baja.
+
+354
+00:20:40,840 --> 00:20:45,640
+Y su punto débil es el ruido: una etiqueta mala acumula peso ronda tras ronda.
+
+355
+00:20:45,760 --> 00:20:48,060
+Siguiente parada: Gradient Boosting.
+
+356
+00:20:48,180 --> 00:20:52,920
+En vez de pesos, cada árbol recibe directamente el error: los residuos.
+
+357
+00:20:53,810 --> 00:20:55,900
+Quinta parada: Gradient Boosting.
+
+358
+00:20:56,020 --> 00:21:00,080
+Vas a hacer una ronda completa a mano con la tabla de la diapositiva diez.
+
+359
+00:21:00,200 --> 00:21:04,970
+AdaBoost le avisa al siguiente árbol con pesos: fíjate en estos casos.
+
+360
+00:21:05,090 --> 00:21:06,980
+Gradient Boosting es más directo.
+
+361
+00:21:07,100 --> 00:21:11,692
+Le pasa al siguiente árbol el error mismo, con su signo y su tamaño: a esta
+
+362
+00:21:11,692 --> 00:21:15,550
+casa le faltan dos mil dólares; a esta otra le sobran tres mil.
+
+363
+00:21:15,670 --> 00:21:16,970
+Piensa en un sastre.
+
+364
+00:21:17,090 --> 00:21:20,130
+En la primera prueba, el traje queda más o menos.
+
+365
+00:21:20,250 --> 00:21:25,420
+El sastre mide cuánto falta en cada costura: dos centímetros aquí, tres de más allá.
+
+366
+00:21:25,540 --> 00:21:30,030
+El siguiente ajuste no rehace el traje: corrige justo esas diferencias.
+
+367
+00:21:30,150 --> 00:21:34,770
+Esas diferencias, lo que falta para llegar al valor real, se llaman residuos.
+
+368
+00:21:34,890 --> 00:21:38,980
+Residuo igual a y menos efe: el valor real menos la predicción actual.
+
+369
+00:21:39,100 --> 00:21:41,340
+La diapositiva nueve escribe la regla.
+
+370
+00:21:41,460 --> 00:21:44,573
+El modelo nuevo, efe eme, es el modelo anterior
+
+371
+00:21:44,573 --> 00:21:47,090
+más eta por hache eme, el árbol nuevo.
+
+372
+00:21:47,210 --> 00:21:50,473
+Y el ciclo: una pérdida, su gradiente negativo, un
+
+373
+00:21:50,473 --> 00:21:53,540
+árbol que lo aproxima, y el modelo actualizado.
+
+374
+00:21:53,660 --> 00:21:57,013
+Y abajo, una frase clave: con error cuadrático, el
+
+375
+00:21:57,013 --> 00:22:00,030
+gradiente negativo coincide con los residuos.
+
+376
+00:22:00,150 --> 00:22:02,180
+En la próxima parada veremos por qué.
+
+377
+00:22:02,300 --> 00:22:04,690
+Por ahora, trabajemos con residuos.
+
+378
+00:22:04,810 --> 00:22:07,450
+Ahora a mano, con la diapositiva diez.
+
+379
+00:22:07,570 --> 00:22:13,870
+Cuatro observaciones: A, B, C y D, con valores 12, 7, 11 y 10.
+
+380
+00:22:13,990 --> 00:22:17,830
+El primer paso es la predicción base, efe cero: el promedio.
+
+381
+00:22:17,950 --> 00:22:23,120
+12 más 7 más 11 más 10 son 40, y 40 dividido por cuatro: 10.
+
+382
+00:22:23,240 --> 00:22:26,520
+Segundo paso: los residuos, y menos efe cero.
+
+383
+00:22:26,640 --> 00:22:29,140
+A: 12 menos 10, más 2.
+
+384
+00:22:29,260 --> 00:22:32,180
+B: 7 menos 10, menos 3.
+
+385
+00:22:32,300 --> 00:22:33,620
+C: más 1.
+
+386
+00:22:33,740 --> 00:22:37,080
+Y D: cero, porque D ya vale justo el promedio.
+
+387
+00:22:37,200 --> 00:22:40,080
+Los residuos son lo que el primer árbol tiene que aprender.
+
+388
+00:22:40,200 --> 00:22:43,790
+Tercer paso: un árbol pequeño que predice esos residuos.
+
+389
+00:22:43,910 --> 00:22:48,012
+La diapositiva no dice dónde corta, así que usemos un stump de
+
+390
+00:22:48,012 --> 00:22:51,650
+ejemplo: pone a B en una hoja, y a A, C y D en la otra.
+
+391
+00:22:51,770 --> 00:22:56,290
+Cada hoja predice el promedio de sus residuos: para B, menos 3.
+
+392
+00:22:56,410 --> 00:23:01,840
+Para A, C y D: 2 más 1 más 0, dividido por tres, igual a 1.
+
+393
+00:23:01,960 --> 00:23:04,380
+Cuarto paso: actualizar con eta.
+
+394
+00:23:04,500 --> 00:23:06,050
+Usemos 0.1.
+
+395
+00:23:06,170 --> 00:23:11,250
+Para A, C y D: 10 más 0.1 por 1, igual a 10.1.
+
+396
+00:23:11,370 --> 00:23:16,170
+Para B: 10 más 0.1 por menos 3, igual a 9.7.
+
+397
+00:23:16,290 --> 00:23:19,040
+Solo avanzamos un diez por ciento de la corrección.
+
+398
+00:23:19,160 --> 00:23:21,570
+Quinto paso: los nuevos residuos.
+
+399
+00:23:21,690 --> 00:23:23,100
+A, 1.9.
+
+400
+00:23:23,220 --> 00:23:25,280
+B, menos 2.7.
+
+401
+00:23:25,400 --> 00:23:27,130
+C, 0.9.
+
+402
+00:23:27,250 --> 00:23:29,340
+D, menos 0.1.
+
+403
+00:23:29,460 --> 00:23:32,345
+Todos se achicaron un poco, salvo D, que estaba
+
+404
+00:23:32,345 --> 00:23:34,800
+perfecto y ahora se pasa por una décima.
+
+405
+00:23:34,920 --> 00:23:36,070
+¿Mejoró el modelo?
+
+406
+00:23:36,190 --> 00:23:38,250
+Midamos el error cuadrático medio.
+
+407
+00:23:38,370 --> 00:23:43,740
+Antes: 4 más 9 más 1 más 0, dividido por cuatro: 3.5.
+
+408
+00:23:43,860 --> 00:23:55,050
+Después: 3.61 más 7.29 más 0.81 más 0.01, igual a 11.72, dividido por cuatro: 2.93.
+
+409
+00:23:55,170 --> 00:23:55,670
+Bajó.
+
+410
+00:23:55,790 --> 00:23:59,990
+Y el siguiente árbol vuelve a estudiar lo que aún falta: los residuos nuevos.
+
+411
+00:24:00,110 --> 00:24:03,030
+Con datos reales pasa lo mismo, a gran escala.
+
+412
+00:24:03,150 --> 00:24:07,890
+En Ames, Gradient Boosting con árboles de profundidad tres y eta 0.1.
+
+413
+00:24:08,010 --> 00:24:11,900
+Con un árbol, el error de validación es 69 000 dólares.
+
+414
+00:24:12,020 --> 00:24:14,520
+Con diez, 40 700.
+
+415
+00:24:14,640 --> 00:24:17,430
+Con cincuenta, 24 300.
+
+416
+00:24:17,550 --> 00:24:19,990
+Con cien, 22 700.
+
+417
+00:24:20,110 --> 00:24:22,990
+Y con trescientos, 21 800.
+
+418
+00:24:23,110 --> 00:24:26,659
+En Python: GradientBoostingRegressor, con el número de
+
+419
+00:24:26,659 --> 00:24:30,340
+árboles, el learning_rate, que es eta, y la profundidad.
+
+420
+00:24:30,460 --> 00:24:34,780
+Con la pérdida cuadrática, efe cero es el promedio, igual que a mano.
+
+421
+00:24:34,900 --> 00:24:38,142
+Y staged_predict te entrega efe uno, efe dos, efe
+
+422
+00:24:38,142 --> 00:24:40,920
+tres: la predicción después de cada árbol.
+
+423
+00:24:41,040 --> 00:24:44,135
+El error típico al programarlo a mano: entrenar cada
+
+424
+00:24:44,135 --> 00:24:47,110
+árbol nuevo sobre y, en vez de sobre los residuos.
+
+425
+00:24:47,230 --> 00:24:50,370
+Así, todos los árboles aprenderían lo mismo que el
+
+426
+00:24:50,370 --> 00:24:52,820
+primero, y sumarlos no corregiría nada.
+
+427
+00:24:52,940 --> 00:24:57,160
+El otro error: sumar el árbol completo, sin multiplicar por eta.
+
+428
+00:24:57,280 --> 00:24:58,500
+Piensa un segundo.
+
+429
+00:24:58,620 --> 00:25:01,710
+En la tabla, ¿qué pasaría con eta igual a uno?
+
+430
+00:25:01,830 --> 00:25:03,670
+¿Los residuos bajan más o menos?
+
+431
+00:25:04,390 --> 00:25:08,900
+Con eta igual a uno, A, C y D pasan a 11, y B a 7.
+
+432
+00:25:09,020 --> 00:25:15,890
+Los residuos quedan en 1, 0, 0 y menos 1, y el error cuadrático medio cae a 0.5.
+
+433
+00:25:16,010 --> 00:25:17,610
+Mucho mejor en esta tabla.
+
+434
+00:25:17,730 --> 00:25:20,842
+Pero ojo: cada árbol también aprende el ruido de
+
+435
+00:25:20,842 --> 00:25:23,630
+sus datos, y con eta uno lo copia completo.
+
+436
+00:25:23,750 --> 00:25:28,160
+Por eso, en datos reales, los pasos chicos suelen generalizar mejor.
+
+437
+00:25:28,280 --> 00:25:31,116
+Para llevarte: Gradient Boosting parte del promedio
+
+438
+00:25:31,116 --> 00:25:33,340
+y entrena cada árbol sobre los residuos.
+
+439
+00:25:33,460 --> 00:25:36,020
+Cada árbol se suma multiplicado por eta.
+
+440
+00:25:36,140 --> 00:25:40,750
+Y en cada ronda, el siguiente árbol estudia lo que todavía falta por explicar.
+
+441
+00:25:40,870 --> 00:25:43,730
+Siguiente parada: por qué se llama gradient.
+
+442
+00:25:43,850 --> 00:25:45,510
+La pérdida y su gradiente.
+
+443
+00:25:46,410 --> 00:25:49,210
+Sexta parada: la pérdida y el gradiente.
+
+444
+00:25:49,330 --> 00:25:51,945
+Por qué el algoritmo se llama Gradient Boosting,
+
+445
+00:25:51,945 --> 00:25:54,070
+y qué cambia cuando cambias la pérdida.
+
+446
+00:25:54,190 --> 00:25:57,600
+En la parada anterior, cada árbol aprendía los residuos.
+
+447
+00:25:57,720 --> 00:26:00,220
+Pero el algoritmo no se llama residual boosting.
+
+448
+00:26:00,340 --> 00:26:01,940
+Se llama Gradient Boosting.
+
+449
+00:26:02,060 --> 00:26:04,390
+¿Qué tiene que ver un gradiente con todo esto?
+
+450
+00:26:04,510 --> 00:26:08,780
+Imagina que estás en un cerro, con una niebla tan densa que no ves el valle.
+
+451
+00:26:08,900 --> 00:26:11,370
+Pero puedes sentir la pendiente bajo tus pies.
+
+452
+00:26:11,490 --> 00:26:14,370
+Entonces das un paso hacia donde el suelo baja más.
+
+453
+00:26:14,490 --> 00:26:15,480
+Y repites.
+
+454
+00:26:15,600 --> 00:26:19,930
+Paso a paso, llegas abajo, sin haber visto nunca el valle completo.
+
+455
+00:26:20,050 --> 00:26:25,050
+En boosting, el cerro es la pérdida: una función que mide qué tan mal predices.
+
+456
+00:26:25,170 --> 00:26:27,830
+El gradiente dice hacia dónde sube la pérdida.
+
+457
+00:26:27,950 --> 00:26:31,910
+Su negativo, el gradiente negativo, dice hacia dónde baja.
+
+458
+00:26:32,030 --> 00:26:35,040
+Y cada árbol nuevo aprende a predecir esa dirección.
+
+459
+00:26:35,160 --> 00:26:39,650
+Empecemos con la pérdida cuadrática: un medio de y menos efe, al cuadrado.
+
+460
+00:26:39,770 --> 00:26:43,280
+Su derivada respecto de efe es menos, y menos efe.
+
+461
+00:26:43,400 --> 00:26:47,500
+Y el gradiente negativo es y menos efe: exactamente el residuo.
+
+462
+00:26:47,620 --> 00:26:50,257
+Por eso, con pérdida cuadrática, ajustar el
+
+463
+00:26:50,257 --> 00:26:53,140
+gradiente es lo mismo que ajustar los residuos.
+
+464
+00:26:53,260 --> 00:26:56,640
+Para eso está el un medio: para que la derivada quede limpia.
+
+465
+00:26:56,760 --> 00:26:58,320
+Pero hay otras pérdidas.
+
+466
+00:26:58,440 --> 00:27:03,110
+La diapositiva once lo dice: la pérdida define qué significa equivocarse.
+
+467
+00:27:03,230 --> 00:27:06,250
+La absoluta, el valor absoluto de y menos efe.
+
+468
+00:27:06,370 --> 00:27:08,979
+Y la de Huber, que es cuadrática para errores
+
+469
+00:27:08,979 --> 00:27:11,240
+chicos y absoluta para errores grandes.
+
+470
+00:27:11,360 --> 00:27:13,220
+Aquí, con y igual a 12.
+
+471
+00:27:13,340 --> 00:27:14,560
+Mira las colas.
+
+472
+00:27:14,680 --> 00:27:19,400
+La cuadrática castiga muchísimo los errores grandes: crece como una parábola.
+
+473
+00:27:19,520 --> 00:27:24,330
+La absoluta y la de Huber crecen en línea recta: un error enorme no domina todo.
+
+474
+00:27:24,450 --> 00:27:27,200
+¿Qué aprende el siguiente árbol con cada pérdida?
+
+475
+00:27:27,320 --> 00:27:31,630
+Con el ejemplo del apunte: y vale 12, y la predicción actual es 9.
+
+476
+00:27:31,750 --> 00:27:37,290
+Con la cuadrática, el gradiente negativo es el residuo: 12 menos 9, más 3.
+
+477
+00:27:37,410 --> 00:27:40,910
+Con la absoluta, es solo el signo del residuo: más 1.
+
+478
+00:27:41,030 --> 00:27:46,280
+Y con Huber, con delta igual a 2, el residuo recortado en 2: más 2.
+
+479
+00:27:46,400 --> 00:27:51,410
+Ahora un valor atípico: supón que y vale 40, y la predicción sigue en 9.
+
+480
+00:27:51,530 --> 00:27:54,536
+Con la cuadrática, el árbol tiene que aprender
+
+481
+00:27:54,536 --> 00:27:57,150
+más 31: ese solo caso arrastra al árbol.
+
+482
+00:27:57,270 --> 00:27:59,010
+Con la absoluta, más 1.
+
+483
+00:27:59,130 --> 00:28:00,770
+Con Huber, más 2.
+
+484
+00:28:00,890 --> 00:28:03,416
+Por eso la absoluta y la de Huber se llaman
+
+485
+00:28:03,416 --> 00:28:06,060
+robustas: un caso extremo no domina al árbol.
+
+486
+00:28:06,180 --> 00:28:07,490
+¿Y en clasificación?
+
+487
+00:28:07,610 --> 00:28:10,510
+Ahí la pérdida es la logística, la log-loss.
+
+488
+00:28:10,630 --> 00:28:13,605
+El modelo suma puntajes, efe, y los convierte en
+
+489
+00:28:13,605 --> 00:28:15,960
+probabilidad con la función logística.
+
+490
+00:28:16,080 --> 00:28:19,791
+El gradiente negativo es y menos pe: la clase real, cero
+
+491
+00:28:19,791 --> 00:28:22,840
+o uno, menos la probabilidad que da el modelo.
+
+492
+00:28:22,960 --> 00:28:26,310
+Con el apunte: un paciente enfermo, y igual a uno.
+
+493
+00:28:26,430 --> 00:28:31,630
+Si el puntaje es cero, pe es 0.5, y el árbol aprende 0.5.
+
+494
+00:28:31,750 --> 00:28:38,600
+Si el puntaje ya es dos, pe es 0.881, y el árbol aprende apenas 0.119.
+
+495
+00:28:38,720 --> 00:28:42,240
+A medida que el modelo acierta, el gradiente se achica solo.
+
+496
+00:28:42,360 --> 00:28:45,120
+En scikit-learn, la pérdida es un parámetro.
+
+497
+00:28:45,240 --> 00:28:48,098
+En regresión, la cuadrática es la de defecto, y
+
+498
+00:28:48,098 --> 00:28:50,530
+también están la absoluta y la de Huber.
+
+499
+00:28:50,650 --> 00:28:53,740
+En clasificación, la de defecto es la log-loss.
+
+500
+00:28:53,860 --> 00:28:56,670
+Y aquí, una alerta del notebook de la clase.
+
+501
+00:28:56,790 --> 00:29:00,490
+En Ames, el Gradient Boosting se entrena con la pérdida de Huber.
+
+502
+00:29:00,610 --> 00:29:04,550
+Pero después se evalúa, y se optimiza, con el RMSE,
+
+503
+00:29:04,550 --> 00:29:07,640
+que corresponde a la pérdida cuadrática.
+
+504
+00:29:07,760 --> 00:29:11,510
+El objetivo con que se entrena y la métrica con que se juzga no coinciden.
+
+505
+00:29:11,630 --> 00:29:14,330
+Lo medimos con la misma configuración del notebook.
+
+506
+00:29:14,450 --> 00:29:19,740
+Con Huber, el RMSE en test es 29 200 dólares.
+
+507
+00:29:19,860 --> 00:29:23,220
+Con la pérdida cuadrática, 28 600.
+
+508
+00:29:23,340 --> 00:29:27,710
+Unos quinientos dólares mejor, solo por alinear el objetivo con la métrica.
+
+509
+00:29:27,830 --> 00:29:32,550
+El error típico: decir que boosting siempre ajusta los residuos, y menos efe.
+
+510
+00:29:32,670 --> 00:29:35,310
+Eso es cierto solo con la pérdida cuadrática.
+
+511
+00:29:35,430 --> 00:29:39,157
+Con la absoluta, el árbol aprende signos; con Huber,
+
+512
+00:29:39,157 --> 00:29:42,740
+residuos recortados; con la logística, y menos pe.
+
+513
+00:29:42,860 --> 00:29:45,010
+Lo general es el gradiente negativo.
+
+514
+00:29:45,130 --> 00:29:46,350
+Piensa un segundo.
+
+515
+00:29:46,470 --> 00:29:50,960
+Con la pérdida absoluta, dos casas tienen residuos de más 1 y de más 100.
+
+516
+00:29:51,080 --> 00:29:53,700
+¿Qué valores tiene que aprender el siguiente árbol?
+
+517
+00:29:54,420 --> 00:29:55,960
+Más 1 y más 1.
+
+518
+00:29:56,080 --> 00:29:58,940
+Con la pérdida absoluta, el árbol solo ve el
+
+519
+00:29:58,940 --> 00:30:01,930
+signo: las dos casas le piden lo mismo, subir.
+
+520
+00:30:02,050 --> 00:30:04,936
+El tamaño del error no importa para la dirección, y
+
+521
+00:30:04,936 --> 00:30:07,540
+por eso un caso extremo no arrastra al modelo.
+
+522
+00:30:07,660 --> 00:30:11,320
+Para llevarte: la pérdida define qué significa equivocarse.
+
+523
+00:30:11,440 --> 00:30:14,635
+Cada árbol aprende el gradiente negativo de esa pérdida,
+
+524
+00:30:14,635 --> 00:30:17,260
+que con la cuadrática coincide con el residuo.
+
+525
+00:30:17,380 --> 00:30:20,870
+Y entrena con la misma pérdida que vas a usar para juzgar al modelo.
+
+526
+00:30:20,990 --> 00:30:24,920
+Siguiente parada: la tasa de aprendizaje y el número de árboles.
+
+527
+00:30:25,040 --> 00:30:27,460
+Dos perillas que siempre se mueven juntas.
+
+528
+00:30:28,330 --> 00:30:32,260
+Séptima parada: la tasa de aprendizaje y el número de árboles.
+
+529
+00:30:32,380 --> 00:30:34,800
+Dos perillas que siempre se mueven juntas.
+
+530
+00:30:34,920 --> 00:30:37,706
+Si cada árbol corrige errores, ¿por qué no dejar
+
+531
+00:30:37,706 --> 00:30:39,970
+que cada uno corrija todo lo que pueda?
+
+532
+00:30:40,090 --> 00:30:43,300
+Eta igual a uno, pasos completos, y listo.
+
+533
+00:30:43,420 --> 00:30:46,090
+Con datos reales vas a ver que eso sale peor.
+
+534
+00:30:46,210 --> 00:30:49,780
+Y vas a ver cuántos árboles más hacen falta cuando achicas el paso.
+
+535
+00:30:49,900 --> 00:30:52,420
+Piensa en dos formas de estudiar para un examen.
+
+536
+00:30:52,540 --> 00:30:55,210
+Una: todo de golpe, la noche anterior.
+
+537
+00:30:55,330 --> 00:30:58,340
+Otra: un poco cada día, durante semanas.
+
+538
+00:30:58,460 --> 00:31:02,270
+La segunda toma más días, pero deja un aprendizaje más estable.
+
+539
+00:31:02,390 --> 00:31:06,070
+Eta es el tamaño de cada sesión, y los árboles son los días.
+
+540
+00:31:06,190 --> 00:31:09,640
+La diapositiva once habla de tres perillas fundamentales.
+
+541
+00:31:09,760 --> 00:31:12,910
+La pérdida, que define qué significa equivocarse.
+
+542
+00:31:13,030 --> 00:31:15,955
+La tasa eta, que controla el tamaño de cada
+
+543
+00:31:15,955 --> 00:31:18,880
+paso: menor eta suele requerir más árboles.
+
+544
+00:31:19,000 --> 00:31:22,852
+Y la complejidad, que limita lo que aprende cada árbol: su
+
+545
+00:31:22,852 --> 00:31:25,840
+profundidad, sus hojas, sus muestras mínimas.
+
+546
+00:31:25,960 --> 00:31:28,796
+En boosting, los árboles suelen ser chicos:
+
+547
+00:31:28,796 --> 00:31:31,500
+profundidad dos a seis, o incluso stumps.
+
+548
+00:31:31,620 --> 00:31:36,250
+Achicar cada paso tiene un nombre en inglés: shrinkage, encogimiento.
+
+549
+00:31:36,370 --> 00:31:38,940
+Un modelo idealizado ayuda a ver el efecto.
+
+550
+00:31:39,060 --> 00:31:43,640
+Supón que cada árbol corrige exactamente una fracción eta del residuo que queda.
+
+551
+00:31:43,760 --> 00:31:46,742
+Entonces, tras eme árboles, queda el residuo
+
+552
+00:31:46,742 --> 00:31:49,520
+inicial por uno menos eta, elevado a eme.
+
+553
+00:31:49,640 --> 00:31:54,790
+Con el ejemplo del apunte: el residuo parte en 10, y queremos bajarlo a menos de 1.
+
+554
+00:31:54,910 --> 00:32:03,760
+Con eta 0.5: queda 5, luego 2.5, luego 1.25, y con el cuarto árbol, 0.625.
+
+555
+00:32:03,880 --> 00:32:05,510
+Bastan cuatro árboles.
+
+556
+00:32:05,630 --> 00:32:10,740
+Con eta 0.1: 9, 8.1, 7.29…
+
+557
+00:32:10,860 --> 00:32:13,470
+y recién con el árbol 22 baja de 1.
+
+558
+00:32:13,590 --> 00:32:20,050
+La cuenta exacta: 0.5 elevado a cuatro es 0.0625: menos de una décima.
+
+559
+00:32:20,170 --> 00:32:27,570
+0.9 elevado a 21 todavía es 0.109; elevado a 22, 0.098.
+
+560
+00:32:27,690 --> 00:32:32,200
+Dividir eta por cinco multiplicó por cinco y medio los árboles necesarios.
+
+561
+00:32:32,320 --> 00:32:33,990
+Ahora con datos reales.
+
+562
+00:32:34,110 --> 00:32:37,714
+Gradient Boosting en Ames, con árboles de profundidad tres,
+
+563
+00:32:37,714 --> 00:32:40,830
+hasta ochocientos árboles, y cuatro valores de eta.
+
+564
+00:32:40,950 --> 00:32:45,246
+Con eta igual a uno, el error baja rapidísimo, y su mejor
+
+565
+00:32:45,246 --> 00:32:49,090
+punto llega con solo nueve árboles: 30 300 dólares.
+
+566
+00:32:49,210 --> 00:32:50,330
+Después empeora.
+
+567
+00:32:50,450 --> 00:32:57,210
+Con eta 0.3, su mejor punto llega con 462 árboles: 22 500.
+
+568
+00:32:57,330 --> 00:33:02,970
+Con eta 0.1, con 587 árboles: 21 500.
+
+569
+00:33:03,090 --> 00:33:11,230
+Y con eta 0.03, con 792 árboles, casi el tope de ochocientos: también 21 500.
+
+570
+00:33:11,350 --> 00:33:12,510
+Tres lecciones.
+
+571
+00:33:12,630 --> 00:33:16,450
+Eta grande aprende rápido, pero se queda corto y luego empeora.
+
+572
+00:33:16,570 --> 00:33:20,450
+Eta chico necesita muchos más árboles, pero llega más abajo.
+
+573
+00:33:20,570 --> 00:33:26,090
+Y entre 0.1 y 0.03 ya casi no hay diferencia de error: solo de costo.
+
+574
+00:33:26,210 --> 00:33:30,570
+El error típico: bajar eta, sin subir el número de árboles.
+
+575
+00:33:30,690 --> 00:33:32,570
+Mira el corte en cien árboles.
+
+576
+00:33:32,690 --> 00:33:37,080
+Con eta 0.1, el error ya va en 22 700.
+
+577
+00:33:37,200 --> 00:33:44,760
+Con eta 0.03, todavía va en 25 900: el modelo quedó subajustado, a medio camino.
+
+578
+00:33:44,880 --> 00:33:48,601
+La regla de la diapositiva once: más árboles con menor tasa suele
+
+579
+00:33:48,601 --> 00:33:51,520
+ser una combinación estable, pero aumenta el costo.
+
+580
+00:33:51,640 --> 00:33:55,560
+Eta y el número de árboles se ajustan en pareja, nunca por separado.
+
+581
+00:33:55,680 --> 00:33:59,270
+En Python, las dos perillas son parámetros del mismo modelo.
+
+582
+00:33:59,390 --> 00:34:03,340
+n_estimators es el número de árboles, y learning_rate es eta.
+
+583
+00:34:03,460 --> 00:34:07,720
+Y la complejidad, con max_depth, o con el mínimo de muestras por hoja.
+
+584
+00:34:07,840 --> 00:34:09,060
+Piensa un segundo.
+
+585
+00:34:09,180 --> 00:34:14,140
+Pasar de eta 0.1 a eta 0.03, ¿vale la pena en Ames?
+
+586
+00:34:14,860 --> 00:34:21,810
+Con eta 0.1, el mínimo es 21 512 dólares, con 587 árboles.
+
+587
+00:34:21,930 --> 00:34:28,440
+Con eta 0.03, 21 462 dólares, con 792.
+
+588
+00:34:28,560 --> 00:34:33,210
+Cincuenta dólares de diferencia, por un treinta y cinco por ciento más de árboles.
+
+589
+00:34:33,330 --> 00:34:35,400
+En este caso, no vale la pena.
+
+590
+00:34:35,520 --> 00:34:38,824
+Por eso, en la práctica, se fija un eta moderado y se
+
+591
+00:34:38,824 --> 00:34:41,380
+deja que la validación elija los árboles.
+
+592
+00:34:41,500 --> 00:34:46,560
+Para llevarte: eta es el tamaño del paso, y achicarlo exige más árboles.
+
+593
+00:34:46,680 --> 00:34:49,555
+Eta grande aprende rápido pero se queda corto;
+
+594
+00:34:49,555 --> 00:34:51,930
+eta chico con pocos árboles subajusta.
+
+595
+00:34:52,050 --> 00:34:56,430
+Se ajustan en pareja, y el número de árboles conviene que lo elija la validación.
+
+596
+00:34:56,550 --> 00:35:00,430
+Siguiente parada: XGBoost, LightGBM y CatBoost.
+
+597
+00:35:00,550 --> 00:35:02,730
+Gradient Boosting, con ingeniería.
+
+598
+00:35:03,610 --> 00:35:06,660
+Octava parada: las implementaciones modernas.
+
+599
+00:35:06,780 --> 00:35:10,620
+La misma idea de Gradient Boosting, con mucha ingeniería encima.
+
+600
+00:35:10,740 --> 00:35:14,210
+Entrenamos trescientos cincuenta árboles sobre las casas de Ames.
+
+601
+00:35:14,330 --> 00:35:17,780
+El Gradient Boosting de scikit-learn tardó unos tres segundos.
+
+602
+00:35:17,900 --> 00:35:20,400
+XGBoost, menos de medio segundo.
+
+603
+00:35:20,520 --> 00:35:22,670
+LightGBM, medio segundo.
+
+604
+00:35:22,790 --> 00:35:25,560
+Misma idea, pero seis veces más rápido.
+
+605
+00:35:25,680 --> 00:35:26,640
+¿Qué hay debajo?
+
+606
+00:35:26,760 --> 00:35:29,970
+Empecemos por XGBoost: la equis viene de extremo.
+
+607
+00:35:30,090 --> 00:35:32,580
+La diapositiva doce lo define como un sistema
+
+608
+00:35:32,580 --> 00:35:35,070
+optimizado para datos tabulares y producción.
+
+609
+00:35:35,190 --> 00:35:38,973
+Cuatro ideas: un objetivo regularizado, gradientes de primer y
+
+610
+00:35:38,973 --> 00:35:42,146
+segundo orden, submuestreo de filas y columnas, y un
+
+611
+00:35:42,146 --> 00:35:45,380
+tratamiento eficiente de datos dispersos y faltantes.
+
+612
+00:35:45,500 --> 00:35:48,600
+La idea más importante es el objetivo regularizado.
+
+613
+00:35:48,720 --> 00:35:53,200
+El objetivo es la pérdida de entrenamiento, más una penalización por complejidad.
+
+614
+00:35:53,320 --> 00:35:57,050
+La penalización tiene dos partes: gamma por el número de hojas,
+
+615
+00:35:57,050 --> 00:36:00,070
+y lambda por el tamaño de los valores de las hojas.
+
+616
+00:36:00,190 --> 00:36:02,820
+Piensa en gamma como una multa por cada hoja.
+
+617
+00:36:02,940 --> 00:36:07,380
+Un corte nuevo solo vale la pena si mejora la pérdida más de lo que cuesta la multa.
+
+618
+00:36:07,500 --> 00:36:11,680
+Si un corte mejora la pérdida en 5 y gamma vale 3, se hace.
+
+619
+00:36:11,800 --> 00:36:13,620
+Si la mejora en 2, no.
+
+620
+00:36:13,740 --> 00:36:16,090
+Y lambda encoge los valores de las hojas.
+
+621
+00:36:16,210 --> 00:36:18,910
+Hagamos la cuenta, con pérdida cuadrática.
+
+622
+00:36:19,030 --> 00:36:23,260
+Una hoja tiene tres casas, con residuos 3, 5 y 4.
+
+623
+00:36:23,380 --> 00:36:25,880
+Su valor óptimo es la suma de los residuos,
+
+624
+00:36:25,880 --> 00:36:28,380
+dividida por el número de casas más lambda.
+
+625
+00:36:28,500 --> 00:36:33,220
+Con lambda igual a cero, 12 sobre 3: 4, el promedio de siempre.
+
+626
+00:36:33,340 --> 00:36:36,730
+Con lambda igual a uno, 12 sobre 4: 3.
+
+627
+00:36:36,850 --> 00:36:40,240
+Con lambda igual a tres, 12 sobre 6: 2.
+
+628
+00:36:40,360 --> 00:36:43,730
+Cuanto más grande lambda, más se encoge la hoja hacia cero.
+
+629
+00:36:43,850 --> 00:36:48,370
+Y el efecto es más fuerte en hojas con pocos datos, que son las menos confiables.
+
+630
+00:36:48,490 --> 00:36:50,440
+¿Y los gradientes de segundo orden?
+
+631
+00:36:50,560 --> 00:36:52,330
+Volvamos al cerro con niebla.
+
+632
+00:36:52,450 --> 00:36:54,360
+El gradiente te dice la pendiente.
+
+633
+00:36:54,480 --> 00:36:57,480
+La segunda derivada te dice cuán curvo es el terreno.
+
+634
+00:36:57,600 --> 00:37:01,409
+Con las dos, XGBoost calcula pasos mejor calibrados: sabe
+
+635
+00:37:01,409 --> 00:37:04,350
+no solo hacia dónde ir, sino cuánto avanzar.
+
+636
+00:37:04,470 --> 00:37:05,960
+Ahora LightGBM.
+
+637
+00:37:06,080 --> 00:37:08,590
+Según la diapositiva trece, busca entrenar
+
+638
+00:37:08,590 --> 00:37:11,220
+rápido y escalar a muchas filas y variables.
+
+639
+00:37:11,340 --> 00:37:13,580
+Su primera idea son los histogramas.
+
+640
+00:37:13,700 --> 00:37:16,344
+Para buscar el mejor corte de una variable, un
+
+641
+00:37:16,344 --> 00:37:18,700
+árbol clásico prueba cada valor distinto.
+
+642
+00:37:18,820 --> 00:37:22,268
+LightGBM primero agrupa los valores en intervalos, los
+
+643
+00:37:22,268 --> 00:37:25,460
+bins, y solo prueba los bordes de esos intervalos.
+
+644
+00:37:25,580 --> 00:37:31,410
+Con datos reales: la superficie habitable de Ames tiene 1 292 valores distintos.
+
+645
+00:37:31,530 --> 00:37:36,210
+LightGBM los agrupa, por defecto, en 255 bins.
+
+646
+00:37:36,330 --> 00:37:39,920
+Cinco veces menos cortes que probar, y mucha menos memoria.
+
+647
+00:37:40,040 --> 00:37:42,570
+La segunda idea: cómo crece el árbol.
+
+648
+00:37:42,690 --> 00:37:44,440
+Es la diapositiva catorce.
+
+649
+00:37:44,560 --> 00:37:48,750
+Por nivel: se expande un nivel completo, todas las hojas a la vez.
+
+650
+00:37:48,870 --> 00:37:50,810
+Es lo que suele hacer XGBoost.
+
+651
+00:37:50,930 --> 00:37:55,320
+Por hoja: se expande solo la hoja con mayor ganancia, una a la vez.
+
+652
+00:37:55,440 --> 00:37:58,900
+Es lo que hace LightGBM, y el árbol queda asimétrico.
+
+653
+00:37:59,020 --> 00:38:01,458
+Crecer por hoja es más eficiente con muchos
+
+654
+00:38:01,458 --> 00:38:04,010
+datos: pone las hojas donde más ganancia hay.
+
+655
+00:38:04,130 --> 00:38:07,492
+Pero tiene un riesgo, y la diapositiva lo advierte: con
+
+656
+00:38:07,492 --> 00:38:10,610
+datos pequeños, puede sobreajustar si no se limita.
+
+657
+00:38:10,730 --> 00:38:12,720
+Un poco de aritmética de hojas.
+
+658
+00:38:12,840 --> 00:38:16,167
+Un árbol por nivel con profundidad cuatro tiene,
+
+659
+00:38:16,167 --> 00:38:18,870
+como máximo, dos a la cuarta: 16 hojas.
+
+660
+00:38:18,990 --> 00:38:24,181
+En LightGBM, con 15 hojas el árbol puede ser asimétrico: 15 hojas son 14
+
+661
+00:38:24,181 --> 00:38:28,290
+cortes, y en el caso extremo, una rama de profundidad 14.
+
+662
+00:38:28,410 --> 00:38:31,536
+Por eso la regla práctica: el número de hojas, menor
+
+663
+00:38:31,536 --> 00:38:33,940
+que dos elevado a la profundidad máxima.
+
+664
+00:38:34,060 --> 00:38:37,180
+Con profundidad cinco, menos de 32 hojas.
+
+665
+00:38:37,300 --> 00:38:39,550
+¿Se nota el riesgo en los datos de la clase?
+
+666
+00:38:39,670 --> 00:38:43,999
+LightGBM con 31 hojas por árbol, en Ames: su RMSE
+
+667
+00:38:43,999 --> 00:38:47,710
+en entrenamiento es de solo 8 000 dólares.
+
+668
+00:38:47,830 --> 00:38:49,510
+En test, 27 000.
+
+669
+00:38:49,630 --> 00:38:54,290
+Más de tres veces peor fuera de los datos que vio: una señal clara de sobreajuste.
+
+670
+00:38:54,410 --> 00:38:56,760
+LightGBM trae dos trucos más.
+
+671
+00:38:56,880 --> 00:39:01,304
+GOSS: conserva las filas con gradientes grandes, las que el modelo todavía
+
+672
+00:39:01,304 --> 00:39:05,190
+predice mal, y toma solo una muestra de las de gradiente pequeño.
+
+673
+00:39:05,310 --> 00:39:09,676
+Y EFB: agrupa variables dispersas que casi nunca están activas a la
+
+674
+00:39:09,676 --> 00:39:13,130
+vez, como muchas columnas de un one-hot, en una sola.
+
+675
+00:39:13,250 --> 00:39:14,900
+Y una alerta del notebook.
+
+676
+00:39:15,020 --> 00:39:18,766
+El LightGBM del notebook usa subsample igual a 0.8, para que
+
+677
+00:39:18,766 --> 00:39:22,200
+cada árbol vea solo el ochenta por ciento de las filas.
+
+678
+00:39:22,320 --> 00:39:25,455
+Pero en LightGBM, ese submuestreo solo se activa si
+
+679
+00:39:25,455 --> 00:39:29,020
+subsample_freq es mayor que cero, y por defecto vale cero.
+
+680
+00:39:29,140 --> 00:39:34,130
+Lo comprobamos: con o sin ese 0.8, las predicciones son idénticas.
+
+681
+00:39:34,250 --> 00:39:36,950
+XGBoost, en cambio, sí lo aplica.
+
+682
+00:39:37,070 --> 00:39:37,910
+¿Y CatBoost?
+
+683
+00:39:38,030 --> 00:39:41,353
+Es la quinta implementación de la clase, especialista en
+
+684
+00:39:41,353 --> 00:39:44,320
+variables categóricas: las maneja de forma nativa.
+
+685
+00:39:44,440 --> 00:39:48,530
+La diapositiva dieciocho la recomienda cuando dominan muchas categorías.
+
+686
+00:39:48,650 --> 00:39:52,421
+Pero en la práctica de la clase no se usó, y no está instalada en este
+
+687
+00:39:52,421 --> 00:39:55,330
+entorno, así que no tenemos números propios para ella.
+
+688
+00:39:55,450 --> 00:39:58,537
+El error típico: pensar que XGBoost y LightGBM son
+
+689
+00:39:58,537 --> 00:40:01,130
+algoritmos distintos de Gradient Boosting.
+
+690
+00:40:01,250 --> 00:40:04,537
+No lo son: son implementaciones de la misma idea,
+
+691
+00:40:04,537 --> 00:40:07,220
+residuos y gradientes, árbol tras árbol.
+
+692
+00:40:07,340 --> 00:40:10,445
+Lo que cambia es la ingeniería: regularización,
+
+693
+00:40:10,445 --> 00:40:13,550
+histogramas, crecimiento por hoja, y velocidad.
+
+694
+00:40:13,670 --> 00:40:14,890
+Piensa un segundo.
+
+695
+00:40:15,010 --> 00:40:18,430
+El XGBoost del notebook usa profundidad máxima tres.
+
+696
+00:40:18,550 --> 00:40:21,800
+¿Cuántas hojas puede tener cada árbol, como máximo?
+
+697
+00:40:21,920 --> 00:40:25,680
+¿Y cómo se compara con las 31 hojas del LightGBM de Ames?
+
+698
+00:40:26,400 --> 00:40:29,030
+Dos elevado a tres: 8 hojas.
+
+699
+00:40:29,150 --> 00:40:32,880
+El LightGBM de Ames usa casi cuatro veces más hojas por árbol.
+
+700
+00:40:33,000 --> 00:40:35,401
+Árboles mucho más complejos, y eso ayuda a
+
+701
+00:40:35,401 --> 00:40:38,030
+explicar su brecha entre entrenamiento y test.
+
+702
+00:40:38,150 --> 00:40:40,920
+Para llevarte: XGBoost agrega un objetivo
+
+703
+00:40:40,920 --> 00:40:44,095
+regularizado, con gamma y lambda, y usa segundo
+
+704
+00:40:44,095 --> 00:40:44,500
+orden.
+
+705
+00:40:44,620 --> 00:40:47,938
+LightGBM usa histogramas y crece hoja por hoja: muy
+
+706
+00:40:47,938 --> 00:40:50,540
+rápido, pero cuidado con datos pequeños.
+
+707
+00:40:50,660 --> 00:40:53,380
+Y CatBoost es el especialista en categóricas.
+
+708
+00:40:53,500 --> 00:40:55,748
+Siguiente parada: early stopping, y los
+
+709
+00:40:55,748 --> 00:40:58,630
+hiperparámetros que de verdad mueven el resultado.
+
+710
+00:40:59,530 --> 00:41:01,680
+Novena parada: early stopping.
+
+711
+00:41:01,800 --> 00:41:04,780
+Y los hiperparámetros que de verdad mueven el resultado.
+
+712
+00:41:04,900 --> 00:41:07,500
+¿Cuántos árboles necesita un modelo de boosting?
+
+713
+00:41:07,620 --> 00:41:08,200
+¿Cien?
+
+714
+00:41:08,320 --> 00:41:08,800
+¿Mil?
+
+715
+00:41:08,920 --> 00:41:11,692
+Ya viste que demasiados pueden empezar a ajustar
+
+716
+00:41:11,692 --> 00:41:14,060
+ruido, y muy pocos dejan el modelo corto.
+
+717
+00:41:14,180 --> 00:41:18,800
+La respuesta práctica es: que lo decida la validación, mientras entrenas.
+
+718
+00:41:18,920 --> 00:41:20,710
+Piensa en un queque en el horno.
+
+719
+00:41:20,830 --> 00:41:25,030
+No pones un temporizador a ciegas: lo revisas cada pocos minutos.
+
+720
+00:41:25,150 --> 00:41:27,060
+Mientras mejora, lo dejas.
+
+721
+00:41:27,180 --> 00:41:30,016
+Y si en dos revisiones seguidas ya no mejora, lo
+
+722
+00:41:30,016 --> 00:41:32,380
+sacas, y te quedas con el mejor momento.
+
+723
+00:41:32,500 --> 00:41:35,760
+Eso es early stopping, en español, parada temprana.
+
+724
+00:41:35,880 --> 00:41:39,270
+Separas un conjunto de validación, distinto del test.
+
+725
+00:41:39,390 --> 00:41:42,640
+Después de cada árbol, mides el error en validación.
+
+726
+00:41:42,760 --> 00:41:46,368
+Y si no mejora durante varias rondas seguidas, la paciencia, el
+
+727
+00:41:46,368 --> 00:41:49,460
+entrenamiento se detiene y se conserva la mejor ronda.
+
+728
+00:41:49,580 --> 00:41:52,300
+Un ejemplo del apunte, con paciencia dos.
+
+729
+00:41:52,420 --> 00:41:58,370
+El error de validación, ronda por ronda: 30, 25, 22, 21.
+
+730
+00:41:58,490 --> 00:42:02,920
+Luego 21.4, 21.9 y 22.5.
+
+731
+00:42:03,040 --> 00:42:05,670
+El mínimo es 21, en la ronda cuatro.
+
+732
+00:42:05,790 --> 00:42:08,240
+La ronda cinco no mejora: van una.
+
+733
+00:42:08,360 --> 00:42:10,770
+La ronda seis tampoco: van dos.
+
+734
+00:42:10,890 --> 00:42:14,320
+Con paciencia dos, se detiene después de la ronda seis.
+
+735
+00:42:14,440 --> 00:42:17,500
+Y el modelo final es el de la ronda cuatro, la mejor.
+
+736
+00:42:17,620 --> 00:42:19,560
+La ronda siete nunca se entrena.
+
+737
+00:42:19,680 --> 00:42:20,980
+Con datos reales.
+
+738
+00:42:21,100 --> 00:42:25,361
+XGBoost en Ames, con eta 0.05, profundidad tres, hasta
+
+739
+00:42:25,361 --> 00:42:28,990
+mil quinientos árboles, y paciencia cincuenta.
+
+740
+00:42:29,110 --> 00:42:31,330
+El error de entrenamiento baja y baja.
+
+741
+00:42:31,450 --> 00:42:35,090
+El de validación baja rápido al principio, y después se aplana.
+
+742
+00:42:35,210 --> 00:42:40,840
+XGBoost reporta su mejor iteración: la 754, contando desde cero.
+
+743
+00:42:40,960 --> 00:42:44,420
+Como espera cincuenta rondas sin mejora, se detiene al
+
+744
+00:42:44,420 --> 00:42:47,880
+completar 805 árboles, de los mil quinientos posibles.
+
+745
+00:42:48,000 --> 00:42:51,817
+En esa mejor ronda, el error de validación es de 21
+
+746
+00:42:51,817 --> 00:42:54,960
+000 dólares, y el de entrenamiento, 9 400.
+
+747
+00:42:55,080 --> 00:42:58,650
+Ahorró casi setecientos árboles, y eligió el número sola.
+
+748
+00:42:58,770 --> 00:43:01,919
+Fíjate en la brecha: el entrenamiento sigue mejorando,
+
+749
+00:43:01,919 --> 00:43:04,660
+pero eso ya no sirve fuera de los datos vistos.
+
+750
+00:43:04,780 --> 00:43:07,231
+Una regla que no se negocia: el conjunto de
+
+751
+00:43:07,231 --> 00:43:09,910
+validación del early stopping nunca es el test.
+
+752
+00:43:10,030 --> 00:43:13,786
+Si usas el test para decidir cuándo parar, el test participó en el
+
+753
+00:43:13,786 --> 00:43:17,030
+entrenamiento, y tu estimación final deja de ser honesta.
+
+754
+00:43:17,150 --> 00:43:21,950
+En estos datos, la validación sale del entrenamiento, y el test queda intacto.
+
+755
+00:43:22,070 --> 00:43:25,815
+Y un detalle de scikit-learn: su Gradient Boosting entrena todos los
+
+756
+00:43:25,815 --> 00:43:29,450
+árboles que le pidas, salvo que actives su propia parada temprana.
+
+757
+00:43:29,570 --> 00:43:34,260
+Por defecto ese parámetro está apagado, así que no hay parada temprana automática.
+
+758
+00:43:34,380 --> 00:43:38,830
+La diapositiva quince resume los hiperparámetros que realmente mueven el resultado.
+
+759
+00:43:38,950 --> 00:43:41,290
+Capacidad: el número de árboles.
+
+760
+00:43:41,410 --> 00:43:43,030
+Paso: el learning_rate.
+
+761
+00:43:43,150 --> 00:43:45,920
+Árbol: la profundidad o el número de hojas.
+
+762
+00:43:46,040 --> 00:43:49,780
+Regularización: mínimos por hoja y la penalización L2.
+
+763
+00:43:49,900 --> 00:43:53,400
+Y aleatoriedad: submuestreo de filas y de columnas.
+
+764
+00:43:53,520 --> 00:43:56,785
+Y su consejo: ajusta con validación cruzada o con early
+
+765
+00:43:56,785 --> 00:43:59,990
+stopping, y conserva el test para la evaluación final.
+
+766
+00:44:00,110 --> 00:44:03,080
+El notebook de la clase ajusta con dos estrategias.
+
+767
+00:44:03,200 --> 00:44:08,452
+GridSearchCV, que prueba todas las combinaciones de una grilla: para AdaBoost,
+
+768
+00:44:08,452 --> 00:44:12,560
+dos valores de árboles por dos de tasa, cuatro combinaciones.
+
+769
+00:44:12,680 --> 00:44:17,190
+Y RandomizedSearchCV, que sortea combinaciones:
+
+770
+00:44:17,190 --> 00:44:20,740
+para XGBoost, seis de 1 728 posibles.
+
+771
+00:44:20,860 --> 00:44:24,600
+Las dos búsquedas usan solo el entrenamiento, con tres pliegues.
+
+772
+00:44:24,720 --> 00:44:26,050
+¿Y mejoraron en test?
+
+773
+00:44:26,170 --> 00:44:27,610
+Replicamos el notebook.
+
+774
+00:44:27,730 --> 00:44:34,880
+AdaBoost: AUC de 0.930 sin ajustar, 0.929 ajustado.
+
+775
+00:44:35,000 --> 00:44:40,680
+XGBoost: 0.937 sin ajustar, 0.929 ajustado.
+
+776
+00:44:40,800 --> 00:44:41,270
+Peor.
+
+777
+00:44:41,390 --> 00:44:45,691
+Con 227 pacientes y tres pliegues, las diferencias de la validación
+
+778
+00:44:45,691 --> 00:44:49,800
+cruzada son casi puro ruido: ajustar no garantiza ganar en test.
+
+779
+00:44:49,920 --> 00:44:55,064
+En Ames, en cambio, ajustar sí ayudó al Gradient Boosting: de 29 200
+
+780
+00:44:55,064 --> 00:44:59,830
+dólares a 23 900, porque la configuración de partida era débil.
+
+781
+00:44:59,950 --> 00:45:05,860
+Y a LightGBM casi no le cambió nada: de 25 800 a 25 900.
+
+782
+00:45:05,980 --> 00:45:11,260
+El error típico: elegir los hiperparámetros, o el momento de parar, mirando el test.
+
+783
+00:45:11,380 --> 00:45:16,090
+Parece inofensivo, pero cada decisión que tomas con el test lo contamina un poco.
+
+784
+00:45:16,210 --> 00:45:18,800
+El test se mira una sola vez, al final.
+
+785
+00:45:18,920 --> 00:45:20,140
+Piensa un segundo.
+
+786
+00:45:20,260 --> 00:45:28,630
+Paciencia dos, y la serie: 30, 25, 22, 21, 21.4, y luego 20.9.
+
+787
+00:45:28,750 --> 00:45:30,460
+¿Se detiene en la ronda seis?
+
+788
+00:45:31,180 --> 00:45:31,600
+No.
+
+789
+00:45:31,720 --> 00:45:34,170
+La ronda cinco no mejora: van una.
+
+790
+00:45:34,290 --> 00:45:37,950
+Pero la ronda seis baja a 20.9, un nuevo mínimo.
+
+791
+00:45:38,070 --> 00:45:41,240
+El contador vuelve a cero, y el entrenamiento sigue.
+
+792
+00:45:41,360 --> 00:45:43,950
+La paciencia cuenta rondas seguidas sin mejorar.
+
+793
+00:45:44,070 --> 00:45:47,660
+Para llevarte: early stopping mide la validación tras cada árbol y
+
+794
+00:45:47,660 --> 00:45:50,870
+para cuando deja de mejorar durante varias rondas seguidas.
+
+795
+00:45:50,990 --> 00:45:54,170
+La validación sale del entrenamiento, nunca del test.
+
+796
+00:45:54,290 --> 00:45:57,644
+Y ajustar hiperparámetros no garantiza ganar en test: con
+
+797
+00:45:57,644 --> 00:46:00,350
+pocos datos, las diferencias pueden ser ruido.
+
+798
+00:46:00,470 --> 00:46:03,114
+Siguiente parada: la comparación de los modelos
+
+799
+00:46:03,114 --> 00:46:05,420
+con los datos de la clase, y cómo elegir.
+
+800
+00:46:06,290 --> 00:46:08,550
+Décima parada: la comparación.
+
+801
+00:46:08,670 --> 00:46:12,690
+Los modelos de la clase, con los mismos datos y la misma validación.
+
+802
+00:46:12,810 --> 00:46:13,810
+Y cómo elegir.
+
+803
+00:46:13,930 --> 00:46:15,620
+Llegó el momento de la verdad.
+
+804
+00:46:15,740 --> 00:46:19,395
+AdaBoost, Gradient Boosting, XGBoost, LightGBM, y el
+
+805
+00:46:19,395 --> 00:46:22,980
+Random Forest de la clase anterior como referencia.
+
+806
+00:46:23,100 --> 00:46:26,000
+Los mismos datos, el mismo preprocesamiento.
+
+807
+00:46:26,120 --> 00:46:26,980
+¿Quién gana?
+
+808
+00:46:27,100 --> 00:46:29,950
+Y, más importante: ¿la diferencia es real?
+
+809
+00:46:30,070 --> 00:46:33,700
+Primero Heart, 303 pacientes, clasificación.
+
+810
+00:46:33,820 --> 00:46:38,379
+Usamos validación cruzada de cinco pliegues, repetida tres
+
+811
+00:46:38,379 --> 00:46:42,860
+veces: quince evaluaciones por modelo, y el AUC promedio.
+
+812
+00:46:42,980 --> 00:46:45,630
+AdaBoost, 0.912.
+
+813
+00:46:45,750 --> 00:46:48,940
+Random Forest, 0.906.
+
+814
+00:46:49,060 --> 00:46:51,870
+XGBoost, 0.894.
+
+815
+00:46:51,990 --> 00:46:54,850
+LightGBM, 0.892.
+
+816
+00:46:54,970 --> 00:46:57,990
+Y Gradient Boosting, 0.891.
+
+817
+00:46:58,110 --> 00:46:59,280
+¿Ganó AdaBoost?
+
+818
+00:46:59,400 --> 00:47:06,410
+Mira las rayas negras: el desvío entre las quince evaluaciones va de 0.035 a 0.044.
+
+819
+00:47:06,530 --> 00:47:11,660
+La distancia entre el primero y el último es 0.021: cabe dentro del desvío.
+
+820
+00:47:11,780 --> 00:47:16,410
+Con 303 pacientes, los cinco modelos están prácticamente empatados.
+
+821
+00:47:16,530 --> 00:47:20,450
+Ahora Ames, 2 930 casas, regresión.
+
+822
+00:47:20,570 --> 00:47:28,450
+RMSE en el test, con la configuración del notebook: XGBoost, 24 400 dólares.
+
+823
+00:47:28,570 --> 00:47:31,400
+Gradient Boosting, 26 800.
+
+824
+00:47:31,520 --> 00:47:33,590
+LightGBM, 27 000.
+
+825
+00:47:33,710 --> 00:47:36,580
+Random Forest, 27 500.
+
+826
+00:47:36,700 --> 00:47:40,380
+Y AdaBoost, muy atrás: 36 200.
+
+827
+00:47:40,500 --> 00:47:42,490
+Aquí sí hay diferencias claras.
+
+828
+00:47:42,610 --> 00:47:46,179
+Con más datos y relaciones más complejas, los métodos de
+
+829
+00:47:46,179 --> 00:47:48,920
+gradiente despegan, y AdaBoost queda atrás.
+
+830
+00:47:49,040 --> 00:47:52,518
+La idea general: a problema simple, modelo simple;
+
+831
+00:47:52,518 --> 00:47:55,370
+a problema complejo, modelo más complejo.
+
+832
+00:47:55,490 --> 00:47:58,440
+Y el consejo de siempre: probar, y validar.
+
+833
+00:47:58,560 --> 00:48:03,700
+El notebook del profesor compara con una sola partición de test: 76 pacientes.
+
+834
+00:48:03,820 --> 00:48:08,445
+Lo replicamos: XGBoost y LightGBM aciertan 65 de
+
+835
+00:48:08,445 --> 00:48:12,010
+76; AdaBoost y Gradient Boosting, 64.
+
+836
+00:48:12,130 --> 00:48:14,020
+Un solo paciente de diferencia.
+
+837
+00:48:14,140 --> 00:48:17,494
+Y un paciente de 76 son 1.3 puntos de exactitud:
+
+838
+00:48:17,494 --> 00:48:20,080
+no es evidencia de que uno sea mejor.
+
+839
+00:48:20,200 --> 00:48:23,008
+El propio notebook lo reconoce al final: una sola
+
+840
+00:48:23,008 --> 00:48:25,530
+partición no determina un ganador universal.
+
+841
+00:48:25,650 --> 00:48:30,390
+Para una evaluación sólida, validación cruzada anidada, o varias semillas.
+
+842
+00:48:30,510 --> 00:48:35,334
+La diapositiva dieciséis resume los modelos en una tabla: su sello distintivo,
+
+843
+00:48:35,334 --> 00:48:39,230
+cómo tratan las categorías, su velocidad y su riesgo principal.
+
+844
+00:48:39,350 --> 00:48:44,570
+AdaBoost pondera casos difíciles; Gradient Boosting usa el gradiente de una pérdida.
+
+845
+00:48:44,690 --> 00:48:49,900
+XGBoost, regularización; LightGBM, histogramas y crecimiento por hoja.
+
+846
+00:48:50,020 --> 00:48:52,400
+Pero ojo, una alerta del material.
+
+847
+00:48:52,520 --> 00:48:57,413
+El título de la diapositiva dice comparación de los cinco modelos, y la tabla trae
+
+848
+00:48:57,413 --> 00:49:01,710
+solo cuatro: falta CatBoost, que sí aparece en la diapositiva dieciocho.
+
+849
+00:49:01,830 --> 00:49:04,360
+Y la numeración impresa salta del trece al
+
+850
+00:49:04,360 --> 00:49:07,010
+quince: el archivo tiene diecinueve láminas.
+
+851
+00:49:07,130 --> 00:49:09,970
+En estos videos usamos la numeración del archivo.
+
+852
+00:49:10,090 --> 00:49:11,000
+¿Cómo elegir?
+
+853
+00:49:11,120 --> 00:49:14,810
+La diapositiva dieciocho propone preguntarte qué domina tu problema.
+
+854
+00:49:14,930 --> 00:49:17,260
+Una línea base simple: AdaBoost.
+
+855
+00:49:17,380 --> 00:49:19,760
+Control didáctico: Gradient Boosting.
+
+856
+00:49:19,880 --> 00:49:22,200
+Rendimiento general: XGBoost.
+
+857
+00:49:22,320 --> 00:49:24,240
+Gran escala: LightGBM.
+
+858
+00:49:24,360 --> 00:49:27,210
+Y muchas variables categóricas: CatBoost.
+
+859
+00:49:27,330 --> 00:49:30,785
+Y después, validar la hipótesis: misma partición,
+
+860
+00:49:30,785 --> 00:49:34,310
+métrica adecuada, tiempo y memoria, y estabilidad.
+
+861
+00:49:34,430 --> 00:49:38,030
+Una alerta más del notebook, en la importancia de variables.
+
+862
+00:49:38,150 --> 00:49:41,391
+Grafica la importancia de XGBoost en Heart, y la de
+
+863
+00:49:41,391 --> 00:49:44,060
+LightGBM en Ames, como si fueran lo mismo.
+
+864
+00:49:44,180 --> 00:49:47,230
+Pero en XGBoost, la importancia por defecto es la
+
+865
+00:49:47,230 --> 00:49:50,280
+ganancia: cuánto mejora la pérdida cada variable.
+
+866
+00:49:50,400 --> 00:49:55,120
+Y en LightGBM, es el número de cortes: cuántas veces se usó la variable.
+
+867
+00:49:55,240 --> 00:49:57,550
+Lo comprobamos en las dos bibliotecas.
+
+868
+00:49:57,670 --> 00:49:59,070
+No son comparables.
+
+869
+00:49:59,190 --> 00:50:01,100
+Y ninguna demuestra causalidad.
+
+870
+00:50:01,220 --> 00:50:05,170
+Para comparar en serio, usa la importancia por permutación sobre el test.
+
+871
+00:50:05,290 --> 00:50:06,670
+¿Dónde se usa boosting?
+
+872
+00:50:06,790 --> 00:50:12,180
+La diapositiva diecisiete da seis áreas: riesgo, como impago, fraude o churn.
+
+873
+00:50:12,300 --> 00:50:15,560
+Demanda: ventas, energía, inventario.
+
+874
+00:50:15,680 --> 00:50:18,780
+Salud, marketing, operaciones y precios.
+
+875
+00:50:18,900 --> 00:50:23,680
+Boosting destaca con datos tabulares, relaciones no lineales e interacciones.
+
+876
+00:50:23,800 --> 00:50:27,852
+El error típico de toda comparación: declarar un ganador con una sola
+
+877
+00:50:27,852 --> 00:50:31,610
+partición, o comparando modelos con preprocesamientos distintos.
+
+878
+00:50:31,730 --> 00:50:36,210
+Compara siempre bajo el mismo pipeline, la misma partición y la misma métrica.
+
+879
+00:50:36,330 --> 00:50:38,330
+Y reporta la media con su desvío.
+
+880
+00:50:38,450 --> 00:50:39,670
+Piensa un segundo.
+
+881
+00:50:39,790 --> 00:50:48,800
+En Ames, XGBoost sacó 24 400 dólares de RMSE en test, y Gradient Boosting, 26 800.
+
+882
+00:50:48,920 --> 00:50:53,380
+¿Puedes afirmar que XGBoost es mejor, con la misma seguridad que en Heart?
+
+883
+00:50:54,100 --> 00:50:55,910
+Con más cautela de la que parece.
+
+884
+00:50:56,030 --> 00:50:59,310
+Es una sola partición de test, y no tenemos su desvío.
+
+885
+00:50:59,430 --> 00:51:04,491
+La diferencia es de unos 2 400 dólares, cerca de un nueve por ciento, y va en la
+
+886
+00:51:04,491 --> 00:51:08,730
+misma dirección que la curva de validación: es una señal razonable.
+
+887
+00:51:08,850 --> 00:51:12,044
+Pero para afirmarlo en serio, repetirías con validación
+
+888
+00:51:12,044 --> 00:51:15,180
+cruzada o con varias semillas, como hicimos con Heart.
+
+889
+00:51:15,300 --> 00:51:18,154
+Para llevarte: en Heart, con pocos datos, los
+
+890
+00:51:18,154 --> 00:51:20,690
+cinco modelos empatan dentro del desvío.
+
+891
+00:51:20,810 --> 00:51:23,751
+En Ames, con más datos, XGBoost y los de
+
+892
+00:51:23,751 --> 00:51:27,060
+gradiente se separan, y AdaBoost queda atrás.
+
+893
+00:51:27,180 --> 00:51:29,916
+Elige según lo que domina tu problema, y valida
+
+894
+00:51:29,916 --> 00:51:32,420
+bajo la misma partición y la misma métrica.
+
+895
+00:51:32,540 --> 00:51:35,360
+Última parada: el repaso final de la clase, con un
+
+896
+00:51:35,360 --> 00:51:38,350
+checklist para entrenar cualquier modelo de boosting.
+
+897
+00:51:39,250 --> 00:51:41,220
+Última parada: el repaso.
+
+898
+00:51:41,340 --> 00:51:45,930
+Toda la clase de boosting en unos minutos, y un checklist para tu próximo modelo.
+
+899
+00:51:46,050 --> 00:51:49,144
+La idea central: boosting entrena modelos simples en
+
+900
+00:51:49,144 --> 00:51:52,000
+secuencia, cada uno sobre el error del anterior.
+
+901
+00:51:52,120 --> 00:51:56,080
+La predicción es una suma: efe cero más eta por cada árbol.
+
+902
+00:51:56,200 --> 00:51:59,350
+Y lo que distingue a cada algoritmo es cómo define el error.
+
+903
+00:51:59,470 --> 00:52:02,033
+Frente a bagging: el bosque promedia árboles
+
+904
+00:52:02,033 --> 00:52:04,480
+profundos en paralelo, y baja la varianza.
+
+905
+00:52:04,600 --> 00:52:08,120
+Boosting suma árboles chicos en secuencia, y baja el sesgo.
+
+906
+00:52:08,240 --> 00:52:12,046
+En Ames, el bosque se estancó en 23 100 dólares;
+
+907
+00:52:12,046 --> 00:52:14,980
+boosting siguió bajando hasta 21 800.
+
+908
+00:52:15,100 --> 00:52:19,940
+AdaBoost: el error épsilon es la suma de los pesos de los casos mal clasificados.
+
+909
+00:52:20,060 --> 00:52:22,515
+El peso del árbol es alfa, un medio del
+
+910
+00:52:22,515 --> 00:52:25,410
+logaritmo de uno menos épsilon, sobre épsilon.
+
+911
+00:52:25,530 --> 00:52:28,690
+Los errores multiplican su peso por e elevado a alfa, y
+
+912
+00:52:28,690 --> 00:52:31,390
+el voto final es el signo de la suma ponderada.
+
+913
+00:52:31,510 --> 00:52:36,906
+El ejemplo a mano: con épsilon 0.2, alfa vale 0.693, los errores duplican
+
+914
+00:52:36,906 --> 00:52:41,120
+su peso, y tras normalizar quedan con la mitad del total.
+
+915
+00:52:41,240 --> 00:52:46,520
+Y su punto débil: el ruido, porque una etiqueta mala acumula peso ronda tras ronda.
+
+916
+00:52:46,640 --> 00:52:49,764
+Gradient Boosting: parte del promedio, y cada árbol
+
+917
+00:52:49,764 --> 00:52:52,460
+aprende el gradiente negativo de la pérdida.
+
+918
+00:52:52,580 --> 00:52:57,032
+Con pérdida cuadrática, eso es el residuo: en la tabla de la
+
+919
+00:52:57,032 --> 00:53:00,520
+diapositiva diez, más 2, menos 3, más 1 y cero.
+
+920
+00:53:00,640 --> 00:53:04,520
+Con la absoluta, aprende signos; con Huber, residuos
+
+921
+00:53:04,520 --> 00:53:07,580
+recortados; con la logística, y menos pe.
+
+922
+00:53:07,700 --> 00:53:11,940
+Y una regla práctica: entrena con la misma pérdida con la que vas a juzgar.
+
+923
+00:53:12,060 --> 00:53:16,300
+El notebook entrenó con Huber y evaluó con RMSE.
+
+924
+00:53:16,420 --> 00:53:21,130
+La tasa de aprendizaje y los árboles: eta chico necesita más árboles.
+
+925
+00:53:21,250 --> 00:53:27,580
+En el modelo idealizado, cuatro árboles con eta 0.5, y veintidós con eta 0.1.
+
+926
+00:53:27,700 --> 00:53:33,844
+En Ames: con eta uno, el mejor punto llegó con 9 árboles y 30
+
+927
+00:53:33,844 --> 00:53:38,980
+300 dólares; con eta 0.1, con 587 árboles y 21 500.
+
+928
+00:53:39,100 --> 00:53:43,070
+Se ajustan en pareja, y eta bajo con pocos árboles subajusta.
+
+929
+00:53:43,190 --> 00:53:48,664
+Las implementaciones: primero, XGBoost, que agrega un objetivo regularizado, con
+
+930
+00:53:48,664 --> 00:53:53,180
+gamma por hoja y lambda que encoge las hojas, y usa segundo orden.
+
+931
+00:53:53,300 --> 00:53:57,029
+LightGBM usa histogramas y crece hoja por hoja: muy rápido,
+
+932
+00:53:57,029 --> 00:54:00,000
+pero con riesgo de sobreajuste en datos chicos.
+
+933
+00:54:00,120 --> 00:54:03,100
+Y CatBoost, el especialista en categóricas.
+
+934
+00:54:03,220 --> 00:54:08,140
+Y la alerta: en LightGBM, subsample no hace nada sin subsample_freq.
+
+935
+00:54:08,260 --> 00:54:11,375
+Early stopping: mide la validación tras cada árbol, y
+
+936
+00:54:11,375 --> 00:54:14,020
+para tras varias rondas seguidas sin mejorar.
+
+937
+00:54:14,140 --> 00:54:17,630
+En Ames, XGBoost se detuvo con 805 árboles de mil
+
+938
+00:54:17,630 --> 00:54:21,690
+quinientos, con un error de validación de 21 000 dólares.
+
+939
+00:54:21,810 --> 00:54:25,070
+Y la validación sale del entrenamiento, nunca del test.
+
+940
+00:54:25,190 --> 00:54:29,560
+La comparación: en Heart, los cinco modelos empatan dentro del desvío.
+
+941
+00:54:29,680 --> 00:54:37,820
+En Ames, XGBoost fue el mejor, con 24 400 dólares, y AdaBoost el peor, con 36 200.
+
+942
+00:54:37,940 --> 00:54:40,430
+Una sola partición no declara ganadores.
+
+943
+00:54:40,550 --> 00:54:44,540
+La última diapositiva, la diecinueve, deja tres preguntas.
+
+944
+00:54:44,660 --> 00:54:46,080
+Respóndelas tú primero.
+
+945
+00:54:46,200 --> 00:54:49,570
+Una: ¿qué cambia entre AdaBoost y Gradient Boosting?
+
+946
+00:54:49,690 --> 00:54:53,680
+Dos: ¿por qué el learning_rate y el número de árboles interactúan?
+
+947
+00:54:53,800 --> 00:54:56,620
+Tres: ¿cuándo priorizarías LightGBM?
+
+948
+00:54:57,340 --> 00:54:58,320
+Respuestas.
+
+949
+00:54:58,440 --> 00:55:03,064
+Uno: AdaBoost cambia los pesos de los casos y vota con alfa; Gradient Boosting
+
+950
+00:55:03,064 --> 00:55:06,740
+entrena cada árbol sobre el gradiente negativo de una pérdida.
+
+951
+00:55:06,860 --> 00:55:11,015
+Dos: porque cada árbol aporta solo una fracción eta; con eta más
+
+952
+00:55:11,015 --> 00:55:14,780
+chico, hacen falta más árboles para llegar igual de lejos.
+
+953
+00:55:14,900 --> 00:55:18,400
+Tres: con muchas filas y variables, cuando la velocidad
+
+954
+00:55:18,400 --> 00:55:22,090
+importa, y cuidando la complejidad si los datos son pocos.
+
+955
+00:55:22,210 --> 00:55:24,700
+El checklist para entrenar un modelo de boosting.
+
+956
+00:55:24,820 --> 00:55:29,590
+Uno, parte en entrenamiento y test, estratificado si es clasificación.
+
+957
+00:55:29,710 --> 00:55:32,350
+Dos, preprocesa dentro del pipeline.
+
+958
+00:55:32,470 --> 00:55:36,610
+Tres, empieza con una línea base, como AdaBoost o un bosque.
+
+959
+00:55:36,730 --> 00:55:40,050
+Cuatro, fija un eta bajo, y deja que early stopping
+
+960
+00:55:40,050 --> 00:55:42,980
+elija los árboles, con una validación propia.
+
+961
+00:55:43,100 --> 00:55:45,640
+Cinco, limita la complejidad del árbol.
+
+962
+00:55:45,760 --> 00:55:49,140
+Y seis, compara el error de entrenamiento con el de test.
+
+963
+00:55:49,260 --> 00:55:52,845
+Siete: si buscas hiperparámetros, incluye tu configuración
+
+964
+00:55:52,845 --> 00:55:56,060
+base en la búsqueda, para no terminar con algo peor.
+
+965
+00:55:56,180 --> 00:56:01,310
+Y ocho: reporta la media con su desvío, y compara siempre bajo la misma partición.
+
+966
+00:56:01,430 --> 00:56:06,240
+Y las tres ideas para llevar de la clase: uno, boosting aprende de forma secuencial.
+
+967
+00:56:06,360 --> 00:56:09,550
+Dos, la pérdida define qué corrige cada etapa.
+
+968
+00:56:09,670 --> 00:56:13,020
+Tres, cada biblioteca prioriza un problema distinto.
+
+969
+00:56:13,140 --> 00:56:17,016
+El siguiente paso, según la clase, es comparar los modelos bajo el
+
+970
+00:56:17,016 --> 00:56:20,480
+mismo pipeline, la misma validación y el mismo presupuesto.
+
+971
+00:56:20,600 --> 00:56:25,160
+Y ahora sí: a practicar con el notebook guiado y el cuaderno de ejercicios.

@@ -1,0 +1,198 @@
+Apuntes · Clase 31 · Introducción al Machine Learning
+
+Para leer antes de los ejercicios · lectura de ~30 min
+
+Lo más importante, en 6 ideas
+1 El tipo de problema decide el modelo. Etiqueta categórica → clasificación; etiqueta numérica → regresión;
+
+        sin etiqueta → clustering o reducción; recompensas → refuerzo.
+
+2 Probabilidad antes que clase. La logística calcula un puntaje, la sigmoide lo vuelve probabilidad y el
+        umbral decide.
+
+3 Siempre se mide el error en datos nuevos. Entrenar con un conjunto, evaluar con otro; todo lo que se
+        aprende, solo con entrenamiento.
+
+4 K-Means: asignar y promediar. Cada punto al centroide más cercano; cada centroide pasa a ser la media
+        de su grupo; se repite.
+
+5 Complejidad y penalización. Mucha complejidad memoriza ruido; Ridge encoge y Lasso anula
+        coeficientes.
+
+6 Accuracy no basta. Con clases desbalanceadas se mira la matriz de confusión, el recall, la precisión y una
+        línea base.
+
+Cada sección trae una explicación, un ejemplo resuelto con números distintos a los de los ejercicios y una pista para el notebook
+C31_IntroML.ipynb o el cuaderno C31_Ejercicios_Cuaderno_IntroML.pdf.
+
+1 Del problema a la tarea de ML
+
+Antes de elegir un algoritmo hay que preguntarse qué se quiere predecir y con qué datos. Una regla fija dice qué
+hacer ante ciertas condiciones; un modelo ajusta sus parámetros con ejemplos. Si hay variable objetivo, es
+supervisado (clasificación si es categoría, regresión si es número); si no, no supervisado (clustering para formar
+grupos, reducción de dimensionalidad para resumir variables); y con un entorno que da recompensas, refuerzo.
+
+Ejemplo resuelto · cuatro situaciones de una tienda
+
+Situación                                              Tipo de problema             Por qué
+
+Saber si una compra online es fraude (hay historial    supervisado · clasificación  la etiqueta es sí / no
+marcado)
+
+Estimar cuánto dinero gastará un cliente en diciembre supervisado · regresión       la salida es un número
+
+Descubrir tipos de clientes sin categorías previas     no supervisado · clustering no hay etiqueta
+
+Un sistema prueba precios y aprende de las ventas      refuerzo                     acción → recompensa → ajuste
+
+Y si el problema se resuelve con una resta o una tabla de reglas que ya funciona, no hace falta ML: «no uses IA porque está de
+moda».
+
+Apuntes · Clase 31 · Introducción al Machine Learning                                                                              1
+Pista para la Parte A del notebook y el Bloque 1 del cuaderno
+
+Clasifica los casos, usa recomendar_enfoque con tu regla fija y pregúntate qué etiqueta tendrías que registrar hoy para
+entrenar un modelo mañana.
+
+2 Regresión logística y la sigmoide
+
+La regresión logística calcula un puntaje z = b₀ + b₁x₁ + … y lo transforma en una probabilidad con p = 1/(1 + e−z).
+
+Si z = 0, p = 0.5; z grande y positivo acerca p a 1; z muy negativo, a 0. Con un umbral de 0.5 se predice «cancela»
+cuando z > 0. Cada coeficiente multiplica las odds (p/(1−p)) por eb por cada unidad adicional de la variable.
+
+Ejemplo resuelto · z = −1.0 + 1.5·quejas − 0.2·uso
+
+Pregunta                                               Cálculo                                   Resultado
+
+Cliente con 2 quejas y 6 usos: puntaje                 −1.0 + 1.5·2 − 0.2·6                      z = 0.8
+Su probabilidad de cancelar                            1/(1 + e−0.8) = 1/(1 + 0.449)             p = 0.690
+Cliente con 0 quejas y 8 usos                          z = −1.0 + 0 − 1.6 = −2.6 → 1/(1 + e2.6)  p = 0.069
+Efecto de una queja más                                e1.5                                      odds × 4.48
+
+Umbral 0.5: clases predichas                           z > 0 p > 0.5                             cancela / se queda
+
+Un cliente con p = 0.69 «cancela» con umbral 0.5, pero con umbral 0.7 ya no. Bajar el umbral detecta más cancelaciones (más
+recall) y genera más falsas alarmas.
+
+ Pista para la Parte B del notebook (B1 y B2) y el Bloque 2 del cuaderno
+ Ajusta la logística dentro de un Pipeline, imprime predict_proba de dos clientes y comprueba a mano que 1/(1 + e−z)
+ coincide.
+
+3 Matriz de confusión y métricas
+
+Se cuentan cuatro tipos de resultado: verdaderos positivos (VP), falsos positivos (FP), falsos negativos (FN) y
+verdaderos negativos (VN). Accuracy = (VP+VN)/total; precisión = VP/(VP+FP); recall = VP/(VP+FN); F1 = media
+armónica de ambas. Con clases muy desiguales el accuracy engaña: hay que compararlo con la línea base «siempre
+la clase mayoritaria».
+
+Apuntes · Clase 31 · Introducción al Machine Learning                                                                        2
+Ejemplo resuelto · 500 transacciones, 20 fraudes
+
+Pregunta                                               Cálculo                                             Resultado
+
+Modelo: VP 12, FN 8, FP 30, VN 450 · accuracy          (12 + 450)/500                                      92.4 %
+
+Precisión                                              12/(12 + 30)                                        28.6 %
+
+Recall                                                 12/(12 + 8)                                         60.0 %
+
+F1                                                     2·0.286·0.60/(0.286 + 0.60)                         0.387
+
+Línea base «nunca hay fraude»: accuracy · recall 480/500 · 0/20                                            96.0 % · 0 %
+
+El modelo «pierde» en accuracy contra la línea base (92.4 % frente a 96 %) pero es el único que detecta fraudes. En la base
+real de churn, «nadie se fuga» ya da 84.3 % de accuracy.
+
+Pista para la Parte D del notebook (D3) y el Bloque 6 del cuaderno
+
+Usa DummyClassifier como línea base, imprime la matriz de confusión con confusion_matrix y calcula a mano las cuatro
+métricas.
+
+4 K-Means a mano: una iteración
+
+K-Means necesita k, un punto de partida (los centroides) y distancias. Cada iteración: (1) asignar cada punto al
+centroide más cercano; (2) recalcular cada centroide como la media de sus puntos. Se detiene cuando las
+asignaciones ya no cambian. Se compara con la inercia: suma de distancias² de cada punto a su centroide. Y se
+escala antes: es un método basado en distancias.
+
+Ejemplo resuelto · seis puntos (antigüedad, uso) y k = 2
+
+A(1, 2), B(2, 1), C(2, 4), D(7, 7), E(8, 9), F(9, 6); centroides iniciales c1 = A y c2 = F.
+
+Pregunta        Cálculo (distancia²)                                                         Resultado
+
+B a c1 y c2     (1² + 1²) = 2 · (7² + 5²) = 74                                               B → c1
+
+C a c1 y c2     (1² + 2²) = 5 · (7² + 2²) = 53                                               C → c1
+
+D, E a c1 y c2  D: 61 vs 5 · E: 98 vs 10                                                     D, E → c2
+
+Nuevo c1        ((1 + 2 + 2)/3, (2 + 1 + 4)/3)                                               (1.67, 2.33)
+
+Nuevo c2        ((7 + 8 + 9)/3, (7 + 9 + 6)/3)                                               (8.00, 7.33)
+
+Con los nuevos centroides las asignaciones no cambian: el algoritmo terminó. En un caso real se repite con varios puntos de
+partida (n_init) y se queda con la menor inercia.
+
+Apuntes · Clase 31 · Introducción al Machine Learning                                                                        3
+Pista para la Parte C del notebook y el Bloque 3 del cuaderno
+
+Reproduce una iteración con NumPy, compara la inercia antes y después y prueba K-Means con y sin StandardScaler (ARI
+0.39 entre ambos).
+
+5 Subajuste, sobreajuste, Ridge y Lasso
+
+El subajuste aparece cuando el modelo falla incluso en entrenamiento; el sobreajuste, cuando acierta en
+entrenamiento y falla en prueba. La regularización añade al error una penalización: Ridge (L2) suma α·Σβ² y Lasso
+(L1), α·Σ|β|. En el caso simple de columnas ortonormales, Ridge deja β/(1 + α) y Lasso aplica un umbral suave:
+signo(β)·máx(|β| − α, 0). Por eso Lasso anula coeficientes pequeños y Ridge no.
+
+Ejemplo resuelto · coeficientes de una regresión con α = 1
+
+Variable         OLS   Ridge β/(1 + 1)                      Lasso máx(|β| − 1, 0)
+
+x₁               5.0   2.50                                 4.0
+
+x₂               −1.4  −0.70                                −0.4
+
+x₃               0.6   0.30                                 0 (anulado)
+
+Suma de |coef.|  7.0   3.50                                 4.4
+
+Con α = 1, Ridge divide todo por 2 (ninguno se anula); Lasso resta 1 y deja en cero x₃ (|0.6| < 1). Un α demasiado grande hace
+que los dos converjan a predecir la media (R² ≈ 0).
+
+Apuntes · Clase 31 · Introducción al Machine Learning                                                                           4
+Pista para la Parte D del notebook (D1 y D2) y los Bloques 4 y 5 del cuaderno
+Ajusta polinomios de grado 1 a 15 con y sin escalar, dibuja el R² de entrenamiento y prueba, y compara los coeficientes de
+OLS, Ridge y Lasso con ruido añadido.
+
+6 Elegir el enfoque: ML o Deep Learning
+
+El Deep Learning es un subconjunto del ML basado en redes con varias capas: aprende representaciones
+directamente de datos complejos (imágenes, audio, texto), pero necesita más datos, más cómputo y es menos
+interpretable. Para datos tabulares con miles de filas, un modelo clásico suele bastar. El orden de preguntas: ¿hay
+etiqueta?, ¿es categoría o número?, ¿hay entorno con recompensas?, ¿es un problema de datos complejos?, ¿qué
+métrica demuestra que supera a la regla actual?
+
+Ejemplo resuelto · tres propuestas de la dirección
+
+Propuesta                                              Enfoque razonable               Por qué
+                                                                                       pocos miles de filas; ML clásico basta
+Predecir ventas semanales con 3 años de                regresión (o series de tiempo)
+historia tabular                                                                       datos complejos y gran volumen
+                                                                                       una regla ya resuelve el problema
+Clasificar 2 millones de fotos de productos            Deep Learning
+
+Calcular un descuento fijo según una tabla de          sin ML
+reglas
+
+Lo que debes recordar
+• Sesión 32 trata PCA y t-SNE en profundidad; aquí solo se usó PCA para mirar los segmentos.
+• Orden sugerido: apuntes → Bloques 1–4 del cuaderno → Partes A–C del notebook → Bloques 5–7 → Parte D → ejercicio
+
+    de cierre.
+
+Apuntes · Clase 31 · Introducción al Machine Learning                                                                          5
+

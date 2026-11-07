@@ -1,0 +1,503 @@
+1
+00:00:00,250 --> 00:00:02,520
+Clasificación y regresión logística.
+
+2
+00:00:02,640 --> 00:00:05,770
+Cómo un modelo decide si un cliente cancela o se queda.
+
+3
+00:00:05,890 --> 00:00:09,330
+Imagina que tienes que adivinar quién va a cancelar su suscripción.
+
+4
+00:00:09,450 --> 00:00:11,120
+No quieres un «tal vez».
+
+5
+00:00:11,240 --> 00:00:12,570
+Quieres un sí o un no.
+
+6
+00:00:12,690 --> 00:00:16,160
+Pero antes de decidir, el modelo calcula algo más fino.
+
+7
+00:00:16,280 --> 00:00:17,960
+Calcula una probabilidad.
+
+8
+00:00:18,080 --> 00:00:22,490
+Por ejemplo, este cliente tiene setenta por ciento de probabilidad de cancelar.
+
+9
+00:00:22,610 --> 00:00:27,620
+Y luego una regla simple, el umbral, convierte esa probabilidad en una decisión.
+
+10
+00:00:27,740 --> 00:00:31,029
+Como en las clases diecisiete a veintiuno, aquí la regresión
+
+11
+00:00:31,029 --> 00:00:33,770
+logística aparece como un modelo de clasificación.
+
+12
+00:00:33,890 --> 00:00:37,810
+La pregunta es cómo pasa de las variables de un cliente a esa probabilidad.
+
+13
+00:00:37,930 --> 00:00:40,760
+Primero calcula un puntaje, que se llama logit.
+
+14
+00:00:40,880 --> 00:00:44,045
+Es una suma ponderada: un punto de partida, más cada
+
+15
+00:00:44,045 --> 00:00:46,540
+variable multiplicada por su coeficiente.
+
+16
+00:00:46,660 --> 00:00:48,560
+Es como un termómetro de riesgo.
+
+17
+00:00:48,680 --> 00:00:51,150
+Cada queja de soporte sube la temperatura.
+
+18
+00:00:51,270 --> 00:00:53,020
+Cada mes de antigüedad la baja.
+
+19
+00:00:53,140 --> 00:00:57,800
+Pero un puntaje puede valer cualquier cosa: menos cinco, cero, o diez.
+
+20
+00:00:57,920 --> 00:01:02,190
+Una probabilidad, en cambio, tiene que estar siempre entre cero y uno.
+
+21
+00:01:02,310 --> 00:01:03,950
+Necesitamos un traductor.
+
+22
+00:01:04,070 --> 00:01:06,170
+Ese traductor es la función sigmoide.
+
+23
+00:01:06,290 --> 00:01:09,530
+Toma cualquier puntaje, y lo aprieta entre cero y uno.
+
+24
+00:01:09,650 --> 00:01:13,670
+La fórmula es uno, dividido por uno más e elevado a menos z.
+
+25
+00:01:13,790 --> 00:01:14,840
+Mira lo que hace.
+
+26
+00:01:14,960 --> 00:01:18,680
+Con puntaje cero, la probabilidad es justo cero coma cinco.
+
+27
+00:01:18,800 --> 00:01:21,590
+Con un puntaje muy alto, se acerca a uno.
+
+28
+00:01:21,710 --> 00:01:24,550
+Y con uno muy negativo, se acerca a cero.
+
+29
+00:01:24,670 --> 00:01:26,390
+Y esto conecta con el umbral.
+
+30
+00:01:26,510 --> 00:01:29,835
+Con umbral cero coma cinco, el modelo dice «cancela»
+
+31
+00:01:29,835 --> 00:01:32,520
+justo cuando el puntaje es mayor que cero.
+
+32
+00:01:32,640 --> 00:01:35,790
+Hagamos una cuenta completa, con la que usa el apunte.
+
+33
+00:01:35,910 --> 00:01:38,761
+El puntaje es menos uno, más uno coma cinco por
+
+34
+00:01:38,761 --> 00:01:41,370
+las quejas, menos cero coma dos por el uso.
+
+35
+00:01:41,490 --> 00:01:44,520
+Cliente uno: dos quejas y seis usos al mes.
+
+36
+00:01:44,640 --> 00:01:49,270
+Menos uno, más uno coma cinco por dos, menos cero coma dos por seis.
+
+37
+00:01:49,390 --> 00:01:54,150
+Menos uno, más tres, menos uno coma dos: da cero coma ocho.
+
+38
+00:01:54,270 --> 00:01:55,560
+Ahora la sigmoide.
+
+39
+00:01:55,680 --> 00:01:59,520
+Uno, dividido por uno más e elevado a menos cero coma ocho.
+
+40
+00:01:59,640 --> 00:02:05,850
+La exponencial vale 0.449, así que queda uno entre 1.449.
+
+41
+00:02:05,970 --> 00:02:08,980
+La probabilidad de cancelar es cero coma sesenta y nueve.
+
+42
+00:02:09,100 --> 00:02:11,930
+Cliente dos: cero quejas y ocho usos.
+
+43
+00:02:12,050 --> 00:02:17,710
+Menos uno, más cero, menos uno coma seis: el puntaje es menos dos coma seis.
+
+44
+00:02:17,830 --> 00:02:21,040
+Y la probabilidad baja a cero coma cero sesenta y nueve.
+
+45
+00:02:21,160 --> 00:02:23,660
+¿Y qué pasa si el cliente tiene una queja más?
+
+46
+00:02:23,780 --> 00:02:27,559
+Cada queja multiplica las odds, que son la probabilidad dividida
+
+47
+00:02:27,559 --> 00:02:30,570
+por su complemento, por e elevado a uno coma cinco.
+
+48
+00:02:30,690 --> 00:02:33,010
+Eso es cuatro coma cuarenta y ocho veces.
+
+49
+00:02:33,130 --> 00:02:37,680
+Piensa un segundo: el cliente uno tiene probabilidad cero coma sesenta y nueve.
+
+50
+00:02:37,800 --> 00:02:39,980
+¿Cancela con umbral cero coma cinco?
+
+51
+00:02:40,100 --> 00:02:41,890
+¿Y con umbral cero coma siete?
+
+52
+00:02:42,610 --> 00:02:47,280
+Con cero coma cinco, sí cancela: cero coma sesenta y nueve pasa el umbral.
+
+53
+00:02:47,400 --> 00:02:50,910
+Con cero coma siete, ya no: se queda por muy poco.
+
+54
+00:02:51,030 --> 00:02:55,650
+Ahora, el caso de la clase: Club Activo, con ochocientos clientes.
+
+55
+00:02:55,770 --> 00:02:58,444
+Se dividen en entrenamiento y prueba, de forma
+
+56
+00:02:58,444 --> 00:03:00,770
+estratificada, como en la clase treinta.
+
+57
+00:03:00,890 --> 00:03:04,540
+Quinientos sesenta para aprender, y doscientos cuarenta para probar.
+
+58
+00:03:04,660 --> 00:03:08,859
+Todo va dentro de un Pipeline: primero se imputan los faltantes, luego se
+
+59
+00:03:08,859 --> 00:03:13,000
+estandarizan las variables, y al final se ajusta la regresión logística.
+
+60
+00:03:13,120 --> 00:03:15,590
+Y el fit se hace solo con el entrenamiento.
+
+61
+00:03:15,710 --> 00:03:19,720
+Con las variables ya estandarizadas, los coeficientes se pueden comparar.
+
+62
+00:03:19,840 --> 00:03:23,940
+Las quejas empujan el riesgo hacia arriba: más uno coma cero ocho.
+
+63
+00:03:24,060 --> 00:03:27,060
+La antigüedad lo baja: menos cero coma ochenta.
+
+64
+00:03:27,180 --> 00:03:30,530
+El uso lo baja un poco: menos cero coma veintidós.
+
+65
+00:03:30,650 --> 00:03:32,220
+Y la edad casi no pesa.
+
+66
+00:03:32,340 --> 00:03:36,330
+Con ese modelo, evaluamos en la prueba, que el modelo nunca vio.
+
+67
+00:03:36,450 --> 00:03:40,290
+Y ahí viene una decisión importante: el peso de las clases.
+
+68
+00:03:40,410 --> 00:03:43,030
+Solo uno de cada cinco clientes cancela.
+
+69
+00:03:43,150 --> 00:03:46,632
+Si el modelo cuenta todos los errores igual, aprende a decir
+
+70
+00:03:46,632 --> 00:03:49,650
+que casi nadie cancela, porque así se equivoca poco.
+
+71
+00:03:49,770 --> 00:03:52,630
+La opción balanced le da más peso a la clase rara.
+
+72
+00:03:52,750 --> 00:03:56,735
+Pondera cada clase al revés de su frecuencia: cero coma sesenta y tres para
+
+73
+00:03:56,735 --> 00:04:00,030
+quien se queda, y dos coma treinta y nueve para quien cancela.
+
+74
+00:04:00,150 --> 00:04:02,772
+Cada cliente que cancela y se pasa de largo pesa
+
+75
+00:04:02,772 --> 00:04:05,120
+casi cuatro veces más que uno que se queda.
+
+76
+00:04:05,240 --> 00:04:07,080
+El modelo se vuelve alarmista.
+
+77
+00:04:07,200 --> 00:04:09,590
+Gana recall, pero pierde precisión.
+
+78
+00:04:09,710 --> 00:04:10,970
+Mira la diferencia.
+
+79
+00:04:11,090 --> 00:04:13,878
+Sin ponderar, la precisión es sesenta y nueve por
+
+80
+00:04:13,878 --> 00:04:16,040
+ciento, pero el recall solo dieciocho.
+
+81
+00:04:16,160 --> 00:04:18,745
+Con balanced, la precisión baja a treinta y
+
+82
+00:04:18,745 --> 00:04:21,270
+nueve, y el recall sube a cincuenta y dos.
+
+83
+00:04:21,390 --> 00:04:23,900
+Hay otra decisión de negocio: el umbral.
+
+84
+00:04:24,020 --> 00:04:28,420
+Estos puntos son una muestra de los clientes de prueba, ubicados sobre la sigmoide.
+
+85
+00:04:28,540 --> 00:04:31,350
+Los grises se quedaron, los ámbar cancelaron.
+
+86
+00:04:31,470 --> 00:04:33,630
+El color no se usó para ubicarlos.
+
+87
+00:04:33,750 --> 00:04:36,482
+Con umbral cero coma cinco, el modelo marca a
+
+88
+00:04:36,482 --> 00:04:38,850
+sesenta y seis clientes como «cancela».
+
+89
+00:04:38,970 --> 00:04:41,950
+Detecta a la mitad, el cincuenta y dos por ciento.
+
+90
+00:04:42,070 --> 00:04:46,660
+Pero solo cuatro de cada diez alertas son aciertos: precisión treinta y nueve.
+
+91
+00:04:46,780 --> 00:04:50,880
+Si bajas el umbral a cero coma tres, el modelo avisa más seguido.
+
+92
+00:04:51,000 --> 00:04:54,440
+Detecta al ochenta y dos por ciento, pero la mayoría de las
+
+93
+00:04:54,440 --> 00:04:57,530
+alertas son falsas: precisión veintisiete por ciento.
+
+94
+00:04:57,650 --> 00:05:01,020
+Y si lo subes a cero coma siete, el modelo avisa poco.
+
+95
+00:05:01,140 --> 00:05:05,120
+La precisión sube a cincuenta por ciento, pero el recall cae a veinte.
+
+96
+00:05:05,240 --> 00:05:07,220
+Se escapan cuatro de cada cinco.
+
+97
+00:05:07,340 --> 00:05:09,920
+Fíjate: el umbral no cambia el modelo.
+
+98
+00:05:10,040 --> 00:05:11,740
+Cambia dónde pones el corte.
+
+99
+00:05:11,860 --> 00:05:14,630
+Y dónde cortar depende de cuánto cuesta cada error.
+
+100
+00:05:14,750 --> 00:05:18,649
+Piensa un segundo: si perder un cliente cuesta mucho más que molestar
+
+101
+00:05:18,649 --> 00:05:21,700
+con una oferta de más, ¿subirías o bajarías el umbral?
+
+102
+00:05:22,420 --> 00:05:23,440
+Lo bajarías.
+
+103
+00:05:23,560 --> 00:05:27,150
+Prefieres algunas falsas alarmas antes que dejar escapar clientes.
+
+104
+00:05:27,270 --> 00:05:29,900
+Ganas recall, y aceptas menos precisión.
+
+105
+00:05:30,020 --> 00:05:33,550
+Resumamos el resultado, con el umbral de cero coma cinco.
+
+106
+00:05:33,670 --> 00:05:36,600
+Accuracy, setenta y tres coma tres por ciento.
+
+107
+00:05:36,720 --> 00:05:39,100
+Precisión, treinta y nueve coma cuatro.
+
+108
+00:05:39,220 --> 00:05:40,990
+Recall, cincuenta y dos.
+
+109
+00:05:41,110 --> 00:05:43,760
+Y F1, cuarenta y cuatro coma ocho.
+
+110
+00:05:43,880 --> 00:05:48,700
+Y el área bajo la curva, el A U C, es cero coma seiscientos ochenta y cinco.
+
+111
+00:05:48,820 --> 00:05:51,170
+Un modelo al azar da cero coma cinco.
+
+112
+00:05:51,290 --> 00:05:55,960
+Así que es un modelo modesto: mejor que el azar, pero lejos de excelente.
+
+113
+00:05:56,080 --> 00:05:57,780
+Este es el error típico.
+
+114
+00:05:57,900 --> 00:06:00,453
+En clase se dijo que una precisión de cincuenta y
+
+115
+00:06:00,453 --> 00:06:02,590
+uno por ciento es como lanzar una moneda.
+
+116
+00:06:02,710 --> 00:06:05,100
+Pero la moneda no es el cincuenta por ciento.
+
+117
+00:06:05,220 --> 00:06:08,167
+Un clasificador al azar tiene una precisión igual a la
+
+118
+00:06:08,167 --> 00:06:11,060
+prevalencia, que aquí es veinte coma ocho por ciento.
+
+119
+00:06:11,180 --> 00:06:12,830
+Y este logra treinta y nueve.
+
+120
+00:06:12,950 --> 00:06:17,412
+Y un detalle de la frontera: con solo dos variables, antigüedad y quejas, la
+
+121
+00:06:17,412 --> 00:06:21,640
+frontera de decisión es una recta, porque el puntaje es una suma lineal.
+
+122
+00:06:21,760 --> 00:06:24,853
+Para llevarte: la logística calcula un puntaje, la
+
+123
+00:06:24,853 --> 00:06:28,070
+sigmoide lo vuelve probabilidad, y el umbral decide.
+
+124
+00:06:28,190 --> 00:06:30,470
+Balanced gana recall y pierde precisión.
+
+125
+00:06:30,590 --> 00:06:33,540
+Y el umbral se elige según el costo de cada error.
+
+126
+00:06:33,660 --> 00:06:37,680
+Vamos con la tercera parada: la regresión, para predecir un número.

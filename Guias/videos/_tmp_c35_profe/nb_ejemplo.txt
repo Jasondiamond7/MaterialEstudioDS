@@ -1,0 +1,697 @@
+##### [0] markdown
+# Bagging y Random Forest: clasificación y regresión
+
+Este notebook acompaña la clase de modelos ensamblados. Compara **Bagging** y **Random Forest** en dos problemas:
+
+1. **Clasificación:** diagnóstico de enfermedad cardíaca con `Heart.xlsx`.
+2. **Regresión:** predicción del precio de venta con `ames_housing.csv`.
+
+En ambos casos se sigue la misma secuencia: EDA breve, preprocesamiento, modelos base, comparación, `GridSearchCV`, `RandomizedSearchCV` y evaluación final.
+
+La comparación usa el mismo conjunto de entrenamiento y prueba para ambos modelos. La selección del modelo optimizado se hace mediante validación cruzada, sin elegir hiperparámetros mirando el conjunto de prueba.
+##### [1] markdown
+## 0. Preparación
+
+El notebook usa `pandas`, `numpy`, `matplotlib`, `seaborn`, `scikit-learn`, `scipy` y `openpyxl`.
+
+`FAST_MODE=True` mantiene las búsquedas suficientemente pequeñas para una demostración en clase. Cambia el valor a `False` para explorar más combinaciones.
+##### [2] code
+from pathlib import Path
+from time import perf_counter
+import warnings
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from scipy.stats import randint, uniform
+
+from sklearn.base import clone
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.impute import SimpleImputer
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.ensemble import (
+    BaggingClassifier, BaggingRegressor,
+    RandomForestClassifier, RandomForestRegressor,
+)
+from sklearn.model_selection import (
+    train_test_split, GridSearchCV, RandomizedSearchCV,
+    StratifiedKFold, KFold,
+)
+from sklearn.metrics import (
+    accuracy_score, balanced_accuracy_score, precision_score, recall_score,
+    f1_score, roc_auc_score, RocCurveDisplay, ConfusionMatrixDisplay,
+    mean_absolute_error, mean_squared_error, r2_score,
+)
+from sklearn.inspection import permutation_importance
+
+warnings.filterwarnings("ignore", category=FutureWarning)
+pd.set_option("display.max_colwidth", 120)
+sns.set_theme(style="whitegrid", context="notebook")
+
+RANDOM_STATE = 42
+FAST_MODE = False
+N_JOBS = 6  # Ryzen 7 3700X (8 núcleos/16 hilos): deja hilos libres para que el equipo siga usable
+
+CV_CLASS = 5
+CV_REG = 5
+N_ITER_RANDOM = 6 if FAST_MODE else 30
+N_ESTIMATORS_GRID = [60, 120] if FAST_MODE else [100, 300, 600]
+
+DATA_DIR = Path(r"C:\Users\Jason Leon\Desktop\D\Clase35-BastianGalasso")
+HEART_PATH = DATA_DIR / "Heart.xlsx"
+AMES_PATH = DATA_DIR / "ames_housing.csv"
+
+for path in [HEART_PATH, AMES_PATH]:
+    if not path.exists():
+        raise FileNotFoundError(
+            f"No se encontró {path}. Modifica DATA_DIR para apuntar a la carpeta de datos."
+        )
+
+print(f"Modo rápido: {FAST_MODE}")
+print(f"Iteraciones de RandomizedSearchCV por modelo: {N_ITER_RANDOM}")
+##### [3] markdown
+## Funciones auxiliares
+
+Las funciones siguientes mantienen la evaluación consistente. En clasificación se reportan métricas complementarias porque `accuracy` puede ocultar problemas cuando las clases no están balanceadas. En regresión se reportan errores en dólares y $R^2$.
+##### [4] code
+def classification_scores(name, estimator, X, y):
+    pred = estimator.predict(X)
+    proba = estimator.predict_proba(X)[:, 1]
+    return {
+        "Modelo": name,
+        "Accuracy": accuracy_score(y, pred),
+        "Balanced accuracy": balanced_accuracy_score(y, pred),
+        "Precision": precision_score(y, pred),
+        "Recall": recall_score(y, pred),
+        "F1": f1_score(y, pred),
+        "ROC AUC": roc_auc_score(y, proba),
+    }
+
+
+def regression_scores(name, estimator, X, y):
+    pred = estimator.predict(X)
+    return {
+        "Modelo": name,
+        "RMSE": np.sqrt(mean_squared_error(y, pred)),
+        "MAE": mean_absolute_error(y, pred),
+        "R2": r2_score(y, pred),
+    }
+
+
+def summarize_searches(searches, sign=1):
+    rows = []
+    for name, search in searches.items():
+        rows.append({
+            "Búsqueda": name,
+            "Mejor score CV": sign * search.best_score_,
+            "Tiempo (s)": search.refit_time_,
+            "Mejores parámetros": search.best_params_,
+        })
+    return pd.DataFrame(rows).sort_values("Mejor score CV", ascending=(sign < 0))
+
+
+def choose_by_cv(grid_search, random_search):
+    # Escoge entre Grid y Randomized usando únicamente el score de CV.
+    return grid_search if grid_search.best_score_ >= random_search.best_score_ else random_search
+
+
+def original_feature_importance(estimator, X, y, scoring, n_repeats=5, top_n=15):
+    # Importancia por permutación sobre las columnas originales del DataFrame.
+    result = permutation_importance(
+        estimator, X, y, scoring=scoring, n_repeats=n_repeats,
+        random_state=RANDOM_STATE, n_jobs=1,
+    )
+    return (
+        pd.DataFrame({"Variable": X.columns, "Importancia": result.importances_mean})
+        .sort_values("Importancia", ascending=False)
+        .head(top_n)
+    )
+##### [5] markdown
+# Parte I. Clasificación con Heart
+
+La variable objetivo es `AHD`, con valores `Yes` y `No`. El objetivo consiste en predecir la presencia de enfermedad cardíaca a partir de variables clínicas.
+##### [6] code
+heart = pd.read_excel(HEART_PATH, sheet_name="Heart")
+print(f"Dimensiones: {heart.shape[0]} filas y {heart.shape[1]} columnas")
+display(heart.head())
+##### [7] markdown
+## 1. EDA breve de Heart
+##### [8] code
+heart_summary = pd.DataFrame({
+    "tipo": heart.dtypes.astype(str),
+    "faltantes": heart.isna().sum(),
+    "únicos": heart.nunique(dropna=False),
+}).sort_values(["faltantes", "únicos"], ascending=[False, True])
+display(heart_summary)
+
+print("Distribución de AHD")
+display(heart["AHD"].value_counts().rename_axis("AHD").to_frame("casos"))
+##### [9] code
+fig, axes = plt.subplots(1, 2, figsize=(13, 4.5))
+sns.countplot(data=heart, x="AHD", hue="AHD", legend=False, ax=axes[0], palette="Set2")
+axes[0].set_title("Distribución de la variable objetivo")
+axes[0].set_xlabel("Enfermedad cardíaca")
+axes[0].set_ylabel("Número de pacientes")
+
+missing = heart.isna().sum().sort_values(ascending=False)
+missing = missing[missing > 0]
+sns.barplot(x=missing.values, y=missing.index, ax=axes[1], color="#F4B64E")
+axes[1].set_title("Valores faltantes")
+axes[1].set_xlabel("Cantidad")
+axes[1].set_ylabel("")
+plt.tight_layout()
+plt.show()
+##### [10] code
+numeric_for_plot = ["Age", "RestBP", "Chol", "MaxHR", "Oldpeak"]
+heart_long = heart.melt(id_vars="AHD", value_vars=numeric_for_plot,
+                        var_name="Variable", value_name="Valor")
+g = sns.FacetGrid(heart_long, col="Variable", col_wrap=3, hue="AHD",
+                  sharex=False, sharey=False, height=3)
+g.map_dataframe(sns.kdeplot, x="Valor", fill=True, alpha=0.25, common_norm=False)
+g.add_legend(title="AHD")
+g.set_titles("{col_name}")
+g.fig.suptitle("Distribuciones numéricas según AHD", y=1.03)
+plt.show()
+##### [11] markdown
+### Lectura del EDA
+
+- El conjunto es pequeño, por lo que la validación cruzada ayuda a reducir la dependencia de una única partición.
+- `Ca` y `Thal` contienen pocos valores faltantes. La imputación se realizará dentro del pipeline.
+- `AHD` presenta una distribución relativamente equilibrada. Aun así, se compararán recall, F1 y ROC AUC además de accuracy.
+##### [12] markdown
+## 2. Preparación y partición de Heart
+##### [13] code
+X_heart = heart.drop(columns="AHD")
+y_heart = heart["AHD"].map({"No": 0, "Yes": 1})
+
+heart_categorical = ["Sex", "ChestPain", "Fbs", "RestECG", "ExAng", "Slope", "Thal"]
+heart_numeric = [c for c in X_heart.columns if c not in heart_categorical]
+
+heart_preprocessor = ColumnTransformer(
+    transformers=[
+        ("num", Pipeline([
+            ("imputer", SimpleImputer(strategy="median")),
+        ]), heart_numeric),
+        ("cat", Pipeline([
+            ("imputer", SimpleImputer(strategy="most_frequent")),
+            ("onehot", OneHotEncoder(handle_unknown="ignore")),
+        ]), heart_categorical),
+    ],
+    remainder="drop",
+)
+
+Xh_train, Xh_test, yh_train, yh_test = train_test_split(
+    X_heart, y_heart, test_size=0.25, stratify=y_heart, random_state=RANDOM_STATE
+)
+
+print("Entrenamiento:", Xh_train.shape, " Prueba:", Xh_test.shape)
+print("Proporción positiva en entrenamiento:", round(yh_train.mean(), 3))
+print("Proporción positiva en prueba:", round(yh_test.mean(), 3))
+##### [14] markdown
+## 3. Modelos base de clasificación
+
+Bagging usa árboles con todas las variables disponibles en cada división. Random Forest añade la selección aleatoria de variables por nodo mediante `max_features`.
+##### [15] code
+bagging_clf = Pipeline([
+    ("prep", heart_preprocessor),
+    ("model", BaggingClassifier(
+        estimator=DecisionTreeClassifier(random_state=RANDOM_STATE),
+        n_estimators=120,
+        bootstrap=True,
+        oob_score=True,
+        random_state=RANDOM_STATE,
+        n_jobs=N_JOBS,
+    )),
+])
+
+rf_clf = Pipeline([
+    ("prep", heart_preprocessor),
+    ("model", RandomForestClassifier(
+        n_estimators=120,
+        max_features="sqrt",
+        bootstrap=True,
+        oob_score=True,
+        class_weight="balanced",
+        random_state=RANDOM_STATE,
+        n_jobs=N_JOBS,
+    )),
+])
+
+baseline_classifiers = {"Bagging base": bagging_clf, "Random Forest base": rf_clf}
+class_rows = []
+
+for name, model in baseline_classifiers.items():
+    t0 = perf_counter()
+    model.fit(Xh_train, yh_train)
+    elapsed = perf_counter() - t0
+    row = classification_scores(name, model, Xh_test, yh_test)
+    row["Tiempo ajuste (s)"] = elapsed
+    row["OOB score"] = model.named_steps["model"].oob_score_
+    class_rows.append(row)
+
+class_baseline_results = pd.DataFrame(class_rows).set_index("Modelo")
+display(class_baseline_results.style.format("{:.3f}"))
+##### [16] code
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.2))
+for ax, (name, model) in zip(axes, baseline_classifiers.items()):
+    ConfusionMatrixDisplay.from_estimator(
+        model, Xh_test, yh_test, display_labels=["No", "Sí"], cmap="Blues", ax=ax,
+        colorbar=False,
+    )
+    ax.set_title(name)
+plt.tight_layout()
+plt.show()
+
+fig, ax = plt.subplots(figsize=(7, 5))
+for name, model in baseline_classifiers.items():
+    RocCurveDisplay.from_estimator(model, Xh_test, yh_test, name=name, ax=ax)
+ax.plot([0, 1], [0, 1], "--", color="gray")
+ax.set_title("Curvas ROC de los modelos base")
+plt.show()
+##### [17] markdown
+## 4. GridSearchCV para clasificación
+##### [18] code
+cv_class = StratifiedKFold(n_splits=CV_CLASS, shuffle=True, random_state=RANDOM_STATE)
+
+bag_clf_grid = {
+    "model__n_estimators": N_ESTIMATORS_GRID,
+    "model__max_samples": [0.7, 1.0],
+    "model__estimator__max_depth": [None, 5],
+    "model__estimator__min_samples_leaf": [1, 3],
+}
+
+rf_clf_grid = {
+    "model__n_estimators": N_ESTIMATORS_GRID,
+    "model__max_features": ["sqrt", 0.7],
+    "model__max_depth": [None, 6],
+    "model__min_samples_leaf": [1, 3],
+}
+
+grid_bag_clf = GridSearchCV(
+    clone(bagging_clf).set_params(model__n_jobs=1), bag_clf_grid, scoring="roc_auc", cv=cv_class,
+    n_jobs=N_JOBS, refit=True, verbose=0,
+)
+grid_rf_clf = GridSearchCV(
+    clone(rf_clf).set_params(model__n_jobs=1), rf_clf_grid, scoring="roc_auc", cv=cv_class,
+    n_jobs=N_JOBS, refit=True, verbose=0,
+)
+
+for search in [grid_bag_clf, grid_rf_clf]:
+    search.fit(Xh_train, yh_train)
+
+class_grid_summary = summarize_searches({
+    "Bagging GridSearch": grid_bag_clf,
+    "Random Forest GridSearch": grid_rf_clf,
+})
+display(class_grid_summary)
+##### [19] markdown
+## 5. RandomizedSearchCV para clasificación
+##### [20] code
+bag_clf_random = {
+    "model__n_estimators": randint(50, 220 if FAST_MODE else 700),
+    "model__max_samples": uniform(0.55, 0.45),
+    "model__estimator__max_depth": [None, 3, 5, 8, 12],
+    "model__estimator__min_samples_leaf": randint(1, 7),
+    "model__estimator__max_features": [None, "sqrt", 0.7],
+}
+
+rf_clf_random = {
+    "model__n_estimators": randint(50, 220 if FAST_MODE else 700),
+    "model__max_features": ["sqrt", "log2", 0.4, 0.7, 1.0],
+    "model__max_depth": [None, 4, 6, 10, 16],
+    "model__min_samples_leaf": randint(1, 7),
+    "model__min_samples_split": randint(2, 12),
+}
+
+random_bag_clf = RandomizedSearchCV(
+    clone(bagging_clf).set_params(model__n_jobs=1), bag_clf_random, n_iter=N_ITER_RANDOM,
+    scoring="roc_auc", cv=cv_class, random_state=RANDOM_STATE,
+    n_jobs=N_JOBS, refit=True, verbose=0,
+)
+random_rf_clf = RandomizedSearchCV(
+    clone(rf_clf).set_params(model__n_jobs=1), rf_clf_random, n_iter=N_ITER_RANDOM,
+    scoring="roc_auc", cv=cv_class, random_state=RANDOM_STATE,
+    n_jobs=N_JOBS, refit=True, verbose=0,
+)
+
+for search in [random_bag_clf, random_rf_clf]:
+    search.fit(Xh_train, yh_train)
+
+class_random_summary = summarize_searches({
+    "Bagging RandomizedSearch": random_bag_clf,
+    "Random Forest RandomizedSearch": random_rf_clf,
+})
+display(class_random_summary)
+##### [21] markdown
+## 6. Comparación final de clasificación
+
+Primero se compara GridSearch con RandomizedSearch mediante ROC AUC de validación cruzada. Para cada familia se lleva a prueba la alternativa con mejor resultado de CV.
+##### [22] code
+best_bag_clf_search = choose_by_cv(grid_bag_clf, random_bag_clf)
+best_rf_clf_search = choose_by_cv(grid_rf_clf, random_rf_clf)
+
+selected_classifiers = {
+    "Bagging base": bagging_clf,
+    "Random Forest base": rf_clf,
+    "Bagging optimizado": best_bag_clf_search.best_estimator_,
+    "Random Forest optimizado": best_rf_clf_search.best_estimator_,
+}
+
+class_final_results = pd.DataFrame([
+    classification_scores(name, model, Xh_test, yh_test)
+    for name, model in selected_classifiers.items()
+]).set_index("Modelo")
+
+display(class_final_results.style.format("{:.3f}").highlight_max(axis=0, color="#d9f0e7"))
+
+print("Bagging seleccionado desde:", type(best_bag_clf_search).__name__)
+print("Random Forest seleccionado desde:", type(best_rf_clf_search).__name__)
+##### [23] code
+fig, ax = plt.subplots(figsize=(8, 5))
+for name in ["Bagging optimizado", "Random Forest optimizado"]:
+    RocCurveDisplay.from_estimator(selected_classifiers[name], Xh_test, yh_test, name=name, ax=ax)
+ax.plot([0, 1], [0, 1], "--", color="gray")
+ax.set_title("Clasificación: modelos optimizados")
+plt.show()
+
+heart_importance = {}
+for name in ["Bagging optimizado", "Random Forest optimizado"]:
+    heart_importance[name] = original_feature_importance(
+        selected_classifiers[name], Xh_test, yh_test, scoring="roc_auc", top_n=10
+    ).assign(Modelo=name)
+
+heart_importance_df = pd.concat(heart_importance.values(), ignore_index=True)
+g = sns.catplot(
+    data=heart_importance_df, x="Importancia", y="Variable", col="Modelo",
+    kind="bar", sharex=False, sharey=False, height=4.5, aspect=0.9,
+    color="#17B6B0",
+)
+g.set_titles("{col_name}")
+g.fig.suptitle("Importancia por permutación en Heart", y=1.03)
+plt.show()
+##### [24] markdown
+### Interpretación de la competencia de clasificación
+
+- **Bagging** reduce la varianza al promediar árboles entrenados con muestras bootstrap.
+- **Random Forest** intenta reducir además la correlación entre árboles usando subconjuntos de variables.
+- La diferencia observada depende de la muestra, la métrica y los hiperparámetros. El ganador debe justificarse con validación cruzada y desempeño en prueba, no por el nombre del algoritmo.
+##### [25] markdown
+# Parte II. Regresión con Ames Housing
+
+La variable objetivo es `Sale_Price`. El dataset contiene variables numéricas y categóricas sobre ubicación, tamaño, calidad, antigüedad y características de cada vivienda.
+##### [26] code
+ames = pd.read_csv(AMES_PATH)
+ames = ames.drop(columns=["Unnamed: 0"], errors="ignore")
+print(f"Dimensiones: {ames.shape[0]} filas y {ames.shape[1]} columnas")
+display(ames.head())
+##### [27] markdown
+## 7. EDA breve de Ames
+##### [28] code
+ames_target_summary = ames["Sale_Price"].describe().to_frame("Sale_Price")
+display(ames_target_summary.style.format("{:,.0f}"))
+
+ames_missing = (
+    ames.isna().mean().mul(100).sort_values(ascending=False)
+    .rename("Porcentaje faltante").to_frame()
+)
+display(ames_missing.head(15).style.format("{:.1f}%"))
+
+print("Variables categóricas:", ames.select_dtypes(include=["object", "str"]).shape[1])
+print("Variables numéricas:", ames.select_dtypes(include=np.number).shape[1] - 1)
+##### [29] code
+fig, axes = plt.subplots(1, 2, figsize=(13, 4.5))
+sns.histplot(ames["Sale_Price"], kde=True, ax=axes[0], color="#17B6B0")
+axes[0].set_title("Distribución de Sale_Price")
+axes[0].set_xlabel("Precio de venta")
+
+sns.histplot(np.log1p(ames["Sale_Price"]), kde=True, ax=axes[1], color="#F4B64E")
+axes[1].set_title("Distribución de log(1 + Sale_Price)")
+axes[1].set_xlabel("Logaritmo del precio")
+plt.tight_layout()
+plt.show()
+##### [30] code
+numeric_ames = ames.select_dtypes(include=np.number)
+target_corr = (
+    numeric_ames.corr(numeric_only=True)["Sale_Price"]
+    .drop("Sale_Price").sort_values(key=np.abs, ascending=False)
+)
+display(target_corr.head(12).rename("Correlación con Sale_Price").to_frame())
+
+top_features = target_corr.head(3).index.tolist()
+fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+for ax, feature in zip(axes, top_features):
+    sns.scatterplot(data=ames, x=feature, y="Sale_Price", alpha=0.45, ax=ax)
+    ax.set_title(feature)
+plt.tight_layout()
+plt.show()
+##### [31] markdown
+### Lectura del EDA
+
+- El precio presenta asimetría positiva y algunos valores extremos.
+- Varias variables categóricas usan categorías explícitas para indicar ausencia, mientras otras contienen `NaN`. El pipeline imputará faltantes antes de codificar.
+- La relación entre precio y predictores importantes no es perfectamente lineal. Los árboles pueden representar umbrales e interacciones sin especificarlos manualmente.
+##### [32] markdown
+## 8. Preparación y partición de Ames
+##### [33] code
+X_ames = ames.drop(columns="Sale_Price")
+y_ames = ames["Sale_Price"]
+
+ames_categorical = X_ames.select_dtypes(include=["object", "str", "category"]).columns.tolist()
+ames_numeric = X_ames.select_dtypes(include=np.number).columns.tolist()
+
+ames_preprocessor = ColumnTransformer(
+    transformers=[
+        ("num", Pipeline([
+            ("imputer", SimpleImputer(strategy="median")),
+        ]), ames_numeric),
+        ("cat", Pipeline([
+            ("imputer", SimpleImputer(strategy="most_frequent")),
+            ("onehot", OneHotEncoder(handle_unknown="ignore")),
+        ]), ames_categorical),
+    ],
+    remainder="drop",
+)
+
+Xa_train, Xa_test, ya_train, ya_test = train_test_split(
+    X_ames, y_ames, test_size=0.20, random_state=RANDOM_STATE
+)
+
+print("Entrenamiento:", Xa_train.shape, " Prueba:", Xa_test.shape)
+print("Precio mediano en entrenamiento:", f"${ya_train.median():,.0f}")
+print("Precio mediano en prueba:", f"${ya_test.median():,.0f}")
+##### [34] markdown
+## 9. Modelos base de regresión
+##### [35] code
+bagging_reg = Pipeline([
+    ("prep", ames_preprocessor),
+    ("model", BaggingRegressor(
+        estimator=DecisionTreeRegressor(random_state=RANDOM_STATE),
+        n_estimators=120,
+        bootstrap=True,
+        oob_score=True,
+        random_state=RANDOM_STATE,
+        n_jobs=N_JOBS,
+    )),
+])
+
+rf_reg = Pipeline([
+    ("prep", ames_preprocessor),
+    ("model", RandomForestRegressor(
+        n_estimators=120,
+        max_features=1.0,
+        bootstrap=True,
+        oob_score=True,
+        random_state=RANDOM_STATE,
+        n_jobs=N_JOBS,
+    )),
+])
+
+baseline_regressors = {"Bagging base": bagging_reg, "Random Forest base": rf_reg}
+reg_rows = []
+
+for name, model in baseline_regressors.items():
+    t0 = perf_counter()
+    model.fit(Xa_train, ya_train)
+    elapsed = perf_counter() - t0
+    row = regression_scores(name, model, Xa_test, ya_test)
+    row["Tiempo ajuste (s)"] = elapsed
+    row["OOB R2"] = model.named_steps["model"].oob_score_
+    reg_rows.append(row)
+
+reg_baseline_results = pd.DataFrame(reg_rows).set_index("Modelo")
+display(reg_baseline_results.style.format({
+    "RMSE": "${:,.0f}", "MAE": "${:,.0f}", "R2": "{:.3f}",
+    "Tiempo ajuste (s)": "{:.2f}", "OOB R2": "{:.3f}",
+}))
+##### [36] code
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+for ax, (name, model) in zip(axes, baseline_regressors.items()):
+    pred = model.predict(Xa_test)
+    ax.scatter(ya_test, pred, alpha=0.45, s=22)
+    low = min(ya_test.min(), pred.min())
+    high = max(ya_test.max(), pred.max())
+    ax.plot([low, high], [low, high], "--", color="black")
+    ax.set_title(name)
+    ax.set_xlabel("Precio real")
+    ax.set_ylabel("Precio predicho")
+plt.tight_layout()
+plt.show()
+##### [37] markdown
+## 10. GridSearchCV para regresión
+##### [38] code
+cv_reg = KFold(n_splits=CV_REG, shuffle=True, random_state=RANDOM_STATE)
+
+bag_reg_grid = {
+    "model__n_estimators": N_ESTIMATORS_GRID,
+    "model__max_samples": [0.7, 1.0],
+    "model__estimator__max_depth": [None, 12],
+    "model__estimator__min_samples_leaf": [1, 3],
+}
+
+rf_reg_grid = {
+    "model__n_estimators": N_ESTIMATORS_GRID,
+    "model__max_features": [0.5, 1.0],
+    "model__max_depth": [None, 16],
+    "model__min_samples_leaf": [1, 3],
+}
+
+grid_bag_reg = GridSearchCV(
+    clone(bagging_reg).set_params(model__n_jobs=1), bag_reg_grid, scoring="neg_root_mean_squared_error",
+    cv=cv_reg, n_jobs=N_JOBS, refit=True, verbose=0,
+)
+grid_rf_reg = GridSearchCV(
+    clone(rf_reg).set_params(model__n_jobs=1), rf_reg_grid, scoring="neg_root_mean_squared_error",
+    cv=cv_reg, n_jobs=N_JOBS, refit=True, verbose=0,
+)
+
+for search in [grid_bag_reg, grid_rf_reg]:
+    search.fit(Xa_train, ya_train)
+
+reg_grid_summary = summarize_searches({
+    "Bagging GridSearch": grid_bag_reg,
+    "Random Forest GridSearch": grid_rf_reg,
+}, sign=-1)
+display(reg_grid_summary.rename(columns={"Mejor score CV": "RMSE CV"}))
+##### [39] markdown
+## 11. RandomizedSearchCV para regresión
+##### [40] code
+bag_reg_random = {
+    "model__n_estimators": randint(50, 220 if FAST_MODE else 700),
+    "model__max_samples": uniform(0.55, 0.45),
+    "model__estimator__max_depth": [None, 8, 12, 18, 25],
+    "model__estimator__min_samples_leaf": randint(1, 8),
+    "model__estimator__max_features": [None, "sqrt", 0.7],
+}
+
+rf_reg_random = {
+    "model__n_estimators": randint(50, 220 if FAST_MODE else 700),
+    "model__max_features": uniform(0.3, 0.7),
+    "model__max_depth": [None, 8, 12, 18, 25],
+    "model__min_samples_leaf": randint(1, 8),
+    "model__min_samples_split": randint(2, 14),
+}
+
+random_bag_reg = RandomizedSearchCV(
+    clone(bagging_reg).set_params(model__n_jobs=1), bag_reg_random, n_iter=N_ITER_RANDOM,
+    scoring="neg_root_mean_squared_error", cv=cv_reg,
+    random_state=RANDOM_STATE, n_jobs=N_JOBS, refit=True, verbose=0,
+)
+random_rf_reg = RandomizedSearchCV(
+    clone(rf_reg).set_params(model__n_jobs=1), rf_reg_random, n_iter=N_ITER_RANDOM,
+    scoring="neg_root_mean_squared_error", cv=cv_reg,
+    random_state=RANDOM_STATE, n_jobs=N_JOBS, refit=True, verbose=0,
+)
+
+for search in [random_bag_reg, random_rf_reg]:
+    search.fit(Xa_train, ya_train)
+
+reg_random_summary = summarize_searches({
+    "Bagging RandomizedSearch": random_bag_reg,
+    "Random Forest RandomizedSearch": random_rf_reg,
+}, sign=-1)
+display(reg_random_summary.rename(columns={"Mejor score CV": "RMSE CV"}))
+##### [41] markdown
+## 12. Comparación final de regresión
+
+En métricas de error, un valor menor de RMSE o MAE es mejor. En $R^2$, un valor mayor es mejor. La selección entre GridSearch y RandomizedSearch se realiza con el RMSE de validación cruzada.
+##### [42] code
+best_bag_reg_search = choose_by_cv(grid_bag_reg, random_bag_reg)
+best_rf_reg_search = choose_by_cv(grid_rf_reg, random_rf_reg)
+
+selected_regressors = {
+    "Bagging base": bagging_reg,
+    "Random Forest base": rf_reg,
+    "Bagging optimizado": best_bag_reg_search.best_estimator_,
+    "Random Forest optimizado": best_rf_reg_search.best_estimator_,
+}
+
+reg_final_results = pd.DataFrame([
+    regression_scores(name, model, Xa_test, ya_test)
+    for name, model in selected_regressors.items()
+]).set_index("Modelo")
+
+display(reg_final_results.style.format({
+    "RMSE": "${:,.0f}", "MAE": "${:,.0f}", "R2": "{:.3f}",
+}).highlight_min(subset=["RMSE", "MAE"], color="#d9f0e7")
+  .highlight_max(subset=["R2"], color="#d9f0e7"))
+
+print("Bagging seleccionado desde:", type(best_bag_reg_search).__name__)
+print("Random Forest seleccionado desde:", type(best_rf_reg_search).__name__)
+##### [43] code
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+for ax, name in zip(axes, ["Bagging optimizado", "Random Forest optimizado"]):
+    model = selected_regressors[name]
+    pred = model.predict(Xa_test)
+    ax.scatter(ya_test, pred, alpha=0.45, s=22)
+    low = min(ya_test.min(), pred.min())
+    high = max(ya_test.max(), pred.max())
+    ax.plot([low, high], [low, high], "--", color="black")
+    ax.set_title(name)
+    ax.set_xlabel("Precio real")
+    ax.set_ylabel("Precio predicho")
+plt.tight_layout()
+plt.show()
+##### [44] code
+ames_importance = {}
+for name in ["Bagging optimizado", "Random Forest optimizado"]:
+    ames_importance[name] = original_feature_importance(
+        selected_regressors[name], Xa_test, ya_test,
+        scoring="neg_root_mean_squared_error", n_repeats=3, top_n=12,
+    ).assign(Modelo=name)
+
+ames_importance_df = pd.concat(ames_importance.values(), ignore_index=True)
+g = sns.catplot(
+    data=ames_importance_df, x="Importancia", y="Variable", col="Modelo",
+    kind="bar", sharex=False, sharey=False, height=5, aspect=0.9,
+    color="#2D6D8E",
+)
+g.set_titles("{col_name}")
+g.fig.suptitle("Importancia por permutación en Ames", y=1.03)
+plt.show()
+##### [45] markdown
+# Conclusiones
+
+1. **Bagging** y **Random Forest** reducen la inestabilidad de un árbol individual mediante promedios o votación.
+2. **Random Forest** añade aleatoriedad en las variables. Esta diferencia puede disminuir la correlación entre árboles y mejorar la generalización.
+3. **GridSearchCV** prueba todas las combinaciones de una grilla discreta. Funciona bien cuando conocemos una región pequeña y razonable.
+4. **RandomizedSearchCV** explora una cantidad fija de configuraciones. Resulta útil cuando el espacio contiene más hiperparámetros o distribuciones continuas.
+5. El resultado relevante no es quién gana una única partición. La comparación debe considerar validación cruzada, conjunto de prueba, costo computacional y métrica del problema.
+
+## Preguntas para discutir
+
+- ¿Cambió el ganador después de optimizar hiperparámetros?
+- ¿GridSearch y RandomizedSearch encontraron configuraciones similares?
+- ¿Qué hiperparámetros explican mejor la diferencia entre Bagging y Random Forest?
+- ¿Qué costo adicional tuvo la mejora predictiva?
+##### [46] code
+class_winner = class_final_results["ROC AUC"].idxmax()
+reg_winner = reg_final_results["RMSE"].idxmin()
+
+print("Resumen de esta ejecución")
+print("- Mayor ROC AUC en clasificación:", class_winner)
+print("- Menor RMSE en regresión:", reg_winner)
+print("\nLos ganadores pueden cambiar con otra semilla, partición o espacio de búsqueda.")

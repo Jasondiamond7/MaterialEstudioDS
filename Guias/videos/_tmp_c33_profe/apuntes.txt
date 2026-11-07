@@ -1,0 +1,290 @@
+Apuntes · Clase 33 · Feature engineering y selección de variables
+
+Para leer antes de los ejercicios · lectura de ~60 min
+
+Lo más importante, en 6 ideas
+1 Limpiar primero. Los valores imposibles se tratan con reglas de negocio, antes de seleccionar. Imputa con
+
+        la mediana; no borres filas.
+2 Construir con sentido. Ratios, logs, binarias, cuartiles. Épsilon en todo denominador.
+
+3 Tres razones para sobrar. Irrelevante (se va), redundante (queda una), útil solo en conjunto (no la mates
+        por un p-valor).
+
+4 Tres familias. Filter (rápido, univariado), wrapper (caro, ve combinaciones), embedded (Lasso: selecciona al
+        entrenar).
+
+5 La trampa. Todo lo que mira el target va dentro de cada fold. Si no, el AUC es inventado.
+
+6 Desconfía. Un AUC demasiado bueno suele ser leakage, también por la ventana temporal.
+
+Cada sección trae una explicación, un ejemplo resuelto con números distintos a los de los ejercicios y una pista para el notebook
+C33_FeatureEngineering.ipynb o el cuaderno C33_Ejercicios_Cuaderno_FeatureEngineering.pdf.
+
+1 Qué es feature engineering y por qué importa
+
+Un modelo solo puede aprender de lo que le entregas. El feature engineering es el trabajo de convertir datos
+crudos en variables útiles: limpiarlas, transformarlas y crear nuevas. La selección de variables decide cuáles de esas
+candidatas entran al modelo final.
+
+El profesor insiste en que no es una receta lineal («primero esto, después esto»), sino un trabajo iterativo que
+depende del problema de negocio. Su ejemplo de la clase: predecir qué clientes de una telco se van a fugar, con
+3.150 clientes y 12 variables.
+
+2 Limpiar con criterio de negocio
+
+Antes de cualquier técnica estadística, revisa mínimos y máximos con describe(). Un valor imposible (segundos
+negativos, 233 años) no es un outlier interesante: es un error de captura. Se marca como faltante (NaN) y luego se
+imputa.
+
+Ejemplo resuelto · ¿media o mediana para imputar?
+
+Segundos de 5 clientes: 3.000, 3.200, 2.900, 3.100 y -14.645 (imposible).
+
+Paso Qué haces                                                     Resultado
+
+1  Media con el error incluido                                     (12.200 - 14.645) / 5 = -489
+
+2  Mediana con el error incluido                                   3.000 (casi no se mueve)
+
+3  Marcar -14.645 como NaN y calcular la                           3.050
+
+   mediana
+
+4  Imputar el NaN con esa mediana                                  el cliente queda con 3.050 segundos
+
+Un solo dato malo vuelve negativa la media; la mediana es robusta. Por eso la clase imputa con la mediana.
+
+La regla la pone el negocio
+Edad entre 15 y 100 es una regla de negocio. ¿Y los 108 clientes de 0 a 14 años? Podrían ser cuentas a nombre de un menor.
+No hay respuesta estadística: hay que preguntar al negocio y documentar la decisión. Y no borres la fila: perderías la
+información de sus otras 11 variables.
+
+Apuntes · Clase 33 · Feature engineering y selección de variables                                                                  1
+Pista para la Parte A del notebook y el Bloque 1 del cuaderno
+Para cada variable pregúntate: ¿qué rango es físicamente posible? Todo lo que esté fuera, a NaN. Después cuenta cuántos
+marcaste por variable antes de imputar.
+
+3 Construir variables
+
+Las variables crudas muchas veces no capturan lo importante. Un cliente con 60 llamadas en 20 meses no es igual a
+uno con 60 llamadas en 2 meses: lo que discrimina es el ratio llamadas por mes.
+
+Familia            Ejemplo                                         Para qué sirve
+Ratios             frec_llamadas / antigüedad                      normalizar por exposición; según el profesor, las más potentes
+Logaritmos         log(1 + clv)                                    aplastar colas largas
+Binarias           tiene_reclamo, cliente_nuevo                    marcar una condición de negocio
+Cuartiles          clv_q1 ... clv_q4                               capturar relaciones no lineales
+Interacciones      reclamo × antigüedad                            efectos que dependen de otra variable
+One-hot            estado_2, plan_2                                categóricas para modelos lineales
+
+Ejemplo resuelto · ratios con épsilon
+
+Cliente                                  Cálculo                                 Resultado
+
+20 meses, 60 llamadas                    60 / (20 + 0.000001)                    3.0 llamadas por mes
+
+60 llamadas, 4.500 segundos              4.500 / (60 + 0.000001)                 75 segundos por llamada
+
+0 meses (cliente nuevo), 60              60 / (0 + 0.000001)                     60.000.000: enorme pero finito
+llamadas
+
+Sin el épsilon, la tercera fila daría infinito y rompería el escalado y el modelo. Fíjate también que el resultado es gigante:
+conviene revisar y tratar esos casos, por ejemplo con un log o un tope.
+
+Pista para la Parte B del notebook y el Bloque 2 del cuaderno
+Escribe primero el ratio en palabras («llamadas por cada mes de antigüedad») y después en código. Al terminar, verifica que
+no queden infinitos con np.isinf(X).sum().sum().
+
+4 Irrelevante, redundante o útil en conjunto
+
+Tipo               Qué pasa                                        Decisión      Ejemplo de la clase
+
+Irrelevante        no aporta ni sola ni acompañada descartar                     ninguna clara en este dataset
+
+Redundante         repite otra variable                            conservar una reclamos y tiene_reclamo (r = 1)
+
+Útil en conjunto sola no sirve, acompañada sí                      NO descartar  numero_fallas, el caso XOR
+
+Ejemplo resuelto · el XOR con 4 puntos
+
+Punto          x1            x2          Clase (signos distintos)
+
+A              +1            +1          0
+
+B              +1            -1          1
+
+C              -1            +1          1
+
+D              -1            -1          0
+
+Mira solo x1: con +1 hay un 0 y un 1; con -1 también. x1 sola no dice nada, y lo mismo pasa con x2. Pero x1·x2 vale +1 en las
+clases 0 y -1 en las clases 1: juntas separan perfecto. Un filtro univariado habría descartado las dos.
+
+Apuntes · Clase 33 · Feature engineering y selección de variables                                                                  2
+5 Métodos de filtro
+
+Un filtro mide cada variable por separado contra el target, sin entrenar el modelo. Es rápido, pero no ve
+combinaciones.
+
+· Varianza: una variable casi constante no informa. Para una binaria, Var = (1 - ); con threshold = 0.01 se exige
+    que la categoría menor tenga más de ~1% de los casos.
+
+· Correlación de Pearson: mide solo relación lineal. Con y = x² (una U perfecta), r = 0.
+· Información mutua: detecta cualquier dependencia, también no lineal. Sirve para ordenar dentro de un dataset.
+
+    Cambia con la semilla: fija random_state.
+· ANOVA F: compara las medias de la variable entre fugados y no fugados. Falla con relaciones tipo U.
+
+Ejemplo resuelto · varianza de una variable binaria
+
+% de unos ()      Var = (1 - )                                                 ¿Pasa threshold = 0.01?
+                                                                               No: casi constante
+0.5%              0.005 · 0.995 = 0.005                                        No, por muy poco
+                                                                               Sí
+1%                0.01 · 0.99 = 0.0099
+
+10%               0.1 · 0.9 = 0.09
+
+Pista para la Parte C del notebook y los Bloques 3 y 4 del cuaderno
+Ordena las variables por información mutua y después mira la matriz de correlación entre las primeras: si dos de arriba tienen
+r > 0.9, son la misma información.
+
+6 Wrapper y embedded
+
+Un wrapper entrena el modelo con distintos subconjuntos y compara el desempeño. RFE parte con todas y va
+quitando la de menor coeficiente. El problema es el costo: con p variables hay 2p - 1 subconjuntos posibles.
+
+Ejemplo resuelto · ¿cuánto cuesta probar todo? (1.000 modelos por segundo)
+
+p Subconjuntos (2p - 1)                                                Tiempo
+
+10     1.023                                                           1 segundo
+
+20     1.048.575                                                       17 minutos
+                                                                       12 días
+30  1.07 · 109                                                         35.702 años
+
+50  1.13 · 1015
+
+Un método embedded selecciona mientras entrena. El Lasso (penalización L1) empuja coeficientes a exactamente 0:
+las variables con coeficiente 0 quedan fuera. En sklearn, C es el inverso de la penalización: C = 0.01 dejó 13
+variables y C = 1 dejó 45. Antes del Lasso hay que escalar: si no, el coeficiente depende de las unidades.
+
+7 La trampa: selección fuera de la validación cruzada
+
+Si eliges variables mirando el target con todos los datos y después validas, los casos de validación ya influyeron en la
+elección. Con suficientes variables, algunas parecen buenas por puro azar, y la validación no lo detecta porque esos
+mismos casos las hicieron parecer buenas.
+
+Ejemplo resuelto · ¿cuántas variables «buenas» aparecen por azar?
+
+Variables de puro ruido (p)                                        Falsos positivos esperados =  · p
+
+1.000                               0.05                           50
+
+200                                 0.05                           10
+
+1.000                               0.01                           10
+
+En la clase, elegir 20 de 1.000 variables de ruido fuera del CV dio AUC 0.882. Dentro del pipeline, 0.514. La verdad: 0.5.
+
+Apuntes · Clase 33 · Feature engineering y selección de variables                                                               3
+Paso                                      ¿Mira el target?         ¿Usa estadísticas del  ¿Dónde va?
+                                                                   conjunto?
+Borrar imposibles, construir ratios, one-hot No                    No                     Puede ir antes del split
+                                                                   Sí                     Dentro del fold
+Imputar con la mediana, escalar           No                       Sí                     Dentro del fold
+                                                                   Sí                     Dentro del fold
+Filtro por MI, desempate de redundantes Sí
+
+RFE, Lasso, SelectKBest                   Sí
+
+Pista para la Parte E del notebook y el Bloque 7 del cuaderno
+
+Regla de bolsillo: si un paso necesita fit, va dentro del Pipeline. Si es una fórmula fija fila por fila (un ratio, un log), puede ir
+antes.
+
+8 La ventana temporal («junio hacia atrás»)
+
+En un modelo predictivo, las variables deben medirse antes del período en que ocurre el target. Si quieres predecir
+la fuga de agosto, usa información hasta junio. Si construyes una variable con datos de julio o agosto, estás usando
+el futuro: es leakage, aunque no uses la columna fuga.
+
+ Señal de alarma
+ Una variable con poder predictivo «demasiado bueno», como «llamó para dar de baja el servicio», casi siempre ocurre
+ después de la decisión que quieres predecir. En la industria, un AUC de 0.84-0.85 en fuga ya es muy bueno.
+
+9 Adelanto: WOE e Information Value
+
+El profesor pidió anotar esta técnica de banca y riesgo de crédito. No se calcula en esta clase. Se discretiza la variable
+en tramos y, para cada tramo, se compara la proporción de «buenos» con la de «malos».
+
+Ejemplo resuelto · una variable con 2 tramos (800 buenos y 200 malos en total)
+
+Tramo % buenos                   % malos         WOE = ln(%buenos /                       Aporte al IV
+                                                 %malos)
+
+A     500/800 = 62.5% 60/200 = 30%               ln(0.625/0.30) = 0.734                   (0.625 - 0.30)·0.734 = 0.239
+
+B     300/800 = 37.5% 140/200 = 70% ln(0.375/0.70) = -0.624                               (0.375 - 0.70)·(-0.624) = 0.203
+
+IV = 0.239 + 0.203 = 0.44  poder predictivo fuerte. Umbrales usuales: < 0.02 nulo · 0.02-0.1 débil · 0.1-0.3 medio · 0.3-0.5
+fuerte · > 0.5 sospechoso (posible leakage).
+
+Apuntes · Clase 33 · Feature engineering y selección de variables                                                                      4
+10 Chuleta de código
+
+Quiero...                       Código
+
+Ver mínimos y máximos           d.describe().T[['min', 'max']]
+
+Marcar imposibles               d.loc[d.x < 0, 'x'] = np.nan
+
+Contar duplicados               d.duplicated().sum()
+
+Ratio seguro                    d.a / (d.b + 1e-6)
+
+Cuartiles                       pd.qcut(d.x, 4, labels=False)
+
+Pares redundantes               corr.where(np.triu(np.ones(corr.shape), 1).astype(bool)).stack()
+
+Información mutua               mutual_info_classif(X, y, random_state=0)
+
+Lasso                           LogisticRegression(penalty='l1', solver='liblinear', C=0.05)
+
+Pipeline honesto                Pipeline([('imp', SimpleImputer(strategy='median')), ('esc', StandardScaler()), ('sel',
+                                SelectKBest(...)), ('log', ...)])
+
+Validar                         cross_val_score(pipe, X, y, cv=StratifiedKFold(5, shuffle=True), scoring='roc_auc')
+
+11 Errores comunes
+
+Error                           Por qué está mal                           Qué hacer
+                                                                           NaN + imputar, o una categoría propia
+Borrar filas con un valor raro  Pierdes las otras variables de esa
+                                fila                                       Mediana
+                                                                           x / (y + 1e-6)
+Imputar con la media            Los extremos la arrastran                  Probar en el modelo con otras
+                                                                           Revisar la correlación entre las elegidas
+Dividir sin épsilon             Un infinito rompe el pipeline              Selección dentro del Pipeline
+                                                                           Ventana «junio hacia atrás»
+Descartar por un p-valor alto   Puede servir en conjunto                   AUC, sensibilidad, precisión
+
+Top-k por un ranking univariado Gasta cupos en redundantes
+
+Seleccionar antes del CV        AUC inflado (0.88 con puro ruido)
+
+Variables del futuro            Leakage temporal
+
+Usar exactitud con 15.7% de     Decir «nadie se va» da 84.3%
+fuga
+
+Lo que debes recordar
+· Orden sugerido: lee estos apuntes  Bloques 1-3 del cuaderno  Partes A y B del notebook  Bloques 4-6  Partes C y
+
+    D  Bloques 7-8  Parte E  ejercicio de cierre.
+· Si te trabas más de 10 minutos, mira la solución, entiéndela y vuelve a hacerlo sin mirar.
+
+Apuntes · Clase 33 · Feature engineering y selección de variables                                                        5
+

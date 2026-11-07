@@ -1,0 +1,483 @@
+1
+00:00:00,250 --> 00:00:01,700
+La trampa del accuracy.
+
+2
+00:00:01,820 --> 00:00:05,650
+Por qué un porcentaje alto de aciertos puede esconder un modelo que no sirve.
+
+3
+00:00:05,770 --> 00:00:08,568
+Un hospital quiere detectar una enfermedad rara, que
+
+4
+00:00:08,568 --> 00:00:11,150
+tiene solo el cinco por ciento de los pacientes.
+
+5
+00:00:11,270 --> 00:00:16,230
+Alguien propone un modelo muy simple: siempre responde «este paciente está sano».
+
+6
+00:00:16,350 --> 00:00:19,500
+Sobre mil casos, acierta novecientos cincuenta.
+
+7
+00:00:19,620 --> 00:00:22,190
+Su accuracy es de noventa y cinco por ciento.
+
+8
+00:00:22,310 --> 00:00:24,360
+Y no detecta ni un solo enfermo.
+
+9
+00:00:24,480 --> 00:00:25,780
+Ese es el problema.
+
+10
+00:00:25,900 --> 00:00:29,270
+Con clases desbalanceadas, el accuracy es engañoso.
+
+11
+00:00:29,390 --> 00:00:32,590
+Un modelo perezoso saca nota alta, y es inútil.
+
+12
+00:00:32,710 --> 00:00:35,800
+La herramienta para ver los errores es la matriz de confusión.
+
+13
+00:00:35,920 --> 00:00:37,920
+Las filas son lo que realmente pasó.
+
+14
+00:00:38,040 --> 00:00:40,500
+Las columnas, lo que el modelo predijo.
+
+15
+00:00:40,620 --> 00:00:42,400
+Así se ordena en scikit-learn.
+
+16
+00:00:42,520 --> 00:00:46,060
+Arriba a la izquierda, el verdadero negativo, VN.
+
+17
+00:00:46,180 --> 00:00:49,460
+Era un cliente que se queda, y el modelo dijo que se queda.
+
+18
+00:00:49,580 --> 00:00:50,470
+Un acierto.
+
+19
+00:00:50,590 --> 00:00:54,030
+Abajo a la derecha, el verdadero positivo, VP.
+
+20
+00:00:54,150 --> 00:00:57,140
+Era un cliente que cancela, y el modelo lo detectó.
+
+21
+00:00:57,260 --> 00:00:58,320
+Otro acierto.
+
+22
+00:00:58,440 --> 00:01:01,880
+Arriba a la derecha, el falso positivo, FP.
+
+23
+00:01:02,000 --> 00:01:04,730
+Se quedaba, pero el modelo dijo que cancela.
+
+24
+00:01:04,850 --> 00:01:06,190
+Es una falsa alarma.
+
+25
+00:01:06,310 --> 00:01:09,930
+Y abajo a la izquierda, el falso negativo, FN.
+
+26
+00:01:10,050 --> 00:01:12,360
+Cancelaba, pero el modelo no lo vio.
+
+27
+00:01:12,480 --> 00:01:13,860
+Es un caso que se escapó.
+
+28
+00:01:13,980 --> 00:01:17,310
+Ahora con los doscientos cuarenta clientes de prueba de Club Activo.
+
+29
+00:01:17,430 --> 00:01:19,790
+Ciento cincuenta verdaderos negativos.
+
+30
+00:01:19,910 --> 00:01:21,730
+Cuarenta falsos positivos.
+
+31
+00:01:21,850 --> 00:01:23,840
+Veinticuatro falsos negativos.
+
+32
+00:01:23,960 --> 00:01:26,160
+Y veintiséis verdaderos positivos.
+
+33
+00:01:26,280 --> 00:01:28,510
+El accuracy es el total de aciertos.
+
+34
+00:01:28,630 --> 00:01:32,040
+Veintiséis más ciento cincuenta, entre doscientos cuarenta.
+
+35
+00:01:32,160 --> 00:01:34,340
+Da setenta y tres coma tres por ciento.
+
+36
+00:01:34,460 --> 00:01:37,738
+La precisión pregunta: de todos los que el modelo marcó
+
+37
+00:01:37,738 --> 00:01:40,480
+como «cancela», ¿cuántos realmente cancelaban?
+
+38
+00:01:40,600 --> 00:01:43,550
+Marcó sesenta y seis, y acertó veintiséis.
+
+39
+00:01:43,670 --> 00:01:45,880
+Es treinta y nueve coma cuatro por ciento.
+
+40
+00:01:46,000 --> 00:01:50,640
+El recall pregunta: de todos los que realmente cancelaban, ¿cuántos detectó?
+
+41
+00:01:50,760 --> 00:01:53,670
+Cancelaban cincuenta, y detectó veintiséis.
+
+42
+00:01:53,790 --> 00:01:55,390
+Es cincuenta y dos por ciento.
+
+43
+00:01:55,510 --> 00:01:56,850
+Mira lo que comparten.
+
+44
+00:01:56,970 --> 00:01:59,550
+El numerador es el mismo: veintiséis.
+
+45
+00:01:59,670 --> 00:02:01,910
+Solo cambia el total por el que divides.
+
+46
+00:02:02,030 --> 00:02:05,917
+Es como una red de pesca: la precisión mide cuántos peces había en
+
+47
+00:02:05,917 --> 00:02:08,920
+la red, y el recall, cuántos peces del mar sacaste.
+
+48
+00:02:09,040 --> 00:02:12,220
+El F1 combina las dos, con la media armónica.
+
+49
+00:02:12,340 --> 00:02:14,840
+Dos por precisión por recall, entre su suma.
+
+50
+00:02:14,960 --> 00:02:17,370
+Da cero coma cuarenta y cuatro, ocho.
+
+51
+00:02:17,490 --> 00:02:21,821
+Piensa un segundo: si hubiera mil casos más, y el modelo siguiera con el mismo
+
+52
+00:02:21,821 --> 00:02:25,930
+patrón, ¿qué métrica te avisa que se escapan la mitad de los que cancelan?
+
+53
+00:02:26,650 --> 00:02:27,410
+El recall.
+
+54
+00:02:27,530 --> 00:02:30,870
+Es del cincuenta y dos por ciento: casi la mitad se escapa.
+
+55
+00:02:30,990 --> 00:02:33,960
+El accuracy de setenta y tres por ciento no te lo diría.
+
+56
+00:02:34,080 --> 00:02:36,300
+Un ejemplo del apunte, con quinientas
+
+57
+00:02:36,300 --> 00:02:39,180
+transacciones, de las cuales veinte son fraudes.
+
+58
+00:02:39,300 --> 00:02:43,485
+El modelo detecta doce, deja escapar ocho, marca treinta falsas alarmas,
+
+59
+00:02:43,485 --> 00:02:46,740
+y acierta cuatrocientos cincuenta de las que están bien.
+
+60
+00:02:46,860 --> 00:02:50,800
+El accuracy: doce más cuatrocientos cincuenta, entre quinientos.
+
+61
+00:02:50,920 --> 00:02:52,960
+Noventa y dos coma cuatro por ciento.
+
+62
+00:02:53,080 --> 00:02:57,290
+La precisión: doce entre cuarenta y dos, veintiocho coma seis.
+
+63
+00:02:57,410 --> 00:03:00,740
+El recall: doce entre veinte, sesenta por ciento.
+
+64
+00:03:00,860 --> 00:03:03,828
+Y el F1: dos por cero coma doscientos ochenta y
+
+65
+00:03:03,828 --> 00:03:06,480
+seis por cero coma sesenta, entre su suma.
+
+66
+00:03:06,600 --> 00:03:08,770
+Cero coma trescientos ochenta y siete.
+
+67
+00:03:08,890 --> 00:03:12,740
+Ahora la línea base: un modelo que dice siempre «no hay fraude».
+
+68
+00:03:12,860 --> 00:03:16,920
+Acierta cuatrocientos ochenta de quinientos: noventa y seis por ciento.
+
+69
+00:03:17,040 --> 00:03:18,160
+Con recall de cero.
+
+70
+00:03:18,280 --> 00:03:23,420
+Mira lo curioso: el modelo pierde en accuracy, noventa y dos contra noventa y seis.
+
+71
+00:03:23,540 --> 00:03:25,730
+Pero es el único que detecta fraudes.
+
+72
+00:03:25,850 --> 00:03:28,230
+Siempre hay que comparar contra la línea base.
+
+73
+00:03:28,350 --> 00:03:30,180
+En Club Activo pasa lo mismo.
+
+74
+00:03:30,300 --> 00:03:32,850
+Un modelo que dijera siempre «nadie cancela»
+
+75
+00:03:32,850 --> 00:03:35,690
+acertaría el setenta y nueve coma dos por ciento.
+
+76
+00:03:35,810 --> 00:03:39,280
+Nuestro modelo saca setenta y tres coma tres: menos.
+
+77
+00:03:39,400 --> 00:03:41,120
+¿Entonces el modelo es peor?
+
+78
+00:03:41,240 --> 00:03:41,660
+No.
+
+79
+00:03:41,780 --> 00:03:44,760
+La línea base nunca detecta a nadie que cancele.
+
+80
+00:03:44,880 --> 00:03:46,860
+Nuestro modelo detecta a la mitad.
+
+81
+00:03:46,980 --> 00:03:50,050
+Se compara con el accuracy, y también con el recall.
+
+82
+00:03:50,170 --> 00:03:55,120
+En la base real de la actividad de repaso, tres mil ciento cincuenta clientes, un modelo
+
+83
+00:03:55,120 --> 00:03:59,170
+que dice «nadie se fuga» ya logra ochenta y cuatro coma tres por ciento.
+
+84
+00:03:59,290 --> 00:04:03,260
+Así que un ochenta y ocho coma cinco no es tan impresionante como parece.
+
+85
+00:04:03,380 --> 00:04:06,107
+Esa logística tiene precisión de setenta y uno coma
+
+86
+00:04:06,107 --> 00:04:08,780
+cuatro, y recall de cuarenta y cuatro coma cuatro.
+
+87
+00:04:08,900 --> 00:04:11,610
+F1 de cero coma quinientos cuarenta y siete.
+
+88
+00:04:11,730 --> 00:04:14,973
+Con balanced, el accuracy baja a ochenta y dos coma uno,
+
+89
+00:04:14,973 --> 00:04:17,810
+pero el recall sube a ochenta y siete coma nueve.
+
+90
+00:04:17,930 --> 00:04:21,170
+La balanceada pierde accuracy, pero gana mucho recall.
+
+91
+00:04:21,290 --> 00:04:22,890
+Y su F1 es mayor.
+
+92
+00:04:23,010 --> 00:04:27,597
+Aun así, su capacidad de ordenar casos es casi la misma: el área bajo la curva
+
+93
+00:04:27,597 --> 00:04:31,360
+es cero coma novecientos ocho contra cero coma novecientos diez.
+
+94
+00:04:31,480 --> 00:04:34,670
+Cambia el punto de operación, no la capacidad de ordenar.
+
+95
+00:04:34,790 --> 00:04:36,930
+Entonces, ¿qué métrica elegir?
+
+96
+00:04:37,050 --> 00:04:39,210
+Depende de cuál error cuesta más.
+
+97
+00:04:39,330 --> 00:04:42,700
+Si dejar escapar un caso cuesta mucho, prioriza el recall.
+
+98
+00:04:42,820 --> 00:04:46,230
+Si las falsas alarmas son lo caro, prioriza la precisión.
+
+99
+00:04:46,350 --> 00:04:47,980
+Y acepta menos de la otra.
+
+100
+00:04:48,100 --> 00:04:52,580
+Por eso, el accuracy y el F1 no se pueden leer como un ranking único.
+
+101
+00:04:52,700 --> 00:04:55,220
+Un modelo puede ganar en uno y perder en otro.
+
+102
+00:04:55,340 --> 00:04:58,290
+Lo importante es qué error te duele más en tu negocio.
+
+103
+00:04:58,410 --> 00:05:01,510
+Ahora, algunas confusiones que aparecieron en la clase.
+
+104
+00:05:01,630 --> 00:05:05,390
+Se dijo «esto es ciento cuarenta y nueve verdaderos positivos».
+
+105
+00:05:05,510 --> 00:05:08,472
+Pero la celda de arriba a la izquierda en scikit-learn
+
+106
+00:05:08,472 --> 00:05:11,050
+son los verdaderos negativos: ciento cincuenta.
+
+107
+00:05:11,170 --> 00:05:13,640
+Los verdaderos positivos son veintiséis.
+
+108
+00:05:13,760 --> 00:05:17,260
+Otra: se dijo que quitar las quejas desbalanceó el modelo.
+
+109
+00:05:17,380 --> 00:05:21,430
+No cambia el balance de clases, que sigue en veinte coma ocho por ciento.
+
+110
+00:05:21,550 --> 00:05:25,476
+Lo que sí cambia es el rendimiento: el accuracy baja de setenta y tres a
+
+111
+00:05:25,476 --> 00:05:29,511
+cincuenta y dos coma cinco, la precisión de treinta y nueve a veinticuatro
+
+112
+00:05:29,511 --> 00:05:33,655
+coma seis, el recall sube de cincuenta y dos a sesenta y dos, y el área bajo
+
+113
+00:05:33,655 --> 00:05:36,490
+la curva cae a cero coma quinientos setenta y cinco.
+
+114
+00:05:36,610 --> 00:05:41,330
+Y otra más: se dijo que un diez por ciento de prueba corre riesgo de sobreajuste.
+
+115
+00:05:41,450 --> 00:05:44,930
+No: el sobreajuste depende de la complejidad del modelo.
+
+116
+00:05:45,050 --> 00:05:48,630
+Un diez por ciento de prueba da una estimación más ruidosa del error.
+
+117
+00:05:48,750 --> 00:05:52,440
+Para llevarte: todas las métricas salen de la matriz de confusión.
+
+118
+00:05:52,560 --> 00:05:55,040
+El accuracy engaña cuando una clase domina.
+
+119
+00:05:55,160 --> 00:05:57,080
+Compara siempre con la línea base.
+
+120
+00:05:57,200 --> 00:06:00,070
+Y elige la métrica según el costo de cada error.
+
+121
+00:06:00,190 --> 00:06:05,210
+Vamos con la séptima parada: cómo elegir el enfoque, y cómo armar un flujo honesto.

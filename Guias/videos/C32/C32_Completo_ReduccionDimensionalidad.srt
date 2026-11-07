@@ -1,0 +1,3635 @@
+1
+00:00:00,250 --> 00:00:00,710
+Hola.
+
+2
+00:00:00,830 --> 00:00:03,950
+Bienvenido a la serie de videos de la clase treinta y dos.
+
+3
+00:00:04,070 --> 00:00:06,705
+Hoy vas a aprender a preparar las variables para
+
+4
+00:00:06,705 --> 00:00:08,900
+un modelo, y a resumirlas cuando sobran.
+
+5
+00:00:09,020 --> 00:00:10,650
+Imagina que vas a cocinar.
+
+6
+00:00:10,770 --> 00:00:13,583
+Tienes veinte ingredientes en la mesa, pero seis de
+
+7
+00:00:13,583 --> 00:00:16,230
+ellos son casi la misma sal con distinto nombre.
+
+8
+00:00:16,350 --> 00:00:19,080
+Y unos vienen en gramos, otros en kilos.
+
+9
+00:00:19,200 --> 00:00:23,882
+Antes de cocinar, un buen chef ordena: mide todo en la misma unidad, corta cada
+
+10
+00:00:23,882 --> 00:00:28,150
+ingrediente de la forma correcta, y saca de la mesa lo que repite sabor.
+
+11
+00:00:28,270 --> 00:00:30,570
+Con los datos pasa exactamente lo mismo.
+
+12
+00:00:30,690 --> 00:00:34,430
+La gran idea de hoy es esta: un modelo no recibe datos.
+
+13
+00:00:34,550 --> 00:00:36,890
+Recibe una representación de los datos.
+
+14
+00:00:37,010 --> 00:00:39,760
+Y esa representación se arma en dos pasos.
+
+15
+00:00:39,880 --> 00:00:44,460
+Primero, representar: escalar, codificar y construir variables.
+
+16
+00:00:44,580 --> 00:00:48,910
+Después, si sobran columnas, reducir: resumirlas en pocas.
+
+17
+00:00:49,030 --> 00:00:53,430
+La profesora lo dijo así: las matemáticas buscan el camino más eficiente.
+
+18
+00:00:53,550 --> 00:00:57,550
+Reducir dimensiones es eficiente, pero no es reducir por reducir.
+
+19
+00:00:57,670 --> 00:00:58,850
+¿De dónde venimos?
+
+20
+00:00:58,970 --> 00:01:02,900
+En la clase treinta, nos aseguramos de que los datos fueran confiables.
+
+21
+00:01:03,020 --> 00:01:05,890
+En la treinta y uno, vimos cómo aprende un modelo.
+
+22
+00:01:06,010 --> 00:01:11,160
+Hoy, en la treinta y dos, le entregamos variables bien representadas, y resumidas.
+
+23
+00:01:11,280 --> 00:01:12,770
+Fíjate en la diferencia.
+
+24
+00:01:12,890 --> 00:01:15,655
+Un dato puede estar perfecto, sin errores ni
+
+25
+00:01:15,655 --> 00:01:18,420
+faltantes, y aun así estar mal representado.
+
+26
+00:01:18,540 --> 00:01:21,710
+Si eso pasa, el modelo resume una distorsión.
+
+27
+00:01:21,830 --> 00:01:25,320
+Vamos a trabajar con clientes de una empresa de telecomunicaciones.
+
+28
+00:01:25,440 --> 00:01:29,740
+La pregunta de negocio es la fuga: ¿qué cliente va a cancelar su suscripción?
+
+29
+00:01:29,860 --> 00:01:33,600
+El notebook de la profesora genera mil quinientos clientes simulados.
+
+30
+00:01:33,720 --> 00:01:37,870
+Tienen doce variables, y el quince coma cero siete por ciento se fuga.
+
+31
+00:01:37,990 --> 00:01:39,980
+Estas son las doce variables.
+
+32
+00:01:40,100 --> 00:01:45,547
+Hay fallas y reclamos, antigüedad y monto del plan, segundos, llamadas, mensajes y
+
+33
+00:01:45,547 --> 00:01:50,330
+contactos, y el tipo de plan, el estado, la edad y el valor del cliente.
+
+34
+00:01:50,450 --> 00:01:53,445
+Ojo con un detalle de las diapositivas: dicen
+
+35
+00:01:53,445 --> 00:01:56,240
+«dataset real de mil quinientos clientes».
+
+36
+00:01:56,360 --> 00:01:58,550
+Esos mil quinientos son simulados.
+
+37
+00:01:58,670 --> 00:02:01,524
+La base real es otra: tres mil ciento cincuenta
+
+38
+00:02:01,524 --> 00:02:04,620
+clientes, con quince coma siete por ciento de fuga.
+
+39
+00:02:04,740 --> 00:02:06,990
+Veamos la ruta de hoy, en números.
+
+40
+00:02:07,110 --> 00:02:08,970
+Partimos con doce variables.
+
+41
+00:02:09,090 --> 00:02:11,660
+Construimos tres más, con cocientes.
+
+42
+00:02:11,780 --> 00:02:14,310
+Doce más tres, quince columnas.
+
+43
+00:02:14,430 --> 00:02:17,960
+Después, PCA resume esas quince columnas.
+
+44
+00:02:18,080 --> 00:02:21,870
+Con ocho componentes conserva el ochenta y cinco por ciento de la varianza.
+
+45
+00:02:21,990 --> 00:02:25,680
+Ocho de quince: usamos poco más de la mitad de las columnas.
+
+46
+00:02:25,800 --> 00:02:30,530
+Y aquí viene el error más común: creer que más columnas es más información.
+
+47
+00:02:30,650 --> 00:02:31,570
+No es así.
+
+48
+00:02:31,690 --> 00:02:36,080
+Si dos columnas cuentan la misma historia, la segunda no agrega casi nada.
+
+49
+00:02:36,200 --> 00:02:39,060
+Solo agrega costo, inestabilidad y ruido.
+
+50
+00:02:39,180 --> 00:02:40,400
+Piensa un segundo.
+
+51
+00:02:40,520 --> 00:02:43,585
+En los datos de la clase, los segundos hablados y el número de
+
+52
+00:02:43,585 --> 00:02:46,600
+llamadas tienen una correlación de cero coma noventa y nueve.
+
+53
+00:02:46,720 --> 00:02:49,170
+¿Cuánta información nueva aporta la segunda?
+
+54
+00:02:49,890 --> 00:02:50,910
+Casi ninguna.
+
+55
+00:02:51,030 --> 00:02:53,250
+Son prácticamente la misma variable.
+
+56
+00:02:53,370 --> 00:02:58,050
+Por eso, antes de modelar, hay que decidir cuántas dimensiones necesitas de verdad.
+
+57
+00:02:58,170 --> 00:02:59,940
+Este es el mapa de la serie.
+
+58
+00:03:00,060 --> 00:03:02,900
+Después de esta introducción vienen nueve paradas.
+
+59
+00:03:03,020 --> 00:03:07,069
+Empezamos por el problema, seguimos con la representación,
+
+60
+00:03:07,069 --> 00:03:10,350
+luego PCA y t-SNE, y cerramos con el caso real.
+
+61
+00:03:10,470 --> 00:03:14,610
+Para llevarte de esta introducción: un modelo recibe una representación.
+
+62
+00:03:14,730 --> 00:03:17,180
+Primero se representa, después se reduce.
+
+63
+00:03:17,300 --> 00:03:19,600
+Y más columnas no es más información.
+
+64
+00:03:19,720 --> 00:03:23,220
+Vamos con la primera parada: el problema de la dimensionalidad.
+
+65
+00:03:24,090 --> 00:03:27,010
+Primera parada: el problema de la dimensionalidad.
+
+66
+00:03:27,130 --> 00:03:30,520
+Por qué tener demasiadas variables puede perjudicar a un modelo.
+
+67
+00:03:30,640 --> 00:03:34,480
+Imagina que investigas un accidente, y hablas con seis testigos.
+
+68
+00:03:34,600 --> 00:03:36,050
+Parece mucha evidencia.
+
+69
+00:03:36,170 --> 00:03:40,760
+Pero los seis leyeron la misma noticia en el diario, y te cuentan la misma historia.
+
+70
+00:03:40,880 --> 00:03:44,510
+En realidad tienes un solo testigo, repetido seis veces.
+
+71
+00:03:44,630 --> 00:03:47,050
+Con las variables de un modelo pasa lo mismo.
+
+72
+00:03:47,170 --> 00:03:49,380
+Más columnas no son más información.
+
+73
+00:03:49,500 --> 00:03:51,140
+¿Por qué sobran las variables?
+
+74
+00:03:51,260 --> 00:03:52,710
+Hay cuatro razones.
+
+75
+00:03:52,830 --> 00:03:54,270
+Una: el costo.
+
+76
+00:03:54,390 --> 00:03:57,640
+Más columnas, más memoria y más tiempo, y un modelo más
+
+77
+00:03:57,640 --> 00:04:00,300
+difícil de explicar y de poner en producción.
+
+78
+00:04:00,420 --> 00:04:02,450
+Dos: la multicolinealidad.
+
+79
+00:04:02,570 --> 00:04:07,140
+Variables que cuentan la misma historia, y que vuelven inestable a una regresión.
+
+80
+00:04:07,260 --> 00:04:08,680
+Tres: el ruido.
+
+81
+00:04:08,800 --> 00:04:10,920
+Columnas que no traen ninguna señal.
+
+82
+00:04:11,040 --> 00:04:13,150
+Y cuatro: sesgo y varianza.
+
+83
+00:04:13,270 --> 00:04:17,228
+Con pocas observaciones, cada variable extra hace más inestables
+
+84
+00:04:17,228 --> 00:04:20,630
+las predicciones, sin que el modelo gane nada a cambio.
+
+85
+00:04:20,750 --> 00:04:23,630
+Veamos la multicolinealidad en los datos de la clase.
+
+86
+00:04:23,750 --> 00:04:26,660
+Esta es la correlación entre las seis variables de uso.
+
+87
+00:04:26,780 --> 00:04:30,900
+Todas están entre cero coma sesenta y seis, y cero coma noventa y nueve.
+
+88
+00:04:31,020 --> 00:04:33,702
+La más fuerte: segundos hablados y número de
+
+89
+00:04:33,702 --> 00:04:36,140
+llamadas, con cero coma noventa y nueve.
+
+90
+00:04:36,260 --> 00:04:39,130
+Es casi una sola variable, con dos nombres.
+
+91
+00:04:39,250 --> 00:04:40,260
+¿Cómo se mide?
+
+92
+00:04:40,380 --> 00:04:43,680
+Con el VIF, el factor de inflación de la varianza.
+
+93
+00:04:43,800 --> 00:04:48,730
+Tomas una variable, y tratas de explicarla con todas las demás, con una regresión.
+
+94
+00:04:48,850 --> 00:04:50,520
+Eso te da un R cuadrado.
+
+95
+00:04:50,640 --> 00:04:54,140
+Y el VIF es uno dividido en uno menos R cuadrado.
+
+96
+00:04:54,260 --> 00:04:58,310
+Si es mayor que diez, es una señal fuerte de que esa variable sobra.
+
+97
+00:04:58,430 --> 00:05:00,200
+Hagamos un ejemplo del apunte.
+
+98
+00:05:00,320 --> 00:05:04,312
+Si una variable se explica con R cuadrado cero coma noventa y seis, uno
+
+99
+00:05:04,312 --> 00:05:07,460
+menos cero coma noventa y seis es cero coma cero cuatro.
+
+100
+00:05:07,580 --> 00:05:11,090
+Y uno dividido en cero coma cero cuatro, da veinticinco.
+
+101
+00:05:11,210 --> 00:05:14,650
+Veinticinco es mucho más que diez: esa variable sobra.
+
+102
+00:05:14,770 --> 00:05:18,546
+En cambio, con R cuadrado cero coma cincuenta, el VIF
+
+103
+00:05:18,546 --> 00:05:21,680
+es uno dividido en cero coma cincuenta: dos.
+
+104
+00:05:21,800 --> 00:05:22,690
+Sin problema.
+
+105
+00:05:22,810 --> 00:05:25,170
+Ahora, los datos reales de la clase.
+
+106
+00:05:25,290 --> 00:05:28,328
+Segundos tiene un VIF de cuarenta coma ocho, y el
+
+107
+00:05:28,328 --> 00:05:31,180
+número de llamadas, cuarenta y ocho coma tres.
+
+108
+00:05:31,300 --> 00:05:33,390
+Contactos, doce coma dos.
+
+109
+00:05:33,510 --> 00:05:38,250
+Las otras tres, monto, mensajes y valor del cliente, están bajo cinco.
+
+110
+00:05:38,370 --> 00:05:43,135
+Un VIF de cuarenta y ocho coma tres quiere decir que el R cuadrado es
+
+111
+00:05:43,135 --> 00:05:47,210
+uno menos uno dividido en cuarenta y ocho coma tres: 0.979.
+
+112
+00:05:47,330 --> 00:05:49,344
+Casi el noventa y ocho por ciento de las
+
+113
+00:05:49,344 --> 00:05:51,560
+llamadas se explica con las otras variables.
+
+114
+00:05:51,680 --> 00:05:52,780
+Ahora el ruido.
+
+115
+00:05:52,900 --> 00:05:54,950
+La profesora hizo un experimento.
+
+116
+00:05:55,070 --> 00:05:57,736
+Tomó solo cien clientes, y les fue agregando
+
+117
+00:05:57,736 --> 00:06:00,160
+columnas de puro ruido, números al azar.
+
+118
+00:06:00,280 --> 00:06:02,000
+¿Qué crees que pasa con el modelo?
+
+119
+00:06:02,420 --> 00:06:05,330
+En entrenamiento, el modelo mejora y mejora.
+
+120
+00:06:05,450 --> 00:06:10,920
+Con cuatrocientas columnas de ruido, el AUC de entrenamiento llega a uno: perfecto.
+
+121
+00:06:11,040 --> 00:06:16,470
+Pero en la prueba, cae de 0.715, a 0.569.
+
+122
+00:06:16,590 --> 00:06:17,940
+Eso es sobreajuste.
+
+123
+00:06:18,060 --> 00:06:20,923
+El modelo usa el ruido para memorizar a los cien
+
+124
+00:06:20,923 --> 00:06:23,250
+clientes, y con clientes nuevos, falla.
+
+125
+00:06:23,370 --> 00:06:27,540
+Con pocas filas, cada columna extra es una oportunidad de memorizar.
+
+126
+00:06:27,660 --> 00:06:31,220
+Una regla práctica: mira cuántas filas tienes por columna.
+
+127
+00:06:31,340 --> 00:06:33,984
+Con doscientas filas y cuarenta columnas, son
+
+128
+00:06:33,984 --> 00:06:36,980
+doscientas entre cuarenta: cinco filas por columna.
+
+129
+00:06:37,100 --> 00:06:38,030
+Muy pocas.
+
+130
+00:06:38,150 --> 00:06:41,286
+Si quitas veinticinco columnas redundantes, quedan
+
+131
+00:06:41,286 --> 00:06:44,360
+quince: doscientas entre quince, trece coma tres.
+
+132
+00:06:44,480 --> 00:06:46,710
+Hay un efecto más, muy curioso.
+
+133
+00:06:46,830 --> 00:06:50,010
+En muchas dimensiones, todas las distancias se parecen.
+
+134
+00:06:50,130 --> 00:06:54,520
+Medimos qué tan lejos está el punto más lejano, comparado con el más cercano.
+
+135
+00:06:54,640 --> 00:06:58,650
+Con puntos al azar en dos dimensiones, esa razón vale cuarenta y uno:
+
+136
+00:06:58,650 --> 00:07:02,020
+el más lejano está muchísimo más lejos que el más cercano.
+
+137
+00:07:02,140 --> 00:07:04,540
+En diez dimensiones, dos coma siete.
+
+138
+00:07:04,660 --> 00:07:06,800
+En cien, cero coma treinta y nueve.
+
+139
+00:07:06,920 --> 00:07:09,860
+Y en mil dimensiones, apenas cero coma uno.
+
+140
+00:07:09,980 --> 00:07:12,250
+Todos quedan a casi la misma distancia.
+
+141
+00:07:12,370 --> 00:07:13,410
+¿Por qué importa?
+
+142
+00:07:13,530 --> 00:07:16,792
+Porque muchos métodos, como K-Means o t-SNE, se
+
+143
+00:07:16,792 --> 00:07:19,360
+basan en «quién está cerca de quién».
+
+144
+00:07:19,480 --> 00:07:23,470
+Si todos están igual de cerca, la idea de vecino pierde sentido.
+
+145
+00:07:23,590 --> 00:07:25,190
+¿Y cómo se sale de esto?
+
+146
+00:07:25,310 --> 00:07:27,996
+La profesora usó una imagen bonita: un globo
+
+147
+00:07:27,996 --> 00:07:30,620
+terráqueo es un objeto en tres dimensiones.
+
+148
+00:07:30,740 --> 00:07:35,150
+Pero lo puedes dibujar en un mapa plano, sin perder las relaciones entre países.
+
+149
+00:07:35,270 --> 00:07:40,300
+Esa estructura más simple, doblada dentro de un espacio grande, se llama manifold.
+
+150
+00:07:40,420 --> 00:07:44,990
+Reducir dimensiones es, en el fondo, encontrar y desdoblar esa estructura.
+
+151
+00:07:45,110 --> 00:07:46,930
+Para reducir hay dos caminos.
+
+152
+00:07:47,050 --> 00:07:48,560
+Uno: la selección.
+
+153
+00:07:48,680 --> 00:07:52,220
+Quitas columnas redundantes, y conservas las originales.
+
+154
+00:07:52,340 --> 00:07:54,000
+Es más fácil de interpretar.
+
+155
+00:07:54,120 --> 00:07:55,660
+Dos: la extracción.
+
+156
+00:07:55,780 --> 00:08:00,260
+Combinas columnas en variables nuevas, como los componentes de PCA.
+
+157
+00:08:00,380 --> 00:08:04,310
+En el ejemplo de los testigos: seleccionar es escuchar a uno solo.
+
+158
+00:08:04,430 --> 00:08:07,470
+Extraer es escribir un resumen con lo que dijeron los seis.
+
+159
+00:08:07,590 --> 00:08:12,010
+Un error típico: confundir variables correlacionadas con variables ruido.
+
+160
+00:08:12,130 --> 00:08:13,730
+Son problemas distintos.
+
+161
+00:08:13,850 --> 00:08:18,630
+Las correlacionadas sí tienen señal, pero repetida: cuentan la misma historia.
+
+162
+00:08:18,750 --> 00:08:23,080
+El ruido no aporta nada, aunque no se parezca a ninguna otra variable.
+
+163
+00:08:23,200 --> 00:08:26,065
+Piensa un segundo: una variable se explica con las
+
+164
+00:08:26,065 --> 00:08:28,300
+demás con R cuadrado cero coma noventa.
+
+165
+00:08:28,420 --> 00:08:29,940
+¿Cuánto vale su VIF?
+
+166
+00:08:30,860 --> 00:08:33,958
+Uno dividido en uno menos cero coma noventa: uno
+
+167
+00:08:33,958 --> 00:08:36,540
+dividido en cero coma uno, igual a diez.
+
+168
+00:08:36,660 --> 00:08:38,890
+Justo en el límite de la regla práctica.
+
+169
+00:08:39,010 --> 00:08:44,270
+Para llevarte: las variables sobran por costo, multicolinealidad, ruido y varianza.
+
+170
+00:08:44,390 --> 00:08:48,820
+La multicolinealidad se mide con el VIF: más de diez es mala señal.
+
+171
+00:08:48,940 --> 00:08:51,250
+Y se reduce por selección o por extracción.
+
+172
+00:08:51,370 --> 00:08:55,210
+Siguiente parada: escalar las variables, antes de reducir.
+
+173
+00:08:56,090 --> 00:08:58,800
+Segunda parada: escalar las variables.
+
+174
+00:08:58,920 --> 00:09:03,600
+Por qué es obligatorio antes de PCA, y cómo se hace sin hacer trampa.
+
+175
+00:09:03,720 --> 00:09:06,150
+Imagina una reunión donde todos opinan.
+
+176
+00:09:06,270 --> 00:09:08,520
+Pero una persona habla con un megáfono.
+
+177
+00:09:08,640 --> 00:09:11,940
+No importa si tiene razón: es la única que se escucha.
+
+178
+00:09:12,060 --> 00:09:15,660
+En los datos de la clase, la variable segundos llega a miles.
+
+179
+00:09:15,780 --> 00:09:17,830
+Y reclamos es solo cero o uno.
+
+180
+00:09:17,950 --> 00:09:21,030
+Sin escalar, segundos es la persona del megáfono.
+
+181
+00:09:21,150 --> 00:09:25,040
+Mira la desviación estándar de seis variables, en el entrenamiento.
+
+182
+00:09:25,160 --> 00:09:28,020
+Segundos: dos mil novecientos sesenta y nueve.
+
+183
+00:09:28,140 --> 00:09:30,870
+El valor del cliente, doscientos treinta y uno.
+
+184
+00:09:30,990 --> 00:09:32,960
+Mensajes, setenta y cinco.
+
+185
+00:09:33,080 --> 00:09:35,670
+Llamadas, cuarenta y cinco coma siete.
+
+186
+00:09:35,790 --> 00:09:37,570
+Monto, dos coma cuatro.
+
+187
+00:09:37,690 --> 00:09:40,020
+Y reclamos, cero coma veintisiete.
+
+188
+00:09:40,140 --> 00:09:44,760
+Las barras están en escala logarítmica: cada marca es diez veces la anterior.
+
+189
+00:09:44,880 --> 00:09:48,420
+Entre segundos y reclamos hay más de cuatro órdenes de magnitud.
+
+190
+00:09:48,540 --> 00:09:49,500
+¿Y la varianza?
+
+191
+00:09:49,620 --> 00:09:51,310
+Es la desviación al cuadrado.
+
+192
+00:09:51,430 --> 00:09:55,980
+Con los números redondos del apunte: tres mil al cuadrado son nueve millones.
+
+193
+00:09:56,100 --> 00:09:59,050
+Cero coma tres al cuadrado es cero coma cero nueve.
+
+194
+00:09:59,170 --> 00:10:01,625
+Nueve millones dividido en cero coma cero
+
+195
+00:10:01,625 --> 00:10:04,200
+nueve: cien millones de veces más varianza.
+
+196
+00:10:04,320 --> 00:10:07,920
+Y PCA busca justamente la dirección de mayor varianza.
+
+197
+00:10:08,040 --> 00:10:11,097
+Sin escalar, el primer componente sería casi solo
+
+198
+00:10:11,097 --> 00:10:13,530
+segundos, solo por su unidad de medida.
+
+199
+00:10:13,650 --> 00:10:15,890
+La solución más común es estandarizar.
+
+200
+00:10:16,010 --> 00:10:20,190
+A cada valor le restas la media, y lo divides por la desviación estándar.
+
+201
+00:10:20,310 --> 00:10:21,880
+Eso se llama z-score.
+
+202
+00:10:22,000 --> 00:10:26,530
+El resultado se lee como: ¿a cuántas desviaciones está este valor del promedio?
+
+203
+00:10:26,650 --> 00:10:31,330
+Después de estandarizar, todas las variables quedan con media cero y desviación uno.
+
+204
+00:10:31,450 --> 00:10:32,800
+Un ejemplo del apunte.
+
+205
+00:10:32,920 --> 00:10:36,160
+Segundos tiene media cuatro mil, y desviación tres mil.
+
+206
+00:10:36,280 --> 00:10:38,480
+Un cliente habló diez mil segundos.
+
+207
+00:10:38,600 --> 00:10:41,150
+Diez mil menos cuatro mil, son seis mil.
+
+208
+00:10:41,270 --> 00:10:44,460
+Seis mil dividido en tres mil: z igual a dos.
+
+209
+00:10:44,580 --> 00:10:49,380
+Ahora reclamos: media cero coma uno, y desviación cero coma tres.
+
+210
+00:10:49,500 --> 00:10:54,010
+Un cliente con un reclamo: uno menos cero coma uno, es cero coma nueve.
+
+211
+00:10:54,130 --> 00:10:57,410
+Dividido en cero coma tres: z igual a tres.
+
+212
+00:10:57,530 --> 00:10:58,470
+¿Te das cuenta?
+
+213
+00:10:58,590 --> 00:11:02,580
+Antes, diez mil segundos parecían enormes al lado de un reclamo.
+
+214
+00:11:02,700 --> 00:11:06,021
+Estandarizados, el reclamo es más inusual: está a
+
+215
+00:11:06,021 --> 00:11:09,070
+tres desviaciones, y los segundos solo a dos.
+
+216
+00:11:09,190 --> 00:11:12,690
+Con los datos reales de la clase, los números son parecidos.
+
+217
+00:11:12,810 --> 00:11:17,174
+Segundos tiene media cuatro mil doscientos dos y desviación dos mil novecientos
+
+218
+00:11:17,174 --> 00:11:20,820
+sesenta y nueve: diez mil segundos dan z uno coma noventa y cinco.
+
+219
+00:11:20,940 --> 00:11:28,690
+Y un reclamo, con media 0.078 y desviación 0.269, da z 3.43.
+
+220
+00:11:28,810 --> 00:11:31,730
+La otra opción es normalizar, con min-max.
+
+221
+00:11:31,850 --> 00:11:36,250
+Le restas el mínimo, y divides por el rango: máximo menos mínimo.
+
+222
+00:11:36,370 --> 00:11:40,000
+Todo queda comprimido entre cero y uno, y se conserva el orden.
+
+223
+00:11:40,120 --> 00:11:44,390
+Con el ejemplo del apunte: mínimo cincuenta, máximo diecisiete mil.
+
+224
+00:11:44,510 --> 00:11:48,150
+Diez mil menos cincuenta, son nueve mil novecientos cincuenta.
+
+225
+00:11:48,270 --> 00:11:52,240
+Diecisiete mil menos cincuenta, dieciséis mil novecientos cincuenta.
+
+226
+00:11:52,360 --> 00:11:55,460
+El cociente: cero coma quinientos ochenta y siete.
+
+227
+00:11:55,580 --> 00:11:56,250
+¿Cuál uso?
+
+228
+00:11:56,370 --> 00:12:00,290
+Para PCA y t-SNE, lo habitual es estandarizar.
+
+229
+00:12:00,410 --> 00:12:05,320
+Min-max sirve cuando necesitas límites fijos, por ejemplo en redes neuronales.
+
+230
+00:12:05,440 --> 00:12:09,120
+Y ojo: ninguna de las dos exige que la variable sea normal.
+
+231
+00:12:09,240 --> 00:12:13,980
+Ahora, lo más importante: ¿con qué datos se calculan la media y la desviación?
+
+232
+00:12:14,100 --> 00:12:15,650
+Solo con el entrenamiento.
+
+233
+00:12:15,770 --> 00:12:19,060
+Esa es la lección de la clase treinta sobre la fuga de datos.
+
+234
+00:12:19,180 --> 00:12:22,636
+Los mil quinientos clientes se dividen en mil ciento veinticinco para
+
+235
+00:12:22,636 --> 00:12:25,390
+entrenar, y trescientos setenta y cinco para la prueba.
+
+236
+00:12:25,510 --> 00:12:27,738
+El StandardScaler aprende la media y la
+
+237
+00:12:27,738 --> 00:12:30,480
+desviación con fit, solo sobre el entrenamiento.
+
+238
+00:12:30,600 --> 00:12:34,810
+Después, con transform, aplica esos mismos números a la prueba.
+
+239
+00:12:34,930 --> 00:12:38,049
+Si en cambio ajustas el escalador con todas las filas, la
+
+240
+00:12:38,049 --> 00:12:40,730
+prueba ya influyó en la media y en la desviación.
+
+241
+00:12:40,850 --> 00:12:44,630
+Es fuga: el modelo vio algo de los datos con que lo vas a evaluar.
+
+242
+00:12:44,750 --> 00:12:47,685
+Un error típico: creer que estandarizar convierte
+
+243
+00:12:47,685 --> 00:12:50,200
+la variable en una normal, en una campana.
+
+244
+00:12:50,320 --> 00:12:51,240
+No es así.
+
+245
+00:12:51,360 --> 00:12:54,100
+Mira esta variable con cola hacia la derecha.
+
+246
+00:12:54,220 --> 00:12:59,240
+Al estandarizar, cambian los números del eje, pero la forma es exactamente la misma.
+
+247
+00:12:59,360 --> 00:13:04,007
+Piensa un segundo: si aplicas PCA sin escalar, a segundos, con desviación
+
+248
+00:13:04,007 --> 00:13:08,081
+dos mil novecientos sesenta y nueve, y a reclamos, con cero coma
+
+249
+00:13:08,081 --> 00:13:11,710
+veintisiete, ¿qué variable se lleva el primer componente?
+
+250
+00:13:12,430 --> 00:13:14,270
+Segundos, por lejos.
+
+251
+00:13:14,390 --> 00:13:18,565
+En el video siete lo veremos con los datos: sin escalar, segundos concentra
+
+252
+00:13:18,565 --> 00:13:21,850
+el noventa y nueve coma dos por ciento de toda la varianza.
+
+253
+00:13:21,970 --> 00:13:26,520
+Para llevarte: la variable de mayor magnitud domina varianzas y distancias.
+
+254
+00:13:26,640 --> 00:13:31,570
+Estandariza: z igual a x menos la media, dividido por la desviación.
+
+255
+00:13:31,690 --> 00:13:34,440
+Y ajusta el escalador solo con el entrenamiento.
+
+256
+00:13:34,560 --> 00:13:39,960
+Siguiente parada: codificar las variables categóricas, y construir variables nuevas.
+
+257
+00:13:40,850 --> 00:13:44,195
+Tercera parada: codificar las variables categóricas, y
+
+258
+00:13:44,195 --> 00:13:46,920
+construir variables nuevas antes de reducir.
+
+259
+00:13:47,040 --> 00:13:49,090
+Un modelo solo entiende números.
+
+260
+00:13:49,210 --> 00:13:52,870
+Si le das la palabra «prepago», no sabe qué hacer con ella.
+
+261
+00:13:52,990 --> 00:13:54,120
+Hay que traducirla.
+
+262
+00:13:54,240 --> 00:13:57,100
+Y la forma de traducir cambia lo que el modelo entiende.
+
+263
+00:13:57,220 --> 00:13:59,790
+Primera técnica: la codificación ordinal.
+
+264
+00:13:59,910 --> 00:14:01,810
+Se usa cuando hay un orden real.
+
+265
+00:14:01,930 --> 00:14:06,690
+Por ejemplo, el monto del plan, de cero, bajo, a nueve, alto.
+
+266
+00:14:06,810 --> 00:14:10,210
+O el nivel educativo: básico, medio y superior.
+
+267
+00:14:10,330 --> 00:14:14,260
+Ojo con la diapositiva: dice «ordinal: nominal a entero».
+
+268
+00:14:14,380 --> 00:14:15,410
+Es al revés.
+
+269
+00:14:15,530 --> 00:14:19,620
+La codificación ordinal es para variables ordinales, las que tienen orden.
+
+270
+00:14:19,740 --> 00:14:22,650
+¿Qué pasa si usas números para una variable sin orden?
+
+271
+00:14:22,770 --> 00:14:27,460
+Toma la región: Norte cero, Sur uno, Este dos, Oeste tres.
+
+272
+00:14:27,580 --> 00:14:32,580
+Ahora, para el modelo, Norte está a tres de Oeste, y a solo uno de Sur.
+
+273
+00:14:32,700 --> 00:14:33,930
+Sin ningún motivo.
+
+274
+00:14:34,050 --> 00:14:35,600
+La solución es one-hot.
+
+275
+00:14:35,720 --> 00:14:38,650
+Una columna de ceros y unos por cada categoría.
+
+276
+00:14:38,770 --> 00:14:42,010
+Norte es uno, cero, cero, cero.
+
+277
+00:14:42,130 --> 00:14:45,330
+Oeste es cero, cero, cero, uno.
+
+278
+00:14:45,450 --> 00:14:48,110
+Calculemos la distancia entre Norte y Oeste.
+
+279
+00:14:48,230 --> 00:14:52,990
+Difieren en dos posiciones: uno al cuadrado, más uno al cuadrado, es dos.
+
+280
+00:14:53,110 --> 00:14:55,690
+La raíz de dos: uno coma cuarenta y uno.
+
+281
+00:14:55,810 --> 00:14:59,080
+Y entre cualquier otro par, también uno coma cuarenta y uno.
+
+282
+00:14:59,200 --> 00:15:01,600
+Ninguna región queda más cerca que otra.
+
+283
+00:15:01,720 --> 00:15:03,700
+Pero one-hot agrega columnas.
+
+284
+00:15:03,820 --> 00:15:06,150
+Hagamos la cuenta con el ejemplo del apunte.
+
+285
+00:15:06,270 --> 00:15:10,880
+Región tiene cinco categorías, canal tiene cuatro, y estado es binario.
+
+286
+00:15:11,000 --> 00:15:15,160
+Sin quitar ninguna: cinco más cuatro más dos, once columnas.
+
+287
+00:15:15,280 --> 00:15:18,155
+Con drop igual a first, se quita una columna por
+
+288
+00:15:18,155 --> 00:15:21,150
+variable, porque la última se deduce de las otras.
+
+289
+00:15:21,270 --> 00:15:24,020
+Cuatro más tres más uno: ocho columnas.
+
+290
+00:15:24,140 --> 00:15:28,330
+En los datos de la clase, tipo de plan y estado vienen como uno o dos.
+
+291
+00:15:28,450 --> 00:15:32,047
+Son binarias, así que se usa drop igual a if binary: cada
+
+292
+00:15:32,047 --> 00:15:34,950
+una queda en una sola columna de ceros y unos.
+
+293
+00:15:35,070 --> 00:15:37,190
+Por eso seguimos en quince columnas.
+
+294
+00:15:37,310 --> 00:15:41,150
+¿Y si una variable tiene trescientas categorías, como la comuna?
+
+295
+00:15:41,270 --> 00:15:43,700
+One-hot crearía trescientas columnas.
+
+296
+00:15:43,820 --> 00:15:46,933
+Aquí entran el target encoding y el frequency encoding:
+
+297
+00:15:46,933 --> 00:15:49,480
+la categoría se reemplaza por un solo número.
+
+298
+00:15:49,600 --> 00:15:50,940
+Un ejemplo del apunte.
+
+299
+00:15:51,060 --> 00:15:54,300
+La comuna A tiene cuarenta clientes, y ocho se fugaron.
+
+300
+00:15:54,420 --> 00:15:57,820
+La tasa cruda es ocho entre cuarenta: cero coma veinte.
+
+301
+00:15:57,940 --> 00:16:01,100
+Pero con pocos clientes, la tasa cruda es ruidosa.
+
+302
+00:16:01,220 --> 00:16:05,040
+Por eso se suaviza hacia la tasa global, que es cero coma quince.
+
+303
+00:16:05,160 --> 00:16:08,455
+Con un suavizado m igual a veinte: ocho más veinte
+
+304
+00:16:08,455 --> 00:16:11,420
+por cero coma quince, es ocho más tres: once.
+
+305
+00:16:11,540 --> 00:16:14,330
+Dividido en cuarenta más veinte: sesenta.
+
+306
+00:16:14,450 --> 00:16:17,720
+Once sesentavos: cero coma ciento ochenta y tres.
+
+307
+00:16:17,840 --> 00:16:21,140
+Más cerca de la tasa global que el cero coma veinte crudo.
+
+308
+00:16:21,260 --> 00:16:25,140
+Pero cuidado: el target encoding mira la respuesta, la fuga.
+
+309
+00:16:25,260 --> 00:16:29,220
+Si lo calculas con todas las filas, la prueba se filtra en la variable.
+
+310
+00:16:29,340 --> 00:16:31,700
+La profesora lo probó con sesenta comunas
+
+311
+00:16:31,700 --> 00:16:34,290
+inventadas, sin ninguna relación con la fuga.
+
+312
+00:16:34,410 --> 00:16:37,750
+Con la media del target calculada sin cuidado, el AUC
+
+313
+00:16:37,750 --> 00:16:40,460
+en entrenamiento llega a cero coma setenta.
+
+314
+00:16:40,580 --> 00:16:43,970
+En la prueba: cero coma cincuenta y uno, puro azar.
+
+315
+00:16:44,090 --> 00:16:47,858
+Con TargetEncoder, que usa validación cruzada interna, ya en
+
+316
+00:16:47,858 --> 00:16:51,500
+entrenamiento da cero coma cincuenta y tres: no se engaña.
+
+317
+00:16:51,620 --> 00:16:55,160
+Último paso de la representación: construir variables.
+
+318
+00:16:55,280 --> 00:16:59,370
+A veces la señal no está en una columna, sino en un cociente entre dos.
+
+319
+00:16:59,490 --> 00:17:01,180
+La clase construye tres.
+
+320
+00:17:01,300 --> 00:17:04,990
+Duración promedio de llamada: segundos dividido en llamadas.
+
+321
+00:17:05,110 --> 00:17:09,290
+SMS por antigüedad: mensajes dividido en meses de antigüedad.
+
+322
+00:17:09,410 --> 00:17:12,960
+E intensidad de contacto: contactos dividido en llamadas.
+
+323
+00:17:13,080 --> 00:17:16,004
+Un ejemplo del apunte: un cliente habló siete mil
+
+324
+00:17:16,004 --> 00:17:18,450
+doscientos segundos, en noventa llamadas.
+
+325
+00:17:18,570 --> 00:17:22,610
+Siete mil doscientos dividido en noventa: ochenta segundos por llamada.
+
+326
+00:17:22,730 --> 00:17:26,807
+Un cliente con muchas llamadas cortas se comporta distinto de uno con pocas
+
+327
+00:17:26,807 --> 00:17:29,960
+llamadas largas, aunque los dos sumen los mismos segundos.
+
+328
+00:17:30,080 --> 00:17:33,178
+Y estas variables se construyen antes de reducir:
+
+329
+00:17:33,178 --> 00:17:36,340
+después de PCA, ya no puedes calcular un cociente.
+
+330
+00:17:36,460 --> 00:17:39,661
+Con eso, la cuenta de la clase queda así: doce
+
+331
+00:17:39,661 --> 00:17:43,210
+variables originales, más tres construidas: quince.
+
+332
+00:17:43,330 --> 00:17:46,740
+Y el one-hot de tipo de plan y estado no agrega columnas.
+
+333
+00:17:46,860 --> 00:17:49,480
+Quince columnas listas para escalar y reducir.
+
+334
+00:17:49,600 --> 00:17:52,708
+El error típico de esta parada: calcular el target
+
+335
+00:17:52,708 --> 00:17:55,630
+encoding con todas las filas, antes de dividir.
+
+336
+00:17:55,750 --> 00:18:00,480
+Recuerda el experimento: setenta en entrenamiento, cincuenta y uno en la prueba.
+
+337
+00:18:00,600 --> 00:18:02,960
+Es una fuga disfrazada de buena variable.
+
+338
+00:18:03,080 --> 00:18:04,300
+Piensa un segundo.
+
+339
+00:18:04,420 --> 00:18:06,140
+¿Qué codificación usarías?
+
+340
+00:18:06,260 --> 00:18:10,040
+La talla de una polera: S, M, L, XL.
+
+341
+00:18:10,160 --> 00:18:12,700
+El color favorito, entre seis colores.
+
+342
+00:18:12,820 --> 00:18:15,810
+Y un código postal, con ochocientos valores.
+
+343
+00:18:16,730 --> 00:18:18,910
+La talla tiene orden: ordinal.
+
+344
+00:18:19,030 --> 00:18:23,460
+El color no tiene orden: one-hot, seis columnas, o cinco con drop.
+
+345
+00:18:23,580 --> 00:18:26,949
+Y el código postal, con tantas categorías, target o
+
+346
+00:18:26,949 --> 00:18:29,790
+frequency encoding, con validación interna.
+
+347
+00:18:29,910 --> 00:18:33,010
+Para llevarte: ordinal solo si hay un orden real.
+
+348
+00:18:33,130 --> 00:18:35,250
+One-hot para categorías sin orden.
+
+349
+00:18:35,370 --> 00:18:39,580
+Target encoding con muchas categorías, siempre con validación interna.
+
+350
+00:18:39,700 --> 00:18:42,620
+Y las variables construidas, antes de reducir.
+
+351
+00:18:42,740 --> 00:18:48,600
+Siguiente parada: PCA, la idea, y una matriz de dos por dos resuelta a mano.
+
+352
+00:18:49,490 --> 00:18:54,080
+Cuarta parada: el análisis de componentes principales, PCA.
+
+353
+00:18:54,200 --> 00:18:57,590
+Primero la intuición, y después un ejemplo resuelto a mano.
+
+354
+00:18:57,710 --> 00:19:01,370
+Imagina que tienes que sacarle una sola foto a una banca de plaza.
+
+355
+00:19:01,490 --> 00:19:05,420
+Si la fotografías de frente, de lado, se ve como una línea.
+
+356
+00:19:05,540 --> 00:19:09,300
+Si la fotografías en diagonal, se ve su largo, su forma.
+
+357
+00:19:09,420 --> 00:19:11,450
+Eliges el ángulo que muestra más.
+
+358
+00:19:11,570 --> 00:19:13,750
+PCA hace eso con tus datos.
+
+359
+00:19:13,870 --> 00:19:16,490
+Busca la dirección en que los datos varían más.
+
+360
+00:19:16,610 --> 00:19:19,970
+Esa dirección es el primer componente, PC1.
+
+361
+00:19:20,090 --> 00:19:23,127
+Y como la profesora dijo: cada componente es una
+
+362
+00:19:23,127 --> 00:19:26,100
+receta, una mezcla de las variables originales.
+
+363
+00:19:26,220 --> 00:19:27,930
+Veamos con datos de la clase.
+
+364
+00:19:28,050 --> 00:19:32,420
+Dos variables estandarizadas: los segundos, y el valor del cliente.
+
+365
+00:19:32,540 --> 00:19:37,110
+Su correlación es cero coma ochenta y cuatro: la nube de puntos sube en diagonal.
+
+366
+00:19:37,230 --> 00:19:39,020
+Ahora probamos direcciones.
+
+367
+00:19:39,140 --> 00:19:44,010
+Una línea horizontal: si proyectamos los puntos sobre ella, la varianza es uno.
+
+368
+00:19:44,130 --> 00:19:48,420
+La vamos girando, y la varianza crece, hasta un máximo en la diagonal.
+
+369
+00:19:48,540 --> 00:19:51,260
+Si seguimos girando, baja hasta casi cero.
+
+370
+00:19:51,380 --> 00:19:56,730
+La dirección de máxima varianza es PC1: la diagonal, uno coma ochenta y cuatro.
+
+371
+00:19:56,850 --> 00:20:02,470
+Y la siguiente, perpendicular a la primera, es PC2: cero coma dieciséis.
+
+372
+00:20:02,590 --> 00:20:05,660
+Esos dos números se llaman valores propios, o lambda.
+
+373
+00:20:05,780 --> 00:20:10,460
+Lambda uno, uno coma ochenta y cuatro, es la varianza de PC1.
+
+374
+00:20:10,580 --> 00:20:14,560
+Lambda dos, cero coma dieciséis, la de PC2.
+
+375
+00:20:14,680 --> 00:20:18,380
+Suman dos, que es el número de variables estandarizadas.
+
+376
+00:20:18,500 --> 00:20:20,370
+¿Cuánto conserva PC1?
+
+377
+00:20:20,490 --> 00:20:23,572
+Uno coma ochenta y cuatro, dividido en dos: noventa
+
+378
+00:20:23,572 --> 00:20:26,110
+y uno coma ocho por ciento de la varianza.
+
+379
+00:20:26,230 --> 00:20:30,370
+Con una sola columna nueva, guardamos casi todo lo que tenían las dos.
+
+380
+00:20:30,490 --> 00:20:34,420
+Proyectar es dejar caer cada punto sobre la línea, en ángulo recto.
+
+381
+00:20:34,540 --> 00:20:38,960
+Cada cliente queda con un solo número: su posición sobre PC1.
+
+382
+00:20:39,080 --> 00:20:41,530
+Ese número se llama puntaje del componente.
+
+383
+00:20:41,650 --> 00:20:46,610
+Fíjate en lo que la profesora destacó: PCA no usa la variable fuga para nada.
+
+384
+00:20:46,730 --> 00:20:50,670
+Es no supervisado: solo mira cómo varían las variables entre sí.
+
+385
+00:20:50,790 --> 00:20:55,020
+Ahora, resolvamos un PCA a mano, con el ejemplo del apunte.
+
+386
+00:20:55,140 --> 00:20:59,170
+Dos variables estandarizadas, con correlación cero coma seis.
+
+387
+00:20:59,290 --> 00:21:03,059
+Con datos estandarizados, la matriz de covarianza es la matriz de
+
+388
+00:21:03,059 --> 00:21:06,480
+correlaciones: unos en la diagonal, y cero coma seis fuera.
+
+389
+00:21:06,600 --> 00:21:09,200
+Probemos la dirección diagonal, uno, uno.
+
+390
+00:21:09,320 --> 00:21:12,508
+Multiplicamos la matriz por ella: uno más cero coma
+
+391
+00:21:12,508 --> 00:21:15,070
+seis, es uno coma seis, en las dos filas.
+
+392
+00:21:15,190 --> 00:21:21,280
+Da uno coma seis, uno coma seis: la misma dirección, estirada uno coma seis veces.
+
+393
+00:21:21,400 --> 00:21:23,530
+Ese uno coma seis es lambda uno.
+
+394
+00:21:23,650 --> 00:21:28,271
+Con la otra dirección, uno, menos uno: uno menos cero coma seis da cero coma
+
+395
+00:21:28,271 --> 00:21:31,980
+cuatro, y cero coma seis menos uno da menos cero coma cuatro.
+
+396
+00:21:32,100 --> 00:21:34,580
+Es cero coma cuatro por uno, menos uno.
+
+397
+00:21:34,700 --> 00:21:36,770
+Lambda dos vale cero coma cuatro.
+
+398
+00:21:36,890 --> 00:21:39,770
+La regla: uno más r, y uno menos r.
+
+399
+00:21:39,890 --> 00:21:44,830
+Varianza explicada: uno coma seis, dividido en dos, ochenta por ciento.
+
+400
+00:21:44,950 --> 00:21:48,160
+Cero coma cuatro dividido en dos, veinte por ciento.
+
+401
+00:21:48,280 --> 00:21:49,200
+Suman cien.
+
+402
+00:21:49,320 --> 00:21:51,880
+Las direcciones se normalizan para que midan uno.
+
+403
+00:21:52,000 --> 00:21:54,993
+Uno, uno, dividido en raíz de dos: cero coma
+
+404
+00:21:54,993 --> 00:21:58,190
+setecientos siete, cero coma setecientos siete.
+
+405
+00:21:58,310 --> 00:22:01,905
+Y comprueba que son perpendiculares: cero coma setecientos siete
+
+406
+00:22:01,905 --> 00:22:05,500
+por cero coma setecientos siete, más cero coma setecientos siete
+
+407
+00:22:05,500 --> 00:22:08,140
+por menos cero coma setecientos siete, da cero.
+
+408
+00:22:08,260 --> 00:22:13,410
+Ahora proyectamos un cliente, con z igual a uno coma cero, y cero coma dos.
+
+409
+00:22:13,530 --> 00:22:17,530
+Su puntaje en PC1 es el producto punto con v uno: uno coma
+
+410
+00:22:17,530 --> 00:22:20,840
+cero más cero coma dos, dividido en raíz de dos.
+
+411
+00:22:20,960 --> 00:22:23,484
+Uno coma dos dividido en uno coma cuatro uno
+
+412
+00:22:23,484 --> 00:22:26,180
+cuatro: cero coma ochocientos cuarenta y nueve.
+
+413
+00:22:26,300 --> 00:22:32,163
+Su puntaje en PC2: uno coma cero menos cero coma dos, dividido en raíz de dos: cero coma
+
+414
+00:22:32,163 --> 00:22:37,160
+ocho entre uno coma cuatro uno cuatro, cero coma quinientos sesenta y seis.
+
+415
+00:22:37,280 --> 00:22:39,660
+¿Y si nos quedamos solo con PC1?
+
+416
+00:22:39,780 --> 00:22:44,489
+Reconstruimos el punto: cero coma ochocientos cuarenta y nueve, por cero coma
+
+417
+00:22:44,489 --> 00:22:48,220
+setecientos siete, da cero coma seis, en las dos coordenadas.
+
+418
+00:22:48,340 --> 00:22:51,790
+El punto original era uno coma cero, cero coma dos.
+
+419
+00:22:51,910 --> 00:22:55,410
+Lo reconstruido es cero coma seis, cero coma seis.
+
+420
+00:22:55,530 --> 00:22:59,624
+El error de reconstrucción: uno coma cero menos cero coma seis, al
+
+421
+00:22:59,624 --> 00:23:03,470
+cuadrado, más cero coma dos menos cero coma seis, al cuadrado.
+
+422
+00:23:03,590 --> 00:23:07,930
+Cero coma dieciséis más cero coma dieciséis: cero coma treinta y dos.
+
+423
+00:23:08,050 --> 00:23:11,800
+Y fíjate: es justo el puntaje de PC2 al cuadrado.
+
+424
+00:23:11,920 --> 00:23:14,640
+Lo que se pierde es lo que estaba en PC2.
+
+425
+00:23:14,760 --> 00:23:16,810
+Ahora vuelve a los datos de la clase.
+
+426
+00:23:16,930 --> 00:23:20,860
+Segundos y valor del cliente tenían r igual a cero coma ochenta y cuatro.
+
+427
+00:23:20,980 --> 00:23:23,619
+Con la regla, lambda uno es uno más cero coma
+
+428
+00:23:23,619 --> 00:23:26,200
+ochenta y cuatro: uno coma ochenta y cuatro.
+
+429
+00:23:26,320 --> 00:23:28,610
+Exactamente lo que vimos en el gráfico.
+
+430
+00:23:28,730 --> 00:23:30,360
+Dos errores típicos.
+
+431
+00:23:30,480 --> 00:23:34,020
+El primero se dijo en la clase: «PCA es un clustering».
+
+432
+00:23:34,140 --> 00:23:34,560
+No.
+
+433
+00:23:34,680 --> 00:23:39,300
+PCA no forma grupos: solo cambia los ejes con que miras los datos.
+
+434
+00:23:39,420 --> 00:23:44,079
+El segundo está en las diapositivas: el ejemplo de valores propios usa una
+
+435
+00:23:44,079 --> 00:23:48,360
+matriz que no es simétrica, diez, menos dieciocho, seis, menos once.
+
+436
+00:23:48,480 --> 00:23:50,690
+Sus vectores no son perpendiculares.
+
+437
+00:23:50,810 --> 00:23:53,771
+Una matriz de covarianza siempre es simétrica, y por
+
+438
+00:23:53,771 --> 00:23:56,220
+eso sus componentes sí son perpendiculares.
+
+439
+00:23:56,340 --> 00:23:58,860
+En Python se usa np.linalg.eigh.
+
+440
+00:23:58,980 --> 00:24:04,060
+Piensa un segundo: dos variables estandarizadas, con correlación cero coma nueve.
+
+441
+00:24:04,180 --> 00:24:07,180
+¿Qué porcentaje de la varianza explica PC1?
+
+442
+00:24:08,100 --> 00:24:11,520
+Lambda uno es uno más cero coma nueve: uno coma nueve.
+
+443
+00:24:11,640 --> 00:24:14,420
+Dividido en dos, noventa y cinco por ciento.
+
+444
+00:24:14,540 --> 00:24:18,050
+Mientras más correlacionadas, más resume PC1.
+
+445
+00:24:18,170 --> 00:24:22,116
+Para llevarte: PC1 es la dirección de máxima varianza, y cada
+
+446
+00:24:22,116 --> 00:24:25,350
+componente siguiente es perpendicular al anterior.
+
+447
+00:24:25,470 --> 00:24:29,550
+Los valores propios, lambda, son las varianzas de cada componente.
+
+448
+00:24:29,670 --> 00:24:35,030
+Y en una matriz de correlaciones de dos por dos, lambda es uno más r, y uno menos r.
+
+449
+00:24:35,150 --> 00:24:39,670
+Siguiente parada: con quince variables, ¿cuántos componentes nos quedamos?
+
+450
+00:24:40,570 --> 00:24:44,260
+Quinta parada: la varianza explicada, y la gran pregunta.
+
+451
+00:24:44,380 --> 00:24:46,210
+¿Con cuántos componentes me quedo?
+
+452
+00:24:46,330 --> 00:24:48,980
+Imagina que vas de viaje con una maleta chica.
+
+453
+00:24:49,100 --> 00:24:53,250
+Lo primero que guardas es lo más importante: el pasaporte, la ropa.
+
+454
+00:24:53,370 --> 00:24:55,390
+Cada cosa extra aporta menos.
+
+455
+00:24:55,510 --> 00:24:59,070
+En algún momento, agregar otra cosa ya no vale el espacio.
+
+456
+00:24:59,190 --> 00:25:01,000
+Con los componentes pasa igual.
+
+457
+00:25:01,120 --> 00:25:06,680
+PC1 guarda la mayor parte de la varianza, PC2 un poco menos, y así.
+
+458
+00:25:06,800 --> 00:25:08,370
+La pregunta es dónde parar.
+
+459
+00:25:08,490 --> 00:25:11,440
+Primero, cómo se mide cuánto guarda cada uno.
+
+460
+00:25:11,560 --> 00:25:14,618
+La varianza explicada del componente j es su lambda,
+
+461
+00:25:14,618 --> 00:25:16,970
+dividido en la suma de todos los lambda.
+
+462
+00:25:17,090 --> 00:25:21,600
+Y con p variables estandarizadas, la suma de los lambda es justamente p.
+
+463
+00:25:21,720 --> 00:25:25,240
+Un ejemplo del apunte: seis variables estandarizadas.
+
+464
+00:25:25,360 --> 00:25:29,427
+Los valores propios son dos coma cuatro, uno coma cinco, uno,
+
+465
+00:25:29,427 --> 00:25:32,560
+cero coma seis, cero coma tres y cero coma dos.
+
+466
+00:25:32,680 --> 00:25:35,580
+Suman seis: igual al número de variables.
+
+467
+00:25:35,700 --> 00:25:38,050
+Ahora dividimos cada uno por seis.
+
+468
+00:25:38,170 --> 00:25:41,110
+Dos coma cuatro entre seis: cuarenta por ciento.
+
+469
+00:25:41,230 --> 00:25:43,890
+Uno coma cinco entre seis: veinticinco.
+
+470
+00:25:44,010 --> 00:25:46,560
+Uno entre seis: dieciséis coma siete.
+
+471
+00:25:46,680 --> 00:25:49,530
+Y cero coma seis entre seis: diez por ciento.
+
+472
+00:25:49,650 --> 00:25:50,920
+Y vamos acumulando.
+
+473
+00:25:51,040 --> 00:25:51,680
+Cuarenta.
+
+474
+00:25:51,800 --> 00:25:54,390
+Cuarenta más veinticinco, sesenta y cinco.
+
+475
+00:25:54,510 --> 00:25:57,660
+Más dieciséis coma siete, ochenta y uno coma siete.
+
+476
+00:25:57,780 --> 00:26:00,170
+Más diez, noventa y uno coma siete.
+
+477
+00:26:00,290 --> 00:26:03,070
+¿Cuántos componentes para llegar al ochenta por ciento?
+
+478
+00:26:03,190 --> 00:26:07,100
+Tres: es el primero que lo supera, con ochenta y uno coma siete.
+
+479
+00:26:07,220 --> 00:26:08,300
+¿Y para el noventa?
+
+480
+00:26:08,420 --> 00:26:10,670
+Cuatro, con noventa y uno coma siete.
+
+481
+00:26:10,790 --> 00:26:13,774
+Hay un tercer criterio, el de Kaiser: quedarse con
+
+482
+00:26:13,774 --> 00:26:16,460
+los componentes cuyo lambda es mayor que uno.
+
+483
+00:26:16,580 --> 00:26:19,610
+Aquí, solo dos coma cuatro y uno coma cinco.
+
+484
+00:26:19,730 --> 00:26:22,570
+El tercero vale justo uno, y no es mayor.
+
+485
+00:26:22,690 --> 00:26:24,490
+Kaiser dice k igual a dos.
+
+486
+00:26:24,610 --> 00:26:28,730
+Tres criterios, tres respuestas: tres, cuatro y dos.
+
+487
+00:26:28,850 --> 00:26:29,740
+Y está bien.
+
+488
+00:26:29,860 --> 00:26:33,570
+La profesora insistió: son referencias, no verdades.
+
+489
+00:26:33,690 --> 00:26:35,360
+Hay que bajarlas al contexto.
+
+490
+00:26:35,480 --> 00:26:39,700
+Ahora, los datos de la clase: quince columnas estandarizadas.
+
+491
+00:26:39,820 --> 00:26:44,520
+Este es el scree plot: una barra por componente, con su varianza explicada.
+
+492
+00:26:44,640 --> 00:26:48,606
+PC1 tiene lambda cinco coma veinticuatro: cinco coma veinticuatro
+
+493
+00:26:48,606 --> 00:26:51,840
+entre quince, treinta y cuatro coma nueve por ciento.
+
+494
+00:26:51,960 --> 00:26:55,522
+Después de PC1, la caída es fuerte, y luego las barras
+
+495
+00:26:55,522 --> 00:26:58,820
+quedan casi planas, entre seis y nueve por ciento.
+
+496
+00:26:58,940 --> 00:27:00,410
+Ese quiebre es el codo.
+
+497
+00:27:00,530 --> 00:27:02,580
+La línea naranja es la acumulada.
+
+498
+00:27:02,700 --> 00:27:06,750
+Con siete componentes, la acumulada llega a setenta y ocho coma siete.
+
+499
+00:27:06,870 --> 00:27:08,800
+Con ocho, a ochenta y cinco.
+
+500
+00:27:08,920 --> 00:27:11,280
+Y con nueve, a noventa coma cinco.
+
+501
+00:27:11,400 --> 00:27:14,480
+Para el ochenta por ciento se necesitan ocho componentes.
+
+502
+00:27:14,600 --> 00:27:16,610
+Y aquí hay una alerta del material.
+
+503
+00:27:16,730 --> 00:27:20,313
+La diapositiva dice «siete componentes, aproximadamente
+
+504
+00:27:20,313 --> 00:27:23,180
+ochenta por ciento», pero su tabla usa ocho.
+
+505
+00:27:23,300 --> 00:27:27,800
+Con los datos del notebook, siete dan setenta y ocho coma siete: no llegan.
+
+506
+00:27:27,920 --> 00:27:30,550
+En la base real de tres mil ciento cincuenta
+
+507
+00:27:30,550 --> 00:27:33,360
+clientes, siete sí llegan: ochenta coma cuatro.
+
+508
+00:27:33,480 --> 00:27:35,890
+Pero el mejor criterio no es un porcentaje.
+
+509
+00:27:36,010 --> 00:27:41,006
+Es el desempeño del modelo, medido con validación cruzada, dentro de un
+
+510
+00:27:41,006 --> 00:27:45,510
+Pipeline: escalar, PCA con k componentes, y regresión logística.
+
+511
+00:27:45,630 --> 00:27:47,430
+Probamos k de uno a quince.
+
+512
+00:27:47,550 --> 00:27:49,000
+Este es el resultado.
+
+513
+00:27:49,120 --> 00:27:53,010
+Con un componente, el AUC es cero coma cincuenta y cinco.
+
+514
+00:27:53,130 --> 00:27:57,430
+Con tres, salta a cero coma setecientos setenta y tres, el máximo.
+
+515
+00:27:57,550 --> 00:28:02,140
+Y después baja un poco: con ocho, cero coma setecientos cuarenta y cinco.
+
+516
+00:28:02,260 --> 00:28:05,930
+Con las quince variables, cero coma setecientos cuarenta y seis.
+
+517
+00:28:06,050 --> 00:28:09,290
+¿Cómo es posible que tres componentes rindan mejor que todo?
+
+518
+00:28:09,410 --> 00:28:11,360
+Porque varianza no es relevancia.
+
+519
+00:28:11,480 --> 00:28:16,460
+PC3, que es un componente chico, es el que más se relaciona con la fuga.
+
+520
+00:28:16,580 --> 00:28:20,280
+Los componentes cuatro a quince agregan, sobre todo, ruido.
+
+521
+00:28:20,400 --> 00:28:24,180
+Ahora la comparación final en la prueba, la tabla de la diapositiva.
+
+522
+00:28:24,300 --> 00:28:27,789
+Con las quince variables: F1 cero coma doscientos
+
+523
+00:28:27,789 --> 00:28:31,350
+setenta, MCC cero coma doscientos sesenta y cinco.
+
+524
+00:28:31,470 --> 00:28:35,277
+Con ocho componentes: F1 cero coma doscientos sesenta y
+
+525
+00:28:35,277 --> 00:28:38,600
+siete, MCC cero coma doscientos cincuenta y dos.
+
+526
+00:28:38,720 --> 00:28:41,890
+La diapositiva concluye que se cede algo de desempeño.
+
+527
+00:28:42,010 --> 00:28:44,680
+Pero en la prueba hay solo cincuenta y siete fugas.
+
+528
+00:28:44,800 --> 00:28:49,350
+Con tan pocas, uno o dos aciertos cambian el F1 en el segundo decimal.
+
+529
+00:28:49,470 --> 00:28:51,010
+Esa diferencia es ruido.
+
+530
+00:28:51,130 --> 00:28:55,600
+Y en validación cruzada, como vimos, tres componentes incluso ganan.
+
+531
+00:28:55,720 --> 00:28:59,398
+Un error típico, que se escuchó en la clase: «ochenta y cinco por
+
+532
+00:28:59,398 --> 00:29:02,680
+ciento: con ocho componentes cubrimos a los que se fugan».
+
+533
+00:29:02,800 --> 00:29:04,760
+Son dos cantidades sin relación.
+
+534
+00:29:04,880 --> 00:29:08,257
+El ochenta y cinco por ciento de varianza no tiene nada que ver con el
+
+535
+00:29:08,257 --> 00:29:10,910
+ochenta y cinco por ciento de clientes que no se fugan.
+
+536
+00:29:11,030 --> 00:29:16,180
+Piensa un segundo: cinco variables estandarizadas, con lambda dos coma cinco,
+
+537
+00:29:16,180 --> 00:29:20,460
+uno coma dos, cero coma siete, cero coma cuatro y cero coma dos.
+
+538
+00:29:20,580 --> 00:29:23,610
+¿Cuántos componentes necesitas para el ochenta por ciento?
+
+539
+00:29:24,530 --> 00:29:25,770
+La suma es cinco.
+
+540
+00:29:25,890 --> 00:29:28,950
+Dos coma cinco entre cinco: cincuenta por ciento.
+
+541
+00:29:29,070 --> 00:29:32,920
+Más uno coma dos entre cinco, veinticuatro: setenta y cuatro.
+
+542
+00:29:33,040 --> 00:29:33,930
+Todavía no.
+
+543
+00:29:34,050 --> 00:29:37,620
+Más cero coma siete entre cinco, catorce: ochenta y ocho.
+
+544
+00:29:37,740 --> 00:29:38,950
+Tres componentes.
+
+545
+00:29:39,070 --> 00:29:43,990
+Para llevarte: la varianza explicada es lambda, dividido en la suma de los lambda.
+
+546
+00:29:44,110 --> 00:29:46,770
+Umbral, codo y Kaiser son referencias.
+
+547
+00:29:46,890 --> 00:29:49,450
+Y el número final de componentes se elige con
+
+548
+00:29:49,450 --> 00:29:51,840
+validación cruzada, dentro de un Pipeline.
+
+549
+00:29:51,960 --> 00:29:54,748
+Siguiente parada: leer qué hay dentro de cada
+
+550
+00:29:54,748 --> 00:29:57,350
+componente, y qué pasa si no estandarizas.
+
+551
+00:29:58,250 --> 00:30:01,462
+Sexta parada: qué hay dentro de cada componente,
+
+552
+00:30:01,462 --> 00:30:04,340
+cómo se lee, y qué pasa si no estandarizas.
+
+553
+00:30:04,460 --> 00:30:07,130
+Imagina un jugo que se vende como «tropical».
+
+554
+00:30:07,250 --> 00:30:09,870
+El nombre suena bien, pero no te dice nada.
+
+555
+00:30:09,990 --> 00:30:14,830
+Para saber qué tiene, lees la lista de ingredientes, y cuánto lleva de cada uno.
+
+556
+00:30:14,950 --> 00:30:16,860
+Un componente principal es igual.
+
+557
+00:30:16,980 --> 00:30:18,920
+PC1 es una receta.
+
+558
+00:30:19,040 --> 00:30:21,847
+La lista de ingredientes se llama cargas: cuánto
+
+559
+00:30:21,847 --> 00:30:24,010
+pesa cada variable en ese componente.
+
+560
+00:30:24,130 --> 00:30:27,720
+Estas son las cargas de PC1, en los datos de la clase.
+
+561
+00:30:27,840 --> 00:30:31,512
+Las seis variables de uso pesan casi lo mismo: segundos,
+
+562
+00:30:31,512 --> 00:30:35,643
+llamadas, contactos, valor del cliente, mensajes y monto, entre
+
+563
+00:30:35,643 --> 00:30:39,250
+cero coma treinta y cinco, y cero coma cuarenta y tres.
+
+564
+00:30:39,370 --> 00:30:41,040
+El resto, casi nada.
+
+565
+00:30:41,160 --> 00:30:45,971
+Por eso PC1 se puede leer como «uso del servicio»: un cliente con
+
+566
+00:30:45,971 --> 00:30:49,820
+PC1 alto habla más, llama más, y manda más mensajes.
+
+567
+00:30:49,940 --> 00:30:52,010
+Pero ese nombre lo pone quien analiza.
+
+568
+00:30:52,130 --> 00:30:53,680
+No viene en los datos.
+
+569
+00:30:53,800 --> 00:30:57,090
+Ahora PC2, con ocho coma nueve por ciento.
+
+570
+00:30:57,210 --> 00:30:59,630
+Las mismas variables, otra receta.
+
+571
+00:30:59,750 --> 00:31:03,467
+Pesan la antigüedad, más cero coma setenta y uno, y los
+
+572
+00:31:03,467 --> 00:31:06,440
+SMS por antigüedad, menos cero coma sesenta.
+
+573
+00:31:06,560 --> 00:31:10,100
+Fíjate en los signos: uno positivo y el otro negativo.
+
+574
+00:31:10,220 --> 00:31:14,350
+Cuando la antigüedad sube, los SMS por mes de antigüedad bajan.
+
+575
+00:31:14,470 --> 00:31:17,730
+Un cliente antiguo manda pocos mensajes, por mes.
+
+576
+00:31:17,850 --> 00:31:21,010
+Y PC3, con siete coma ocho por ciento.
+
+577
+00:31:21,130 --> 00:31:24,294
+Aquí aparecen las fallas, más cero coma setenta y
+
+578
+00:31:24,294 --> 00:31:27,200
+dos, y los reclamos, más cero coma cincuenta.
+
+579
+00:31:27,320 --> 00:31:29,740
+Es el componente de la fricción con el servicio.
+
+580
+00:31:29,860 --> 00:31:31,180
+Y aquí una alerta.
+
+581
+00:31:31,300 --> 00:31:35,340
+La diapositiva y el apunte dicen que PC2 es fallas y reclamos.
+
+582
+00:31:35,460 --> 00:31:39,050
+En el notebook, fallas y reclamos forman PC3.
+
+583
+00:31:39,170 --> 00:31:44,220
+La regla: comprueba siempre con components_, no con el nombre de la diapositiva.
+
+584
+00:31:44,340 --> 00:31:48,980
+Un detalle que confunde mucho: el signo global de un componente es arbitrario.
+
+585
+00:31:49,100 --> 00:31:52,791
+Si das vuelta todas las cargas de PC1, multiplicando por
+
+586
+00:31:52,791 --> 00:31:56,020
+menos uno, el componente es exactamente el mismo.
+
+587
+00:31:56,140 --> 00:31:58,610
+Lo que importa es la relación entre los signos.
+
+588
+00:31:58,730 --> 00:32:01,130
+Hagamos las cuentas con el ejemplo del apunte.
+
+589
+00:32:01,250 --> 00:32:05,124
+PC1 tiene cuatro cargas: cero coma cinco, cero coma
+
+590
+00:32:05,124 --> 00:32:08,770
+cinco, cero coma cinco, y menos cero coma cinco.
+
+591
+00:32:08,890 --> 00:32:12,696
+Primero, comprobamos que su largo es uno: la raíz de cuatro
+
+592
+00:32:12,696 --> 00:32:16,050
+por cero coma veinticinco, raíz de uno, igual a uno.
+
+593
+00:32:16,170 --> 00:32:20,290
+Un cliente estandarizado es z igual a dos, uno, cero, uno.
+
+594
+00:32:20,410 --> 00:32:25,388
+Su puntaje en PC1 es la suma de carga por z: cero coma cinco por dos, más
+
+595
+00:32:25,388 --> 00:32:29,820
+cero coma cinco por uno, más cero, menos cero coma cinco por uno.
+
+596
+00:32:29,940 --> 00:32:33,910
+Uno, más cero coma cinco, menos cero coma cinco: uno.
+
+597
+00:32:34,030 --> 00:32:36,168
+Y la correlación de una variable con el
+
+598
+00:32:36,168 --> 00:32:38,690
+componente es su carga, por la raíz de lambda.
+
+599
+00:32:38,810 --> 00:32:43,050
+Para la variable uno: cero coma cinco por raíz de uno coma seis.
+
+600
+00:32:43,170 --> 00:32:47,570
+Cero coma cinco por uno coma dos seis cinco: cero coma sesenta y tres.
+
+601
+00:32:47,690 --> 00:32:51,881
+Con los datos de la clase: segundos tiene carga cero coma cuatro dos
+
+602
+00:32:51,881 --> 00:32:55,210
+cinco en PC1, y lambda uno vale cinco coma dos cuatro.
+
+603
+00:32:55,330 --> 00:32:58,208
+Cero coma cuatro dos cinco por raíz de cinco coma
+
+604
+00:32:58,208 --> 00:33:00,440
+dos cuatro: cero coma noventa y siete.
+
+605
+00:33:00,560 --> 00:33:03,240
+Segundos y PC1 casi son lo mismo.
+
+606
+00:33:03,360 --> 00:33:04,130
+¿Y la fuga?
+
+607
+00:33:04,250 --> 00:33:08,850
+Aquí están los clientes del entrenamiento, en PC1 y PC2.
+
+608
+00:33:08,970 --> 00:33:10,570
+En gris, los que siguen.
+
+609
+00:33:10,690 --> 00:33:12,510
+En rojo, los que se fugaron.
+
+610
+00:33:12,630 --> 00:33:15,770
+PCA no usó ese color para construir nada.
+
+611
+00:33:15,890 --> 00:33:21,540
+Los rojos están mezclados con los grises: PC1 y PC2 no separan la fuga.
+
+612
+00:33:21,660 --> 00:33:26,240
+La correlación de PC1 con la fuga es apenas menos cero coma cero seis.
+
+613
+00:33:26,360 --> 00:33:32,030
+La de PC3, el componente de las fallas y los reclamos, es cero coma treinta y tres.
+
+614
+00:33:32,150 --> 00:33:34,520
+Ese es el error típico de esta parada.
+
+615
+00:33:34,640 --> 00:33:38,520
+Pensar que PC1 es «lo más importante para predecir».
+
+616
+00:33:38,640 --> 00:33:43,260
+PC1 es la dirección de mayor varianza, no de mayor relación con la fuga.
+
+617
+00:33:43,380 --> 00:33:45,140
+Varianza no es relevancia.
+
+618
+00:33:45,260 --> 00:33:48,980
+Último tema: ¿qué pasa si haces PCA sin estandarizar?
+
+619
+00:33:49,100 --> 00:33:51,290
+PCA maximiza la varianza.
+
+620
+00:33:51,410 --> 00:33:54,570
+Y en unidades originales, segundos concentra el noventa y
+
+621
+00:33:54,570 --> 00:33:57,120
+nueve coma dos por ciento de toda la varianza.
+
+622
+00:33:57,240 --> 00:33:59,770
+El valor del cliente, cero coma seis.
+
+623
+00:33:59,890 --> 00:34:01,560
+El resto, casi nada.
+
+624
+00:34:01,680 --> 00:34:06,296
+Entonces PC1, sin estandarizar, explica el noventa y nueve coma siete
+
+625
+00:34:06,296 --> 00:34:10,845
+uno por ciento, y es prácticamente la variable segundos: su carga es
+
+626
+00:34:10,845 --> 00:34:14,190
+cero coma nueve nueve ocho, y la correlación, uno.
+
+627
+00:34:14,310 --> 00:34:17,280
+Con un solo componente ya pasas el noventa por ciento.
+
+628
+00:34:17,400 --> 00:34:21,110
+Parece un gran resumen, pero solo refleja la unidad de medida.
+
+629
+00:34:21,230 --> 00:34:25,260
+Piensa un segundo: la antigüedad tiene carga cero coma setenta y
+
+630
+00:34:25,260 --> 00:34:28,660
+uno en PC2, y lambda dos vale uno coma treinta y tres.
+
+631
+00:34:28,780 --> 00:34:31,110
+¿Cuál es su correlación con PC2?
+
+632
+00:34:32,030 --> 00:34:35,893
+Carga por raíz de lambda: cero coma siete uno cinco por raíz de
+
+633
+00:34:35,893 --> 00:34:39,020
+uno coma treinta y tres, que es uno coma uno cinco.
+
+634
+00:34:39,140 --> 00:34:43,520
+Da cero coma ochenta y dos: la antigüedad casi define PC2.
+
+635
+00:34:43,640 --> 00:34:47,356
+Para llevarte: las cargas dicen cuánto pesa cada variable, y
+
+636
+00:34:47,356 --> 00:34:50,390
+el nombre del componente lo pones tú, leyéndolas.
+
+637
+00:34:50,510 --> 00:34:52,350
+El signo global es arbitrario.
+
+638
+00:34:52,470 --> 00:34:54,770
+Correlación es carga por raíz de lambda.
+
+639
+00:34:54,890 --> 00:34:59,480
+Y sin estandarizar, PC1 solo refleja la variable de mayor unidad.
+
+640
+00:34:59,600 --> 00:35:03,900
+Siguiente parada: t-SNE, un mapa no lineal para explorar.
+
+641
+00:35:04,770 --> 00:35:07,170
+Séptima parada: t-SNE.
+
+642
+00:35:07,290 --> 00:35:10,070
+Un mapa no lineal para explorar tus datos, y por
+
+643
+00:35:10,070 --> 00:35:12,270
+qué no se usa para producir variables.
+
+644
+00:35:12,390 --> 00:35:15,190
+Imagina que organizas las mesas de un matrimonio.
+
+645
+00:35:15,310 --> 00:35:18,960
+Tu única regla: los que se conocen, se sientan juntos.
+
+646
+00:35:19,080 --> 00:35:21,590
+Al final, cada mesa tiene amigos.
+
+647
+00:35:21,710 --> 00:35:24,425
+Pero que la mesa tres esté cerca de la puerta, o
+
+648
+00:35:24,425 --> 00:35:26,800
+lejos de la mesa siete, no significa nada.
+
+649
+00:35:26,920 --> 00:35:28,540
+Eso es t-SNE.
+
+650
+00:35:28,660 --> 00:35:32,690
+Dibuja los datos en dos dimensiones, cuidando quién es vecino de quién.
+
+651
+00:35:32,810 --> 00:35:36,600
+A diferencia de PCA, no le importa la varianza total.
+
+652
+00:35:36,720 --> 00:35:38,210
+Solo las vecindades.
+
+653
+00:35:38,330 --> 00:35:39,340
+¿Cómo funciona?
+
+654
+00:35:39,460 --> 00:35:40,580
+Dos pasos.
+
+655
+00:35:40,700 --> 00:35:44,677
+Uno: en el espacio original, con todas las columnas, mide qué tan
+
+656
+00:35:44,677 --> 00:35:47,920
+probable es que cada cliente sea vecino de cada otro.
+
+657
+00:35:48,040 --> 00:35:52,066
+Dos: pone los puntos en un plano, y los va moviendo de a poco, hasta
+
+658
+00:35:52,066 --> 00:35:55,440
+que las vecindades del mapa se parezcan a las originales.
+
+659
+00:35:55,560 --> 00:35:58,130
+No es una fórmula que se resuelve de una vez.
+
+660
+00:35:58,250 --> 00:36:00,890
+Es prueba y ajuste, una vuelta tras otra.
+
+661
+00:36:01,010 --> 00:36:04,940
+Por eso tarda, y por eso el resultado cambia un poco entre corridas.
+
+662
+00:36:05,060 --> 00:36:08,965
+Veámoslo con los datos de la clase: los mil ciento veinticinco clientes
+
+663
+00:36:08,965 --> 00:36:12,100
+de entrenamiento, con las quince columnas estandarizadas.
+
+664
+00:36:12,220 --> 00:36:15,210
+Aquí está el mapa de PCA en dos dimensiones.
+
+665
+00:36:15,330 --> 00:36:17,150
+En rojo, los que se fugaron.
+
+666
+00:36:17,270 --> 00:36:22,410
+Ahora mira cómo se reacomodan los mismos clientes con t-SNE, perplexity treinta.
+
+667
+00:36:22,530 --> 00:36:25,060
+Cada punto viaja a su lugar en el nuevo mapa.
+
+668
+00:36:25,180 --> 00:36:26,990
+Se forman islas de vecinos.
+
+669
+00:36:27,110 --> 00:36:29,350
+¿Qué mapa conserva mejor a los vecinos?
+
+670
+00:36:29,470 --> 00:36:32,440
+Se mide con la trustworthiness: qué tanto se conservan
+
+671
+00:36:32,440 --> 00:36:34,970
+los diez vecinos más cercanos de cada cliente.
+
+672
+00:36:35,090 --> 00:36:36,240
+Uno es perfecto.
+
+673
+00:36:36,360 --> 00:36:40,610
+PCA en dos dimensiones: cero coma setecientos noventa y nueve.
+
+674
+00:36:40,730 --> 00:36:44,180
+t-SNE: cero coma novecientos ochenta y dos.
+
+675
+00:36:44,300 --> 00:36:48,060
+Fíjate en algo más: los rojos no forman una isla propia.
+
+676
+00:36:48,180 --> 00:36:50,350
+t-SNE no usa la etiqueta.
+
+677
+00:36:50,470 --> 00:36:53,440
+La fuga no es un grupo que el mapa pueda descubrir solo.
+
+678
+00:36:53,560 --> 00:36:56,770
+El hiperparámetro clave de t-SNE es perplexity.
+
+679
+00:36:56,890 --> 00:37:00,250
+En lenguaje simple: a cuántos vecinos le presto atención.
+
+680
+00:37:00,370 --> 00:37:03,030
+Baja, grupos chicos y muy locales.
+
+681
+00:37:03,150 --> 00:37:05,500
+Alta, una vista más panorámica.
+
+682
+00:37:05,620 --> 00:37:07,010
+Míralo en los datos.
+
+683
+00:37:07,130 --> 00:37:11,210
+Con perplexity cinco, el mapa se desmenuza en piezas pequeñas.
+
+684
+00:37:11,330 --> 00:37:15,890
+Con perplexity ochenta, los grupos se consolidan, y la vista es más global.
+
+685
+00:37:16,010 --> 00:37:16,880
+¿Cuál es mejor?
+
+686
+00:37:17,000 --> 00:37:18,650
+Ninguno, sin más.
+
+687
+00:37:18,770 --> 00:37:27,930
+La trustworthiness es casi igual en los tres: 0.977, 0.982, y 0.979.
+
+688
+00:37:28,050 --> 00:37:31,376
+Se recomienda probar entre cinco y cincuenta, y la perplexity
+
+689
+00:37:31,376 --> 00:37:34,320
+siempre debe ser menor que el número de observaciones.
+
+690
+00:37:34,440 --> 00:37:38,440
+En el caso aplicado, la pregunta era qué mapa mostrarle a la gerencia.
+
+691
+00:37:38,560 --> 00:37:43,290
+Para un mapa general de tipos de cliente, una perplexity alta, como ochenta.
+
+692
+00:37:43,410 --> 00:37:47,580
+Para buscar subgrupos pequeños y específicos, una baja, como cinco.
+
+693
+00:37:47,700 --> 00:37:49,780
+Ahora, dos limitaciones.
+
+694
+00:37:49,900 --> 00:37:52,970
+La primera: t-SNE no es determinista.
+
+695
+00:37:53,090 --> 00:37:55,580
+Con otra semilla, sale otro dibujo.
+
+696
+00:37:55,700 --> 00:38:00,090
+Mira: misma perplexity treinta, semilla cero, y semilla uno.
+
+697
+00:38:00,210 --> 00:38:02,090
+La segunda: es costoso.
+
+698
+00:38:02,210 --> 00:38:04,450
+Compara todas las parejas de clientes.
+
+699
+00:38:04,570 --> 00:38:08,165
+Con mil ciento veinticinco clientes, son mil ciento veinticinco
+
+700
+00:38:08,165 --> 00:38:11,418
+por mil ciento veinticuatro, dividido en dos: seiscientas
+
+701
+00:38:11,418 --> 00:38:14,100
+treinta y dos mil doscientas cincuenta parejas.
+
+702
+00:38:14,220 --> 00:38:18,520
+Y la más importante para producción: t-SNE no tiene transform.
+
+703
+00:38:18,640 --> 00:38:20,340
+Solo tiene fit transform.
+
+704
+00:38:20,460 --> 00:38:23,656
+Si llega un cliente nuevo, no hay cómo ubicarlo en el
+
+705
+00:38:23,656 --> 00:38:26,310
+mapa: habría que recalcular todo desde cero.
+
+706
+00:38:26,430 --> 00:38:28,290
+Pongamos los dos lado a lado.
+
+707
+00:38:28,410 --> 00:38:32,478
+PCA combina de forma lineal, conserva la varianza global, da
+
+708
+00:38:32,478 --> 00:38:36,410
+siempre lo mismo, es rápido, y transforma clientes nuevos.
+
+709
+00:38:36,530 --> 00:38:40,073
+t-SNE es no lineal, conserva vecindades, cambia
+
+710
+00:38:40,073 --> 00:38:43,240
+entre corridas, es lento, y no transforma.
+
+711
+00:38:43,360 --> 00:38:45,590
+Para modelar, PCA.
+
+712
+00:38:45,710 --> 00:38:47,900
+Para explorar, t-SNE.
+
+713
+00:38:48,020 --> 00:38:50,250
+Y hay más técnicas en la misma familia.
+
+714
+00:38:50,370 --> 00:38:55,030
+Lineales: análisis factorial, análisis discriminante y SVD.
+
+715
+00:38:55,150 --> 00:39:01,140
+No lineales, más complejas: autoencoders, Isomap, local linear embedding y UMAP.
+
+716
+00:39:01,260 --> 00:39:05,940
+El error típico con t-SNE: ver islas y concluir que hay clústeres.
+
+717
+00:39:06,060 --> 00:39:10,400
+t-SNE expande los grupos densos, y compacta los dispersos.
+
+718
+00:39:10,520 --> 00:39:14,820
+El tamaño de las islas, y la distancia entre ellas, no se interpretan.
+
+719
+00:39:14,940 --> 00:39:18,280
+Y t-SNE no es K-Means: no hay centros.
+
+720
+00:39:18,400 --> 00:39:23,015
+Piensa un segundo: un colega queda impresionado con los mapas de t-SNE, y
+
+721
+00:39:23,015 --> 00:39:27,250
+propone usarlo en vez de PCA, antes del modelo que va a producción.
+
+722
+00:39:27,370 --> 00:39:28,370
+¿Qué le dices?
+
+723
+00:39:29,290 --> 00:39:29,780
+Que no.
+
+724
+00:39:29,900 --> 00:39:32,845
+Primero, t-SNE no tiene transform: no puede
+
+725
+00:39:32,845 --> 00:39:35,790
+ubicar clientes nuevos sin recalcular todo.
+
+726
+00:39:35,910 --> 00:39:40,640
+Segundo, no es determinista: el mismo cliente podría quedar en otro lugar.
+
+727
+00:39:40,760 --> 00:39:43,240
+Un modelo en producción necesita lo contrario.
+
+728
+00:39:43,360 --> 00:39:49,000
+Para llevarte: t-SNE conserva vecindades locales, y PCA la varianza global.
+
+729
+00:39:49,120 --> 00:39:53,730
+Perplexity es a cuántos vecinos presta atención; prueba entre cinco y cincuenta.
+
+730
+00:39:53,850 --> 00:39:55,850
+Las islas no prueban clústeres.
+
+731
+00:39:55,970 --> 00:40:00,910
+Y t-SNE es para explorar; para modelar y producir, PCA.
+
+732
+00:40:01,030 --> 00:40:04,465
+Última parada antes del repaso: el Pipeline sin fuga, y
+
+733
+00:40:04,465 --> 00:40:07,150
+el caso aplicado con la base real de churn.
+
+734
+00:40:08,050 --> 00:40:11,417
+Octava parada: cómo armar todo esto sin hacer trampa, y
+
+735
+00:40:11,417 --> 00:40:14,050
+el caso aplicado con la base real de churn.
+
+736
+00:40:14,170 --> 00:40:17,791
+Imagina que un profesor arma la prueba, y antes de tomarla, deja
+
+737
+00:40:17,791 --> 00:40:20,620
+que los alumnos estudien con las mismas preguntas.
+
+738
+00:40:20,740 --> 00:40:21,950
+Todos sacan siete.
+
+739
+00:40:22,070 --> 00:40:23,790
+Pero la nota ya no mide nada.
+
+740
+00:40:23,910 --> 00:40:25,600
+Eso es la fuga de datos.
+
+741
+00:40:25,720 --> 00:40:28,817
+Y la regla para evitarla es una sola: todo lo que aprende
+
+742
+00:40:28,817 --> 00:40:31,480
+de los datos se ajusta solo con el entrenamiento.
+
+743
+00:40:31,600 --> 00:40:33,470
+Veamos qué aprende cada paso.
+
+744
+00:40:33,590 --> 00:40:36,090
+El imputador aprende la mediana o la moda.
+
+745
+00:40:36,210 --> 00:40:39,120
+El StandardScaler, la media y la desviación.
+
+746
+00:40:39,240 --> 00:40:42,220
+Los codificadores, la lista de categorías.
+
+747
+00:40:42,340 --> 00:40:46,005
+El TargetEncoder aprende la tasa de fuga por categoría: mira
+
+748
+00:40:46,005 --> 00:40:49,060
+la respuesta, así que necesita validación interna.
+
+749
+00:40:49,180 --> 00:40:53,040
+PCA aprende los componentes, y va después del escalador.
+
+750
+00:40:53,160 --> 00:40:57,290
+Y t-SNE no tiene transform: se queda afuera del modelo.
+
+751
+00:40:57,410 --> 00:40:59,390
+¿Qué tan grave es saltarse la regla?
+
+752
+00:40:59,510 --> 00:41:02,730
+La profesora hizo un experimento con datos de puro ruido.
+
+753
+00:41:02,850 --> 00:41:06,900
+Cien filas, mil columnas al azar, y etiquetas también al azar.
+
+754
+00:41:07,020 --> 00:41:11,760
+No hay nada que aprender: lo honesto es acertar la mitad, cincuenta por ciento.
+
+755
+00:41:11,880 --> 00:41:15,682
+Primero, la trampa: elegir las diez «mejores» columnas
+
+756
+00:41:15,682 --> 00:41:18,710
+mirando todas las filas, y después validar.
+
+757
+00:41:18,830 --> 00:41:21,440
+La exactitud sale cero coma setenta y nueve.
+
+758
+00:41:21,560 --> 00:41:24,533
+Dentro de un Pipeline, donde la selección se rehace
+
+759
+00:41:24,533 --> 00:41:27,040
+en cada pliegue: cero coma cincuenta y uno.
+
+760
+00:41:27,160 --> 00:41:27,830
+La verdad.
+
+761
+00:41:27,950 --> 00:41:29,250
+¿Y con PCA?
+
+762
+00:41:29,370 --> 00:41:32,358
+PCA ajustado afuera da cero coma cincuenta y
+
+763
+00:41:32,358 --> 00:41:35,210
+uno, y adentro, cero coma cincuenta y dos.
+
+764
+00:41:35,330 --> 00:41:38,550
+PCA no mira la etiqueta, así que no la filtra.
+
+765
+00:41:38,670 --> 00:41:42,340
+Pero igual es un mal hábito: la prueba influyó en los componentes.
+
+766
+00:41:42,460 --> 00:41:44,910
+Así se ve el Pipeline honesto de la clase.
+
+767
+00:41:45,030 --> 00:41:48,313
+Escalador, PCA con ocho componentes, y regresión
+
+768
+00:41:48,313 --> 00:41:51,870
+logística, ajustados con fit sobre el entrenamiento.
+
+769
+00:41:51,990 --> 00:41:55,631
+Y si usas GridSearchCV o cross val score, el escalador
+
+770
+00:41:55,631 --> 00:41:58,530
+y PCA se vuelven a ajustar en cada pliegue.
+
+771
+00:41:58,650 --> 00:42:00,820
+Así eliges k sin mirar la prueba.
+
+772
+00:42:00,940 --> 00:42:02,390
+El checklist del flujo.
+
+773
+00:42:02,510 --> 00:42:04,760
+Construyo variables antes de reducir.
+
+774
+00:42:04,880 --> 00:42:06,360
+Divido antes de escalar.
+
+775
+00:42:06,480 --> 00:42:08,750
+Estandarizo antes de PCA.
+
+776
+00:42:08,870 --> 00:42:11,210
+Elijo k con criterio y con validación.
+
+777
+00:42:11,330 --> 00:42:12,990
+Interpreto con las cargas.
+
+778
+00:42:13,110 --> 00:42:15,580
+Y uso t-SNE solo para explorar.
+
+779
+00:42:15,700 --> 00:42:19,300
+Ahora el caso aplicado de las sesiones treinta y uno y treinta y dos.
+
+780
+00:42:19,420 --> 00:42:23,557
+La base real: tres mil ciento cincuenta clientes de una telco, doce
+
+781
+00:42:23,557 --> 00:42:26,830
+variables, y un quince coma siete por ciento de fuga.
+
+782
+00:42:26,950 --> 00:42:28,120
+Desafío uno.
+
+783
+00:42:28,240 --> 00:42:30,760
+Retención quiere anticipar quién cancela, y
+
+784
+00:42:30,760 --> 00:42:33,280
+tiene el historial con la fuga, cero o uno.
+
+785
+00:42:33,400 --> 00:42:37,120
+Eso es supervisado: clasificación, con y igual a fuga.
+
+786
+00:42:37,240 --> 00:42:41,940
+Marketing quiere descubrir tipos de clientes, sin etiqueta: no supervisado.
+
+787
+00:42:42,060 --> 00:42:45,746
+Una precisión que ya vimos en la clase treinta y uno: el caso dice que
+
+788
+00:42:45,746 --> 00:42:49,010
+predecir cuántos meses le quedan a un cliente sería regresión.
+
+789
+00:42:49,130 --> 00:42:51,869
+En rigor es análisis de supervivencia, porque de los
+
+790
+00:42:51,869 --> 00:42:54,240
+que aún no cancelan no sabes cuándo lo harán.
+
+791
+00:42:54,360 --> 00:42:57,510
+Desafío dos: las correlaciones de la base real.
+
+792
+00:42:57,630 --> 00:43:00,290
+Segundos y llamadas, cero coma noventa.
+
+793
+00:43:00,410 --> 00:43:03,840
+Mensajes y valor del cliente, cero coma noventa y dos.
+
+794
+00:43:03,960 --> 00:43:07,080
+Contactos y llamadas, cero coma setenta y tres.
+
+795
+00:43:07,200 --> 00:43:09,910
+Fallas y monto, cero coma cincuenta y nueve.
+
+796
+00:43:10,030 --> 00:43:13,050
+Y estado con segundos, menos cero coma treinta.
+
+797
+00:43:13,170 --> 00:43:14,300
+¿Qué problema es?
+
+798
+00:43:14,420 --> 00:43:15,640
+Multicolinealidad.
+
+799
+00:43:15,760 --> 00:43:18,000
+¿Y qué hay que hacer antes de PCA?
+
+800
+00:43:18,120 --> 00:43:22,804
+Dos pasos: estandarizar, porque segundos llega a miles; y codificar con
+
+801
+00:43:22,804 --> 00:43:26,960
+one-hot el tipo de plan y el estado, que vienen como uno y dos.
+
+802
+00:43:27,080 --> 00:43:28,280
+Desafío tres.
+
+803
+00:43:28,400 --> 00:43:31,510
+Con quince columnas, PCA en la base real.
+
+804
+00:43:31,630 --> 00:43:35,059
+PC1 explica veintiséis coma tres por ciento, y se necesitan
+
+805
+00:43:35,059 --> 00:43:38,140
+siete componentes para llegar al ochenta coma cuatro.
+
+806
+00:43:38,260 --> 00:43:43,226
+Y la logística en la prueba: con las quince variables, F1 cero coma quinientos
+
+807
+00:43:43,226 --> 00:43:47,110
+setenta y cuatro, y MCC cero coma quinientos cuarenta y seis.
+
+808
+00:43:47,230 --> 00:43:50,259
+Con siete componentes, cero coma quinientos cuarenta y
+
+809
+00:43:50,259 --> 00:43:52,840
+ocho, y cero coma quinientos treinta y cuatro.
+
+810
+00:43:52,960 --> 00:43:57,650
+Aquí sí hay señal real: el F1 es más del doble que en los datos simulados.
+
+811
+00:43:57,770 --> 00:44:02,120
+Y el recorte cuesta algo: el F1 baja cero coma cero dos seis.
+
+812
+00:44:02,240 --> 00:44:02,950
+¿Conviene?
+
+813
+00:44:03,070 --> 00:44:07,580
+Depende del negocio: un modelo más simple, contra un poco de desempeño.
+
+814
+00:44:07,700 --> 00:44:12,110
+Y la decisión se confirma con validación cruzada, no con una sola partición.
+
+815
+00:44:12,230 --> 00:44:15,200
+La pregunta tres punto dos del caso dice: «fallas y
+
+816
+00:44:15,200 --> 00:44:18,170
+reclamos apuntan en dirección casi opuesta al uso».
+
+817
+00:44:18,290 --> 00:44:22,290
+Y propone: más fallas, menos uso, fuga silenciosa.
+
+818
+00:44:22,410 --> 00:44:24,180
+Comprobémoslo con los datos.
+
+819
+00:44:24,300 --> 00:44:28,260
+En la base real, las fallas se correlacionan positivamente con el uso.
+
+820
+00:44:28,380 --> 00:44:31,070
+Con segundos, más cero coma cuarenta y nueve.
+
+821
+00:44:31,190 --> 00:44:33,980
+Con llamadas, más cero coma cincuenta y siete.
+
+822
+00:44:34,100 --> 00:44:38,440
+Con monto, más cero coma cincuenta y nueve: el propio caso lo reporta.
+
+823
+00:44:38,560 --> 00:44:42,612
+Y su correlación con PC1 es más cero coma sesenta y uno, la misma
+
+824
+00:44:42,612 --> 00:44:46,040
+dirección que segundos, con cero coma ochenta y cuatro.
+
+825
+00:44:46,160 --> 00:44:50,990
+Solo los reclamos son levemente negativos: menos cero coma doce con segundos.
+
+826
+00:44:51,110 --> 00:44:55,230
+La interpretación «más fallas, menos uso» no se sostiene.
+
+827
+00:44:55,350 --> 00:44:59,200
+La lección: una interpretación bonita se comprueba con components_
+
+828
+00:44:59,200 --> 00:45:02,350
+y con las correlaciones, antes de llevarla al negocio.
+
+829
+00:45:02,470 --> 00:45:05,318
+Y otra alerta sobre la limpieza: el código de la
+
+830
+00:45:05,318 --> 00:45:07,870
+clase solo corrige la edad y los faltantes.
+
+831
+00:45:07,990 --> 00:45:12,022
+Quedan valores imposibles: segundos hasta menos catorce mil seiscientos
+
+832
+00:45:12,022 --> 00:45:15,600
+cuarenta y cinco, y llamadas hasta menos ciento setenta y seis.
+
+833
+00:45:15,720 --> 00:45:18,050
+Hay que limpiarlos antes de PCA.
+
+834
+00:45:18,170 --> 00:45:22,363
+El error típico de esta parada: ajustar el escalador, o el
+
+835
+00:45:22,363 --> 00:45:26,050
+PCA, con todas las filas, y recién después dividir.
+
+836
+00:45:26,170 --> 00:45:27,370
+Primero se divide.
+
+837
+00:45:27,490 --> 00:45:31,740
+Después, todo se ajusta con el entrenamiento, dentro de un Pipeline.
+
+838
+00:45:31,860 --> 00:45:33,890
+Piensa un segundo: ¿fuga o no?
+
+839
+00:45:34,010 --> 00:45:38,570
+Uno: imputar la mediana de la edad con todas las filas, antes de dividir.
+
+840
+00:45:38,690 --> 00:45:42,510
+Dos: calcular SMS por antigüedad antes de dividir.
+
+841
+00:45:43,430 --> 00:45:47,270
+La primera es fuga: la mediana se aprendió mirando también la prueba.
+
+842
+00:45:47,390 --> 00:45:52,700
+La segunda no: un cociente se calcula fila por fila, y no aprende nada del conjunto.
+
+843
+00:45:52,820 --> 00:45:55,631
+Para llevarte: todo lo que aprende de los datos se
+
+844
+00:45:55,631 --> 00:45:58,330
+ajusta con entrenamiento, dentro de un Pipeline.
+
+845
+00:45:58,450 --> 00:46:01,841
+En la base real, siete componentes conservan el ochenta
+
+846
+00:46:01,841 --> 00:46:04,800
+coma cuatro por ciento, y cuestan un poco de F1.
+
+847
+00:46:04,920 --> 00:46:07,590
+Y toda interpretación se comprueba con los datos.
+
+848
+00:46:07,710 --> 00:46:10,380
+Y ahora sí: el repaso final de la clase.
+
+849
+00:46:11,250 --> 00:46:13,520
+Repaso final de la clase treinta y dos.
+
+850
+00:46:13,640 --> 00:46:16,305
+Las seis ideas, las confusiones que conviene
+
+851
+00:46:16,305 --> 00:46:19,030
+corregir, y cómo saber si ya dominas el tema.
+
+852
+00:46:19,150 --> 00:46:21,350
+Repasemos la clase en seis ideas.
+
+853
+00:46:21,470 --> 00:46:24,270
+Una: más columnas no es más información.
+
+854
+00:46:24,390 --> 00:46:28,650
+Las variables sobran por costo, multicolinealidad, ruido y varianza.
+
+855
+00:46:28,770 --> 00:46:32,150
+Dos: primero se representa, y después se reduce.
+
+856
+00:46:32,270 --> 00:46:35,845
+Tres: PCA busca las direcciones de máxima varianza, y
+
+857
+00:46:35,845 --> 00:46:38,610
+lambda es la varianza de cada componente.
+
+858
+00:46:38,730 --> 00:46:41,420
+Cuatro: el número de componentes se elige con
+
+859
+00:46:41,420 --> 00:46:44,230
+criterio, y se confirma con validación cruzada.
+
+860
+00:46:44,350 --> 00:46:47,400
+Cinco: los componentes se leen con sus cargas.
+
+861
+00:46:47,520 --> 00:46:53,190
+Y seis: t-SNE sirve para explorar; para modelar y producir, PCA.
+
+862
+00:46:53,310 --> 00:46:55,300
+Y los números que conviene recordar.
+
+863
+00:46:55,420 --> 00:46:59,120
+Segundos y llamadas, con correlación cero coma noventa y nueve.
+
+864
+00:46:59,240 --> 00:47:05,330
+El ruido, que baja el AUC de prueba de 0.715 a 0.569.
+
+865
+00:47:05,450 --> 00:47:08,412
+PC1 con treinta y cuatro coma nueve por ciento, y
+
+866
+00:47:08,412 --> 00:47:10,890
+ocho componentes para el ochenta y cinco.
+
+867
+00:47:11,010 --> 00:47:15,170
+En validación cruzada, tres componentes ganan a las quince variables.
+
+868
+00:47:15,290 --> 00:47:19,470
+Sin estandarizar, segundos se lleva el noventa y nueve coma dos por ciento.
+
+869
+00:47:19,590 --> 00:47:23,310
+Y en la base real, siete componentes dan el ochenta coma cuatro.
+
+870
+00:47:23,430 --> 00:47:25,590
+Un ejercicio rápido, para cerrar.
+
+871
+00:47:25,710 --> 00:47:29,279
+Cuatro variables estandarizadas, con lambda dos coma
+
+872
+00:47:29,279 --> 00:47:32,230
+dos, uno, cero coma cinco y cero coma tres.
+
+873
+00:47:32,350 --> 00:47:35,890
+¿Cuántos componentes necesitas para al menos el ochenta por ciento?
+
+874
+00:47:36,010 --> 00:47:37,160
+¿Y qué dice Kaiser?
+
+875
+00:47:38,080 --> 00:47:39,290
+La suma es cuatro.
+
+876
+00:47:39,410 --> 00:47:42,750
+Dos coma dos entre cuatro: cincuenta y cinco por ciento.
+
+877
+00:47:42,870 --> 00:47:46,240
+Más uno entre cuatro, veinticinco: ochenta justo.
+
+878
+00:47:46,360 --> 00:47:49,010
+Como pide al menos ochenta, bastan dos.
+
+879
+00:47:49,130 --> 00:47:52,440
+Kaiser exige lambda mayor que uno: solo el primero.
+
+880
+00:47:52,560 --> 00:47:53,780
+Kaiser dice uno.
+
+881
+00:47:53,900 --> 00:47:57,210
+Ahora, seis ideas del material que conviene corregir.
+
+882
+00:47:57,330 --> 00:47:59,340
+PCA no es un clustering.
+
+883
+00:47:59,460 --> 00:48:03,210
+Siete componentes no llegan al ochenta por ciento en los datos del notebook.
+
+884
+00:48:03,330 --> 00:48:07,020
+Y fallas y reclamos forman PC3, no PC2.
+
+885
+00:48:07,140 --> 00:48:09,910
+La codificación ordinal es para variables con orden.
+
+886
+00:48:10,030 --> 00:48:14,250
+La diferencia de F1 entre quince variables y ocho componentes es ruido.
+
+887
+00:48:14,370 --> 00:48:16,958
+Y en la base real, las fallas van en la misma
+
+888
+00:48:16,958 --> 00:48:19,200
+dirección que el uso, no en la opuesta.
+
+889
+00:48:19,320 --> 00:48:23,260
+Para pasar a la siguiente clase, deberías poder hacer seis cosas.
+
+890
+00:48:23,380 --> 00:48:26,660
+Calcular a mano la varianza explicada, y elegir k.
+
+891
+00:48:26,780 --> 00:48:30,130
+Resolver una matriz de dos por dos, y proyectar un punto.
+
+892
+00:48:30,250 --> 00:48:32,090
+Y leer las cargas sin inventar.
+
+893
+00:48:32,210 --> 00:48:35,000
+Elegir la codificación correcta según la variable.
+
+894
+00:48:35,120 --> 00:48:36,970
+Escribir un Pipeline sin fuga.
+
+895
+00:48:37,090 --> 00:48:39,984
+Y resolver los bloques uno a siete del cuaderno, con
+
+896
+00:48:39,984 --> 00:48:42,210
+al menos ochenta por ciento de aciertos.
+
+897
+00:48:42,330 --> 00:48:43,720
+¿En qué orden estudiar?
+
+898
+00:48:43,840 --> 00:48:45,550
+Primero, los apuntes.
+
+899
+00:48:45,670 --> 00:48:50,330
+Luego, los bloques uno a cuatro del cuaderno, y las partes A a C del notebook.
+
+900
+00:48:50,450 --> 00:48:55,330
+Después, los bloques cinco a siete, y la parte D, la de t-SNE.
+
+901
+00:48:55,450 --> 00:48:57,660
+Y al final, el ejercicio de cierre.
+
+902
+00:48:57,780 --> 00:49:01,061
+Y si te trabas más de diez minutos, mira la solución,
+
+903
+00:49:01,061 --> 00:49:03,600
+entiéndela, y vuelve a hacerlo sin mirar.
+
+904
+00:49:03,720 --> 00:49:04,700
+Eso es todo.
+
+905
+00:49:04,820 --> 00:49:09,167
+Ya sabes diagnosticar cuándo sobran variables, representarlas
+
+906
+00:49:09,167 --> 00:49:12,730
+bien, resumirlas con PCA, y explorarlas con t-SNE.
+
+907
+00:49:12,850 --> 00:49:16,210
+Y recuerda la frase de la profesora: reducir dimensiones
+
+908
+00:49:16,210 --> 00:49:18,910
+es eficiente, pero no es reducir por reducir.
+
+909
+00:49:19,030 --> 00:49:20,700
+Mucho éxito con tu estudio.

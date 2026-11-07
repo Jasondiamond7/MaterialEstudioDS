@@ -1,0 +1,302 @@
+# Redes neuronales: calcular, entrenar, elegir y evaluar.
+# Extrae el ZIP completo. En RStudio: abre este archivo, fija la carpeta del
+# archivo como directorio de trabajo (Session > Set Working Directory > To Source
+# File Location) y usa Source. En terminal: Rscript redes_neuronales.R
+# No requiere instalar paquetes. El único archivo de entrada es digitos.csv.
+# Modifica los parámetros de 03; ejecuta las secciones en orden.
+# Para evaluar prueba al cerrar la selección: activa TRUE en 07, o ejecuta
+# Rscript redes_neuronales.R --evaluar-prueba
+# R y Python entrenan por separado. Sus generadores aleatorios son diferentes:
+# las cifras proyectadas corresponden a la receta base de Python.
+
+# 00. Datos y particiones — diapositivas 3, 4 y 31
+if (.Platform$OS.type == "windows") invisible(Sys.setlocale("LC_CTYPE", ""))
+argumentos <- commandArgs(trailingOnly = FALSE)
+archivo <- grep("^--file=", argumentos, value = TRUE)
+ROOT <- if (length(archivo)) dirname(normalizePath(sub("^--file=", "", archivo[1]))) else getwd()
+if (!file.exists(file.path(ROOT, "digitos.csv")))
+  stop("Fija como directorio de trabajo la carpeta que contiene este programa y digitos.csv.")
+datos <- read.csv(file.path(ROOT, "digitos.csv"), check.names = FALSE)
+X <- as.matrix(datos[, grepl("^px", names(datos))]) / 16
+y <- datos$digito
+tr <- datos$conjunto == "entrenamiento"
+va <- datos$conjunto == "validacion"
+te <- datos$conjunto == "prueba"
+stopifnot(identical(dim(X), c(1797L, 64L)), sum(tr) == 1077, sum(va) == 360,
+          sum(te) == 360, all(tr + va + te == 1), all(is.finite(X)), all(y %in% 0:9))
+cat("Imágenes:", nrow(X), "| entrenamiento:", sum(tr), "| validación:", sum(va),
+    "| prueba:", sum(te), "\n")
+
+# 01. De una entrada a una probabilidad — diapositivas 8 y 14–15
+entrada <- matrix(c(1, 2), nrow = 1)
+W1 <- matrix(c(1, -1, .5, .5), nrow = 2, byrow = TRUE)
+H <- pmax(entrada %*% W1, 0)
+puntaje <- as.numeric(H %*% c(.5, -1) - .5)
+cat("Activaciones:", H, "| puntaje:", puntaje, "| probabilidad:", plogis(puntaje), "\n")
+
+# 02. Seguir un gradiente — diapositivas 19–24
+theta <- c(.4, .1, .8, -.2)   # w1, b1, w2, b2.
+tasa_ejemplo <- .1
+perdida_pequena <- function(t) {
+  s <- t[3] * max(t[1] * .5 + t[2], 0) + t[4]
+  log1p(exp(-s))
+}
+a1 <- theta[1] * .5 + theta[2]
+h <- max(a1, 0)
+delta_salida <- plogis(theta[3] * h + theta[4]) - 1
+delta_oculta <- delta_salida * theta[3] * (a1 > 0)
+gradiente <- c(delta_oculta * .5, delta_oculta, delta_salida * h, delta_salida)
+numerico <- vapply(seq_along(theta), function(i) {
+  paso <- diag(length(theta))[, i] * 1e-6
+  (perdida_pequena(theta + paso) - perdida_pequena(theta - paso)) / 2e-6
+}, numeric(1))
+stopifnot(max(abs(gradiente - numerico)) < 1e-8)
+actualizados <- theta - tasa_ejemplo * gradiente
+cat("Gradiente:", gradiente, "\nPérdida antes/después:",
+    perdida_pequena(theta), perdida_pequena(actualizados), "\n")
+# Este paso usa descenso simple. La red real usará Adam.
+
+# 03. Configurar nuestra red — diapositivas 9, 13, 25–29 y 33
+CAPAS_CANDIDATAS <- list(c(16L), c(32L))  # c(32L, 16L) tiene dos capas ocultas.
+
+ACTIVACION <- "relu"
+TASA <- .002
+LOTE <- 64L
+ALPHA <- .0001
+EPOCAS <- 120L
+SEMILLA <- 20261020L
+EXPERIMENTO <- "base"
+# Adam: beta1=.9, beta2=.999 y epsilon=1e-8.
+# L2 se aplica a los pesos (no a sesgos), dividida por el tamaño de cada lote.
+# La selección siempre utiliza la pérdida de validación sin penalización.
+stopifnot(ACTIVACION %in% c("relu", "tanh"), is.finite(TASA), TASA > 0,
+          is.finite(ALPHA), ALPHA >= 0, EPOCAS >= 1, EPOCAS == as.integer(EPOCAS),
+          LOTE >= 1, LOTE <= sum(tr), LOTE == as.integer(LOTE),
+          is.finite(SEMILLA), SEMILLA >= 0, SEMILLA <= .Machine$integer.max,
+          SEMILLA == as.integer(SEMILLA), grepl("^[A-Za-z0-9_-]+$", EXPERIMENTO))
+OUT <- file.path(ROOT, "mis_resultados", paste0(EXPERIMENTO, "_R"))
+dir.create(OUT, recursive = TRUE, showWarnings = FALSE)
+# Repetir el nombre reemplaza las salidas de esa ejecución.
+
+stopifnot(length(CAPAS_CANDIDATAS) > 0,
+          all(vapply(CAPAS_CANDIDATAS, function(c) length(c) > 0 &&
+            all(is.finite(c) & c > 0 & c == as.integer(c)), logical(1))))
+capas <- CAPAS_CANDIDATAS
+nombres <- vapply(capas, function(c) paste0("Red", paste(c, collapse = "_")), character(1))
+stopifnot(!anyDuplicated(nombres))
+# Retirar únicamente salidas de prueba anteriores de este experimento.
+unlink(file.path(OUT, c("metricas.csv", "confusion.png", "errores.csv")))
+
+# Funciones de entrenamiento. Solo usan R base.
+# Cada fila es una imagen; W[[j]] conecta la capa j con la siguiente.
+activar <- function(z, tipo) if (tipo == "relu") pmax(z, 0) else tanh(z)
+softmax <- function(z) {
+  e <- exp(z - apply(z, 1, max))
+  e / rowSums(e)
+}
+propagar <- function(x, modelo) {
+  a <- list(x)
+  for (j in seq_along(modelo$W)) {
+    z <- sweep(a[[j]] %*% modelo$W[[j]], 2, modelo$b[[j]], "+")
+    a[[j + 1L]] <- if (j < length(modelo$W)) activar(z, modelo$activacion) else
+      if (modelo$salida == "softmax") softmax(z) else z
+  }
+  a
+}
+predecir <- function(x, modelo) tail(propagar(x, modelo), 1)[[1]]
+crear_red <- function(anchos, activacion, salida, semilla) {
+  set.seed(semilla)
+  W <- b <- list()
+  for (j in seq_len(length(anchos) - 1L)) {
+    limite <- sqrt(6 / (anchos[j] + anchos[j + 1L]))
+    W[[j]] <- matrix(runif(anchos[j] * anchos[j + 1L], -limite, limite),
+                     anchos[j], anchos[j + 1L])
+    b[[j]] <- runif(anchos[j + 1L], -limite, limite)
+  }
+  list(W = W, b = b, activacion = activacion, salida = salida)
+}
+gradientes <- function(x, objetivo, modelo, alpha) {
+  a <- propagar(x, modelo)
+  L <- length(modelo$W)
+  # Softmax + entropía cruzada, o salida lineal + mitad de suma de cuadrados.
+  # Para reconstrucción, el MSE por píxel se calcula aparte al validar.
+  delta <- (a[[L + 1L]] - objetivo) / nrow(x)
+  gW <- gb <- vector("list", L)
+  for (j in L:1L) {
+    gW[[j]] <- crossprod(a[[j]], delta) + alpha * modelo$W[[j]] / nrow(x)
+    gb[[j]] <- colSums(delta)
+    if (j > 1L) {
+      derivada <- if (modelo$activacion == "relu") (a[[j]] > 0) else 1 - a[[j]]^2
+      delta <- (delta %*% t(modelo$W[[j]])) * derivada
+    }
+  }
+  list(W = gW, b = gb)
+}
+entrenar <- function(ocultas, salida, objetivo, nombre) {
+  modelo <- crear_red(c(ncol(X), ocultas, ncol(objetivo)), ACTIVACION, salida, SEMILLA)
+  # Adam conserva dos promedios del gradiente a lo largo de todos los lotes.
+  mW <- vW <- lapply(modelo$W, function(w) w * 0)
+  mb <- vb <- lapply(modelo$b, function(b) b * 0)
+  paso <- 0L
+  mejor <- Inf
+  historial <- data.frame(epoca = seq_len(EPOCAS), entrenamiento = NA_real_,
+                          validacion = NA_real_)
+  evaluar <- function(ind, red) {
+    p <- predecir(X[ind, , drop = FALSE], red)
+    if (salida == "softmax") -mean(rowSums(objetivo[ind, , drop = FALSE] *
+                                            log(pmax(p, 1e-15)))) else
+      mean((objetivo[ind, , drop = FALSE] - p)^2)
+  }
+  inicial <- evaluar(which(tr), modelo)
+  for (epoca in seq_len(EPOCAS)) {
+    orden <- sample(which(tr))
+    for (inicio in seq.int(1L, length(orden), by = LOTE)) {
+      ind <- orden[inicio:min(inicio + LOTE - 1L, length(orden))]
+      g <- gradientes(X[ind, , drop = FALSE], objetivo[ind, , drop = FALSE], modelo, ALPHA)
+      paso <- paso + 1L
+      tasa_paso <- TASA * sqrt(1 - .999^paso) / (1 - .9^paso)
+      for (j in seq_along(modelo$W)) {
+        mW[[j]] <- .9 * mW[[j]] + .1 * g$W[[j]]
+        vW[[j]] <- .999 * vW[[j]] + .001 * g$W[[j]]^2
+        mb[[j]] <- .9 * mb[[j]] + .1 * g$b[[j]]
+        vb[[j]] <- .999 * vb[[j]] + .001 * g$b[[j]]^2
+        modelo$W[[j]] <- modelo$W[[j]] - tasa_paso * mW[[j]] / (sqrt(vW[[j]]) + 1e-8)
+        modelo$b[[j]] <- modelo$b[[j]] - tasa_paso * mb[[j]] / (sqrt(vb[[j]]) + 1e-8)
+      }
+    }
+    err_tr <- evaluar(which(tr), modelo)
+    err_va <- evaluar(which(va), modelo)
+    if (!all(is.finite(c(err_tr, err_va)))) stop("Ajuste no finito: revisa la tasa y los datos.")
+    historial[epoca, 2:3] <- c(err_tr, err_va)
+    if (err_va < mejor) {
+      mejor <- err_va
+      elegido <- modelo           # Copia de los parámetros de esta época.
+      epoca_elegida <- epoca
+    }
+    if (epoca == 1L || epoca %% 20L == 0L || epoca == EPOCAS)
+      cat(nombre, "| época", epoca, "| entrenamiento", signif(err_tr, 6),
+          "| validación", signif(err_va, 6), "\n")
+  }
+  list(modelo = elegido, historial = historial, epoca = epoca_elegida,
+       validacion = mejor, inicial = inicial,
+       parametros = sum(lengths(elegido$W)) + sum(lengths(elegido$b)))
+}
+metricas <- function(reales, p) {
+  predicha <- max.col(p, ties.method = "first") - 1L
+  data.frame(log_loss = -mean(log(pmax(p[cbind(seq_along(reales), reales + 1L)], 1e-15))),
+             exactitud = mean(predicha == reales), errores = sum(predicha != reales))
+}
+guardar_tabla <- function(tabla, nombre)
+  write.csv(tabla, file.path(OUT, nombre), row.names = FALSE, fileEncoding = "UTF-8")
+figura <- function(nombre, ancho = 1200, alto = 600)
+  png(file.path(OUT, nombre), width = ancho, height = alto, res = 140)
+curvas <- function(ajustes, nombres) {
+  figura("curvas.png", 650 * length(ajustes), 550)
+  par(mfrow = c(1, length(ajustes)), mar = c(4, 4, 3, 1))
+  for (i in seq_along(ajustes)) {
+    h <- ajustes[[i]]$historial
+    matplot(h$epoca, h[, 2:3], type = "l", lty = 1, col = c("#126782", "#d17a22"),
+            xlab = "Época", ylab = "Pérdida sin penalización", main = nombres[i])
+    abline(v = ajustes[[i]]$epoca, lty = 2)
+    legend("topright", c("Entrenamiento", "Validación"), lty = 1,
+           col = c("#126782", "#d17a22"), bty = "n")
+  }
+  invisible(dev.off())
+}
+# Regresión logística multiclase de referencia: C=1.
+# Criterio = suma de log loss + 1/2 suma(W^2); los interceptos no se penalizan.
+# La estandarización, si se solicita, se estima exclusivamente con entrenamiento.
+ajustar_logistica <- function(x, etiquetas, estandarizar = FALSE) {
+  centro <- if (estandarizar) colMeans(x) else rep(0, ncol(x))
+  escala <- if (estandarizar) sqrt(colMeans(sweep(x, 2, centro)^2)) else rep(1, ncol(x))
+  escala[escala == 0] <- 1
+  z <- cbind(sweep(sweep(x, 2, centro), 2, escala, "/"), 1)
+  objetivo <- diag(10)[etiquetas + 1L, , drop = FALSE]
+  evaluar <- function(v, gradiente = FALSE) {
+    w <- matrix(v, ncol = 10)
+    puntajes <- z %*% w
+    maximo <- apply(puntajes, 1, max)
+    log_suma <- maximo + log(rowSums(exp(puntajes - maximo)))
+    penalizados <- w
+    penalizados[nrow(w), ] <- 0
+    if (gradiente) return(as.vector(crossprod(z, softmax(puntajes) - objetivo) + penalizados))
+    sum(log_suma - rowSums(objetivo * puntajes)) + sum(penalizados^2) / 2
+  }
+  ajuste <- optim(rep(0, ncol(z) * 10), evaluar, function(v) evaluar(v, TRUE),
+                   method = "BFGS", control = list(maxit = 1500, reltol = 1e-10))
+  if (ajuste$convergence != 0) warning("La logística alcanzó su límite de optimización.")
+  list(W = matrix(ajuste$par, ncol = 10), centro = centro, escala = escala)
+}
+predecir_logistica <- function(x, ajuste) {
+  z <- cbind(sweep(sweep(x, 2, ajuste$centro), 2, ajuste$escala, "/"), 1)
+  softmax(z %*% ajuste$W)
+}
+
+# 04. Entrenar desde cero y elegir con validación — diapositivas 25–26, 30–31 y 35–36
+SALIDA <- "softmax"
+OBJETIVO <- diag(10)[y + 1L, , drop = FALSE]
+
+ajustes <- lapply(seq_along(capas), function(i) entrenar(capas[[i]], SALIDA, OBJETIVO, nombres[i]))
+seleccion <- do.call(rbind, lapply(seq_along(ajustes), function(i)
+  data.frame(modelo = nombres[i], epoca = ajustes[[i]]$epoca,
+             validacion = ajustes[[i]]$validacion, parametros = ajustes[[i]]$parametros)))
+indice_elegido <- which.min(seleccion$validacion)
+modelo_final <- ajustes[[indice_elegido]]$modelo
+guardar_tabla(seleccion, "seleccion.csv")
+guardar_tabla(do.call(rbind, lapply(seq_along(ajustes), function(i)
+  cbind(modelo = nombres[i], ajustes[[i]]$historial))), "historial.csv")
+print(seleccion)
+cat("Elegimos", nombres[indice_elegido], "por validación.\n")
+if (ajustes[[indice_elegido]]$epoca == EPOCAS)
+  cat("La mejor época coincide con el presupuesto; no demuestra convergencia.\n")
+
+# 05. Leer las curvas y comparar — diapositivas 30, 35 y 36
+curvas(ajustes, nombres)
+# Cambia una decisión en 03 y EXPERIMENTO; repite 03–06 y compara validación.
+
+# 06. Abrir la red que acabamos de entrenar — diapositivas 8, 14, 17 y 34
+# Recorrer las matrices explícitamente; contrastar con la función de predicción.
+a <- X[va, , drop = FALSE]
+for (j in seq_along(modelo_final$W)) {
+  a <- sweep(a %*% modelo_final$W[[j]], 2, modelo_final$b[[j]], "+")
+  a <- if (j < length(modelo_final$W)) activar(a, ACTIVACION) else softmax(a)
+  cat("Después de la capa", j, ":", dim(a), "\n")
+}
+diferencia <- max(abs(a - predecir(X[va, , drop = FALSE], modelo_final)))
+stopifnot(diferencia < 1e-10, max(abs(rowSums(a) - 1)) < 1e-12)
+cat("Diferencia entre propagaciones:", diferencia, "\n")
+saveRDS(modelo_final, file.path(OUT, "modelo_entrenado.rds"))
+guardar_tabla(data.frame(id = datos$id[va], real = y[va],
+                         predicha = max.col(a, ties.method = "first") - 1L),
+              "predicciones_validacion.csv")
+
+# 07. Evaluar la decisión fijada — diapositivas 37–41 y 43–46
+# Al fijar la receta, cambia a TRUE y ejecuta esta sección sin volver a entrenar.
+EVALUAR_PRUEBA <- FALSE
+prueba_habilitada <- EVALUAR_PRUEBA || "--evaluar-prueba" %in% commandArgs(TRUE)
+if (prueba_habilitada) {
+  p <- predecir(X[te, , drop = FALSE], modelo_final)
+  logistica <- ajustar_logistica(X[tr, , drop = FALSE], y[tr])
+  pl <- predecir_logistica(X[te, , drop = FALSE], logistica)
+  tabla <- rbind(cbind(modelo = "Red", metricas(y[te], p)),
+                 cbind(modelo = "Logistica", metricas(y[te], pl)))
+  guardar_tabla(tabla, "metricas.csv")
+  print(tabla)
+  predicha <- max.col(p, ties.method = "first") - 1L
+  errores <- data.frame(id = datos$id[te], real = y[te], predicha = predicha,
+                        probabilidad_real = p[cbind(seq_len(sum(te)), y[te] + 1L)])
+  guardar_tabla(errores[errores$real != errores$predicha, ], "errores.csv")
+  confusion <- table(factor(y[te], levels = 0:9), factor(predicha, levels = 0:9))
+  figura("confusion.png", 800, 800)
+  par(mar = c(4, 4, 3, 2))
+  image(0:9, 0:9, t(confusion), col = hcl.colors(40, "Blues", rev = TRUE),
+        xlab = "Dígito predicho", ylab = "Dígito observado", main = "Matriz de confusión",
+        axes = FALSE)
+  axis(1, 0:9); axis(2, 0:9)
+  for (real in 0:9) for (pred in 0:9)
+    text(pred, real, confusion[real + 1L, pred + 1L], cex = .8,
+         col = if (confusion[real + 1L, pred + 1L] > max(confusion) / 2) "white" else "black")
+  invisible(dev.off())
+} else cat("Prueba pendiente: fija la receta, activa TRUE y ejecuta 07.\n")
+cat("La prueba del caso ya se mostró: la comparación es retrospectiva.\n")
+cat("Resultados en mis_resultados/", EXPERIMENTO, "_R\n", sep = "")

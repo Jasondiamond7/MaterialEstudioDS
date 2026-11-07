@@ -1,0 +1,1411 @@
+1
+00:00:00,500 --> 00:00:02,372
+Hola.
+
+2
+00:00:02,652 --> 00:00:08,220
+Este es un video de estudio de la clase treinta, preparación para Machine Learning:
+
+3
+00:00:08,500 --> 00:00:11,956
+variables, datos y validación.
+
+4
+00:00:12,236 --> 00:00:16,196
+Va en el mismo orden que tu guía y tus apuntes.
+
+5
+00:00:16,476 --> 00:00:20,609
+Te recomiendo verlo con la guía al lado, pausar cuando algo no
+
+6
+00:00:20,609 --> 00:00:24,276
+quede claro, y volver a mirar los ejemplos con números.
+
+7
+00:00:25,500 --> 00:00:28,380
+Empecemos por la idea central.
+
+8
+00:00:28,660 --> 00:00:33,607
+En Machine Learning, un modelo no se juzga por lo bien que responde a los datos con
+
+9
+00:00:33,607 --> 00:00:37,660
+los que aprendió, sino por cómo se comporta con datos que nunca vio.
+
+10
+00:00:37,940 --> 00:00:41,085
+Piensa en un estudiante que se aprende de memoria
+
+11
+00:00:41,085 --> 00:00:43,652
+las respuestas de un examen de práctica.
+
+12
+00:00:43,932 --> 00:00:50,484
+Si el examen real trae otras preguntas, le va mal, porque memorizó y no aprendió.
+
+13
+00:00:50,764 --> 00:00:55,036
+La pregunta guía de toda la clase es justamente esa:
+
+14
+00:00:55,316 --> 00:00:59,396
+¿cómo sé que mi modelo aprendió y no solo memorizó?
+
+15
+00:00:59,676 --> 00:01:03,026
+Para poder responderla, hay reglas del juego que se
+
+16
+00:01:03,026 --> 00:01:05,916
+aplican antes de elegir cualquier algoritmo.
+
+17
+00:01:07,200 --> 00:01:10,320
+Este esquema es el mapa de la clase.
+
+18
+00:01:10,600 --> 00:01:16,192
+Primero conocemos el tipo de cada variable y revisamos la calidad de los datos.
+
+19
+00:01:16,472 --> 00:01:21,008
+Después los dividimos en entrenamiento, validación y prueba.
+
+20
+00:01:21,288 --> 00:01:24,273
+Luego vemos Ridge y Lasso, que son formas de
+
+21
+00:01:24,273 --> 00:01:27,936
+regularizar un modelo, y por qué hay que estandarizar.
+
+22
+00:01:28,216 --> 00:01:33,400
+Más adelante, la validación cruzada K-Fold y la estratificación.
+
+23
+00:01:33,680 --> 00:01:39,272
+Y cerramos con las métricas y con la fuga de datos, que es el error más común.
+
+24
+00:01:39,552 --> 00:01:45,595
+Los datos de la clase son trescientas viviendas simuladas, con su precio en pesos chilenos,
+
+25
+00:01:45,595 --> 00:01:50,376
+y dos mil casos de fraude simulados, donde cinco por ciento son fraudes.
+
+26
+00:01:51,600 --> 00:01:53,592
+Primer paso:
+
+27
+00:01:53,872 --> 00:01:59,464
+saber qué tipo es cada variable, porque de eso depende todo lo demás.
+
+28
+00:01:59,744 --> 00:02:04,304
+Una variable numérica es aquella que se puede sumar y promediar.
+
+29
+00:02:04,584 --> 00:02:10,440
+Si puede tomar cualquier valor, como la superficie de una casa, es continua.
+
+30
+00:02:10,720 --> 00:02:16,192
+Si solo toma valores enteros, como el número de hijos, es discreta.
+
+31
+00:02:16,472 --> 00:02:21,224
+Una variable categórica, en cambio, son etiquetas.
+
+32
+00:02:21,504 --> 00:02:26,544
+Si las etiquetas no tienen orden, como la región, es nominal.
+
+33
+00:02:26,824 --> 00:02:30,106
+Y si tienen un orden natural, como nivel de
+
+34
+00:02:30,106 --> 00:02:33,616
+estudios básico, medio y superior, es ordinal.
+
+35
+00:02:33,896 --> 00:02:35,888
+Para recordar:
+
+36
+00:02:36,168 --> 00:02:43,008
+si tiene sentido promediarla, es numérica; si son nombres o niveles, es categórica.
+
+37
+00:02:44,300 --> 00:02:46,628
+Aquí hay un problema:
+
+38
+00:02:46,908 --> 00:02:52,596
+los modelos solo entienden números, así que no podemos entregarles la palabra Sur.
+
+39
+00:02:52,876 --> 00:02:59,092
+La solución más usada se llama one-hot, que significa una columna por categoría.
+
+40
+00:02:59,372 --> 00:03:03,044
+Con la región, se crean tres columnas:
+
+41
+00:03:03,324 --> 00:03:07,044
+región Norte, región Sur y región Este.
+
+42
+00:03:07,324 --> 00:03:12,316
+Cada una vale uno si el cliente pertenece a esa región y cero si no.
+
+43
+00:03:12,596 --> 00:03:17,540
+Así, un cliente del Sur queda como cero, uno, cero.
+
+44
+00:03:17,820 --> 00:03:22,644
+Es como una fila de interruptores donde solo uno está encendido.
+
+45
+00:03:22,924 --> 00:03:25,756
+En pandas se hace con get dummies.
+
+46
+00:03:26,036 --> 00:03:28,028
+Para recordar:
+
+47
+00:03:28,308 --> 00:03:33,708
+one-hot convierte cada categoría en su propia columna de ceros y unos.
+
+48
+00:03:35,000 --> 00:03:39,512
+Antes de modelar hay que preguntarse si los datos son confiables.
+
+49
+00:03:39,792 --> 00:03:43,536
+La clase propone cuatro dimensiones de calidad.
+
+50
+00:03:43,816 --> 00:03:47,920
+La exactitud pregunta si el dato refleja la realidad.
+
+51
+00:03:48,200 --> 00:03:51,632
+La completitud, si faltan datos.
+
+52
+00:03:51,912 --> 00:03:56,424
+La coherencia, si las distintas fuentes concuerdan entre sí.
+
+53
+00:03:56,704 --> 00:04:00,448
+Y la frescura, si el dato sigue vigente.
+
+54
+00:04:00,728 --> 00:04:03,584
+Pueden fallar varias a la vez.
+
+55
+00:04:03,864 --> 00:04:06,552
+Y hay una idea importante:
+
+56
+00:04:06,832 --> 00:04:11,368
+los sesgos que hay en los datos se convierten en sesgos del modelo.
+
+57
+00:04:11,648 --> 00:04:15,032
+Un buen modelo no repara datos malos.
+
+58
+00:04:15,312 --> 00:04:17,304
+Para recordar:
+
+59
+00:04:17,584 --> 00:04:22,216
+la calidad del modelo no puede superar la calidad de sus datos.
+
+60
+00:04:23,500 --> 00:04:28,132
+Cuando falta un dato, se puede completar con un estadístico.
+
+61
+00:04:28,412 --> 00:04:31,172
+A eso se le llama imputar.
+
+62
+00:04:31,452 --> 00:04:36,780
+Si la variable es simétrica y sin valores extremos, se usa la media.
+
+63
+00:04:37,060 --> 00:04:41,775
+Si tiene atípicos, que son valores muy alejados del resto, o es
+
+64
+00:04:41,775 --> 00:04:45,892
+asimétrica, se usa la mediana, que es el valor central.
+
+65
+00:04:46,172 --> 00:04:52,604
+Si la variable es categórica, se usa la moda, que es la categoría que más se repite.
+
+66
+00:04:52,884 --> 00:04:56,988
+Y si falta un tercio de los datos, no se imputa:
+
+67
+00:04:57,268 --> 00:05:00,124
+se revisa cómo se recogieron.
+
+68
+00:05:00,404 --> 00:05:04,865
+En las viviendas de la clase, la antigüedad tiene veinte faltantes de
+
+69
+00:05:04,865 --> 00:05:08,420
+trescientas filas, es decir seis coma siete por ciento.
+
+70
+00:05:09,700 --> 00:05:12,004
+Veamos números.
+
+71
+00:05:12,284 --> 00:05:16,220
+Tenemos seis clientes y a uno le falta el ingreso.
+
+72
+00:05:16,500 --> 00:05:20,796
+Los cinco que conocemos ganan, en millones de pesos:
+
+73
+00:05:21,076 --> 00:05:27,028
+uno coma dos, uno coma cuatro, uno coma cinco, uno coma seis y nueve.
+
+74
+00:05:27,308 --> 00:05:30,846
+La media es dos coma noventa y cuatro, pero la
+
+75
+00:05:30,846 --> 00:05:34,460
+mediana, el valor del medio, es uno coma cinco.
+
+76
+00:05:34,740 --> 00:05:36,612
+Fíjate:
+
+77
+00:05:36,892 --> 00:05:41,287
+ese nueve empuja la media a más del doble de lo que gana la mayoría,
+
+78
+00:05:41,287 --> 00:05:45,100
+así que aquí la mediana representa mejor al cliente típico.
+
+79
+00:05:45,380 --> 00:05:53,588
+Para la región, con Norte, Sur, Sur, Este, Sur, la moda es Sur, tres de cinco veces.
+
+80
+00:05:53,868 --> 00:05:56,196
+Dos advertencias:
+
+81
+00:05:56,476 --> 00:06:00,167
+imputar con la media deja la variable menos variable,
+
+82
+00:06:00,167 --> 00:06:03,580
+porque todos los rellenos caen en el mismo valor.
+
+83
+00:06:03,860 --> 00:06:07,328
+Y la media o la mediana se aprenden solo con el
+
+84
+00:06:07,328 --> 00:06:11,385
+entrenamiento; si no, hay fuga de datos, que veremos al
+
+85
+00:06:11,385 --> 00:06:11,828
+final.
+
+86
+00:06:13,100 --> 00:06:16,460
+Ahora, la división de los datos.
+
+87
+00:06:16,740 --> 00:06:21,900
+Se separan en tres conjuntos, y cada uno tiene un papel distinto.
+
+88
+00:06:22,180 --> 00:06:26,572
+El de entrenamiento es donde el modelo aprende sus parámetros.
+
+89
+00:06:26,852 --> 00:06:32,171
+El de validación sirve para que tú compares alternativas, por ejemplo qué valor de
+
+90
+00:06:32,171 --> 00:06:36,452
+alfa usar, qué profundidad darle a un árbol, o qué modelo escoger.
+
+91
+00:06:36,732 --> 00:06:40,897
+Y el de prueba se reserva hasta el final, se mira una sola vez y
+
+92
+00:06:40,897 --> 00:06:44,412
+solo para informar el resultado del modelo ya elegido.
+
+93
+00:06:44,692 --> 00:06:47,140
+Imagina una escuela:
+
+94
+00:06:47,420 --> 00:06:52,325
+el entrenamiento son las clases, la validación son los ensayos que te sirven
+
+95
+00:06:52,325 --> 00:06:56,132
+para decidir cómo estudiar, y la prueba es el examen final.
+
+96
+00:06:56,412 --> 00:07:01,884
+Si miras el examen final antes de decidir cómo estudiar, ya no mide nada.
+
+97
+00:07:03,100 --> 00:07:08,356
+En la clase se usó una división de setenta, quince y quince por ciento.
+
+98
+00:07:08,636 --> 00:07:11,907
+Con trescientas viviendas, el setenta por ciento
+
+99
+00:07:11,907 --> 00:07:14,564
+son doscientas diez para entrenamiento.
+
+100
+00:07:14,844 --> 00:07:18,372
+Quedan noventa, que se parten a la mitad:
+
+101
+00:07:18,652 --> 00:07:23,044
+cuarenta y cinco para validación y cuarenta y cinco para prueba.
+
+102
+00:07:23,324 --> 00:07:27,620
+Se hace con dos llamadas a la función train test split.
+
+103
+00:07:27,900 --> 00:07:31,436
+Esas proporciones son solo una referencia, y con
+
+104
+00:07:31,436 --> 00:07:34,236
+pocos datos se usa validación cruzada.
+
+105
+00:07:34,516 --> 00:07:39,796
+Si los datos tienen orden en el tiempo, se divide cronológicamente:
+
+106
+00:07:40,076 --> 00:07:43,607
+se entrena con el pasado y se prueba con lo posterior,
+
+107
+00:07:43,607 --> 00:07:46,484
+porque un corte al azar filtraría el futuro.
+
+108
+00:07:47,700 --> 00:07:52,020
+Aquí aparece el sobreajuste, en inglés overfitting.
+
+109
+00:07:52,300 --> 00:07:57,100
+Ocurre cuando el modelo aprende hasta el ruido de los datos de entrenamiento:
+
+110
+00:07:57,380 --> 00:08:01,196
+rinde muy bien ahí y peor con datos nuevos.
+
+111
+00:08:01,476 --> 00:08:07,212
+La señal es la brecha, que es la métrica de entrenamiento menos la de validación.
+
+112
+00:08:07,492 --> 00:08:10,396
+Lo contrario es el subajuste:
+
+113
+00:08:10,676 --> 00:08:15,116
+un modelo demasiado simple, que rinde mal en los dos.
+
+114
+00:08:15,396 --> 00:08:19,764
+En el panel derecho se ven árboles de profundidad creciente.
+
+115
+00:08:20,044 --> 00:08:25,457
+El de profundidad doce llega a un R cuadrado de cero coma novecientos noventa y nueve
+
+116
+00:08:25,457 --> 00:08:29,788
+en entrenamiento, pero solo cero coma ochocientos uno en validación.
+
+117
+00:08:30,068 --> 00:08:35,948
+El mejor punto fue la profundidad siete, con cero coma ochocientos cuarenta y siete.
+
+118
+00:08:37,200 --> 00:08:39,720
+Un ejemplo con números.
+
+119
+00:08:40,000 --> 00:08:45,280
+Tenemos mil registros divididos en sesenta, veinte y veinte por ciento:
+
+120
+00:08:45,560 --> 00:08:49,232
+seiscientos, doscientos y doscientos.
+
+121
+00:08:49,512 --> 00:08:53,391
+El modelo A tiene un R cuadrado de cero coma noventa y nueve
+
+122
+00:08:53,391 --> 00:08:56,688
+en entrenamiento y cero coma setenta en validación.
+
+123
+00:08:56,968 --> 00:09:00,136
+Su brecha es cero coma veintinueve:
+
+124
+00:09:00,416 --> 00:09:02,504
+sobreajuste.
+
+125
+00:09:02,784 --> 00:09:07,109
+El modelo B tiene cero coma ochenta y seis y cero coma ochenta y
+
+126
+00:09:07,109 --> 00:09:10,488
+dos, con una brecha de solo cero coma cero cuatro:
+
+127
+00:09:10,768 --> 00:09:12,640
+es estable.
+
+128
+00:09:12,920 --> 00:09:17,864
+Elegimos B por su validación, aunque A tenga mejor entrenamiento.
+
+129
+00:09:18,144 --> 00:09:23,312
+Con pocas filas, a veces la validación supera al entrenamiento, y es normal;
+
+130
+00:09:23,312 --> 00:09:27,528
+lo preocupante es una brecha grande a favor del entrenamiento.
+
+131
+00:09:27,808 --> 00:09:29,800
+Para recordar:
+
+132
+00:09:30,080 --> 00:09:34,592
+se elige con la validación, nunca con el entrenamiento.
+
+133
+00:09:35,800 --> 00:09:38,560
+Pasemos a la regularización.
+
+134
+00:09:38,840 --> 00:09:42,920
+Regularizar es castigar la complejidad de un modelo:
+
+135
+00:09:43,200 --> 00:09:48,864
+se le suma al error una penalización que depende del tamaño de los coeficientes.
+
+136
+00:09:49,144 --> 00:09:53,224
+Ridge penaliza la suma de los coeficientes al cuadrado:
+
+137
+00:09:53,504 --> 00:09:57,320
+los achica, normalmente sin llegar a cero.
+
+138
+00:09:57,600 --> 00:10:01,584
+Lasso penaliza la suma de los valores absolutos:
+
+139
+00:10:01,864 --> 00:10:07,744
+puede llevar coeficientes exactamente a cero, así que además selecciona variables.
+
+140
+00:10:08,024 --> 00:10:12,050
+Y alfa es el hiperparámetro que controla cuánto castigo se
+
+141
+00:10:12,050 --> 00:10:15,728
+aplica; se elige con validación, nunca con la prueba.
+
+142
+00:10:16,008 --> 00:10:18,000
+Para recordar:
+
+143
+00:10:18,280 --> 00:10:21,544
+Ridge achica, Lasso puede anular.
+
+144
+00:10:22,800 --> 00:10:26,352
+Veamos qué pasó con las viviendas de la clase.
+
+145
+00:10:26,632 --> 00:10:31,480
+En el panel de la izquierda están los coeficientes del modelo estandarizado.
+
+146
+00:10:31,760 --> 00:10:36,734
+La superficie tiene un coeficiente de cincuenta y seis coma cuatro sin regularizar,
+
+147
+00:10:36,734 --> 00:10:41,408
+cincuenta y tres coma ocho con Ridge y cincuenta y cuatro coma tres con Lasso.
+
+148
+00:10:41,688 --> 00:10:47,112
+Fíjate en la variable de ruido aleatorio, que no tiene relación con el precio:
+
+149
+00:10:47,392 --> 00:10:51,951
+con los dos primeros modelos queda en menos cero coma cuarenta y menos cero
+
+150
+00:10:51,951 --> 00:10:55,720
+coma cuarenta y cuatro, y con Lasso queda exactamente en cero.
+
+151
+00:10:56,000 --> 00:10:58,256
+Lasso la descartó.
+
+152
+00:10:58,536 --> 00:11:02,184
+El panel del centro muestra el camino de Lasso:
+
+153
+00:11:02,464 --> 00:11:07,054
+a medida que sube alfa, los coeficientes se apagan de a uno, y el
+
+154
+00:11:07,054 --> 00:11:11,008
+ruido es el primero, con alfa cerca de cero coma cuatro.
+
+155
+00:11:12,300 --> 00:11:15,204
+Ahora, la pregunta clave:
+
+156
+00:11:15,484 --> 00:11:17,884
+¿por qué estandarizar?
+
+157
+00:11:18,164 --> 00:11:21,299
+Porque la penalización mira el tamaño de los
+
+158
+00:11:21,299 --> 00:11:24,932
+coeficientes, y ese tamaño depende de las unidades.
+
+159
+00:11:25,212 --> 00:11:29,819
+Si una variable está en unidades pequeñas, necesita un coeficiente
+
+160
+00:11:29,819 --> 00:11:33,588
+grande para tener el mismo efecto, y paga más castigo.
+
+161
+00:11:33,868 --> 00:11:37,313
+Estandarizar es restar la media y dividir por la
+
+162
+00:11:37,313 --> 00:11:41,116
+desviación estándar; el resultado se llama puntaje z.
+
+163
+00:11:41,396 --> 00:11:45,841
+Por ejemplo, una casa de ciento veinte metros cuadrados, con
+
+164
+00:11:45,841 --> 00:11:49,916
+media ochenta y desviación veinte, tiene z igual a dos.
+
+165
+00:11:50,196 --> 00:11:54,681
+Y una casa con cuatro coma cinco habitaciones, con media tres
+
+166
+00:11:54,681 --> 00:11:58,284
+y desviación uno coma cinco, tiene z igual a uno.
+
+167
+00:11:59,500 --> 00:12:02,068
+Veamos cuánto importa.
+
+168
+00:12:02,348 --> 00:12:06,668
+Imagina el mismo efecto expresado en dos unidades:
+
+169
+00:12:06,948 --> 00:12:12,084
+tres por metro cuadrado, o trescientos por cada cien metros cuadrados.
+
+170
+00:12:12,364 --> 00:12:17,089
+Con Ridge y alfa igual a uno, la penalización es tres al cuadrado,
+
+171
+00:12:17,089 --> 00:12:20,740
+nueve, contra trescientos al cuadrado, noventa mil.
+
+172
+00:12:21,020 --> 00:12:25,508
+Es el mismo efecto, castigado diez mil veces más.
+
+173
+00:12:25,788 --> 00:12:30,856
+Con las viviendas de la clase, Ridge con alfa treinta tiene un R cuadrado de cero coma
+
+174
+00:12:30,856 --> 00:12:35,629
+novecientos dieciséis con la superficie en metros cuadrados, pero cae a cero coma
+
+175
+00:12:35,629 --> 00:12:39,636
+quinientos treinta y dos si se mide en centenas de metros cuadrados.
+
+176
+00:12:39,916 --> 00:12:45,652
+Con estandarización queda en cero coma ochocientos ochenta y siete en ambos casos.
+
+177
+00:12:45,932 --> 00:12:47,924
+Para recordar:
+
+178
+00:12:48,204 --> 00:12:51,636
+estandariza siempre antes de Ridge o Lasso.
+
+179
+00:12:52,900 --> 00:12:58,348
+Una sola división de los datos puede resultar fácil o difícil solo por suerte.
+
+180
+00:12:58,628 --> 00:13:03,524
+La solución es la validación cruzada, conocida como K-Fold.
+
+181
+00:13:03,804 --> 00:13:07,068
+Se parten los datos en K pliegues.
+
+182
+00:13:07,348 --> 00:13:13,324
+Cada pliegue actúa una vez como validación, mientras los otros K menos uno entrenan.
+
+183
+00:13:13,604 --> 00:13:17,084
+Al final se promedian los K resultados.
+
+184
+00:13:17,364 --> 00:13:22,380
+Se hace con entrenamiento más validación; la prueba queda fuera.
+
+185
+00:13:22,660 --> 00:13:26,697
+Por ejemplo, con cien filas y cuatro pliegues, cada uno tiene
+
+186
+00:13:26,697 --> 00:13:31,132
+veinticinco filas de validación y setenta y cinco de entrenamiento.
+
+187
+00:13:31,412 --> 00:13:33,404
+Para recordar:
+
+188
+00:13:33,684 --> 00:13:39,684
+K-Fold te da un promedio y una dispersión, en lugar de un solo número de suerte.
+
+189
+00:13:40,900 --> 00:13:43,924
+Ahora con las viviendas de la clase:
+
+190
+00:13:44,204 --> 00:13:49,124
+doscientas cincuenta y cinco viviendas de desarrollo y cinco pliegues.
+
+191
+00:13:49,404 --> 00:13:53,823
+Los R cuadrado fueron cero coma novecientos cuarenta y uno, cero coma
+
+192
+00:13:53,823 --> 00:13:58,241
+novecientos treinta y uno, cero coma novecientos dieciocho, cero coma
+
+193
+00:13:58,241 --> 00:14:02,532
+ochocientos noventa y cinco y cero coma novecientos treinta y tres.
+
+194
+00:14:02,812 --> 00:14:06,484
+La media es cero coma novecientos veinticuatro, con
+
+195
+00:14:06,484 --> 00:14:09,580
+una desviación de cero coma cero dieciséis.
+
+196
+00:14:09,860 --> 00:14:15,404
+Una desviación grande significaría que el resultado depende mucho de la muestra.
+
+197
+00:14:15,684 --> 00:14:21,557
+En el panel derecho, al repetir trescientas particiones simples, el R cuadrado de una sola
+
+198
+00:14:21,557 --> 00:14:26,124
+puede ir desde cero coma ochenta y dos hasta cero coma noventa y seis.
+
+199
+00:14:26,404 --> 00:14:28,276
+Una nota:
+
+200
+00:14:28,556 --> 00:14:31,793
+el cuaderno de la clase hizo el K-Fold con las
+
+201
+00:14:31,793 --> 00:14:34,748
+trescientas filas, que incluyen la prueba.
+
+202
+00:14:35,028 --> 00:14:39,324
+Lo correcto es usar solo entrenamiento más validación.
+
+203
+00:14:40,600 --> 00:14:44,428
+Hay un problema especial cuando una clase es rara, como el
+
+204
+00:14:44,428 --> 00:14:48,256
+fraude, que aparece en solo cinco por ciento de los casos.
+
+205
+00:14:48,536 --> 00:14:52,221
+Si cortas los datos al azar, la prueba puede quedar
+
+206
+00:14:52,221 --> 00:14:55,112
+con muy pocos fraudes, o con demasiados.
+
+207
+00:14:55,392 --> 00:14:58,464
+La estratificación resuelve esto:
+
+208
+00:14:58,744 --> 00:15:02,920
+al dividir, conserva la proporción de cada clase.
+
+209
+00:15:03,200 --> 00:15:07,470
+Es como repartir caramelos de dos colores entre varios niños,
+
+210
+00:15:07,470 --> 00:15:10,760
+asegurando que cada uno reciba la misma mezcla.
+
+211
+00:15:11,040 --> 00:15:16,824
+No aumenta los fraudes; solo evita que una partición quede casi sin ellos.
+
+212
+00:15:17,104 --> 00:15:21,495
+Por ejemplo, con cuatrocientas filas y cinco por ciento de fraude, una
+
+213
+00:15:21,495 --> 00:15:25,636
+prueba de veinticinco por ciento tiene siempre cinco fraudes si se
+
+214
+00:15:25,636 --> 00:15:29,776
+estratifica; sin estratificar, puede salir dos o puede salir ocho.
+
+215
+00:15:30,056 --> 00:15:34,160
+En Python se usa el argumento stratify igual a y.
+
+216
+00:15:35,400 --> 00:15:41,112
+En el notebook de la clase hay dos mil casos, con ciento nueve positivos:
+
+217
+00:15:41,392 --> 00:15:45,160
+cinco coma cuarenta y cinco por ciento de fraude.
+
+218
+00:15:45,440 --> 00:15:50,811
+Al estratificar, el entrenamiento queda con cinco coma cuatrocientos sesenta y siete
+
+219
+00:15:50,811 --> 00:15:54,968
+por ciento, y la prueba, con cinco coma cuatrocientos por ciento:
+
+220
+00:15:55,248 --> 00:15:57,504
+casi idénticos.
+
+221
+00:15:57,784 --> 00:16:02,750
+Sin estratificar, con dos mil casos, el porcentaje de fraude en la prueba
+
+222
+00:16:02,750 --> 00:16:06,832
+varía desde dos coma ocho hasta ocho coma cuatro por ciento.
+
+223
+00:16:07,112 --> 00:16:11,813
+Y con apenas doscientos casos, el panel derecho muestra que en dos coma dos
+
+224
+00:16:11,813 --> 00:16:15,824
+por ciento de las particiones la prueba no recibe ningún fraude.
+
+225
+00:16:16,104 --> 00:16:21,456
+Un modelo evaluado sin ningún fraude no puede decirte nada sobre fraudes.
+
+226
+00:16:22,700 --> 00:16:25,412
+Llegamos a las métricas.
+
+227
+00:16:25,692 --> 00:16:30,444
+Todas salen de cuatro números, que forman la matriz de confusión.
+
+228
+00:16:30,724 --> 00:16:36,316
+Los verdaderos positivos, o TP, son fraudes que el modelo detectó.
+
+229
+00:16:36,596 --> 00:16:41,588
+Los falsos positivos, FP, son falsas alarmas:
+
+230
+00:16:41,868 --> 00:16:45,300
+transacciones buenas marcadas como fraude.
+
+231
+00:16:45,580 --> 00:16:52,108
+Los falsos negativos, FN, son fraudes que se escaparon sin que el modelo los viera.
+
+232
+00:16:52,388 --> 00:16:56,102
+Y los verdaderos negativos, TN, son transacciones
+
+233
+00:16:56,102 --> 00:16:59,588
+buenas que el modelo dejó pasar correctamente.
+
+234
+00:16:59,868 --> 00:17:03,804
+Con estas cuatro cifras se calcula todo lo demás.
+
+235
+00:17:05,100 --> 00:17:07,644
+Veamos las fórmulas.
+
+236
+00:17:07,924 --> 00:17:13,180
+La exactitud, o accuracy, es la proporción de aciertos totales:
+
+237
+00:17:13,460 --> 00:17:18,956
+verdaderos positivos más verdaderos negativos, dividido por el total.
+
+238
+00:17:19,236 --> 00:17:21,636
+La precisión responde:
+
+239
+00:17:21,916 --> 00:17:26,740
+de todo lo que marqué como positivo, ¿cuánto realmente lo era?
+
+240
+00:17:27,020 --> 00:17:32,876
+Es verdaderos positivos dividido por verdaderos positivos más falsos positivos.
+
+241
+00:17:33,156 --> 00:17:36,972
+El recall, o exhaustividad, responde:
+
+242
+00:17:37,252 --> 00:17:41,452
+de todos los positivos reales, ¿cuántos detecté?
+
+243
+00:17:41,732 --> 00:17:47,612
+Es verdaderos positivos dividido por verdaderos positivos más falsos negativos.
+
+244
+00:17:47,892 --> 00:17:51,684
+Tienen el mismo numerador y solo cambia el total.
+
+245
+00:17:51,964 --> 00:17:55,310
+El F1 es la media armónica de ambas y resume el
+
+246
+00:17:55,310 --> 00:17:58,372
+equilibrio cuando los dos errores importan.
+
+247
+00:17:59,600 --> 00:18:04,880
+Un ejemplo con mil transacciones, de las cuales cincuenta son fraudes.
+
+248
+00:18:05,160 --> 00:18:10,520
+El modelo tiene treinta verdaderos positivos, diez falsos positivos, veinte
+
+249
+00:18:10,520 --> 00:18:14,880
+falsos negativos y novecientos cuarenta verdaderos negativos.
+
+250
+00:18:15,160 --> 00:18:20,176
+La exactitud es treinta más novecientos cuarenta, dividido por mil:
+
+251
+00:18:20,456 --> 00:18:23,168
+cero coma noventa y siete.
+
+252
+00:18:23,448 --> 00:18:26,976
+La precisión es treinta dividido por cuarenta:
+
+253
+00:18:27,256 --> 00:18:30,040
+cero coma setenta y cinco.
+
+254
+00:18:30,320 --> 00:18:33,848
+El recall es treinta dividido por cincuenta:
+
+255
+00:18:34,128 --> 00:18:36,504
+cero coma sesenta.
+
+256
+00:18:36,784 --> 00:18:40,960
+Y el F1 es cero coma seiscientos sesenta y siete.
+
+257
+00:18:41,240 --> 00:18:43,448
+Mira el contraste:
+
+258
+00:18:43,728 --> 00:18:47,099
+un modelo que dijera siempre no fraude tendría una
+
+259
+00:18:47,099 --> 00:18:49,728
+exactitud de cero coma noventa y cinco.
+
+260
+00:18:50,008 --> 00:18:53,664
+El cero coma noventa y siete parece excelente, pero el
+
+261
+00:18:53,664 --> 00:18:57,184
+modelo deja escapar veinte de los cincuenta fraudes.
+
+262
+00:18:58,400 --> 00:19:03,551
+En la prueba de la clase, con quinientos casos, la regresión logística obtuvo
+
+263
+00:19:03,551 --> 00:19:08,502
+cuatrocientos sesenta y seis verdaderos negativos, siete falsos positivos,
+
+264
+00:19:08,502 --> 00:19:12,248
+diecisiete falsos negativos y diez verdaderos positivos.
+
+265
+00:19:12,528 --> 00:19:17,016
+La exactitud fue cero coma novecientos cincuenta y dos, la precisión cero
+
+266
+00:19:17,016 --> 00:19:21,505
+coma quinientos ochenta y ocho, el recall cero coma trescientos setenta y
+
+267
+00:19:21,505 --> 00:19:24,456
+el F1 cero coma cuatrocientos cincuenta y cinco.
+
+268
+00:19:24,736 --> 00:19:28,967
+El modelo que siempre dice no fraude logra una exactitud de cero
+
+269
+00:19:28,967 --> 00:19:32,272
+coma novecientos cuarenta y seis, con recall cero:
+
+270
+00:19:32,552 --> 00:19:36,224
+la exactitud casi no distingue entre ambos.
+
+271
+00:19:36,504 --> 00:19:40,703
+Con solo veintisiete fraudes en la prueba, mover el umbral cambia
+
+272
+00:19:40,703 --> 00:19:44,256
+mucho el resultado, así que se elige con la validación.
+
+273
+00:19:45,500 --> 00:19:48,740
+Entonces, ¿qué métrica elegir?
+
+274
+00:19:49,020 --> 00:19:52,116
+Depende del costo de equivocarse.
+
+275
+00:19:52,396 --> 00:19:57,895
+En el caso del banco, con dos por ciento de impago, dejar pasar un mal pagador es
+
+276
+00:19:57,895 --> 00:20:02,308
+muy costoso, así que importa el recall, sin olvidar la precisión.
+
+277
+00:20:02,588 --> 00:20:07,436
+Si lo caro fueran las falsas alarmas, mirarías la precisión.
+
+278
+00:20:07,716 --> 00:20:11,652
+Y si ambos errores pesan, usas el F1.
+
+279
+00:20:11,932 --> 00:20:16,304
+Para regresión, el MAE es el error medio en las unidades del
+
+280
+00:20:16,304 --> 00:20:20,311
+precio, el RMSE castiga más los errores grandes, y el R
+
+281
+00:20:20,311 --> 00:20:24,100
+cuadrado es la proporción de variabilidad explicada.
+
+282
+00:20:24,380 --> 00:20:30,757
+En la prueba de precios de la clase, el MAE fue trece coma nueve millones de pesos, el
+
+283
+00:20:30,757 --> 00:20:35,948
+RMSE dieciséis coma dos, y el R cuadrado cero coma novecientos cuatro.
+
+284
+00:20:37,200 --> 00:20:42,096
+Llegamos al error que más se rompe en la primera clase de Machine Learning:
+
+285
+00:20:42,376 --> 00:20:45,808
+la fuga de datos, o data leakage.
+
+286
+00:20:46,088 --> 00:20:49,857
+Es usar, directa o indirectamente, información de la
+
+287
+00:20:49,857 --> 00:20:53,336
+prueba o de la validación durante el desarrollo:
+
+288
+00:20:53,616 --> 00:20:59,304
+al imputar, escalar, seleccionar variables o elegir hiperparámetros.
+
+289
+00:20:59,584 --> 00:21:02,848
+Es como estudiar con el examen en la mano.
+
+290
+00:21:03,128 --> 00:21:06,488
+Recuerda los tres verbos de scikit-learn:
+
+291
+00:21:06,768 --> 00:21:12,480
+fit significa aprender de los datos, por ejemplo calcular una media; transform
+
+292
+00:21:12,480 --> 00:21:18,192
+significa aplicar lo aprendido; y predict, predecir con un modelo ya ajustado.
+
+293
+00:21:18,472 --> 00:21:21,599
+Un estandarizador con fit sobre todas las filas
+
+294
+00:21:21,599 --> 00:21:24,592
+conoce la media y la desviación de la prueba.
+
+295
+00:21:24,872 --> 00:21:30,560
+Lo correcto es hacer fit solo con entrenamiento y aplicar transform en el resto.
+
+296
+00:21:31,800 --> 00:21:35,160
+Veamos cómo la fuga esconde un problema.
+
+297
+00:21:35,440 --> 00:21:40,086
+El entrenamiento tiene los valores diez, doce y catorce, con media
+
+298
+00:21:40,086 --> 00:21:43,888
+doce y desviación uno coma seiscientos treinta y tres.
+
+299
+00:21:44,168 --> 00:21:47,024
+En la prueba aparece un treinta.
+
+300
+00:21:47,304 --> 00:21:52,455
+Con los estadísticos del entrenamiento, correcto, su puntaje z es treinta
+
+301
+00:21:52,455 --> 00:21:56,760
+menos doce, dividido por uno coma seiscientos treinta y tres:
+
+302
+00:21:57,040 --> 00:21:58,912
+once.
+
+303
+00:21:59,192 --> 00:22:01,664
+Un atípico clarísimo.
+
+304
+00:22:01,944 --> 00:22:06,678
+Pero si se calculan la media y la desviación con las cuatro filas, que
+
+305
+00:22:06,678 --> 00:22:11,479
+es la fuga, la media sube a dieciséis coma cinco, la desviación a siete
+
+306
+00:22:11,479 --> 00:22:14,928
+coma noventa y dos, y el z baja a uno coma setenta:
+
+307
+00:22:15,208 --> 00:22:17,200
+¡parece normal!
+
+308
+00:22:17,480 --> 00:22:22,880
+La fuga ocultó el atípico, porque el modelo ya había visto la prueba.
+
+309
+00:22:24,100 --> 00:22:27,460
+Este experimento lo muestra con claridad.
+
+310
+00:22:27,740 --> 00:22:30,476
+Tomamos datos de puro ruido:
+
+311
+00:22:30,756 --> 00:22:35,220
+mil columnas sin ninguna relación con lo que se quiere predecir.
+
+312
+00:22:35,500 --> 00:22:41,164
+Si seleccionamos las diez mejores columnas usando todas las filas y luego validamos, la
+
+313
+00:22:41,164 --> 00:22:46,372
+exactitud da cerca de cero coma setenta y nueve, como si el modelo supiera algo.
+
+314
+00:22:46,652 --> 00:22:50,777
+Pero si lo hacemos dentro de un Pipeline, da cerca de cero
+
+315
+00:22:50,777 --> 00:22:54,404
+coma cincuenta y uno, que es azar, y es lo honesto.
+
+316
+00:22:54,684 --> 00:22:58,596
+La diferencia entre ambos números es toda la fuga.
+
+317
+00:22:58,876 --> 00:23:02,332
+Se repitió cuarenta veces para confirmarlo.
+
+318
+00:23:03,600 --> 00:23:07,104
+La solución práctica se llama Pipeline.
+
+319
+00:23:07,384 --> 00:23:12,055
+Encadena varios pasos, por ejemplo estandarizar y luego modelar, y
+
+320
+00:23:12,055 --> 00:23:15,736
+hace fit de cada paso solo con los datos que recibe.
+
+321
+00:23:16,016 --> 00:23:21,008
+Dentro del K-Fold, repite el proceso completo en cada pliegue.
+
+322
+00:23:21,288 --> 00:23:26,475
+Y con ColumnTransformer, a las columnas numéricas se les imputa y se les escala,
+
+323
+00:23:26,475 --> 00:23:30,624
+y a las categóricas se les pone la moda y se les aplica one-hot.
+
+324
+00:23:30,904 --> 00:23:32,776
+Un checklist:
+
+325
+00:23:33,056 --> 00:23:36,872
+divide primero, antes de imputar o escalar.
+
+326
+00:23:37,152 --> 00:23:39,432
+Usa un Pipeline.
+
+327
+00:23:39,712 --> 00:23:42,976
+Estratifica si hay clases raras.
+
+328
+00:23:43,256 --> 00:23:47,096
+Elige hiperparámetros con validación o K-Fold.
+
+329
+00:23:47,376 --> 00:23:50,328
+Mira la prueba una sola vez.
+
+330
+00:23:50,608 --> 00:23:56,920
+Y reporta varias métricas, porque la exactitud no basta con clases desbalanceadas.
+
+331
+00:23:58,200 --> 00:24:00,504
+Hagamos un repaso.
+
+332
+00:24:00,784 --> 00:24:02,656
+Uno:
+
+333
+00:24:02,936 --> 00:24:07,565
+cada variable es numérica o categórica, y los datos se juzgan
+
+334
+00:24:07,565 --> 00:24:11,360
+por exactitud, completitud, coherencia y frescura.
+
+335
+00:24:11,640 --> 00:24:13,512
+Dos:
+
+336
+00:24:13,792 --> 00:24:17,527
+se imputa con media, mediana o moda según el caso,
+
+337
+00:24:17,527 --> 00:24:20,440
+siempre aprendida con el entrenamiento.
+
+338
+00:24:20,720 --> 00:24:22,592
+Tres:
+
+339
+00:24:22,872 --> 00:24:26,689
+el entrenamiento aprende, la validación elige, y la
+
+340
+00:24:26,689 --> 00:24:29,832
+prueba da el veredicto final una sola vez.
+
+341
+00:24:30,112 --> 00:24:31,984
+Cuatro:
+
+342
+00:24:32,264 --> 00:24:36,992
+Ridge achica y Lasso puede anular, y por eso se estandariza.
+
+343
+00:24:37,272 --> 00:24:39,144
+Cinco:
+
+344
+00:24:39,424 --> 00:24:42,836
+K-Fold entrega un promedio y una dispersión, y la
+
+345
+00:24:42,836 --> 00:24:46,456
+estratificación reparte la clase rara en proporción.
+
+346
+00:24:46,736 --> 00:24:48,608
+Seis:
+
+347
+00:24:48,888 --> 00:24:53,059
+precision, recall y F1 según el costo del error, y todo
+
+348
+00:24:53,059 --> 00:24:56,472
+el preprocesamiento va dentro de un Pipeline.
+
+349
+00:24:56,752 --> 00:25:02,073
+Para pasar a la siguiente clase, deberías poder calcular a mano las métricas de una
+
+350
+00:25:02,073 --> 00:25:06,304
+matriz de confusión, y escribir un Pipeline sin filtrar la prueba.
+
+351
+00:25:06,584 --> 00:25:11,968
+Lee los apuntes, resuelve los bloques del cuaderno, y si te trabas más de diez
+
+352
+00:25:11,968 --> 00:25:16,592
+minutos, mira la solución, entiéndela y vuelve a hacerlo sin mirar.
+
+353
+00:25:16,872 --> 00:25:21,504
+Gracias por ver este video, y mucho éxito con tu estudio.

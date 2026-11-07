@@ -1,0 +1,399 @@
+Sesión 32: Reducción de dimensionalidad y
+         representación de variables
+
+                                 Laura Sánchez Fernández
+ANTES DE EMPEZAR                                                                    Sesión 31
+
+¿Dónde estábamos?                                                               Introducción práctica al
+                                                                                Machine Learning
+                   Sesión 30
+                                                                        • Jerarquía IA ⊃ Machine Learning ⊃ Deep Learning
+            Preparación para Machine Learning                           • El ciclo: Datos → Modelo → Evaluación → Mejora
+                                                                        • 3 familias: supervisado, no supervisado, por refuerzo
+     • Ciclo de EDA: preguntar, responder, refinar                      • Clasificación vs. regresión
+     • 4 dimensiones de calidad: exactitud, completitud,                • No supervisado: Clustering (grupos) y PCA (resumir
+     coherencia, frescura                                               variables)
+     • Imputación (media / mediana / moda / regresión)
+     • División honesta: entrenamiento / validación / prueba
+     • Regularización (Lasso / Ridge) y métricas más allá del
+     Accuracy
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                           2
+HOJA DE RUTA
+
+Objetivos de la sesión
+
+Diagnosticar                                                            Por qué demasiadas variables perjudican un modelo (multicolinealidad, ruido,
+Representar                                                             sobreajuste).
+                                                                        Cómo escalar, codificar y construir variables antes de modelar (feature engineering).
+
+Extraer — PCA                                                           Resumir variables correlacionadas en componentes principales, explicado en
+Extraer — t-SNE                                                         lenguaje simple.
+                                                                        Visualizar estructura no lineal en 2D preservando relaciones de vecindad.
+
+Comparar                                                                Cuándo usar selección vs. extracción, y PCA vs. t-SNE, con un caso aplicado (churn
+                                                                        real).
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                                                         3
+01
+
+El problema de la dimensionalidad
+
+Por qué demasiadas variables perjudican y no ayudan, a un modelo.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables  4
+PARTE 1 · EL PROBLEMA DE LA DIMENSIONALIDAD
+
+¿Qué pasa cuando hay demasiadas variables?
+
+        Costo computacional                                                     Multicolinealidad
+
+Más columnas implican más tiempo de procesamiento                       Variables muy correlacionadas generan inestabilidad e
+y entrenamiento.                                                        ineficiencia en regresiones, redes neuronales, etc.
+
+             Variables ruido                                                    Sesgo vs. varianza
+
+     No todas las columnas aportan información real al                  Con pocas observaciones, más variables aumentan la
+     modelo.                                                            varianza de las predicciones sin compensar el sesgo.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                                                                                                           5
+PARTE 1 · EL PROBLEMA DE LA DIMENSIONALIDAD
+
+Por qué vale la pena reducir dimensiones
+
+Más fácil de poner en                                                   Incrementa la performance  Remueve variables
+      producción                                                                  del modelo           irrelevantes
+
+          Entrenamientos más                                            Más fácil de depurar       Más fácil de comprender
+                 eficientes
+                                                                                                                                                                                   6
+Sesión 32 · Reducción de dimensionalidad y representación de variables
+PARTE 1 · EL PROBLEMA DE LA DIMENSIONALIDAD
+
+¿Manifold, y por dónde reducimos?
+
+       ¿Qué es un manifold?                                                         Camino 1 — Selección de variables
+
+Un globo terráqueo (3D) se puede representar                                Eliminar columnas: quitamos variables
+en un mapa plano (2D) sin perder las relaciones                             redundantes o poco informativas y conservamos
+esenciales entre países y continentes.                                      las originales (más interpretable).
+Un manifold es esa estructura de menor
+dimensión, "doblada" dentro de un espacio                                           Camino 2 — Creación / extracción
+mayor, que conserva la forma real de los datos.                                     de variables
+Reducir dimensionalidad es, en esencia,
+encontrar y "desdoblar" ese manifold.                                       Combinar columnas en nuevas variables (p. ej.
+                                                                            componentes principales) que resumen la
+Por eso hoy usaremos dos técnicas con lógicas distintas: PCA (lineal) y t-  información original. Es lo que veremos hoy con
+SNE (no lineal).                                                            PCA y t-SNE.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                       7
+02
+
+Representación de variables
+
+Escalar, codificar y construir: cómo entregamos la información al modelo.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables     8
+PARTE 2 · REPRESENTACIÓN DE VARIABLES
+
+Diferenias entre Calidad de datos y representación
+
+En la Sesión 30 nos aseguramos de que los datos fueran exactos, completos, coherentes y frescos. Eso responde "¿son datos
+confiables?". Hoy respondemos una pregunta distinta: "¿en qué forma se las entrego al modelo?"
+
+Escalas distintas                                                       Texto y categorías                            Información implícita
+
+"segundos" llega a miles y "reclamos" es 0 o 1.                         Un modelo no entiende "prepago" o "plan":     A veces el dato útil no es una columna cruda,
+Sin ajustar, la variable de mayor magnitud                              necesita una representación numérica de esas  sino una combinación de columnas (una razón,
+domina distancias y componentes.                                        categorías.                                   una tasa, un promedio).
+
+Idea clave: PCA y t-SNE trabajan con distancias y varianzas. Si las variables no están bien representadas, el algoritmo "resume" ruido, no información.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                                                               9
+PARTE 2 · REPRESENTACIÓN DE VARIABLES
+
+Escalamiento y estandarización
+
+Antes de aplicar PCA, t-SNE o cualquier método basado en distancias, las variables numéricas deben quedar en una
+escala comparable — como convertir todo a la misma unidad antes de comparar.
+
+Estandarización                                                         Mide cada valor en "cuántas desviaciones típicas se aleja del
+     (z-score)                                                          promedio". Todas las variables terminan centradas en 0. Es el estándar
+                                                                        para PCA y t-SNE.
+
+Normalización                                                           Comprime todos los valores para que queden entre 0 y 1, conservando
+  (min-max)                                                             el orden. Útil cuando se necesitan límites fijos (p. ej. redes neuronales).
+
+En Python: StandardScaler() y MinMaxScaler() de sklearn.preprocessing — siempre ajustados (fit) solo con el conjunto de entrenamiento (Sesión 30: evitar Data Leakage).
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                                                                   10
+PARTE 2 · REPRESENTACIÓN DE VARIABLES
+
+Codificación de variables categóricas
+
+Ordinal encoding                                                        One-hot encoding                    Target / frequency
+                                                                                                            encoding
+Nominal → entero cuando existe                                          Una columna binaria por categoría;
+un orden real.                                                          evita imponer un orden falso.       Reemplaza la categoría por un
+                                                                                                            estadístico (tasa de fuga,
+  monto: 0 (bajo) … 9                                                     tipo_plan →                       frecuencia). Útil con muchas
+  (alto)                                                                  tipo_plan_prepago,                categorías.
+                                                                          tipo_plan_plan
+                                                                                                              comuna → tasa de fuga
+                                                                                                              histórica de esa comuna
+
+En nuestro dataset churn: tipo_plan y estado son categóricas codificadas como enteros (1/2) — funcionan directo en modelos de
+árbol, pero conviene one-hot para PCA/t-SNE porque estos asumen una noción de distancia numérica continua.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                                     11
+PARTE 2 · REPRESENTACIÓN DE VARIABLES
+
+Creación de variables (feature engineering)
+
+A veces la variable más informativa no existe todavía en el dataset: se construye combinando columnas.
+
+duracion_prom_llamada                                                   segundos ÷             Un cliente con muchas llamadas cortas se
+                                                                        frec_llamadas          comporta distinto de uno con pocas llamadas
+                                                                                               largas.
+
+sms_por_antiguedad                                                      frec_sms ÷ antiguedad  Normaliza el uso de SMS por el tiempo que lleva el
+                                                                                               cliente en la compañía.
+
+intensidad_contacto                                                     n_contactos ÷          Aproxima cuán concentrada está la actividad del
+                                                                        frec_llamadas          cliente en pocos contactos.
+
+Estas variables nuevas se agregan al conjunto ANTES de escalar y reducir dimensionalidad: la representación es un paso previo, no un sustituto de PCA/t-SNE.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                                                        12
+03
+
+Extracción de variables — PCA
+
+De muchas variables correlacionadas a componentes que resumen lo esencial.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables      13
+ PARTE 3 · EXTRACCIÓN DE VARIABLES — PCA                                  No supervisado
+
+Análisis de Componentes Principales                                       No usa la variable objetivo (fuga)
+                                                                          para construir los componentes.
+      En una frase: PCA toma un montón de variables y las "resume" en
+      unas pocas nuevas variables (los componentes), tratando de perder   Requiere escala
+      la menor cantidad de información posible.
+      Cada componente es como una mezcla o receta hecha con un poco       Se calcula sobre variables
+      de cada variable original. El primer componente es la mezcla que    estandarizadas (ver Parte 2).
+      mejor captura el patrón principal de los datos; el segundo, el
+      siguiente patrón más importante que no se repite con el primero; y  Es una "receta"
+      así sucesivamente.
+      Objetivo: explicar la mayor parte de la variabilidad de los datos   Cada componente combina un poco
+      usando muchas menos variables que el conjunto original.             de cada variable original — el detalle
+                                                                          matemático lo hace el computador
+Sesión 32 · Reducción de dimensionalidad y representación de variables    por ti.
+
+                                                                                                                                                                   14
+ PARTE 3 · EXTRACCIÓN DE VARIABLES — PCA                                No necesitas el álgebra para usar PCA — basta
+                                                                        con entender la idea:
+La intuición detrás de PCA
+                                                                        1. PCA busca la dirección donde los datos varían
+Sesión 32 · Reducción de dimensionalidad y representación de variables  más. Ahí es donde hay más información para
+                                                                        resumir.
+
+                                                                        2. Esa dirección se convierte en el primer
+                                                                        componente (PC1, la línea naranja). La siguiente
+                                                                        dirección más informativa, que no repite lo que ya
+                                                                        explicó PC1, es el segundo componente (PC2, la
+                                                                        línea azul).
+
+                                                                        3. Con muchas variables, este mismo
+                                                                        razonamiento se repite: cada nuevo componente
+                                                                        capta el patrón más fuerte que aún no se había
+                                                                        explicado.
+
+                                                                                                                                                                                                       15
+PARTE 3 · EXTRACCIÓN DE VARIABLES — PCA
+
+Aplicación: el dataset real de churn
+
+Retomamos el ejemplo de la Sesión 31 ("¿el cliente cancelará su suscripción?"), ahora con los datos reales de comportamiento de
+1500 clientes de una telco.
+
+numero_fallas  N° de llamadas fallidas                                  frec_sms     Total de mensajes de texto
+
+reclamos       0: sin reclamo · 1: con reclamo                          n_contactos  N° de números distintos contactados
+
+antiguedad     Meses en suscripción                                     tipo_plan    1: prepago · 2: plan
+
+monto          Nivel del plan (0 bajo … 9 alto)                         estado       1: activa · 2: no activa
+
+segundos       Segundos totales en llamadas                             edad         Edad del cliente
+
+frec_llamadas  Total de llamadas                                        clv          Valor del cliente (Customer Lifetime Value)
+
+Variable objetivo: fuga (1 = abandonó, 0 = activo). Hoy la dejamos fuera del PCA — solo la usamos después, para colorear y evaluar — porque
+PCA es no supervisado.
+
+Antes de este análisis, corregimos un par de cosas típicas de la Sesión 30: valores de edad imposibles (negativos o sobre 100) y datos faltantes
+en varias columnas.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                                            16
+PARTE 3 · EXTRACCIÓN DE VARIABLES — PCA
+
+Antes de reducir: revisar correlaciones
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables  17
+PARTE 3 · EXTRACCIÓN DE VARIABLES — PCA
+
+¿Cuántas componentes elegimos?
+
+Cada barra es "cuánta información nueva" aporta ese componente. La línea naranja es la suma acumulada. Buscamos el punto
+donde agregar un componente más ya no suma casi nada — ahí nos detenemos.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                    18
+PARTE 3 · EXTRACCIÓN DE VARIABLES — PCA
+
+¿Qué variables arma cada componente?
+
+                                                                     PC1 agrupa el uso general del servicio
+                                                                     (segundos, llamadas, contactos, SMS, monto,
+                                                                     CLV): mientras más usa el cliente el servicio,
+                                                                     más alto es su PC1.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables  PC2 mezcla número de fallas técnicas y
+                                                                        reclamos: un valor alto en PC2 se parece a un
+                                                                        cliente con más fricción/insatisfacción con el
+                                                                        servicio.
+
+                                                                                                                                                                                                               19
+PARTE 3 · EXTRACCIÓN DE VARIABLES — PCA
+
+Proyectando clientes en 2 dimensiones
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables  20
+PARTE 3 · EXTRACCIÓN DE VARIABLES — PCA
+
+¿Reducir dimensiones cuesta desempeño?
+
+Comparamos una regresión logística entrenada con las 15 variables (ya representadas: escaladas + codificadas) vs. con solo 7 componentes principales
+(≈80% de la varianza).
+
+Modelo                                                                  N° variables  F1-score  MCC
+Variables originales                                                    15            0.270     0.265
+8 componentes (PCA)                                                     8             0.267     0.252
+
+Lectura: con menos de la mitad de las columnas (8 en vez de 15), el desempeño baja apenas un poco. Ese es el trade-off real de PCA: normalmente se cede
+algo de desempeño a cambio de un modelo mucho más simple, liviano y fácil de mantener. Si esa pequeña pérdida vale la pena depende del problema — no
+siempre es gratis, pero tampoco suele ser caro.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                                                   21
+04
+
+t-SNE
+
+Un mapa no lineal para explorar la estructura de los datos.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables  22
+PARTE 4 · T-SNE
+
+Una alternativa no lineal: t-SNE
+
+t-Distributed Stochastic Neighbor Embedding (Hinton & van der Maaten, 2008) busca un embedding: un mapa en 2 o 3 dimensiones que
+mantiene juntos a los puntos que eran parecidos originalmente, y separados a los que no. A diferencia de PCA, no le importa la varianza
+total, sino "quién es vecino de quién".
+
+               La idea                                                            Embedding                         No lineal
+Si dos clientes se parecen mucho                                        Es solo el nombre técnico de    A diferencia de PCA, no asume
+en las variables originales, t-SNE                                                                    que la relación entre variables sea
+los va a dibujar cerca en el mapa                                         "mapa simplificado": una    una simple mezcla lineal — puede
+                                                                        representación más chica que  capturar patrones más retorcidos.
+  2D. Si son distintos, los aleja.
+                                                                            conserva las relaciones
+                                                                        importantes entre los datos.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                                     23
+PARTE 4 · T-SNE
+
+¿Cómo funciona?
+
+1  Mide las "vecindades" originales                                     Para cada cliente, t-SNE calcula qué tan probable es
+                                                                        que cada otro cliente sea su "vecino", usando las
+                                                                        variables originales (con muchas columnas).
+
+                                                                        Ubica a cada cliente como un punto en el plano, y va
+                                                                        moviendo esos puntos de a poco hasta que las
+2  Dibuja un mapa en 2D que respete esas vecindades vecindades del mapa 2D se parezcan lo más posible
+
+                                                                        a las vecindades originales.
+
+Sin fórmulas: el algoritmo va "acomodando" los puntos en el mapa, un poquito en cada vuelta, hasta que el resultado se
+parece lo más posible al original. Es un proceso de prueba y ajuste, no una fórmula que se resuelve de una vez — por eso
+
+puede tardar y por eso el resultado varía un poco entre corridas.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                        24
+PARTE 4 · T-SNE
+
+El hiperparámetro clave: perplexity
+
+En lenguaje coloquial: perplexity es más o menos "a cuántos vecinos le presto atención" al armar el mapa. Baja → grupos chicos y muy locales. Alta → una
+vista más panorámica, con grupos más grandes. En la práctica se prueba entre 5 y 50.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                                                    25
+PARTE 4 · T-SNE
+
+Consideraciones prácticas
+
+Perplexity acotado                                                      Debe ser menor al número de observaciones; en la práctica se
+                                                                        prueba entre 5 y 50.
+
+No determinístico                                                       Cada corrida puede variar levemente el resultado (fijar random_state
+                                                                        ayuda a reproducir).
+
+No es un modelo de                                                      Expande grupos densos y compacta los dispersos: no interpretar
+clúster                                                                 distancias entre clústeres como "distancia real".
+
+Costo computacional alto                                                Comparar todas las parejas de observaciones crece rápido con el
+                                                                        número de datos.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                                        26
+SÍNTESIS TÉCNICA
+
+PCA vs. t-SNE, y otras alternativas
+
+PCA                                                                     t-SNE
+
+Combina variables de forma simple (lineal) · conserva la                Combina variables de forma más compleja (no lineal) ·
+variabilidad global · da el mismo resultado cada vez ·                  conserva vecindades locales · el resultado varía un poco
+rápido · sirve para producción.                                         cada vez · más lento · pensado para visualizar, no para
+                                                                        producción.
+
+Otros algoritmos que existen en la misma familia                        Más complejos (no lineales): Autoencoders · IsoMap ·
+   Simples (lineales): Análisis Factorial · Análisis                    Local Linear Embedding · UMAP
+   Discriminante · SVD
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                            27
+CIERRE DE LA SESIÓN
+
+De la calidad de los datos a variables listas para modelar
+
+30                                                                         31                                      32
+
+Calidad de datos                                                        › Aprendizaje                           › Representación y reducción
+Diagnosticamos, imputamos y
+dividimos honestamente el                                                      Entendimos el ciclo de ML y las         Escalamos, codificamos y
+dataset.                                                                       familias supervisado / no               resumimos variables con PCA / t-
+                                                                               supervisado.                            SNE.
+
+De datos confiables, a un modelo que aprende, a variables bien representadas y resumidas: cada sesión resuelve una condición para que el modelo
+funcione en la vida real.
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                                                   28
+PARA CERRAR
+
+Para pensar después de la clase
+
+            De las variables de su proyecto, ¿cuáles cree que están altamente correlacionadas entre sí?
+            ¿Qué variable nueva podría construir combinando dos columnas que ya tiene (feature engineering)?
+            Si tuviera que quedarse con la mitad de sus variables, ¿las eliminaría (selección) o las resumiría con PCA (extracción)?
+            ¿Cuándo preferiría un mapa t-SNE para explorar sus datos, y cuándo un PCA para reducir antes de modelar?
+
+Sesión 32 · Reducción de dimensionalidad y representación de variables                                                                29
+

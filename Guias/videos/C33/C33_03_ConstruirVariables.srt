@@ -1,0 +1,359 @@
+1
+00:00:00,250 --> 00:00:02,940
+Segunda parada: construir variables.
+
+2
+00:00:03,060 --> 00:00:07,920
+Con doce columnas no hay nada que seleccionar: primero hay que fabricar candidatas.
+
+3
+00:00:08,040 --> 00:00:09,880
+Mira a estos dos clientes.
+
+4
+00:00:10,000 --> 00:00:12,100
+Los dos hicieron sesenta llamadas.
+
+5
+00:00:12,220 --> 00:00:16,270
+Pero uno lleva veinte meses con la empresa, y el otro, solo dos.
+
+6
+00:00:16,390 --> 00:00:17,420
+¿Son iguales?
+
+7
+00:00:17,540 --> 00:00:17,960
+No.
+
+8
+00:00:18,080 --> 00:00:21,800
+Sesenta entre veinte: el cliente A llama tres veces al mes.
+
+9
+00:00:21,920 --> 00:00:25,780
+Sesenta entre dos: el cliente B llama treinta veces al mes.
+
+10
+00:00:25,900 --> 00:00:29,770
+Lo que distingue a estos clientes no es la variable cruda: es el ratio.
+
+11
+00:00:29,890 --> 00:00:32,860
+Un ratio normaliza una magnitud por su exposición.
+
+12
+00:00:32,980 --> 00:00:37,740
+Llamadas por mes, valor del cliente por mes de antigüedad, segundos por llamada.
+
+13
+00:00:37,860 --> 00:00:41,007
+En la experiencia del profesor, los ratios son algo bien
+
+14
+00:00:41,007 --> 00:00:43,760
+potente: discriminan mejor que la variable cruda.
+
+15
+00:00:43,880 --> 00:00:45,050
+¿Por qué construir?
+
+16
+00:00:45,170 --> 00:00:48,640
+Porque seleccionar entre doce variables es un ejercicio de juguete.
+
+17
+00:00:48,760 --> 00:00:52,296
+El problema real aparece con cincuenta, doscientas o dos mil
+
+18
+00:00:52,296 --> 00:00:55,360
+candidatas, cuando hay que justificar cada descarte.
+
+19
+00:00:55,480 --> 00:00:59,480
+Hoy aplicamos la misma lógica de la clase treinta y dos, pero en serio.
+
+20
+00:00:59,600 --> 00:01:02,130
+Se conservan diez variables originales.
+
+21
+00:01:02,250 --> 00:01:05,953
+Se agregan trece ratios y tres interacciones, efectos que solo
+
+22
+00:01:05,953 --> 00:01:08,820
+existen combinados, como reclamo por antigüedad.
+
+23
+00:01:08,940 --> 00:01:12,110
+Cinco logaritmos, para aplastar colas largas.
+
+24
+00:01:12,230 --> 00:01:16,100
+Cinco indicadores binarios, como tiene reclamo o cliente nuevo.
+
+25
+00:01:16,220 --> 00:01:20,440
+Doce columnas de cuartiles, de edad, antigüedad y valor del cliente.
+
+26
+00:01:20,560 --> 00:01:23,510
+Y dos one-hot: plan dos y estado dos.
+
+27
+00:01:23,630 --> 00:01:30,340
+Sumemos: diez, más trece, más tres, más cinco, más cinco, más doce, más dos.
+
+28
+00:01:30,460 --> 00:01:32,040
+Cincuenta candidatas.
+
+29
+00:01:32,160 --> 00:01:34,640
+¿Y por qué diez originales, y no doce?
+
+30
+00:01:34,760 --> 00:01:37,542
+Porque tipo de plan y estado se reemplazan por
+
+31
+00:01:37,542 --> 00:01:39,900
+sus indicadores, plan dos y estado dos.
+
+32
+00:01:40,020 --> 00:01:41,650
+Las dos originales se van.
+
+33
+00:01:41,770 --> 00:01:44,550
+Por eso quedan cincuenta, y no cincuenta y dos.
+
+34
+00:01:44,670 --> 00:01:47,860
+Ahora, un detalle técnico que salva pipelines.
+
+35
+00:01:47,980 --> 00:01:50,509
+Todo ratio se calcula con un épsilon en el
+
+36
+00:01:50,509 --> 00:01:53,400
+denominador: x dividido en y más un millonésimo.
+
+37
+00:01:53,520 --> 00:01:54,810
+Tres casos del apunte.
+
+38
+00:01:54,930 --> 00:01:58,580
+Veinte meses y sesenta llamadas: tres llamadas por mes.
+
+39
+00:01:58,700 --> 00:02:01,003
+Sesenta llamadas y cuatro mil quinientos
+
+40
+00:02:01,003 --> 00:02:03,710
+segundos: setenta y cinco segundos por llamada.
+
+41
+00:02:03,830 --> 00:02:07,590
+Y un cliente nuevo, con cero meses: sesenta millones.
+
+42
+00:02:07,710 --> 00:02:11,020
+Sin el épsilon, esa tercera fila daría infinito.
+
+43
+00:02:11,140 --> 00:02:14,586
+Y un solo infinito rompe el escalado, el modelo, y todo
+
+44
+00:02:14,586 --> 00:02:17,280
+el pipeline de selección que viene después.
+
+45
+00:02:17,400 --> 00:02:20,700
+Ojo también con que el resultado es gigante: esos casos
+
+46
+00:02:20,700 --> 00:02:23,940
+conviene revisarlos, por ejemplo con un log o un tope.
+
+47
+00:02:24,060 --> 00:02:25,130
+¿Y en nuestra base?
+
+48
+00:02:25,250 --> 00:02:28,864
+Después de limpiar, ningún cliente tiene antigüedad cero, y el
+
+49
+00:02:28,864 --> 00:02:31,720
+máximo de llamadas por mes es veintidós coma uno.
+
+50
+00:02:31,840 --> 00:02:34,140
+Se verificó: cero infinitos.
+
+51
+00:02:34,260 --> 00:02:37,870
+Pero el código tiene que estar listo para el cliente nuevo que llegue mañana.
+
+52
+00:02:37,990 --> 00:02:40,610
+Las otras familias, con números de la base.
+
+53
+00:02:40,730 --> 00:02:45,833
+El log de uno más x aplasta las colas largas: el valor del cliente va de cero a dos mil
+
+54
+00:02:45,833 --> 00:02:50,290
+ciento sesenta y cinco, y su logaritmo, de cero a siete coma sesenta y ocho.
+
+55
+00:02:50,410 --> 00:02:54,760
+La mediana, doscientos veintiocho, queda en cinco coma cuarenta y cuatro.
+
+56
+00:02:54,880 --> 00:02:58,102
+Las binarias marcan una condición de negocio: tiene
+
+57
+00:02:58,102 --> 00:03:01,260
+reclamo, o cliente nuevo, con menos de doce meses.
+
+58
+00:03:01,380 --> 00:03:03,999
+Los cuartiles parten una variable en cuatro
+
+59
+00:03:03,999 --> 00:03:06,740
+tramos, para capturar relaciones no lineales.
+
+60
+00:03:06,860 --> 00:03:10,450
+Y las interacciones multiplican dos variables que actúan juntas.
+
+61
+00:03:10,570 --> 00:03:11,980
+En código se ve así.
+
+62
+00:03:12,100 --> 00:03:13,480
+Un ratio con épsilon.
+
+63
+00:03:13,600 --> 00:03:15,350
+El logaritmo con log uno pe.
+
+64
+00:03:15,470 --> 00:03:17,160
+Y los cuartiles con qcut.
+
+65
+00:03:17,280 --> 00:03:18,530
+¿Y sirvió construir?
+
+66
+00:03:18,650 --> 00:03:21,892
+Con las doce originales, la regresión logística llega
+
+67
+00:03:21,892 --> 00:03:24,400
+a un AUC de cero coma novecientos veinte.
+
+68
+00:03:24,520 --> 00:03:28,360
+Con las cincuenta candidatas, a cero coma novecientos cuarenta y uno.
+
+69
+00:03:28,480 --> 00:03:29,780
+Dos puntos más.
+
+70
+00:03:29,900 --> 00:03:34,240
+Pero aquí viene el error típico: creer que basta con crear variables.
+
+71
+00:03:34,360 --> 00:03:37,080
+Construir genera redundancia por construcción.
+
+72
+00:03:37,200 --> 00:03:40,988
+Tiene reclamo y reclamos tienen correlación uno: como reclamos ya
+
+73
+00:03:40,988 --> 00:03:44,310
+vale cero o uno, es la misma información con otro nombre.
+
+74
+00:03:44,430 --> 00:03:46,733
+Entre las cincuenta candidatas hay once pares
+
+75
+00:03:46,733 --> 00:03:48,780
+con correlación sobre cero coma noventa.
+
+76
+00:03:48,900 --> 00:03:52,950
+Crear variables sin seleccionar después no mejora el modelo: lo infla.
+
+77
+00:03:53,070 --> 00:03:56,990
+Por eso el siguiente paso de la clase es justamente decidir cuáles sobran.
+
+78
+00:03:57,110 --> 00:03:58,330
+Piensa un segundo.
+
+79
+00:03:58,450 --> 00:04:01,910
+Construir un ratio o un logaritmo, ¿mira la columna fuga?
+
+80
+00:04:02,030 --> 00:04:04,830
+¿Puede hacerse antes de separar entrenamiento y prueba?
+
+81
+00:04:05,550 --> 00:04:09,430
+No miran la fuga: son fórmulas fijas, fila por fila.
+
+82
+00:04:09,550 --> 00:04:11,270
+Por eso pueden ir antes del split.
+
+83
+00:04:11,390 --> 00:04:16,011
+Pero ojo con la ventana temporal: una variable construida con información posterior
+
+84
+00:04:16,011 --> 00:04:19,630
+al momento de predecir es leakage, aunque no use la columna fuga.
+
+85
+00:04:19,750 --> 00:04:24,370
+Para llevarte: los ratios normalizan por exposición, y siempre llevan épsilon.
+
+86
+00:04:24,490 --> 00:04:28,741
+Construir llevó la base de doce a cincuenta candidatas, y el AUC de cero
+
+87
+00:04:28,741 --> 00:04:32,460
+coma novecientos veinte a cero coma novecientos cuarenta y uno.
+
+88
+00:04:32,580 --> 00:04:35,960
+Pero también fabricó redundancia: ahora hay que seleccionar.
+
+89
+00:04:36,080 --> 00:04:38,880
+Siguiente parada: por qué una variable sobra.
+
+90
+00:04:39,000 --> 00:04:42,470
+Irrelevante, redundante, o útil solo en conjunto.

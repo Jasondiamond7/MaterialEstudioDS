@@ -1,0 +1,319 @@
+1
+00:00:00,250 --> 00:00:04,020
+Bienvenido a la clase treinta y cinco: Random Forest y Bagging.
+
+2
+00:00:04,140 --> 00:00:07,825
+Hoy vas a aprender a convertir un modelo nervioso, que cambia con
+
+3
+00:00:07,825 --> 00:00:10,830
+cualquier detalle, en uno estable, combinando muchos.
+
+4
+00:00:10,950 --> 00:00:14,030
+Imagina que entrenas un árbol de decisión con tus datos.
+
+5
+00:00:14,150 --> 00:00:18,030
+La primera pregunta del árbol es: ¿la edad es menor que 35?
+
+6
+00:00:18,150 --> 00:00:21,920
+Ahora cambias apenas unas pocas filas, y lo vuelves a entrenar.
+
+7
+00:00:22,040 --> 00:00:26,600
+Y la primera pregunta ahora es otra: ¿el ingreso es menor que 820?
+
+8
+00:00:26,720 --> 00:00:31,320
+Mismo problema, mismos clientes casi, y dos árboles que razonan distinto.
+
+9
+00:00:31,440 --> 00:00:33,980
+Eso tiene nombre: el árbol es inestable.
+
+10
+00:00:34,100 --> 00:00:35,950
+Y hoy vamos a ver cómo se arregla.
+
+11
+00:00:36,070 --> 00:00:37,480
+Piensa en una veleta.
+
+12
+00:00:37,600 --> 00:00:40,580
+Una ráfaga pequeña, y apunta para otro lado.
+
+13
+00:00:40,700 --> 00:00:43,948
+Un árbol profundo es una veleta: aprende tanto detalle de
+
+14
+00:00:43,948 --> 00:00:46,570
+su muestra que cualquier cambio lo hace girar.
+
+15
+00:00:46,690 --> 00:00:49,450
+¿Cómo sabes hacia dónde sopla de verdad el viento?
+
+16
+00:00:49,570 --> 00:00:54,600
+No miras una veleta: miras cien, puestas en lugares distintos, y promedias.
+
+17
+00:00:54,720 --> 00:00:57,579
+Esa es toda la idea de la clase: muchos modelos
+
+18
+00:00:57,579 --> 00:00:59,830
+distintos, y luego votan o promedian.
+
+19
+00:00:59,950 --> 00:01:01,800
+Primero, el diagnóstico.
+
+20
+00:01:01,920 --> 00:01:05,843
+Un árbol profundo tiene bajo sesgo: puede capturar cualquier
+
+21
+00:01:05,843 --> 00:01:09,440
+forma, umbrales, interacciones, relaciones no lineales.
+
+22
+00:01:09,560 --> 00:01:14,130
+Pero tiene alta varianza: su forma depende demasiado de la muestra que le tocó.
+
+23
+00:01:14,250 --> 00:01:17,849
+Y aquí está la pregunta guía de la clase, tal cual la plantea el
+
+24
+00:01:17,849 --> 00:01:21,504
+profesor: ¿cómo podemos reducir la inestabilidad de un árbol, sin
+
+25
+00:01:21,504 --> 00:01:24,990
+renunciar a su capacidad para capturar relaciones no lineales?
+
+26
+00:01:25,110 --> 00:01:28,030
+Vamos a medir esa inestabilidad con datos reales.
+
+27
+00:01:28,150 --> 00:01:31,753
+Heart: 303 pacientes, 13 variables clínicas, y la
+
+28
+00:01:31,753 --> 00:01:34,620
+pregunta es si hay enfermedad cardíaca.
+
+29
+00:01:34,740 --> 00:01:39,900
+El 46 % de los pacientes la tiene: 139 de 303.
+
+30
+00:01:40,020 --> 00:01:43,130
+Tomamos los 227 pacientes de entrenamiento.
+
+31
+00:01:43,250 --> 00:01:46,288
+Sacamos 200 muestras un poco distintas de ellos, y
+
+32
+00:01:46,288 --> 00:01:48,840
+en cada una entrenamos un árbol sin podar.
+
+33
+00:01:48,960 --> 00:01:51,795
+Después preguntamos: ¿qué variable eligió cada
+
+34
+00:01:51,795 --> 00:01:54,260
+árbol para su primera pregunta, la raíz?
+
+35
+00:01:54,380 --> 00:01:55,360
+El resultado.
+
+36
+00:01:55,480 --> 00:01:59,561
+En casi la mitad de los árboles, el 48.5 %, la raíz fue
+
+37
+00:01:59,561 --> 00:02:02,900
+Thal, el resultado de una prueba de esfuerzo.
+
+38
+00:02:03,020 --> 00:02:07,070
+En el 30 %, fue ChestPain, el tipo de dolor de pecho.
+
+39
+00:02:07,190 --> 00:02:11,560
+Y en el 20 %, Ca, el número de vasos sanguíneos visibles.
+
+40
+00:02:11,680 --> 00:02:15,486
+Mismo hospital, mismos pacientes, solo otra muestra: y el árbol
+
+41
+00:02:15,486 --> 00:02:19,050
+cambia su primera pregunta en más de la mitad de los casos.
+
+42
+00:02:19,170 --> 00:02:23,194
+Y peor: si tomas dos de estos árboles al azar, discrepan en el
+
+43
+00:02:23,194 --> 00:02:26,310
+diagnóstico del 26 % de los pacientes de prueba.
+
+44
+00:02:26,430 --> 00:02:28,510
+Ahora el ejemplo que resume la clase.
+
+45
+00:02:28,630 --> 00:02:34,790
+Medimos el AUC de cada uno de esos árboles en los 76 pacientes de prueba.
+
+46
+00:02:34,910 --> 00:02:38,580
+En promedio, un árbol suelto da 0.744.
+
+47
+00:02:38,700 --> 00:02:44,620
+Y varía mucho: el peor da 0.586, el mejor 0.817.
+
+48
+00:02:44,740 --> 00:02:48,560
+Y ahora promediamos las probabilidades de esos mismos árboles.
+
+49
+00:02:48,680 --> 00:02:54,360
+Con 5 árboles, el AUC sube a 0.878.
+
+50
+00:02:54,480 --> 00:02:57,560
+Con 25, a 0.894.
+
+51
+00:02:57,680 --> 00:03:01,310
+Y con 100 árboles promediados, 0.905.
+
+52
+00:03:01,430 --> 00:03:05,270
+Los mismos árboles mediocres, juntos, se vuelven buenos.
+
+53
+00:03:05,390 --> 00:03:09,014
+Eso es un ensamblado: varios modelos base, una función que
+
+54
+00:03:09,014 --> 00:03:12,200
+agrega sus respuestas, y una sola predicción final.
+
+55
+00:03:12,320 --> 00:03:16,640
+Y funciona con una condición: que los modelos cometan errores distintos.
+
+56
+00:03:16,760 --> 00:03:19,000
+La ruta de hoy tiene cinco paradas.
+
+57
+00:03:19,120 --> 00:03:22,210
+El bootstrap, para fabricar muestras distintas.
+
+58
+00:03:22,330 --> 00:03:25,370
+El error fuera de bolsa, una validación gratis.
+
+59
+00:03:25,490 --> 00:03:27,180
+El bagging, que promedia.
+
+60
+00:03:27,300 --> 00:03:29,760
+La matemática de por qué promediar funciona.
+
+61
+00:03:29,880 --> 00:03:34,930
+Y el Random Forest, que agrega azar en las variables, más su ajuste en la práctica.
+
+62
+00:03:35,050 --> 00:03:38,275
+El error típico en este punto: creer que si un árbol tuvo
+
+63
+00:03:38,275 --> 00:03:41,160
+buen resultado en una partición, es un buen modelo.
+
+64
+00:03:41,280 --> 00:03:47,500
+Con otra partición, ese mismo árbol puede caer de 0.817 a 0.586.
+
+65
+00:03:47,620 --> 00:03:51,210
+Un solo resultado de un modelo inestable no te dice casi nada.
+
+66
+00:03:51,330 --> 00:03:52,550
+Piensa un segundo.
+
+67
+00:03:52,670 --> 00:03:55,644
+Si los 200 árboles hubieran salido idénticos,
+
+68
+00:03:55,644 --> 00:03:59,080
+exactamente iguales, ¿serviría de algo promediarlos?
+
+69
+00:03:59,800 --> 00:04:00,220
+No.
+
+70
+00:04:00,340 --> 00:04:03,000
+El promedio de doscientas copias es la misma
+
+71
+00:04:03,000 --> 00:04:05,720
+copia: comete exactamente los mismos errores.
+
+72
+00:04:05,840 --> 00:04:08,740
+Promediar solo ayuda si los modelos son distintos.
+
+73
+00:04:08,860 --> 00:04:11,282
+Por eso la primera parada de la clase es una
+
+74
+00:04:11,282 --> 00:04:13,760
+máquina de fabricar diversidad: el bootstrap.
+
+75
+00:04:13,880 --> 00:04:17,095
+Para llevarte: un árbol profundo tiene bajo sesgo y alta
+
+76
+00:04:17,095 --> 00:04:20,540
+varianza; con otra muestra cambia hasta su primera pregunta.
+
+77
+00:04:20,660 --> 00:04:28,850
+Promediar árboles distintos lo estabiliza: de 0.744 a 0.905 de AUC en Heart.
+
+78
+00:04:28,970 --> 00:04:30,760
+Y la condición es la diversidad.
+
+79
+00:04:30,880 --> 00:04:33,710
+Siguiente parada: el bootstrap, a mano.
+
+80
+00:04:33,830 --> 00:04:36,660
+Cómo sacar muestras distintas de los mismos datos.

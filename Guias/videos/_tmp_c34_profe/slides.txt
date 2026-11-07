@@ -1,0 +1,904 @@
+######## Arbol de decision.pptx
+=== slide 1
+Árboles de Decisión para Machine Learning
+Diplomado en Data Science · Aprendizaje supervisado
+De la partición recursiva a scikit-learn
+[notas] Bienvenida. Este módulo cubre árboles de decisión: el modelo base más interpretable del aprendizaje supervisado y el ladrillo de los ensambles (Random Forest, XGBoost). Objetivo del módulo: que puedas entrenar, regularizar, evaluar e interpretar un árbol, y explicar por qué toma cada decisión. Requisitos previos: probabilidad básica, pandas y nociones de train/test split.
+=== slide 2
+Objetivos de aprendizaje y ruta del módulo
+Al finalizar serás capaz de
+Explicar cómo un árbol particiona el espacio de atributos
+Calcular Gini, entropía y ganancia de información a mano
+Entrenar y regularizar un árbol con scikit-learn
+Diagnosticar sobreajuste y aplicar poda
+Interpretar reglas e importancia de variables
+Ruta del módulo
+Fundamentos: anatomía y partición recursiva
+Criterios de división: impureza y ganancia
+Familias: ID3, C4.5 y CART
+Regresión con árboles
+Sobreajuste, poda e hiperparámetros
+Práctica en scikit-learn e interpretabilidad
+Puente a ensambles: Random Forest y Boosting
+[notas] Enmarca el módulo. Recalca que el árbol es un modelo no paramétrico y no lineal, que no requiere escalado de variables. Menciona que la evaluación del diplomado se apoya en poder justificar decisiones del modelo, no solo en la métrica. Pide a los participantes anotar sus dudas sobre la parte matemática: se resuelve con el ejemplo numérico de la diapositiva 7.
+=== slide 3
+Anatomía de un árbol de decisión
+¿Ingreso > 50k?
+¿Edad < 30?
+¿Deuda alta?
+Rechazar
+Aprobar
+Aprobar
+Rechazar
+Sí
+No
+Cada nodo interno es una pregunta sobre una variable; cada hoja, una predicción. El modelo es una secuencia de reglas si-entonces.
+Vocabulario
+Raíz: primera pregunta, usa toda la muestra.
+Nodo interno: condición sobre una variable.
+Rama: resultado de la condición.
+Hoja: predicción final (clase o valor).
+Profundidad: nº de preguntas encadenadas.
+[notas] Dibuja el árbol en pizarra mientras lo explicas. Enfatiza tres ideas: (1) el árbol divide el espacio de atributos en regiones rectangulares disjuntas; (2) cada hoja contiene un subconjunto de observaciones y predice la clase mayoritaria (o la media, en regresión); (3) la profundidad controla la complejidad. Pregunta al grupo qué pasaría si añadimos una pregunta por cada cliente: llegamos a hojas puras y sobreajuste, que es el tema de la diapositiva 11.
+=== slide 4
+Clasificación o regresión: la misma idea, otro criterio
+Árbol de clasificación
+Objetivo: predecir una clase (fuga sí/no, tipo de flor).
+Criterio de división: Gini o entropía.
+Predicción en la hoja: clase mayoritaria.
+Probabilidades: proporción de cada clase en la hoja.
+Métricas: accuracy, F1, AUC, matriz de confusión.
+Casos típicos: riesgo de crédito, diagnóstico, churn.
+Árbol de regresión
+Objetivo: predecir un valor continuo (precio, demanda).
+Criterio de división: MSE o MAE (varianza intranodo).
+Predicción en la hoja: media de los valores.
+Forma de la salida: escalonada, constante por región.
+Métricas: RMSE, MAE, R².
+Casos típicos: valuación inmobiliaria, consumo.
+[notas] El algoritmo es el mismo: partición recursiva binaria. Solo cambia la función de impureza y la regla de predicción en la hoja. Recalca ventajas prácticas comunes a ambos: no requieren escalado ni normalización, aceptan variables numéricas y categóricas, capturan interacciones y no linealidades sin especificarlas, y toleran valores atípicos en la X. Aclara que sí son sensibles a atípicos en la Y en regresión, porque la hoja predice la media.
+=== slide 5
+Cómo aprende: partición recursiva voraz
+El algoritmo, en palabras
+Coloca todas las observaciones en la raíz.
+Evalúa todos los pares (variable, umbral) posibles.
+Elige el corte que más reduce la impureza.
+Divide la muestra en dos nodos hijos.
+Repite el proceso en cada hijo (recursión).
+Se detiene con un criterio de parada: profundidad máxima, mínimo de muestras u hoja pura.
+Es voraz: decide localmente y nunca revisa un corte anterior, por eso no garantiza el árbol óptimo global.
+Pseudocódigo
+construir(D):
+  si parada(D):
+      devolver Hoja(pred(D))
+  mejor, G_max = None, 0
+  para cada variable j:
+    para cada umbral t:
+      G = ganancia(D, j, t)
+      si G > G_max:
+          G_max, mejor = G, (j, t)
+  si mejor es None:
+      devolver Hoja(pred(D))
+  Di, Dd = dividir(D, mejor)
+  devolver Nodo(mejor,
+               construir(Di),
+               construir(Dd))
+[notas] Insiste en el coste computacional: para cada nodo se prueban todas las variables por todos los umbrales candidatos, del orden de O(n·p·log n) para entrenar. Explica que 'ganancia' es la reducción de impureza ponderada por el tamaño de los hijos. Señala que la voracidad es la razón de que árboles distintos aparezcan al cambiar unas pocas filas: esa inestabilidad es lo que Random Forest aprovecha después.
+=== slide 6
+Medidas de impureza: Gini y entropía
+Las fórmulas
+Gini(t) = 1 − Σₖ pₖ²
+H(t) = − Σₖ pₖ · log₂ pₖ
+I(división) = (n_izq/n)·I(izq) + (n_der/n)·I(der)
+pₖ = proporción de la clase k en el nodo t.
+  p        Gini      Entropía
+0.50       0.500      1.000 bits
+0.80       0.320      0.722 bits
+1.00       0.000      0.000 bits
+Cómo interpretarlas
+Impureza = 0 significa nodo puro: todas las observaciones son de la misma clase.
+El máximo ocurre con clases perfectamente balanceadas: Gini 0,5 y entropía 1 bit con dos clases.
+Gini se calcula más rápido (no usa logaritmos) y es el criterio por defecto en scikit-learn.
+La entropía penaliza algo más los nodos muy mezclados, pero en la práctica produce árboles casi idénticos.
+Elegir entre ambas rara vez cambia el desempeño: la profundidad y el tamaño mínimo de hoja importan mucho más.
+[notas] Dibuja la curva de impureza contra p: una parábola invertida para Gini y una campana algo más alta para la entropía, ambas con máximo en p=0,5 y ceros en 0 y 1. La clave conceptual: el árbol busca cortes que produzcan hijos lo más puros posible, y la impureza de la división se pondera por el número de observaciones de cada hijo para no premiar cortes que aíslan una sola fila. Si alguien pregunta por 'misclassification error' como criterio, explica que es menos sensible y no favorece divisiones que mejoran la pureza sin cambiar la clase mayoritaria.
+=== slide 7
+Ganancia de información: ejemplo paso a paso
+Con Gini
+Nodo padre: 10 clientes -> 6 Sí / 4 No
+Gini(padre) = 1 - (0,6² + 0,4²) = 0,480
+ 
+A) ¿Clima = Sol?
+  izq 5 (4 Sí/1 No): Gini = 0,320
+  der 5 (2 Sí/3 No): Gini = 0,480
+  ponderada = 0,5·0,320 + 0,5·0,480 = 0,400
+  ganancia   = 0,480 - 0,400 = 0,080
+ 
+B) ¿Viento = Sí?
+  izq 4 (1 Sí/3 No): Gini = 0,375
+  der 6 (5 Sí/1 No): Gini = 0,278
+  ponderada = 0,4·0,375 + 0,6·0,278 = 0,317
+  ganancia   = 0,480 - 0,317 = 0,163
+Con entropía
+H(padre) = 0,971 bits
+A) ganancia = 0,971 - 0,847 = 0,124
+B) ganancia = 0,971 - 0,715 = 0,256
+Mismo ganador que con Gini.
+La raíz será «¿Viento = Sí?»: 0,163 > 0,080. El corte con mayor ganancia gana.
+El ranking de cortes casi siempre coincide entre Gini y entropía.
+El cálculo se repite en cada hijo hasta cumplir el criterio de parada.
+[notas] Haz este cálculo en vivo y pide al grupo que verifique un número. Puntos a subrayar: (1) la ganancia siempre es no negativa; (2) la ponderación por tamaño evita premiar cortes que aíslan pocas observaciones; (3) la ganancia de entropía y la de Gini casi siempre ordenan igual los candidatos. Como ejercicio en clase, pide calcular el corte de un tercer candidato y comprobar que sigue ganando Viento. Menciona que C4.5 usa 'gain ratio' para corregir el sesgo de la ganancia hacia variables con muchas categorías, tema de la diapositiva siguiente.
+=== slide 8
+Familias de algoritmos: ID3, C4.5 y CART
+Aspecto | ID3 | C4.5 | CART
+División | Multivía por categoría | Multivía + umbrales | Siempre binaria
+Criterio | Ganancia de información | Gain ratio (normalizada) | Gini / MSE
+Numéricas | No las maneja | Sí, busca umbral | Sí, busca umbral
+Faltantes | No | Sí, con pesos por rama | Sustitutos (surrogates)
+Poda | No tiene | Poda pesimista | Coste-complejidad (ccp_alpha)
+Regresión | No | No | Sí
+Uso actual | Valor histórico | Weka (J48) | scikit-learn, R (rpart)
+En el diplomado trabajaremos con CART: es lo que implementa DecisionTreeClassifier y DecisionTreeRegressor de scikit-learn.
+[notas] Aclara una confusión frecuente: scikit-learn no implementa ID3 ni C4.5, solo CART, y por eso siempre produce árboles binarios y no acepta categóricas sin codificar. Explica el gain ratio de C4.5: divide la ganancia por la entropía de la propia partición para castigar variables con muchas categorías (por ejemplo un ID de cliente, que daría ganancia máxima y valor predictivo nulo). Menciona que en scikit-learn los faltantes se admiten desde la versión 1.3 en los árboles, pero la práctica habitual sigue siendo imputar antes.
+=== slide 9
+Cómo se cortan las variables numéricas y categóricas
+Variables numéricas
+Se ordenan los valores distintos y se prueban umbrales en los puntos medios entre valores consecutivos.
+regla:  x ≤ t   frente a   x > t
+Con k valores distintos hay k − 1 cortes candidatos por variable.
+No hace falta escalar ni normalizar: el umbral se adapta a la escala de cada variable.
+Transformaciones monótonas (log, raíz) no cambian el árbol resultante.
+Variables categóricas
+CART solo hace cortes binarios, así que en scikit-learn hay que codificar antes.
+Usa one-hot cuando hay pocas categorías; evita LabelEncoder en variables sin orden, porque inventa una jerarquía inexistente.
+Cuidado con la alta cardinalidad: el árbol prefiere esas variables y sobreajusta (un ID de cliente separa perfectamente el train).
+Alternativas: agrupar categorías raras en «Otras» o usar target encoding validado dentro del pipeline.
+C4.5, LightGBM y CatBoost sí tratan categóricas de forma nativa.
+[notas] Ejercicio rápido: con la variable Edad y valores 22, 25, 31, 40, los umbrales candidatos son 23,5 / 28 / 35,5. Explica que scikit-learn no prueba todos los valores reales sino los puntos medios entre valores observados consecutivos. Sobre categóricas, insiste en el riesgo de fuga de información con target encoding si se calcula antes del split train/test: siempre dentro de un Pipeline con validación cruzada. Advierte que one-hot con muchas categorías fragmenta la muestra y produce árboles profundos y débiles.
+=== slide 10
+Árboles de regresión: cambia el criterio, no la idea
+Qué cambia
+Se sustituye la impureza de clase por el error cuadrático dentro del nodo.
+MSE(t) = (1/nₜ) Σᵢ (yᵢ − ȳₜ)²
+El corte elegido es el que más reduce la suma ponderada de MSE de los hijos.
+La hoja predice la media de y de sus observaciones.
+Criterios en scikit-learn: squared_error (por defecto), absolute_error, friedman_mse, poisson.
+Implicaciones prácticas
+La predicción es escalonada: constante dentro de cada región, con saltos en los umbrales.
+No extrapola: nunca predice un valor fuera del rango de y observado en el entrenamiento.
+Con squared_error es sensible a atípicos en y; absolute_error (mediana) es más robusto pero más lento.
+Métricas: RMSE, MAE y R² sobre el conjunto de prueba.
+Si la relación es suave y monótona, una regresión lineal o un ensamble suelen superar a un árbol único.
+[notas] Dibuja en pizarra una nube de puntos con tendencia curva y superpón la predicción del árbol: una escalera. Esa imagen explica de golpe las dos limitaciones clave, la falta de suavidad y la ausencia de extrapolación. Recalca que en regresión la reducción de MSE es equivalente a reducir la varianza intranodo. Pregunta qué ocurre con min_samples_leaf=1 en regresión: cada hoja contiene una sola observación, el R² de entrenamiento es 1 y el de prueba se desploma.
+=== slide 11
+Sobreajuste: el árbol que memoriza
+Síntomas
+El error de entrenamiento baja siempre; el de prueba baja, toca un mínimo y vuelve a subir.
+Sin restricciones el árbol crece hasta hojas con una sola observación: memoriza el ruido.
+Brecha grande entre train y test = varianza alta.
+Aquí el óptimo está en max_depth = 5.
+Elige la complejidad con el error de validación, nunca con el de entrenamiento.
+[notas] Esta es la diapositiva central del módulo. Explica la descomposición sesgo-varianza: un árbol de profundidad 1 (stump) tiene sesgo alto y varianza baja; un árbol sin poda, sesgo casi nulo y varianza enorme. Pide a los participantes que reproduzcan esta curva en el laboratorio con validation_curve de scikit-learn sobre su propio dataset. Advierte del error más común del diplomado: seleccionar hiperparámetros mirando el conjunto de prueba. La curva debe construirse con validación cruzada sobre el train y el test se toca una sola vez al final.
+=== slide 12
+Poda y regularización: los mandos del árbol
+Hiperparámetro | Qué controla | Efecto al aumentarlo | Rango típico
+max_depth | Nº de preguntas encadenadas | Más profundo = más varianza | 3 – 8
+min_samples_split | Mínimo de obs. para dividir | Frena el crecimiento | 10 – 50
+min_samples_leaf | Mínimo de obs. por hoja | Suaviza; evita hojas anecdóticas | 5 – 20
+max_leaf_nodes | Número total de hojas | Control directo del tamaño | 10 – 50
+max_features | Variables candidatas por corte | Menos = menos varianza | None / sqrt
+ccp_alpha | Penalización por hoja (poda) | Más alto = árbol más pequeño | 0 – 0,05
+class_weight | Peso relativo de las clases | balanced si hay desbalance | None / balanced
+Poda por coste-complejidad: Rₐ(T) = R(T) + α · |hojas(T)|  — se poda el subárbol cuyo aporte no compensa su coste α.
+[notas] Distingue prepoda (early stopping: max_depth, min_samples_leaf) de pospoda (cost-complexity pruning con ccp_alpha, que crece el árbol completo y luego recorta). La segunda es teóricamente preferible porque evalúa el subárbol completo, pero la primera es más rápida. Muestra cómo obtener los alphas candidatos: path = clf.cost_complexity_pruning_path(X_train, y_train) y luego validación cruzada sobre path.ccp_alphas. Recomienda min_samples_leaf como el hiperparámetro con mejor relación esfuerzo-beneficio, alrededor del 1-5% de las observaciones.
+=== slide 13
+Implementación en scikit-learn
+1 · Entrenar
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import \
+    train_test_split
+ 
+X_tr, X_te, y_tr, y_te = train_test_split(
+    X, y, test_size=0.2,
+    stratify=y, random_state=42)
+ 
+clf = DecisionTreeClassifier(
+    criterion="gini",
+    max_depth=5,
+    min_samples_leaf=10,
+    class_weight="balanced",
+    random_state=42)
+ 
+clf.fit(X_tr, y_tr)
+2 · Evaluar e inspeccionar
+from sklearn.metrics import \
+    classification_report, roc_auc_score
+from sklearn.tree import export_text
+ 
+pred = clf.predict(X_te)
+prob = clf.predict_proba(X_te)[:, 1]
+ 
+print(classification_report(y_te, pred))
+print("AUC:", roc_auc_score(y_te, prob))
+ 
+# las reglas del árbol, en texto
+print(export_text(clf,
+      feature_names=list(X.columns)))
+ 
+# nunca ajustes nada mirando X_te
+print(clf.get_depth(), clf.get_n_leaves())
+[notas] Repasa cada argumento en voz alta. stratify=y mantiene la proporción de clases en train y test, imprescindible con clases desbalanceadas. random_state fija la semilla: sin ella el árbol puede cambiar entre ejecuciones porque los empates entre cortes se rompen al azar. class_weight='balanced' pesa las clases por su frecuencia inversa y suele mejorar el recall de la clase minoritaria. Recuerda que no hace falta StandardScaler. Si trabajan con un Pipeline, el ColumnTransformer con OneHotEncoder va antes del árbol. export_text convierte el árbol en un modelo auditable ante un área de riesgos.
+=== slide 14
+Ajuste de hiperparámetros con validación cruzada
+Búsqueda en rejilla con 5 folds
+from sklearn.model_selection import \
+    GridSearchCV, StratifiedKFold
+ 
+grid = {
+    "max_depth": [3, 4, 5, 6, 8, None],
+    "min_samples_leaf": [1, 5, 10, 20],
+    "criterion": ["gini", "entropy"],
+}
+ 
+cv = StratifiedKFold(n_splits=5,
+        shuffle=True, random_state=42)
+ 
+search = GridSearchCV(
+    DecisionTreeClassifier(random_state=42),
+    grid, cv=cv, scoring="roc_auc", n_jobs=-1)
+ 
+search.fit(X_tr, y_tr)
+print(search.best_params_)
+best = search.best_estimator_
+Buenas prácticas
+El conjunto de prueba se reserva y se usa una sola vez, al final.
+Elige la métrica según el problema: roc_auc o f1 con clases desbalanceadas, nunca solo accuracy.
+5 folds estratificados es un buen punto de partida.
+Con muchas combinaciones, usa RandomizedSearchCV o HalvingGridSearchCV.
+Mete la codificación en un Pipeline para que se ajuste dentro de cada fold y evitar fuga de datos.
+Reporta siempre dos números: la métrica media de validación cruzada y la del test.
+[notas] Explica el bucle de la validación cruzada: por cada combinación de hiperparámetros se entrenan 5 modelos y se promedia la métrica de validación. Con esta rejilla son 6 x 4 x 2 = 48 combinaciones, es decir 240 ajustes, algo perfectamente viable con un árbol. Advierte sobre la fuga de datos: si el OneHotEncoder o el imputador se ajustan antes del split, la CV se vuelve optimista. Comenta que ccp_alpha también puede entrar en la rejilla usando los valores de cost_complexity_pruning_path. Cierra recordando que el objetivo del ajuste no es maximizar un número sino elegir la complejidad correcta.
+=== slide 15
+Interpretabilidad: importancia de variables y reglas
+clf.feature_importances_  ·  reducción total de impureza
+Las reglas, en texto
+|--- ingreso <= 48.500
+|    |--- deuda_ingreso <= 0.42
+|    |    |--- clase: aprueba
+|    |--- deuda_ingreso >  0.42
+|    |    |--- clase: rechaza
+|--- ingreso >  48.500
+|    |--- clase: aprueba
+Cómo leerla con cuidado
+La importancia mide reducción de impureza, no causalidad ni dirección del efecto.
+Se reparte entre variables correlacionadas y favorece las de alta cardinalidad.
+Complementa con permutation_importance y con la lectura de las reglas.
+La interpretabilidad es la ventaja competitiva del árbol.
+[notas] Aclara qué mide feature_importances_ en scikit-learn: la suma de la reducción de impureza aportada por cada variable, ponderada por las observaciones que pasan por cada nodo, normalizada a 1. Advierte de sus dos sesgos conocidos: infla variables continuas o de alta cardinalidad y reparte arbitrariamente la importancia entre variables correlacionadas. La alternativa recomendada es permutation_importance sobre el conjunto de validación. Insiste en que una importancia alta no dice si el efecto es positivo o negativo: para eso hay que leer las reglas o usar dependencias parciales.
+=== slide 16
+Ventajas y limitaciones que debes saber defender
+Ventajas
+Interpretable: se explica a un perfil no técnico y se audita regla por regla.
+No exige escalado, normalización ni supuestos de distribución.
+Captura no linealidades e interacciones sin especificarlas.
+Robusto a valores atípicos en las variables predictoras.
+Rápido de entrenar: excelente línea base y herramienta de exploración.
+Selecciona variables de forma implícita.
+Limitaciones
+Inestabilidad: cambiar unas pocas filas puede alterar todo el árbol.
+Varianza alta: sobreajusta con facilidad si no se regulariza.
+Fronteras ortogonales: le cuesta una separación diagonal simple.
+En regresión no extrapola y su predicción es escalonada.
+Sesgo hacia variables de alta cardinalidad.
+Un árbol único suele rendir por debajo de un ensamble.
+[notas] Esta diapositiva es material de examen y de entrevista de trabajo. Pide a los participantes que memoricen dos ventajas y dos limitaciones con su justificación. Para ilustrar la inestabilidad, entrena el mismo árbol quitando el 5% de las filas y compara la variable de la raíz. Para las fronteras ortogonales, dibuja dos clases separadas por la recta y=x: el árbol necesita una escalera de muchos cortes para aproximarla. Cierra con el argumento de negocio: cuando el requisito es explicar la decisión a un cliente o a un regulador, un árbol podado gana a un modelo más preciso pero opaco.
+=== slide 17
+Del árbol al bosque: por qué existen los ensambles
+Random Forest (bagging)
+Idea: muchos árboles profundos, cada uno sobre una muestra bootstrap y con un subconjunto aleatorio de variables por corte.
+Efecto: promediar árboles descorrelacionados reduce la varianza sin aumentar el sesgo.
+Claves: n_estimators, max_features, min_samples_leaf.
+Muy robusto y con poco ajuste, pero se pierde la lectura de reglas.
+Boosting (secuencial)
+Idea: árboles pequeños encadenados; cada uno corrige los errores del anterior.
+Efecto: reduce el sesgo y suele dar el mejor desempeño en datos tabulares.
+Claves: learning_rate, n_estimators, max_depth (2–6), early stopping.
+Implementaciones: GradientBoosting, XGBoost, LightGBM, CatBoost.
+Ambos se construyen con árboles: todo lo aprendido aquí sigue aplicando. Empieza siempre por un árbol podado como línea base.
+[notas] Conecta con la inestabilidad de la diapositiva 16: precisamente porque un árbol tiene varianza alta, promediar muchos funciona tan bien. Explica bagging con la analogía del promedio de opiniones independientes y boosting con la del alumno que repasa solo los ejercicios que falló. Señala el compromiso: se gana desempeño y se pierde interpretabilidad directa, aunque quedan la importancia de variables y SHAP. Recomienda el orden de trabajo en proyectos del diplomado: árbol podado como línea base, luego Random Forest, y boosting solo si el desempeño lo justifica.
+=== slide 18
+Glosario y hoja de fórmulas
+Glosario
+Impureza: cuánto se mezclan las clases dentro de un nodo.
+Gini: impureza basada en probabilidades al cuadrado; rápida.
+Entropía: impureza en bits, de la teoría de la información.
+Ganancia de información: reducción de impureza que produce un corte.
+Gain ratio: ganancia normalizada; corrige el sesgo por cardinalidad (C4.5).
+CART: algoritmo de árboles binarios para clasificación y regresión.
+Prepoda: limitar el crecimiento durante el entrenamiento (max_depth).
+Pospoda: crecer el árbol y recortarlo después (ccp_alpha).
+Hoja: nodo terminal; entrega la predicción.
+Profundidad: número de cortes encadenados desde la raíz.
+Sesgo / varianza: error por simplificar frente a error por memorizar.
+Bagging / boosting: promediar árboles frente a encadenarlos.
+Hoja de fórmulas
+Gini(t) = 1 − Σₖ pₖ²
+H(t) = − Σₖ pₖ · log₂ pₖ
+MSE(t) = (1/nₜ) Σ (yᵢ − ȳₜ)²
+I(corte) = Σⱼ (nⱼ/n) · I(j)
+Ganancia = I(padre) − I(corte)
+GainRatio = Ganancia / H(corte)
+Rₐ(T) = R(T) + α · |hojas(T)|
+Clasificación: la hoja predice la clase mayoritaria; la probabilidad es la proporción de la clase en la hoja.
+Regresión: la hoja predice la media de y.
+Impureza 0 = nodo puro. Máximo con clases balanceadas: Gini 0,5 y H = 1 bit (dos clases).
+[notas] Diapositiva de repaso: sugiere imprimirla o tenerla abierta durante el laboratorio y el examen. Pide a los participantes que cierren el material y expliquen tres términos con sus propias palabras. Buen ejercicio de cierre: dar un nodo con 20 observaciones y 12 positivas y calcular Gini y entropía de memoria usando solo esta hoja.
+=== slide 19
+Autoevaluación: seis preguntas
+¿Por qué un árbol sin restricciones tiene varianza alta?
+Un nodo tiene 20 observaciones: 15 de clase A y 5 de clase B. Calcula Gini y entropía.
+¿Qué diferencia hay entre prepoda y pospoda?
+¿Qué riesgo tiene aplicar LabelEncoder a una variable nominal?
+Tu árbol logra 0,99 de exactitud en entrenamiento y 0,71 en prueba. ¿Qué haces y en qué orden?
+¿Por qué un Random Forest suele superar a un árbol único?
+[notas] Deja tres minutos de trabajo individual y luego dos de discusión en parejas antes de mostrar las respuestas. La pregunta 2 es la única de cálculo: verifica que usen p=0,75. La pregunta 5 es la más importante de todas porque evalúa criterio, no memoria: la respuesta correcta empieza por regularizar y validar, no por cambiar de modelo.
+=== slide 20
+Respuestas
+Crece hasta hojas puras, así que ajusta también el ruido de la muestra: cambiar unas pocas filas altera los cortes y el árbol resultante.
+p = 0,75. Gini = 1 − (0,75² + 0,25²) = 0,375. H = −0,75·log₂0,75 − 0,25·log₂0,25 = 0,811 bits.
+La prepoda limita el crecimiento mientras se entrena (max_depth, min_samples_leaf); la pospoda deja crecer el árbol y luego recorta con ccp_alpha validado.
+Inventa un orden inexistente: el árbol hará cortes del tipo «≤ 2» sobre categorías sin jerarquía. Se usa one-hot o una codificación validada.
+Primero regularizar (max_depth, min_samples_leaf) y trazar la curva de validación con validación cruzada; después podar con ccp_alpha; solo si sigue siendo insuficiente, pasar a un ensamble.
+Promedia muchos árboles descorrelacionados por bootstrap y submuestreo de variables: reduce la varianza sin aumentar el sesgo.
+[notas] Al corregir, insiste en el razonamiento más que en la respuesta literal. En la 2, si alguien obtiene 0,375 pero no sabe interpretarlo, recuérdale que el máximo con dos clases es 0,5. En la 5, marca como incompleta cualquier respuesta que empiece por 'cambio a Random Forest': primero hay que diagnosticar y regularizar. Cierra el módulo anunciando el laboratorio: entrenar, validar, podar e interpretar un árbol sobre un dataset propio y documentar las reglas de las tres hojas más frecuentes.
+######## S34_arboles_de_decision.pptx
+=== slide 1
+Diplomado en Data Science  ·  Sesión 34
+Árboles de decisión
+Un modelo que se puede dibujar
+Cómo parte el espacio, cómo se poda y cuándo conviene · 3 horas
+Eduardo Rodríguez Faúndez
+Doctor en Estadística UC · Máster en Big Data & Data Science, MBIT · Matemático
+=== slide 2
+Dónde estamos en el diplomado
+Cada sesión responde una pregunta distinta sobre los mismos datos
+30
+Calidad de datos
+¿Son datos confiables?
+✓
+31
+Aprendizaje
+¿Cómo aprende un modelo?
+✓
+32
+Representación y reducción
+¿En qué forma se los entrego?
+✓
+33
+Feature Engineering: selección de variables
+¿Cuáles me quedo?
+34
+Árboles de decisión
+¿Cómo lo explico?
+—
+Repaso / Taller con datos reales
+Hacerlo de punta a punta
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+1
+=== slide 3
+Tres cosas de la Sesión 33 que hoy se explican solas
+1
+Usamos la ganancia de información como filtro
+Es exactamente el criterio con el que un árbol elige cada corte. Hoy vamos a ver el mismo cálculo desde adentro del modelo.
+2
+Hablamos de «importancia de árboles» como método embedded
+Un árbol selecciona variables mientras se entrena: las que no aparecen en ningún corte quedaron descartadas por el propio algoritmo.
+3
+Vimos que reclamos era la variable más fuerte
+Hoy vamos a ver por qué siempre queda arriba de todo, y qué pasa justo debajo de ella.
+Y una cuarta, de la Sesión 32: los árboles no necesitan que escalemos las variables. Vamos a comprobarlo con un número.
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+2
+=== slide 4
+Estructura de la sesión
+3 horas · 6 bloques · 2 descansos
+0
+Puente con la Sesión 33 y encuadre
+15 min
+1
+Cómo parte el espacio un árbol
+30 min
+2
+El criterio de corte: Gini y entropía
+30 min
+3
+Sobreajuste y poda
+30 min
+4
+Interpretar: reglas e importancia de variables
+30 min
+5
+Fortalezas, límites y el salto al bosque
+25 min
+El bloque 3 es el que decide si el árbol sirve o no. Si vamos atrasados, se acorta el 5.
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+3
+=== slide 5
+Al terminar esta sesión vas a poder…
+Explicar
+cómo un árbol construye reglas partiendo el espacio de forma recursiva
+Calcular
+la impureza de Gini y la entropía, y elegir el mejor corte a mano
+Diagnosticar
+sobreajuste con la curva de profundidad y controlarlo con poda
+Leer
+un árbol entrenado y traducirlo a reglas de negocio comunicables
+Reconocer
+el sesgo de la importancia por impureza y corregirlo con permutación
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+4
+=== slide 6
+BLOQUE 1
+Cómo parte el espacio un árbol
+Preguntas binarias, una atrás de otra
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+5
+=== slide 7
+La idea: preguntas binarias encadenadas
+Un árbol no ajusta una fórmula. Divide el espacio en regiones.
+Regresión logística
+Ajusta un único plano que separa todo el espacio. Cada variable pesa igual en todas partes.
+P(fuga) = f(β₀ + β₁·reclamos + β₂·segundos + …)
+Una sola frontera, global y lineal.
+Árbol de decisión
+Parte el espacio en rectángulos. Dentro de cada uno predice un valor constante.
+¿reclamos > 0?  →  ¿frec_llamadas ≤ 57,5?  →  94 % de fuga
+Muchas fronteras, locales y perpendiculares a los ejes.
+Las tres consecuencias de partir en rectángulos
+Captura no linealidad sola
+Sin que nadie construya un log ni un cuadrado.
+Captura interacciones solas
+Una rama distinta puede usar variables distintas.
+Pero solo corta perpendicular
+Una frontera diagonal necesita muchos escalones.
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+6
+=== slide 8
+Un árbol de profundidad 3 sobre nuestro churn
+3.150 clientes · las 12 variables originales · mínimo 60 casos por hoja
+Cada caja muestra la regla de corte, cuántos clientes caen ahí en número y en porcentaje, y qué proporción de ellos se fuga. El color codifica la clase mayoritaria: naranja se queda, azul se fuga.
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+7
+[notas] Dedicar tiempo a leer el árbol en voz alta con la clase antes de pasar al siguiente slide.
+=== slide 9
+El mismo árbol, leído como reglas de negocio
+Tasa de fuga real en cada hoja
+Regla | Clientes | Tasa de fuga | Lectura
+reclamos > 0  ·  frec_llamadas ≤ 57,5  ·  numero_fallas > 0 | 149 | 94,0 % | Reclamó, usa poco y tuvo fallas
+reclamos > 0  ·  frec_llamadas ≤ 57,5  ·  numero_fallas = 0 | 67 | 67,2 % | Reclamó y usa poco
+reclamos = 0  ·  segundos ≤ 934  ·  antiguedad > 28,5 | 340 | 43,2 % | Uso bajo pese a la antigüedad
+reclamos > 0  ·  frec_llamadas > 57,5 | 62 | 40,3 % | Reclamó pero sigue usando
+reclamos = 0  ·  segundos > 934  ·  clv > 61,3 | 2.359 | 4,5 % | El núcleo sano de la cartera
+Esto es lo que un árbol da y una regresión logística no: reglas accionables. «Cliente que reclamó, usa poco y tuvo fallas» no es un coeficiente — es un segmento de 149 personas con 94 % de fuga, al que se le puede mandar una campaña mañana.
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+8
+=== slide 10
+BLOQUE 2
+El criterio de corte
+¿Por qué reclamos y no otra? Gini y entropía
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+9
+=== slide 11
+Impureza: qué tan mezclado está un nodo
+El árbol busca el corte que más reduce la mezcla
+pᵢ es la proporción de la clase i DENTRO DEL NODO
+Gini     = 1 − Σ pᵢ²
+Entropía = − Σ pᵢ · log₂(pᵢ)
+En la raíz hay 3.150 clientes y 495 se fugan:
+p_queda = 2.655 / 3.150 = 0,843
+p_fuga  =   495 / 3.150 = 0,157
+Gini    = 1 − 0,843² − 0,157² = 0,265
+Cada nodo tiene sus propios pᵢ: se recalculan con los clientes que caen ahí.
+Composición del nodo | Gini | Entropía
+100 % se queda (puro) | 0,000 | 0,000
+84 % / 16 %  ← nuestra raíz | 0,269 | 0,634
+50 % / 50 % (máxima mezcla) | 0,500 | 1,000
+6 % / 94 %  ← la hoja de fuga | 0,113 | 0,327
+Cómo elige el corte
+Para cada variable y cada umbral posible, el algoritmo calcula:
+ganancia = impureza(padre)
+  − Σ (nᵢ/n) · impureza(hijoᵢ)
+Se queda con el corte de mayor ganancia y repite en cada hijo
+Es un algoritmo voraz: elige lo mejor ahora, sin mirar dos pasos adelante
+Por eso no garantiza el árbol óptimo — solo uno bueno y rápido de construir
+La ganancia de información que usamos como filtro en la Sesión 33 es esta misma fórmula, aplicada una sola vez por variable en lugar de recursivamente.
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+10
+=== slide 12
+¿Por qué el árbol empieza por reclamos?
+El algoritmo no elige: prueba todo y se queda con lo mejor
+Para cada una de las 12 variables prueba todos los umbrales posibles, calcula la ganancia de cada corte, y se queda con el mejor de todos. Son miles de evaluaciones para elegir una sola pregunta.
+El mejor corte de cada variable en la raíz, ordenado por ganancia
+Variable | Mejor corte | Gini ponderado | Ganancia
+reclamos | > 0 | 0,1956 | 0,0693
+estado | = 2 | 0,2379 | 0,0270
+frec_llamadas | > 57 | 0,2382 | 0,0267
+clv | > 105,6 | 0,2390 | 0,0259
+segundos | > 1.263 | 0,2394 | 0,0255
+n_contactos | > 5 | 0,2451 | 0,0198
+antiguedad | > 11 | 0,2597 | 0,0052
+numero_fallas | > 0 | 0,2638 | 0,0011
+edad | > 23 | 0,2644 | 0,0005
+Cómo leer la tabla
+El Gini de la raíz es 0,2649. La ganancia es cuánto lo baja cada corte.
+reclamos gana con 0,0693: más del doble que la segunda. No hay competencia.
+edad aporta 0,0005. Parte la población en dos grupos casi idénticos al original.
+Nada de esto mira el futuro: es el mejor corte AHORA. De ahí que el algoritmo sea voraz.
+Y una vez elegido reclamos, el algoritmo repite el mismo barrido completo dentro de cada uno de los dos hijos, por separado.
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+11
+[notas] Los números salen de barrer 60 umbrales por variable exigiendo al menos 60 casos por lado. Están en el notebook de la sesión.
+=== slide 13
+Ejercicio: elegir el primer corte a mano
+Raíz: 3.150 clientes, 495 se fugan (15,7 %).   Gini del padre = 1 − 0,843² − 0,157² = 0,265
+Dos candidatos a primer corte
+Candidato A:  reclamos > 0
+Sí: 278 clientes, 211 se fugan (75,9 %)
+No: 2.872 clientes, 284 se fugan (9,9 %)
+Candidato B:  edad > 40
+Sí: 1.559 clientes, 240 se fugan (15,4 %)
+No: 1.591 clientes, 255 se fugan (16,0 %)
+Calculen el Gini ponderado de cada candidato y la ganancia respecto de 0,265. ¿Cuál elegiría el árbol y por qué? ¿Qué le pasa a la ganancia cuando los dos hijos se parecen al padre?
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+12
+[notas] Respuesta: A da Gini ponderado ~0,168 y ganancia ~0,097. B da ~0,265 y ganancia ~0,000. El árbol elige reclamos. La moraleja es que una variable sin poder de separación produce hijos idénticos al padre y ganancia cero — que es lo que le pasa a edad.
+=== slide 14
+Entrenar y visualizar el árbol
+Bloque 2 · sin escalar, sin imputar más de lo necesario
+Python
+from sklearn.tree import (DecisionTreeClassifier,
+                          plot_tree, export_text)
+import matplotlib.pyplot as plt
+
+arbol = DecisionTreeClassifier(
+    criterion    = "gini",     # o "entropy"
+    max_depth    = 3,
+    min_samples_leaf = 60,
+    random_state = 0,
+).fit(X, y)
+
+# Diagrama
+fig, ax = plt.subplots(figsize=(16, 7))
+plot_tree(arbol, feature_names=list(X.columns),
+          class_names=["Se queda","Se fuga"],
+          filled=True, rounded=True,
+          proportion=True, ax=ax)
+
+# Las mismas reglas, en texto
+print(export_text(arbol,
+      feature_names=list(X.columns)))
+R
+library(rpart); library(rpart.plot)
+
+arbol <- rpart(
+  fuga ~ .,
+  data    = dt,
+  method  = "class",
+  parms   = list(split = "gini"),
+  control = rpart.control(
+    maxdepth = 3,
+    minbucket = 60,
+    cp = 0.001
+  )
+)
+
+# Diagrama
+rpart.plot(arbol, type = 2, extra = 106,
+           box.palette = "BuRd")
+
+# Las mismas reglas, en texto
+rpart.rules(arbol)
+printcp(arbol)
+En R, extra = 106 muestra la probabilidad de la clase positiva y el porcentaje de observaciones en cada nodo. Es la vista más útil para leer el árbol con gente de negocio.
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+13
+=== slide 15
+BLOQUE 3
+Sobreajuste y poda
+Un árbol sin límites memoriza el dataset entero
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+14
+=== slide 16
+Validación cruzada
+Cómo medimos el desempeño sin engañarnos · ejemplo con un árbol de profundidad 5
+El problema: si medimos sobre los mismos datos con que entrenamos, el número siempre sale bien. Un árbol sin límites acierta el 100 % en sus propios datos y no sirve para nada.
+Lo que pasa en UNA ronda
+1
+Partir los 3.150 clientes en 5 bloques de 630
+2
+Entrenar el árbol con 4 bloques: 2.520 clientes
+3
+Medir el AUC sobre el bloque restante: 630 clientes que el árbol nunca vio
+Eso da UN número. Después se rota qué bloque se usa para medir, y se repite cinco veces.
+Las 5 rondas y su resultado, con un árbol de profundidad 5
+Ronda 1
+mide
+entrena
+entrena
+entrena
+entrena
+AUC 0,9005
+Ronda 2
+entrena
+mide
+entrena
+entrena
+entrena
+AUC 0,9204
+Ronda 3
+entrena
+entrena
+mide
+entrena
+entrena
+AUC 0,9107
+Ronda 4
+entrena
+entrena
+entrena
+mide
+entrena
+AUC 0,9175
+Ronda 5
+entrena
+entrena
+entrena
+entrena
+mide
+AUC 0,8799
+Promedio = 0,9058     ·     desvío = 0,0146
+El desvío importa tanto como el promedio: si las rondas dieran 0,70 y 0,95, un promedio de 0,82 no significaría nada. Y usamos StratifiedKFold para que cada bloque conserve el 15,7 % de fuga — al azar, alguno podría quedar casi sin casos positivos.
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+15
+=== slide 17
+Lo que pasa cuando el árbol crece sin control
+Nuestro dataset de churn, AUC en entrenamiento vs. validación cruzada
+Cómo leer la curva
+El entrenamiento sube siempre, hasta llegar a 1,000: el árbol termina con una hoja por cliente.
+La validación sube hasta profundidad 6 y después baja.
+Ese punto de quiebre es el ajuste adecuado del que hablaba la Sesión 31.
+Sin límite, el árbol pasa de 0,911 a 0,827. Perdió 8 puntos por memorizar.
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+16
+=== slide 18
+Dos formas de controlarlo
+Frenar antes de crecer, o dejar crecer y podar después
+Pre-poda
+Poner límites antes de entrenar
+max_depth
+profundidad máxima
+min_samples_leaf
+mínimo de casos por hoja
+min_samples_split
+mínimo para intentar partir
+max_leaf_nodes
+cantidad total de hojas
+Rápido y directo. El riesgo: un corte pobre puede esconder uno muy bueno debajo.
+Post-poda
+Dejar crecer y recortar ramas que no pagan
+ccp_alpha
+el precio de cada hoja (Python)
+cp
+el equivalente en rpart (R)
+Más costoso, pero evalúa cada rama por lo que aporta al conjunto ya construido.
+Qué es exactamente ccp_alpha
+costo(T) = error(T) + α · nº de hojas
+α es cuánto «cobra» cada hoja. Con α = 0 no hay penalización y sobrevive el árbol completo. Al subir α, cada hoja tiene que justificar su existencia reduciendo el error más de lo que cuesta. Para cada α existe un único subárbol que minimiza ese costo, y la validación cruzada elige cuál.
+Post-poda sobre nuestro churn: cada α, su árbol
+ccp_alpha | 0,0 | 0,0005 | 0,001 | 0,002 | 0,005 | 0,01
+Hojas | 224 | 116 | 42 | 15 | 5 | 3
+AUC en CV | 0,827 | 0,851 | 0,900 | 0,883 | 0,835 | 0,805
+Con α = 0,001 el árbol pasa de 224 hojas a 42 y el AUC sube de 0,827 a 0,900.
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+17
+=== slide 19
+Podar de verdad
+Elegir alpha con validación cruzada, no a ojo
+Python
+from sklearn.model_selection import GridSearchCV
+
+# 1. Los alphas que el árbol considera relevantes
+base = DecisionTreeClassifier(random_state=0)
+path = base.cost_complexity_pruning_path(X, y)
+alphas = path.ccp_alphas[:-1]
+
+# 2. Elegir por validación cruzada
+grid = GridSearchCV(
+    DecisionTreeClassifier(random_state=0),
+    {"ccp_alpha": alphas[::5]},
+    cv = 5, scoring = "roc_auc", n_jobs = -1,
+).fit(X, y)
+
+print(grid.best_params_, grid.best_score_.round(4))
+mejor = grid.best_estimator_
+print("hojas:", mejor.get_n_leaves())
+# {'ccp_alpha': 0.001} 0.8996  ·  hojas: 42
+R
+library(rpart)
+
+# 1. Dejar crecer con cp bajo
+arbol <- rpart(fuga ~ ., data = dt,
+               method = "class",
+               control = rpart.control(cp = 0.0001,
+                                       minbucket = 5))
+
+# 2. rpart ya corre validación cruzada interna
+printcp(arbol)
+plotcp(arbol)
+
+# 3. Podar con el cp de menor xerror
+cp_opt <- arbol$cptable[
+  which.min(arbol$cptable[, "xerror"]), "CP"]
+
+podado <- prune(arbol, cp = cp_opt)
+rpart.plot(podado)
+rpart hace la validación cruzada de la poda por su cuenta y la deja en cptable. En sklearn hay que pedirla explícitamente con GridSearchCV.
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+18
+=== slide 20
+BLOQUE 4
+Interpretar el árbol
+Reglas, importancia y una trampa muy común
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+19
+=== slide 21
+La importancia por impureza engaña
+Random Forest sobre el churn: dos formas de medir lo mismo
+Variable | Importancia por impureza | Importancia por permutación | Valores únicos
+reclamos | 0,2058 | 0,0352 | 2
+segundos | 0,1175 | 0,0315 | 1.745
+frec_llamadas | 0,1169 | 0,0313 | 242
+clv | 0,1089 | 0,0140 | 2.654
+edad | 0,0696 | 0,0080 | 61
+numero_fallas | 0,0661 | 0,0206 | 37
+estado | 0,0452 | 0,0185 | 2
+El sesgo por cardinalidad
+Una variable con muchos valores distintos ofrece más cortes posibles. Por puro azar, alguno reduce la impureza. La importancia por impureza premia eso.
+clv y edad se ven importantes y no lo son. numero_fallas y estado se ven modestas y aportan más.
+Usá siempre importancia por permutación, y calculada sobre datos que el modelo no vio. Es más lenta, pero mide lo que uno cree que está midiendo: cuánto empeora el modelo si esa variable se vuelve ruido.
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+20
+=== slide 22
+Medir la importancia bien
+Python
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.inspection import permutation_importance
+from sklearn.model_selection import train_test_split
+
+Xtr, Xte, ytr, yte = train_test_split(
+    X, y, test_size=0.25, stratify=y, random_state=42)
+
+rf = RandomForestClassifier(
+    n_estimators=300, random_state=0).fit(Xtr, ytr)
+
+# SESGADA: mide sobre el entrenamiento
+imp_gini = pd.Series(rf.feature_importances_,
+                     index=X.columns)
+
+# CORRECTA: mide sobre datos no vistos
+pi = permutation_importance(
+    rf, Xte, yte, n_repeats=20,
+    random_state=0, scoring="roc_auc")
+
+imp_perm = pd.Series(pi.importances_mean,
+                     index=X.columns)
+print(imp_perm.sort_values(ascending=False))
+R
+library(ranger); library(vip)
+
+set.seed(42)
+idx <- sample(nrow(dt), 0.75 * nrow(dt))
+
+# SESGADA
+rf_g <- ranger(fuga ~ ., data = dt[idx, ],
+               importance = "impurity",
+               num.trees = 300)
+
+# CORRECTA
+rf_p <- ranger(fuga ~ ., data = dt[idx, ],
+               importance = "permutation",
+               num.trees = 300)
+
+vip(rf_p, num_features = 12)
+sort(rf_p$variable.importance,
+     decreasing = TRUE)
+En ranger, el argumento importance igual a «permutation» hace el cálculo con las observaciones out-of-bag, así que no hace falta separar un test aparte.
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+21
+=== slide 23
+BLOQUE 5
+Fortalezas, límites
+y el salto al bosque
+Cuándo conviene un árbol y cuándo conviene otra cosa
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+22
+=== slide 24
+Los árboles no necesitan que escalemos
+Una diferencia práctica con todo lo de la Sesión 32
+Corrimos el mismo experimento dos veces: con las variables originales, y aplicando log a segundos y raíz cuadrada a clv.
+Modelo | Variables originales | Con log y raíz cuadrada | Diferencia
+Árbol (profundidad 5) | 0,9058 | 0,9058 | exactamente cero
+Regresión logística | 0,9199 | 0,9231 | cambia
+Por qué: el árbol solo pregunta «¿está por encima o por debajo de este umbral?». Cualquier transformación que respete el orden mueve el umbral pero no cambia qué observaciones caen de cada lado. El resultado es idéntico, no parecido.
+Lo que sí les molesta: la inestabilidad
+Entrenamos seis árboles con seis muestras distintas del 70 %. La raíz fue reclamos en las seis veces, porque domina. Pero justo debajo:
+semilla 0 → clv (73,5)     semilla 1 → segundos (629,0)     semilla 2 → clv (73,5)
+semilla 3 → frec_llamadas (13,5)     semilla 4 → segundos (935,5)     semilla 5 → segundos (574,0)
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+23
+=== slide 25
+Cuándo conviene un árbol
+Fortalezas
+Se puede dibujar y explicar a alguien que no sabe estadística
+Captura no linealidad e interacciones sin que nadie las escriba
+Invariante a transformaciones monótonas: no hay que escalar
+Maneja variables categóricas y numéricas juntas
+Hace selección de variables por su cuenta mientras se entrena
+Límites
+Inestable: cambiar unas pocas observaciones cambia el árbol
+Solo corta perpendicular a los ejes; una diagonal le cuesta muchos escalones
+Sobreajusta con facilidad si no se poda
+Predice valores constantes por región: no extrapola
+Un árbol solo suele rendir menos que una logística bien especificada
+El último límite es el más importante y el más incómodo: en nuestro churn, la logística da 0,920 y el mejor árbol solo 0,911. Si lo único que importa es predecir, el árbol pierde. Se elige un árbol cuando la explicación vale más que el punto de AUC.
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+24
+=== slide 26
+Random Forest: qué es exactamente
+Si el problema del árbol es la inestabilidad, la solución es promediar muchos
+La receta, en tres pasos
+1
+Sortear una muestra
+De los 3.150 clientes se sortean 3.150 CON reemplazo. Algunos entran varias veces y cerca de un tercio no entra. Eso se llama bootstrap.
+2
+Limitar las variables en cada corte
+En cada nodo el árbol solo puede mirar 3 de las 12 variables, sorteadas de nuevo cada vez. Así ningún árbol puede apoyarse siempre en reclamos.
+3
+Repetir y promediar
+Se entrenan cientos de árboles así y la predicción final es el promedio de sus probabilidades.
+Por qué funciona
+Cada árbol sobreajusta, pero cada uno sobreajusta a un ruido DISTINTO, porque vio otra muestra y otras variables. Al promediar, los errores idiosincráticos se cancelan y queda la señal común.
+Cuántos árboles hacen falta
+Árboles | 1 | 5 | 25 | 100 | 300
+AUC en CV | 0,797 | 0,931 | 0,968 | 0,973 | 0,974
+Un solo árbol del bosque rinde 0,797 — peor que el árbol podado. La ganancia no está en los árboles: está en promediarlos. Y se estabiliza cerca de 100: agregar más no empeora, solo cuesta tiempo.
+El precio: un bosque de 300 árboles ya no se puede dibujar ni convertir en ocho reglas para el call center. Ganamos 6 puntos de AUC y perdimos la explicación — el mismo trade-off que la Sesión 32 planteó con PCA.
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+25
+[notas] Dato para mencionar: el tercio de clientes que no entra en cada bootstrap se llama out-of-bag y sirve para estimar el error sin separar un test aparte.
+=== slide 27
+Del árbol al bosque
+Si el problema es la inestabilidad, la solución es promediar muchos
+La idea del bosque
+El mejor árbol solo llega a 0,906; la logística a 0,920.
+El bosque salta a 0,974: seis puntos sobre cualquier árbol individual.
+Pero el árbol de profundidad 3 se dibuja en una lámina y el bosque no.
+La pregunta no es cuál gana, sino para qué es el modelo.
+Es el mismo trade-off de la Sesión 32 con PCA: se cede interpretabilidad a cambio de otra cosa. La decisión depende de para qué es el modelo, no de cuál número se ve más alto.
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+26
+=== slide 28
+Lo que nos llevamos
+Un árbol parte el espacio en rectángulos y predice una constante en cada uno
+Elige cada corte maximizando la reducción de impureza — la misma ganancia de información de la Sesión 33
+Sin poda memoriza: 1,000 en entrenamiento y 0,827 en validación
+La importancia por impureza premia la cardinalidad; usá permutación
+Se elige un árbol cuando la explicación vale más que el punto de AUC
+PRÓXIMA CLASE
+Repaso / Taller
+con datos reales
+Todo el diplomado aplicado de punta a punta sobre un dataset real, con la suciedad, los desbalances y las decisiones ambiguas que no tiene un dataset de clase.
+Calidad de datos, representación, selección y modelo. En equipos y contra reloj.
+Para pensar antes de la próxima clase:  ¿en qué problema de tu trabajo preferirías un árbol de 8 reglas antes que un modelo con mejor AUC?
+Sesión 34 · Árboles de decisión · Diplomado en Data Science UC · Facultad de Matemáticas
+27

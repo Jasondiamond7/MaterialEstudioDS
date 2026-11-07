@@ -1,0 +1,339 @@
+1
+00:00:00,250 --> 00:00:03,050
+Sexta parada: la pérdida y el gradiente.
+
+2
+00:00:03,170 --> 00:00:05,785
+Por qué el algoritmo se llama Gradient Boosting,
+
+3
+00:00:05,785 --> 00:00:07,910
+y qué cambia cuando cambias la pérdida.
+
+4
+00:00:08,030 --> 00:00:11,440
+En la parada anterior, cada árbol aprendía los residuos.
+
+5
+00:00:11,560 --> 00:00:14,060
+Pero el algoritmo no se llama residual boosting.
+
+6
+00:00:14,180 --> 00:00:15,780
+Se llama Gradient Boosting.
+
+7
+00:00:15,900 --> 00:00:18,230
+¿Qué tiene que ver un gradiente con todo esto?
+
+8
+00:00:18,350 --> 00:00:22,620
+Imagina que estás en un cerro, con una niebla tan densa que no ves el valle.
+
+9
+00:00:22,740 --> 00:00:25,210
+Pero puedes sentir la pendiente bajo tus pies.
+
+10
+00:00:25,330 --> 00:00:28,210
+Entonces das un paso hacia donde el suelo baja más.
+
+11
+00:00:28,330 --> 00:00:29,320
+Y repites.
+
+12
+00:00:29,440 --> 00:00:33,770
+Paso a paso, llegas abajo, sin haber visto nunca el valle completo.
+
+13
+00:00:33,890 --> 00:00:38,890
+En boosting, el cerro es la pérdida: una función que mide qué tan mal predices.
+
+14
+00:00:39,010 --> 00:00:41,670
+El gradiente dice hacia dónde sube la pérdida.
+
+15
+00:00:41,790 --> 00:00:45,750
+Su negativo, el gradiente negativo, dice hacia dónde baja.
+
+16
+00:00:45,870 --> 00:00:48,880
+Y cada árbol nuevo aprende a predecir esa dirección.
+
+17
+00:00:49,000 --> 00:00:53,490
+Empecemos con la pérdida cuadrática: un medio de y menos efe, al cuadrado.
+
+18
+00:00:53,610 --> 00:00:57,120
+Su derivada respecto de efe es menos, y menos efe.
+
+19
+00:00:57,240 --> 00:01:01,340
+Y el gradiente negativo es y menos efe: exactamente el residuo.
+
+20
+00:01:01,460 --> 00:01:04,097
+Por eso, con pérdida cuadrática, ajustar el
+
+21
+00:01:04,097 --> 00:01:06,980
+gradiente es lo mismo que ajustar los residuos.
+
+22
+00:01:07,100 --> 00:01:10,480
+Para eso está el un medio: para que la derivada quede limpia.
+
+23
+00:01:10,600 --> 00:01:12,160
+Pero hay otras pérdidas.
+
+24
+00:01:12,280 --> 00:01:16,950
+La diapositiva once lo dice: la pérdida define qué significa equivocarse.
+
+25
+00:01:17,070 --> 00:01:20,090
+La absoluta, el valor absoluto de y menos efe.
+
+26
+00:01:20,210 --> 00:01:22,819
+Y la de Huber, que es cuadrática para errores
+
+27
+00:01:22,819 --> 00:01:25,080
+chicos y absoluta para errores grandes.
+
+28
+00:01:25,200 --> 00:01:27,060
+Aquí, con y igual a 12.
+
+29
+00:01:27,180 --> 00:01:28,400
+Mira las colas.
+
+30
+00:01:28,520 --> 00:01:33,240
+La cuadrática castiga muchísimo los errores grandes: crece como una parábola.
+
+31
+00:01:33,360 --> 00:01:38,170
+La absoluta y la de Huber crecen en línea recta: un error enorme no domina todo.
+
+32
+00:01:38,290 --> 00:01:41,040
+¿Qué aprende el siguiente árbol con cada pérdida?
+
+33
+00:01:41,160 --> 00:01:45,470
+Con el ejemplo del apunte: y vale 12, y la predicción actual es 9.
+
+34
+00:01:45,590 --> 00:01:51,130
+Con la cuadrática, el gradiente negativo es el residuo: 12 menos 9, más 3.
+
+35
+00:01:51,250 --> 00:01:54,750
+Con la absoluta, es solo el signo del residuo: más 1.
+
+36
+00:01:54,870 --> 00:02:00,120
+Y con Huber, con delta igual a 2, el residuo recortado en 2: más 2.
+
+37
+00:02:00,240 --> 00:02:05,250
+Ahora un valor atípico: supón que y vale 40, y la predicción sigue en 9.
+
+38
+00:02:05,370 --> 00:02:08,376
+Con la cuadrática, el árbol tiene que aprender
+
+39
+00:02:08,376 --> 00:02:10,990
+más 31: ese solo caso arrastra al árbol.
+
+40
+00:02:11,110 --> 00:02:12,850
+Con la absoluta, más 1.
+
+41
+00:02:12,970 --> 00:02:14,610
+Con Huber, más 2.
+
+42
+00:02:14,730 --> 00:02:17,256
+Por eso la absoluta y la de Huber se llaman
+
+43
+00:02:17,256 --> 00:02:19,900
+robustas: un caso extremo no domina al árbol.
+
+44
+00:02:20,020 --> 00:02:21,330
+¿Y en clasificación?
+
+45
+00:02:21,450 --> 00:02:24,350
+Ahí la pérdida es la logística, la log-loss.
+
+46
+00:02:24,470 --> 00:02:27,445
+El modelo suma puntajes, efe, y los convierte en
+
+47
+00:02:27,445 --> 00:02:29,800
+probabilidad con la función logística.
+
+48
+00:02:29,920 --> 00:02:33,631
+El gradiente negativo es y menos pe: la clase real, cero
+
+49
+00:02:33,631 --> 00:02:36,680
+o uno, menos la probabilidad que da el modelo.
+
+50
+00:02:36,800 --> 00:02:40,150
+Con el apunte: un paciente enfermo, y igual a uno.
+
+51
+00:02:40,270 --> 00:02:45,470
+Si el puntaje es cero, pe es 0.5, y el árbol aprende 0.5.
+
+52
+00:02:45,590 --> 00:02:52,440
+Si el puntaje ya es dos, pe es 0.881, y el árbol aprende apenas 0.119.
+
+53
+00:02:52,560 --> 00:02:56,080
+A medida que el modelo acierta, el gradiente se achica solo.
+
+54
+00:02:56,200 --> 00:02:58,960
+En scikit-learn, la pérdida es un parámetro.
+
+55
+00:02:59,080 --> 00:03:01,938
+En regresión, la cuadrática es la de defecto, y
+
+56
+00:03:01,938 --> 00:03:04,370
+también están la absoluta y la de Huber.
+
+57
+00:03:04,490 --> 00:03:07,580
+En clasificación, la de defecto es la log-loss.
+
+58
+00:03:07,700 --> 00:03:10,510
+Y aquí, una alerta del notebook de la clase.
+
+59
+00:03:10,630 --> 00:03:14,330
+En Ames, el Gradient Boosting se entrena con la pérdida de Huber.
+
+60
+00:03:14,450 --> 00:03:18,390
+Pero después se evalúa, y se optimiza, con el RMSE,
+
+61
+00:03:18,390 --> 00:03:21,480
+que corresponde a la pérdida cuadrática.
+
+62
+00:03:21,600 --> 00:03:25,350
+El objetivo con que se entrena y la métrica con que se juzga no coinciden.
+
+63
+00:03:25,470 --> 00:03:28,170
+Lo medimos con la misma configuración del notebook.
+
+64
+00:03:28,290 --> 00:03:33,580
+Con Huber, el RMSE en test es 29 200 dólares.
+
+65
+00:03:33,700 --> 00:03:37,060
+Con la pérdida cuadrática, 28 600.
+
+66
+00:03:37,180 --> 00:03:41,550
+Unos quinientos dólares mejor, solo por alinear el objetivo con la métrica.
+
+67
+00:03:41,670 --> 00:03:46,390
+El error típico: decir que boosting siempre ajusta los residuos, y menos efe.
+
+68
+00:03:46,510 --> 00:03:49,150
+Eso es cierto solo con la pérdida cuadrática.
+
+69
+00:03:49,270 --> 00:03:52,997
+Con la absoluta, el árbol aprende signos; con Huber,
+
+70
+00:03:52,997 --> 00:03:56,580
+residuos recortados; con la logística, y menos pe.
+
+71
+00:03:56,700 --> 00:03:58,850
+Lo general es el gradiente negativo.
+
+72
+00:03:58,970 --> 00:04:00,190
+Piensa un segundo.
+
+73
+00:04:00,310 --> 00:04:04,800
+Con la pérdida absoluta, dos casas tienen residuos de más 1 y de más 100.
+
+74
+00:04:04,920 --> 00:04:07,540
+¿Qué valores tiene que aprender el siguiente árbol?
+
+75
+00:04:08,260 --> 00:04:09,800
+Más 1 y más 1.
+
+76
+00:04:09,920 --> 00:04:12,780
+Con la pérdida absoluta, el árbol solo ve el
+
+77
+00:04:12,780 --> 00:04:15,770
+signo: las dos casas le piden lo mismo, subir.
+
+78
+00:04:15,890 --> 00:04:18,776
+El tamaño del error no importa para la dirección, y
+
+79
+00:04:18,776 --> 00:04:21,380
+por eso un caso extremo no arrastra al modelo.
+
+80
+00:04:21,500 --> 00:04:25,160
+Para llevarte: la pérdida define qué significa equivocarse.
+
+81
+00:04:25,280 --> 00:04:28,475
+Cada árbol aprende el gradiente negativo de esa pérdida,
+
+82
+00:04:28,475 --> 00:04:31,100
+que con la cuadrática coincide con el residuo.
+
+83
+00:04:31,220 --> 00:04:34,710
+Y entrena con la misma pérdida que vas a usar para juzgar al modelo.
+
+84
+00:04:34,830 --> 00:04:38,760
+Siguiente parada: la tasa de aprendizaje y el número de árboles.
+
+85
+00:04:38,880 --> 00:04:41,300
+Dos perillas que siempre se mueven juntas.

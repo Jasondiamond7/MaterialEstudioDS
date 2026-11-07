@@ -1,0 +1,299 @@
+1
+00:00:00,250 --> 00:00:02,220
+Última parada: el repaso.
+
+2
+00:00:02,340 --> 00:00:06,930
+Toda la clase de boosting en unos minutos, y un checklist para tu próximo modelo.
+
+3
+00:00:07,050 --> 00:00:10,144
+La idea central: boosting entrena modelos simples en
+
+4
+00:00:10,144 --> 00:00:13,000
+secuencia, cada uno sobre el error del anterior.
+
+5
+00:00:13,120 --> 00:00:17,080
+La predicción es una suma: efe cero más eta por cada árbol.
+
+6
+00:00:17,200 --> 00:00:20,350
+Y lo que distingue a cada algoritmo es cómo define el error.
+
+7
+00:00:20,470 --> 00:00:23,033
+Frente a bagging: el bosque promedia árboles
+
+8
+00:00:23,033 --> 00:00:25,480
+profundos en paralelo, y baja la varianza.
+
+9
+00:00:25,600 --> 00:00:29,120
+Boosting suma árboles chicos en secuencia, y baja el sesgo.
+
+10
+00:00:29,240 --> 00:00:33,046
+En Ames, el bosque se estancó en 23 100 dólares;
+
+11
+00:00:33,046 --> 00:00:35,980
+boosting siguió bajando hasta 21 800.
+
+12
+00:00:36,100 --> 00:00:40,940
+AdaBoost: el error épsilon es la suma de los pesos de los casos mal clasificados.
+
+13
+00:00:41,060 --> 00:00:43,515
+El peso del árbol es alfa, un medio del
+
+14
+00:00:43,515 --> 00:00:46,410
+logaritmo de uno menos épsilon, sobre épsilon.
+
+15
+00:00:46,530 --> 00:00:49,690
+Los errores multiplican su peso por e elevado a alfa, y
+
+16
+00:00:49,690 --> 00:00:52,390
+el voto final es el signo de la suma ponderada.
+
+17
+00:00:52,510 --> 00:00:57,906
+El ejemplo a mano: con épsilon 0.2, alfa vale 0.693, los errores duplican
+
+18
+00:00:57,906 --> 00:01:02,120
+su peso, y tras normalizar quedan con la mitad del total.
+
+19
+00:01:02,240 --> 00:01:07,520
+Y su punto débil: el ruido, porque una etiqueta mala acumula peso ronda tras ronda.
+
+20
+00:01:07,640 --> 00:01:10,764
+Gradient Boosting: parte del promedio, y cada árbol
+
+21
+00:01:10,764 --> 00:01:13,460
+aprende el gradiente negativo de la pérdida.
+
+22
+00:01:13,580 --> 00:01:18,032
+Con pérdida cuadrática, eso es el residuo: en la tabla de la
+
+23
+00:01:18,032 --> 00:01:21,520
+diapositiva diez, más 2, menos 3, más 1 y cero.
+
+24
+00:01:21,640 --> 00:01:25,520
+Con la absoluta, aprende signos; con Huber, residuos
+
+25
+00:01:25,520 --> 00:01:28,580
+recortados; con la logística, y menos pe.
+
+26
+00:01:28,700 --> 00:01:32,940
+Y una regla práctica: entrena con la misma pérdida con la que vas a juzgar.
+
+27
+00:01:33,060 --> 00:01:37,300
+El notebook entrenó con Huber y evaluó con RMSE.
+
+28
+00:01:37,420 --> 00:01:42,130
+La tasa de aprendizaje y los árboles: eta chico necesita más árboles.
+
+29
+00:01:42,250 --> 00:01:48,580
+En el modelo idealizado, cuatro árboles con eta 0.5, y veintidós con eta 0.1.
+
+30
+00:01:48,700 --> 00:01:54,844
+En Ames: con eta uno, el mejor punto llegó con 9 árboles y 30
+
+31
+00:01:54,844 --> 00:01:59,980
+300 dólares; con eta 0.1, con 587 árboles y 21 500.
+
+32
+00:02:00,100 --> 00:02:04,070
+Se ajustan en pareja, y eta bajo con pocos árboles subajusta.
+
+33
+00:02:04,190 --> 00:02:09,664
+Las implementaciones: primero, XGBoost, que agrega un objetivo regularizado, con
+
+34
+00:02:09,664 --> 00:02:14,180
+gamma por hoja y lambda que encoge las hojas, y usa segundo orden.
+
+35
+00:02:14,300 --> 00:02:18,029
+LightGBM usa histogramas y crece hoja por hoja: muy rápido,
+
+36
+00:02:18,029 --> 00:02:21,000
+pero con riesgo de sobreajuste en datos chicos.
+
+37
+00:02:21,120 --> 00:02:24,100
+Y CatBoost, el especialista en categóricas.
+
+38
+00:02:24,220 --> 00:02:29,140
+Y la alerta: en LightGBM, subsample no hace nada sin subsample_freq.
+
+39
+00:02:29,260 --> 00:02:32,375
+Early stopping: mide la validación tras cada árbol, y
+
+40
+00:02:32,375 --> 00:02:35,020
+para tras varias rondas seguidas sin mejorar.
+
+41
+00:02:35,140 --> 00:02:38,630
+En Ames, XGBoost se detuvo con 805 árboles de mil
+
+42
+00:02:38,630 --> 00:02:42,690
+quinientos, con un error de validación de 21 000 dólares.
+
+43
+00:02:42,810 --> 00:02:46,070
+Y la validación sale del entrenamiento, nunca del test.
+
+44
+00:02:46,190 --> 00:02:50,560
+La comparación: en Heart, los cinco modelos empatan dentro del desvío.
+
+45
+00:02:50,680 --> 00:02:58,820
+En Ames, XGBoost fue el mejor, con 24 400 dólares, y AdaBoost el peor, con 36 200.
+
+46
+00:02:58,940 --> 00:03:01,430
+Una sola partición no declara ganadores.
+
+47
+00:03:01,550 --> 00:03:05,540
+La última diapositiva, la diecinueve, deja tres preguntas.
+
+48
+00:03:05,660 --> 00:03:07,080
+Respóndelas tú primero.
+
+49
+00:03:07,200 --> 00:03:10,570
+Una: ¿qué cambia entre AdaBoost y Gradient Boosting?
+
+50
+00:03:10,690 --> 00:03:14,680
+Dos: ¿por qué el learning_rate y el número de árboles interactúan?
+
+51
+00:03:14,800 --> 00:03:17,620
+Tres: ¿cuándo priorizarías LightGBM?
+
+52
+00:03:18,340 --> 00:03:19,320
+Respuestas.
+
+53
+00:03:19,440 --> 00:03:24,064
+Uno: AdaBoost cambia los pesos de los casos y vota con alfa; Gradient Boosting
+
+54
+00:03:24,064 --> 00:03:27,740
+entrena cada árbol sobre el gradiente negativo de una pérdida.
+
+55
+00:03:27,860 --> 00:03:32,015
+Dos: porque cada árbol aporta solo una fracción eta; con eta más
+
+56
+00:03:32,015 --> 00:03:35,780
+chico, hacen falta más árboles para llegar igual de lejos.
+
+57
+00:03:35,900 --> 00:03:39,400
+Tres: con muchas filas y variables, cuando la velocidad
+
+58
+00:03:39,400 --> 00:03:43,090
+importa, y cuidando la complejidad si los datos son pocos.
+
+59
+00:03:43,210 --> 00:03:45,700
+El checklist para entrenar un modelo de boosting.
+
+60
+00:03:45,820 --> 00:03:50,590
+Uno, parte en entrenamiento y test, estratificado si es clasificación.
+
+61
+00:03:50,710 --> 00:03:53,350
+Dos, preprocesa dentro del pipeline.
+
+62
+00:03:53,470 --> 00:03:57,610
+Tres, empieza con una línea base, como AdaBoost o un bosque.
+
+63
+00:03:57,730 --> 00:04:01,050
+Cuatro, fija un eta bajo, y deja que early stopping
+
+64
+00:04:01,050 --> 00:04:03,980
+elija los árboles, con una validación propia.
+
+65
+00:04:04,100 --> 00:04:06,640
+Cinco, limita la complejidad del árbol.
+
+66
+00:04:06,760 --> 00:04:10,140
+Y seis, compara el error de entrenamiento con el de test.
+
+67
+00:04:10,260 --> 00:04:13,845
+Siete: si buscas hiperparámetros, incluye tu configuración
+
+68
+00:04:13,845 --> 00:04:17,060
+base en la búsqueda, para no terminar con algo peor.
+
+69
+00:04:17,180 --> 00:04:22,310
+Y ocho: reporta la media con su desvío, y compara siempre bajo la misma partición.
+
+70
+00:04:22,430 --> 00:04:27,240
+Y las tres ideas para llevar de la clase: uno, boosting aprende de forma secuencial.
+
+71
+00:04:27,360 --> 00:04:30,550
+Dos, la pérdida define qué corrige cada etapa.
+
+72
+00:04:30,670 --> 00:04:34,020
+Tres, cada biblioteca prioriza un problema distinto.
+
+73
+00:04:34,140 --> 00:04:38,016
+El siguiente paso, según la clase, es comparar los modelos bajo el
+
+74
+00:04:38,016 --> 00:04:41,480
+mismo pipeline, la misma validación y el mismo presupuesto.
+
+75
+00:04:41,600 --> 00:04:46,160
+Y ahora sí: a practicar con el notebook guiado y el cuaderno de ejercicios.

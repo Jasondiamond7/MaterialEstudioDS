@@ -1,0 +1,379 @@
+1
+00:00:00,250 --> 00:00:03,595
+Tercera parada: codificar las variables categóricas, y
+
+2
+00:00:03,595 --> 00:00:06,320
+construir variables nuevas antes de reducir.
+
+3
+00:00:06,440 --> 00:00:08,490
+Un modelo solo entiende números.
+
+4
+00:00:08,610 --> 00:00:12,270
+Si le das la palabra «prepago», no sabe qué hacer con ella.
+
+5
+00:00:12,390 --> 00:00:13,520
+Hay que traducirla.
+
+6
+00:00:13,640 --> 00:00:16,500
+Y la forma de traducir cambia lo que el modelo entiende.
+
+7
+00:00:16,620 --> 00:00:19,190
+Primera técnica: la codificación ordinal.
+
+8
+00:00:19,310 --> 00:00:21,210
+Se usa cuando hay un orden real.
+
+9
+00:00:21,330 --> 00:00:26,090
+Por ejemplo, el monto del plan, de cero, bajo, a nueve, alto.
+
+10
+00:00:26,210 --> 00:00:29,610
+O el nivel educativo: básico, medio y superior.
+
+11
+00:00:29,730 --> 00:00:33,660
+Ojo con la diapositiva: dice «ordinal: nominal a entero».
+
+12
+00:00:33,780 --> 00:00:34,810
+Es al revés.
+
+13
+00:00:34,930 --> 00:00:39,020
+La codificación ordinal es para variables ordinales, las que tienen orden.
+
+14
+00:00:39,140 --> 00:00:42,050
+¿Qué pasa si usas números para una variable sin orden?
+
+15
+00:00:42,170 --> 00:00:46,860
+Toma la región: Norte cero, Sur uno, Este dos, Oeste tres.
+
+16
+00:00:46,980 --> 00:00:51,980
+Ahora, para el modelo, Norte está a tres de Oeste, y a solo uno de Sur.
+
+17
+00:00:52,100 --> 00:00:53,330
+Sin ningún motivo.
+
+18
+00:00:53,450 --> 00:00:55,000
+La solución es one-hot.
+
+19
+00:00:55,120 --> 00:00:58,050
+Una columna de ceros y unos por cada categoría.
+
+20
+00:00:58,170 --> 00:01:01,410
+Norte es uno, cero, cero, cero.
+
+21
+00:01:01,530 --> 00:01:04,730
+Oeste es cero, cero, cero, uno.
+
+22
+00:01:04,850 --> 00:01:07,510
+Calculemos la distancia entre Norte y Oeste.
+
+23
+00:01:07,630 --> 00:01:12,390
+Difieren en dos posiciones: uno al cuadrado, más uno al cuadrado, es dos.
+
+24
+00:01:12,510 --> 00:01:15,090
+La raíz de dos: uno coma cuarenta y uno.
+
+25
+00:01:15,210 --> 00:01:18,480
+Y entre cualquier otro par, también uno coma cuarenta y uno.
+
+26
+00:01:18,600 --> 00:01:21,000
+Ninguna región queda más cerca que otra.
+
+27
+00:01:21,120 --> 00:01:23,100
+Pero one-hot agrega columnas.
+
+28
+00:01:23,220 --> 00:01:25,550
+Hagamos la cuenta con el ejemplo del apunte.
+
+29
+00:01:25,670 --> 00:01:30,280
+Región tiene cinco categorías, canal tiene cuatro, y estado es binario.
+
+30
+00:01:30,400 --> 00:01:34,560
+Sin quitar ninguna: cinco más cuatro más dos, once columnas.
+
+31
+00:01:34,680 --> 00:01:37,555
+Con drop igual a first, se quita una columna por
+
+32
+00:01:37,555 --> 00:01:40,550
+variable, porque la última se deduce de las otras.
+
+33
+00:01:40,670 --> 00:01:43,420
+Cuatro más tres más uno: ocho columnas.
+
+34
+00:01:43,540 --> 00:01:47,730
+En los datos de la clase, tipo de plan y estado vienen como uno o dos.
+
+35
+00:01:47,850 --> 00:01:51,447
+Son binarias, así que se usa drop igual a if binary: cada
+
+36
+00:01:51,447 --> 00:01:54,350
+una queda en una sola columna de ceros y unos.
+
+37
+00:01:54,470 --> 00:01:56,590
+Por eso seguimos en quince columnas.
+
+38
+00:01:56,710 --> 00:02:00,550
+¿Y si una variable tiene trescientas categorías, como la comuna?
+
+39
+00:02:00,670 --> 00:02:03,100
+One-hot crearía trescientas columnas.
+
+40
+00:02:03,220 --> 00:02:06,333
+Aquí entran el target encoding y el frequency encoding:
+
+41
+00:02:06,333 --> 00:02:08,880
+la categoría se reemplaza por un solo número.
+
+42
+00:02:09,000 --> 00:02:10,340
+Un ejemplo del apunte.
+
+43
+00:02:10,460 --> 00:02:13,700
+La comuna A tiene cuarenta clientes, y ocho se fugaron.
+
+44
+00:02:13,820 --> 00:02:17,220
+La tasa cruda es ocho entre cuarenta: cero coma veinte.
+
+45
+00:02:17,340 --> 00:02:20,500
+Pero con pocos clientes, la tasa cruda es ruidosa.
+
+46
+00:02:20,620 --> 00:02:24,440
+Por eso se suaviza hacia la tasa global, que es cero coma quince.
+
+47
+00:02:24,560 --> 00:02:27,855
+Con un suavizado m igual a veinte: ocho más veinte
+
+48
+00:02:27,855 --> 00:02:30,820
+por cero coma quince, es ocho más tres: once.
+
+49
+00:02:30,940 --> 00:02:33,730
+Dividido en cuarenta más veinte: sesenta.
+
+50
+00:02:33,850 --> 00:02:37,120
+Once sesentavos: cero coma ciento ochenta y tres.
+
+51
+00:02:37,240 --> 00:02:40,540
+Más cerca de la tasa global que el cero coma veinte crudo.
+
+52
+00:02:40,660 --> 00:02:44,540
+Pero cuidado: el target encoding mira la respuesta, la fuga.
+
+53
+00:02:44,660 --> 00:02:48,620
+Si lo calculas con todas las filas, la prueba se filtra en la variable.
+
+54
+00:02:48,740 --> 00:02:51,100
+La profesora lo probó con sesenta comunas
+
+55
+00:02:51,100 --> 00:02:53,690
+inventadas, sin ninguna relación con la fuga.
+
+56
+00:02:53,810 --> 00:02:57,150
+Con la media del target calculada sin cuidado, el AUC
+
+57
+00:02:57,150 --> 00:02:59,860
+en entrenamiento llega a cero coma setenta.
+
+58
+00:02:59,980 --> 00:03:03,370
+En la prueba: cero coma cincuenta y uno, puro azar.
+
+59
+00:03:03,490 --> 00:03:07,258
+Con TargetEncoder, que usa validación cruzada interna, ya en
+
+60
+00:03:07,258 --> 00:03:10,900
+entrenamiento da cero coma cincuenta y tres: no se engaña.
+
+61
+00:03:11,020 --> 00:03:14,560
+Último paso de la representación: construir variables.
+
+62
+00:03:14,680 --> 00:03:18,770
+A veces la señal no está en una columna, sino en un cociente entre dos.
+
+63
+00:03:18,890 --> 00:03:20,580
+La clase construye tres.
+
+64
+00:03:20,700 --> 00:03:24,390
+Duración promedio de llamada: segundos dividido en llamadas.
+
+65
+00:03:24,510 --> 00:03:28,690
+SMS por antigüedad: mensajes dividido en meses de antigüedad.
+
+66
+00:03:28,810 --> 00:03:32,360
+E intensidad de contacto: contactos dividido en llamadas.
+
+67
+00:03:32,480 --> 00:03:35,404
+Un ejemplo del apunte: un cliente habló siete mil
+
+68
+00:03:35,404 --> 00:03:37,850
+doscientos segundos, en noventa llamadas.
+
+69
+00:03:37,970 --> 00:03:42,010
+Siete mil doscientos dividido en noventa: ochenta segundos por llamada.
+
+70
+00:03:42,130 --> 00:03:46,207
+Un cliente con muchas llamadas cortas se comporta distinto de uno con pocas
+
+71
+00:03:46,207 --> 00:03:49,360
+llamadas largas, aunque los dos sumen los mismos segundos.
+
+72
+00:03:49,480 --> 00:03:52,578
+Y estas variables se construyen antes de reducir:
+
+73
+00:03:52,578 --> 00:03:55,740
+después de PCA, ya no puedes calcular un cociente.
+
+74
+00:03:55,860 --> 00:03:59,061
+Con eso, la cuenta de la clase queda así: doce
+
+75
+00:03:59,061 --> 00:04:02,610
+variables originales, más tres construidas: quince.
+
+76
+00:04:02,730 --> 00:04:06,140
+Y el one-hot de tipo de plan y estado no agrega columnas.
+
+77
+00:04:06,260 --> 00:04:08,880
+Quince columnas listas para escalar y reducir.
+
+78
+00:04:09,000 --> 00:04:12,108
+El error típico de esta parada: calcular el target
+
+79
+00:04:12,108 --> 00:04:15,030
+encoding con todas las filas, antes de dividir.
+
+80
+00:04:15,150 --> 00:04:19,880
+Recuerda el experimento: setenta en entrenamiento, cincuenta y uno en la prueba.
+
+81
+00:04:20,000 --> 00:04:22,360
+Es una fuga disfrazada de buena variable.
+
+82
+00:04:22,480 --> 00:04:23,700
+Piensa un segundo.
+
+83
+00:04:23,820 --> 00:04:25,540
+¿Qué codificación usarías?
+
+84
+00:04:25,660 --> 00:04:29,440
+La talla de una polera: S, M, L, XL.
+
+85
+00:04:29,560 --> 00:04:32,100
+El color favorito, entre seis colores.
+
+86
+00:04:32,220 --> 00:04:35,210
+Y un código postal, con ochocientos valores.
+
+87
+00:04:36,130 --> 00:04:38,310
+La talla tiene orden: ordinal.
+
+88
+00:04:38,430 --> 00:04:42,860
+El color no tiene orden: one-hot, seis columnas, o cinco con drop.
+
+89
+00:04:42,980 --> 00:04:46,349
+Y el código postal, con tantas categorías, target o
+
+90
+00:04:46,349 --> 00:04:49,190
+frequency encoding, con validación interna.
+
+91
+00:04:49,310 --> 00:04:52,410
+Para llevarte: ordinal solo si hay un orden real.
+
+92
+00:04:52,530 --> 00:04:54,650
+One-hot para categorías sin orden.
+
+93
+00:04:54,770 --> 00:04:58,980
+Target encoding con muchas categorías, siempre con validación interna.
+
+94
+00:04:59,100 --> 00:05:02,020
+Y las variables construidas, antes de reducir.
+
+95
+00:05:02,140 --> 00:05:08,000
+Siguiente parada: PCA, la idea, y una matriz de dos por dos resuelta a mano.

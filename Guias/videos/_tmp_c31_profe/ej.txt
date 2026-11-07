@@ -1,0 +1,179 @@
+ Ejercicios para el cuaderno · Clase 31 · Introducción al Machine
+ Learning
+
+ Para resolver en papel, con calculadora · soluciones paso a paso al final
+
+ Cómo usar esta guía
+ • Escribe el número del bloque y del ejercicio, y tu desarrollo completo.
+ • Fórmulas: p = 1/(1 + e−z) · accuracy = (VP+VN)/total · precisión = VP/(VP+FP) · recall = VP/(VP+FN) · F1 = 2PR/(P+R) · R²
+
+     = 1 − SSE/SST · Ridge: β/(1+λ) · Lasso: signo(β)·máx(|β|−λ, 0).
+ • Nivel: ★ directo · ★★ 2 o 3 pasos · ★★★ integra varios conceptos.
+
+Bloque 1 Clasificar problemas ★
+
+Indica el tipo de problema: clasificación, regresión, clustering, reducción de dimensionalidad, refuerzo o Deep Learning.
+1 (a) Decidir si un correo es spam · (b) estimar los minutos que demorará un pedido · (c) agrupar tiendas según
+
+        su perfil de ventas, sin categorías previas · (d) resumir 40 indicadores de una encuesta en 3 factores para
+        graficarlos · (e) un robot aprende a caminar con premios por avanzar · (f) reconocer objetos en 2 millones de
+        fotos.
+2 Para los problemas supervisados, nombra la variable objetivo y una métrica adecuada.
+
+Bloque 2 La sigmoide a mano ★★
+
+Modelo: z = −1.2 + 0.8·quejas − 0.1·uso. Cliente A: 3 quejas y 5 usos. Cliente B: 0 quejas y 10 usos.
+1 Calcula el puntaje y la probabilidad de cancelar de A y de B.
+
+2 ¿Cuánto se multiplican las odds por cada queja adicional?
+
+3 Con umbral 0.5 y luego con 0.3, ¿qué clase predice el modelo para cada cliente?
+
+Bloque 3 Una iteración de K-Means ★★★
+
+Puntos (antigüedad, uso): P1(1, 2), P2(2, 4), P3(3, 3), P4(6, 5), P5(7, 8), P6(8, 6). Centroides iniciales c1 = (1, 1) y c2 = (8, 8).
+1 Asigna cada punto con la distancia euclidiana al cuadrado y calcula la inercia.
+
+2 Recalcula los centroides y la nueva inercia. ¿Cambian las asignaciones?
+
+3 Si «antigüedad» estuviera en días (valores de 365 a 3.650) y «uso» en veces, ¿qué problema aparecería?
+        ¿Cómo se evita?
+
+Bloque 4 Leer subajuste y sobreajuste ★★
+
+R² de entrenamiento / prueba según el grado de un polinomio: grado 1: 0.52 / 0.50 · grado 2: 0.80 / 0.78 · grado 4: 0.84 / 0.74 ·
+grado 8: 0.93 / 0.31 · grado 15: 0.99 / −0.60.
+1 ¿Qué grado muestra subajuste, cuál un ajuste adecuado y cuál sobreajuste? Justifica con la brecha.
+
+2 ¿Qué grado elegirías y por qué no el de mayor R² de entrenamiento?
+
+3 Nombra dos acciones que reduzcan el sobreajuste del grado 15.
+
+Ejercicios para el cuaderno · Clase 31                                                                                                 1
+Bloque 5 Ridge frente a Lasso ★★
+
+Coeficientes de una regresión sin penalizar con variables ortonormales: β = (4.0, −2.0, 0.8, 0.3). Penalización λ = 0.5.
+1 Calcula los coeficientes de Ridge (β/(1+λ)) y de Lasso (signo(β)·máx(|β| − λ, 0)).
+2 ¿Qué variables anula cada método? ¿Cuál usarías para «limpiar» variables sospechosas?
+3 Repite con λ = 1 solo para Lasso. ¿Cuántos coeficientes quedan distintos de cero?
+
+Bloque 6 Accuracy contra recall ★★★
+
+2.000 transacciones, 40 fraudes. Modelo A: VP 10, FN 30, FP 20, VN 1.940. Modelo B: siempre «no fraude». Modelo C: VP 34, FN
+6, FP 150, VN 1.810.
+1 Calcula accuracy, precisión, recall y F1 de A, B y C.
+2 Ordena los modelos por accuracy y por recall. ¿Coinciden?
+3 Un fraude no detectado cuesta 100 y una falsa alarma cuesta 1. Calcula el costo total de cada modelo y elige.
+
+Bloque 7 Métricas de regresión y elegir el enfoque ★★
+
+Valores reales (60, 70, 80, 90) y predichos (62, 66, 83, 89).
+1 Calcula los errores, el MSE, el RMSE y el R².
+2 Una empresa propone Deep Learning para predecir la demanda de 500 productos con 3 años de historia
+
+        semanal en una planilla. ¿Qué le recomiendas y qué línea base usarías?
+
+Ejercicios para el cuaderno · Clase 31                                                                                        2
+   Soluciones paso a paso
+
+   Revisa el desarrollo, no solo el número final
+
+Bloque 1
+
+#  Solución
+
+1  (a) clasificación · (b) regresión · (c) clustering · (d) reducción de dimensionalidad · (e) refuerzo · (f) Deep Learning
+
+   (clasificación de imágenes, supervisado con gran volumen).
+
+2  (a) y = spam / no spam: precisión, recall, F1 · (b) y = minutos: RMSE, R² · (f) y = objeto: accuracy y matriz de confusión.
+
+   Los problemas (c), (d), (e) no tienen variable objetivo en el sentido supervisado.
+
+Bloque 2
+
+#  Solución
+
+1 A: z = −1.2 + 2.4 − 0.5 = 0.7 → p = 1/(1 + e−0.7) = 0.668. B: z = −1.2 + 0 − 1.0 = −2.2 → p = 1/(1 + e2.2) = 0.100.
+
+2 e0.8 = 2.23: cada queja multiplica las odds por ≈ 2.2.
+
+3  Umbral 0.5: A cancela, B se queda. Umbral 0.3: A cancela (0.668 ≥ 0.3), B se queda (0.100 < 0.3). Bajar el umbral
+
+   aumenta los positivos solo si hay clientes entre 0.3 y 0.5.
+
+Bloque 3
+
+#  Solución
+
+1  Distancia² a c1 / c2: P1 1 / 85 · P2 10 / 52 · P3 8 / 50 · P4 41 / 13 · P5 85 / 1 · P6 74 / 4. Asignación: P1, P2, P3 → c1; P4,
+
+   P5, P6 → c2. Inercia = 1 + 10 + 8 + 13 + 1 + 4 = 37.
+
+2  c1 = (2, 3); c2 = (7, 6.33). Nueva inercia: P1 2, P2 1, P3 1, P4 2.78, P5 2.78, P6 1.11 = 10.67. Las asignaciones no cambian:
+
+   terminó.
+
+3  La variable en días domina la distancia: el agrupamiento solo reflejaría antigüedad. Se evita estandarizando (o llevando
+
+   todo a una misma escala) antes de ejecutar K-Means.
+
+Bloque 4
+
+#  Solución
+
+1  Subajuste: grado 1 (bajo en entrenamiento y en prueba, 0.52 / 0.50). Adecuado: grado 2 (0.80 / 0.78, brecha 0.02).
+
+   Sobreajuste: grados 8 y 15 (brechas 0.62 y 1.59).
+
+2  Grado 2: el R² de prueba es el más alto y la brecha es pequeña. El grado 15 tiene el mejor entrenamiento pero
+
+   memoriza ruido.
+
+3  Más datos; menos complejidad (grado bajo); regularización (Ridge o Lasso con alpha elegido en validación); validación
+
+   cruzada para escoger el grado.
+
+Bloque 5
+
+#  Solución
+
+1  Ridge: (4.0, −2.0, 0.8, 0.3)/1.5 = (2.67, −1.33, 0.53, 0.20). Lasso: (3.5, −1.5, 0.3, 0).
+
+2  Ridge no anula ninguno; Lasso anula el cuarto (|0.3| < 0.5). Para limpiar variables sospechosas, Lasso.
+
+3  Con λ = 1: (3.0, −1.0, 0, 0): quedan 2 distintos de cero.
+
+Ejercicios para el cuaderno · Clase 31                                                                                              3
+Bloque 6
+
+#  Solución
+
+1  A: accuracy 1.950/2.000 = 97.5 %; precisión 10/30 = 33.3 %; recall 10/40 = 25.0 %; F1 = 0.286. B: accuracy 1.960/2.000 =
+
+   98.0 %; precisión 0/0 (se define como 0); recall 0 %; F1 0. C: accuracy 1.844/2.000 = 92.2 %; precisión 34/184 = 18.5 %;
+
+   recall 34/40 = 85.0 %; F1 = 0.304.
+
+2  Por accuracy: B (98.0) > A (97.5) > C (92.2). Por recall: C (85) > A (25) > B (0). El orden se invierte.
+
+3  A: 30·100 + 20·1 = 3.020. B: 40·100 = 4.000. C: 6·100 + 150·1 = 750. Se elige C: el modelo con peor accuracy es el más
+
+   barato.
+
+Bloque 7
+
+#  Solución
+
+1  Errores: 60 − 62 = −2, 70 − 66 = 4, 80 − 83 = −3, 90 − 89 = 1. SSE = 4 + 16 + 9 + 1 = 30; MSE = 7.5; RMSE = 2.74.
+
+   Media real 75; SST = 225 + 25 + 25 + 225 = 500; R² = 1 − 30/500 = 0.94.
+
+2  Con datos tabulares y una historia corta, no se justifica Deep Learning: conviene regresión o series de tiempo (y
+
+   modelos de árboles). Línea base: «demanda de la semana anterior» o el promedio móvil; el modelo debe superarla en
+
+   el error de prueba.
+
+Ejercicios para el cuaderno · Clase 31                                                                                       4
+

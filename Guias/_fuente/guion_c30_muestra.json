@@ -1,0 +1,416 @@
+{
+  "clase": "Clase 30",
+  "titulo": "Entrenamiento, validación y prueba",
+  "cabecera": "Clase 30  ·  Entrenamiento, validación y prueba",
+  "profesora": "Prof. Laura Sánchez",
+  "voz": "es-MX-DaliaNeural",
+  "rate": "+0%",
+  "fps": 25,
+  "fuentes_numeros": {
+    "300 viviendas, 70/15/15 -> 210/45/45, test_size 0.30 y luego 0.50": "Guia C30 p.(Entrenamiento...) 'n_entrenamiento = 0.70 · 300 = 210', 'n_temp = 0.30 · 300 = 90 → 45 y 45'; figuras_c30.py lineas 63-64; transcripcion 'en entrenamiento 210 viviendas, en la validacion 45, en la prueba 45'",
+    "profundidad 12: 0.999 / 0.801; mejor profundidad 7: 0.847": "Guia C30 'Arbol de profundidad 12: R² 0.999 en entrenamiento y 0.801 en validacion; el mejor punto fue profundidad 7 (0.847)'; curva recalculada con figuras_c30.division_fig",
+    "1.000 registros 60/20/20 -> 600/200/200; A 0.99/0.70 brecha 0.29; B 0.86/0.82 brecha 0.04": "Apuntes C30 'Ejemplo resuelto · 1.000 registros con una division 60/20/20'",
+    "0.198": "derivado en pantalla: 0.999 − 0.801"
+  },
+  "beats": [
+    {"seccion": "1. La pregunta", "say": "Empecemos con una pregunta.", "acciones": [
+      {"id": "t_fondo", "tipo": "caja", "x": 960, "y": 540, "w": 1920, "h": 1080, "radio": 0, "relleno": "navy", "entrada": "ninguna"},
+      {"id": "t_franja", "tipo": "caja", "x": 12, "y": 540, "w": 24, "h": 1080, "radio": 0, "relleno": "teal", "entrada": "ninguna"},
+      {"id": "t_clase", "tipo": "texto", "texto": "CLASE 30  ·  PREPARACIÓN PARA MACHINE LEARNING", "x": 140, "y": 330, "ancla": "lm", "tam": 40, "peso": "b", "color": "#96D6DC", "entrada": "subir"},
+      {"id": "t_tit", "tipo": "texto", "texto": "Entrenamiento, validación y prueba", "x": 140, "y": 450, "ancla": "lm", "tam": 100, "peso": "b", "color": "blanco", "entrada": "subir", "t": 0.1},
+      {"id": "t_lin", "tipo": "caja", "x0": 140, "y0": 540, "x1": 420, "y1": 548, "radio": 0, "relleno": "teal", "desde": {"x1": 140}, "t": 0.2},
+      {"id": "t_sub", "tipo": "texto", "texto": "Por qué se separan los datos y cómo se detecta el sobreajuste", "x": 140, "y": 610, "ancla": "lm", "tam": 46, "color": "#E2EAF4", "entrada": "subir", "t": 0.25},
+      {"id": "t_pie", "tipo": "texto", "texto": "Diplomado Data Science UC 2026  ·  Prof. Laura Sánchez", "x": 140, "y": 960, "ancla": "lm", "tam": 32, "color": "#96AAC8", "t": 0.3}
+    ]},
+    {"say": "Imagina que entrenas un modelo, y al medirlo, [[a]]te da una nota casi perfecta: 0.99.", "acciones": [
+      {"limpiar": true, "dur": 0.5},
+      {"id": "modelo", "tipo": "caja", "x": 600, "y": 540, "w": 380, "h": 230, "radio": 30, "relleno": "blanco", "borde": "violeta", "grosor": 5, "sombra": true, "entrada": "pop", "t": 0.2},
+      {"id": "modelo_t", "tipo": "texto", "texto": "modelo", "x": 600, "y": 535, "tam": 64, "peso": "b", "color": "violeta", "entrada": "pop", "t": 0.25},
+      {"id": "flecha", "tipo": "linea", "x0": 815, "y0": 540, "x1": 1060, "y1": 540, "color": "gris", "grosor": 7, "punta": true, "entrada": "ninguna", "desde": {"progreso": 0}, "en": "a"},
+      {"id": "nota", "tipo": "numero", "valor": 0.99, "fmt": "{:.2f}", "x": 1360, "y": 520, "tam": 210, "color": "tinta", "desde": {"valor": 0}, "dur": 1.1, "en": "a", "t": 0.2},
+      {"id": "nota_l", "tipo": "texto", "texto": "la nota del modelo", "x": 1360, "y": 680, "tam": 42, "color": "gris", "en": "a", "t": 0.5}
+    ]},
+    {"say": "¿Te lo crees? [[a]]Depende. Depende de con qué datos lo mediste.", "acciones": [
+      {"id": "nota_r", "tipo": "anillo", "x": 1360, "y": 560, "w": 600, "h": 400, "color": "ambar", "grosor": 7, "entrada": "ninguna", "desde": {"progreso": 0}, "dur": 0.7},
+      {"id": "conque", "tipo": "texto", "texto": "¿con qué datos?", "x": 1360, "y": 820, "tam": 64, "peso": "b", "color": "ambar", "entrada": "pop", "en": "a"}
+    ]},
+    {"say": "Piénsalo como un estudiante que se prepara para un examen.", "acciones": [
+      {"limpiar": true},
+      {"id": "cuaderno", "tipo": "tarjeta", "x": 560, "y": 590, "w": 600, "h": 520, "titulo": "Lo que estudiaste", "items": ["Pregunta 1", "Pregunta 2", "Pregunta 3"], "color": "violeta", "entrada": "subir", "t": 0.15},
+      {"id": "examen", "tipo": "tarjeta", "x": 1360, "y": 590, "w": 600, "h": 520, "titulo": "El examen", "items": ["Pregunta 1", "Pregunta 2", "Pregunta 3"], "visibles": 0, "color": "azul", "entrada": "subir", "t": 0.45}
+    ]},
+    {"say": "Si el examen trae [[a]]exactamente las mismas preguntas que estudiaste, [[b]]vas a sacar la nota máxima.", "acciones": [
+      {"id": "examen", "visibles": 3, "dur": 1.3, "ease": "lineal", "en": "a"},
+      {"id": "l1", "tipo": "linea", "x0": 872, "y0": 498, "x1": 1048, "y1": 498, "color": "verde", "grosor": 5, "guion": true, "entrada": "ninguna", "desde": {"progreso": 0}, "en": "a", "t": 0.3},
+      {"id": "l2", "tipo": "linea", "x0": 872, "y0": 628, "x1": 1048, "y1": 628, "color": "verde", "grosor": 5, "guion": true, "entrada": "ninguna", "desde": {"progreso": 0}, "en": "a", "t": 0.7},
+      {"id": "l3", "tipo": "linea", "x0": 872, "y0": 758, "x1": 1048, "y1": 758, "color": "verde", "grosor": 5, "guion": true, "entrada": "ninguna", "desde": {"progreso": 0}, "en": "a", "t": 1.1},
+      {"id": "sello", "tipo": "texto", "texto": "nota máxima", "x": 1360, "y": 935, "tam": 54, "peso": "b", "color": "verde", "fondo_txt": "verdeclaro", "entrada": "pop", "en": "b"}
+    ]},
+    {"say": "Pero, ¿esa nota dice que entendiste? [[a]]No. Solo dice que memorizaste.", "acciones": [
+      {"id": "sello_r", "tipo": "anillo", "x": 1360, "y": 935, "w": 440, "h": 120, "radio": 50, "color": "ambar", "grosor": 6, "entrada": "fade"},
+      {"quitar": ["sello", "sello_r"], "en": "a", "dur": 0.3},
+      {"id": "memo", "tipo": "texto", "texto": "memorizó, no entendió", "x": 1360, "y": 935, "tam": 54, "peso": "b", "color": "ambar", "fondo_txt": "ambarclaro", "entrada": "pop", "en": "a", "t": 0.15}
+    ]},
+    {"say": "La profesora lo contó así en clase: es el alumno que se aprende todo de memoria. [[a]]Y cuando le preguntan algo distinto, suelta toda la información que tiene, a ver si algo le sirve.", "acciones": [
+      {"id": "cuad_r", "tipo": "anillo", "x": 560, "y": 594, "w": 640, "h": 560, "radio": 34, "color": "violeta", "grosor": 5, "pulso": false},
+      {"quitar": ["l1", "l2", "l3", "cuad_r"], "en": "a"},
+      {"id": "examen", "tipo": "tarjeta", "x": 1360, "y": 590, "w": 600, "h": 520, "titulo": "El examen", "items": ["Pregunta 4", "Pregunta 5", "Pregunta 6"], "color": "azul",
+       "marcas": [{"forma": "cruz", "color": "rojo", "progreso": 0}, {"forma": "cruz", "color": "rojo", "progreso": 0}, {"forma": "cruz", "color": "rojo", "progreso": 0}], "entrada": "fade", "en": "a"},
+      {"id": "examen", "marcas.0.progreso": 1, "dur": 0.4, "en": "a", "t": 1.2},
+      {"id": "examen", "marcas.1.progreso": 1, "dur": 0.4, "en": "a", "t": 1.7},
+      {"id": "examen", "marcas.2.progreso": 1, "dur": 0.4, "en": "a", "t": 2.2}
+    ]},
+    {"say": "Con los modelos pasa exactamente lo mismo: [[a]]un modelo puede memorizar los datos con los que aprendió, [[b]]y fallar con datos nuevos.", "acciones": [
+      {"id": "cap1", "tipo": "texto", "texto": "= datos de entrenamiento", "x": 560, "y": 268, "tam": 42, "peso": "sb", "color": "violeta", "entrada": "subir", "en": "a"},
+      {"id": "cap2", "tipo": "texto", "texto": "= datos nuevos", "x": 1360, "y": 268, "tam": 42, "peso": "sb", "color": "azul", "entrada": "subir", "en": "b"}
+    ]},
+    {"say": "Por eso, nunca evaluamos un modelo solo con los datos con los que aprendió. [[a]]Los separamos.", "acciones": [
+      {"quitar": ["memo"]},
+      {"id": "regla0", "tipo": "texto", "texto": "evaluar con datos que el modelo no vio", "x": 960, "y": 935, "tam": 48, "peso": "b", "color": "teal", "fondo_txt": "tealclaro", "entrada": "pop", "t": 0.3},
+      {"limpiar": true, "en": "a", "dur": 0.5}
+    ]},
+
+    {"seccion": "2. Tres conjuntos", "say": "Mira estos puntos. [[a]]Cada uno es una vivienda: son {300|trescientas}, como en el ejemplo de la clase.", "acciones": [
+      {"id": "viv", "tipo": "puntos", "grupos": [{"n": 300, "rect": [160, 205, 1760, 375], "color": "#94A3B8"}], "radio": 10, "z": 100, "entrada": "ninguna", "desde": {"visibles": 0}, "visibles": 300, "dur": 2.2, "ease": "lineal", "t": 0.05},
+      {"id": "n_viv", "tipo": "numero", "valor": 300, "fmt": "{:.0f}", "sufijo": " viviendas", "x": 960, "y": 140, "tam": 60, "color": "tinta", "desde": {"valor": 0}, "dur": 2.0, "ease": "lineal", "t": 0.05}
+    ]},
+    {"say": "Las vamos a repartir en tres grupos, y [[a]]cada grupo tiene un trabajo distinto.", "acciones": [
+      {"id": "c_tr", "tipo": "caja", "x0": 80, "y0": 625, "x1": 1060, "y1": 925, "radio": 24, "relleno": "blanco", "borde": "grisclaro", "grosor": 4, "guion": true, "entrada": "subir", "t": 0.2},
+      {"id": "c_va", "tipo": "caja", "x0": 1130, "y0": 625, "x1": 1460, "y1": 925, "radio": 24, "relleno": "blanco", "borde": "grisclaro", "grosor": 4, "guion": true, "entrada": "subir", "t": 0.4},
+      {"id": "c_te", "tipo": "caja", "x0": 1530, "y0": 625, "x1": 1860, "y1": 925, "radio": 24, "relleno": "blanco", "borde": "grisclaro", "grosor": 4, "guion": true, "entrada": "subir", "t": 0.6},
+      {"id": "q1", "tipo": "texto", "texto": "?", "x": 570, "y": 525, "tam": 60, "peso": "b", "color": "gris", "entrada": "pop", "en": "a"},
+      {"id": "q2", "tipo": "texto", "texto": "?", "x": 1295, "y": 525, "tam": 60, "peso": "b", "color": "gris", "entrada": "pop", "en": "a", "t": 0.2},
+      {"id": "q3", "tipo": "texto", "texto": "?", "x": 1695, "y": 525, "tam": 60, "peso": "b", "color": "gris", "entrada": "pop", "en": "a", "t": 0.4}
+    ]},
+    {"say": "¿Cuántas van al primer grupo? En la clase se usó el 70 %. [[a]]Y el 70 % de {300|trescientas} es [[b]]{210|doscientas diez}.", "acciones": [
+      {"id": "r_q1", "tipo": "anillo", "x": 570, "y": 525, "w": 110, "h": 110, "color": "violeta", "grosor": 6},
+      {"quitar": ["r_q1"], "en": "a"},
+      {"id": "eq1", "tipo": "texto", "texto": "0.70 × 300 =", "x": 1000, "y": 452, "ancla": "rm", "tam": 64, "peso": "sb", "color": "tinta", "entrada": "subir", "en": "a"},
+      {"id": "eq1b", "tipo": "texto", "texto": "210", "x": 1022, "y": 452, "ancla": "lm", "tam": 76, "peso": "b", "color": "violeta", "entrada": "pop", "en": "b"},
+      {"id": "viv", "grupos": [{"n": 210, "rect": [112, 652, 1028, 898], "color": "violeta"}, {"n": 90, "rect": [700, 205, 1220, 375], "color": "#94A3B8"}], "escalonar": 0.6, "dur": 1.6, "en": "b"},
+      {"quitar": ["q1"], "en": "b"},
+      {"id": "cnt_tr", "tipo": "numero", "valor": 210, "fmt": "{:.0f}", "x": 558, "y": 590, "ancla": "rm", "tam": 44, "color": "violeta", "desde": {"valor": 0}, "dur": 1.6, "ease": "lineal", "en": "b"},
+      {"id": "c_tr", "borde": "violeta", "guion": false, "relleno": "violetaclaro", "en": "b", "t": 0.8}
+    ]},
+    {"say": "Ese es el conjunto de [[a]]entrenamiento. Con él, el modelo aprende sus parámetros: [[b]]los números internos que ajusta para predecir el precio.", "acciones": [
+      {"id": "n_tr", "tipo": "texto", "texto": "Entrenamiento", "x": 570, "y": 525, "tam": 46, "peso": "b", "color": "violeta", "entrada": "pop", "en": "a"},
+      {"id": "r_tr", "tipo": "anillo", "x": 570, "y": 775, "w": 1012, "h": 334, "radio": 30, "color": "violeta", "grosor": 5, "en": "a"},
+      {"id": "rol_tr", "tipo": "texto", "texto": "aprende los parámetros", "x": 570, "y": 965, "tam": 34, "peso": "sb", "color": "violeta", "entrada": "subir", "en": "b"}
+    ]},
+    {"say": "Nos quedan [[a]]90. ¿Y qué hacemos con ellas? [[b]]Las partimos justo a la mitad: 45 y 45.", "acciones": [
+      {"quitar": ["r_tr", "eq1", "eq1b"]},
+      {"id": "eq2", "tipo": "texto", "texto": "300 − 210 = 90", "x": 960, "y": 452, "tam": 64, "peso": "sb", "color": "tinta", "entrada": "subir", "en": "a"},
+      {"id": "r_rest", "tipo": "anillo", "x": 960, "y": 290, "w": 600, "h": 230, "radio": 34, "color": "ambar", "grosor": 6, "en": "a"},
+      {"quitar": ["eq2", "r_rest", "q2", "q3"], "en": "b", "dur": 0.3},
+      {"id": "eq3", "tipo": "texto", "texto": "90 ÷ 2 = 45 y 45", "x": 960, "y": 452, "tam": 64, "peso": "sb", "color": "tinta", "entrada": "subir", "en": "b", "t": 0.1},
+      {"id": "viv", "grupos": [{"n": 210, "rect": [112, 652, 1028, 898], "color": "violeta"}, {"n": 45, "rect": [1160, 652, 1430, 898], "color": "azul"}, {"n": 45, "rect": [1560, 652, 1830, 898], "color": "rojo"}], "escalonar": 0.5, "dur": 1.5, "en": "b"},
+      {"id": "cnt_va", "tipo": "numero", "valor": 45, "fmt": "{:.0f}", "x": 1283, "y": 590, "ancla": "rm", "tam": 44, "color": "azul", "desde": {"valor": 0}, "dur": 1.4, "ease": "lineal", "en": "b"},
+      {"id": "cnt_te", "tipo": "numero", "valor": 45, "fmt": "{:.0f}", "x": 1683, "y": 590, "ancla": "rm", "tam": 44, "color": "rojo", "desde": {"valor": 0}, "dur": 1.4, "ease": "lineal", "en": "b"},
+      {"id": "c_va", "borde": "azul", "guion": false, "relleno": "azulclaro", "en": "b", "t": 0.8},
+      {"id": "c_te", "borde": "rojo", "guion": false, "relleno": "rojoclaro", "en": "b", "t": 0.8}
+    ]},
+    {"say": "Las 45 azules son la [[a]]validación. Esas las usas tú, para decidir: [[b]]por ejemplo, qué tan profundo hacer un árbol, o qué modelo elegir.", "acciones": [
+      {"quitar": ["eq3"]},
+      {"id": "n_va", "tipo": "texto", "texto": "Validación", "x": 1295, "y": 525, "tam": 46, "peso": "b", "color": "azul", "entrada": "pop", "en": "a"},
+      {"id": "r_va", "tipo": "anillo", "x": 1295, "y": 775, "w": 362, "h": 334, "radio": 30, "color": "azul", "grosor": 5, "en": "a"},
+      {"id": "rol_va", "tipo": "texto", "texto": "tú eliges", "x": 1295, "y": 965, "tam": 34, "peso": "sb", "color": "azul", "entrada": "subir", "en": "b"}
+    ]},
+    {"say": "Y las 45 rojas son la [[a]]prueba. [[b]]Se guardan bajo llave, hasta el final.", "acciones": [
+      {"quitar": ["r_va"]},
+      {"id": "n_te", "tipo": "texto", "texto": "Prueba", "x": 1695, "y": 525, "tam": 46, "peso": "b", "color": "rojo", "entrada": "pop", "en": "a"},
+      {"id": "lock", "tipo": "candado", "z": 110, "x": 1695, "y": 775, "tam": 110, "color": "rojo", "abierto": 1, "desde": {"dy": -160}, "dur": 0.6, "ease": "out", "en": "b"},
+      {"id": "lock", "abierto": 0, "dur": 0.3, "en": "b", "t": 0.65},
+      {"id": "rol_te", "tipo": "texto", "texto": "veredicto final", "x": 1695, "y": 965, "tam": 34, "peso": "sb", "color": "rojo", "entrada": "subir", "en": "b", "t": 0.5}
+    ]},
+    {"say": "Fíjate en los porcentajes: [[a]]70, [[b]]15 y [[c]]15.", "acciones": [
+      {"id": "pct_tr", "tipo": "texto", "texto": "·  70 %", "x": 582, "y": 590, "ancla": "lm", "tam": 44, "peso": "sb", "color": "gris", "entrada": "pop", "en": "a"},
+      {"id": "pct_va", "tipo": "texto", "texto": "·  15 %", "x": 1307, "y": 590, "ancla": "lm", "tam": 44, "peso": "sb", "color": "gris", "entrada": "pop", "en": "b"},
+      {"id": "pct_te", "tipo": "texto", "texto": "·  15 %", "x": 1707, "y": 590, "ancla": "lm", "tam": 44, "peso": "sb", "color": "gris", "entrada": "pop", "en": "c"}
+    ]},
+    {"say": "En Python se hace con dos llamadas a train test split. [[a]]Primero apartas el 30 %, y [[b]]después ese 30 % lo divides a la mitad.", "acciones": [
+      {"id": "code1", "tipo": "texto", "texto": "train_test_split(X, y, test_size=0.30)               →  210 | 90", "x": 960, "y": 265, "tam": 36, "peso": "m", "color": "tinta", "fondo_txt": "#E8EDF4", "entrada": "subir", "en": "a"},
+      {"id": "code2", "tipo": "texto", "texto": "train_test_split(X_temp, y_temp, test_size=0.50)     →   45 | 45", "x": 960, "y": 375, "tam": 36, "peso": "m", "color": "tinta", "fondo_txt": "#E8EDF4", "entrada": "subir", "en": "b"}
+    ]},
+    {"say": "Vuelve a la escuela por un momento: el entrenamiento son [[a]]las clases, la validación son [[b]]los ensayos, y la prueba es [[c]]el examen final.", "acciones": [
+      {"quitar": ["code1", "code2"]},
+      {"id": "an_tr", "tipo": "texto", "texto": "= las clases", "x": 570, "y": 1010, "tam": 32, "color": "gris", "entrada": "pop", "en": "a"},
+      {"id": "an_va", "tipo": "texto", "texto": "= los ensayos", "x": 1295, "y": 1010, "tam": 32, "color": "gris", "entrada": "pop", "en": "b"},
+      {"id": "an_te", "tipo": "texto", "texto": "= el examen final", "x": 1695, "y": 1010, "tam": 32, "color": "gris", "entrada": "pop", "en": "c"}
+    ]},
+    {"say": "Ojo: el 70, 15, 15 no es una ley, es [[a]]una referencia. [[b]]Con pocos datos se usa validación cruzada, que verás en otro capítulo.", "acciones": [
+      {"id": "ref", "tipo": "texto", "texto": "70 / 15 / 15  =  una referencia, no una regla", "x": 960, "y": 275, "tam": 48, "peso": "b", "color": "ambar", "fondo_txt": "ambarclaro", "entrada": "pop", "en": "a"},
+      {"id": "ref2", "tipo": "texto", "texto": "pocos datos  →  validación cruzada", "x": 960, "y": 390, "tam": 42, "peso": "sb", "color": "teal", "entrada": "subir", "en": "b"}
+    ]},
+    {"say": "Y si los datos tienen orden en el tiempo, no se cortan al azar: [[a]]se entrena con el pasado, y [[b]]se prueba con lo que vino después.", "acciones": [
+      {"quitar": ["ref", "ref2"]},
+      {"id": "tl", "tipo": "linea", "x0": 160, "y0": 350, "x1": 1760, "y1": 350, "color": "gris", "grosor": 5, "punta": true, "entrada": "ninguna", "desde": {"progreso": 0}, "dur": 0.9, "t": 0.3},
+      {"id": "tl_l", "tipo": "texto", "texto": "tiempo", "x": 1760, "y": 392, "ancla": "rm", "tam": 30, "color": "gris", "t": 0.8},
+      {"id": "tl_tr", "tipo": "caja", "x0": 160, "y0": 240, "x1": 1290, "y1": 310, "radio": 12, "relleno": "violeta", "desde": {"x1": 160}, "dur": 0.8, "en": "a"},
+      {"id": "tl_trt", "tipo": "texto", "texto": "pasado  →  entrenamiento", "x": 725, "y": 274, "tam": 34, "peso": "b", "color": "blanco", "en": "a", "t": 0.4},
+      {"id": "tl_te", "tipo": "caja", "x0": 1310, "y0": 240, "x1": 1740, "y1": 310, "radio": 12, "relleno": "rojo", "desde": {"x1": 1310}, "dur": 0.6, "en": "b"},
+      {"id": "tl_tet", "tipo": "texto", "texto": "después  →  prueba", "x": 1525, "y": 274, "tam": 34, "peso": "b", "color": "blanco", "en": "b", "t": 0.3}
+    ]},
+
+    {"seccion": "3. Sobreajuste", "say": "Ahora viene lo importante. ¿Para qué sirve, de verdad, la validación? [[a]]Para descubrir el sobreajuste.", "acciones": [
+      {"limpiar": true, "dur": 0.5},
+      {"id": "q_big", "tipo": "texto", "texto": "¿Para qué sirve la validación?", "x": 960, "y": 430, "tam": 72, "peso": "b", "color": "tinta", "entrada": "subir", "t": 0.9},
+      {"id": "sob", "tipo": "texto", "texto": "sobreajuste", "x": 960, "y": 600, "tam": 130, "peso": "b", "color": "rojo", "entrada": "pop", "en": "a"},
+      {"id": "sob_en", "tipo": "texto", "texto": "en inglés: overfitting", "x": 960, "y": 715, "tam": 42, "color": "gris", "en": "a", "t": 0.4}
+    ]},
+    {"say": "Sobreajuste es cuando el modelo se aprende hasta el ruido: [[a]]los detalles del entrenamiento que son pura casualidad.", "acciones": [
+      {"quitar": ["q_big", "sob_en"]},
+      {"id": "sob", "y": 140, "tam": 60, "dur": 0.7},
+      {"id": "g0", "tipo": "grafico", "x0": 380, "y0": 250, "x1": 1540, "y1": 900, "xmin": 0, "xmax": 11, "ymin": 0.2, "ymax": 1.0, "rejilla": false, "t": 0.3,
+       "series": [
+         {"xs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "ys": [0.42, 0.33, 0.55, 0.47, 0.66, 0.52, 0.74, 0.69, 0.62, 0.86], "color": "tinta", "linea": false, "marcadores": 13, "revela": 1},
+         {"xs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "ys": [0.42, 0.33, 0.55, 0.47, 0.66, 0.52, 0.74, 0.69, 0.62, 0.86], "color": "rojo", "suave": true, "grosor": 6, "revela": 0, "alfa": 1},
+         {"xs": [0.6, 10.4], "ys": [0.33, 0.82], "color": "verde", "grosor": 8, "revela": 0}
+       ]},
+      {"id": "g0", "series.1.revela": 1, "dur": 2.4, "ease": "lineal", "en": "a"},
+      {"id": "lbl_r", "tipo": "texto", "texto": "memoriza el ruido", "x": 900, "y": 330, "tam": 42, "peso": "b", "color": "rojo", "entrada": "pop", "en": "a", "t": 1.4}
+    ]},
+    {"say": "En cambio, un modelo que generaliza, o sea, que funciona bien con datos nuevos, [[a]]captura la tendencia y deja pasar el ruido.", "acciones": [
+      {"id": "g0", "series.1.alfa": 0.25, "dur": 0.6, "en": "a"},
+      {"id": "lbl_r", "alfa": 0.35, "dur": 0.6, "en": "a"},
+      {"id": "g0", "series.2.revela": 1, "dur": 1.5, "en": "a"},
+      {"id": "lbl_v", "tipo": "texto", "texto": "aprende la tendencia", "x": 1240, "y": 800, "tam": 42, "peso": "b", "color": "verde", "entrada": "pop", "en": "a", "t": 1.0}
+    ]},
+    {"say": "Veámoslo con las viviendas de la clase. [[a]]Entrenamos árboles de decisión, cada vez más profundos.", "acciones": [
+      {"limpiar": true, "mantener": ["sob"]},
+      {"id": "g", "tipo": "grafico", "x0": 260, "y0": 210, "x1": 1360, "y1": 860, "xmin": 0.5, "xmax": 12.5, "ymin": 0.5, "ymax": 1.03,
+       "xticks": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "yticks": [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "yfmt": "{:.1f}", "xlabel": "profundidad del árbol", "ylabel": "R²",
+       "series": [
+         {"xs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "ys": [0.619, 0.82, 0.878, 0.928, 0.948, 0.965, 0.977, 0.986, 0.991, 0.996, 0.998, 0.999], "color": "violeta", "grosor": 7, "marcadores": 9, "revela": 0, "alfa": 1},
+         {"xs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "ys": [0.53, 0.719, 0.757, 0.793, 0.846, 0.844, 0.847, 0.83, 0.825, 0.809, 0.786, 0.801], "color": "azul", "grosor": 7, "marcadores": 9, "revela": 0, "alfa": 1}
+       ], "en": "a", "dur": 0.7}
+    ]},
+    {"say": "La profundidad es cuántas preguntas seguidas puede hacer el árbol. [[a]]Más profundidad, modelo más complejo.", "acciones": [
+      {"id": "r_x", "tipo": "anillo", "x": 810, "y": 893, "w": 1180, "h": 80, "radio": 34, "color": "ambar", "grosor": 5, "t": 0.2},
+      {"quitar": ["r_x"], "en": "a"},
+      {"id": "cx", "tipo": "linea", "x0": 700, "y0": 995, "x1": 1060, "y1": 995, "color": "ambar", "grosor": 6, "punta": true, "entrada": "ninguna", "desde": {"progreso": 0}, "dur": 0.7, "en": "a"},
+      {"id": "cx_t", "tipo": "texto", "texto": "más complejo", "x": 1080, "y": 993, "ancla": "lm", "tam": 34, "peso": "b", "color": "ambar", "en": "a", "t": 0.4}
+    ]},
+    {"say": "Y la nota la medimos con el R²: [[a]]qué parte de la variación del precio explica el modelo. [[b]]Uno es perfecto.", "acciones": [
+      {"id": "r_y", "tipo": "anillo", "x": 212, "y": 168, "w": 130, "h": 84, "radio": 30, "color": "ambar", "grosor": 5},
+      {"id": "r2def", "tipo": "texto", "texto": "R² = qué parte de la variación del precio explica el modelo", "x": 1500, "y": 260, "ancla": "lm", "ancho_max": 390, "tam": 32, "peso": "sb", "color": "tinta", "entrada": "subir", "en": "a"},
+      {"quitar": ["r_y"], "en": "b"},
+      {"id": "uno", "tipo": "linea", "ref": "g", "x0": 0.5, "y0": 1.0, "x1": 12.5, "y1": 1.0, "color": "verde", "grosor": 3, "guion": true, "entrada": "ninguna", "desde": {"progreso": 0}, "dur": 0.8, "en": "b"},
+      {"id": "uno_t", "tipo": "texto", "texto": "1 = perfecto", "ref": "g", "x": 0.6, "y": 1.0, "dy": -24, "ancla": "lm", "tam": 30, "peso": "sb", "color": "verde", "en": "b", "t": 0.3}
+    ]},
+    {"say": "Mira la línea violeta: es el [[a]]entrenamiento. Mientras más profundo el árbol, [[b]]más sube.", "acciones": [
+      {"quitar": ["r2def"]},
+      {"id": "lg_tr", "tipo": "caja", "x": 1520, "y": 262, "w": 40, "h": 12, "radio": 6, "relleno": "violeta", "en": "a"},
+      {"id": "lg_trt", "tipo": "texto", "texto": "entrenamiento", "x": 1555, "y": 260, "ancla": "lm", "tam": 38, "peso": "sb", "color": "violeta", "entrada": "subir", "en": "a"},
+      {"id": "g", "series.0.revela": 1, "dur": 2.8, "ease": "lineal", "en": "b"}
+    ]},
+    {"say": "Con profundidad 12, llega a [[a]]0.999. Casi perfecto.", "acciones": [
+      {"id": "mk_tr", "tipo": "anillo", "ref": "g", "x": 12, "y": 0.999, "w": 48, "h": 48, "color": "violeta", "grosor": 5, "en": "a"},
+      {"id": "tag_tr", "tipo": "texto", "texto": "0.999", "ref": "g", "x": 12, "y": 0.999, "dx": 52, "ancla": "lm", "tam": 42, "peso": "b", "color": "violeta", "entrada": "pop", "en": "a"}
+    ]},
+    {"say": "Pero ojo: esos son los mismos datos con los que aprendió. [[a]]Es como el alumno que corrige su propio cuaderno.", "acciones": [
+      {"quitar": ["mk_tr"]},
+      {"id": "nt_tr", "tipo": "texto", "texto": "datos que ya vio", "x": 1555, "y": 306, "ancla": "lm", "tam": 30, "color": "gris", "entrada": "subir", "t": 0.4},
+      {"id": "nt_tr2", "tipo": "texto", "texto": "= corrige su cuaderno", "x": 1555, "y": 346, "ancla": "lm", "tam": 28, "color": "gris", "entrada": "subir", "en": "a"}
+    ]},
+    {"say": "Ahora, la línea azul: la [[a]]validación, datos que el árbol nunca vio. [[b]]Sube al principio, llega a su punto más alto, y después empieza a bajar.", "acciones": [
+      {"id": "lg_va", "tipo": "caja", "x": 1520, "y": 432, "w": 40, "h": 12, "radio": 6, "relleno": "azul", "en": "a"},
+      {"id": "lg_vat", "tipo": "texto", "texto": "validación", "x": 1555, "y": 430, "ancla": "lm", "tam": 38, "peso": "sb", "color": "azul", "entrada": "subir", "en": "a"},
+      {"id": "nt_va", "tipo": "texto", "texto": "datos que nunca vio", "x": 1555, "y": 476, "ancla": "lm", "tam": 30, "color": "gris", "entrada": "subir", "en": "a", "t": 0.4},
+      {"id": "g", "series.1.revela": 1, "dur": 3.8, "ease": "lineal", "en": "b"}
+    ]},
+    {"say": "En profundidad 12, la validación es solo [[a]]0.801.", "acciones": [
+      {"id": "mk_va", "tipo": "anillo", "ref": "g", "x": 12, "y": 0.801, "w": 48, "h": 48, "color": "azul", "grosor": 5, "en": "a"},
+      {"id": "tag_va", "tipo": "texto", "texto": "0.801", "ref": "g", "x": 12, "y": 0.801, "dx": 52, "ancla": "lm", "tam": 42, "peso": "b", "color": "azul", "entrada": "pop", "en": "a"}
+    ]},
+    {"say": "Esa distancia entre las dos líneas se llama [[a]]brecha: la métrica de entrenamiento, menos la de validación.", "acciones": [
+      {"quitar": ["mk_va"]},
+      {"id": "br", "tipo": "linea", "ref": "g", "x0": 12.28, "y0": 0.801, "x1": 12.28, "y1": 0.999, "color": "rojo", "grosor": 7, "entrada": "ninguna", "desde": {"progreso": 0}, "dur": 0.8, "en": "a"},
+      {"id": "br_t", "tipo": "texto", "texto": "brecha", "ref": "g", "x": 12.28, "y": 0.9, "dx": -16, "ancla": "rm", "tam": 38, "peso": "b", "color": "rojo", "entrada": "pop", "en": "a", "t": 0.4},
+      {"id": "f1", "tipo": "texto", "texto": "brecha =", "x": 1500, "y": 610, "ancla": "lm", "tam": 40, "peso": "b", "color": "rojo", "entrada": "subir", "en": "a", "t": 0.6},
+      {"id": "f2", "tipo": "texto", "texto": "entrenamiento − validación", "x": 1500, "y": 660, "ancla": "lm", "tam": 32, "peso": "sb", "color": "gris", "entrada": "subir", "en": "a", "t": 0.9}
+    ]},
+    {"say": "Aquí, la brecha es 0.999 menos 0.801: [[a]]0.198. Casi dos décimas.", "acciones": [
+      {"id": "f3", "tipo": "texto", "texto": "0.999 − 0.801", "x": 1500, "y": 730, "ancla": "lm", "tam": 44, "peso": "sb", "color": "tinta", "entrada": "subir", "t": 0.2},
+      {"id": "f4", "tipo": "texto", "texto": "= 0.198", "x": 1500, "y": 795, "ancla": "lm", "tam": 58, "peso": "b", "color": "rojo", "entrada": "pop", "en": "a"}
+    ]},
+    {"say": "Una brecha así de grande es la señal del sobreajuste: [[a]]el árbol memorizó.", "acciones": [
+      {"id": "z_sob", "tipo": "caja", "ref": "g", "x0": 8.5, "y0": 0.5, "x1": 12.5, "y1": 1.03, "radio": 0, "relleno": "rojoclaro", "alfa": 0.75, "z": 0.5, "dur": 0.6},
+      {"id": "z_sob_t", "tipo": "texto", "texto": "zona de sobreajuste", "ref": "g", "x": 10.5, "y": 0.56, "tam": 32, "peso": "b", "color": "rojo", "entrada": "pop", "en": "a"}
+    ]},
+    {"say": "Entonces, ¿con qué árbol nos quedamos? [[a]]Con el que tiene la mejor validación.", "acciones": [
+      {"id": "g", "series.0.alfa": 0.3, "dur": 0.5, "en": "a"},
+      {"id": "pt", "tipo": "anillo", "ref": "g", "x": 1, "y": 0.53, "w": 54, "h": 54, "color": "verde", "grosor": 6, "en": "a"},
+      {"id": "pt", "x": 7, "y": 0.847, "dur": 1.4, "en": "a", "t": 0.4}
+    ]},
+    {"say": "Mira el punto verde: [[a]]profundidad 7, con un R² de validación de [[b]]0.847.", "acciones": [
+      {"id": "best", "tipo": "linea", "ref": "g", "x0": 7, "y0": 0.5, "x1": 7, "y1": 1.03, "color": "verde", "grosor": 4, "guion": true, "entrada": "ninguna", "desde": {"progreso": 0}, "dur": 0.8, "en": "a"},
+      {"id": "best_t", "tipo": "texto", "texto": "elegido: profundidad 7", "x": 1500, "y": 880, "ancla": "lm", "tam": 36, "peso": "b", "color": "verde", "entrada": "subir", "en": "a", "t": 0.3},
+      {"id": "tag_best", "tipo": "texto", "texto": "0.847", "ref": "g", "x": 7, "y": 0.847, "dy": -54, "tam": 44, "peso": "b", "color": "verde", "fondo_txt": "verdeclaro", "pad": 12, "entrada": "pop", "en": "b"}
+    ]},
+    {"say": "Fíjate que no elegimos el de mejor entrenamiento. [[a]]Ese sería el de profundidad 12: justo el que memorizó.", "acciones": [
+      {"id": "g", "series.0.alfa": 1, "dur": 0.5},
+      {"id": "x12", "tipo": "marca", "forma": "cruz", "ref": "g", "x": 12, "y": 0.999, "tam": 46, "color": "rojo", "entrada": "ninguna", "desde": {"progreso": 0}, "dur": 0.5, "en": "a"},
+      {"id": "tag_tr", "tachado": 1, "dur": 0.5, "en": "a", "t": 0.3}
+    ]},
+    {"say": "Y en el otro extremo, con muy poca profundidad, el árbol es tan simple que rinde mal en los dos. [[a]]Eso es el subajuste.", "acciones": [
+      {"id": "z_sub", "tipo": "caja", "ref": "g", "x0": 0.5, "y0": 0.5, "x1": 2.5, "y1": 1.03, "radio": 0, "relleno": "ambarclaro", "alfa": 0.85, "z": 0.4, "dur": 0.6, "t": 1.0},
+      {"id": "sub_t", "tipo": "texto", "texto": "subajuste", "ref": "g", "x": 1.5, "y": 0.96, "tam": 34, "peso": "b", "color": "ambar", "entrada": "pop", "en": "a"}
+    ]},
+    {"say": "Piensa un segundo: [[a]]si solo hubieras mirado la línea violeta, ¿qué árbol habrías elegido?", "pausa": 0.45, "acciones": [
+      {"id": "g", "series.1.alfa": 0.2, "series.0.grosor": 11, "dur": 0.5, "en": "a"},
+      {"id": "pt", "alfa": 0.2, "dur": 0.5, "en": "a"},
+      {"id": "tag_best", "alfa": 0.2, "dur": 0.5, "en": "a"}
+    ]},
+    {"say": "El de profundidad 12, el que más memorizó. [[a]]Por eso la validación es indispensable: es la que elige.", "acciones": [
+      {"id": "mk12", "tipo": "anillo", "ref": "g", "x": 12, "y": 0.999, "w": 70, "h": 70, "color": "rojo", "grosor": 6},
+      {"quitar": ["mk12"], "en": "a"},
+      {"id": "g", "series.1.alfa": 1, "series.0.grosor": 7, "series.0.alfa": 0.3, "dur": 0.5, "en": "a"},
+      {"id": "pt", "alfa": 1, "dur": 0.5, "en": "a"},
+      {"id": "tag_best", "alfa": 1, "dur": 0.5, "en": "a"},
+      {"id": "elige", "tipo": "texto", "texto": "la validación elige", "x": 1500, "y": 950, "ancla": "lm", "tam": 36, "peso": "b", "color": "azul", "fondo_txt": "azulclaro", "pad": 14, "entrada": "pop", "en": "a", "t": 0.5}
+    ]},
+
+    {"seccion": "4. Ejercicio: modelo A contra modelo B", "say": "Hagamos un ejercicio con números, como el de tus apuntes. [[a]]Tienes 1.000 registros, y los divides en 60, 20 y 20 por ciento.", "acciones": [
+      {"limpiar": true, "dur": 0.5},
+      {"id": "e_tit", "tipo": "texto", "texto": "1.000 registros", "x": 260, "y": 168, "ancla": "lm", "tam": 50, "peso": "b", "color": "tinta", "entrada": "subir", "en": "a"},
+      {"id": "seg1", "tipo": "caja", "x0": 260, "y0": 220, "x1": 1094, "y1": 320, "radio": 14, "relleno": "violeta", "desde": {"x1": 260}, "dur": 0.8, "en": "a", "t": 0.6},
+      {"id": "seg2", "tipo": "caja", "x0": 1100, "y0": 220, "x1": 1374, "y1": 320, "radio": 14, "relleno": "azul", "desde": {"x1": 1100}, "dur": 0.5, "en": "a", "t": 1.3},
+      {"id": "seg3", "tipo": "caja", "x0": 1380, "y0": 220, "x1": 1660, "y1": 320, "radio": 14, "relleno": "rojo", "desde": {"x1": 1380}, "dur": 0.5, "en": "a", "t": 1.7},
+      {"id": "s1_t", "tipo": "texto", "texto": "60 %", "x": 677, "y": 268, "tam": 46, "peso": "b", "color": "blanco", "en": "a", "t": 1.0},
+      {"id": "s2_t", "tipo": "texto", "texto": "20 %", "x": 1237, "y": 268, "tam": 46, "peso": "b", "color": "blanco", "en": "a", "t": 1.5},
+      {"id": "s3_t", "tipo": "texto", "texto": "20 %", "x": 1520, "y": 268, "tam": 46, "peso": "b", "color": "blanco", "en": "a", "t": 1.9}
+    ]},
+    {"say": "Piensa un segundo: ¿cuántos registros quedan en cada grupo?", "pausa": 0.45, "acciones": [
+      {"id": "q_a", "tipo": "texto", "texto": "?", "x": 677, "y": 378, "tam": 56, "peso": "b", "color": "violeta", "entrada": "pop", "t": 0.4},
+      {"id": "q_b", "tipo": "texto", "texto": "?", "x": 1237, "y": 378, "tam": 56, "peso": "b", "color": "azul", "entrada": "pop", "t": 0.6},
+      {"id": "q_c", "tipo": "texto", "texto": "?", "x": 1520, "y": 378, "tam": 56, "peso": "b", "color": "rojo", "entrada": "pop", "t": 0.8}
+    ]},
+    {"say": "[[a]]600 para entrenar, [[b]]200 para validar, y [[c]]200 para la prueba.", "acciones": [
+      {"quitar": ["q_a"], "en": "a", "dur": 0.2},
+      {"id": "n_a", "tipo": "numero", "valor": 600, "fmt": "{:.0f}", "x": 677, "y": 378, "tam": 56, "color": "violeta", "desde": {"valor": 0}, "dur": 0.8, "en": "a"},
+      {"quitar": ["q_b"], "en": "b", "dur": 0.2},
+      {"id": "n_b", "tipo": "numero", "valor": 200, "fmt": "{:.0f}", "x": 1237, "y": 378, "tam": 56, "color": "azul", "desde": {"valor": 0}, "dur": 0.7, "en": "b"},
+      {"quitar": ["q_c"], "en": "c", "dur": 0.2},
+      {"id": "n_c", "tipo": "numero", "valor": 200, "fmt": "{:.0f}", "x": 1520, "y": 378, "tam": 56, "color": "rojo", "desde": {"valor": 0}, "dur": 0.7, "en": "c"}
+    ]},
+    {"say": "Ahora entrenas dos modelos. [[a]]El modelo A tiene un R² de [[c]]0.99 en entrenamiento, [[b]]y 0.70 en validación.", "acciones": [
+      {"id": "h1", "tipo": "texto", "texto": "modelo", "x": 480, "y": 485, "tam": 34, "peso": "sb", "color": "gris", "t": 0.2},
+      {"id": "h2", "tipo": "texto", "texto": "entrenamiento", "x": 800, "y": 485, "tam": 34, "peso": "sb", "color": "violeta", "t": 0.3},
+      {"id": "h3", "tipo": "texto", "texto": "validación", "x": 1100, "y": 485, "tam": 34, "peso": "sb", "color": "azul", "t": 0.4},
+      {"id": "h4", "tipo": "texto", "texto": "brecha", "x": 1400, "y": 485, "tam": 34, "peso": "sb", "color": "rojo", "t": 0.5},
+      {"id": "rowA", "tipo": "caja", "x": 960, "y": 578, "w": 1200, "h": 96, "radio": 20, "relleno": "blanco", "borde": "linea", "grosor": 3, "entrada": "subir", "en": "a"},
+      {"id": "a_nm", "tipo": "texto", "texto": "A", "x": 480, "y": 575, "tam": 56, "peso": "b", "color": "tinta", "entrada": "pop", "en": "a", "t": 0.2},
+      {"id": "a_tr", "tipo": "texto", "texto": "0.99", "x": 800, "y": 575, "tam": 56, "peso": "b", "color": "violeta", "entrada": "pop", "en": "c"},
+      {"id": "a_va", "tipo": "texto", "texto": "0.70", "x": 1100, "y": 575, "tam": 56, "peso": "b", "color": "azul", "entrada": "pop", "en": "b", "t": 0.3}
+    ]},
+    {"say": "[[a]]El modelo B tiene [[c]]0.86 en entrenamiento, [[b]]y 0.82 en validación.", "acciones": [
+      {"id": "rowB", "tipo": "caja", "x": 960, "y": 688, "w": 1200, "h": 96, "radio": 20, "relleno": "blanco", "borde": "linea", "grosor": 3, "entrada": "subir", "en": "a"},
+      {"id": "b_nm", "tipo": "texto", "texto": "B", "x": 480, "y": 685, "tam": 56, "peso": "b", "color": "tinta", "entrada": "pop", "en": "a", "t": 0.2},
+      {"id": "b_tr", "tipo": "texto", "texto": "0.86", "x": 800, "y": 685, "tam": 56, "peso": "b", "color": "violeta", "entrada": "pop", "en": "c"},
+      {"id": "b_va", "tipo": "texto", "texto": "0.82", "x": 1100, "y": 685, "tam": 56, "peso": "b", "color": "azul", "entrada": "pop", "en": "b", "t": 0.3}
+    ]},
+    {"say": "¿Cuál elegirías? Calculemos la brecha de cada uno. [[a]]Para A: 0.99 menos 0.70, [[b]]da 0.29.", "acciones": [
+      {"id": "r_h4", "tipo": "anillo", "x": 1400, "y": 485, "w": 200, "h": 70, "radio": 30, "color": "rojo", "grosor": 5, "t": 1.0},
+      {"quitar": ["r_h4"], "en": "a"},
+      {"id": "a_br0", "tipo": "texto", "texto": "0.99 − 0.70", "x": 1400, "y": 575, "tam": 42, "peso": "sb", "color": "gris", "entrada": "subir", "en": "a"},
+      {"quitar": ["a_br0"], "en": "b", "dur": 0.25},
+      {"id": "a_br", "tipo": "texto", "texto": "0.29", "x": 1400, "y": 575, "tam": 56, "peso": "b", "color": "rojo", "entrada": "pop", "en": "b", "t": 0.1}
+    ]},
+    {"say": "[[a]]Para B: 0.86 menos 0.82, [[b]]apenas 0.04.", "acciones": [
+      {"id": "b_br0", "tipo": "texto", "texto": "0.86 − 0.82", "x": 1400, "y": 685, "tam": 42, "peso": "sb", "color": "gris", "entrada": "subir", "en": "a"},
+      {"quitar": ["b_br0"], "en": "b", "dur": 0.25},
+      {"id": "b_br", "tipo": "texto", "texto": "0.04", "x": 1400, "y": 685, "tam": 56, "peso": "b", "color": "verde", "entrada": "pop", "en": "b", "t": 0.1}
+    ]},
+    {"say": "Aquí está el error típico: [[a]]elegir A, porque tiene el entrenamiento más alto.", "acciones": [
+      {"id": "r_err", "tipo": "anillo", "x": 800, "y": 578, "w": 230, "h": 92, "radio": 30, "color": "ambar", "grosor": 6, "en": "a"},
+      {"id": "err_t", "tipo": "texto", "texto": "error típico: elegir por el entrenamiento", "x": 960, "y": 820, "tam": 42, "peso": "b", "color": "ambar", "fondo_txt": "ambarclaro", "entrada": "pop", "en": "a", "t": 0.3}
+    ]},
+    {"say": "Pero A está sobreajustado: su brecha es enorme. [[a]]Elegimos B, porque su validación es mejor: [[b]]0.82 contra 0.70.", "acciones": [
+      {"quitar": ["r_err", "err_t"]},
+      {"id": "r_brA", "tipo": "anillo", "x": 1400, "y": 578, "w": 230, "h": 92, "radio": 30, "color": "rojo", "grosor": 6, "t": 0.3},
+      {"quitar": ["r_brA"], "en": "a"},
+      {"id": "rowB", "relleno": "verdeclaro", "borde": "verde", "dur": 0.5, "en": "a"},
+      {"id": "chkB", "tipo": "marca", "x": 300, "y": 688, "tam": 60, "color": "verde", "entrada": "ninguna", "desde": {"progreso": 0}, "dur": 0.5, "en": "a", "t": 0.2},
+      {"id": "r_va2", "tipo": "anillo", "x": 1100, "y": 633, "w": 250, "h": 230, "radio": 34, "color": "azul", "grosor": 6, "en": "b"}
+    ]},
+    {"say": "La regla es simple: [[a]]se elige con la validación, nunca con el entrenamiento.", "acciones": [
+      {"quitar": ["r_va2"], "en": "a"},
+      {"id": "regla", "tipo": "texto", "texto": "se elige con la validación, nunca con el entrenamiento", "x": 960, "y": 850, "tam": 44, "peso": "b", "color": "teal", "fondo_txt": "tealclaro", "entrada": "pop", "en": "a"}
+    ]},
+
+    {"seccion": "5. La prueba, una sola vez", "say": "¿Y la prueba? ¿Cuándo entra en juego? [[a]]Al final, una sola vez, y solo con el modelo ya elegido.", "acciones": [
+      {"limpiar": true, "dur": 0.5},
+      {"id": "k_tr", "tipo": "caja", "x0": 160, "y0": 300, "x1": 900, "y1": 520, "radio": 24, "relleno": "violetaclaro", "borde": "violeta", "grosor": 4, "entrada": "subir", "t": 0.3},
+      {"id": "k_trt", "tipo": "texto", "texto": "Entrenamiento", "x": 530, "y": 410, "tam": 46, "peso": "b", "color": "violeta", "t": 0.4},
+      {"id": "k_va", "tipo": "caja", "x0": 980, "y0": 300, "x1": 1320, "y1": 520, "radio": 24, "relleno": "azulclaro", "borde": "azul", "grosor": 4, "entrada": "subir", "t": 0.5},
+      {"id": "k_vat", "tipo": "texto", "texto": "Validación", "x": 1150, "y": 410, "tam": 42, "peso": "b", "color": "azul", "t": 0.6},
+      {"id": "k_te", "tipo": "caja", "x0": 1400, "y0": 300, "x1": 1760, "y1": 520, "radio": 24, "relleno": "rojoclaro", "borde": "rojo", "grosor": 4, "entrada": "subir", "t": 0.7},
+      {"id": "k_tet", "tipo": "texto", "texto": "Prueba", "x": 1580, "y": 365, "tam": 42, "peso": "b", "color": "rojo", "t": 0.8},
+      {"id": "k_lock", "tipo": "candado", "x": 1580, "y": 455, "tam": 64, "color": "rojo", "disco": false, "t": 0.8},
+      {"id": "chip", "tipo": "caja", "x": 1150, "y": 640, "w": 250, "h": 84, "radio": 42, "relleno": "verde", "entrada": "pop", "t": 1.0},
+      {"id": "chip_t", "tipo": "texto", "texto": "modelo B", "x": 1150, "y": 638, "tam": 38, "peso": "b", "color": "blanco", "entrada": "pop", "t": 1.0},
+      {"id": "k_lock", "abierto": 1, "dur": 0.4, "en": "a"},
+      {"id": "chip", "x": 1580, "dur": 0.9, "en": "a", "t": 0.3},
+      {"id": "chip_t", "x": 1580, "dur": 0.9, "en": "a", "t": 0.3},
+      {"id": "vez", "tipo": "texto", "texto": "una sola vez", "x": 1580, "y": 760, "tam": 42, "peso": "b", "color": "rojo", "fondo_txt": "rojoclaro", "pad": 14, "entrada": "pop", "en": "a", "t": 1.0}
+    ]},
+    {"say": "Su trabajo es [[a]]informar qué tan bien le irá al modelo con datos nuevos. [[b]]No decide nada: solo informa.", "acciones": [
+      {"id": "inf", "tipo": "texto", "texto": "informa: ¿qué tal con datos nuevos?", "x": 1580, "y": 850, "tam": 32, "peso": "sb", "color": "gris", "entrada": "subir", "en": "a"},
+      {"id": "dec", "tipo": "texto", "texto": "la validación decide  ·  la prueba informa", "x": 960, "y": 960, "tam": 42, "peso": "b", "color": "teal", "fondo_txt": "tealclaro", "entrada": "pop", "en": "b"}
+    ]},
+    {"say": "¿Por qué tanto cuidado? Porque si usas la prueba para decidir, [[a]]aunque sea un poquito, [[b]]se convierte en otra validación.", "acciones": [
+      {"quitar": ["inf", "dec", "vez"]},
+      {"id": "chip", "x": 1150, "dur": 0.7, "t": 0.2},
+      {"id": "chip_t", "x": 1150, "dur": 0.7, "t": 0.2},
+      {"id": "fl_dec", "tipo": "linea", "x0": 1480, "y0": 560, "x1": 1300, "y1": 630, "color": "ambar", "grosor": 6, "punta": true, "entrada": "ninguna", "desde": {"progreso": 0}, "dur": 0.6, "en": "a"},
+      {"id": "fl_dect", "tipo": "texto", "texto": "decidir con la prueba", "x": 1150, "y": 730, "tam": 36, "peso": "b", "color": "ambar", "entrada": "subir", "en": "a", "t": 0.3},
+      {"id": "k_te", "relleno": "azulclaro", "borde": "azul", "dur": 0.8, "en": "b"},
+      {"id": "k_tet", "color": "azul", "dur": 0.8, "en": "b"},
+      {"quitar": ["k_lock"], "en": "b"},
+      {"id": "k_tet2", "tipo": "texto", "texto": "otra validación", "x": 1580, "y": 455, "tam": 34, "peso": "b", "color": "azul", "entrada": "pop", "en": "b", "t": 0.4}
+    ]},
+    {"say": "Y su nota deja de ser honesta. [[a]]Es como el alumno que vio el examen antes de darlo.", "acciones": [
+      {"id": "ex2", "tipo": "tarjeta", "x": 1590, "y": 800, "w": 520, "h": 420, "escala": 0.7, "titulo": "El examen", "items": ["Pregunta 1"], "color": "rojo", "entrada": "subir", "en": "a"},
+      {"id": "visto", "tipo": "texto", "texto": "visto antes", "x": 1590, "y": 870, "tam": 44, "peso": "b", "color": "rojo", "fondo_txt": "rojoclaro", "pad": 14, "entrada": "pop", "en": "a", "t": 0.7}
+    ]},
+    {"say": "Piensa un segundo: [[a]]pruebas diez profundidades distintas mirando la prueba, y te quedas con la que mejor salió. [[b]]¿Esa nota es confiable?", "pausa": 0.45, "acciones": [
+      {"limpiar": true, "dur": 0.5},
+      {"id": "bt", "tipo": "texto", "texto": "nota en la prueba de 10 árboles distintos", "x": 960, "y": 250, "tam": 40, "peso": "sb", "color": "gris", "entrada": "subir", "en": "a"},
+      {"id": "base", "tipo": "linea", "x0": 480, "y0": 822, "x1": 1440, "y1": 822, "color": "tinta", "grosor": 3, "entrada": "ninguna", "desde": {"progreso": 0}, "dur": 0.5, "en": "a"},
+      {"id": "b0", "tipo": "caja", "x0": 520, "y0": 700, "x1": 580, "y1": 820, "radio": 8, "relleno": "rojo", "desde": {"y0": 820}, "en": "a", "t": 0.3},
+      {"id": "b1", "tipo": "caja", "x0": 610, "y0": 610, "x1": 670, "y1": 820, "radio": 8, "relleno": "rojo", "desde": {"y0": 820}, "en": "a", "t": 0.45},
+      {"id": "b2", "tipo": "caja", "x0": 700, "y0": 660, "x1": 760, "y1": 820, "radio": 8, "relleno": "rojo", "desde": {"y0": 820}, "en": "a", "t": 0.6},
+      {"id": "b3", "tipo": "caja", "x0": 790, "y0": 540, "x1": 850, "y1": 820, "radio": 8, "relleno": "rojo", "desde": {"y0": 820}, "en": "a", "t": 0.75},
+      {"id": "b4", "tipo": "caja", "x0": 880, "y0": 580, "x1": 940, "y1": 820, "radio": 8, "relleno": "rojo", "desde": {"y0": 820}, "en": "a", "t": 0.9},
+      {"id": "b5", "tipo": "caja", "x0": 970, "y0": 630, "x1": 1030, "y1": 820, "radio": 8, "relleno": "rojo", "desde": {"y0": 820}, "en": "a", "t": 1.05},
+      {"id": "b6", "tipo": "caja", "x0": 1060, "y0": 490, "x1": 1120, "y1": 820, "radio": 8, "relleno": "rojo", "desde": {"y0": 820}, "en": "a", "t": 1.2},
+      {"id": "b7", "tipo": "caja", "x0": 1150, "y0": 600, "x1": 1210, "y1": 820, "radio": 8, "relleno": "rojo", "desde": {"y0": 820}, "en": "a", "t": 1.35},
+      {"id": "b8", "tipo": "caja", "x0": 1240, "y0": 560, "x1": 1300, "y1": 820, "radio": 8, "relleno": "rojo", "desde": {"y0": 820}, "en": "a", "t": 1.5},
+      {"id": "b9", "tipo": "caja", "x0": 1330, "y0": 620, "x1": 1390, "y1": 820, "radio": 8, "relleno": "rojo", "desde": {"y0": 820}, "en": "a", "t": 1.65},
+      {"id": "b6", "relleno": "verde", "dur": 0.4, "en": "a", "t": 2.6},
+      {"id": "mejor", "tipo": "texto", "texto": "la mejor", "x": 1090, "y": 450, "tam": 36, "peso": "b", "color": "verde", "entrada": "pop", "en": "a", "t": 2.7},
+      {"id": "conf", "tipo": "texto", "texto": "¿confiable?", "x": 960, "y": 920, "tam": 54, "peso": "b", "color": "ambar", "entrada": "pop", "en": "b"}
+    ]},
+    {"say": "[[a]]No. Elegiste usando la prueba, así que esa nota es optimista. [[b]]La decisión se toma con la validación, y la prueba solo confirma.", "acciones": [
+      {"quitar": ["conf", "mejor"], "en": "a", "dur": 0.3},
+      {"id": "xb6", "tipo": "marca", "forma": "cruz", "x": 1090, "y": 655, "tam": 70, "color": "blanco", "entrada": "ninguna", "desde": {"progreso": 0}, "dur": 0.5, "en": "a", "t": 0.1},
+      {"id": "opt", "tipo": "texto", "texto": "nota optimista", "x": 1090, "y": 440, "tam": 42, "peso": "b", "color": "rojo", "fondo_txt": "rojoclaro", "pad": 12, "entrada": "pop", "en": "a", "t": 0.5},
+      {"id": "dec2", "tipo": "texto", "texto": "decide la validación  ·  la prueba solo confirma", "x": 960, "y": 930, "tam": 44, "peso": "b", "color": "teal", "fondo_txt": "tealclaro", "entrada": "pop", "en": "b"}
+    ]},
+
+    {"seccion": "6. Para llevar", "say": "Para llevarte en una frase: [[a]]el entrenamiento aprende, [[b]]la validación elige, [[c]]y la prueba da el veredicto final, una sola vez.", "acciones": [
+      {"limpiar": true, "dur": 0.5},
+      {"id": "p1", "tipo": "caja", "x": 960, "y": 360, "w": 1240, "h": 124, "radio": 62, "relleno": "violetaclaro", "borde": "violeta", "grosor": 4, "entrada": "pop", "en": "a"},
+      {"id": "p1t", "tipo": "texto", "texto": "Entrenamiento  →  aprende", "x": 960, "y": 356, "tam": 54, "peso": "b", "color": "violeta", "entrada": "pop", "en": "a"},
+      {"id": "p2", "tipo": "caja", "x": 960, "y": 530, "w": 1240, "h": 124, "radio": 62, "relleno": "azulclaro", "borde": "azul", "grosor": 4, "entrada": "pop", "en": "b"},
+      {"id": "p2t", "tipo": "texto", "texto": "Validación  →  elige", "x": 960, "y": 526, "tam": 54, "peso": "b", "color": "azul", "entrada": "pop", "en": "b"},
+      {"id": "p3", "tipo": "caja", "x": 960, "y": 700, "w": 1240, "h": 124, "radio": 62, "relleno": "rojoclaro", "borde": "rojo", "grosor": 4, "entrada": "pop", "en": "c"},
+      {"id": "p3t", "tipo": "texto", "texto": "Prueba  →  veredicto final, una sola vez", "x": 1000, "y": 696, "tam": 54, "peso": "b", "color": "rojo", "entrada": "pop", "en": "c"},
+      {"id": "p3l", "tipo": "candado", "x": 440, "y": 704, "tam": 58, "color": "rojo", "disco": false, "entrada": "pop", "en": "c", "t": 0.3}
+    ]},
+    {"say": "Y si ves una brecha grande entre entrenamiento y validación, [[a]]ya sabes lo que significa: [[b]]sobreajuste.", "acciones": [
+      {"id": "fin_r", "tipo": "anillo", "x": 960, "y": 445, "w": 1320, "h": 300, "radio": 70, "color": "rojo", "grosor": 5, "en": "a"},
+      {"id": "fin", "tipo": "texto", "texto": "brecha grande  =  sobreajuste", "x": 960, "y": 880, "tam": 54, "peso": "b", "color": "rojo", "fondo_txt": "rojoclaro", "entrada": "pop", "en": "b"}
+    ]}
+  ]
+}

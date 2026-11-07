@@ -1,0 +1,343 @@
+1
+00:00:00,250 --> 00:00:02,340
+Quinta parada: Gradient Boosting.
+
+2
+00:00:02,460 --> 00:00:06,520
+Vas a hacer una ronda completa a mano con la tabla de la diapositiva diez.
+
+3
+00:00:06,640 --> 00:00:11,410
+AdaBoost le avisa al siguiente árbol con pesos: fíjate en estos casos.
+
+4
+00:00:11,530 --> 00:00:13,420
+Gradient Boosting es más directo.
+
+5
+00:00:13,540 --> 00:00:18,132
+Le pasa al siguiente árbol el error mismo, con su signo y su tamaño: a esta
+
+6
+00:00:18,132 --> 00:00:21,990
+casa le faltan dos mil dólares; a esta otra le sobran tres mil.
+
+7
+00:00:22,110 --> 00:00:23,410
+Piensa en un sastre.
+
+8
+00:00:23,530 --> 00:00:26,570
+En la primera prueba, el traje queda más o menos.
+
+9
+00:00:26,690 --> 00:00:31,860
+El sastre mide cuánto falta en cada costura: dos centímetros aquí, tres de más allá.
+
+10
+00:00:31,980 --> 00:00:36,470
+El siguiente ajuste no rehace el traje: corrige justo esas diferencias.
+
+11
+00:00:36,590 --> 00:00:41,210
+Esas diferencias, lo que falta para llegar al valor real, se llaman residuos.
+
+12
+00:00:41,330 --> 00:00:45,420
+Residuo igual a y menos efe: el valor real menos la predicción actual.
+
+13
+00:00:45,540 --> 00:00:47,780
+La diapositiva nueve escribe la regla.
+
+14
+00:00:47,900 --> 00:00:51,013
+El modelo nuevo, efe eme, es el modelo anterior
+
+15
+00:00:51,013 --> 00:00:53,530
+más eta por hache eme, el árbol nuevo.
+
+16
+00:00:53,650 --> 00:00:56,913
+Y el ciclo: una pérdida, su gradiente negativo, un
+
+17
+00:00:56,913 --> 00:00:59,980
+árbol que lo aproxima, y el modelo actualizado.
+
+18
+00:01:00,100 --> 00:01:03,453
+Y abajo, una frase clave: con error cuadrático, el
+
+19
+00:01:03,453 --> 00:01:06,470
+gradiente negativo coincide con los residuos.
+
+20
+00:01:06,590 --> 00:01:08,620
+En la próxima parada veremos por qué.
+
+21
+00:01:08,740 --> 00:01:11,130
+Por ahora, trabajemos con residuos.
+
+22
+00:01:11,250 --> 00:01:13,890
+Ahora a mano, con la diapositiva diez.
+
+23
+00:01:14,010 --> 00:01:20,310
+Cuatro observaciones: A, B, C y D, con valores 12, 7, 11 y 10.
+
+24
+00:01:20,430 --> 00:01:24,270
+El primer paso es la predicción base, efe cero: el promedio.
+
+25
+00:01:24,390 --> 00:01:29,560
+12 más 7 más 11 más 10 son 40, y 40 dividido por cuatro: 10.
+
+26
+00:01:29,680 --> 00:01:32,960
+Segundo paso: los residuos, y menos efe cero.
+
+27
+00:01:33,080 --> 00:01:35,580
+A: 12 menos 10, más 2.
+
+28
+00:01:35,700 --> 00:01:38,620
+B: 7 menos 10, menos 3.
+
+29
+00:01:38,740 --> 00:01:40,060
+C: más 1.
+
+30
+00:01:40,180 --> 00:01:43,520
+Y D: cero, porque D ya vale justo el promedio.
+
+31
+00:01:43,640 --> 00:01:46,520
+Los residuos son lo que el primer árbol tiene que aprender.
+
+32
+00:01:46,640 --> 00:01:50,230
+Tercer paso: un árbol pequeño que predice esos residuos.
+
+33
+00:01:50,350 --> 00:01:54,452
+La diapositiva no dice dónde corta, así que usemos un stump de
+
+34
+00:01:54,452 --> 00:01:58,090
+ejemplo: pone a B en una hoja, y a A, C y D en la otra.
+
+35
+00:01:58,210 --> 00:02:02,730
+Cada hoja predice el promedio de sus residuos: para B, menos 3.
+
+36
+00:02:02,850 --> 00:02:08,280
+Para A, C y D: 2 más 1 más 0, dividido por tres, igual a 1.
+
+37
+00:02:08,400 --> 00:02:10,820
+Cuarto paso: actualizar con eta.
+
+38
+00:02:10,940 --> 00:02:12,490
+Usemos 0.1.
+
+39
+00:02:12,610 --> 00:02:17,690
+Para A, C y D: 10 más 0.1 por 1, igual a 10.1.
+
+40
+00:02:17,810 --> 00:02:22,610
+Para B: 10 más 0.1 por menos 3, igual a 9.7.
+
+41
+00:02:22,730 --> 00:02:25,480
+Solo avanzamos un diez por ciento de la corrección.
+
+42
+00:02:25,600 --> 00:02:28,010
+Quinto paso: los nuevos residuos.
+
+43
+00:02:28,130 --> 00:02:29,540
+A, 1.9.
+
+44
+00:02:29,660 --> 00:02:31,720
+B, menos 2.7.
+
+45
+00:02:31,840 --> 00:02:33,570
+C, 0.9.
+
+46
+00:02:33,690 --> 00:02:35,780
+D, menos 0.1.
+
+47
+00:02:35,900 --> 00:02:38,785
+Todos se achicaron un poco, salvo D, que estaba
+
+48
+00:02:38,785 --> 00:02:41,240
+perfecto y ahora se pasa por una décima.
+
+49
+00:02:41,360 --> 00:02:42,510
+¿Mejoró el modelo?
+
+50
+00:02:42,630 --> 00:02:44,690
+Midamos el error cuadrático medio.
+
+51
+00:02:44,810 --> 00:02:50,180
+Antes: 4 más 9 más 1 más 0, dividido por cuatro: 3.5.
+
+52
+00:02:50,300 --> 00:03:01,490
+Después: 3.61 más 7.29 más 0.81 más 0.01, igual a 11.72, dividido por cuatro: 2.93.
+
+53
+00:03:01,610 --> 00:03:02,110
+Bajó.
+
+54
+00:03:02,230 --> 00:03:06,430
+Y el siguiente árbol vuelve a estudiar lo que aún falta: los residuos nuevos.
+
+55
+00:03:06,550 --> 00:03:09,470
+Con datos reales pasa lo mismo, a gran escala.
+
+56
+00:03:09,590 --> 00:03:14,330
+En Ames, Gradient Boosting con árboles de profundidad tres y eta 0.1.
+
+57
+00:03:14,450 --> 00:03:18,340
+Con un árbol, el error de validación es 69 000 dólares.
+
+58
+00:03:18,460 --> 00:03:20,960
+Con diez, 40 700.
+
+59
+00:03:21,080 --> 00:03:23,870
+Con cincuenta, 24 300.
+
+60
+00:03:23,990 --> 00:03:26,430
+Con cien, 22 700.
+
+61
+00:03:26,550 --> 00:03:29,430
+Y con trescientos, 21 800.
+
+62
+00:03:29,550 --> 00:03:33,099
+En Python: GradientBoostingRegressor, con el número de
+
+63
+00:03:33,099 --> 00:03:36,780
+árboles, el learning_rate, que es eta, y la profundidad.
+
+64
+00:03:36,900 --> 00:03:41,220
+Con la pérdida cuadrática, efe cero es el promedio, igual que a mano.
+
+65
+00:03:41,340 --> 00:03:44,582
+Y staged_predict te entrega efe uno, efe dos, efe
+
+66
+00:03:44,582 --> 00:03:47,360
+tres: la predicción después de cada árbol.
+
+67
+00:03:47,480 --> 00:03:50,575
+El error típico al programarlo a mano: entrenar cada
+
+68
+00:03:50,575 --> 00:03:53,550
+árbol nuevo sobre y, en vez de sobre los residuos.
+
+69
+00:03:53,670 --> 00:03:56,810
+Así, todos los árboles aprenderían lo mismo que el
+
+70
+00:03:56,810 --> 00:03:59,260
+primero, y sumarlos no corregiría nada.
+
+71
+00:03:59,380 --> 00:04:03,600
+El otro error: sumar el árbol completo, sin multiplicar por eta.
+
+72
+00:04:03,720 --> 00:04:04,940
+Piensa un segundo.
+
+73
+00:04:05,060 --> 00:04:08,150
+En la tabla, ¿qué pasaría con eta igual a uno?
+
+74
+00:04:08,270 --> 00:04:10,110
+¿Los residuos bajan más o menos?
+
+75
+00:04:10,830 --> 00:04:15,340
+Con eta igual a uno, A, C y D pasan a 11, y B a 7.
+
+76
+00:04:15,460 --> 00:04:22,330
+Los residuos quedan en 1, 0, 0 y menos 1, y el error cuadrático medio cae a 0.5.
+
+77
+00:04:22,450 --> 00:04:24,050
+Mucho mejor en esta tabla.
+
+78
+00:04:24,170 --> 00:04:27,282
+Pero ojo: cada árbol también aprende el ruido de
+
+79
+00:04:27,282 --> 00:04:30,070
+sus datos, y con eta uno lo copia completo.
+
+80
+00:04:30,190 --> 00:04:34,600
+Por eso, en datos reales, los pasos chicos suelen generalizar mejor.
+
+81
+00:04:34,720 --> 00:04:37,556
+Para llevarte: Gradient Boosting parte del promedio
+
+82
+00:04:37,556 --> 00:04:39,780
+y entrena cada árbol sobre los residuos.
+
+83
+00:04:39,900 --> 00:04:42,460
+Cada árbol se suma multiplicado por eta.
+
+84
+00:04:42,580 --> 00:04:47,190
+Y en cada ronda, el siguiente árbol estudia lo que todavía falta por explicar.
+
+85
+00:04:47,310 --> 00:04:50,170
+Siguiente parada: por qué se llama gradient.
+
+86
+00:04:50,290 --> 00:04:51,950
+La pérdida y su gradiente.

@@ -1,0 +1,194 @@
+ Ejercicios para el cuaderno · Clase 34 · Árboles de decisión
+
+ Para resolver en papel, con calculadora (teclas ln y log) · soluciones paso a paso al final
+
+ Cómo usar esta guía
+ • Escribe el número del bloque y del ejercicio, y tu desarrollo completo.
+ • Para log2 usa log2(x) = ln(x) / ln(2) = ln(x) / 0.693.
+ • Nivel: ★ directo · ★★ 2 o 3 pasos · ★★★ integra varios conceptos.
+ • Los Bloques 1 y 4 usan el árbol y los números de la guía (página 1).
+
+Bloque 1 Recorrer el árbol de la clase ★
+
+Usa el árbol de profundidad 3 de la guía.
+1 Cliente A: no reclamó, 500 segundos, 40 meses de antigüedad. ¿En qué hoja cae y cuál es su probabilidad de
+
+        fuga?
+2 Cliente B: reclamó, 30 llamadas, 2 fallas. ¿Hoja y probabilidad?
+3 Cliente C: no reclamó, 3.000 segundos, CLV 500. ¿Hoja y probabilidad?
+4 Calcula el lift de la hoja del cliente B (tasa general 15.7%) y escribe su regla en una frase de negocio.
+
+Bloque 2 Impureza a mano ★
+
+1 Calcula Gini y entropía de un nodo con 30 clientes, de los cuales 6 se fugan.
+2 Calcula Gini y entropía de un nodo con 20 clientes, 15 de clase A y 5 de clase B.
+3 ¿Cuánto valen Gini y entropía en un nodo puro? ¿Y en uno 50/50?
+
+Bloque 3 Elegir el corte ★★
+
+Padre: 200 clientes, 40 se fugan. Corte A: izquierda 80 clientes (32 fugan), derecha 120 (8 fugan). Corte B: izquierda 100 (20
+fugan), derecha 100 (20 fugan).
+1 Calcula el Gini del padre.
+2 Calcula el Gini de cada hijo, el Gini ponderado y la ganancia de los cortes A y B.
+3 ¿Cuál elige el árbol? ¿Qué tienen de especial los hijos del corte B?
+4 ★★★ Repite el corte A con entropía en vez de Gini. ¿Cambia la elección?
+
+Bloque 4 El primer corte real ★★
+
+Raíz: 3.150 clientes, 495 fugan. Reclamó: 278 clientes, 210 fugan. No reclamó: 2.872, 285 fugan.
+1 Calcula el Gini de la raíz y de cada hijo.
+2 Calcula el Gini ponderado y la ganancia.
+3 La diapositiva 13 dice que la ganancia es ~0.097. ¿Está bien? Justifica.
+
+Bloque 5 Sobreajuste ★★
+
+AUC (entrenamiento / validación): prof. 3 → 0.855 / 0.850 · prof. 6 → 0.940 / 0.911 · prof. 10 → 0.985 / 0.882 · sin límite → 1.000 /
+0.827.
+1 ¿Qué profundidad eliges y por qué?
+2 Calcula la brecha entre entrenamiento y validación para cada profundidad. ¿Qué te dice?
+
+Ejercicios para el cuaderno · Clase 34                                                                                                 1
+3 Con el criterio del profesor (diferencia máxima de unos 2 puntos), ¿qué profundidades aceptarías?
+
+Bloque 6 Poda por costo-complejidad ★★
+
+T1: error 0.08 con 30 hojas · T2: error 0.12 con 6 hojas.
+1 Calcula el costo de T1 y T2 con α = 0.001 y con α = 0.004. ¿Cuál gana en cada caso?
+
+2 ¿Para qué α empatan?
+
+3 Si GridSearchCV elige α = 0.0013 con 36 hojas y la tabla de la clase muestra α = 0.002 con 15 hojas y menor
+        AUC, ¿cuál elegirías para una presentación a gerencia? Justifica.
+
+Bloque 7 Importancia de variables ★★
+
+1 Un modelo tiene AUC 0.92 en el test. Al desordenar «segundos» baja a 0.89 y al desordenar «edad» baja a
+        0.915. Calcula ambas importancias por permutación.
+
+2 En la clase, clv tiene importancia por impureza 0.109 y por permutación 0.014. Explica la diferencia usando
+        sus 2.654 valores distintos.
+
+3 ¿Por qué la permutación se mide sobre el test y no sobre el entrenamiento?
+
+Bloque 8 Invariancia y bosque ★★★
+
+1 El árbol corta en segundos ≤ 934. Si reemplazas segundos por log(1 + segundos), ¿cuál sería el nuevo
+        umbral? ¿Cambia algún cliente de lado?
+
+2 Con σ² = 1 y ρ = 0.4, calcula la varianza del promedio de 10 y de 200 árboles. ¿Cuál es el piso con infinitos
+        árboles?
+
+3 Con 12 variables y max_features = 'sqrt', ¿cuántas variables mira cada corte? ¿Para qué sirve eso?
+
+Ejercicios para el cuaderno · Clase 34                                                                           2
+   Soluciones paso a paso
+
+   Revisa el desarrollo, no solo el número final
+
+Bloque 1
+
+#  Solución
+
+1  reclamos ≤ 0.5 sí → segundos ≤ 934 sí → antigüedad ≤ 28.5 no → hoja de 340 clientes: 43%.
+
+2  reclamos ≤ 0.5 no → frec_llamadas ≤ 57.5 sí → numero_fallas ≤ 0.5 no → hoja de 149 clientes: 94%.
+
+3  reclamos ≤ 0.5 sí → segundos ≤ 934 no → clv ≤ 61.3 no → hoja de 2.359 clientes: 4.5%.
+
+4  Lift = 0.94 / 0.157 = 6.0. Regla: «clientes que reclamaron, usan poco el servicio (57 llamadas o menos) y tuvieron fallas
+
+   técnicas: 94% se fuga». Prioridad 1 para retención.
+
+Bloque 2
+
+#  Solución
+
+1 p = 6/30 = 0.2 → Gini = 1 − 0.04 − 0.64 = 0.32 · entropía = −0.2·log20.2 − 0.8·log20.8 = 0.464 + 0.258 = 0.722.
+
+2  p = 0.75 → Gini = 1 − 0.5625 − 0.0625 = 0.375 · entropía = 0.311 + 0.5 = 0.811.
+
+3  Puro: 0 y 0 · 50/50: Gini 0.5 y entropía 1 (los máximos).
+
+Bloque 3
+
+#  Solución
+
+1  p = 40/200 = 0.2 → Gini padre = 0.32.
+
+2  A: izquierda p = 0.4 → 0.48 · derecha p = 8/120 = 0.067 → 0.124 · ponderado 0.4·0.48 + 0.6·0.124 = 0.267 · ganancia
+
+   0.053. B: los dos hijos con p = 0.2 → 0.32 · ponderado 0.32 · ganancia 0.
+
+3  Elige A. Los hijos de B tienen la misma proporción que el padre: no separan nada.
+
+4  Entropía padre 0.722 · izquierda 0.971 · derecha 0.353 · ponderada 0.4·0.971 + 0.6·0.353 = 0.600 · ganancia 0.122. B
+
+   sigue con ganancia 0: la elección no cambia.
+
+Ejercicios para el cuaderno · Clase 34                                                                                        3
+Bloque 4
+
+#  Solución
+
+1  Raíz: p = 0.157 → 0.265 · reclamó: p = 210/278 = 0.755 → 0.370 · no reclamó: p = 285/2.872 = 0.099 → 0.179.
+
+2  Ponderado = (278·0.370 + 2.872·0.179) / 3.150 = 0.196 · ganancia = 0.265 − 0.196 = 0.069.
+
+3  No: con esos datos (incluso con los 211/284 de la diapositiva) la ganancia es 0.070, no 0.097. La propia diapositiva 12
+
+   muestra 0.0693. La nota de respuesta tiene un error.
+
+Bloque 5
+
+#  Solución
+
+1  Profundidad 6: tiene el mayor AUC de validación (0.911).
+
+2  Brechas: prof. 3 → 0.005 · 6 → 0.029 · 10 → 0.103 · sin límite → 0.173. La brecha crece con la profundidad: más
+
+   sobreajuste.
+
+3  Solo la profundidad 3 (0.5 puntos). La 6 tiene casi 3 puntos: hay que decidir si esa ganancia de AUC justifica el
+
+   sobreajuste, o podar.
+
+Bloque 6
+
+#  Solución
+
+1  α = 0.001: T1 = 0.08 + 0.030 = 0.110 · T2 = 0.12 + 0.006 = 0.126 → gana T1. α = 0.004: T1 = 0.08 + 0.12 = 0.20 · T2 =
+
+   0.12 + 0.024 = 0.144 → gana T2.
+
+2  0.08 + 30α = 0.12 + 6α → 24α = 0.04 → α = 0.00167.
+
+3  Para gerencia, probablemente el de 15 hojas: se entiende en una lámina y pierde poco AUC (0.883 vs 0.909). Si el
+
+   objetivo es predecir, el de 36 hojas. Depende de para qué es el modelo.
+
+Bloque 7
+
+#  Solución
+
+1  segundos: 0.92 − 0.89 = 0.03 · edad: 0.92 − 0.915 = 0.005. segundos importa seis veces más.
+
+2  Con 2.654 valores, clv ofrece muchísimos umbrales; por azar alguno reduce la impureza, y la importancia por impureza
+
+   lo premia. Al desordenarla en datos nuevos, el AUC casi no cae: el modelo no la necesitaba tanto.
+
+3  Porque sobre el entrenamiento el modelo ya memorizó: desordenar una variable que memorizó hace caer el AUC
+
+   aunque no generalice.
+
+Bloque 8
+
+#  Solución
+
+1  Nuevo umbral: log(1 + 934) = 6.84. Ningún cliente cambia de lado: la transformación es monótona y conserva el orden.
+
+2  B = 10: 0.4 + 0.6/10 = 0.46 · B = 200: 0.4 + 0.6/200 = 0.403 · piso: ρσ² = 0.4.
+
+3  √12 ≈ 3 variables por corte. Así los árboles se parecen menos entre sí (baja ρ) y el promedio reduce más la varianza.
+
+Ejercicios para el cuaderno · Clase 34                                                                                      4
+

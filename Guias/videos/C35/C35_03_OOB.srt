@@ -1,0 +1,315 @@
+1
+00:00:00,250 --> 00:00:04,670
+Tercera parada: el error fuera de bolsa, el OOB.
+
+2
+00:00:04,790 --> 00:00:09,400
+Vas a calcularlo a mano, y vas a ver por qué es una validación casi gratis.
+
+3
+00:00:09,520 --> 00:00:13,543
+Para saber si un modelo generaliza, normalmente apartas datos: un
+
+4
+00:00:13,543 --> 00:00:16,700
+conjunto de validación, o haces validación cruzada.
+
+5
+00:00:16,820 --> 00:00:21,040
+Eso cuesta: o pierdes datos para entrenar, o entrenas cinco veces.
+
+6
+00:00:21,160 --> 00:00:24,420
+¿Y si cada árbol trajera su propia validación incluida?
+
+7
+00:00:24,540 --> 00:00:27,857
+Piensa en un curso donde cada alumno estudia con una guía
+
+8
+00:00:27,857 --> 00:00:31,000
+distinta, sacada al azar del mismo banco de preguntas.
+
+9
+00:00:31,120 --> 00:00:34,446
+Para evaluar a un alumno, no le preguntas lo que ya estudió: le
+
+10
+00:00:34,446 --> 00:00:37,560
+tomas el examen con las preguntas que NO venían en su guía.
+
+11
+00:00:37,680 --> 00:00:42,248
+Cada árbol es un alumno, su muestra bootstrap es su guía, y las
+
+12
+00:00:42,248 --> 00:00:46,090
+filas que quedaron afuera, ese 36.8 %, son su examen.
+
+13
+00:00:46,210 --> 00:00:49,460
+La receta, tal como la dice la diapositiva seis.
+
+14
+00:00:49,580 --> 00:00:52,120
+Cada árbol se entrena con su muestra bootstrap.
+
+15
+00:00:52,240 --> 00:00:56,260
+Las filas que quedaron afuera de esa muestra le sirven de validación interna.
+
+16
+00:00:56,380 --> 00:01:00,900
+Y al final, cada fila recibe predicciones solo de los árboles que no la vieron.
+
+17
+00:01:01,020 --> 00:01:03,360
+¿Cuántos árboles opinan sobre cada fila?
+
+18
+00:01:03,480 --> 00:01:08,286
+Una fila queda afuera con probabilidad 0.368, así que con B
+
+19
+00:01:08,286 --> 00:01:12,440
+árboles, la predice más o menos un 36.8 % de ellos.
+
+20
+00:01:12,560 --> 00:01:17,560
+Con los 120 árboles del notebook del profesor, unos 44 árboles por fila.
+
+21
+00:01:17,680 --> 00:01:20,200
+Con 500, unos 184.
+
+22
+00:01:20,320 --> 00:01:22,840
+Ahora a mano, con un ejemplo pequeño.
+
+23
+00:01:22,960 --> 00:01:25,120
+Cuatro pacientes y cinco árboles.
+
+24
+00:01:25,240 --> 00:01:29,510
+En la tabla, cada casilla con voto es un árbol que NO vio a ese paciente.
+
+25
+00:01:29,630 --> 00:01:33,650
+Las casillas vacías son árboles que sí lo vieron, y por eso no opinan.
+
+26
+00:01:33,770 --> 00:01:37,330
+Votamos fila por fila, solo con los árboles que no la vieron.
+
+27
+00:01:37,450 --> 00:01:39,190
+P1: dos votos Sí.
+
+28
+00:01:39,310 --> 00:01:41,150
+Predice Sí, y acierta.
+
+29
+00:01:41,270 --> 00:01:43,030
+P2: dos votos No.
+
+30
+00:01:43,150 --> 00:01:43,970
+Acierta.
+
+31
+00:01:44,090 --> 00:01:46,280
+P3: dos No contra un Sí.
+
+32
+00:01:46,400 --> 00:01:49,420
+Predice No, pero el paciente era Sí: error.
+
+33
+00:01:49,540 --> 00:01:51,630
+P4: dos No contra un Sí.
+
+34
+00:01:51,750 --> 00:01:53,590
+Predice No, y acierta.
+
+35
+00:01:53,710 --> 00:01:55,910
+Una fila mal clasificada de cuatro.
+
+36
+00:01:56,030 --> 00:02:05,360
+El error OOB es uno sobre cuatro, 25 %, y la exactitud OOB, 0.75.
+
+37
+00:02:05,480 --> 00:02:09,940
+Y fíjate: ningún árbol evaluó a un paciente que hubiera visto en su entrenamiento.
+
+38
+00:02:10,060 --> 00:02:13,223
+Un detalle práctico: con muy pocos árboles,
+
+39
+00:02:13,223 --> 00:02:16,680
+algunas filas no tienen ninguna predicción OOB.
+
+40
+00:02:16,800 --> 00:02:20,880
+Una fila entra a una muestra con probabilidad 0.632.
+
+41
+00:02:21,000 --> 00:02:24,543
+Que entre a las diez muestras de diez árboles:
+
+42
+00:02:24,543 --> 00:02:27,470
+0.632 elevado a diez, más o menos 1 %.
+
+43
+00:02:27,590 --> 00:02:30,550
+Con treinta árboles, ya es prácticamente cero.
+
+44
+00:02:30,670 --> 00:02:36,560
+Ahora con datos reales: ¿se parece el OOB a las otras formas de validar?
+
+45
+00:02:36,680 --> 00:02:40,150
+Heart, un bosque de quinientos árboles, exactitud.
+
+46
+00:02:40,270 --> 00:02:44,210
+El OOB da 0.811.
+
+47
+00:02:44,330 --> 00:02:48,440
+La validación cruzada de cinco bloques da 0.798.
+
+48
+00:02:48,560 --> 00:02:54,480
+Y el conjunto de prueba, 76 pacientes que nadie tocó, da 0.855.
+
+49
+00:02:54,600 --> 00:02:56,320
+Las tres en el mismo rango.
+
+50
+00:02:56,440 --> 00:02:59,910
+Y con un desvío de la validación cruzada de cerca de
+
+51
+00:02:59,910 --> 00:03:03,180
+0.05, esas diferencias son ruido, no un problema.
+
+52
+00:03:03,300 --> 00:03:10,021
+En Ames, el error en dólares cuenta la misma historia: OOB, 26 000;
+
+53
+00:03:10,021 --> 00:03:15,940
+validación cruzada, 26 300; prueba, 27 000 dólares de RMSE.
+
+54
+00:03:16,060 --> 00:03:22,250
+Y la gran diferencia está en el costo: el OOB salió de un solo ajuste del bosque.
+
+55
+00:03:22,370 --> 00:03:24,750
+La validación cruzada necesitó cinco.
+
+56
+00:03:24,870 --> 00:03:30,630
+Por eso el OOB es tan útil para comparar configuraciones mientras ajustas.
+
+57
+00:03:30,750 --> 00:03:32,820
+En scikit-learn basta un parámetro.
+
+58
+00:03:32,940 --> 00:03:37,930
+oob_score igual a True, al crear el bosque o el bagging.
+
+59
+00:03:38,050 --> 00:03:44,451
+Y después de entrenar, el atributo oob_score_ trae la exactitud
+
+60
+00:03:44,451 --> 00:03:50,040
+OOB en clasificación, o el R cuadrado OOB en regresión.
+
+61
+00:03:50,160 --> 00:03:56,230
+El error típico: usar el OOB como si reemplazara al conjunto de prueba final.
+
+62
+00:03:56,350 --> 00:04:00,544
+La propia nota de la diapositiva seis lo advierte: el OOB ayuda a
+
+63
+00:04:00,544 --> 00:04:04,739
+ajustar el modelo, pero un conjunto de prueba independiente sigue
+
+64
+00:04:04,739 --> 00:04:08,030
+siendo la referencia final, cuando está disponible.
+
+65
+00:04:08,150 --> 00:04:09,370
+Piensa un segundo.
+
+66
+00:04:09,490 --> 00:04:14,372
+En Ames, con trescientos árboles, el error OOB sobre las casas de
+
+67
+00:04:14,372 --> 00:04:19,105
+entrenamiento es 27 300 dólares, pero el error del mismo bosque
+
+68
+00:04:19,105 --> 00:04:22,560
+en un conjunto de validación aparte es 23 100.
+
+69
+00:04:22,680 --> 00:04:26,120
+¿Por qué el OOB sale más alto?
+
+70
+00:04:26,840 --> 00:04:30,089
+Porque cada fila se predice solo con los árboles que
+
+71
+00:04:30,089 --> 00:04:32,650
+no la vieron: más o menos 110 de los 300.
+
+72
+00:04:32,770 --> 00:04:37,070
+Es como evaluar un bosque más chico, y un bosque más chico es un poco peor.
+
+73
+00:04:37,190 --> 00:04:43,030
+Por eso el OOB tiende a ser levemente pesimista: es una estimación prudente.
+
+74
+00:04:43,150 --> 00:04:47,059
+Para llevarte: cada fila se predice solo con los árboles
+
+75
+00:04:47,059 --> 00:04:50,480
+que no la vieron, más o menos un 36.8 % de ellos.
+
+76
+00:04:50,600 --> 00:04:56,400
+Ese error OOB sale de un solo ajuste y se parece a la validación cruzada.
+
+77
+00:04:56,520 --> 00:05:00,060
+Úsalo para ajustar; el conjunto de prueba queda para el final.
+
+78
+00:05:00,180 --> 00:05:02,820
+Siguiente parada: juntar los árboles.
+
+79
+00:05:02,940 --> 00:05:04,740
+Cómo vota y promedia el bagging.

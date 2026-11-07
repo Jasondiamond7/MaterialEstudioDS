@@ -1,0 +1,208 @@
+ Ejercicios para el cuaderno · Clase 33 · Feature engineering
+
+ Para resolver en papel, con calculadora (tecla ln) · soluciones paso a paso al final
+
+ Cómo usar esta guía
+ · Escribe el número del bloque y del ejercicio, y tu razonamiento completo: aquí importan tanto las decisiones como los
+
+     números.
+ · Nivel:  directo ·  2 o 3 pasos ·  integra varios conceptos.
+ · Corrige con las soluciones y marca con color lo que tuviste mal: eso va al repaso del domingo.
+
+Bloque 1 Limpiar con criterio 
+
+Seis clientes: (a) edad 34, segundos 3.100 · (b) edad 233 · (c) segundos -250 · (d) antigüedad 0 meses · (e) edad 12 · (f)
+frec_llamadas 0.
+1 Clasifica cada caso como imposible, dudoso (decisión de negocio) o válido. Justifica en una línea.
+2 ¿Qué harías con cada uno: NaN + imputar, preguntar al negocio, o dejarlo?
+3 Segundos de 6 clientes: 2.800, 3.000, 3.100, 3.300, 3.500 y -9.000. Calcula la media y la mediana con el error,
+
+        y la mediana después de marcarlo como NaN.
+4  Un compañero borra las 111 filas con edad fuera de [15, 100]. Explica dos problemas de esa decisión.
+
+Bloque 2 Construir variables 
+
+Cliente: antigüedad 25 meses, 50 llamadas, 4.000 segundos, 200 SMS, CLV 600.
+1 Calcula llamadas por mes, segundos por llamada y SMS por llamada.
+2 Calcula log(1 + CLV). ¿Para qué sirve el logaritmo en una variable como CLV?
+3 Si la antigüedad fuera 0, ¿qué pasa con llamadas / antigüedad sin épsilon? ¿Y con  = 10-6?
+4 La variable categórica estado tiene 2 niveles y tipo_plan tiene 2. ¿Cuántas columnas one-hot agregas con
+
+        drop_first?
+
+Bloque 3 Varianza y correlación a mano 
+
+1 Una binaria vale 1 en el 2% de los clientes. Calcula su varianza. ¿La descarta VarianceThreshold(0.01)?
+2 Calcula r de Pearson para x = 1, 2, 3, 4, 5 · y = 1, 3, 2, 5, 4.
+3 Calcula r para x = -2, -1, 0, 1, 2 · y = x². ¿Significa que no hay relación?
+4 Dos variables tienen r = 0.96 entre sí. Una tiene MI 0.10 con el target y la otra 0.08. ¿Con cuál te quedas y por
+
+        qué?
+
+Bloque 4 Irrelevante, redundante o útil en conjunto 
+
+1 Clasifica: (a) log_segundos cuando ya tienes segundos · (b) el color favorito del cliente · (c) numero_fallas, que
+        sola da AUC 0.53 pero sube el modelo de 0.907 a 0.910.
+
+2 Para los 4 puntos (x1, x2, clase): (+1, +1, 1), (+1, -1, 0), (-1, +1, 0), (-1, -1, 1), ¿x1 sola separa las clases?
+        Calcula x1·x2 para cada punto. ¿Qué observas?
+
+3  ¿Por qué un filtro univariado (ANOVA F) descartaría x1 y x2 en el ejercicio anterior? ¿Qué método no
+        las descartaría?
+
+Ejercicios para el cuaderno · Clase 33                                                                                      1
+Bloque 5 Filter, wrapper o embedded 
+
+1 Clasifica: VarianceThreshold · RFE · Lasso · información mutua · forward selection · importancia de un árbol ·
+        ANOVA F.
+
+2 Tienes 5.000 variables candidatas y poco cómputo. Propón el orden en que aplicarías las tres familias.
+
+Bloque 6 Costo y Lasso 
+
+1 ¿Cuántos subconjuntos hay con 15 variables? ¿Cuánto tardarías a 1.000 modelos por segundo?
+2 En sklearn, C = 0.01 deja 13 variables y C = 1 deja 45. ¿Qué C usarías si quieres un modelo simple de explicar?
+
+        ¿Qué arriesgas?
+3 ¿Por qué hay que escalar las variables antes de un Lasso? Responde con un ejemplo de segundos (miles) vs
+
+        reclamos (0/1).
+
+Bloque 7 Leakage en la selección 
+
+1 Tienes 400 variables de puro ruido y usas  = 0.05. ¿Cuántas esperas que parezcan significativas por azar?
+2 Clasifica cada paso como «antes del split» o «dentro del fold»: (a) quitar edades imposibles · (b) imputar con
+
+        la mediana · (c) calcular llamadas por mes · (d) SelectKBest · (e) StandardScaler · (f) Lasso · (g) one-hot de
+        estado.
+3 Un compañero reporta AUC 0.97 en fuga. Nombra dos preguntas que le harías antes de creerle.
+4 Quieres predecir la fuga de agosto. ¿Puedes usar «n° de reclamos en julio»? ¿Y «n° de reclamos en agosto»?
+        Explica.
+
+Bloque 8 WOE e IV 
+
+Variable con 2 tramos; total 1.000 buenos y 250 malos. Tramo A: 700 buenos y 50 malos. Tramo B: 300 buenos y 200 malos.
+1 Calcula % de buenos y % de malos de cada tramo.
+2 Calcula el WOE de cada tramo.
+3 Calcula el IV e interprétalo con los umbrales de los apuntes.
+
+Ejercicios para el cuaderno · Clase 33                                                                                   2
+   Soluciones paso a paso
+
+   Revisa el razonamiento, no solo el número final
+
+Bloque 1
+
+#  Solución
+
+1  (a) válido · (b) imposible · (c) imposible · (d) válido: cliente nuevo, pero ojo con los ratios · (e) dudoso: podría ser la
+
+   cuenta de un menor · (f) válido: un cliente sin llamadas existe.
+
+2  (b) y (c): NaN + imputar con la mediana · (e): preguntar al negocio y documentar · (a), (d) y (f): dejar; (d) necesita épsilon
+
+   en los ratios.
+
+3  Media con el error = (15.700 - 9.000) / 6 = 1.116.7 · mediana con el error = (3.000 + 3.100) / 2 = 3.050 · mediana sin el
+
+   error (5 valores) = 3.100.
+
+4  Pierde la información de las otras 11 variables de esas filas, y los 108 casos de 0-14 años podrían ser clientes reales
+
+   (cuentas de menores). Además puede sesgar la muestra si esos clientes se fugan distinto.
+
+Bloque 2
+
+#  Solución
+
+1  50 / 25 = 2 llamadas por mes · 4.000 / 50 = 80 segundos por llamada · 200 / 50 = 4 SMS por llamada.
+
+2  ln(601) = 6.40. El log aplasta la cola larga: los clientes de CLV muy alto no dominan el modelo.
+
+3 Sin épsilon: división por cero  infinito, y el pipeline se rompe. Con épsilon: 50 / 10-6 = 50.000.000, finito pero enorme:
+           conviene revisarlo o aplicarle un log.
+
+4  2 - 1 = 1 por estado y 2 - 1 = 1 por plan: 2 columnas (estado_2, plan_2).
+
+Bloque 3
+
+#  Solución
+
+1  0.02 · 0.98 = 0.0196 > 0.01  no la descarta.
+
+2 x = 3,  = 3. Desvíos x: -2, -1, 0, 1, 2 · desvíos y: -2, 0, -1, 2, 1. Sxy = 4 + 0 + 0 + 2 + 2 = 8 · Sxx = 10 · Syy = 10  r = 8 /
+           10 = 0.8.
+
+3  r = 0, pero la relación es perfecta (y = x²). Pearson solo mide relaciones lineales: grafica siempre.
+
+4  Son redundantes: me quedo con la de MI 0.10, salvo que la otra sea mucho más simple de mantener en producción.
+
+Ejercicios para el cuaderno · Clase 33                                                                                              3
+Bloque 4
+
+#  Solución
+
+1  (a) redundante  conservar una · (b) irrelevante  descartar · (c) útil en conjunto  no descartarla.
+
+2  x1 = +1 tiene una clase 1 y una 0; con -1, igual: x1 sola no separa. x1·x2 = +1, -1, -1, +1 coincide con la clase (+1  1,
+
+   -1  0): juntas separan perfecto.
+
+3  ANOVA F compara la media de cada variable entre clases, y esas medias son iguales: F  0. Un modelo con la
+
+   interacción x1·x2, un Random Forest o un árbol profundo sí las aprovechan.
+
+Bloque 5
+
+#  Solución
+
+1  Filter: VarianceThreshold, información mutua, ANOVA F · Wrapper: RFE, forward selection · Embedded: Lasso,
+
+   importancia de un árbol.
+
+2  Filtro (varianza + MI) para bajar a unas 200  embedded (Lasso) para bajar a unas 30  wrapper (RFE) solo si sobra
+
+   cómputo.
+
+Bloque 6
+
+#  Solución
+
+1 215 - 1 = 32.767 subconjuntos  33 segundos a 1.000 modelos por segundo.
+
+2  Un C chico, por ejemplo 0.01 (13 variables). Arriesgas perder variables útiles y algo de AUC; además, entre variables
+
+   redundantes el Lasso elige una casi al azar.
+
+3  La penalización castiga el tamaño del coeficiente. Segundos en miles tendría un coeficiente diminuto aunque fuera
+
+   importante, y reclamos (0/1) uno grande: el Lasso decidiría por las unidades, no por la información.
+
+Bloque 7
+
+#  Solución
+
+1   · p = 0.05 · 400 = 20 variables falsamente significativas.
+
+2  Antes del split: (a), (c), (g) · Dentro del fold: (b), (d), (e), (f).
+
+3  ¿La selección o la imputación se hizo dentro del CV? ¿Alguna variable usa información posterior al momento de
+
+   predecir (ventana temporal)? También: ¿está evaluado en un test que nunca se tocó?
+
+4  Julio sí: es anterior al período del target. Agosto no: es el mismo período que quieres predecir (leakage temporal).
+
+Bloque 8
+
+#  Solución
+
+1  A: 700/1.000 = 70% buenos · 50/250 = 20% malos · B: 300/1.000 = 30% buenos · 200/250 = 80% malos.
+
+2 WOEA = ln(0.70 / 0.20) = 1.253 · WOEB = ln(0.30 / 0.80) = -0.981.
+
+3  IV = (0.70 - 0.20)·1.253 + (0.30 - 0.80)·(-0.981) = 0.626 + 0.490 = 1.12 > 0.5  sospechoso: tanto poder predictivo
+
+   suele indicar leakage. Hay que revisar cómo se construyó la variable.
+
+Ejercicios para el cuaderno · Clase 33                                                                                        4
+

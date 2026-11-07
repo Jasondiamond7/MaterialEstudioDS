@@ -1,0 +1,342 @@
+ Clase 31 · Introducción al Machine Learning
+
+ Profesora Laura Sánchez · bloque de Machine Learning · sigue a Preparación para ML (C30) y precede a Reducción
+ de dimensionalidad (C32)
+
+ La gran idea de la clase
+En lugar de escribir a mano las reglas de decisión, se le entregan ejemplos a un modelo y él ajusta sus parámetros.
+Según lo que se tenga, el problema cae en una familia: con etiqueta (supervisado: clasificación o regresión), sin
+etiqueta (no supervisado: clustering o reducción de dimensionalidad) o con un entorno y recompensas (refuerzo).
+El ciclo es siempre el mismo: datos, modelo, evaluación del error y mejora. «No siempre se necesita inteligencia
+artificial: quieren un Ferrari para ir a comprar pan a la esquina.»
+
+La clase en una imagen
+
+Lo que necesitas ANTES                                         Ruta de la clase y datos
+
+• Regresión lineal (Clases 17–19) y logística (Clases 20–21):  • Reglas fijas → ciclo del ML → clasificación → regresión
+    aquí aparecen como «modelos de ML»                             → K-Means y PCA → ajuste y regularización → trampa
+                                                                   del accuracy → elegir el enfoque
+• Train / validación / prueba, Pipeline, Ridge y Lasso,
+    accuracy / precision / recall / F1 (Clase 30)              • Datos: Club Activo, 800 clientes simulados (el notebook
+                                                                   usa np.random.seed(42); 20.9 % cancela) y la base real
+• Imputar con media o mediana (Clase 30), ahora dentro de          de 3.150 clientes de la actividad de repaso (15.7 % de
+    un Pipeline                                                    fuga), que sirve para el desafío «supervisado o no
+                                                                   supervisado»
+• Distancia euclidiana y promedio (para K-Means); la idea de
+    varianza (para PCA)                                        • Pregunta guía: ¿qué tipo de problema es, qué datos tengo
+                                                                   y cómo sabré que el modelo sirve?
+
+Puentes con las clases vecinas
+C30 → C31: lo que allí se vio por piezas (división, regularización, métricas) aquí se aplica a un caso completo. C31 → C32: PCA
+aparece como «resumen visual» de 3 variables (58.2 % + 33.6 %); la Clase 32 explica cómo se calcula, cuántos componentes
+elegir y qué es t-SNE. Para no repetir: aquí solo se usa PCA para mirar segmentos, no para modelar.
+
+Clase 31 · Introducción al Machine Learning                                                                                      1
+ Clase 31 · Clasificación: la regresión logística
+
+ Fuente: transcripción de la clase + diapositivas + apunte + notebook y caso de la profesora Laura Sánchez
+
+Si lo que se predice es una categoría (¿cancela, sí o no?), el problema es de
+clasificación. La regresión logística calcula un puntaje (logit) y lo convierte en
+probabilidad con la función sigmoide; el umbral decide la clase.
+
+Conceptos clave
+
+1 Puntaje y probabilidad. logit = b₀ + b₁x₁ + … ; p = 1 / (1 + e−logit). Puntaje 0 equivale a p = 0.5; cada unidad
+        adicional de x multiplica las odds por ebj.
+
+                                 j
+
+2 Aprende con entrenamiento, se juzga con prueba. Flujo de la Clase 30: dividir (estratificado), ajustar con
+        fit solo en entrenamiento, evaluar en datos que el modelo nunca vio.
+
+3 class_weight='balanced'. Pondera cada clase de forma inversa a su frecuencia (aquí 0.63 y 2.39): el modelo
+        se vuelve «alarmista», gana recall y pierde precisión. Es una decisión de modelado, no un arreglo gratuito.
+
+4 El umbral es una decisión de negocio. Con 0.5 se detecta el 52 %; subirlo da más precisión y menos recall.
+        Se elige según el costo de cada error.
+
+Izquierda: los 240 clientes de prueba sobre la sigmoide (el color real no se usó para ubicarlos). Centro: precisión y recall según el
+umbral. Derecha: frontera de decisión con solo antigüedad y quejas (una recta, porque el logit es lineal).
+
+Fórmulas y reglas                                  Con los datos de la clase
+
+p = 1 / (1 + e−z)                                  • Prueba de 240 clientes (20.8 % cancela): accuracy 73.3 %,
+                                                       precisión 39.4 %, recall 52.0 %, F1 44.8 %, AUC 0.685
+z = b₀ + b₁x₁ + b₂x₂ + …
+odds = p / (1 − p) = ez                            • Coeficientes (estandarizados): quejas +1.08, antigüedad
+                                                       −0.80, uso −0.22, edad +0.08; intercepto −0.39
+
+                                                   • Sin class_weight: precisión 69.2 %, recall 18.0 %
+
+En Python                                          Cuidado
+                                                   El 73.3 % de accuracy es menor que el 79.2 % de «nadie
+   Pipeline([('imp', ColumnTransformer(...)),      cancela». Con un AUC de 0.685 el modelo es modesto, no
+                   ('esc', StandardScaler()),      «una moneda» ni «excelente».
+                   ('lr', LogisticRegression())])
+
+Clase 31 · Introducción al Machine Learning                                                                                            2
+ Clase 31 · Regresión: predecir un número
+
+ Fuente: transcripción de la clase + diapositivas + apunte + notebook y caso de la profesora Laura Sánchez
+
+Si lo que se predice es un valor continuo (¿cuánto gastará?), el problema es de
+regresión. El modelo ajusta una función de las variables y se evalúa con el error entre
+lo predicho y lo real (MSE, RMSE, R²).
+
+Conceptos clave
+
+1 Métricas de error. MSE = promedio de errores²; RMSE = su raíz, en las unidades del gasto (miles de CLP); R²
+        = 1 − SSE/SST: la proporción de la variación explicada.
+
+2 Redescubrir una regla. Los datos se generaron con gasto = 25 + 0.9·antigüedad + 3.2·uso + ruido. El
+        modelo, sin conocer la fórmula, aprende 26.8, 0.93 y 2.98.
+
+3 R² moderado no es falla. Con ruido (sd 12) sobre un gasto de sd 19, un R² de 0.55 es lo esperable: el techo
+        lo pone el ruido, no el modelo.
+
+4 Mismo flujo, otra métrica. En clasificación, matriz de confusión; en regresión, error cuadrático y R². Dividir y
+        evaluar en datos no vistos no cambia.
+
+Izquierda: predicción vs. gasto real en la prueba (R² 0.55, RMSE 12.0). Centro: coeficientes ocultos y aprendidos. Derecha: los residuos
+se centran en 0 (sd ≈ 12).
+
+Fórmulas y reglas                            Con los datos de la clase
+
+  MSE = (1/n) Σ (yᵢ − ŷᵢ)²                   • MSE 144.9 · RMSE 12.0 · R² 0.548 en la prueba (0.572 en
+  RMSE = √MSE                                    entrenamiento)
+  R² = 1 − SSE / SST
+                                             • Coeficientes: antigüedad 0.929 (real 0.9), uso 2.981 (real
+En Python                                        3.2), intercepto 26.76 (real 25)
+
+   LinearRegression().fit(X_train, y_train)  • El gasto medio es 63.2 miles de CLP: un RMSE de 12 es ≈
+   mean_squared_error(y_test, pred)              19 % del gasto medio
+   r2_score(y_test, pred)
+                                                Cuidado
+                                                «Redescubrir» la fórmula es posible solo porque los datos
+                                                se simularon con ella; en un caso real no existe una
+                                                fórmula verdadera que comparar.
+
+Clase 31 · Introducción al Machine Learning                                                                                               3
+ Clase 31 · Sin etiquetas: K-Means y PCA
+
+ Fuente: transcripción de la clase + diapositivas + apunte + notebook y caso de la profesora Laura Sánchez
+
+En aprendizaje no supervisado no hay respuesta correcta; se busca estructura.
+K-Means forma grupos alrededor de centroides; PCA resume variables correlacionadas
+en pocos componentes. PCA no forma grupos: solo cambia el sistema de ejes.
+
+Conceptos clave
+
+1 K-Means paso a paso. Elegir k centroides → asignar cada punto al más cercano → recalcular cada centroide
+        como la media de su grupo → repetir hasta que nada cambie. Minimiza la suma de distancias² a los
+        centroides (inercia).
+
+2 Escalar antes de agrupar. Se usan distancias: la variable de mayor escala domina. Sin estandarizar, los
+        segmentos cambian (ARI 0.39 respecto de los estandarizados).
+
+3 Elegir k. No hay un k verdadero: se mira el codo de la inercia, la silueta y, sobre todo, si los grupos tienen
+        sentido para el negocio.
+
+4 Interpretar y validar. Los grupos se leen mirando el perfil de cada uno. Aunque cancelo no se usó, un grupo
+        (antiguos y de alto gasto) tiene 7 % de cancelación frente a 21–24 %.
+
+K-Means con antigüedad, uso y gasto estandarizados (Club Activo). Izquierda: dos de las tres variables; segundo: los mismos clientes
+proyectados con PCA (58.2 % + 33.6 % = 91.8 % de la varianza); tercero: codo y silueta; derecha: perfil de cada segmento y su tasa de
+cancelación.
+
+Fórmulas y reglas                                   Con los datos de la clase
+
+  inercia = Σ ‖xᵢ − μc(i)‖²                         • Segmentos de 252, 439 y 109 clientes; silueta 0.348 (k = 2),
+  μc = media de los puntos del grupo c                  0.338 (k = 3), 0.327 (k = 4): sin un k claro
+  silueta [−1, 1]; más alta = grupos más separados
+                                                    • Segmento 2: antigüedad +1.99 sd, gasto +1.48 sd, cancela
+En Python                                               7 %; segmentos 0 y 1: 21 % y 24 %
+
+   KMeans(n_clusters=3, n_init=10,                  • Base real, 6 variables de uso: k = 3, silueta 0.473; fuga de
+              random_state=42).fit_predict(Z)           24.7 %, 0.0 % y 2.3 % en la prueba
+
+   silhouette_score(Z, etiquetas)                      Cuidado
+                                                       «Con dos de las tres variables llegamos a los mismos
+                                                       clústeres» no es exacto: los componentes mezclan las tres
+                                                       variables, y los clústeres los formó K-Means, no PCA.
+
+Clase 31 · Introducción al Machine Learning                                                                                            4
+ Clase 31 · Ajuste del modelo: subajuste, sobreajuste y
+ regularización
+
+ Fuente: transcripción de la clase + diapositivas + apunte + notebook y caso de la profesora Laura Sánchez
+
+Un modelo demasiado simple no aprende el patrón (subajuste); uno demasiado
+complejo memoriza el ruido (sobreajuste). Se detecta comparando entrenamiento y
+prueba. La regularización penaliza coeficientes grandes: Ridge los encoge, Lasso
+puede llevarlos a cero.
+
+Conceptos clave
+
+1 Subajuste y sobreajuste. Subajuste: mal incluso en entrenamiento. Sobreajuste: muy bien en entrenamiento
+        y mucho peor en prueba. La causa es la complejidad frente a los datos disponibles.
+
+2 Ridge (L2). Penaliza Σβ²: encoge todos los coeficientes, rara vez los anula.
+3 Lasso (L1). Penaliza Σ|β|: lleva a cero los coeficientes poco útiles (selección automática).
+
+Tres ajustes sobre la misma nube (60 puntos): grado 1, 2 y 15, y el R² de entrenamiento y prueba según el grado. La X roja es lo que
+ocurre sin escalar.
+
+Caminos de coeficientes de Lasso y Ridge al subir alpha (antigüedad y uso en azul; ruido en rojo) y R² de prueba. Con alpha
+moderado el R² no cambia (0.544 → 0.552 con Lasso 0.5).
+
+Fórmulas y reglas                                   Con los datos de la clase
+
+Ridge: min Σ(y − ŷ)² + α Σ β²                       • Grado 1: R² 0.52 / 0.10 · grado 2: 0.80 / 0.51 · grado 15
+Lasso: min Σ(y − ŷ)² + α Σ |β|                          (escalado): 0.90 / −4.79 · (sin escalar: 0.30 / −0.56)
+si las columnas son ortonormales: Ridge = β/(1+α);
+Lasso = signo(β)·máx(|β| − α, 0)                    • Lasso (alpha 0.5) anula quejas, ruido 1 y ruido 2 y deja
+                                                        edad en 0.22; Ridge (alpha 5) apenas las encoge
+
+                                                    • Con alpha enorme los dos tienden a predecir la media (R²
+                                                        ≈ 0)
+
+                                                    Cuidado
+                                                    En el notebook de la clase el grado 15 sin escalar da R² de
+                                                    entrenamiento 0.30 (no «altísimo»): hay un problema
+                                                    numérico, no solo sobreajuste.
+
+Clase 31 · Introducción al Machine Learning                                                                                           5
+ Clase 31 · Evaluar bien: la trampa del accuracy
+
+ Fuente: transcripción de la clase + diapositivas + apunte + notebook y caso de la profesora Laura Sánchez
+
+Con clases desbalanceadas, un modelo que siempre responde «no pasa nada» obtiene
+un accuracy alto y un recall de 0. Hay que reportar la matriz de confusión y mirar
+precisión, recall y F1 junto con una línea base.
+
+Conceptos clave
+
+1 Matriz de confusión. Filas = real, columnas = predicho: VN y FP arriba, FN y VP abajo (convención de
+        scikit-learn). Todas las métricas salen de estas cuatro cifras.
+
+2 Accuracy vs. recall. Accuracy = (VP + VN)/total. Recall = VP/(VP + FN): de los que sí cancelan, cuántos se
+        detectan. Precisión = VP/(VP + FP).
+
+3 Siempre comparar con la línea base. En la base real, «nadie se fuga» ya logra 84.3 % de accuracy: un 88.5 %
+        no es tan impresionante como parece.
+
+4 El costo manda. Si dejar escapar un caso cuesta mucho más que una falsa alarma, se prioriza el recall (y se
+        acepta menos precisión).
+
+Izquierda: 1.000 casos con 5 % de riesgo y un modelo «perezoso». Centro: base real (prueba de 788 clientes) con la línea base, la
+logística y la logística balanceada. Derecha: matriz de confusión del modelo de Club Activo.
+
+Fórmulas y reglas                                 Con los datos de la clase
+
+  precisión = VP / (VP + FP)                      • Club Activo: VN 150, FP 40, FN 24, VP 26 → precisión 26/66
+  recall = VP / (VP + FN)                             = 39.4 %, recall 26/50 = 52.0 %
+  F1 = 2·precisión·recall / (precisión + recall)
+                                                  • Base real: logística 88.5 % acc, 71.4 % prec, 44.4 % recall,
+En Python                                             F1 0.547; balanceada 82.1 %, 46.4 %, 87.9 %, F1 0.607
+
+   confusion_matrix(y_test, pred)                 • Mismo AUC (0.908 y 0.910): cambia el punto de operación,
+   DummyClassifier(strategy='most_frequent')          no la capacidad de ordenar
+   classification_report(y_test, pred)
+                                                     Cuidado
+                                                     El F1 y el accuracy no se pueden leer como un ranking
+                                                     único: depende de qué error cuesta más.
+
+Clase 31 · Introducción al Machine Learning                                                                                        6
+Cómo elegir el enfoque, ML vs. Deep Learning y el flujo honesto
+
+Primero el problema, luego el algoritmo
+
+Pregunta                                     Si la respuesta es…                  Enfoque a considerar
+¿Tengo ejemplos con la respuesta             sí, y es una categoría               Clasificación (supervisado)
+correcta?
+                                             sí, y es un número                   Regresión (supervisado)
+¿No tengo etiquetas?                         quiero descubrir grupos              Clustering, p. ej. K-Means
+                                             quiero simplificar muchas variables  Reducción de dimensionalidad, p. ej. PCA
+¿Decisiones secuenciales con entorno?        ensayo y error con recompensa        Aprendizaje por refuerzo
+¿Imágenes, audio, texto, gran volumen?       datos complejos                      Deep Learning (redes neuronales)
+
+Criterio                 Machine Learning clásico                                 Deep Learning
+Volumen de datos         suele bastar con miles de registros                      suele necesitar muchísimos más
+Hardware                 CPU estándar                                             frecuentemente GPU
+Extracción de atributos  manual, con conocimiento del negocio                     automática, por capas ocultas
+Interpretabilidad        en general mayor (la regresión lo es; otros              en general menor
+                         modelos no)
+Casos de uso             datos tabulares, scoring                                 visión, audio, lenguaje, IA generativa
+
+El Pipeline de la clase, honesto
+Pipeline([('imp', ColumnTransformer(...media / mediana...)), ('esc', StandardScaler()), ('lr',
+LogisticRegression(class_weight='balanced'))]).fit(X_train, y_train)
+El notebook de la clase imputa (media, mediana) y escala antes de dividir: es una fuga leve. Dentro de un Pipeline, cada paso
+aprende solo con entrenamiento y las métricas de la clase no cambian (73.3 / 39.4 / 52.0).
+
+       Checklist del flujo                          Cómo sé que lo hice bien
+☐ Defino qué quiero predecir y qué decisión mejora  etiqueta o no, categoría o número
+☐ Divido antes de imputar, escalar o ajustar        todo lo que aprende de los datos va en un Pipeline
+☐ Comparo contra una línea base                     «siempre la clase mayoritaria» o la regla fija actual
+☐ Elijo la métrica según el costo del error         no solo accuracy; matriz de confusión completa
+☐ Escalo antes de usar distancias o penalizaciones  K-Means, Ridge, Lasso
+☐ Interpreto los segmentos con su perfil            los grupos de K-Means no traen nombre ni etiqueta
+
+Clase 31 · Introducción al Machine Learning                                                                                    7
+Alertas del material, repaso y criterio de dominio
+
+Diferencias entre materiales y qué conviene corregir (verificado con código)
+
+Diapositivas, apunte y notebook
+• Nota del notebook sobre K-Means: «el gasto mensual es la variable que más distingue al Segmento 2 y queda
+
+    invisible». El que más lo distingue es la antigüedad (+1.99 sd; gasto +1.48) y sí se ve en el eje x. Los segmentos 0 y 1 se
+    separan por uso (+0.99 frente a −0.56), también visible. Además se espera un segmento de mayor cancelación; ocurre lo
+    contrario: el 2 cancela 7 % frente a 21 % y 24 %.
+• Sobreajuste con grado 15: el texto habla de R² de entrenamiento «altísimo». Con PolynomialFeatures(15) sin escalar
+    el R² de entrenamiento es 0.30 (menor que el 0.80 del grado 2) y el de prueba −0.56: la matriz está mal condicionada.
+    Escalando, 0.90 y −4.79. El diagnóstico es correcto; las cifras de la celda no lo muestran.
+• K-Means (diapositiva 8): «encuentra centros (K) que minimizan la distancia entre los puntos de cada grupo». K es el
+    número de grupos; se minimiza la suma de distancias² de cada punto a su centroide. Y PCA «elimina ruido visual»:
+    descarta direcciones de poca varianza, que no es lo mismo que ruido.
+• Diapositiva 12: «Modelos neuronales requieren conjuntos… divididos en entrenamiento, validación y prueba»: la división
+    vale para cualquier modelo. Diapositiva 13: ML = «cajas blancas» y DL = «millones de registros» son tendencias, no
+    reglas (un boosting no es caja blanca; hay redes con pocos datos).
+• Cierre del notebook: «Próxima sesión (32): redes neuronales». La Clase 32 es reducción de dimensionalidad (PCA y
+    t-SNE). Y recomendar_enfoque devuelve un solo enfoque como si fueran excluyentes.
+• Apunte: dice que el modelo de clasificación usó «antigüedad, uso, edad, quejas y gasto» y que se predijo «un cliente
+    nuevo»; usa cuatro variables (sin gasto) y predice el conjunto de prueba. En clase salió 22.8 % de cancelación; el notebook
+    final da 20.9 %.
+
+Lo dicho en clase
+• «Precisión 51 % es como lanzar una moneda» y «recall 52 %… lo mismo que una moneda»: la comparación es con la
+
+    prevalencia (20.8 %), no con 50 %. Un clasificador al azar tiene precisión igual a la prevalencia; este logra 39.4 % y AUC
+    0.685 (azar = 0.5): modesto, pero no es una moneda.
+• «Esto es 149 verdaderos positivos»: la celda superior izquierda de scikit-learn son los verdaderos negativos (150 en el
+    notebook final); los verdaderos positivos son 26.
+• «Quitar quejas_soporte desbalanceó el modelo»: no cambia el balance de clases (20.8 %). Efecto real: accuracy 73.3 →
+    52.5 %, precisión 39.4 → 24.6 %, recall 52 → 62 %, F1 44.8 → 35.2 % y AUC 0.685 → 0.575. Subió solo el recall (lo dijo bien
+    una participante).
+• 90/10 «corre el riesgo de sobreajuste»: un 10 % de prueba da una estimación ruidosa del error; el sobreajuste depende
+    de la complejidad, no del porcentaje.
+• K-Means «toma un punto, ve los más cercanos y mueve el centro»: no; asigna cada punto a su centroide más cercano y
+    recalcula medias. PCA «separa tres clústeres»: los formó K-Means; PCA proyecta. «91.8 % de la información» es 91.8 %
+    de la varianza.
+• Caso de repaso, pregunta 1.2: predecir «cuántos meses le quedan antes de cancelar» no es sin más una regresión lineal;
+    es un problema de tiempo hasta el evento con datos censurados (los que aún no cancelan), que se trata con análisis de
+    supervivencia.
+
+Transcripción con ruido
+Whisper confundió KYC (KIC), K-Means (camins, Kamins, Cummings), accuracy (cura), recall (recol), PCA (PSA, IPCA), CAPTCHA
+(CAPCHAT), «redes neuronales» (jornales) y «Machine Learning» (Machilas, Machete). El volumen cayó a ≈ −65 dB desde ≈
+35:00 y a ≈ −78 dB desde ≈ 85:00 (se transcribió una copia amplificada); el recreo (≈ 0:59:00) no está en el video. Frases
+dudosas: «la gragasa» (omitida), «un platón de riesgo».
+
+Criterio de dominio para pasar a la siguiente clase
+☐ Clasifico un problema como clasificación, regresión, clustering, reducción de dimensionalidad o refuerzo
+☐ Calculo a mano una probabilidad con la sigmoide y una iteración de K-Means
+☐ Leo una curva de entrenamiento / prueba y explico qué hacen Ridge y Lasso
+☐ Calculo accuracy, precisión, recall y F1 y comparo con la línea base
+☐ Resuelvo los bloques 1 a 7 del cuaderno con al menos 80 % de aciertos
+
+Clase 31 · Introducción al Machine Learning                                                                                      8
+

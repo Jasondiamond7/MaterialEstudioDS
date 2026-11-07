@@ -1,0 +1,475 @@
+1
+00:00:00,250 --> 00:00:02,250
+Octava parada: la trampa.
+
+2
+00:00:02,370 --> 00:00:05,600
+Todo lo que hicimos hoy tiene un problema, y lo vamos a medir.
+
+3
+00:00:05,720 --> 00:00:08,995
+Imagina un profesor que arma la prueba final eligiendo justo las
+
+4
+00:00:08,995 --> 00:00:11,860
+preguntas que sus alumnos ya respondieron bien en clase.
+
+5
+00:00:11,980 --> 00:00:13,540
+El curso saca un siete.
+
+6
+00:00:13,660 --> 00:00:17,670
+¿Aprendieron, o el profesor eligió las preguntas mirando las respuestas?
+
+7
+00:00:17,790 --> 00:00:19,880
+Eso mismo hicimos toda la clase.
+
+8
+00:00:20,000 --> 00:00:24,361
+La clase treinta y dos dejó escrita esta regla: el escalador se ajusta solo
+
+9
+00:00:24,361 --> 00:00:28,140
+con entrenamiento; ajustarlo con todos los datos es data leakage.
+
+10
+00:00:28,260 --> 00:00:32,770
+Si eso vale para el escalador, ¿por qué no valdría para la selección de variables?
+
+11
+00:00:32,890 --> 00:00:38,301
+Toda esta clase seleccionamos mirando las tres mil ciento cincuenta filas: el filtro de
+
+12
+00:00:38,301 --> 00:00:43,090
+información mutua, el desempate de los pares redundantes, el RFE, y el Lasso.
+
+13
+00:00:43,210 --> 00:00:46,590
+Y después medimos el desempeño sobre esas mismas filas.
+
+14
+00:00:46,710 --> 00:00:49,200
+Todos esos AUC están inflados.
+
+15
+00:00:49,320 --> 00:00:50,680
+La pregunta es cuánto.
+
+16
+00:00:50,800 --> 00:00:55,010
+Para medirlo, la clase arma un caso donde sabemos la respuesta de antemano.
+
+17
+00:00:55,130 --> 00:00:58,133
+Cien observaciones, mil variables generadas al
+
+18
+00:00:58,133 --> 00:01:00,810
+azar, y un target lanzado a cara o sello.
+
+19
+00:01:00,930 --> 00:01:05,960
+No hay ninguna señal: cualquier medición honesta tiene que dar AUC cero coma cinco.
+
+20
+00:01:06,080 --> 00:01:10,577
+El procedimiento que casi todos escriben: calcular el estadístico F de las mil
+
+21
+00:01:10,577 --> 00:01:14,786
+variables contra el target, quedarse con las veinte mejores, y recién ahí
+
+22
+00:01:14,786 --> 00:01:18,130
+hacer validación cruzada de cinco folds sobre esas veinte.
+
+23
+00:01:18,250 --> 00:01:21,990
+Resultado: AUC cero coma ochocientos ochenta y dos.
+
+24
+00:01:22,110 --> 00:01:24,640
+Con datos que no contienen absolutamente nada.
+
+25
+00:01:24,760 --> 00:01:28,938
+El procedimiento correcto: armar un Pipeline que encadene la selección y
+
+26
+00:01:28,938 --> 00:01:32,420
+el modelo, y pasarle el pipeline completo a cross val score.
+
+27
+00:01:32,540 --> 00:01:35,460
+Así, en cada fold, las veinte variables se eligen
+
+28
+00:01:35,460 --> 00:01:38,260
+usando solo los ochenta casos de entrenamiento.
+
+29
+00:01:38,380 --> 00:01:40,650
+Los veinte de validación no participan.
+
+30
+00:01:40,770 --> 00:01:43,590
+Resultado: cero coma quinientos catorce.
+
+31
+00:01:43,710 --> 00:01:44,380
+La verdad.
+
+32
+00:01:44,500 --> 00:01:47,730
+Mismo dato, mismo modelo, misma validación.
+
+33
+00:01:47,850 --> 00:01:50,470
+Lo único que cambió es dónde vive la selección.
+
+34
+00:01:50,590 --> 00:01:54,839
+Cero coma ochocientos ochenta y dos menos cero coma cinco: treinta y ocho
+
+35
+00:01:54,839 --> 00:01:58,680
+puntos de AUC inventados, a partir de datos que no contienen nada.
+
+36
+00:01:58,800 --> 00:01:59,700
+¿Por qué pasa?
+
+37
+00:01:59,820 --> 00:02:02,159
+Con mil variables de ruido, algunas van a
+
+38
+00:02:02,159 --> 00:02:04,670
+coincidir con el target por pura casualidad.
+
+39
+00:02:04,790 --> 00:02:07,503
+Si usas un test al cinco por ciento, el número
+
+40
+00:02:07,503 --> 00:02:10,040
+esperado de falsos positivos es alfa por p.
+
+41
+00:02:10,160 --> 00:02:11,460
+Tres casos del apunte.
+
+42
+00:02:11,580 --> 00:02:15,650
+Mil variables al cinco por ciento: cincuenta falsos positivos.
+
+43
+00:02:15,770 --> 00:02:18,360
+Doscientas al cinco por ciento: diez.
+
+44
+00:02:18,480 --> 00:02:20,990
+Mil al uno por ciento: también diez.
+
+45
+00:02:21,110 --> 00:02:23,240
+¿Y en los datos de ruido del notebook?
+
+46
+00:02:23,360 --> 00:02:24,270
+Lo verifiqué.
+
+47
+00:02:24,390 --> 00:02:27,902
+Cincuenta y siete de las mil variables tienen p-valor bajo cero
+
+48
+00:02:27,902 --> 00:02:30,690
+coma cero cinco: cerca de los cincuenta esperados.
+
+49
+00:02:30,810 --> 00:02:34,130
+Y diez bajo cero coma cero uno: justo lo esperado.
+
+50
+00:02:34,250 --> 00:02:38,660
+Elegimos las veinte que mejor coincidieron en estas cien observaciones concretas.
+
+51
+00:02:38,780 --> 00:02:42,256
+Después validamos sobre esas mismas cien: el fold de validación
+
+52
+00:02:42,256 --> 00:02:45,400
+contiene justo los casos que las hicieron parecer buenas.
+
+53
+00:02:45,520 --> 00:02:47,980
+El modelo no generaliza: recuerda.
+
+54
+00:02:48,100 --> 00:02:50,888
+Y la validación cruzada no lo detecta, porque la
+
+55
+00:02:50,888 --> 00:02:53,270
+trampa ocurrió antes de partir los datos.
+
+56
+00:02:53,390 --> 00:02:57,960
+La regla de oro: si la decisión mira el target, va dentro de cada fold.
+
+57
+00:02:58,080 --> 00:03:01,969
+Borrar una edad imposible, construir ratios y logaritmos,
+
+58
+00:03:01,969 --> 00:03:05,040
+y el one-hot, no miran nada: pueden ir antes.
+
+59
+00:03:05,160 --> 00:03:08,133
+Escalar e imputar no miran el target, pero usan la
+
+60
+00:03:08,133 --> 00:03:10,750
+media y la mediana del conjunto: van dentro.
+
+61
+00:03:10,870 --> 00:03:14,370
+Y el filtro de información mutua, el desempate, el
+
+62
+00:03:14,370 --> 00:03:17,450
+RFE y el Lasso, miran el target: van dentro.
+
+63
+00:03:17,570 --> 00:03:22,460
+Regla de bolsillo del apunte: si un paso necesita fit, va dentro del Pipeline.
+
+64
+00:03:22,580 --> 00:03:26,560
+Si es una fórmula fija, fila por fila, puede ir antes.
+
+65
+00:03:26,680 --> 00:03:30,212
+Y una precisión sobre el propio notebook: los cuartiles, y los
+
+66
+00:03:30,212 --> 00:03:33,915
+indicadores que usan la mediana o el percentil setenta y cinco de
+
+67
+00:03:33,915 --> 00:03:36,650
+toda la base, sí usan estadísticas del conjunto.
+
+68
+00:03:36,770 --> 00:03:39,960
+Por la misma regla, en rigor, van dentro del fold.
+
+69
+00:03:40,080 --> 00:03:43,320
+Aquí no medimos cuánto cambia, pero la regla es la regla.
+
+70
+00:03:43,440 --> 00:03:46,560
+Ahora, rehacer la clase entera, esta vez bien.
+
+71
+00:03:46,680 --> 00:03:51,508
+Un Pipeline con cuatro pasos, en este orden: imputar con la mediana, escalar,
+
+72
+00:03:51,508 --> 00:03:56,210
+seleccionar doce variables por información mutua, y la regresión logística.
+
+73
+00:03:56,330 --> 00:03:58,667
+Todo dentro del mismo objeto, para que la
+
+74
+00:03:58,667 --> 00:04:01,460
+validación cruzada lo repita entero en cada fold.
+
+75
+00:04:01,580 --> 00:04:05,711
+El resultado del notebook, fold por fold: cero coma ocho nueve
+
+76
+00:04:05,711 --> 00:04:09,775
+cinco, cero coma nueve uno cuatro, cero coma ocho nueve, cero
+
+77
+00:04:09,775 --> 00:04:13,040
+coma nueve dos tres, y cero coma ocho ocho siete.
+
+78
+00:04:13,160 --> 00:04:15,770
+Promedio: cero coma nueve cero uno.
+
+79
+00:04:15,890 --> 00:04:19,704
+Al repetirlo da lo mismo hasta la tercera cifra: la información mutua
+
+80
+00:04:19,704 --> 00:04:23,020
+dentro del pipeline no tiene semilla, y cambia en la cuarta.
+
+81
+00:04:23,140 --> 00:04:25,580
+¿Y cuánto inflaba la trampa con la base real?
+
+82
+00:04:25,700 --> 00:04:28,780
+Lo medí con la misma selección, y la misma semilla.
+
+83
+00:04:28,900 --> 00:04:33,530
+Seleccionando las doce afuera del CV: cero coma nueve cero uno tres.
+
+84
+00:04:33,650 --> 00:04:37,400
+Adentro del pipeline: cero coma ocho nueve nueve seis.
+
+85
+00:04:37,520 --> 00:04:40,232
+Con tres mil filas y señal fuerte, la trampa
+
+86
+00:04:40,232 --> 00:04:42,820
+infla poco: menos de dos décimas de punto.
+
+87
+00:04:42,940 --> 00:04:46,270
+Con cien filas y mil variables, treinta y ocho puntos.
+
+88
+00:04:46,390 --> 00:04:50,820
+La regla es la misma; el daño depende de cuántas variables tengas por fila.
+
+89
+00:04:50,940 --> 00:04:53,790
+Dos decisiones del pipeline, explicadas.
+
+90
+00:04:53,910 --> 00:04:58,198
+StratifiedKFold conserva el quince coma siete por ciento de fuga en cada
+
+91
+00:04:58,198 --> 00:05:02,070
+fold; una partición simple podría dejar un fold casi sin fugados.
+
+92
+00:05:02,190 --> 00:05:06,598
+Y el AUC: decir «nadie se va» acierta el ochenta y cuatro coma
+
+93
+00:05:06,598 --> 00:05:10,010
+tres por ciento, pero su AUC es cero coma cinco.
+
+94
+00:05:10,130 --> 00:05:13,780
+Y la trampa que ningún pipeline detecta: la ventana temporal.
+
+95
+00:05:13,900 --> 00:05:18,540
+Si quieres predecir la fuga de agosto, las variables se miden de junio hacia atrás.
+
+96
+00:05:18,660 --> 00:05:21,920
+Una variable como «llamó para dar de baja el servicio» casi
+
+97
+00:05:21,920 --> 00:05:25,180
+siempre ocurre después de la decisión que quieres predecir.
+
+98
+00:05:25,300 --> 00:05:28,110
+Es leakage, aunque no uses la columna fuga.
+
+99
+00:05:28,230 --> 00:05:32,535
+Por eso el profesor advierte: en la industria, un AUC de cero coma ochenta y
+
+100
+00:05:32,535 --> 00:05:36,500
+cuatro a cero coma ochenta y cinco en fuga ya es extremadamente bueno.
+
+101
+00:05:36,620 --> 00:05:40,490
+Un número demasiado bueno, de libro, suele esconder leakage.
+
+102
+00:05:40,610 --> 00:05:42,960
+Desconfía de las métricas perfectas.
+
+103
+00:05:43,080 --> 00:05:45,752
+El error típico de esta parada: elegir las
+
+104
+00:05:45,752 --> 00:05:48,870
+variables con todos los datos, y después validar.
+
+105
+00:05:48,990 --> 00:05:51,700
+La validación sale preciosa, y es mentira.
+
+106
+00:05:51,820 --> 00:05:54,450
+La selección tiene que vivir dentro del Pipeline.
+
+107
+00:05:54,570 --> 00:05:55,790
+Piensa un segundo.
+
+108
+00:05:55,910 --> 00:06:00,420
+Imputas los nulos con la mediana de toda la base, antes de la validación cruzada.
+
+109
+00:06:00,540 --> 00:06:01,860
+No miraste la fuga.
+
+110
+00:06:01,980 --> 00:06:02,810
+¿Hay leakage?
+
+111
+00:06:03,530 --> 00:06:05,160
+Sí, aunque sea leve.
+
+112
+00:06:05,280 --> 00:06:08,380
+La mediana se calculó también con los casos de validación.
+
+113
+00:06:08,500 --> 00:06:12,423
+La solución es la misma de siempre: SimpleImputer dentro del Pipeline,
+
+114
+00:06:12,423 --> 00:06:15,730
+para que cada fold use solo la mediana de su entrenamiento.
+
+115
+00:06:15,850 --> 00:06:19,346
+Para llevarte: toda decisión que mire el target, o que use
+
+116
+00:06:19,346 --> 00:06:22,360
+estadísticas del conjunto, va dentro de cada fold.
+
+117
+00:06:22,480 --> 00:06:26,880
+Con ruido puro, seleccionar afuera inventó treinta y ocho puntos de AUC.
+
+118
+00:06:27,000 --> 00:06:31,060
+Y además del pipeline, cuida la ventana temporal: nada del futuro.
+
+119
+00:06:31,180 --> 00:06:35,310
+Última parada: el repaso de la clase, y el checklist del proyecto.

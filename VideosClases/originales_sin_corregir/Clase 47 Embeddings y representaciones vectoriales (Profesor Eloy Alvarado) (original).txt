@@ -1,0 +1,1280 @@
+Podíamos verlo como una variante de reenerales.
+Y en ese sentido, entonces, entender bien reenerales nos da un piso bastante sólido
+para entender el resto de metodologías.
+Entonces, después vimos un toncodes, que en esencia, si se acuerdan, en reenerales
+nosotros podíamos predecir y podíamos clasificar.
+y eso dependía mucho de cuál era la función de activación que nosotros teníamos en la última capa
+y en general, en rellenos normales, nuestra entrada o la dimensión de nuestra entrada no era necesariamente nuestra salida
+nosotros vimos el ejemplo de clasificación de los números de escrito a mano
+entonces teníamos algo que representábamos como una matriz
+y nuestra salida era un número entre 0 y 9 ya que eran 10 categorías
+entonces las dimensiones variaban y en AutonCoders nosotros vimos que
+queríamos aprender de nuestra entrada para reconstruir nuestra entrada
+entonces ahí la principal característica era que el tamaño de nuestra entrada de
+nuestros datos, lo que nosotros tenemos como sumo para nuestra red iba a tener la
+misma dimensión que al final y teníamos además
+esta capa, que era esta función latente que nosotros le hicimos de
+8 dimensiones en la sesión pasada.
+Ahora,
+queremos ver lo que es Empery, lo que queremos, lo que vamos a ver hoy
+es cómo represento cosas que ahora no son tan naturales de matematizar porque
+uno puede ver si son datos un excel, un excel particular ya y que tiene
+número la entrada o como insumo una red es bastante natural porque un conjunto
+de una base bien definida las imágenes con ciertas transformaciones podemos
+verlas como matrices y el verlas como matrices también sigue siendo como algo más natural,
+pero pensemos ahora en textos. Nosotros vimos tangencialmente cómo podemos matematizar esos
+textos. Yo les comentaba cuando vimos el ejemplo de los correos, podríamos contar palabras cuando
+queríamos clasificar, por ejemplo, si un correo era spam o no. Nosotros podríamos contar cuántas
+palabras tenía en particular las frecuencias, ciertas palabras que pueden
+ser clave, que nosotros hablamos de la palabra oferta, por ejemplo, la
+longitud también. Uno podría dar ciertas reglas que podrían determinar o que
+podríamos utilizar como variables para identificar si ese correo en particular,
+esa observación, podría ser clasificada como spam o no. Y si se fijan cuando
+estábamos haciendo eso nosotros estábamos desfragmentando la observación algo que
+no era matemático no era una observación que es un texto libre una
+concatenación de símbolos lo matematizamos de alguna manera ya ahora
+nosotros nos vamos a utilizar digamos el
+el mismo tipo de codificador de imágenes recuerden cuando veíamos
+un coder que nosotros codificamos con la función latente y luego decodificamos
+con otra función para reconstruirlo porque le bajamos la dimensión.
+Nosotros vamos a escoger en este sentido, vamos a escoger un modelo que está entrenado
+para representar oraciones o textos.
+Entonces vamos a utilizar ciertas herramientas para matematizar un texto
+pero lo vamos a matizar de cierta manera en particular y esa representación va a ser vectorial.
+vectorial. Entonces lo que vamos a hacer en principio es que los textos van a ser
+vistos como un punto en el espacio, en el espacio digamos hipercube, porque
+va a tener muchas dimensiones. En nuestro caso, lo que vamos a hacer en el
+ejemplo de hoy, no vamos a entrenar en principio la red porque la vamos a
+ocupar, lo que quiere decir que no vamos a cambiar los pesos que están dentro
+dentro del modelo, ya porque nosotros vamos a ocupar una red que ya está establecida,
+ya no vamos a dejar fijos en principio.
+Y ahora, también se puede hacer, que lo vamos a modificar, lo vamos a especificar, digamos,
+cómo lo llamamos, esa cosa, cuando utilizar una red y adaptarla a nuestra actividad, a
+nuestra aplicación en particular.
+lo que nosotros queríamos hacer en principio es tener textos y matematizarlos como un punto
+en el espacio y tener una noción de cercanía. ¿Son similares o no estos puntos? Entenderemos que
+si dos puntos están en esa representación, están cerca entre sí en términos de alguna métrica,
+tipo distancia, entonces vamos a considerar que son, por ejemplo, textos que son parecidos entre sí.
+entonces hay una métrica o una noción de similitud ya cuando yo represento en
+términos vectoriales esos distintos tipos de texto ya entonces vamos a
+ocupar una forma que me lleva texto a una representación vectorial matemática
+y vamos a ocupar eso para darnos una una tarea de por ejemplo buscar ya buscar
+documentos, vamos a una tarea y después vamos a definir qué es lo que tenemos que hacer cuando
+queremos buscar esa tarea en términos de similitud. Entonces nos vamos a preguntar ahora es cómo hay
+una representación aprendida a encontrar información pertinente y vamos a definir que entendemos por esa
+tarea y vamos a ver cómo lo podemos representar y cómo lo vamos a conectar con Rayne Neuronal y
+Antocobers que vamos a ver que esto es en esencia otra variante de lo que nosotros ya hemos visto
+como reino de una vez sólo que ahora si bien nuestras entradas son texto comillas
+libre antes de entrar a nuestra red nosotros lo matematizamos y lo vemos en
+principio como un vector y al verlo como un vector entonces ya podemos aplicar
+todas las cosas que hemos visto antes con la actualización de pesos con la
+activa la función de activación etc
+Entonces,
+imaginemos que tenemos una noción de
+un aula ficticia y nosotros estamos en el equipo de soporte
+y esto ofrece el curso online, etcétera, y me llegan distintas solicitudes.
+y como el equipo digamos de soporte ya tiene de cierta manera preguntas
+recurrentes que tienen que se le hacen en términos de la plataforma
+que ya la tienen definida tienen instructivos por ejemplo si les
+pregunta algo entonces tienen fichas definidas para entregarlo. Ahora
+estos son documentos breves, texto en principio, entonces matematizable por lo
+por lo que les comentaba antes.
+Y este equipo, digamos, tiene 12 fichas. Los de fichas que hablan de setas
+problemáticas o resolución de problemáticas que son recurrentes.
+Entonces lo que nosotros queremos construir es un herramienta, una
+metodología que actúe como un buscador, que encuentre la ficha de las 12 que se
+tienen disponible que entrega una ayuda pertenente bajo cierta consulta. Por
+ejemplo, si un estudiante pregunta, como un ticket pensemos,
+olvide mi clave, como vuelvo a entrar.
+Tenemos por ejemplo una ficha que es la primera que habla de el acceso y escribe
+digamos explica cómo recuperar la contraseña. Ahora, uno podría hacer
+cosas que son un poco más intuitivas, por ejemplo, poder frecuencias como
+cuando lo vimos con el caso de los spam, el caso de los spams, si se
+acuerdan nosotros contábamos palabras y aquí podría hacer algo similar, solo que
+ahora no va a ser spam y no spam, sino que va a ser ficha 1 hasta ficha 2
+y pudiamos extenderlo de esa manera. Pero en estas frases que tenemos, tengo un
+contexto. Y en este caso, por ejemplo, yo pudiese hacer la similitud o el
+sinónimo de clave con contraseña. Entonces si veo frecuencia de palabras, no
+voy a tener una similitud porque clave no es lo mismo que contraseña. Entonces
+tengo que tener una otra forma un poco más robusta de identificar esas similitudes,
+identificar ese parafraseo, ese sinónimo dentro de algo que puede ser computable
+por una red neural. Entonces necesitamos que eso sea un número y ese número, dado que son
+sinónimos, sean parecidos entre sí.
+Entonces, veamos las fichas que se tienen disponibles en este caso, en este caso, digamos,
+ejemplo.
+Entonces, es un documento breve, de texto, plano, en el múdul, les puse un CSV, digamos,
+que explicita que es cada una de estas, pero en esencia son 12, las identificamos como
+de 01, de 02, de 03, y así para cada uno que habla de algún tema en particular.
+El primero habla de acceso, el quinto habla de pagos y el texto asociado que se le pone
+como respuesta cuando se tiene alguna consulta de ese estilo.
+Ahora, simplemente son requerimientos, son consultas.
+La identificación de 05 hace simplemente referencia a un orden, no tiene mayor relevancia.
+lo que tenemos lo importante de acá es que tenemos 12 fichas y lo que yo quiero
+hacer es cómo puedo resolver el problema que acabo de decir. Si un estudiante me
+pregunta o me dice mi clave cómo puedo entrar, cómo puedo generar alguna
+herramienta que automáticamente asigne esa ficha como respuesta
+a esa consulta. Ahora, si se fijan, es muy similar a un problema de clasificación.
+Para un input quiero asignarlo a una de 12 categorías. El problema y el principal
+problema que tengo acá es que mis entradas y mis salidas no son números.
+Entonces, la noción de cercanía, la noción de error, que era la forma en
+que nosotros ajustábamos nuestros pesos en nuestras redes, ya no es tan
+entitido. Entonces tenemos que tener una forma un poquito más metodológica, un poquito más formal de
+pasar esos textos a un número, que es lo que nosotros vamos a llamar el embedding o una
+representación vectorial. Entonces el procedimiento que vamos a seguir, o que vamos a construir,
+recuerden que tienen los códigos en R&M en Python a disposición, lo pueden ir ejecutando, es primero
+cuatro etapas, son cuatro etapas, en el principio lo vamos a ver 1, 2 y 3 y 4, en principio 1,
+vamos a concentrar entonces en primero representar, que en esencia es asignar números al contenido,
+entonces cómo convertir una consulta de texto y un documento que son las fichas en vectores
+comparables, entonces tengo que tenerlo, tener alguna forma de llevar esos textos a algo que sea
+en un mismo dominio, en un mismo soporte. ¿Qué quiere decir eso? Que si lo llevo por ejemplo un
+vector esos vectores tienen que tener igual dimensión. Y la otra pregunta es ¿cómo llevo eso que eso no es un
+número a algo que es un número? No es tan trivial esa pregunta. Entonces la representación puede afectar
+mucho las cosas porque la representación me entrega la forma en la cual yo voy a ver cercanías,
+y la métrica que voy a ocupar para las cercanías va a depender mucho del objeto con el cual yo estoy
+viendo dos cosas, ya nosotros sabemos la distancia entre dos puntos, pero si tengo un vector van a
+depender mucho de cómo voy a generar ese vector que nuevamente viene a partir de un texto, entonces
+tengo muchas formas de representar ese texto. Entonces la primera forma bastante importante que
+es como asigno algún número, algún elemento matemático a ese contenido, que contenido puede
+tener aparte distintas longitudes, la consulta no tiene que ser necesariamente igual. Luego voy a
+entrar en la etapa de comparación, que significa producir un puntaje para cada par o pareja que es
+consulta documento. Entonces para una consulta tengo un documento que es el idóneo, entonces
+cómo voy a comparar esos pares, esos puntajes que yo voy a definir. Y en esa situación quiero
+producir un puntaje, quiero producir un puntaje de qué pasa si la pregunta que
+nos planteamos de olvide mi clave cómo vuelvo a entrar
+sabemos que la ficha 1 es la que se esperaría que resuelva ese problema
+pero también todo eso para tener un número, una comparación, un ranking, un
+puntaje, qué pasa cuál es el puntaje de esta pregunta con el segundo, con la
+segunda ficha o con la quinta ficha que habla de pagos que no tienen nada que
+ver con la entrada, digamos, al portal, a esta aula virtual que yo les comentaba.
+Entonces, tengo que definir alguna manera de matematizar y rankear esas cosas.
+Entonces, lo que vamos a estar respondiendo es qué significa que esos
+vectores sean parecidos y qué vamos a entender por parecidos.
+Luego de eso, nosotros tenemos que ordenar esos puntajes para decidir, por ejemplo,
+ejemplo, en el caso de que nos planteábamos, bajo alguna pregunta, alguna consulta, ¿qué ficha voy a
+mostrar primero? Entonces, puedo tener que ordenar esos pares o esas fichas en función a cuál es la
+más presida o que puede que puede recibir esa pregunta o consulta que hizo el estudiante.
+entonces tengo que ordenar esas posibles respuestas para mostrarlas
+ahora, la ultima etapa que es evaluar, digamos, es mas allá que simplemente la matematización de las cosas
+porque requiere revisar la pertinencia del resultado
+vamos a ver por ejemplo unos casos en donde se muestra algo que pareciera ser similar
+pero no necesariamente lo es, porque no lo puedo deducir, no puedo comprobar concretamente
+o estar totalmente seguro de que lo que está haciendo esta metodología, esta herramienta
+está correcto sólo a través del puntaje que yo le voy a estar asignando en la segunda etapa
+que en esencia es la comparación, la generación de los puntajes. Ahora, esta última etapa es
+super importante porque nosotros vamos a un poco más aurística porque en esencia
+todo lo matemático me puede decir que estas cosas son similares pero tengo que tener una
+una certeza de que los resultados que estoy estudiando para la problemática o aplicación
+que estoy realizando, efectivamente son coherentes con lo que la pregunta está
+queriendo responder. Entonces, no porque tenga apuntajes muy similares o
+más altos, digamos, que lo que ha generado en la etapa 2, voy a tener
+necesariamente buenas respuestas a esas consultas. Estas van a ser las cuatro
+etapas que vamos a identificar, digamos, en este ejemplo, digamos, ficticio.
+Entonces, vamos a entender qué es el embedding primero, ¿ya?
+¿Qué es el embedding de un texto?
+Que nosotros, de cierta manera, no hemos hablado en sesiones pasadas, ¿ya?
+Que es este concepto de representar, ¿ya?
+de representar algo no necesariamente matemático como algo como un elemento matemático
+podemos concordar que un texto puede tener muchas representaciones matemáticas
+yo puedo contar el número, puedo por ejemplo llevarlo a un plano, a un par
+en donde la primera coordenada es el número de vocales y la segunda coordenada es el número
+de consonantes, puedo llevarlo a un número simplemente contando cuantas
+palabras tiene el texto y así suminicia entonces tengo muchas representaciones
+que pueden llevar algo no numérico a algo numérico, entonces el embedding es un
+vector que representa un objeto en un espacio numérico entonces imagínense
+que yo tengo un texto de entrada x y tengo un codificador que es lo que
+nosotros vamos a ver que está entrenado ya que lleva esa entrada de texto a un
+punto en el espacio y se fijan este punto en el espacio que es un vector
+tiene de dimensiones ya en donde tengo la primera componente la segunda
+componente y así sumisí ya cuando se fijan me lleva algo un texto a un vector
+Ahora, ¿qué es lo importante ahí? Lo importante ahí es cuál es la función de F.
+Esa función de F tiene que ser, digamos, compleja para poder, digamos, representar
+distintos tipos de texto. Por ejemplo, puede variar respecto de idiomas.
+Los idiomas pueden tener distintas representaciones.
+Entonces, es muy importante cuál es la representación que estamos utilizando.
+Es súper difícil de llegar a una función que funcione siempre bien.
+De hecho, no ninguna funciona siempre bien, solo que tengo que ir probando y hay unas que funcionan
+mejor en ciertos contextos que otros. Y nosotros vamos a ver, vamos a utilizar una y yo les voy a
+mencionar dos otras herramientas, digamos, que pueden ser utilizadas en este contexto.
+Entonces, estas representaciones, si se fijan de alguna manera, ya fueron entrenadas.
+Ya fueron entrenadas entre texto y representación, porque tienen que ser consistentes dentro de sí.
+Por ejemplo, si el texto es clave y una entrada es clave y se le asigna un vector,
+yo esperaría que contraseña, como otra entrada, otra observación, también tenga
+una representación vectorial no tan lejos de la primera que es clara.
+Entonces tienen que tener una consistencia interna que además tiene que ser consistente con el idioma.
+Entonces es un problema bastante más complicado de abarcar y nosotros lo vamos a ver en términos de una representación, una función.
+Claramente esta función es bastante más compleja que simplemente definir un f que depende de un parámetro en particular.
+porque no son un parámetro, son muchos parámetros.
+Ahora, siguiendo, veamos esta pequeña representación.
+Por ejemplo, podemos hacer pasar texto a número vectorial,
+pero de una manera bien ingenua.
+Si el texto es clave, yo puedo contar cuantas palabras del texto o entrada es clave y en ese
+caso el texto clave va a ser pasado a un vector de tres dimensiones que va a ser 100. Si es
+contraseña el texto, voy a hacer 010. Si es video clave, va a ser 101. Y si se fijan, uno,
+Teóricamente podría hacerlo con todas las palabras, pero va a quedar un vector de dimensión demasiado gigantesco como para poder trabajarlo.
+Entonces, ¿cuál es el problema que tengo acá?
+Es lo que les comentaba en un principio, la coincidencia.
+Aquí, clave y contraseña, lo ocupo como sinónimos.
+Y al ocuparlo como sinónimos, si se fijan acá, en este vector, en esta representación vectorial, son ortogonales.
+porque 100 y 010 son ortogonales entre sí, ya, entonces van a ser súper distintos bajo esa representación.
+Entonces esta representación no me sirve para, digamos, tener una noción de cercanía entre la palabra clave
+y la palabra contraseña. Entonces esta representación que es bastante ingenua no me serviría, digamos,
+por ejemplo para la consulta que tengo anterior, que la tenía del estudiante.
+Entonces el conteo en general no me va a servir, por el hecho de que en texto tengo sinónimos.
+Dos cosas que son distintas pueden ser muy similares entre sí.
+Entonces, tengo que tener cuidado con estos conteos.
+Entonces, mi problema es que sirve para identificar cuando hay una igualdad exacta, porque cualquier
+otro texto que tiene la palabra clave va a estar dentro de una combinación lineal de
+este vector, pero el problema son los sinónimos. Clave y contraseña son sinónimos, pero cuando
+tengo esta representación vectorial en términos de bases en principio no voy a
+tener digamos una noción de similitud de o de cercanía entonces estas
+relaciones de cercanía de sinónimos en términos de palabra no funcionan
+también cuando trabaja con texto ahora
+siguiendo entonces yo tengo que tener una una noción de
+cercanía o una noción de relación. Entonces, esta señal que yo les comentaba, porque nosotros
+sabemos que clave y contraseña son similares entre sí, son sinónimos. Entonces, la señal es
+una información que tenemos antes de calcularlos en Bering, que es esta representación, y corrienta
+de cierta manera el aprendizaje, el aprendizaje de esta representación.
+Por ejemplo, ¿qué tengo que tener ahí yo? Por eso estos modelos de LLM de Inteligencia
+Artificial son súper costosos porque para yo tener eso tengo que saber que son similares.
+Entonces tengo que tener algunos datos que digan que son similares.
+yo puedo tener por ejemplo dos frases, olvidé mi clave y no recuerdo mi
+contraseña, si yo lo matematizo no comparten palabras entre sí, entonces en
+términos de frecuencia son distintos, pero yo sé que son similares pero eso no sé
+yo como persona, entonces tengo que tener alguna señal, algo que me indique ya como
+información apendada a los textos que son un parafraseo entre sí, ya, no que en
+esencia expresan lo mismo, ya, no son exactamente lo mismo pero tienen la misma
+intención, es decir, olvidé mi clave, no recuerdo mi contraseña, la intención es
+que no puedo entrar al portal del aula el aula abierta, digo, entonces esa es la
+noción de par, ya, entonces yo puedo hacer esas similitudes y hay una señal de
+relación. Entonces son un parafraseo entre sí.
+También voy a tener por ejemplo
+olvide mi clave como como entrada, como consulta y el par de las fichas 01 que
+indica el instructivo de cómo recuperar la contraseña. Entonces es una pareja
+relevante porque olvide mi clave es solucionada comillas o es categorizada
+como con las fichas de 01. Entonces lo puedo categorizar con etiquetas 1 que sirve.
+Y olvidé mi clave y las fichas de pagos no, porque no responde a la consulta que se tenía.
+Entonces, no necesariamente esas representaciones van a ser iguales.
+Siempre no necesariamente voy a ocupar las mismas etiquetas binarias siempre.
+y también va a depender obviamente del idioma. Entonces, todas estas codificadores que me llevan
+a una representación vectorial, estos textos, tienden a ser distintos entre sí, distintas
+dimensiones en términos matemáticos de los vectores y la forma en que lo llevan, digamos,
+es porque en esencia es una una proyección
+ahora
+si fijan eso requiere mucho mucha información mucho dato porque tengo un
+digamos un empecido infinito digamos formas de combinar palabras para
+llevarlo a otro par entonces todas estas cosas requieren un entrenamiento muy
+grado ser una codificación bueno la representación vectorial muy buena
+requiere mucho costo computacional y por eso lo vamos a utilizar y no lo vamos a
+entrenar, no lo podrías hacerlo. Ahora lo que se hace es tener
+partir de una base, partir de una representación y tratar de adaptarlo a lo
+que yo tengo. Entonces, esas marcas que en esencia es información apendada a
+los datos que yo tengo originales, lo pueden ser de principio por personas ya,
+cosa que ya se sabe pero necesitamos tener esta esa noción de referencia ya
+entonces se vuelve de cierta manera algo que está más o menos supervisado
+porque tengo una noción de de qué está bien y qué está mal cuando esa señal es
+correcta y cuando no ya cuando hay un parafraseo y sin significar lo mismo
+entonces todo esto justifica digamos que
+todos estos módulos son
+son costosos computacionalmente por la
+por la representación, o sea, más allá de
+el cálculo matemático es por la
+representación misma de que requieres
+obtener este tipo de datos
+entonces
+en el caso que vamos a estar viendo nosotros
+es aprendizaje de estos pares utilizando
+todos estos datos fue previamente hecho. Este f que está acá ya lo vamos a tener dado, con
+sus pesos asociados, con sus parámetros asociados. Entonces, tenemos el entrenamiento y nosotros vamos a
+coger algunos de esos modelos que me representan matemáticamente en términos
+vectoriales, algún texto. Eso es externo a las fichas que yo tengo en este
+ejemplo. Obviamente ese entrenamiento fue realizado con mucha más información,
+con mucho texto y lo que vamos a ver acá también con distintos, en
+distintos idiomas. Nosotros simplemente lo vamos a utilizar. Entonces hubo una
+etapa de un aprendizaje preyo que es esa representación y es lo que más cuesta en principio porque
+tengo que excepcionarme de que cosas similares me lo está llevando a puntos en el espacio
+cercanos entre sí. Entonces, en ese aprendizaje van cambiando los pesos porque en esencia
+es una red de neural. Lo que nosotros vamos a hacer es utilizar ese modelo, esa representación
+para buscar fichas que respondan a distintas consultas, o cuáles son las más pertinentes.
+Eso es lo que nosotros vamos a hacer. Entonces nosotros para ello vamos a ocupar una representación
+que le llamamos Mini LEM, que hace referencia a una cosa
+creada por Microsoft, que es Mini Language Model.
+En esencial, me representa texto de manera matemática,
+pero sin un costo computacional tan grande.
+Por eso el mini.
+Entonces, vamos a ocupar esa forma de representación y vamos
+a llevarlo o ese Mini LEM va a llevar las cosas a un espacio
+o observaciones vectoriales, que nosotros vamos a tratar de encontrar una métrica,
+una noción de similitud que nos va a servir y vamos a ver qué es, digamos,
+o qué vamos a considerar que dos cosas sean similares.
+¿Cómo lo vamos a ver? No solo el texto, sino cómo vamos a considerar que dos cosas
+son similares en el espacio que nos lleva esta herramienta de mini-elec.
+entonces ciertas salvedades, la representación, no puedo enfatizar más lo importante que es porque
+depende mucho del contexto, entonces estos modelos, por ejemplo, modelos de representación que hay,
+que se pueden descargar, son muy difíciles de entrenar porque va a depender mucho del contexto
+de las frases, las frases no son números en principio, son bastante más complicadas, por eso
+texto bastante más difícil que de
+de computar porque la representación matemática y la herramienta que
+nosotros tenemos funcionan bien en términos matemáticos. Podemos hacer las
+funciones de activación, podemos hacer combinaciones lineares, podemos tener los
+P's, podemos utilizarlo, podemos hacer descenso gradiente, tenemos formas de
+trabajar con números, con números y vectores, pero con
+con texto, si bien si lo pasamos a número podemos hacer cosas porque ya
+tenemos esta maquinaria pero si el traspaso que es la representación
+virtual no está correctamente hecha o no es una buena representación entonces
+todo lo que hagamos después de esa representación no va a tener
+necesariamente buenos resultados, no se va a depender mucho del contexto
+Entonces, si fijan acá tengo dos escenas que son en principio similares, si uno lo ve, por ejemplo, en términos matemáticos.
+Entonces, me senté en el banco de la plaza, ocupa la palabra banco, si ocupo, por ejemplo, simplemente el conteo de la palabra banco,
+estas dos frases serían iguales, a pesar de que eran distintas, que son distintas en referencia al contexto.
+tengo bastante adicional el problema que habíamos visto de la similitud por
+sinónimo, que habíamos visto acá, clave y contraseña, cosas que son simulares las
+matematizan de manera distinta, también se ocupa esa misma regla, cosas que son
+que son distintas las voy a clasificar como iguales, ya porque tienen la
+frecuencia 1 la palabra banco, y como banco tiene distintas acepciones
+entonces se expresan distintas
+intenciones o sentidos de esa frase, esa
+consulta. Entonces, tengo que tener cuidado con cómo voy a hacer la representación, por eso,
+enfatizar bastante que el modelo de representación que estoy haciendo para texto es sumamente
+porque digamos esa es la forma en que lo llevo a algo matemático.
+Dictor Chavarri dice en el idioma ingles es más fácil para la IAA porque Banco
+Bech es distinto de Banco. Sí, pero también hay otros problemas en inglés. Cada idioma
+tiene sus propias particularidades. En general en español
+español tenemos hartas problemas porque español es reglas generales
+y luego muchas excepciones a la regla. En cambio en inglés es al revés. Tengo
+excepciones a la regla y después las reglas generales.
+En español tengo mucho sinónimo, digamos, en general. Entonces tiende a ser
+ser un idioma más complicado, pero nuevamente cada idioma tiene su propia complejidad. Claudia.
+Profesor, buenas tardes. Estaba pensando si alguien escribe, por ejemplo, solamente bancos
+sin más contexto, ¿cómo se refleja esa ambigüedad a los resultados?
+Se va a depender de la representación. Por ejemplo, si veo el conteo,
+tengo hartos problemas porque no sé cómo diferenciarlo, no puedo discernirlo,
+no lo voy a poder clasificar bien. Una palabra seca, a secas no me dice mucho.
+Ahora, nuestros modelos de representación están alimentados con un sinfín de texto.
+Ya como que vieron muchas posibles combinaciones de lo que...
+de las posibilidades de texto que puedo tener o de pares de texto que puedo
+tener. Tienen que ser modelos que fueron entrenados con mucho, mucho
+datos, ya, no simplemente con un par de palabras. Entonces, una observación en
+particular de una palabra no me va a afectar tanto la representación porque
+ahí tiene millones y millones de palabras y de textos que fueron entradas,
+ya que con el cual fueron entrenados. Pero en ese problema particular que tú
+mencionas, no tengo una forma de decir ni, porque en términos matemáticos, a menos
+que tenga otra información, el banco de banca y banco de un banco crediticio, digamos, son iguales.
+No hay ausencia distinta de más información, van a ser los mismos, independiente de la
+representación que utilicen. Ok, gracias.
+Entonces, tengo que tener esa representación y tenemos distintas cosas. Ahora, yo les comentaba
+que es súper difícil llegar a hacer representación desde cero. Entonces, no queremos hacer eso,
+porque es muy costoso, por un sinfín de cosas, porque no tengo todos los datos disponibles,
+es costoso computacionalmente, toma tiempo, toma dinero, un sinfín de cosas. Entonces,
+que yo voy a hacer y hay una herramienta que usa una técnica que es destilación
+que es aprender de los vectores de que otra red o de las salidas de otra red que ya aprendió
+recuerden que esta representación por ejemplo el minilem es otra red de neuralza final les
+comentaba todo puede ser visto como una variante o exactamente una red de neural entonces en este
+en este contexto ya tengo una red entrenada que le llamo el maestro y que
+entrega una cierta referencia a otra red que le llamo el estudiante que
+intenta imitar al maestro. Entonces, maestro y estudiante son dos modelos ya de
+redes en algún sentido y en este ejemplo yo lo que quiero es hacer
+una adaptación multilingüe, fíjate acá sale I forgot my password que está en inglés, entonces
+esa noción da, o sea esa entrada me da una referencia vectorial de 0208, entonces el maestro
+recibe la frase que está en inglés que es I forgot my password y entrega un vector de referencia
+0208 y el estudiante recibe su traducción
+olvide mi contraseña y queremos que representen el mismo contenido porque
+son en principio lo mismo entonces
+representan lo mismo a pesar del idioma porque hay problema el password y
+olviden mi contraseña son inherentemente cosas que son muy muy muy
+similares y que no lo mismo. Entonces queremos que el estudiante
+represente lo mismo que el modelo maestro. Entonces tengo un par de frases
+I forgot my password y yo olvidé mi contraseña.
+Entonces la frase original y la frase traucía.
+Como entrenamiento, como datos de entrenamiento. Tengo el par que deben
+ser iguales y sé cuál es la referencia. Entonces yo puedo entrenar la red del
+estudiante tal que se vaya iterando hasta que se parezca.
+Entonces, en este caso el maestro entrega 0 2 0 8, el estudiante entrega inicialmente
+0 4 0 6, y podemos sacar por ejemplo su error cuadrativo medio.
+En esencia, cuánto se fijan por coordenadas, 0 4 el estudiante, 0 2 el maestro al
+cuadrado, 0 6 0 8, y puedo sacar lo que me estoy equivocando.
+y ahí puedo ocupar tal como es una red, fíjate que es una renda lunar,
+reto de propagación para actualizar mis pesos,
+tal que conforme voy iterando esta red y la dejo ejecutar,
+digamos, la que te dejo corriendo,
+esta red entienda o aprenda que cuando le paso el par
+I forgot my password y le pasé olvide mi contraseña,
+me lo debiese llevar una representación vectorial
+que toayan iguales.
+Entonces, ese es el proceso que le vamos a llamar destilación.
+Y si se fijan, acá este proceso es mucho más rápido que
+aprender desde seca, porque lo más costoso computacionalmente
+es llevar un texto a un número.
+Ajustar otro número a otro número es infinitamente menos
+costoso.
+Por eso, este proceso de destilación es bastante utilizado, ¿ya?
+Porque no tenemos que entrenar una red de 0,
+no necesitamos un conjunto de datos de texto enorme, ¿ya?
+Y si se fijan, podemos hacer paralelismo entre idiomas, ¿si?
+Ahora, este caso no es en particular algo que viene del
+minilm, que es el modelo que vamos a ocupar.
+Pero, digamos, ilustra la idea del proceso de destilación que
+vamos a entender para no partir de que cero.
+Y en general, hoy en día, a menos que quiera hacer algo muy,
+muy particular, no tiene mucho sentido empezar de cero,
+sino que siempre hay algo o algún modelo de uso genético,
+digamos, general que uno pueda adaptar a las aplicaciones
+propias.
+¿Sí?
+Entonces, ¿cuál vamos a ocupar nosotros?
+Nosotros vamos a ocupar el modelo o esta representación vectorial de este tipo de embedding que le vamos a llamar mini-LM.
+Tienes comentadas? Algo grabado en Microsoft. LM hace referencia a Language Model.
+Y se fijan cuando usted habla de traje y pelea y todas estas cosas, también le llaman LLM, que es Large Language Model, que son el contrario de lo que estamos haciendo.
+estamos haciendo por algo muy pequeño que tiene en principio pocos parámetros, pocos pesos, por
+el por ende lo podemos ejecutar rápidamente, no así large language model que ocupan muchos parámetros
+y son más costosos que otros elementos, entonces es un paralelismo digamos que simplemente difiere
+escala y obviamente en complejidad. Entonces, lo que hace esta red de Mini-LM
+es representar palabras y esta parte, este Mini-LM es multilinguaje, entonces ya
+lo puedo aplicar con distintos lenguajes. Fijan acá, este es el modelo que
+nos entrega Microsoft, nos pone a disposición esto.
+y lo que hace este, esta red digamos, esta herramienta, es llevar frases a
+un punto en el espacio y ese punto en el espacio tiene dimensión 384
+perdón, entradas en un vector. Entonces todo texto me lo lleva a algo en el
+espacio 384 dimensional, lo cual es muy grande pero entenderán que los textos
+son bastante complicados, entonces necesito tener cierta holgura y flexibilidad
+porque si lo planteo en cuatro dimensiones no voy a poder hacer mucho
+porque los textos son lo suficientemente complicado para que no puedan ser
+representados cuatro dimensionalmente, no puede ser el argumento de que 384
+me sigue diciendo poco, es un texto muy complejo. Entonces, me lleva texto a un
+vector de dimensión 384, que fue entrenado con estos pares que yo les
+comentaba, entonces con estos que ha tenido como entrenamiento estas señales.
+Ahora, nosotros vamos a elegir no reutilizar, perdón, no re-entrena
+sus pesos sino que los vamos a reutilizar ya no nos vamos a adaptar
+necesariamente a nuestro aplicación sino que lo vamos a usar
+directamente se podría adaptar pero necesitamos entrenarlo digo que no va a
+ser tan costoso como hacerlo desde cero pero si va a requerir un tiempo de
+cómputo entonces creo que nos tienen que quedar
+claro de este mini lm es que nos lleva texto a un vector de 384 dimensiones
+como lo represento entonces este mini lm me lleva
+texto a número pero la pregunta natural es bueno porque 384 y cómo hace eso
+Ahora esa es la pregunta, eso es lo relevante de todos estos modelos, porque
+tal como yo tengo una representación entre 184 yo tengo infinitas
+representaciones vectoriales, unas pueden ser más útiles que otras
+y empíricamente uno se va valiando en el sentido de qué tan útiles son, entonces
+MiniLM tiene esta utilidad digamos y aparte que está digamos en cierta manera
+validado por Microsoft y tenemos cierto nivel de éxito cuando lo utilizamos y
+sobre todo que no está contoso computacionalmente pero tenemos otras
+herramientas ya en ePnet, la Pc, la Pc
+que en esencia se basan en distintas estructuras de redes neuronales ya
+para llevar texto a un objeto matemático, no necesariamente en la misma dimensión,
+nada de esto me lo va a llevar necesariamente a un vector de 384 dimensiones, sino que cada
+una va a tener su propia representación, que tiene que ser consistente entre sí, es decir,
+no puedo comparar una representación que está hecha con mini lm con una representación que
+están en MPNN, ya, tengo que tener la misma forma de traducir los textos a
+a un número, digamos, un punto en el espacio en este caso.
+Tengo que ser consistente con eso.
+Nada me asegura que una es mejor que otra y ese es uno de los problemas que tengo acá.
+Se va valigando de manera empírica en términos de para qué funciona bien,
+para qué no funciona bien, etcétera.
+Porque nuevamente las representaciones de objetos en términos matemáticos son infinitas.
+yo tengo unas infinitas formas de representar matemáticamente algo, unas
+útiles otras no tanto, pero nada me dice que una va a ser mejor que otra en
+términos a priori, yo lo valido digamos en términos de que tan útil es la
+aplicación que yo estoy realizando.
+Entonces
+todos han escuchado la noción de token, que es un token para que lo ocupamos, que
+cada entrada, por ejemplo cuando ocupan con TGPT, con Cloud, que ese toque. Y si se fijan,
+nosotros pasamos texto, todas estas tres metodologías que les comentaba, pero nosotros vamos a ocupar el LLM
+a un número, ya a un objeto. Una pregunta y dice Jorge. Dice, y cuando se probaron estos LLM,
+se entrenó esta representación virtual simplemente usando combinatoria, se probó
+variando componente a componente los componentes del vector y se eligió el mejor
+no necesariamente combinatoria, dentro de sí tienen otras metodologías
+porque como ya les comentaba hay en reno orales, y las reno orales tienen muchas variantes
+entonces piénselo así tengo una modelo cajanera tengo texto ya con ciertas
+señales que me lo lleva un número dependiendo de la matematización que hago
+y todas las operaciones que yo tengo entre medio yo puedo llegar a la noción
+de pérdida y va a decir cuánto es mejor y cuando no pero va a depender mucho de
+la representación y eso se probó con mucho dado y por eso es lo costoso de
+estas cosas ellos ellos llegaron a que estos modelos son buenos porque lo fue
+probando con tanto datos que lo pudieron validar espíricamente en términos de un
+error y términos de la representación que están utilizando
+se representó de manera victorial pero la matemática o la operatoria que se hizo
+para llegar a esa representación victorial no necesariamente es
+digamos única cada una de estas ocupa cosas distintas y la forma en que lo
+validaron en términos tal como cuando hacemos una red y vemos que la pérdida
+logarítmica sea menor, ya esta red hace lo mismo, solo que los objetos con los
+cuales están trabajando y sacan esa pérdida logarítmica, por ejemplo,
+fueron desde o vienen desde una representación.
+En términos, volvamos al concepto de token, ya, entonces nosotros dijimos que
+queremos matematizar cosas, queremos tener un objeto y lo quiero matematizar
+entonces matematizar no significa simplemente sustituir cada palabra por
+un número y sumar, entonces la matematización es un poco más complicada
+primero cada modelo de los que hemos visto divide el texto que se quiere
+cambiar en tokens, y esos tokens son palabras o fragmentos de palabras. Luego,
+por ejemplo, un vocabulario, pensamos en español, asigna un identificador a
+cada una de esas piezas de ese token, y ese identificador es una clave, digamos,
+para localizar una representación que ya fue aprendida en el modelo. Entonces
+cada uno de esos token, si se fijan tengo el texto, lo llevo a token y
+cada uno de esos token los voy a llevar a un vector.
+Y luego ese vector de contexto por token los junto de alguna manera, que va a
+detenido de la red, que los lleva al vector de la oración. Entonces, no es que yo todo
+el texto lo paso directamente a un vector, sino que lo separo, matematizo cada
+fragmento o texto y luego esos los junto para hacer el vector
+de la oración completa o el texto completo. No es todo de una.
+Entonces, cada una de estas cosas lo lleva y tiene su forma distinta. Cada una de estas metodologías tiene su forma distinta de matematizar estas cosas.
+Por ejemplo, el minilm que vamos a utilizar nosotros, el multilinguaje, resume, digamos, las posiciones en términos de la medida de las posiciones pálidas.
+y su salida es un vector de 384 valores o dimensión, un vector de dimensión 384
+y por eso es mini porque no tiene tanta dimensión
+mpnet ya y la pce tiene una dimensión bastante más alta ya
+y
+por consecuencia son un poco más costosos o más costosos la verdad que
+el modelo que vamos a utilizar nosotros. Aquí en principio las dimensiones no
+son intercambiables ya y además tenemos que ocuparse, tenemos que usar el mismo
+codificador o la forma de representación, la figura que le llamamos codificador a
+quien nos lleva el texto al número, que también le podemos llamar codificador o
+o la función de representación matemática.
+De distintas formas hacen referencia a lo mismo.
+La idea es, la realidad principal es,
+llevan texto al número.
+Ahora, uno pudiese decir, bueno, estas dos cosas tienen la misma
+dimensión. ¿Los puedo comparar?
+No, tampoco, porque tienen la misma dimensión,
+pero la forma en que fueron llenados cada uno de esos
+vectores en términos de número no fue la misma.
+Entonces, si quiero comparar dos observaciones en términos matemáticos tras una representación,
+tienen que haber necesariamente utilizado la misma representación.
+Porque si no estoy comparando cosas que son distintas.
+Sí.
+Veamos entonces,
+dónde salen ciertos números, tío, del ejemplo que hemos visto.
+Entonces,
+Veamos el ejemplo de textos, y vamos a contar palabras, vamos a seguir en este ejemplo que sabemos que nos funciona bien.
+Entonces, y en principio solo vamos a estar interesados en la operación matemática que va a estar detrás.
+Y van a ser textos pequeños, por algunas razones, para poder ejecutarlo y poder entenderlo más fácilmente.
+Entonces, vamos simplemente a poner un vocabulario de dos palabras.
+La primera coordenada, entonces vamos a llevar algo a un vector de dimensión 2,
+que es algo muy, muy reducido.
+Entonces, la primera coordenada va a contar cuántas veces sale clave en el texto,
+y la segunda coordenada va a contar cuántas veces sale la palabra recuperar.
+¿Ya?
+Si se fijan, si tengo el texto
+Q, una consulta, una pregunta a un estudiante que dice recuperar clave
+entonces es el vector 1,1 porque tiene una palabra que se llama clave
+y una palabra que se llama recuperar, independiente del orden
+un texto A que se llama clave clave va a ser 2,0
+y el texto B va a ser recuperar clave que va a estar repetido 4 veces
+entonces va a ser 4,4 porque va a ser recuperar clave, recuperar clave,
+lugar al clave, pues cuento cada una, son cuatro veces, entonces me lo llevo un vector 4 a 4.
+Entonces, si fijan ahí tengo
+tres puntos en el espacio. Y eso simplemente sale de contar cosas, que nosotros sabemos que
+no es muy bueno cuando tengo parafraseo y también cuando las cosas,
+cuando las cosas representan cosas distintas, la pone como,
+quizás muy similar, el caso del banco
+y cuando las cosas son similares las ponen como distintas, que es el caso de clave y contraseña.
+Ahora, queremos ver la geometría de estas cosas, y si fijan tengo tres puntos en el espacio
+y voy a querer encontrar una noción de similitud.
+Entonces recuerden, estas metodologías me llevan las cosas a un punto en el espacio.
+punto en el espacio va a ser un vector de alguna dimensión. Ahora se
+toca ver cuando tengo por ejemplo dos mensajes que están representados de
+manera vectorial en 384 valores en un vector, ¿cómo puedo decir si esos dos,
+esas dos representaciones son iguales? Entonces para ello vamos a ver un caso
+más simple que es en vez de 384 veamos una representación que es en
+términos dosdimensional para que podamos en la matemática más fácilmente.
+Entonces, si tengo estos números yo puedo ver
+cómo se ven en el plano. Entonces, si se fijan el vector q que era
+1,1 lo puedo ver como el punto que está acá, cierto? 1,1 y su vector desde el
+origen hasta esa cantidad. El punto A, que es 2,0, va a estar en el
+primer en el eje horizontal, esta línea azul y el B va a pasar a través del Q
+porque es 4,4 pero va a llegar a una magnitud distinta.
+Y ya la forma que nosotros vamos a representar cada una de estas
+observaciones, si se fijan eso es un punto en el espacio y en este espacio es el
+plano porque es dosdimensional. Ahora, también podemos ver su dirección desde
+el punto, desde el origen hacia el punto. Si tuviesen la representación que
+acá no podría pasar porque estoy contando cosas o son positivas, también
+pudiese tener otras formas en otro lado, en otra dirección.
+Entonces, lo estamos matematizando como simplemente un vector en el plano porque
+estoy trabajando en vectores de dimensión 2. Ahora lo que yo quiero comparar es qué
+tan similares son esas cosas, son estos vectores que representan nuevamente mensajes, consultas,
+texto. Entonces, siguiendo. Veamos la distancia. Entonces, si se fijan, tengo una distancia,
+un vector dosdimensional
+y yo conozco distancias claras que es por ejemplo la distancia en euclíada y en
+esencia simplemente mide la separación digamos entre dos puntos y nosotros
+tenemos los puntos que es el Q, el A y el B. Entonces yo puedo calcular la
+distancia euclíada entre Q y A y entre Q y B porque uno podría preguntarse
+bueno de estos puntos que está acá cuál se parece más a Q recuperar clave
+el texto clave clave o recuperar clave repetido cuatro veces
+entonces yo veo y saco la distancia euclíana
+saco la distancia euclíana, la distancia euclíana entre el punto Q y el punto A
+es raíz de 2 y la distancia entre el punto Q y el punto B
+es de raíz de 18. Ahora, si se fijan, Q y B tienen la misma dirección pero
+longitudes distintas, tienen la misma dirección, van hacia el mismo lado,
+las flechas apuntan hacia el mismo lado. Entonces esa dirección que es seguir esta flechita
+si, está para acá, corresponde a conservar la misma proporción entre los dos conteos,
+o entre las dos coordenadas, porque si se fijan la proporción entre Q y Q es 1 a 1 y la proporción
+entre en B es 1 a 1, entonces eso me lleva a la misma dirección, ya, y el A apunta sobre el eje
+horizontal y expresa en esencia otro perfil, otra cosa distinta, entonces esa diferencia en la que
+nosotros queremos, digamos, notar, digamos, cuando quiero ver cuando digo las
+cosas son similares, también estoy diciendo internamente cuando son
+distintas, entonces voy a tener que tener en
+consideración la distancia y aquí va a salir algo que va a ser el producto
+interno y el coseno, que son las propiedades que vamos a ocupar para ver
+esta noción de similitud.
+Ahora, si lo vemos en términos de distancia euclidiana a secas,
+el punto A está más cerca del punto Q, pero el B conserva otro perfil que tiene
+la misma dirección, entonces también es bastante similar a pesar de que estoy
+ocupando la distancia euclidiana. Entonces tengo que tener cuidado, si ocupo
+solo esta noción va a ser un poquito más complicado.
+siguen entonces de estas propiedades que les comentaba yo voy a tener el
+el producto interno ya que en esencia es una multiplicación o multiplicar y
+sumar, si se fijan voy a multiplicar el vector Q con el vector A ya entonces
+este producto interno es simplemente multiplicar y sumar ya que en términos
+en términos vectoriales es multiplicar la transpuesta de Q por el vector A, es
+una forma reducida de escribir. Entonces, el índice J recorre las D coordenadas y Q
+transpuesta se va a leer como el producto interno de Q con A, Q transpuesta A, que
+esta noción que está aquí. Nosotros teníamos que Q era 1,1 y teníamos que el punto o la representación del texto A era 2,0 y la representación del texto B era 4,4.
+Entonces cuando hago el producto interno entre Q y A va a ser el primer componente de Q por el primer componente de A más, y fíjense eso es 1 por 2 más el primer componente de Q
+de Q por el segundo componente de A, 1 por 0, ya eso me da 2. Hago el mismo
+ejercicio con el producto B, el producto interno de D, me queda 1 por 4 más 1 por 4
+que me da 8. Tiene un producto interno mayor pero no puedo quedarme ahí, ya
+porque eso no es necesariamente una medida de similitud, porque va a
+depender mucho del tamaño de los valores, entonces estos 8 por 8
+o sea 8,8 va a ser más grande, entonces no puedo simplemente considerar el producto como algo que
+sea tan interpretable en términos de la semejanza de lo que yo quiero, de los perfiles o de los textos
+que yo quiero identificar. Para ello también tengo que considerar las cadenas en las cuales
+están los valores. Por ejemplo, si el B es el 4,4 entonces 2B es 8,8 y en principio genera o
+identifica el mismo perfil porque sigue en la misma dirección solo que tiene
+distinta longitud entonces Q transpose B que es su producto interno va a ser el
+doble y va a ser 16 entonces necesitamos contar con esa
+con esa con esa propiedad digamos de hacer un poquito agnóstico y de cierta
+manera necesitamos una operación que mida la longitud y permita retirar su
+efecto ya porque nosotros acá tenemos si no un efecto muy muy muy
+promedio antes digamos dentro de la noción de semejanza o similitud que
+nosotros queremos llegar entonces ahí van a ser la norma euclidiana
+y en ese sentido nosotros vamos a utilizar la norma pliedena en donde vamos a
+dividir digamos la norma del punto Q, la norma del punto A, la norma del punto B
+si se fijan es la raíz de cada valor de cada una de sus componentes al cuadrado
+entonces de Q que era 1,1 va a ser la raíz de 1 al cuadrado más 1 al cuadrado que
+raíz de 2. Del B va a ser raíz de 2 al cuadrado más 0 al cuadrado, 2, y del B
+o sea, de esa cadena y del B va a salir raíz de 32. Ahora,
+entonces vamos a utilizar esa cantidad que por definición es esta para
+digamos de cierta manera normalizar y hacer comparables las distancias que
+estábamos calculando.
+Entonces, ¿qué vamos a hacer? Cada uno de los vectores o de las representaciones vectoriales
+van a ser divididas por su norma, ¿verdad? Su norma ocultidiana.
+Entonces, el Q va a quedar como el vector 1,1 dividido cada componente a componente por raíz de 2.
+Entonces va a quedar 1 sobre raíz de 2, que es 0.7071 para ambos componentes.
+para el vector A va a quedar 1 0 porque era 2 0 inicialmente y para el B va a quedar 4,4 y va a quedar si se fijan
+el mismo vector que Q y ahora sí lo puedo comparar y estos dos números tienen hacer
+además que compartían dirección tiene que ser muy muy muy sensencial el mismo en realidad
+para cuando quiero hacer la comparación
+ahora
+eso de cierta manera hace comparar la longitud pero ahora tengo que considerar
+también el ángulo en el cual está este vector. Cierta salvedad tiene que pasar
+que el punto no puede ser el origen porque si no, no puedo dividir el 0, si es 0, 0
+va a tener raíz de 0 al cuadrado, vamos a hacer al cuadrado y así todas las dimensiones
+puede estar dividido por 0, no puedo hacer eso. Entonces, el normalizar ahora, cuando ocupamos la
+la norma escrodiana y la divido cada vector, o sea, componente a componente por esa norma,
+entonces retira, digamos, la escala y conserva estos mismos perfiles que yo quiero comparar
+entre las coordenadas. Pero nuevamente la dirección sigue estando un poco libre. Entonces lo que tengo
+que hacer yo ahora es considerar esa dirección dentro de mi análisis. Entonces si se fijan acá
+yo tengo el producto interno entre el vector Q y el vector z, los voy a dividir su norma para sacar
+el efecto de la longitud y esto es lo que yo voy a definir como el coseno porque compara las
+direcciones. Entonces cuando tengo el texto A y hago esta cantidad, digamos, se fijan cuando
+yo he vivido el texto A y hice el producto interno, me dio 2, lo dividí de raíz de 2 y de 2, porque es cada uno de raíz de 2 y de 2, supernormal de pleidiana,
+y en esencia hago esta operación, me va a entregar el coseno que el texto A, el coseno de este texto es 0.7071 y para el punto B es 1,
+entonces B ocupa el primer lugar, ya, tiene la misma dirección que la consulta original.
+Entonces vamos a estar diciendo que ahí tengo una noción de similitud.
+Entonces, ¿cómo interpreto esto? Si se fijan, tengo Q y B que están representados de la misma
+manera y tengo un ángulo adicional, ya. Entonces, esta noción de coseno va a considerar, dado que ocupa
+también la norma criana, no sólo la longitud sino también el ángulo en el
+cual estoy trabajando. Entonces un coseno por ejemplo 0,8 es un
+puntaje geométrico en esencia hay una similitud pero va a depender del ángulo
+y si se fijan el ángulo entre Q y B en términos de diferentes es 0 por
+consecuencia su valor es 1. Entonces siguen la misma noción, siguen la misma
+dirección y podemos decir que esos dos representaciones son mucho más
+similares entre sí que Q y A. Entonces Q y B son más similares.
+Entonces, eso es lo que nosotros hacemos con las
+representaciones matemáticas, las representaciones vectoriales. Aquí lo hicimos
+con dos dimensiones, pero nosotros vamos a utilizar las representaciones vectoriales
+que nos entrega MINILEM o las otras metodologías que me lo llevan a un vector de mucha más
+dimensión. Entonces, en resumidas cuentas, la distancia entre A y B, si se fijan, simplemente
+compara la separación, el producto interno considera las coordenadas con efecto de escala
+y el coseno me además compara la dirección retirando la escala.
+y se fijan acá, la menor distancia considera a, porque si yo lo veo así, este punto está más cercano a ese
+No obstante, el mayor coseno favorece a b, por eso conserva el mismo perfil
+Entonces tengo que tener una noción de similitud entre los vectores
+vectores entonces tengo que casarme con alguna médica, es decir, ¿cómo voy a
+decir que dos cosas son iguales? que son vectores que están en el espacio ¿cómo
+voy a decir que uno es más cerca que otro? y eso o esa medida, esa métrica
+que voy a utilizar va a depender del modelo y de lo que yo quiero hacer
+el coseno en general funciona porque tiene... tomo en consideración la
+consideración la dirección pero no necesariamente va a solucionar todos los
+problema recuerden que esto también está sujeto a la misma representación vectorial que yo estoy
+utilizando. Hay una noción de variabilidad en términos de la respuesta y de la performance que puedo
+tener en este de acá. Entonces finalmente si se fijan acá el min el m me entrega un vector y me
+lleva los textos a algo de 384 dimensiones, de 384 coordenadas que cuando yo quiero sacar el
+coseno, voy a tener que hacerlo en esta operación matemática que es bastante más
+complicada, por eso lo hicimos con dos dimensiones.
+Entonces, es un ejemplo un poco más didáctico, un poco más acotado para
+entender la operación matemática que se hace por detrás, pero en la
+práctica son vectores de mucha mayor magnitud.
+Eso respecto a la representación. Entonces, si fijan acá el embedding
+es representar texto como número en algún sentido, en algún vector. Y aquí tengo entonces distintas
+herramientas para ver cuándo son similares. Produto interno, la norma, normalización y el
+coseno. Cada uno tiene sus proyesos contra. Entonces, ahora vamos a la pauta y vamos a seguir con estas
+partes que habíamos dicho en un inicio, que es la comparación y el orden que tenemos pendiente aún.
+eso volvemos a las 8 5 15 minutos más
+recording stopped nos vemos
+ya entonces estoy compartiendo el
+cierto y sí ya
+entonces vimos que era el embedding como necesitamos como eso me lleva a algo un
+objeto y lo matematiza en algo
+numérico un vector en principio con distintas dimensiones dependiendo de la
+herramienta que nosotros vamos a utilizar.
+Y volvamos, en esencia, al ejemplo que nosotros estábamos
+viendo.
+Nosotros teníamos un equipo de soporte, digamos,
+de una página que nosotros llamamos Ábula Libre y que
+tenían 12 fichas con los distintos identificadores del 1
+al 12 que hacen referencia a respuestas para distintas
+consultas, ¿ya?
+Del 1 el acceso a la clave, el acceso de recuperar la
+contraseña, el segundo para la grabación de los videos,
+Y así sumisigue para cada una de las posibles y recurrentes
+consultas que hacen los alumnos en este aula.
+Entonces, ¿qué rol cumple cada conjunto en el ejemplo que
+nosotros estábamos viendo?
+Primero, nosotros tenemos que el mini LM es quien hace,
+esencia la transformación entre el objeto a, o sea, entre el texto a objeto matemático, pero
+que fue entrenado ya con otros textos, ya fue pre entrenado anterior a la aplicación que
+nosotros estábamos haciendo. Nosotros vamos a ocupar 12 fichas de aula abierta, que va a ser
+la base que nosotros vamos a considerar para ver nociones de similitud, ya, se van a ajustar
+los vocabularios, los pesos y vamos a ver algo que es el arte F y DF, y que no
+reentrenar la representación o el codificador mini lm, sino que
+simplemente lo vamos a utilizar. Vamos a tener 16 consultas de
+evaluación que va a comparar, digamos, ciertas recetas y elegir decisiones de
+búsqueda, ya con distintas nociones, digamos,
+y vamos a hacer 16 consultas de prueba, porque sigue aplicándose esto de la
+separación, entrenamiento que fue hecho en este caso la validación y la prueba.
+Entonces, siguiendo, si nosotros antes de implementarlo y ver el ejemplo con
+número, digamos, si nosotros quisiéramos adaptar el codificación,
+podríamos hacerlo con el proceso de destilación, o podríamos hacerlo con el
+conjunto de entrenamiento propio. Entonces, tendríamos que tener
+conjuntos de datos de este estilo. Por ejemplo, cuál es la consulta
+cuál es la consulta, cuál es la ficha asociada y si es que hay una
+señal es relevante o no. Y si se fijan esto tendríamos que tenerlo en una
+gran cantidad para poder tener una red, ya que en esencia es un codificador que
+nos lleva texto a número de manera un poco más certera. Y entonces necesitaríamos
+ese tipo de conjunto de atlas en una gran magnitud para poder
+nosotros hacer ese entrenamiento y por eso lo que nosotros hemos tratado de
+mantenerlo un poco más sencillo, digamos, optar por una opción más simple que es
+utilizar esta red mini lm para la representación vectorial.
+Aparte, con el pequeño ejemplo que nosotros tenemos,
+tenemos una gran variedad, nuevamente, estas cosas son bastante costosas
+computacionalmente.
+entonces veamos el proceso de comparación entonces el embedding es
+quien lleva el texto a algo numérico y ese numérico ahora tengo que
+compararlo respecto de alguna referencia entonces nosotros vamos a ver algo que se
+llama tf.idf que hace referencia a 10 frequency la frecuencia cada término y
+IDF hace referencia a la frecuencia inversa del documento, entonces TF
+simplemente a cuántas veces se repite la palabra en un texto y el IDF es la
+frecuencia inversa de documentos que en esencia va a dar más peso a las palabras
+presentes en menos ficha, es decir, lo más raro tiene más peso porque es más
+difícil de encontrar. Entonces lo vamos a definir de esta manera. El tfidf,
+este no es un menos sino que es el guión, va a estar definido de esta manera en donde
+el idf lo vamos a definir como logaritmo de 1 más la cantidad de fichas sobre 1
+más la frecuencia del documento, ya, de la palabra o la ficha que contiene la
+palabra J décima y el I representa un texto en particular esto más uno. Esto va a ser el IDF,
+entonces va a ser la frecuencia del término cada palabra multiplicado por esa cantidad y en esencia
+vamos a poder encontrar un valor numérico y vamos a tener una noción de comparación. Entonces,
+¿cómo lo utilizamos? Si se fijan acá, vamos a pasar primero cada ficha del antoce que tenemos
+por minlm entonces vamos a tener una representación en 384 coordenadas de
+cada una de las fichas y dividimos digamos su vector por su norma por lo
+que hablábamos antes para hacerlo comparable pues nos dependa de la
+magnitud, entonces voy a tener un vector de 384 coordenadas de la cual yo aquí
+veo sólo 16 porque si no son muchas entonces aquí veo la primera 16 para la
+primera ficha yo veo las primeras 16 coordenadas y veo su valor numeríctico
+esto obviamente es un vector que sigue para allá 388 coordenadas adicionales
+o sea 184 en total
+así entonces si fijan el minilm me lleva el texto a este tipo de
+representación y voy a querer repetir ese mismo procedimiento para las
+consultas que nuevamente es otro texto y ahora voy a tener dos cosas que están
+en la misma dimensión ya son vectores de 384 coordenadas y nosotros podemos
+tener una noción de similitud o una noción de cercanía
+2 necesitamos hacer una comparación recuerden que nuestra nuestra
+nuestra pregunta inicial era hay una consulta y queremos asignarle una ficha la más cercana
+posible y aquí puede resolver esa pregunta entonces si fijan acá b01 hace referencia a
+las consultas y d01 hace referencia a las fichas entonces estos vectores vectores están acá
+primero provienen del embedding, que nosotros lo guardamos, que es la
+representación, que no es simplemente los conteos que nosotros hicimos
+porque sabemos que no funciona muy bien, nosotros hicimos el embedding con el minlm
+y vamos a identificar las distintas parejas consulta01 con ficha01
+para las distintas coordenadas, porque recuerden tiene 384 coordenadas
+entonces estos vectores ya están normalizados y yo voy a hacer el producto
+interno y el producto interno entre estas dos me da menos punto 0.00114
+y así lo hago para todas y puedo calcular su suma porque recuerdan que es
+el producto interno, multiplico y sumo. Entonces lo hago para todas las cantidades
+y luego de ello, digamos como estas cosas ya están normalizadas simplemente en la
+suma, porque esto está dividido de su norma euclíana, y voy a tener en esencia el
+coseno de la primera consulta con la ficha 01
+y me da 0.45. Eso yo lo puedo repetir para el resto
+de fichas entonces la primera consulta que nosotros sabemos
+recuerde que la primera consulta es olvide mi clave y nosotros sabemos que
+la ficha 0 1 hace referencia a recuperar contraseña entonces es la que debiese
+tener una mayor noción de similitud, debiese tener un mayor
+valor por consecuencia cuando lo vemos con la
+consulta el par consulta ficha y veo la primera consulta con la primera ficha
+tiene un valor 0.45 y cuando lo vemos con el resto tienen valores menores y así lo podemos hacer para
+cada consulta y para cada ficha y puedo hacer todos los pares, en donde voy a tener en esencia
+una matriz de 16 consultas por 12 fichas, 16 por 12. Y esta matriz Q que es 16 por 384 que hace referencia a, si se fijan, Q por detrás puesto, hace referencia a la operación que nosotros hicimos antes pero extendida al resto de los datos.
+Ahora, si os fijan esos son los puntajes y si nos volvemos al inicio de la sesión
+yo les comentaba que primero represento, entonces mini lm, luego comparo que es
+que en la parte que estoy haciendo estoy sacando, le estoy dando estos
+puntajes, voy a querer ahora ordenarlos, si? entonces ya los pasean a un valor
+numérico y los puedo comparar, en esencia tengo una métrica en términos del
+coseno de qué número es más cercano o qué par tiene una mayor similitud en
+esencia la consulta 1 y la ficha 0 1 tiene una mayor similitud por el valor
+que tengo el coseno entonces que ordenarnos ahora entonces ya los yo
+tengo una métrica para compararnos los quiero ordenar entonces veamos ahora
+tengo la consulta de acceso que era olvide mi clave como la recupere
+cierto? Olvidé mi clave cómo vuelvo a entrar. Entonces, sabemos que el documento
+que responde a eso es el primer documento que explica cómo recuperarla
+contra C. Ahora,
+cuando vemos el TF y DF, vemos que el D01 es la que nosotros sabemos que es
+la que da respuesta, le asigna en términos de puntaje, si se fijan acá
+yo ocupé el coseno y esta es la forma de rankearlos, esta es la forma de rankearlos
+el IDF a la ficha que nosotros sabemos que es la correcta le dio el lugar 6 y le dio un puntaje 0
+y el minilem situó la ficha 0 1 en primer lugar que era la más semejante o tiene mayor puntaje
+porque le dio 0.45 y era el documento
+pertenente, entonces en este caso el coseno está entregando el mayor, la
+mayor, la mayor, digamos, noción de similitud correcta.
+Entonces, si se fijan acá, el TF y DF es una forma alternativa
+a el mini lm porque aquí simplemente estoy contando frecuencias y
+multiplicándolas por su frecuencia relativa dentro o la inversa de su
+frecuencia dentro de cada documento para cada palabra
+entonces este es otro tipo de codificación y nosotros sabemos que el
+conteo no es tan bueno entonces si bien esto se basa en con esto sabemos que no
+se va no va a funcionar también porque se basa en conteo entonces cuando lo
+comparamos con mini lm que hace una representación vectorial, el conteo le
+da a todos los valores bastante, cantidades bastante similares, en cambio
+el mini lm si entrega al d01 un mayor puntaje, ya.
+Entonces esta consulta que sabemos que habla de clave y la ficha 01 habla
+de contraseña, puedo considerar dentro de su noción de similitud y
+representación vectorial la parásprisis o el parafraseo entre clave y contraseño
+porque fue entrenado no simplemente con pocos datos sino que fue entrenado
+con muchas, muchas cantidades usted ya sabe reconocer esa similitud dentro de la
+representación. Entonces tengo una forma de cómo compararlos. ¿Qué es lo que
+que es lo que hago después. Tengo una segunda consulta, la 02 y le pongo no
+pude asistir, puedo ver el vídeo después
+y de 02 responde en esencial en la segunda ficha a las grabaciones se
+publican al día siguiente y duran 30 días, que es una respuesta a esta
+consulta. Sabemos que debiese tener la mayor similitud porque lo podemos
+digamos extender desde el contexto, no necesariamente desde el puntaje.
+Entonces la posición en mini lm que le da a esta consulta, la primera posición
+le da el documento 06 que habla de becas, la posición 2 en términos del ranking
+y el puntaje del término del coseno
+que le da a minlm lo pone en segunda posición la ficha 2 que es la que efectivamente responde a
+la consulta que se realizó y en tercer lugar da el de 0 1 que no responde a la métrica que
+o sea la consulta que se está haciendo entonces vemos que no necesariamente lo va a poner en el
+primer ranking o el mayor puntaje la consulta o la respuesta correcta o la ficha correcta a la
+consulta que se está realizando. Entonces vamos a llamar a este rango de R, que va a ser la posición
+de la ficha relevante. Si se fijan acá, las fichas relevantes están en la posición 2. Nosotros
+quisiéramos que estuviese en la posición 1 porque es la más relevante
+porque es la que responde a B0-2. En este caso está en la posición 2
+y al mostrar tres documentos va a estar la relevante dentro de esas tres.
+Entonces esos tres documentos son tres filas para una consulta particular
+y ahí tengo un acierto porque le ajunté cuando sugerí la ficha 02
+naturalmente yo voy a preguntarme
+cómo tengo que implementar esto porque no siempre voy a tener el mayor puntaje
+entonces en esto sale la noción de hit
+a
+que son el acierto entre los primeros K y si se fijan en la anterior los
+aciertos fueron
+uno entre los primeros tres
+entonces vamos a cambiar la unidad de las filas
+entonces ahora tenemos tres consultas distintas que son de evaluación y el
+ranking real ya que le está dando mini lm a cada una de estas ya entonces el b01
+pregunta por la clave y su ficha que la d01 también quedó primera el b02 que
+pregunta por el vídeo d02 quedó en la posición segunda ya como vimos recién
+ya en la b04 que se pide una prórroga d04 quedó quinta ya hay una le pusimos
+una cualificación para saber cuál es la que responde a b01 responde de 0 1 a b02
+responde de 0 2 y así entonces b04 responde para b04 responde de 0 4 pero
+el rango que le dio en mini lm fue 5 entonces cuando analizo en términos de
+los aciertos entre los primeros K
+en P01, por ejemplo, si K es igual a 3, en este caso los aciertos en los
+primeros K, o sea, si no, K igual a 3
+vamos a asignar 1 cuando la posición del relevante es la primera, es decir, la que
+tiene el mayor puntaje. 2 en el caso del B02 y en el último caso 5 en el caso de que
+tuviésemos 5 como primeros K, pero en este caso dijimos que caería a 3, entonces el
+aporte entre los primeros K, el primero va a ser 1 porque está entre el 1 y el
+tercero, en el B2 va a estar, va a ser 1 porque va a estar en el primero y el
+0 que el caso del segundo y en caso 4 va a ser 0 porque le puso mini lm una
+posición 5 y como le puso una posición 5 no se muestra entre los primeros 3 y
+por consecuencia se le va a signar un 0 decir que no se recomendó
+así entonces si veo los primeros aciertos en los primeros 3 ya consulta
+las primeras tres respuestas va a ser 1 más 1 más 0
+va a ser entonces 2 sobre 3 me da 2 tercios, si se fijan
+hace referencia a las tres consultas que yo estoy utilizando y el 02 aporta
+solo o la misma cantidad que el P01, entonces si se fijan acá estoy viendo
+cuántas yo tengo que mostrar antes de encontrar el acierto en particular y
+aquí si se fijan yo lo estoy simplemente ordenando en términos de la
+puntuación que yo estoy utilizando yo estoy utilizando minilm para hacer una
+representación y luego lo estoy puntuando en función al coseno ya no
+necesariamente eso me va a entregar buenos resultados siempre y esta es una de
+las formas que yo voy a tener de digamos cuantificar
+qué tanto voy a yo
+digamos tener cierta certeza de que las recomendaciones que yo estoy haciendo en
+la problemática original o el problema original que nosotros estamos tratando de resolver están
+funcionando ya porque recuerden que tenemos que tener un cuarto paso que es verificar que las
+cosas que está haciendo están bien porque no necesariamente que tengo un puntaje correcto
+significa que estoy haciendo lo que quiero que hagan esta técnica.
+Entonces, otra metodología para definir el orden en el cual yo voy a presentar
+las cosas es el MRR, que se referencia a Mean Reciprocal Grant, que es el
+promedio del rango recíproco. Entonces, cada consulta va a aportar el
+recíproco de su posición en las fichas
+relevantes entonces en la b01 está en la
+primera posición entonces 1 sobre 1 o 1
+a la menos 1 en cambio en el 2
+del vídeo estaba en la posición 2
+entonces es 2 a la menos 1 que es un
+medio ya que su recíproco o 1 sobre 2 y en
+el 4
+estaba en la posición 5 entonces
+su recíproco es 0,2 y el numerador
+suma 1.7 lo divido a 3 y me queda 0,567. Entonces, la primera consulta y la
+segunda consulta acertaban dentro de los primeros K respuestas y el MRR va a
+distinguir el primer del segundo, el primer lugar del segundo. Si se fijan, acá
+el hit, o lo acierto entre los primeros tres, para el B01 y el B02
+le estaba asignando el mismo punto, el mismo valor, en cambio el MRR va a
+distinguir entre el primer lugar y el segundo lugar porque le está sopesando
+y va a depender de la posición en principio, entonces esto va a ser el
+recíproco de la posición y este va a ser si es que sale entre los primeros K
+o los primeros intentos, entonces simplemente yo le voy a estar dando
+distintas interpretaciones y distinto orden en cuanto yo voy a
+presentar esta búsqueda de esencia de fichas. Entonces, fíjense acá,
+los denominadores son 12 porque tengo 12 fichas.
+Las preguntas son las consultas que sí tienen respuesta. Entonces, fíjense acá,
+yo tengo con la metodología TF y DF y con mini LM y en ambos casos mini LM tiene un mayor rendimiento
+en términos de el acierto, digamos términos del orden que estoy asignando a las respuestas o a
+los panels de respuesta consulta ficha. Ahora eso no significa que ese tipo de embedding, que en
+es una representación, esto también sigue siendo una representación, solo que en
+una representación basada en conteo necesariamente va a ser universalmente
+mejor, pero MIMLM al ser entrenado con tantos y tantos datos de texto ya sabemos
+que va a aprender o aprendió en algún punto
+bastante más digamos de cómo representar numéricamente texto.
+Tenemos entonces que TF y DF recupera 7 de 12 consultas y el MINI LM 11 de 12 consultas.
+Entonces, claramente vamos a favorecer la representación vectorial de MINI LM respecto
+de la representación basada en conteos y del inverso o el recíproco de los conteos.
+entonces dos cosas que estas cosas no se van a explicar, fíjense acá, tengo una
+consulta que dice no puedo asistir puedo ver el vídeo después ya que es la
+primera consulta y la ficha que responde es la de la grabación
+es la ficha 2 el rango en minilem es el 2 que la habíamos visto, si se fijan acá
+lo planteé, no puedo asistir, puedo ver el vídeo, le definió el rango el mini LEM
+como en posición 2, en posición 2, entonces ese es su rango que le dio mini LEM
+y la otra consulta fue, me conceden más días automáticamente si pido prórroga
+y D04 era la respuesta y el mini LEM le entregaba el rango 3
+ahora mostrar tres candidatos va a permitir que se encuentre la respuesta
+de la primera consulta ya porque va a ser de 2 y en la segunda si muestro 3 va a
+quedar afuera porque el rango estaba en el quinto ya entonces
+tengo que tener cuidado de cuántos muestro ya para cuando hago el orden
+hasta qué valor voy a considerar, hasta qué orden voy a considerar que puedo mostrar en esta búsqueda.
+Recuerden que esto es extensible, imagínense tengo 100 pichas, nosotros estamos haciendo con 12,
+por eso estamos planteando como entre 3 y 5 los valores que podemos mostrar,
+pero esto tiene una utilidad mayor cuando tengo, imagínense, muchas otras pichas.
+Entonces, si te fijas acá, tengo que tener, digamos, cierta...
+No sé si lo puedo explicar, ya, cuando quiero implementar esta metodología, porque nuevamente
+va a representar...
+Nosotros no podemos creer a ciegas, digamos, que MiniLemme me va a entregar una representación
+que me va a dar una comparación certera, ya.
+Puede que en ciertos casos me funcione bien y en otros me
+funcione super mal.
+Y recuerden que tenemos muchas representaciones en principio
+infinitas de los textos a imágenes.
+Entonces, hasta ahora, ya, nosotros destacamos de cierta
+manera una potencial ventaja de conectar distintas palabras, ya por ejemplo los
+sinónimos, el parafraseo que vimos que en un principio si teníamos una
+representación vectorial que
+era en términos de conteo no tenía o tenía problemas cuando
+dos palabras eran sinónimos, pero se escribían distintos entonces las ponía
+como vectores octogonales. Entonces estamos viendo una potencial ventaja que tiene, digamos,
+esta representación o esta codificación de minilem en identificar esos sinónimos.
+Entonces ¿cuál podría ser un problema? Entonces, si se fijan acá, en este ejemplo
+se muestra otro tipo de necesidades, porque nosotros vemos que tenemos que identificar
+o vemos una necesidad de identificar sinónimos. Entonces, acá en estos ejemplos vamos a tener
+una necesidad de conservar exactamente un código. Si se fijan, tengo dos consultas,
+cuando vence a 17 y cuando vence a 71. Entonces, son parecidos en términos de texto y aparecen
+en textos casi iguales, entonces una representación pudiese representarlo para la redundancia
+numéricamente, muy similares, ¿ya? Pero corresponden a fechas distintas, ¿si? Entonces, entonces
+cuando implemento con minilem y ejecuto, digamos, la representación y el codificador, las dos
+recetas digamos van a acertar ya en el primer lugar para ambas preguntas ya
+porque se representan de manera muy similar ya
+pero ya esta pequeña diferencia puede generar que en otros en otras
+representaciones ya queden no se puede diferenciar entre ambas porque dado que
+son los mismos caracteres pero simplemente con un pequeño cambio de
+orden va a depender la va a depender la representación si efectivamente los
+está clasificando o los está representando en puntos en el espacio en
+el espacio que son cercanos entre sí ya siendo que son cosas distintas y pueden
+llegar a ser tan cercanos que después yo no pueda separarlos y no puede
+identificar cuál es la ficha pertinente que responde esa consulta.
+Entonces queremos que las cosas que son similares se parezcan entre sí, pero
+quiero además considerar ciertas diferencias tal que me la hagan o que me
+permitan discernir entre distintas respuestas para aquellas consultas.
+Entonces son muy similares, no las puedo representar de la misma manera. Entonces,
+una representación que no considera el orden en el cual está saliendo,
+pudiese tener ese problema de que voy a tener una misma representación para dos textos, en principio.
+Entonces, no es simplemente ocupar cualquier representación acerca,
+y eso justifica también que no puedo transponer en ningún sentido o desordenar
+el vector de representación vectorial que tengo o que estoy utilizando,
+independiente de la dimensión que se utiliza o la que lo lleva esta representación vectorial que
+hace en este caso MiniLem u otra herramienta. Veamos ahora, tenemos otra consulta. La consulta
+es cuál es el precio total en pesos y la fecha 5, la ficha 5 digo, responde a que
+el arancel puede pagarse en tres cuotas mensuales sin interés. Si se fijan
+la pregunta no tiene respuesta en la ficha 05 y en ninguna otra, pero D05
+es la más cercana a esa consulta. Si se fijan acá lo vemos el total de fichas
+la más cercana es la 5 porque habla de pagos. La 6 uno podría decir también
+pero si se fijan
+la 5 es la más cercana en términos en términos temáticos pero sigue sin
+responder la consulta en principio, ya entonces esa información que está
+relacionada porque hablan de pagos y de precios y de digamos cancele o cuotas
+etcétera tienen información similar pero la cantidad de cuotas no permite
+deducir el monto total, ya entonces lo que va a pasar es que cuando aplico el
+coseno de mini LEM va a ser, por ejemplo, un número relativamente bueno, ya, en este
+caso va a ser 0,6, si mal recuerdo, 0,26, algo de ese estilo, que va a estar
+ordenado o va a tener el primer ranking, porque dentro de todas las fichas el
+coseno del minileme va a poner las
+cercana a la más similar a una respuesta coherente a la consulta que se está
+definiendo. No obstante,
+no responde la pregunta. Entonces, el buscador que hace referencia entre la
+consulta y los documentos, que en este caso son las pichas, puede poner algo en
+primera posición pero no necesariamente responder a la consulta. Entonces, este
+procedimiento que nosotros estábamos haciendo, además va a necesitar una decisión adicional
+sobre cuándo mostrar los posibles candidatos de las fichas y cómo reconocer digamos que
+falta información porque pareciera ser similar pero no responde la pregunta entonces conocemos
+el número de cuantas pero no los monta dice la cantidad de cuantas entonces no puedo tomar y
+responder efectivamente a esa consulta. Entonces, tengo que tener una noción de
+cuándo mostrar las cosas. Si se fijan acá, este gráfico, este acá, mide
+aceptación y no necesariamente aciertos. Entonces, vamos a tomar
+el mayor coseno de cada consulta, el coseno del mini LEM, y lo vamos a
+comparar con un corte. Y en este caso al pasar
+cierto umbral, que va a ser 0,3, vamos a aceptar 9 de 12 consultas
+que son respondibles, digamos. Y con un umbral de 0,5 vamos a aceptar
+solo 3. Y si fíjense, estamos haciendo cierto paralelismo cuando hacemos, por ejemplo,
+clasificación cuando poníamos cierto umbral de threshold.
+Entonces, las cuatro consultas que no tienen respuesta van a quedar
+rechazadas en ambos casos, que son los casos donde no tengo, digamos, una
+respuesta necesariamente correcta, pero sí puede ser tímida, puede ser
+parecida. Entonces voy a definir ciertos umbrales que van a tener que
+superar para poder ser presentadas como posibles candidatas a ser escogidas.
+Entonces escoger ese corte en el cual yo voy a aceptar
+digamos ciertas respuestas, va a requerir considerar el costo de rechazar preguntas
+que sí podían ser respondidas y tengo que aceptar el riesgo de aceptar información
+insuficiente ya usando validación. Y si se fijan entramos en los mismos conceptos que teníamos de
+tabla de matriz de confusión, es decir, yo me puedo equivocar también porque estoy poniendo aquí
+una binarización de cuando mostrarla. Entonces, aceptar significa superar el
+corte, pero no va necesariamente a decir que el primer documento que está
+dentro de esa aceptación es efectivamente el correcto que responde a
+la consulta que se está realizando. No depende, va a depender del
+ranking, digamos, o el ranking puede ponerlo en primera posición, pero no
+necesariamente eso me va a hacer que la respuesta a la
+consulta que se realizó va a ser necesariamente la una una respuesta
+válida ya porque no recuerdo nosotros estamos haciendo estamos pasando un
+texto a un objeto matemático y vamos y vamos a ver cosas en eso en esa
+dimensión matemática que se parece entre sí pero no precisamente porque se
+parece en esa representación significa que responde a lo que estoy a la
+pregunta o la consulta que se está expresando. Entonces, fíjense acá, tenemos
+al principio dijimos las cuatro etapas, dijimos representar, ya lo vimos, comparar,
+ya lo vimos porque esto es pasarlo a un objeto matemático, comparar es asignarlo
+un puntaje, ordenar es ver cuáles son los que muestro primero y ahora estoy
+viendo la parte de si es que efectivamente los documentos que están
+rankeados de primera en primeros órdenes me responden a la consulta que
+efectivamente yo o sea la consulta que efectivamente tengo
+entonces primero tengo la primera etapa que es si es que voy a aceptar digamos
+la consulta que voy a comprobar ahí si el puntaje que he asignado con el
+principio, en principio estamos ocupando el coseno, alcanza el corte definido, es decir, bajo cierto
+puntaje yo no voy a querer mostrar esa pregunta, entonces voy a simplemente mostrar las respuestas
+que son lo suficientemente similares en términos de la representación vectorial para ser consideradas
+luego voy a querer recuperar esa información, entonces yo voy a comprobar ahí que la ficha
+pertinente aparece entre los candidatos y ahí voy a ver cuánto van a ser los
+aciertos entre las primeras de las primeras K opciones y finalmente voy a
+ver si se responde correctamente con alguno de los posibles candidatos
+entonces la respuesta voy a ver si la respuesta utiliza fielmente la
+información suficiente de la ficha efectivamente responde a la pregunta o
+no ya entonces en el caso de la pregunta del precio cuál es el precio total en
+pesos y tengo las fichas 05, las fichas 05 puede quedar primero para una pregunta
+de precio pero no ser suficiente entonces va a cumplir el umbral, va a ser
+pertinente pero no va a responder correctamente, entonces tengo que
+simplemente encontrar algo que es similar entre 100 términos de
+representación matemática no significa que estoy haciendo efectivamente el
+proceso que quiera yo hacer. El proceso, la última parte que es
+comprobar estas cosas es un poco más complicado y por eso
+es difícil de matematizar porque ya no matematizamos, ya comparamos los
+puntajes y en términos matemáticos bajo esa representación son similares pero
+no podemos accederar que responde efectivamente a la pregunta, ya, entonces
+no podemos abarcar o atacar ese problema, esa etapa, de manera matemática, porque ya fue
+matematizado. Nosotros pudiésemos probar otra representación y ver si sucede el problema,
+pero igual voy a tener que inspeccionar si efectivamente se está dando la interpretación,
+o sea, se está respondiendo efectivamente a la consulta. Siguiendo. Nosotros queremos ver,
+ya cuántos queremos mostrar veamos las distintas dos las dos recetas que hemos visto la basada en
+conteo y la basada en la representación vectorial yo puedo ver cuántos si se fijan acá los aciertos
+en los primeros candidatos es o la chunta la primera o la chunta la primera los aciertos en
+los primeros tres candidatos es cuántas veces la chunta cuando tiro los primeros tres que tienen
+la primera, las tres mayores puntadas y el MRR hace referencia
+dependiendo del recíproco de su importancia. Entonces si se fijan acá
+cuando ocupo estas distintas configuraciones, mostrar más candidatos
+va a tener mayor, un poco mayor de certeza porque tengo más
+posibilidades en las cuales yo le puedo adjuntar a lo que yo estoy buscando.
+Si adjunto a la primera ya muestro 1, en el caso del mini lm 10 de 12 consultas fueron
+respondidas pero ya al agregar 3, pasé de 11 a 12 ya porque voy a poder
+permitirme cierto error en el sentido de que no necesariamente lo que yo
+recomiendo términos de mayor puntaje va a ser efectivamente lo que la respuesta
+correcta entonces me doy un par de opciones en este caso tres vendría siendo o
+dar tres candidatos notaría una cierta algura para definir en el caso de esta
+búsqueda por eso cuando ustedes por ejemplo hacen búsqueda en cualquier
+tipo de búsqueda nunca les muestra sólo una opción sino que muestra más de una
+porque tengo una mayor chance de juntarle digamos o hacer este match en término de
+similitudes de alguna métrica con más de una opción simplemente.
+Entonces esa noción dice, fijan acá va a ser bastante más útil. Ahora, cierto
+cierto que tenemos que tener que por ejemplo el MRR no cambia en funcionar
+cuántas yo estoy diciendo porque siempre va a ocupar en términos de
+de que cuál les va a mostrar o es en términos numéricos porque siempre va a ocupar los rangos completos
+y ahí esos rangos completos no cambiaron, entonces por eso este número de MRR se mantiene constante
+no así los aciertos en los primeros K valores
+ahora analicemos un poco la representación, entonces vemos que el embedding es pasar un objeto
+no matemático a algo matemático
+y el minileme me llevó texto
+que fue pasado a tokens y los tokens fueron pasados después a un vector de 384 coordenadas
+no podemos graficar 384 coordenadas entonces la forma que quiero representar es en términos de
+una análisis de componentes principales que me lo va a resumir en las primeras dos coordenadas ya
+es una una proyección al AR2 en principio y se fijan acá esta va a ser la representación ya
+que va a resumir las 384 no es claramente una representación certera yo veo que la primera
+componente principal que sabemos que reúne la mayor variabilidad tiene el 20% de la variabilidad
+de los datos y tengo la segunda componente principal que es 14.2 que reúne la segunda
+la la el segundo orden de variabilidad entre los datos entonces en total aquí simplemente estoy
+viendo el 34.3% de la variabilidad de los datos, lo cual es poco dentro de
+todo el resto de
+coeficientes y coordenadas que tengo. Entonces hay un sinfín de otras
+digamos
+fuentes de variabilidad que no estoy representando en esta proyección en 2D.
+entonces si se fijan acá yo estoy haciendo simplemente una proyección del
+espacio R384, que es un vector de 384 coordenadas, a R2
+y el PCA es una de las formas que yo puedo hacer esa
+esa representación pero no es la única entonces
+Si se fijan acá, yo puedo ver la representación de cada una de las fichas
+de 0 1, de 0 2 y así sumisigue, no así de las consultas. Si se fijan esto es
+cada una de estas fichas fue pasada a un punto en el espacio de 384 y luego esas
+384, fueron pasadas a un punto en R2, en términos de su componente principal.
+Nosotros podemos ver similitudes. Si se fijan acá, nosotros nos devolvemos a ver
+las fichas y vemos que las fichas...
+Aquí, D11 y D12 son muy muy similares porque vimos que eran prácticamente dos códigos
+distintos pero con distintas fechas pero misma hora.
+Entonces cuando vemos su representación en términos de las componentes principales,
+en términos de las primeras dos componentes principales, vemos que D11 y D12 ya son muy
+parecidos en estar en esta proyección en R2. Entonces, eso que sugiere, sugiere que sus
+tectos son muy similares, pero no son exactamente iguales porque no están en el mismo punto.
+No puedo decir un orden de ranking en este espacio porque el ranking lo calculo en el
+espacio original que es de 384 coordenadas. Entonces, el PSA no entrega una forma de ver
+similitudes entre observaciones, digamos, que o de distintas
+representaciones de observaciones, que sería lo correcto de decir.
+Siguiendo entonces, recordemos nuevamente, en vez de pasar objetos a cosas
+numéricas, yo puedo pasar, yo puedo utilizar esa representación,
+esto claramente ilusativo, no es exactamente lo mismo con lo que estamos haciendo, pero para
+otro uso, no necesariamente para texto, no necesariamente para hacer esta búsqueda entre
+similitud, yo puedo ocuparla para otras funciones, entonces podemos entrenar por ejemplo un clasificador
+sobre esos embedding, entonces si se fijan el embedding pasa a ser simplemente una noción de
+transformación de los datos, bastante más compleja, pero una transformación de
+los datos y estos datos pueden ser
+que son, o sea, son texto. Por ejemplo, pudiésemos ocupar el mini-lm para
+pasarlos a niveles, a vectores de 384 coordenadas y luego entrenar algún
+clasificador que me diga si yo tuviese las etiquetas, si es que tengo un
+correo por ejemplo que sea spam o no. Imagínense, yo tengo los spams, los
+correos que yo sé que son spam y cuáles son spam y cuáles no y en vez de hacer
+lo que habíamos hecho antes con AY, bias y relección logística etcétera, que
+pasa con teo, yo puedo ocupar el embedding para pasar el texto del spam a una
+representación vectorial. Yo sé cuál es la etiqueta porque sé cuando es spam y
+cuando no y utilizar esta representación vectorial ya con minilm para ser el
+clasificador de correos spam o no yo puedo hacer agrupamiento ya y ahí vamos a
+necesitar revisar digamos la estabilidad y la utilidad de los grupos ya va a ser
+una noción de clustering se fijan el embedding lo que me está haciendo es
+llevar me está cambiando el espacio el dominio en el cual yo estoy trabajando
+pero me lo está matematizando. Entonces, en ese espacio quizás puedo hacer
+un agrupamiento bastante más certero que en el espacio original.
+Y también lo que nosotros estábamos haciendo, que es la búsqueda.
+Ver cuáles son los vecinos más cercanos porque estábamos viendo una noción de similitud.
+¿Cuál es lo más cercano a lo que nosotros tenemos?
+Y eso es lo que nosotros estábamos haciendo cuando estábamos sacando este coseno.
+coseno de la representación en mini-le'en. Entonces, este embedding, esta
+transformación de texto a representación matemática puede tener
+distintas aplicaciones. No se saca de mente buscar similitudes.
+Ya entonces, terminando, ¿qué podemos hacer o qué debemos realizar cuando
+queremos cambiar la aplicación o tenemos distintas
+distintos objetivos como lo acabamos de mencionar. Yo puedo
+cambiar el codificador. El codificador nosotros dijimos mini lm pero tal
+como está esa hay muchos más. Entonces esa representación
+va a cambiar bastante los resultados porque
+recuerden tengo infinitas formas de representar algo que es numérico, algo que no es numérico
+de manera numérica, entonces puedo probar cuando quiero hacer estas cosas, quiero probar algo que
+o quiero probar más de algún codificador para ver si los resultados que estoy teniendo son
+relativamente consistente, aunque yo también puedo ver los resultados en
+cuanto a la pertinencia de la respuesta que tengo en las distintas consultas,
+que también hay otra forma de validar empíricamente que lo que estoy
+haciendo tiene alguna noción o está funcionando en principio.
+Puedo hacer otra división de las fichas, puedo revisar qué fragmentos
+contienen información suficiente y cuáles no, entonces clasificar cuándo
+voy a necesitar información adicional. Puedo tener otro dominio o otro tipo de
+consultas, ya evaluar con ejemplos que son adicionales o son más
+representativos de algún uso particular. Entonces voy a poder de cierta manera
+particularizar la red o el embedding a la aplicación que yo estoy utilizando y
+puedo ocuparse en el caso que estoy de búsqueda otro punto, otra noción de
+corte mínimo o en principio otro
+puntaje del coseno de minilem pero podemos ocupar otra también ya que por
+ejemplo no consigue el término de dirección entonces todas esas cosas
+tenemos que setearla digamos configurarla antes de hacer esta
+implementación
+y que tiene muchas variantes ya tengo muchas muchas muchas opciones distintas
+que puedo modificar que me van a entregar estos resultados la idea es que
+yo tengo que nuevamente en la última etapa validar que las cosas que yo estoy haciendo tienen algún
+correlato con lo que yo quiero hacer ya no porque tengo un puntaje un puntaje alto significa que
+más va a estar respondiendo o está haciendo efectivamente el objetivo que yo plantee en un
+principio. Entonces si se fijan acá para ya ir cerrando esto tiene el mismo la misma
+noción de lo que hicimos o la misma herramienta que nosotros usamos de Reino
+Nacional. Todo esto que está aquí ocupa exactamente las mismas cosas que estamos
+haciendo. Puede ser un poco más complicado en términos de la operatoria interna que
+hace el embedding, pero por ejemplo para la clasificación, lo único que me va a
+hacer el embedding es cambiar mi entrada, es decir, el embedding cuando lo hago en
+clasificación, me va a cambiar la entrada a un número y ese número va a
+ser la entrada de mi red neuronale. Entonces, todos son en principio
+red neuronales. Todo lo que nosotros vemos con esta GPT y cosas estas tolas son
+obviamente versiones más sofisticadas de lo que estamos viendo, un poco más
+complejas, pero todos recaen dentro de la misma categoría. Todos tienen alguna
+representación, sobre todo las cosas textuales, tienen alguna representación
+matemática que con la cual nos va a permitir hacer alguna operatoria
+que va a dar algún puntaje de similitud y
+puedo digamos hacer distintas distintos objetivos lo que nosotros vamos a ver un
+poco más en la siguiente sesión es cómo puedo pasar a esta cosa algo
+generativo, ese es como el ideal que queremos ir cerrando.
+Entonces volviendo a la pregunta inicial, si se fijan yo tenía la consulta de
+olvidé mi clave sabemos que D01 es la ficha correcta y bajo el Mini LME y con
+las distintos ranking yo tengo entonces el D01 como la principal respuesta a esa
+consulta y vemos entonces bajo esa representación que estamos
+ocupando Mini LME que es embedding, ya, nos están entregando buenos resultados
+tenemos entonces los distintos pasos, el peding, el puntaje, luego la comparación y luego la
+verificación. Entonces esos son los cuatro pasos que nosotros tenemos que tener y analizar dentro
+de este tipo de tecnologías. Si se fijan acá, todo esto se resume al principio. El primer paso
+siempre definir cómo voy a representar yo de cosas no matemáticas, si bien aquí
+lo estamos particularizando en texto, podrían ser otros tipos, otro tipo de
+cosas, ya, pues pensemos vídeo por ejemplo, igual es algo no matemático o algo no
+innatamente número que lo quiero representar como número, luego voy a
+tener que asignar algún puntaje, ordenarlos y luego evaluar y efectivamente ver que lo que estoy
+realizando tiene algún correlato con el objetivo que yo planteé en un principio. Esto en cuanto
+a lo que es en BEND, si se fijan todo esto puede ser resumido muy brevemente en utilizar
+herramientas de red en principio para pasar algo no matemático en algo matemático y una vez que
+estoy en el mundo matemático de vectores puedo aplicar redes neuronales para los distintos
+objetivos que hemos visto a lo largo de estas últimas sesiones, ya sea clasificación, similitud,
+búsqueda, clustering, etcétera. Entonces todo esto está conectado, se pueden ver muy distintos
+pero por debajo estamos ocupando las mismas tecnologías.
+En esencia son las redes neuronales, solamente que vamos cambiando ciertas cosas dentro de
+esta estructura.
+¿Alguna pregunta, duda que haya salido hoy?
+Si no, volvemos el próximo jueves.
+Y luego de esto, el jueves que es la última sesión que me toca a mí y luego viene el
+profesor Jonathan Acosta, con las últimas siguientes semanas.
+¿Les parece? Si hay alguna consulta también me pueden mandar el correo, me estoy
+demorando un poquito en responder estas últimas preguntas, pero me puedo
+honorar pero siempre respondo. Eso. Nos vemos entonces el jueves misma hora.
+Gracias a todos, buenas noches.
+Chau que estén bien, buenas noches
+Recording stopped

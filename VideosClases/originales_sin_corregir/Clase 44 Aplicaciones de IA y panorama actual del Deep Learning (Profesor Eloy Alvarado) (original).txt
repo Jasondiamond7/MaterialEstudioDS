@@ -1,0 +1,1644 @@
+Ya, entonces, vamos a comenzar. Entonces, lo que hemos visto hasta ahora son metodologías
+y problemas bastante específicos. Nosotros vimos cómo clasificar correos, podíamos utilizar,
+por ejemplo, metodologías de regresión logística, Naive Bayes y otras otras que
+hemos visto de clasificación en principio, ya, y teníamos distintas formas de representar
+nuestros datos. Si teníamos un texto, nosotros podíamos definir, por ejemplo, cuántas veces
+se utilizaba la palabra oferta, o si tenía un link o no. Entonces, si se fijan, tenemos
+una forma numérica en la que nosotros representamos los datos, cualquiera sea esto. También con
+Pedro vieron cómo agrupar vinos, ya en términos de clustering y en esencia salió la noción de
+distancia entre datos y también vimos cómo comparar estos modelos y hacíamos la diferencia
+cuando queremos que estamos en un problema de clasificación y en un problema de predicción
+numérica. Entonces en una teníamos la metría de confusión y en otro digamos discrepancia en términos
+de error cuadrático o la suma cuadrada de error o alguna métrica, digamos por
+ejemplo la pérdida de la olímpica que nos define cuánto nos estamos equivocando
+y en el caso de clasificación contábamos cuantas veces
+predecibamos correctamente y teníamos el concepto de conjunto de entrenamiento,
+conjunto de evaluación y conjunto de prueba. Entonces ahora queremos expandir eso,
+queremos no simplemente quedarnos con cosas que son un poco más ad hoc al análisis, que son
+conjuntos de datos numéricos en un Excel, digamos, o un CSV, o algún otro formato de fuente de datos,
+sino expandirlo. Por ejemplo, ¿qué pasa si queremos utilizar de cierta manera las metodologías que
+conocemos, hubo otras que las vamos a
+especificar a lo largo de las próximas
+semanas para otro tipo de entradas,
+ya, déjalo de esa manera, de conjunto,
+pensando en imágenes, ya, otro tipo de
+textos, recuerden que nosotros vimos una
+forma un poco ingenua de caracterizar un
+correo, ya, por contar simplemente las
+de las palabras. Pero existe todo un significado detrás de eso, dentro de la
+proza que se hace en la reacción. Si nosotros utilizamos, por ejemplo, una
+métrica de simplemente frecuencia, uno puede decir
+el hombre mordió al perro y si utilizamos una métrica de frecuencia, va a tener el
+mismo valor numérico de el perro mordió al hombre.
+Entonces, tenemos en esta representación de pasar el correo, este texto, algo numérico,
+podemos perder información.
+Entonces, la representación en cómo van a entrar los datos que tenemos a nuestro modelo
+toma una importancia.
+Entonces, por eso queremos expandir esta noción de no simplemente datos estructurados,
+en el estricto rigor de una base de datos, con toda su fila y columnas bien definidas,
+porque eso no es la realidad.
+En la realidad nosotros tenemos paseados incompletas en muchos
+tipos de formatos.
+Por ello entonces queremos pasar cómo podríamos trabajar con
+imágenes o textos que son un poco más complejos.
+Tenemos que ver una forma de describirlos.
+Y en general nosotros vamos a querer tener una forma de
+describirlo numéricamente.
+Entonces, antes de ver las aplicaciones que vamos a definir como aplicaciones de inteligencia
+artificial pero luego vamos a particularizar, tenemos que definir bien qué es lo que nosotros
+queremos hacer.
+Todas estas cosas que nosotros estamos viendo, todas estas metodologías tienen un fin, un
+propósito.
+Queremos, estamos bajo un problema de clasificación, queremos definir una categoría, alguna observación,
+predecir o anticipar una cantidad, encontrar información o digamos producir
+y generar algo que sería un algo muy muy predictivo por primera vez. Una vez que
+nosotros definimos qué es lo que queremos hacer
+vemos qué datos necesitamos o qué va a recibir digamos lo que nosotros vamos a
+llamar como sistema, que lo vamos a definir en breve.
+Una vez que definimos cuál es el propósito de lo que queremos
+hacer, definimos claramente qué necesita nuestro modelo,
+que lo vamos a definir de manera un poco etérea,
+qué va a necesitar nuestro modelo para poder funcionar.
+Y después, una vez que definimos cómo va a ser nuestra
+entrada a nuestro modelo vemos cómo lo podemos transformar, cómo lo podemos
+utilizar y cómo podemos, digamos, completar la tarea que nosotros nos definimos.
+Entonces lo que tiene que quedar claro siempre es nuestra
+objetivo está previo a nuestros dados. Si bien en la práctica se sucede mucho
+que se tienen datos disponibles y se plantea una... el problema inverso es, tengo
+todos los datos disponibles, ¿qué puedo hacer con estos?
+En Studio Rigor eso genera muchos problemas porque vamos a tratar de adaptar nuestra metodología
+para lo que nosotros tenemos independiente del objetivo que realmente podemos resolver
+y lo que es realmente útil.
+Entonces, no siempre todos los datos nos van a servir para cosas que efectivamente van a ser
+digamos utilizables en la realidad.
+Tenemos que definir bien cuál es nuestro objetivo, cuál es nuestra tarea
+Y luego de ello vamos a definir cuáles son los datos y qué necesito probablemente tal.
+Una vez que tengo mi tarea definida,
+especificé y describí los datos que tengo disponible o que voy a necesitar,
+voy a tener que analizar cómo lo voy a evaluar.
+Y tuvimos toda una catra respecto a ello,
+dependiendo si estamos en un problema de clasificación,
+si hay una métrica de error que podemos utilizar,
+¿Cómo puedo pasar eso a una decisión tras, digamos, alguna predicción, algún objetivo, digamos, que tenemos cuantitativo?
+Entonces, eso es lo que nosotros tenemos que empezar. Tenemos que empezar desde nuestro objetivo y luego definimos los datos.
+Si lo hago al revés, caigo en el problema de que puede que termine eventualmente
+tratando de resolver o haciendo cosas que no necesariamente se condicen
+con el objetivo que yo quiero solucionar.
+Entonces tenemos que definir claramente cuál es nuestro objetivo
+previo a realizar, digamos, la metodología de implementar y digamos programar y hacer cosas.
+Entonces, tenemos que tener eso muy muy claro. Dentro de estos conceptos que estamos hablando,
+hablamos muy coloquialmente de lo que es inteligencia artificial
+pero es un poco un poco difuso, digamos, que aquí le llamamos inteligencia
+artificial. En general, inteligencia artificial se conoce como un concepto
+muy amplio, muy general, muy paraguas, digamos, porque abarca muchas cosas.
+Entonces, en este diagrama, que lo podemos, digamos, leer de afuera hacia adentro,
+vemos que inteligencia artificial es lo que engloba todo, en donde dentro de ello hay distintos tipos
+de sistemas que pueden estar diseñados para, digamos, reconocer, clasificar, predecir,
+generar contenido en algún sentido, que tiene una finalidad de proveer soluciones
+para algo práctico que nosotros planteamos.
+Entonces, Inteligencia Artificial es algo muy genético, muy amplio, por lo
+cual necesitamos otros conceptos que lo particularizan. Entonces, dentro de la
+Inteligencia Artificial, digamos, nace este concepto de aprendizaje automático.
+Y en esta noción de aprendizaje automático, la idea es
+como aprender patrones a partir de los
+regreso logística, neib-bayes, y si bien sigue siendo amplio son herramientas
+digamos en esa categoría hay herramientas que nosotros sí hemos
+visto a lo largo de este curso. Y la siguiente región que está dentro del aprendizaje automático
+habla del aprendizaje profundo, o en inglés el deep learning.
+Que por ahora, digamos, lo único que necesitamos entender es que, porque lo vamos a profundizar
+en las siguientes sesiones, es que este tipo de metodologías o conjunto de metodologías,
+lo que hace es realizar varias transformaciones de los datos consecutivamente o sucesivamente.
+Se fijan cuando nosotros hicimos en AIPy's, nosotros planteamos una metodología y la
+implementamos, realizando la identidad es lo mismo. En cambio, en el aprendizaje profundo,
+yo hago muchas transformaciones, muchas, muchas funciones en principio, en sentido matemático,
+que son transformaciones de los datos, tal de que yo pueda aprender y por eso
+está dentro de aprendizaje automático, patrones dentro ya no sólo de los datos
+sino dentro de las transformaciones de los datos per se. Entonces puede buscar
+patrones en espacios, en términos matemáticos, de transformaciones de los
+datos que no son visibles a simple vista ni con modelos digamos más
+superficiales, por eso el concepto de profundo. Entonces estas son una relación
+de inclusión. Aprendizaje profundo es aprendizaje automático y aprendizaje
+automático es en principio inteligencia artificial. Ahora, pueden haber cosas que no sean
+aprendizaje automático que están en inteligencia artificial y aquí podemos jugar
+digamos con esta con este diagrama al principio.
+una inteligencia, pueden haber herramientas entonces que de inteligencia artificial que no
+utilizan ninguna de las metodologías de aprendizaje automático que hemos visto
+en el largo del curso. Entonces por eso tiende a ser un concepto bastante amplio que es en
+principio cuando se habla en términos un poco más técnicos tratar de evitar, puesto que puede
+significar muchas cosas. Entonces por eso tratamos y introducimos estos conceptos un poco más
+concretos. Entonces...
+Ahora, planteamos cuatro tareas, que es lo que yo les comentaba que era nuestro
+objetivo, que tenemos que definirlo de antemano. Por ejemplo, el clasificar
+nosotros lo hemos hecho. Tengo que elegir una categoría y tengo
+médicas para definir si la categoría que yo escogí era correcta o no. En este mismo ejemplo,
+la salida dice si es que algún un base presenta daño en un ejemplo digamos hipotético. Entonces,
+eso podría ser la salida de una problemática en donde nuestro objetivo, nuestra tarea sea
+clasificar, presenta daño o no. Y podemos comparar esto con una infección de un dato
+donde se sabe si es que un envase en particular sí tenía daño o no.
+Entonces tengo una etiqueta, estamos trabajando dentro de una metodología
+supervisada. Prolosticar significa en esencia anticipar
+una cantidad futura. En este ejemplo la salida se venderán 120 unidades
+mañana y yo puedo comprobar si es que tan bueno era esa
+cantidad futura con algún tipo de error, alguna métrica.
+Y el rumbo cuadrado de error, el rumbo cuadrado de medio, muchas otras métricas que nosotros vimos.
+Por ejemplo,
+si yo digo, mañana se venderán 120 unidades y mañana se venden 100,
+entonces sé cuánto me equivoqué y puedo utilizar eso para mejorar mi modelo en el futuro.
+Entonces, fíjense ahí, pasé de clasificar a algo cuantitativo,
+algo categórico, algo cuantitativo
+recuperar
+en particular recuperar información que es una siguiente tarea
+significa digamos encontrar
+y ordenar
+fuentes
+que podrían responder a alguna consulta
+entonces un ejemplo de salida de una tarea de recuperación
+son si estos
+documentos en particular responden a alguna consulta
+en específico
+Entonces, ahí cómo voy a comprobar si lo que hice o el sistema, que lo vamos a definir,
+es correcto o no, voy a ver si lo que se recuperó tenía relevancia
+y era actual en términos de las fuentes de información que se están utilizando.
+Y finalmente, una tarea que es la más clásica que se ocupa hoy en día, que es generar,
+que es producir contenido. Sin definir a priori qué es el contenido,
+puede ser una respuesta escrita, como borrador de una respuesta, o un correo por
+ejemplo, o una imagen, si uno quiere generar una imagen como está de modo
+hoy en día. Y ahí necesitamos comprobar que
+es coherente con lo que se le pidió. Si sigo las instrucciones y efectivamente si
+a la larga tiene una utilidad, yo puedo generar una imagen y no era la imagen que yo
+entonces no me es útil, entonces tengo una forma un poco más ambigua de...
+un poco más subjetiva de comprobar que la salida de ese tipo de sistema, que
+otro es el concepto que les estoy mencionando,
+es válido no. Fíjense que en todas estas problemáticas,
+estas aplicaciones que pueden ser por los distintos objetivos y tareas que se
+puedes tener pueden recibir tipos de datos parecidos.
+Una fotografía puede clasificarse, ¿cierto? y estaríamos en la tarea de acá.
+Puede utilizarse para buscar imágenes similares, entonces estaría terminado de
+recuperación. O puede ocupar la imagen para generar, por ejemplo, pasa una
+imagen de ejemplo quiero hacer una modificación sobre eso. Entonces
+todas estas tareas pueden tener distinto insumo, distintas entradas y esas
+entradas van a entrar a algo que nosotros lo vamos a definir como un
+sistema. ¿Qué es lo que es un sistema? Porque un sistema es en esencia
+un conjunto de tareas, definámoslo de esa manera, que resuelven o están
+construidos para resolver algo. Porque una tarea puede ser lo
+suficientemente compleja, que puede ser desglosada en distintas tareas, que
+pueden ser una tarea de clasificación, una tarea de pronóstico, una tarea
+de generación.
+Entonces, si tengo un objetivo en particular, digamos un encargo que tengo que hacer, conviene
+digamos completar una frase.
+Entonces, recibo estos datos, que si se fijan pueden ser de distintos formatos, y entrego
+un resultado.
+Y lo considero útil si es que cumple estas condiciones.
+es cuando yo tengo una tarea compleja tengo que definir bien qué es lo que yo
+voy a tener como insumo, ya, qué voy a entregar o qué va a entregar mi sistema
+como resultado y cómo voy a decidir si ese resultado me es útil para ese
+encargo que yo definí. Si yo no puedo definir y responder a esa pregunta o
+completar la frase, digamos, necesitamos precisar la tarea, necesitamos
+precisar cuál es el conjunto de datos y cuál es nuestro objetivo en general.
+Si no podemos responder a eso,
+vamos a caer en un bucle, digamos, de ir probando herramientas
+que pueden no servirnos para lo que nosotros queremos hacer.
+Entonces,
+tenemos que poder definir cuál es nuestra tarea,
+qué es lo que nosotros vamos a tener como insumo,
+cuál va a ser nuestra salida de nuestro modelo,
+modelo que nosotros vamos a ir definiendo durante las próximas semanas
+y cómo voy a definir si eso es efectivamente ese resultado, eso que me entrega este sistema
+que este conjunto de tareas con un propósito me es útil o no.
+Entonces, veamos un ejemplo.
+Pensemos que tengo un cargo o una consulta que me dice
+ven un correo
+y tengo que clasificar ese correo
+y redactar una respuesta
+si se fijan
+la primera parte es clasificar
+y la segunda es generar
+entonces mi consulta es cuando ven el correo dice
+me cobraron dos veces y necesito el compradante
+entonces son
+dos encargos distintos
+en el primero
+podemos clasificar la consulta
+eeeem
+y en el segundo podemos redactar
+Entonces una posible salida para el primer encargo es que hay que consultar los cobros.
+Pero además tengo que comprobar que esa salida es válida, es útil, es decir, tengo que
+compararlo con la categoría correcta para ver si efectivamente está bien clasificado.
+Y en el segundo cargo pedimos redactar una explicación del procedimiento, que sería
+una posible salida como respuesta al me
+cobraron dos veces y necesito comprobarlo.
+Entonces,
+podría por ejemplo necesitar hablar de
+los documentos necesarios para hacer esa
+esa gestión, plazo de revisión,
+instructivos que puede seguir, digamos, la
+persona que hace la solicitud. Entonces se
+necesita una comprobación. Entonces, si se
+fijan cuando estoy haciendo esta
+la tabla, lo que estoy diciendo es, esto es
+haciendo responder a las preguntas que yo les he comentado.
+¿Qué es lo que yo tengo que hacer? Nuestro objetivo, nuestra tarea. ¿Cuál es
+una salida posible? y por consecuencia voy a saber cuál es mi entraba
+y cómo voy a comprobar si eso es útil o no. Porque si no puedo entregar
+imagínense que este sistema está mal calibrado, no es muy bueno y empieza a
+decir, la gestión está completa,
+ya se gestionó el comprobante y no se comprobó que ese comprobante
+efectivamente
+es sucedido.
+También puedo ver, por ejemplo, la fluidez del texto, si se lee de manera
+natural, y tengo que responder a estas tres
+interrogantes con, en este ejemplo particular, digamos, pero en todas las
+problemáticas, en todas estas aplicaciones, voy a necesitar una comprobación y esa
+comprobación puede ser otro sistema, puede estar dentro del sistema. Entonces, no
+basta simplemente con clasificar bien, que podría ser una de las herramientas
+metodológicas que nosotros hicimos, que llevamos de las sesiones pasadas, vimos cómo
+clasificar correos con distintas metodologías para
+para que todo el encargo, todo nuestro objetivo sea realizado correctamente
+entonces yo puedo desagregar mis objetivos en distintos subtareas y cada
+tarea tendrá su metodología en particular
+que puede hacer más útil en ese caso. Nosotros sabemos cómo clasificar y podemos
+ver cómo redactarlo. Lo voy a ver un poquito más adelante.
+Ahora,
+dentro de estas, estos sistemas, una de las herramientas que más se utiliza, que
+lo vamos a introducir hoy y lo vamos a ver el próximo martes en mucho más
+detalle, es una red de numeral que simplemente es un modelo que recibe datos
+numéricos y recalco el datos numéricos, numérico siendo la palabra clave y los
+transforma para producir una salida. No estoy diciendo cómo, eso lo vamos a ver
+más en detalle porque hay muchas formas de hacerlo.
+Y esas operaciones que realiza esta renda oral ya tiene valores ya entre medio
+que pueden ser ajustados y que esos valores se aprenden a partir de
+ejemplos, a partir de datos pasados.
+Entonces, vamos a definir tres partes. Primero, la entrada. Veamos el ejemplo
+que nosotros vimos de una imagen que nosotros podemos ver
+lo vamos a particularizar en un número, en esencia una imagen de un número escrito a mano
+y vamos a ver cómo lo utilizamos. Segundo, nosotros vamos a ver ese ejemplo de los números
+escrito a mano, segundo el tipo de transformaciones que se hacen, ya que en esencia es la red de la
+neurona, que se hace con ese dato que yo le estoy diciendo que es una imagen, cómo la transformo,
+porque un imagen en principio, si se fijan yo les mencioné y les recalqué que
+el arredondolonal transforma datos numéricos. Un imagen tiene que tener una
+representación numérica, pero esa representación puede ser variada.
+Entonces, tenemos que ver qué tan susceptible es nuestro modelo a las
+distintas representaciones numéricas. Vamos a entrar en detalle la
+semana de cómo construir y cómo se hacen estas transformaciones
+mucho más en detalle la próxima semana y la tercera parte, la tercera
+categoría dentro de esta Renda Rural es la salida, entonces siempre lo he estado viendo
+como un sistema, algo que entra, algo que se hace dentro de este sistema de
+Renda Rural y una salida. Ahora, vamos a tener detalles de cómo se
+hace esto pero tenemos que primero, en primera instancia, definir cómo va a ser la
+entrada. ¿Cómo pasó un imagen, por ejemplo, a algo que yo estoy
+definiendo para que pueda ser utilizado o pueda ser transformado
+en una salida con una red donora? Entonces, tenemos que transformar esa
+imagen a algo numérico y ahí tenemos distintas representaciones.
+Esto está intrínsecamente relacionado con lo que nosotros definimos como
+aprendizaje profundo, porque el aprendizaje profundo en este contexto
+es cuando nosotros vamos a estar modificando estos valores
+ajustables que se definen dentro del sistema de red neuronal
+muchas veces y con metodología un poquito más
+sofisticada, más computacionalmente intensiva,
+en donde tratamos de aprender no sólo de los datos sino de sus transformaciones y
+hacemos muchas transformaciones de ésta para entender
+para entender, digamos, las distintas relaciones unilaterales. Claudia Cuña
+pregunta si es renal jazz deep learning? No, de hecho Josefalo lo respondió
+bastante bien porque va a depender mucho de la complejidad de la red neuronal al
+igual red neuronal sigue siendo un concepto muy amplio si por ejemplo yo hago
+una red neuronal que lo vamos a profundizar la próxima semana una
+red neuronal con una neurona y una capa estoy casi al mismo nivel de hacer una
+regresión entonces necesitamos muchas capas que lo vamos a digamos definir la
+próxima semana pero para que lo consideremos, digamos, algo como
+sin ambigüedad profundo o deep learning
+por eso lo vamos a particularizar y lo vamos a profundizar la próxima semana
+por ahora quedémonos en este concepto de red neural que tiene una entrada
+tiene operaciones, transformaciones de las cuales yo aprendo de mis datos y de
+las transformaciones de mis dados y tengo una salida. Pero lo que quiero profundizar ahora es
+cómo pasó esto de un imagen, por ejemplo, a algo que tiene que ser numérico, porque dijimos que la
+arrendanol oral tiene entradas numéricas. Entonces, antes de pasar a ello, vamos a
+un pequeño recuerdo de cómo hago este aprendizaje.
+Primero, nosotros separamos en un conjunto de entrenamiento o también se
+llama de desarrollo, si pongo validación.
+Y con este conjunto, el conjunto de entrenamiento, yo ajusto mi modelo,
+obtengo estos parámetros, estos valores ajustados que les mencionaba,
+y necesito ejemplos claros. Por ejemplo, datos que tengan
+números escrito a mano,
+tengo que saber qué número efectivamente era el que estaba escrito
+para poder aprender porque si no yo tengo imágenes a secas y no voy a saber
+cuál era la respuesta correcta, entonces necesito saber eso.
+Y voy a tener otro conjunto que va a ser el de uso de predicción en donde yo
+ocupo el modelo que obtuve con el modelo, con el conjunto de entrenamiento y voy a recibir digamos
+probabilidades de clasificación en este caso de quién número era. Entonces se fijan en el
+entrenamiento yo tengo la información clasificada, es decir, tengo imágenes que tienen un número
+asignado o una etiqueta y en la prueba o el conjunto de uso de predicción o de
+prueba también se llama no tengo esa etiqueta y si es que la
+tengo el oculto para ver si efectivamente mi modelo está clasificando
+correctamente. Ahora
+nosotros hacemos eso para tratar de simular qué tan robusto es mi sistema
+mi modelo con imágenes que no conocen. Porque dijimos que estas rebanonales aprenden de un
+conjunto representado de manera numérica, ¿ya? Pero va a aprender de ese conjunto. Entonces,
+nosotros queremos ocupar ese modelo para otros nuevos datos, porque los que nosotros utilizamos
+en el entrenamiento ya los conocemos. Entonces, queremos ocupar los nuevos datos y para ocupar
+los nuevos datos tenemos que ponernos el caso más real, que es no saber efectivamente cuál era el
+número. Entonces por eso lo ocultamos o en principio no lo tenemos.
+Entonces, veamos qué significa entonces representar los datos. Nosotros vimos un
+ejemplo de cómo represento cosas no numéricas como numéricas y tengo en
+esencia infinitas representaciones. Pensemos entonces en el caso de un correo.
+Yo puedo contar las palabras, palabras clave por ejemplo, puedo contar las
+palabra crédito y en este ejemplo tengo el correo apotético digamos crédito
+gratis crédito entonces crédito cuenta dos veces gratis 1 urgente 0
+entonces dado que quiero muchos los modelos que nosotros queremos hacer son
+inherentemente numéricos matemáticos hay número por debajo necesitamos pasar
+nuestra entrada que puede no ser un dato estructurado o estructurado y no
+numérico a algo numérico y tenemos que tener formas de hacer eso entonces por
+ejemplo texto podemos contar las palabras pero tal como yo cuento las
+palabras predefinidas diga ese paso yo podría contar las vocales o las
+consonantes o el número de palabras entonces se fijan yo puedo asignar
+una representación al mismo correo de distintas maneras. Puedo contar aquí, por ejemplo,
+las palabras de crédito y gratis, entonces estoy pasando esta, estos correos van a pasar a ser un
+vector de tres dimensiones, pero tal como están estas, yo puedo ver otras palabras, ¿ya?
+hubo otra representación, por ejemplo puedo hacerlo simplemente con simplemente la longitud
+del correo. Esto va a pasar a ser el número 3 porque son tres palabras. Listo. Entonces tengo
+que tener de cierta manera alguna metodología, ya que no hay una forma general o hay una forma
+que solucione todo, de pasar cosas no numéricas a algo numérico. Entonces tengo que diseñarlo,
+por conveniencia, por lo que es el bio, digamos, por la utilidad propia de la tarea.
+Ahora, en el caso de la imagen, nosotros podemos decir, bueno, la imagen en estricto rigor es una
+matriz, porque dentro de una imagen las imágenes tienen píxeles y dentro de los píxeles se puede
+representar con un número que nosotros le vamos a llamar la intensidad, que para
+nuestro ejemplo va a describir el tono de esa celda, ese
+píxel
+entonces yo siempre voy a tener alguna forma de representar algo no numérico
+como numérico, ahora que sea de utilidad
+en otro tema. Entonces yo voy a tener en
+esencia la noción de pasar los pixeles a un número, pero qué número, esa es otra
+interlocuente, entonces las representaciones que yo tengo de pasar
+imágenes que yo estoy mencionando que son una matriz porque si se fijan acá
+esto tiene distintas píxeles
+es como un pantón de colores
+es algo así, pero aquí lo estamos viendo porque iba a eso digamos porque
+estaba hablando de colores y aquí estoy hablando de la intensidad que describe
+el tono de cada celda, entonces yo estoy haciendo simplemente un degradé entre
+blanco y negro y por eso lo puedo definir sólo con un número yo quiero hacerlo
+como colores tengo que entrar en más dimensiones que lo va a mencionar el tiro
+si se fijan acá el dígito 0 estos son imágenes
+8x8 pixeles o sea hay 8 cuadraditos para la derecha 8 cuadraditos para abajo y si
+si se fijan cada cada celda puede ser visto como la entrada de una matriz ya y
+si yo defino por ejemplo 0 como blanco y 9 como el negro más oscuro puedo
+definir el resto de tonos ya con otro número pero eso sólo dentro de un mismo
+de grado a blanco negro qué pasa si yo quiero definir la hora en términos de
+colores, que es lo que hacen lo que hacían más bien las televisores antiguos, que son
+el RG. Yo puedo descomponer todos los colores en una componente roja, verde y azul, y ahí
+cada celda ya no sería un número, sino que sería un vector de dimensión 3. Entonces
+tendría algo que después vamos a llamar que es como una matriz de vectores, que uno
+puede hacer el paralelismo con los tensores.
+Volvamos al ejemplo. Tenemos el ejemplo de las imágenes que son 8x8 y son
+1797 imágenes. Imágenes en blanco y negro, 8x8 en donde sabemos y las
+podemos ver y además sabemos cuál es la etiqueta. Entonces yo sé que esto es un
+cero y lo tengo tabulado porque si no tendríamos que revisar cada imagen
+una por una y ver manualmente. Y a veces uno podría equivocarse, o sea, el 7 y el 1 siempre se equivocan,
+este pareciera un 5, pero uno podría decir bueno quizás como un 2. Vamos a ver ejemplos, digamos,
+los cuales son un poco más ambiguos. Entonces nuestra tarea, en este caso hipotético, es reconocer
+ya el dígito que está en la imagen entonces se tiene un sinfín de
+una un sinfín de aplicaciones ya sino cuando ustedes por ejemplo ven y hacen
+quieren pagar estacionamiento y le identifica digamos QR es algo muy similar está identificando
+un patrón. Gonzalo pregunta, ¿este proceso sería el mismo si se usara una base de datos
+vectorial? No exactamente, pero voy para allá. Voy a definir cómo se podría utilizar una base de datos vectorial.
+Lo voy a enseñar un poquito, aguantame un ratito. Ya, entonces, esta es nuestra tarea. Tengo imágenes,
+números y los números tan etiquetados. ¿Qué puedo hacer? Si se fijan, en esta
+entrada ya no son números como probablemente tal, sino que es una imagen
+que yo le represento como un conjunto de números
+y que además lo tengo marcado. Entonces yo podría definirlo en términos de un
+vector que va a ser de 8 para la izquierda, 8 de izquierda a
+derecha y después 8 de izquierda a derecha así pegados uno al lado del otro
+o lo puedo ver como matriz también. Ahí tengo distintas formas de representar el
+valor. Entonces, veámoslo acá. Tengo entonces
+una imagen en particular. Entonces 8x8, 64, tengo 64 píxeles, una matriz de números.
+Y ahora voy a hablar de una intensidad, no una intensidad, perdón, de intensidad entre 0 y 16,
+esta acá entre 0 y 9, eran los números que efectivamente podían ser, con los cuales podemos
+reconstruir números adicionales. Entonces aquí tengo una matriz, que es la disección de una imagen,
+en donde si se fijan acá este es ese número este 8 que está aquí este cuarto
+esta cuarta celda que es la que está ahí, es bien nevita entonces mientras más se acerca a 16
+más cercano al negro puro es ya entonces yo puedo representar la imagen como esta matriz
+y la matriz la puedo escribir como un vector, entonces si se fijan yo puedo hacer esto,
+el primer número del vector, el segundo número del vector, tercer número del vector, cuarto
+número del vector, 5, 6, 7, 8 y después sigo con la segunda fila, por convención, yo lo
+estoy haciendo, pero también podría ir para abajo y hacer 8 ceros, después 5 ceros y
+y luego un 3. Lo estoy representando como un vector.
+Ahora, como yo sé que esa intensidad va entre 0 y 16,
+yo puedo dividirlo de 16 y lo estandarizo entre 0 y 1.
+Entonces, un 8 va a ser un 0,5 y así sucesivamente.
+Entonces, lo tengo una interpretación un poquito más clara en vez de ser el 16.
+entonces esto es un 8 y además sabemos que está clasificado como un 8 porque sabemos que es el
+dígito 8, lo tenemos etiquetado previamente porque nuestro conjunto de datos de entrenamiento
+ahora
+cada uno de estas imágenes las voy a guardar como este gran vector
+Y yo podría poner, por ejemplo, la etiqueta como la 65 aba columna o dimensión de este
+vector para saber cuál es el número en términos de la imagen y cuál es su etiqueta.
+Pero lo tengo que guardar, tengo que saberlo.
+Esto, si se fijan, es una de las representaciones que yo tengo de pasar una imagen a un número.
+Pero yo podría tener otro tipo de imagen, podría tener otro tipo de representación,
+podría no ser 8x8. Si se fijan aquí estamos en una imagen estructurada. Todas las imágenes
+son 8 pixeles por 8 pixeles.
+Entonces, la representación numérica no es necesariamente
+trivial.
+No es simplemente pasar una imagen a un número,
+sino que pasa si la imagen tiene muchos más pixeles de
+distinto dimensiones.
+Entonces, tengo que tener distintas metodologías para
+poder representar las distintas entradas de nuestra información,
+nuestros datos que tenemos en los distintos fórmata a algo
+numérico.
+y eso puede ser una tarea en sí misma. Entonces, para cada imagen que tengo yo, el clasificador
+que nosotros vamos a utilizar como ejemplo en la red neuronal, va a entregar 10 probabilidades,
+cada una correspondiente a todos los dígitos posibles, de 0 a 9, ahí tengo 10.
+Entonces, esperamos que esa probabilidad sea lo más cercana a la etiqueta posible.
+En términos de si este número que está acá,
+me entrega una, me, esperaríamos que me entregase una probabilidad alta que sea un 8.
+Entonces, estamos clasificando precisamente tal,
+pero estamos clasificando ahora cosas un poco más no estructuradas, que son imagenes
+pero estamos pasando un filtro, es decir, estamos pasando algo no numérico a algo numérico
+de manera arbitraria que lo estamos haciendo, porque tenemos infinitas representaciones, digamos
+entonces, veamos un ejemplo hipotético, si tengo un dígito 3
+voy a tener una probabilidad de 06, si tengo un dígito 8, una probabilidad de 026
+y las otras 8 clases en conjunto suman 015 para una imagen en particular
+entonces, lo que usualmente se hace es
+la clase que tiene más probabilidad
+es la que yo la clasifico, es decir
+si la probabilidad de que sea la 3 es la mayor, entonces pueda predecir o clasificar
+esa imagen como ese dígito
+entonces el modelo que estamos haciendo, el modelo clasificador que estamos
+utilizando con la reina oral
+va a predecir el 3
+si efectivamente un 8 porque el 3 y el 8
+para ciertas personas que hacen lo mismo
+entonces me equivoqué
+A pesar de que yo igual le di una probabilidad no menor, ya, de dígito 8 a esa imagen, ya, en ese caso se pierde esa predicción.
+Entonces, lo que yo escojo y la probabilidad son cosas distintas. Tengo que obtener es un break y la regla de decisión.
+Sigamos entonces.
+Ahora, en el entrenamiento, en este ejemplo que hemos dicho de 7000, o sea de 1797 imágenes,
+yo voy a dejar 1077 para entrenamiento, 360 para evaluación y 360 para prueba.
+esta 1077 imágenes de números etiquetados voy a ajustar los distintos
+modelos que yo voy a predefinir. Podríamos ocupar regresos logísticos,
+podríamos ocupar naïvayas, podríamos ocupar reanonales y aquí es donde uno
+empieza a buscar las distintas herramientas que se sabe para este que
+pueden servir para esta tarea en particular. Por eso es importante saber
+cuál es tu objetivo porque tu objetivo y en conjunto con el tipo de datos que
+tienes a disposición o necesitas obtener te va a sugerir claramente qué
+tipo de metodología es la que tú puedes utilizar para resolver esa tarea.
+Si no tengo claro el objetivo, no sé bien qué es lo que quiero hacer, entonces se va a
+empezar a hacer puras cosas y nunca se va a llegar algo y si es que si llega
+algo no va a ser algo que tú te definiste en un principio y quizás por
+suerte te sirva pero no va a ser reproducible en estricto rigor.
+Entonces con el entrenamiento ajusto el
+Entonces yo voy a
+entrenar con este modelo, con la
+valiación voy a escoger, una vez que
+el modelo con estas dos cantidades con los 1077 más 360 datos que son el conjunto de desarrollo
+en principio y cuando ese lo entrebe voy a probarlo en el conjunto de prego. Entonces,
+nosotros ya tenemos una forma de clasificar que es la regulación logística. Si bien la regulación
+logística se usa principalmente para clasificación binaria, también se puede extender para clasificación
+en k-clases. Entonces,
+en la regresión logística voy a ocupar los 64 píxeles de la
+imágenes 8x8 para calcular alguna de las 10 clases, ya los
+números 3 0 y 9. Y en general la regresión logística tiende a ser el
+el modelo base para clasificación.
+Es decir, hacemos siempre revisión logística,
+pero a sabiendas que no necesariamente va a ser el mejor
+modelo de clasificación que podemos hacer,
+pero sabemos que es barato, sabemos que es fácil de
+implementar, e interpretable, etcétera.
+Entonces, lo ocupo como base y lo ocupo como modelo a vencer.
+En cambio, la revisión logística no va a ocupar
+directamente los 64 pixeles, sino que va a tener eso como entrada,
+pero va a transformarlos de alguna manera que lo vamos
+a especificar en la próxima sesión para producir las
+distintas probabilidades.
+Para cada imagen va a definir probabilidades para cada clase.
+¿Ya?
+Ahora
+Siguiendo
+¿Cómo voy a medir?
+Esta es probabilidad, ¿sabes?
+Voy a tener cada observación, cada imagen
+va a entregar una probabilidad
+de que pertenezca a una clase
+en el ejemplo que nosotros estamos utilizando son las clases entre
+que el número sea 0, 1, 2, 3 hasta 9
+Pero la probabilidad per se no es todo, nosotros vamos a definirlo, y lo habíamos mencionado en clase anterior, cuando vimos las evaluaciones, es la pérdida logarítmica.
+Entonces, porque no es lo mismo equivocarse y estar muy confiado de esa respuesta que equivocarse y no haberlo estado.
+Entonces, la probabilidad per se puede esconder muchas cosas.
+Entonces vamos a definir este concepto de pérdida, y en particular nosotros vamos a definir la pérdida logarítmica, o LOC-LOS.
+Y lo que hacemos es sacar el menos logaritmo natural de la probabilidad.
+Y esto es lo que nosotros evaluamos para definir y escoger la clase en la cual yo voy a escoger y voy a clasificar.
+en vez de directamente la probabilidad como se hace por ejemplo en la regresión logística binaria
+que me pongo numbral y si supere esa probabilidad entonces un sí y si es que no la supera entonces un no
+aquí voy a utilizar la perdida logri como una métrica un poco más sofisticada de escoger cuál
+es efectivamente lo que voy a utilizar, voy a predecir.
+Entonces, como métrica, cuando lo pruebe en el conjunto de prueba
+o alguna redundancia, vamos a utilizar la exactitud,
+que es simplemente la proporción de imágenes que fue clasificada correctamente.
+Entonces, cuando lo hacemos con los datos,
+En este caso la logística acertó 353 veces de las 360 en el conjunto de prueba
+lo que me da una exactitud del 98.06% y una pérdida logarítmica de 0.3353
+En el caso de la reina neuronal, ya en este ejemplo con los datos que les menciono
+la regresión, es decir, la reno renal va a acercar una vez una cantidad más, es decir, 354 de 360,
+entonces tenemos predicciones bien buenas y viene una exactitud de 98.33.
+Pues si se fijan cuando veo en términos de la exactitud, que es una de las métricas que podemos
+calcular a través de la tabla de confusión, o de la matriz de confusión, perdón,
+aquí hay una pequeña diferencia, pero cuando lo veo en la pérdida logarítmica
+se acrecenta bastante. Entonces, esa pequeña diferencia que tenemos
+claramente hace referencia a clasificar una imagen adicional, porque aquí son
+350 trillecas, 354. Ahora, en esta última columna, si se fijan, tenemos 0.1353
+0.0657 tenemos los números y la diferencia ya es
+no tan cercana en términos de actitud es
+creciente más y aquí estamos haciendo el caso contrario en la actitud nosotros
+queremos el número más alto y en la periáloga arimigia nosotros queremos
+número más bajo entonces cuando queremos hacerlo en este tipo de
+metodología de clasificación utilizando la red neuronal lo vamos a
+utilizar directamente las métricas de tabla de confusión, sino que vamos a ver
+la pérdida logarítmica. Y aquí vamos a escoger el número más bajo que
+podamos tener.
+Porque yo puedo tener distintos números de acierto para distintas categorías y
+puedo estar escondiendo cómo me estoy equivocando.
+no cuando sólo veo el número de aciertos digamos
+no veo toda la problemática de lo que está pasando
+la pérdida que estamos viendo digamos utiliza esas probabilidades de las
+clases reales como en los casos correctos y en los casos incorrectos
+también la exactitud se esconde porque son los casos que sí la junté porque
+recuerden la efectu proporción de imágenes clasificadas correctamente
+entonces
+también está considerando cuando dije que no era y efectivamente no lo era
+entonces en el caso digamos de distintos tipos de clasificación entonces
+por eso una de las razones por la que nosotros utilizamos la pérdida
+logarítmica es que un poco más certera ya en vez de utilizar directamente la
+probabilidad
+así entonces vemos casos particulares si fijan acá tengo una imagen nuevamente
+8x8 son seis imágenes que la red clasificó incorrectamente si se fijan
+el primero es un 9 y la red lo clasificó con un 8
+con la probabilidad de que sea asignado a un 8 le puso un 0.85 entonces se fijan
+se equivocó pero estaba muy seguro de que era un 8, un 85%
+de probabilidad de que fuese un 8 entonces se equivocó y se equivocó con
+ganas, digamos, porque fue muy muy... estaba muy seguro y se equivocó. Y aquí tenemos otra
+otra otra ejemplo. Era real, era 3, predijo 2 y predijo 2 con mucha confianza.
+Y esto pasa en lo mismo con estos 6 números.
+Entonces,
+todos estos son ejemplos de respuestas que son equivocadas pero que además
+están acompañadas de probabilidades muy altas entonces los modelos están muy
+seguros de algo y ese algo es muy equivocado
+y juan bilch pregunta para este y otros ejemplos se puede penalizar más o menos
+basándose en la similitud de números o caracteres se puede penalizar más o
+menos ahí no te entiendo bien la pregunta que a qué te refieres con penalizar. Me refiero a que
+hola buenas tardes, si mira me refiero a que el más que penalizarte por la probabilidad de decir
+la seguridad tu aseveración si no considerar que pucha confundirse entre 9 y 8 no es lo mismo que
+confundirse entre 9 y 1 en términos de la semejanza del carácter, o sea en el fondo que el criterio
+para penalizar sea partiendo de la base que hay números que son muy distintos. Claro,
+eso es algo que pasa dentro de la dinámica pero eso es en este ejemplo en
+particular yo sé que tengo una similitud entre el 3 y el 2 por ejemplo y
+esperaría que hayan probabilidades similares en ciertos casos pero hay
+clases en las cuales no puedo hacer esa similitud porque a priori yo no lo sé si
+no estoy imponiendo cosas la idea es que acá el modelo aprenda por sí solo si yo
+pongo algo, ese criterio exógeno, porque eso sería un criterio exógeno, la
+penalización va
+va a influir directamente dentro de la red, a menos que yo lo pueda cuantificar
+dentro de una transformación. Por eso, cuando para este tipo de problemáticas,
+la red normal funciona, pero tiende a sobreestimar ciertas cosas,
+estas probabilidades de clasificación y por eso vamos a hablar después un poco
+lo que son la raíz profunda que son o las raíz convolucionarias también que
+sirven para datos que son estructurados como este imagen 8x8
+entonces si bien uno puede decir ya hay categorías que sí se parecen
+tenemos que tener cuidado con imponer esa creencia porque aquí la idea es que
+nosotros le pasamos la imagen y lo debiese clasificar correctamente, o sea,
+debísemos pasarle las suficientes imágenes, ya, y tener el modelo lo
+suficientemente bueno, tal que aprenda que esos dos números se parecen, que es lo
+que tú mencionas, pues si le paso muchos números que son 3 y 2 que son más o menos
+parecidos, pero los tengo bien clasificado, eventualmente, si el
+sistema, el modelo es bueno, va a aprender o se va a equivocar muy poco.
+También estamos sujetos a cuántos ejemplos le estamos dando.
+Entonces penalizarlo es un poco más difícil porque ¿qué penalizo? ¿Cómo puedo
+saber a priori cuál era la categoría? Esa es en esencia lo que está
+haciendo el modelo, aprender de esas pequeñas discrepancias.
+No sé si te respondo un poco tu pregunta.
+Entonces, si se fijan, en el último se equivocó y se equivocó con la nación.
+Entonces, yo voy a definir un umbral de corte.
+Por ejemplo, yo puedo decir que una aplicación, ya estamos en la columna de comprobar, supongamos
+que en esta una aplicación se decide aceptar automáticamente cualquier
+predicción en la que la probabilidad supere 0,9
+es decir
+todas las probabilidades que son muy seguras
+que vendría siendo un numeral, todo lo que se prehíse con un 90 o más por ciento de
+probabilidad se acepta automáticamente, ya?
+y en ese caso voy a estar aceptando de cierta manera predicciones muy erróneas
+ya? ahora, eso no significa que todos los casos que tengan una probabilidad de
+predicción muy alta estén mal, ya? lo único que me está diciendo es que
+una probabilidad muy alta de clasificación
+no implica ya o no me da una garantía del acierto y del acierto individual en
+esa en esa imagen entonces usualmente tenemos que definir ciertas reglas no
+necesariamente la probabilidad por si sola me va a estar dando una buena
+garantía de que estoy haciendo las cosas bien
+y la semana pasada.
+Entonces, si se fijan en su umbral, también es una regla que no necesariamente es definida
+del modelo, yo lo puedo definir de manera jurística.
+Entonces, ¿qué podemos concluir de un ejemplo así?
+tenemos, digamos, que la evidencia que tenemos son 300 imágenes que están reservadas, fueron
+dejadas a parte del conjunto de entrenamiento, no participaron en generar el modelo. Y vemos
+que hay observaciones que están muy errores. Eso habla mucho de la red que nosotros estamos
+utilizando, que nosotros estamos utilizando cierta configuración de una red bien particular,
+pero da relativamente mejores resultados con una regreso logístico. Son dos alternativas
+que nosotros tenemos, hay más metodologías de clasificación, dentro de una misma red yo puedo
+utilizar diferentes configuraciones para la propia problemática y tampoco sé la robustez que va a
+tener este modelo con nuevas imágenes, por ejemplo, qué pasa si los números están corridos un poquito,
+que lo vamos a ver como ejemplo. Imagínense que tengo el número y ahora todo lo muevo un
+píxel para el lado. ¿Funcionará bien? Es súper, digamos, natural pensar que es algo bien fácil
+que suceda. Cuando se dice escritores se refiere a nuevas personas que escriben el número.
+a eso se refiere porque si se fijan también el conjunto de datos está sujeto a las personas que
+escribieron ese número porque tienen cierta forma de escribir los números eso tampoco me
+robustece a nuevas personas que van a escribir de la misma manera algunos el típico ejemplo que
+es que es el por ejemplo el 4 uno hace hay dos formas de hacer 4 o el 7 y el 7 y a veces le hacen
+como la línea del medio o no. Entonces hay distintas formas de escribirlo y nada de esto
+me asegura que me va a servir con esos nuevos escritorios, nuevas formas de escribir el número.
+Entonces, tengo que tener cuidado con eso. Por eso, si tienen un conjunto de entrenamiento muy
+amplio y muy diverso, es súper rico en el sentido de que podemos abarcar muchos casos.
+sí?
+ya
+entonces
+tenemos
+si tengo una imagen
+identificada
+como 4, vamos a leer esta
+una predicción paso a paso, si fijan en la logística
+el dígito real
+era un 3
+vamos a poner este caso hipotético, y en la red también
+era el mismo, la región
+la red de la logística me predijo
+un 3 y la red un 3
+y la probabilidad que le asignó la regresión logística fue un 98.3 y el otro 99.9 que son los ejemplos que estábamos viendo acá
+y ahora cuando veo la sola probabilidad esta diferencia es muy pequeña entonces yo podría decir
+bueno los dos modelos son casi iguales porque predicen casi las mismas probabilidades pero
+cuando veo la pérdida de la imagen y veo la pérdida logarítmica discrepan bastante o sea la imagen la
+la pérdida de la red es mucho más pequeña, por consecuencia, y en general sucede que la
+red neuronales en términos de predictivo le ganan a los modelos lineales, ya, en la mayoría de los
+casos. No obstante eso tiene un costo. En la red, los modelos lineales y los modelos logísticos son
+interpretables sabemos y sabemos cuantificar cuánto es el
+cuánto es la el efecto que tiene los distintos cambios de los predictores es
+la variable de respuesta en la red norahel dado que quiso en todo la red es profunda
+es súper difícil cuantificar eso porque tenemos transformaciones de
+transformaciones de transformaciones con muchas digamos relaciones no lineales
+Entonces, cuantificarlo se vuelve muy difícil.
+Ahora, estas redes que nosotros tenemos lo vamos a ver por
+ahora como un sistema.
+Lo vamos a formalizar la próxima semana para ver cómo
+efectivamente hacemos esta red, cómo la programamos,
+cómo la hacemos, por ejemplo, en Python, cómo la hacemos en R.
+Pero tenemos que tener claro que al usar estas redes, ya, nuevamente estamos dentro de el concepto de aprendizaje profundo, aprendizaje automático, estamos en ese paso, ya, porque las redes que estamos ocupando no son tan sofisticadas, no son tan profundas.
+Entonces estamos pasando del aprendizaje automático al aprendizaje profundo, que está dentro del inteligencia artificial, como una subclase.
+tenemos que por ahora lo vamos a ver como un sistema, algo que entra, hace cosas y
+mentira cosas, eso usualmente le gana los modelos lineales pero con un costo, son
+con otro nombre conocidos como modelos de caja negra, son tantas las
+operaciones que se hacen dentro de ese modelo que se pierde un poco la
+trazabilidad de dónde de cómo fue transformado el dato, si bien yo puedo
+hacer la conexión y ver qué fue lo que se hizo, digamos, con redes que son de
+mayor complejidad, con mucha transformación en matemáticas, se
+pierde un poco la cuantificación y la trazabilidad de cómo fue transformado el
+dato. No así en los modelos uniales o los modelos de la generalización logística, etcétera,
+que yo sí sé exactamente qué se hizo, cuánto se hizo, cuál es el efecto de
+esa variable dentro de la variable dependiente y así. Entonces, estamos
+sacrificando interpretabilidad por nivel predictivo, que en esencia es la
+gran discrepancia entre los modelos de estadística clásica y los modelos de ciencia a datos.
+Entonces, vamos a ver ahora lo que es un poco el Bustram. El Bustram ustedes lo vieron un poco en sesiones anteriores
+y vamos preguntando ¿por qué vamos a ocupar el puestro acá?
+Entonces la red tuvo la menor pérdida logarítmica y vamos a querer estudiar
+cuánto podría variar esa ventaja que tuvo la red por sobre la regresión logística
+por haberse evaluado en esos casos, que son los casos de prueba, y no otros,
+porque recuerden que yo dejé 360 conjuntos de datos y imágenes en la prueba
+¿qué pasa si esos 360 imágenes favorecieron a la red y quizás con
+otros 360 hubiese ganado el regreso legítimo?
+entonces primero vamos a fijar la comparación
+entonces vamos a restar la pérdida de la red a la pérdida de la regresión
+tenemos acá tenemos 0.06 0.06 0.7 case
+entonces si es un valor positivo entonces está a favorización de la red porque
+supervía menor voy a utilizar el busstrap más bien la
+metodología va a reutilizar los casos que estuvieron en la prueba
+para estimar la incertidumbre de esa diferencia que está acá.
+Y en esencia es otra forma de reescribir cuántos la discrepancia
+de esta diferencia si yo hubiese tenido otra muestra.
+No la de las 360 o no particularmente las 360 imágenes que tengo en el conjunto
+de prea. Se fijan cuando utilizo el
+boost trap que en esencia es un remuestreo con
+reemplazo, yo puedo estimar, digamos, esta cantidad y puedo hacer un intervalo de
+confianza. Se puede ver que esta cantidad
+tiene una diferencia positiva, porque se fijan el 0 no está
+contenido acá, si el 0 tuviese contenido acá, entonces podría yo concluir que no hay una diferencia
+sustancial o una ganancia sustancial de la red por sobre la regresión logística.
+Entonces hay una evidencia clara de que los resultados obtenidos no dependen solo de la
+muestra, sino que están dando resultados mejores propiamente tal, a pesar de que las probabilidades
+que tenemos o las exactitudes son muy similares. Entonces, si solo veo las probabilidades de
+clasificación, voy a quedar muy cercado en cuanto a el rendimiento del modelo. Nosotros hablamos
+recién de que esta metodología que nosotros hicimos, que llamamos renal-renonal y un sistema,
+pero aún no hemos entrado en cómo se hace, por lo menos tenemos que ver qué es lo que entra,
+qué es lo que sale, qué es lo que hace, cuáles son sus restricciones.
+Dijimos que no es robusto en el sentido a nuevos escritores, nuevas imágenes que hay escrito otra
+persona, o no nuevos números, digamos, que están en imágenes escritas por otra persona,
+porque pueden tener otro tipo de caligrafía, etcétera. Pero incluso cambiando cosas tan leves
+es como que las distintas imágenes son simplemente desplazadas un pixel hacia la
+derecha si se fijan acá entre la original y la desplazada sólo fue
+desplazado el 3 un pixel a la derecha no hay mucha diferencia sigue siendo en
+esencia casi el mismo número entonces se movió todo una posición a la derecha
+lo mismo con este de acá, este de acá, este de acá y si se fijan nosotros
+esperaríamos si el modelo fuese lo suficientemente robusto que siguese dando
+resultados relativamente buenos porque así significaría que podamos ocuparlo
+con nuevos datos porque es susceptible digamos y reconoce cambios en las
+entradas
+Si se fijan acá, aquí tengo los resultados originales, cuando tenía las imágenes originales
+y ahora cuando las desplace.
+Y si se fijan, la exactitud en ambos cambiaron sustancialmente.
+Ahora, estas imágenes fueron cambiadas solo en la prueba.
+los 360 imágenes que dejé para evaluar el modelo, no para el entrenamiento. Para
+las 360 imágenes que dejé fuera y las probé, ahora clasificó muy mal
+y la pérdida ahora en término logarítmico, la menor es la logística, ya.
+No así la renunera. Entonces si fijan, ninguno de estos modelos está siendo muy
+robusto a pequeños cambios como es cambiar simplemente un pixel de imagen
+lo cual para ello necesitamos tratar de mejorar esta metodología que lo que
+vamos a hacer durante estas próximas semanas
+sobre todo con redes convocionales más profundas
+entonces que tenga un buen resultado original no me va a garantizar
+digamos que si pongo un dato muy distinto a lo que yo utilicé para
+entrenar el modelo, tenga buenos resultados. En general, voy a tener muy
+malos resultados, por eso yo quiero tener una diversidad muy muy grande dentro de mi
+conjunto de entrenamiento. En los modelos estadísticos pasa lo mismo, en el final el
+modelo no aprende de cosas que no conoce. Y ese que no conoce, en la imagen
+para nosotros como humanos esto es prácticamente lo mismo pero cuando uno
+hace la representación numérica son muy distintos en términos numéricos
+entonces ese pequeño cambio que para nosotros superlede en términos numéricos
+super sustancial y esa pequeña discrepancia que es para
+nosotros numéricamente mucho y por consecuencia esa discrepancia se ve
+reflejada en el nivel de exactitud y la pérdida logarítmica de ambos modelos
+Si se fijan, ninguno de los modelos mantuvo su rendimiento, pero sí vimos que la logística fue un poco más robusta.
+Ahora con la imagen desplazada, la logística le ganó la renda oral en el conjunto de prueba.
+Entonces, ahora creo que podemos ir a un pequeño break y vamos a seguir con, digamos, otras
+aplicaciones que tenemos que ver. Luego, esto es una pequeña introducción a lo que vamos a ver
+las próximas semanas porque tenemos que primero definir ciertos conceptos, que es lo que tenemos
+de estos distintos sistemas, y luego de ello vamos a ir particularizando cada uno de estos.
+¿Volvemos en unos 15 minutos, les parece?
+Le pausco el video.
+No eran tan robustos a pequeños cambios.
+Vamos a seguir explorando otro ejemplo, por ejemplo una
+inspección visual. Entonces imaginemos que tenemos una línea de producción de
+fotografía, una línea de producción que saca fotografía de empases y trata de
+detectar si hay algún daño visible. Entonces la tarea que nosotros tenemos
+es o se puede formular como una tarea o un objetivo de clasificación. Entonces a
+a partir de una fotografía quiero producir una categoría de alerta o no, ya.
+Si es que hay una alerta de daño o no.
+Entonces, para preparar y evaluar, digamos, este sistema,
+que después nosotros vamos a ir cambiando el que es este sistema,
+necesitamos ejemplos representativos, ya, y con su etiqueta,
+es decir, necesitamos fotos, ya, que tengan la etiqueta si es que tenía daño o no, ya.
+Y eso, si se fijan cuando dices a la gente fotos,
+un poco más complicado porque va a depender de la cámara que se utilizó, la iluminación que está
+disponible, la posición y así sumisigue y puede ser muy muy susceptible a pequeños cambios como
+camoder. Entonces, tenemos que tener cuidado con eso y por eso se requiere tener esta misma estructura
+que les mencionaba de cuál es el objetivo, cuál es la entrada, cuáles son los datos, cuál es la utilidad,
+o una evaluación para ver si está bien. Entonces, terminando la evaluación, debe
+distinguir al menos dos tipos de errores. Uno es dejar pasar un envase con daño
+y el otro señalar como sospechoso un envase san, que son los dos tipos de
+errores, que le llamamos una alarma falsa, digamos, o un falso positivo.
+ambos tipos de errores importan, pero las consecuencias pueden ser distintas y
+nosotros tuvimos la forma de evaluación que pudiéramos poner una función de costo
+digamos. Entonces supongamos que esa alerta se envía a una persona, entonces
+también importa cuántas alertas produce el sistema porque también tenemos el
+ejemplo de que si no solo hacíamos ninguna falla o todas fallan también
+pueden dar métricas en términos de la matriz de convulsión buenas pero la
+prácticas no tienen mayor utilidad. Entonces, una herramienta, un sistema que me entrega
+mucha alerta y por consecuencia va a generar demasiado trabajo, no se va a incorporar,
+digamos, en la línea de trabajo, en la línea de producción, digamos, todo lo que se hace dentro
+de la empresa. Incluso si los detecta también los defectos, digamos, pero si genera mucho trabajo,
+porque le puedes definir una función de costo, puede variar mucho. Entonces,
+el ejemplo de los dígitos nos daba este caso en donde si cambia
+muy poco la entrada, que en este caso sería si cambiamos la cámara, la
+posición del envase, puede tener mucha repercusión en las probabilidades de
+categorización. Entonces, tenemos que tener especial cuidado en la configuración en la
+cual nosotros estamos diseñando nuestra implementación, digamos, de inteligencia
+artificial, pero sabemos que dentro de inteligencia artificial tenemos estas metodologías de
+aprendizaje automático y aprendizaje profundo. Entonces, otro tipo de ejemplo que en el caso
+anterior era un caso de clasificación, de clasificación, por ejemplo, el caso minario.
+O de tres clases, si uno lo quiere ver, no daño, pero alerta de daño y daño sí o sí.
+El caso de un pronóstico de una demanda, nosotros podríamos tener que al terminar
+el día 7 queremos participar la venta el día 8, pero participar la venta el día siguiente,
+lo habíamos mencionado anteriormente. Entonces, la entrada van a ser las ventas
+de los últimos siete días corridos, quizás otros datos que podamos tener a
+disposición dentro del contexto. Y la salida que nosotros vamos a tener de nuestro
+sistema, por ejemplo puede ser la renal oral u otra metodología puede predecir
+digamos 120 unidades. Ahora, nosotros podemos tener como referencia
+simplemente repetir la venta de un día anterior pensando que las ventas son
+cíclicas. Por ejemplo, si el día 1 de la semana anterior, ya aquí me estoy haciendo
+esta de acá, este punto de aquí, se vendió 80, entonces yo voy a predecir 80 y es
+una regla, pero una regla digamos heurística. Entonces la idea que nosotros tenemos que tener
+claro acá es, nuestro objetivo es predecir el octavo día. Tenemos líneas bases como referencia,
+por ejemplo aquí en vez de utilizar una logística, porque no estamos haciendo clasificación, voy a
+utilizar como referencia el utilizar el primer día de esa semana, pensando que se va a repetir para
+la semana siguiente y yo voy a querer vencer con estos sistemas que yo les propongo y los
+vamos a estudiar más en profundidad, si es que son mejores o no que la referencia. Se entiende que
+la referencia siempre tiende a ser algo más simple, es decir, por ejemplo acá, repetir lo
+que lo último que vendí el primer día de la semana, ya estoy en un domingo y veo cuánto vendí
+lunes para digamos poner como pronóstico de demanda el día siguiente. Si se fijan
+una regla sencilla no requiere ningún tipo de mecanismo cuantitativo
+simplemente repetir un dato que yo ya observe y esperamos que estos sistemas
+tengan mejor rendimiento y esa forma de rendimiento nosotros en este caso lo
+vamos a ver como términos del error absoluto del pronóstico, si se fijan en el valor
+absoluto de 120 que puede tener distintos costos ya por ejemplo poner menos
+productos, empecemos en vitrina, de los que se vende
+puede ser tener un costo menor que poner más de los que se venden, o viseers
+entonces va a depender mucho el contexto cómo cuantificamos ese error y la
+pertinencia de la métrica de evaluación para definir si es que esa métrica de
+error de rendimiento del modelo es, digamos, atingente o coherente con el
+contexto del problema. Entonces, ¿qué tenemos que hacer?
+definir siempre una tarea principal. ¿Cuál es nuestro objetivo? Y ese
+objetivo puede ser desagregado en distintas
+subtareas. Clasificación, recupilación, predicción, etcétera. Tenemos que
+describir la entrada, que va a ser nuestro input, nuestro conjunto de datos, cómo los vamos a
+representar numéricamente para hacerlo, para trabajarlo con esta metodología de, digamos,
+de inteligencia artificial, pero en particular de aprendizaje automático. Y tenemos que definir
+una regla útil de cómo vamos a evaluar y cómo vamos a comprobar que efectivamente las salidas
+de nuestro sistema están dando buenos resultados. Y por último tenemos que especificar bien,
+es decir, este modelo que nosotros vamos a hacer va a funcionar en cierta configuración, por ejemplo,
+en el caso del envase si tiene daño o no, con este tipo de cámara, con este tipo de configuración
+de iluminación, etcétera, para que puedan ser homologables y puedan ser utilizadas en nuevos
+datos posteriores. Si los nuevos datos posteriores no siguen esa configuración, nosotros no tenemos
+ninguna forma de asegurar que voy a tener un resultado relativamente bueno.
+Ahora, en caso de aplicaciones que trabajan con texto, que nosotros ya lo
+hemos trabajado, por ejemplo la forma de representación en términos de
+contar las palabras,
+tenemos otra forma de cuantificarlo. Y el texto en principio podemos utilizarlo en los distintos tipos de tareas.
+Nosotros vimos las cuatro tareas de redactar, generar, resumir, recuperar, clasificarlo.
+Entonces el texto, yo podría tener una entrada de una consulta a un cliente en términos de correo
+y puedo clasificarlo, por ejemplo, en términos de urgencia, conforme el texto.
+dado que tengo una representación numérica para ese texto, acorde al
+problema. Puedo recuperar, consultar archivos de
+documentos, puedo resumir distintos documentos extensos y puedo dar
+instrucciones para hacer un pequeño borrador.
+Ahora, según, si se fijan según la entrada, yo en general voy a tener
+distintas tareas que son posibles, pero voy a estar muy sujeto a, primero, la
+representación numerica que voy a estar haciendo y, segundo, la comprobación de
+que efectivamente lo que me está entregando este sistema es coherente con
+la tarea y objetivo que yo definí en un principio. Entonces, nace esta noción de
+embeddings, ya, porque no todas las cosas son, digamos, tan fáciles o tan naturales de
+matematizar, digámoslo así, o cuantificar o representar, que eso es lo que me
+refiero, porque nosotros, por ejemplo, cuando representamos la imagen 8x8
+sabemos que hay pixel y podemos hacer un paralelismo con una matriz, ya, hay una
+un matriz de números o una matriz de vectores, pero tengo esa noción.
+En cambio, ¿qué pasa si son cosas un poquito más abstractas? Son objetos.
+Entonces, aquí tenemos otras ideas y el concepto que nosotros vamos a utilizar,
+lo que lo vamos a mezclar con el concepto de representación, es el embedding.
+Yo voy a ocupar números para comparar objetos que no necesariamente son números,
+porque si no, los compararía directamente.
+Entonces, como recuerden, nosotros sabemos que un vector
+simplemente es una lista ordenada de números.
+Y el embedding es una representación o representa un
+objeto mediante un vector para poder compararlo con otros.
+Entonces, si te fijan, algo que yo defino con un objeto,
+lo defino con un vector.
+Si se fijan, cuando decimos la representación de la imagen,
+eso fue un embedding.
+Porque nosotros pasamos la imagen a un vector.
+eso fue lo que hicimos, pero tenemos múltiples formas de representar esa imagen en vectores.
+Y aquí está la conexión que había preguntado Gonzalo Penigli, que es la noción de bases
+de datos vectoriales. Hay muchos tipos de bases de datos, entre ellas, las que más son
+útiles para este tipo de metodologías son las bases de datos vectoriales, que en esencia
+representa los datos como un punto en el espacio y guarda los datos como los
+datos más cercanos lo guardan más el mismo
+dado que tengo datos los representa en un punto en el espacio y esos puntos que
+están más cercanos los guardo de una manera más local en el sentido que
+tienen acceso más directamente al cojo a ese mismo tipo de datos ahora que
+quiere decir eso? pensémoslo así. Tengo un número inventado, por ejemplo tengo un
+texto, cobro duplicado y yo de alguna manera con una representación a definir
+voy a asignarle a cobro duplicado el vector 0208, a reembolso le voy a poner
+el vector 0307 y a envíos en el texto le voy a poner 0802 y se fijan eso me va a
+representar todos los datos en un diagrama de dos dimensiones. Yo podría hacerlo con más
+dimensiones claramente, pero se entiende que estos números cuando son parecidos en algún sentido
+van a estar más cercanos en este diagrama y lo que hacen las bases de datos vectoriales es guardar
+estos datos los más cercanos entre sí y ¿por qué quiero hacer eso? porque los datos parecidos tienden
+hacer consultado y utilizado conjuntamente. Si quiero sacar datos que están en un mismo,
+por ejemplo, estrato, es mejor que estén en un mismo archivo, pensemoslo así, porque cuando
+quiero trabajar con uno, usualmente quiero trabajar con todos los otros datos que son similares.
+Entonces, en esta ignosión de embedding, yo podría beneficiar bastante de una base de
+vectorial. No obstante, lo que mencionaba, que preguntaba Gonzalo, si ese proceso que
+está hablando de la red neural sería lo mismo si se usara una base de datos vectorial,
+no necesariamente. La base de datos vectorial hace referencia no a la metodología,
+sino que hace referencia a la forma de guardar los datos. Lo que hace es guardar datos parecidos
+más cerca entre sí, entonces puede tener acceso a ello más fácilmente. Pero todas
+estas metodologías podrían ser implementadas con distintos tipos de datos. Entonces, lo que
+hace el embedding es, de alguna manera, si se fijan, no la hemos definido, pasar objetos, que en este
+caso es un texto, a un vector, a un punto en el espacio. Y ahora, dado que tengo puntos en el
+espacio, puedo definir cuáles se parecen. Entonces, si se fijan, cuando los pongo en el diagrama,
+el punto Q que es cobro duplicado y reembolso están más cercanos que en
+bios. Entonces yo voy a decir el dato A se parece mucho al dato Q, o está
+más cerca que B. Ahora, de dónde salen? Esos números que es una forma particular
+de representarlo, numéricamente objetos, se aprenden desde el conjunto
+entrenamiento de mis datos iniciales, ya, con distintas reglas, ya. Esa regla tiene que ser
+consistente a lo largo de todos los datos y toda la representación del embedding porque si no
+tengo una discrepancia, digamos, no es coherente o no es consistente en la forma en que estoy
+representando los objetos dentro del espacio, ya. Se puede aprender de distinta manera y lo voy a
+mover un poquito más adelante. Nuevamente le he comentado que esta es como la clase instructoria,
+las siguientes clases porque ahí lo vamos a ir profundizando. Entonces vamos a ver cómo podemos,
+de cierta manera, representar vectores, o sea, representar objetos dentro de algún espacio.
+Y eso nos va a dar una noción de cercanía. Porque nada nos dice en un principio que cobro
+duplicado es más cercano a reembolso. Uno podría decirlo de alguna manera, bueno, más cercano cobro
+duplicado a reembolso que envío. Pero es muy etéreo, muy, muy, muy ambigüe. Y aquí cuando lo pasamos
+vector sabemos y podemos cuatificar cuánto es la distancia entre esas dos
+cosas vamos a ver qué significa eso
+cómo llegué a ese número ya cuáles son las distintas formas de llegar a ese
+número que cuáles son los pro cuáles son los contra que tenemos al hacer esta
+noción de embed que en esencia es asignar número a cosas que en
+principio no son numéricas entonces cuando lo volvemos al caso cómo
+recupera un cobro duplicado? Una forma, digamos, de buscar consiste, digamos, en
+comparar palabras de la consulta con palabras de los documentos.
+Eso, en esencia, es una referencia bastante natural y puede ser, digamos, útil
+cuando términos coinciden, pero si yo ocupo sinónimos no me va a servir mucho.
+¿Qué pasa si a una consulta y busco la palabra reembolso? Pero en mis documentos no hablo
+de reembolso. Entonces estoy tratando de hablar o hacer una búsqueda de una coincidencia
+exacta. En cambio, el embedding lo que hace es poner cosas no exactas pero parecidas en
+un punto en el espacio. Entonces me da esta noción de que yo puedo
+digamos
+ver cercanía sin necesariamente ser iguales en cosas que en principio no son
+lo mismo. Ahora otra forma de buscar en términos de las distintas aplicaciones
+que tenemos con esta metodología es por significado.
+Ahora, ¿qué es lo que hace ahí? Eso es comparar representaciones numéricas de la
+consulta y los documentos. Lo que hace es utilizar una idea como lo que acabamos de ver que es
+esencial el embedding. Textos que están relacionados pueden quedar cercanos a una
+representación en particular aunque no sean exactamente o no utilicen exactamente las mismas
+palabras. Entonces esta noción de embedding correctamente hecha me permite bypassar esa noción
+de coincidencia exacta, pero que cosas sean cercanas en este sentido de embedding no significa
+que me va a dar una respuesta correcta, porque por ejemplo un documento que habla sobre el
+reembolso y otro o un reembolso de un servicio puede estar muy relacionado en términos de
+el punto del espacio con documentación de algún procedimiento porque ocupa la misma
+terminología pero no servir para la consulta que estoy realizando o el objetivo que tengo.
+Entonces esta noción de embedding que tengo puede, me ayudan en ciertos casos pero no
+no me asegura que las cosas que estoy poniendo, que son cerca, son efectivamente cerca.
+Entonces tengo que tener alto cuidado para tener, para tener que, vamos a necesitar bastante
+entrenamiento y bastante conjunto de datos e insumos auxiliares para definir qué cosas
+se parecen entre sí. Y en ese sentido las pasas de datos vectoriales son una buena ayuda
+para representar, digamos, datos como puntos en el espacio, que tienen una aplicación
+bastante útil por la aceleración de
+tengo otros tipos de datos y quiero relacionar imágenes y descripciones, ya.
+Entonces acá tengo algo que le llamar CLIP, que es en esencia un modelo que
+aprende con pares de imágenes y texto, ya, pares de imagen, imagen, texto
+y aprende, digamos, a producir representaciones comparables, ya. Entonces
+convierte la imagen y cada descripción en vectores y compara una nota, en términos
+de una similitud y da una métrica de similitud en términos de que se parece.
+Por ejemplo, a la izquierda tenemos imagen de la caja de un cartón con un
+daño, digamos, visible. Y a la derecha aparecen tres descriptores, una caja de
+cartón dañada, una caja de cartón intacta, una botella de vídeo. Y lo que hace
+esta metodología de clip, la vamos a ver un poquito más antes, en esencia es definir una métrica de similitud,
+no necesariamente probabilidad, de similitud. Entonces lo que hace esto es
+convierte la imagen en un vector y convierte cada descriptor en otro vector
+y ahora tengo dos números y veo la similitud. Entonces si se fijan estoy comparando
+algo imagen que puede ser visto con homérico y un descriptor que también
+puede ser visto con homérico. Entonces si se fijan siempre de alguna manera estamos
+viendo que algo que en esto rigor se llama una proyección, que es una
+representación. Yo paso algo que es una imagen a una proyección, a un espacio
+numérico, yo lo llame como un vector y ese texto, una proyección a otro
+espacio que también es un vector y ahora dado que tengo cosas numéricas puedo
+ocupar la matemática usual.
+Obviamente hay una metodología que podemos utilizar, digamos, para definir más formalmente cómo hago esa proyección, esa representación numérica en ese espacio vectorial, para poder utilizar las herramientas clásicas de matemática en términos de distancia y de métrica de similitud.
+Acabamos con otro ejemplo, recomendación de contenidos. Nuevamente todos estos ejemplos
+nos vemos como el fin, estamos haciendo el resto, aquí queremos llegar y en las próximas
+sesiones vamos a ir viendo y replicando este mismo tipo de ejemplo con metodología un
+poco más exacta, de algún nombre, apellido, cómo lo vamos a programar, etcétera, pero
+queremos ver a cómo llegamos, a qué es lo que tenemos que llegar, porque lo principal
+Y en general, de todas estas metodologías no es tanto el cómo lo hacemos, que si bien tiene una teoría no menor,
+porque las herramientas que tenemos disponibles hoy en día en términos computacionales son bien vastas,
+y la programación con las mismas herramientas inteligentes de revisar son bastante útiles,
+pero tenemos que definir bien el escenario, el contexto en el cual estamos trabajando,
+de que tenemos que definir bien cuál es la tarea,
+subdesagregarla y saber cuáles son los datos que tenemos a
+disposición y cómo vamos a evaluar.
+Entonces, tenemos que tener eso un poco más claro y eso lo
+podemos ver ejemplificado, digamos,
+en todos estos tipos de aplicaciones que hemos visto y
+hacen de clasificación, predicción, resumen,
+todo lo que hemos visto.
+En este ejemplo de protético, un portal, digamos,
+quiere ordenar cursos que podrían interesar a una
+persona.
+Pues si se fijan acá, es una matriz, de preferencia en principio, que habla de los...
+si es que hay click registrado en el curso.
+Entonces, Ana está interesada con ella o hizo un click en un curso de R, un curso de Python,
+y no quiere gráficos.
+Y así con el resto de personas. Ana, Bruno, Carla.
+Ahora, yo voy a querer pasar esto a una cosa numérica, que al principio ya lo matematicé,
+¿ya?
+Pero tenemos que definir bien, ¿cuál es el objetivo?
+El objetivo es que haya más click, ¿ya?
+Vamos a medir, si queremos que haya más click, vamos a medir otra cosa.
+Vamos a tener unas métricas y una función, un objetivo general distinto, ¿ya?
+no necesariamente significa un 3, si tengo mucho o una inscripción en el curso
+propiamente tal, entonces tenemos que tener claro el cómo pasamos lo que
+nosotros medimos a algo que es nuestro objetivo en particular, porque si
+nosotros tenemos este número de clic y luego lo clasificamos o lo etiquetamos
+con Ana tiene interés en R y en cursos de R y Ana tiene interés en Python o
+cursos de Python eso no necesariamente me va a responder a la pregunta que yo
+quiero que es que el portal quiere tener cursos que podrían interesar a una
+persona, no está interesando un supuesto bastante amplio de si hace click
+entonces está interesado y no necesariamente así porque puede indicar
+el interés. En principio, curiosidad o simplemente el hizo clic por error. Entonces tenemos que tener
+cuidado con cómo representamos las cosas y cómo conversa eso con el objetivo que nosotros queremos
+realizar. Ahora, para hablar digamos de generación de texto, que es la otra tarea que hemos visto ya
+ahora de clasificación, predicción, de resumen un poco, primero hay que definir dos elementos,
+que es la instrucción que indica qué resultado queremos, por ejemplo resumir un procedimiento
+en cinco líneas, el contexto que en esencia es el texto disponible para producir esa salida,
+que vendría siendo el input, los datos que nosotros tenemos, incluido entre sedentes adicionales y lo
+que ya se ha escrito, digamos, todo lo podemos ocupar como insumo.
+Y lo que hace un modelo del lenguaje, que en esa se llama genera texto, lo que
+hace es aprender regularidades en el orden de las palabras conforme, bueno, y
+considerando también sus partes. Entonces genera una respuesta, va añadiendo
+esas unidades sucesivamente. Por eso cuando ustedes ven y ponen
+GPT va agregando poco a poco porque va, digamos, agregando sucesivamente palabras a esa generación
+de texto, pero utilizando el contexto. Esa es la idea que nosotros necesitamos hoy en día. Los
+mecanismos los vamos a ver un poquito más adelante, pero va generando secuencialmente. Entonces,
+por ejemplo, la primera solicitud en esta tabla, que es resumir un procedimiento de cinco líneas,
+la podemos comprobar si conserva, digamos, los requisitos y las excepciones que yo dije en mi
+instructivo. Y la segunda solicitud, que reacta a una respuesta usando ese procedimiento,
+podemos verificar, digamos, si cada firmación tiene un respaldo en términos de la fuente y si el
+borrador, digamos, reconoce información que falta. Entonces, se fijan nuevamente completando esta
+estructura general de cuál es mi tarea, qué datos tengo, qué va a salir, también
+que espero que sale y cómo voy a comprobarse efectivamente lo que me está
+dando tiene coherencia con la tarea y el objetivo principal.
+Otras de las aplicaciones que vamos a profundizar un poco más adelante que
+son la generación de imágenes. Acá estamos viendo generación de texto. Ahora vamos a ver
+generación de imagen y entre ellas por ejemplo tengo una descripción de una
+entrada que es una caja azul sobre una mesa blanca
+se nos pide un objeto un color y una relación espacial
+el resultado que nosotros creemos con esa instrucción o que nosotros
+buscamos es una imagen que tenga esas características cumpla esas
+condiciones. Entonces, si se fijan en esta figura, esto ilustra una
+metodología o una familia de métodos, la verdad, porque son bastante más, que le
+llamamos difusión. Quizás no lo escuchaban, que son los difusión modelos,
+que son los modelos de difusión, que parten, todos parten de un ruido.
+Parte un ruido que no tiene una noción clara de lo que nosotros queremos, un
+un ruido visual, hay una figura reconocible y después poco a poco va generando la imagen
+final. Entonces parte de un ruido y poco a poco le da forma y va eliminando el ruido
+hasta llegar a la imagen que nosotros, o que es coherente con el instructivo que nosotros
+dimos en un principio. Esto no quiere decir que esta imagen final estaba digamos escondida en el
+ruido, sino que se va construyendo conforme le doy la descripción. Entonces, ¿cómo evaluamos
+en ese sentido la salida? Es efectivamente la imagen final que cumple las condiciones de
+nuestro instructivo. Entonces, vamos a ver de cierta manera, vamos a describir un poco más
+cómo funciona, digamos, este mecanismo de pasar un ruido, algo relativamente aleatorio,
+que es lo que nosotros definimos, a algo que es lo que nosotros queremos. Digamos que en este
+caso es una caja azul y sólo una mesa blanca. Entonces, son otras de las metodologías que tenemos
+dentro de inteligencia artificial y en esencia, si se fijan, al igual que en la generación de texto,
+que nosotros dijimos que iba agregando palabras de manera secuencial, en el caso de las imágenes,
+va agregando forma de manera secuencial. En este caso, digamos, con estas cuatro imágenes,
+yo las estoy particularizando en cuatro tiempos distintos, pero esto tiene muchas etapas, es decir,
+tiene el ruido puro y luego hace una primera iteración, una segunda iteración y luego de
+muchos pasos llega la imagen final, no es una ejecución digamos continua en
+principio, tiene muchos pasos por eso este proceso secuencial que parte un
+ruido y quiere terminar en lo que nosotros le tenemos la la la
+instructivo que nosotros y las condiciones que le dimos en un principio
+entonces al igual que la generación de texto son sucesivos ya al igual que la
+generación de texto solamente aquí estamos ampliando lo que es texto ahora
+es una imagen y la imagen también es un número y a su vez también el texto
+también lo puedo representar como un número. Entonces siempre todas estas cosas por debajo
+son predicciones de números, que después las represento como un objeto distinto, ya sea texto
+o ya sea imagen. Entonces, ¿de dónde viene esa señal para aprender? Nosotros hasta ahora hemos visto
+ejemplos con una respuesta conocida. Tenemos una etiqueta, sabemos de dónde viene, por ejemplo,
+la imagen que está, la imagen del número que viene acompañada de la etiqueta, cuál es el número
+correcto que en esencia es aprendizaje supervisado de una manera un poquito más
+sofisticada pero es un aprendizaje supervisado porque sé cuál es la
+respuesta. Recuerden que el aprendizaje supervisado es cuando tengo mis X que son mis
+predictores que en este caso en la imagen son los números dentro de la imagen
+tengo el I vendría siendo la clase que la conozco. Entonces el aprendizaje
+supervisado esa respuesta sirve como una referencia externa para comparar lo que
+es el modelo entonces puedo tener el conjunto de prueba y puedo ver qué tan
+bueno me está dando mi modelo. Pero yo tengo otra noción que es el aprendizaje
+autosupervisado, que es cuando construimos una tarea cuya respuesta
+obtiene de los propios datos. Entonces veamos un caso que estamos viendo acá
+en ejemplo, la frase original dice el banco probó el crédito y lo que
+nosotros vamos a hacer es ocultar la palabra crédito y presentamos el banco
+probó él y nada más, con el oculto. Entonces la palabra original se
+conserva, porque sabemos, la tenemos desde el inicio, para comparar la respuesta. Entonces se fija en que
+estoy como, estoy supervisando el problema. Entonces en el sentido de aprendizaje
+supervisado. Entonces podemos producir un ejemplo de aprendizaje supervisado, un
+dato para aprendizaje supervisado a partir de este texto disponible porque yo
+sé, si fija yo tengo esto en mi dato y yo voy a ocupar esto como el X y el crédito
+como el Y, entonces datos que no tenían una etiqueta yo les puse esa etiqueta
+y no tuve que yo inspeccionarlo manualmente que era el caso de por ejemplo
+números que verán escrito a mano, esos datos, alguien los vio y dijo
+a estos son tres y puso y lo etiquetó como un tres. En el caso autosupervisado
+yo ocupo un sistema, nuevamente un sistema, que me los etiqueta automáticamente.
+Por ejemplo, una metodología autosupervisada
+es
+digamos, predicción supervisada en donde en primer plazo paso es la
+clasificación. Yo clasifico por ejemplo con clustering, le defino una etiqueta,
+una clase y luego esa clase lo ocupo como la verdad, como si fuese lo que yo
+inspeccioné realmente. No obstante eso tiene distintas problemáticas porque
+tengo que estar seguro de que esa categorización, ese clasterizado,
+ese clasthering me está dando respuestas correctas, estoy confiando mucho en esa
+metodología. Tienen sus propios contra los metodos supervisados. En general no
+superan a los modelos supervisados cuando yo sé la etiqueta y tengo 100% de certeza de que esa
+etiqueta está bien categorizada. Ahora, ¿qué pasa si yo tengo modelos? Yo hice un modelo de
+reino oral o tengo otras personas que han hecho modelos. Yo puedo hablar entonces de un modelo
+pre entrenado es decir que yo lo algo alguien más lo hizo y me lo puso a
+disposición pero yo no tengo necesariamente acceso al conjunto
+de entrenamiento con el cual se realizó ese modelo entonces ya hay un modelo que
+aprendió con otros datos antes de llegar a lo que nosotros queremos hacer
+entonces podemos aprovechar parte de lo que se aprendió en ese modelo con un
+punto de partida y luego re entrenarlo ajustarlo a lo que
+nosotros queremos a los datos locales. Hay muchos ejemplos de distintos modelos
+pre-entrenados, que tienen distintos objetivos. Por ejemplo, muchos de las
+herramientas que tenemos, TGPT o Cloud, que son los sumóvulos, tienen ese
+modelo pre-entrenado, que fue entrenado para la redundancia para cierta
+tarea en particular. Entonces, cuando se utiliza para otra tarea muy similar, tiende
+ser bueno. Los modelos de pesos libres también funcionan. Antiguamente
+habían bastantes redes, por ejemplo, convolucionales que estaban pre-entrenadas
+en millones de datos antes que saliera, digamos, la LLM y cosas de ese
+estilo. Redes convolucionales, redes neuronales muy profundas, entrenadas
+con muchos datos que se ponían a disposición para, por ejemplo, reconocer
+objetos y un sinfín de otras cosas que quedaron de cierta manera obsoletas pero
+hace 15 años eran una maravilla digamos términos de la clasificación y la
+precisión que podían tener con muy poco
+o nada prácticamente de cómputo de entrenamiento porque ya está un preentenado
+alguien se dio el tiempo a hacerlo entonces la primera ventaja de utilizar
+modelos preentrenados es aprovechar información de otros datos porque esos modelos vienen con
+un aprendizaje que fue realizado o obtuvo a través de otros datos pero debemos comprobar
+digamos que eso es transferible a lo que nosotros queremos hacer. Tenemos un modelo preentrenado con
+con, por ejemplo, reconocimiento de fauna.
+Y fue entrenado en otro continente, no es la misma fauna, entonces cuando lo aplique en el contexto chileno no va a ser viable.
+Entonces se podría parecer, digamos, pero no va a ser uno a uno la aplicación.
+Entonces tengo que verificar bien las condiciones, las cuales o cuál fue el conjunto de datos que se utilizó para hacer ese modelo.
+Otra de las posibles ventajas, digamos, es reducir el ajuste que debemos hacer, ya, porque no va a partir de cero.
+Entonces, puedo incluso aplicar el modelo sin necesitar yo datos.
+Entonces puedo utilizarlo con nuevos datos, ya como predicción directamente, sin preentredarlo.
+Y la tercera posibilidad es reutilizar una representación.
+Por ejemplo, podemos obtener, digamos, números que describen una imagen y usarlos como entrada de un clasificador para nuestra tarea.
+Entonces, estoy reutilizando un modelo con un nuevo dato.
+Y en esencia, esta representación es una herramienta.
+¿Y cómo lo voy a comprobar?
+En función al contexto del problema.
+tengo que comprobarlo en el mérito de la tarea que yo lo estoy implementando.
+Entonces el aprendizaje previa tiende a ser bastante útil, en general con todas
+las
+las redes neuronales y de distintos tipos que están disponibles en día. Partir de
+cero no es algo del todo en términos prácticos, cuando alguien
+quiere hacer algo un poco más sofisticado, partir de cero no tiene mucho sentido a
+menos que queda que la solución sea muy particular a lo que yo estoy haciendo o
+mi objetivo en particular o mi objetivo es muy particular que no hay una
+red entrenada para lo mismo que puede ser el caso por ejemplo si se quiere
+entrenar en plora silvestre del sur muy particular endógena de Chile
+no va a haber alguien que hay entrenado con ese mismo conjunto
+porque no está solo en Chile, digamos, no está en otro país. Entonces en ese sentido, en esos casos
+sí se puede utilizar Red de Cero y construirla desde cero. Hoy en día se ponen mucho a disposición
+todo ese tipo de modelos, hay páginas que nos tienen a disposición. Ahora, ¿cómo puedo adaptar
+esa solución. Primero, yo puedo adaptar el uso, puedo adaptar el modelo. Puedo ocupar un modelo que
+fue utilizado para una cosa y adaptarlo a lo que quiero hacer. O puedo cambiar el mismo objetivo,
+pero puedo cambiar un poco el modelo. Entonces, hay tres formas acá en esta tabla de adaptar
+una solución. Entonces, la primera consiste en cambiar las instrucciones y el contexto. Lo que
+cambia es la información de entrada. Por ejemplo, si tengo un modelo que
+reconoce imágenes, o reconoce, no sé,
+empecemos en el número de nuevo, el escrito a mano, yo pasarle, no en números.
+O, en el caso de generación de texto, podría ser aportar un procedimiento para
+reácter una respuesta y va a utilizar el modelo ya implementado.
+Entonces en ese cambio cambia la información de entrada, el input, los datos que se tienen disponibles para la
+implementación del modelo. En la esencia lo que estoy haciendo es que mi conjunto de prueba va a ir
+cambiando porque es donde lo voy a utilizar. La segunda alternativa es reutilizar las representaciones.
+podemos obtener vectores con un modelo ya disponible, es la representación de algo no numérico a numérico
+entonces puedo ocupar esos modelos para hacer esa representación y ajustar un clasificador para algo
+particular que yo quiero. Entonces se fijan ahí estoy jugando un modelo para hacer esta proyección de objeto a
+número, ya la representación numérica de las cosas, que es muy importante dentro de todas estas cosas
+como yo represento de manera numérica mis entradas, mis documentos, todo lo que yo quiero incorporar
+y la tercera es un ajuste fino, que en esencia se modifica el modelo mediante datos para la
+tarea particular que yo tengo en mente pero con nuevos conjuntos de datos, por ejemplo,
+qué pasa si yo tengo un clasificador, un modelo que reconoce distintas especies de peces
+y hay especies que no están incorporadas o no fueron utilizadas en el entrenamiento del modelo
+entonces yo le incorporo dentro del modelo y lo trato de reentrenar entonces no parto de nada,
+parto de una base que reconoce especies comunes pero le quiero agregar, además que reconozca
+esta nueva especie que el modelo no lo conocía en un inicio
+porque no fue entrenado con ese conjunto de datos.
+Entonces tengo distintas formas de utilizar estos modelos.
+Ahora, hay muchos que están disponibles.
+Por ejemplo, está el FOD3, que es para aplicaciones, digamos,
+biológicas.
+Entonces, en esencia, es para distintos tipos de moléculas,
+que interactúan, las proteínas, ADN, etc.
+Y este modelo de AlphaFold 3, que es un modelo preentrenado,
+predice cómo podrían disponerse sus componentes,
+digamos, en el espacio, cuál va a ser la configuración.
+Entonces, este modelo que recibe,
+la información sobre los distintos componentes del complejo biomolecular,
+que produce una propuesta de cómo se van a organizar espacialmente.
+Como lo compruebo, digamos, comparando la disposición que me entrega el modelo
+con los resultados experimentales.
+Entonces, se fijan ahí, hay modelos que están hechos con un objetivo en particular
+listo para llegar y ser usado.
+Entonces, hay muchas páginas que ponen a disposición distintas herramientas para esto,
+pero tenemos que tener cuidado porque hay que ver bien cuál fue el conjunto de datos,
+es aplicable para nuestra tarea, etcétera.
+En general, la mayoría de las aplicaciones, digamos, empresariales, organizacionales
+que se tiene hoy en día, alguien ya tuvo el mismo problema y es bueno, digamos,
+buscar esas alternativas para no partir de cero y no agarramos
+bastante nivel de cómputo. Hoy en día, todas estas metodologías de los
+distintos modelos son, digamos, medidas con distintos rankings.
+En el editor no hemos visto que cada cierto tiempo sale un nuevo modelo.
+Se trata de rankear, digamos, los distintos modelos,
+dependiendo de su desempeño, cuántos han sido utilizados,
+cuáles son las distintas aplicaciones, sobre todo el contexto.
+Por ejemplo, hace un par de semanas, digamos,
+se sabe, digamos, que en el contexto matemático han habido muchos avances
+en términos de demostraciones, digamos, de programa bien importante.
+Entonces, todo un tema en general se categoriza dependiendo de alguna tarea en particular.
+Y por eso hacíamos bastante énfasis en cuál es el objetivo de lo que nosotros estamos haciendo
+en términos del sistema que estamos planteando.
+Entonces, cuando hacemos estos benchmarks, digamos, que le llamamos,
+o la forma en que se arranquean, todo este tipo de modelo, siempre funciona la tarea.
+por ejemplo, cuál es el benchmark, digamos, el rendimiento en problemáticas o tareas u objetivos
+de tono matemático, digamos, o de reacción, o lenguaje, o derecho, o así, sumisigues,
+entonces se tienen que ir clasificando porque ningún modelo es específico y gana todo,
+gana en todos los modelos. Cuando uno da una pregunta, digamos, en un modelo de inteligencia artificial
+de los actuales, reconoce a qué tipo de preguntas está haciendo y lo pasa a un sub-submodelo
+que están más entrenados para responder ese tipo de preguntas conforme a las distintas tareas que yo le estoy dando.
+Entonces, se van a evaluar siempre con distintas tareas, los distintos datos y con distintas reglas, digamos, de métrica de evaluación, digamos.
+Entonces, siempre vamos a preguntarnos qué tareas se evaluó y en qué condiciones, ¿ya?
+Un mismo modelo que tuvo mucho más datos disponibles no es lo mismo con un modelo que funcionó igual de bien con tenos de datos.
+y cuando quiero reentrenarlo para una aplicación en particular siempre me va a preguntar si lo que
+yo voy a con los datos que yo tengo disponibles en los cuales yo quiero utilizar mi modelo es
+comparable o es coherente con el modelo que yo estoy utilizando es decir se parecen efectivamente
+puedo utilizar el modelo que tengo pre entrenado para mi objetivo en particular entonces hoy en día
+ya no es un gran modelo que gana a todos, sino que tenemos muchas particularidades,
+tenemos muchos distintos modelos que sirven para distintas cosas en particular. Por eso les
+preguntaba si ustedes quieren, ya que comentaba, digamos, si es que tienen una aplicación en mente
+la cual necesita alguna clasificación, alguna generación de texto, etcétera. Alguien ya lo hizo,
+ya alguien ya lo hizo, alguien tuvo el mismo problema y general partido desde ese modelo tiene
+mucha más, digamos, tasa de llegar a un puerto de que se pueda hacer efectivamente el modelo,
+si es que yo parto algo que ya está entrenado en cosas muy similares y yo lo reentreno con datos
+locales, pero tengo que tener claro de que el uso que le voy a estar dando a ese modelo es comparable,
+De decir, no puedo ocupar un modelo que clasifica tipos de comida para clasificar, digamos,
+marcas de acto, tiene cosas muy distintas, tienen que ser comparables.
+Porque mientras más encajo la problemática, los poes distintos modelos aprenden mejor,
+porque tienen menos de dónde aprender, porque si puede ser cualquier cosa, pueden clasificar
+muchas cosas.
+Entonces, mientras tengo menos categorías las cuales puedo clasificar, el rendimiento
+tiende a ser bastante superior.
+Ahora, cuando yo quiero hacer una aplicación real,
+esto va a tener bastantes componentes. El primero, digamos, va a aportar datos y
+contexto, ya, de un componente de qué es lo que tengo a disposición, en qué
+contexto quiero realizar esto. Por ejemplo, documentos que tengo disponibles,
+registros que voy a utilizar para responder
+y que va a depender mucho digamos que datos tengo para realizar digamos la
+consulta o la aplicación en particular. El otro componente que tengo
+es el modelo mismo, el modelo mismo que yo entreno y que lo voy a mover más en
+detalle en la próxima semana con todas sus herramientas, sus limitantes que yo
+puedo y su objetivo en particular porque también lo puedo ocupar no solo para
+predicción cuatitatilla sino para clasificar entonces tengo que definir
+bien cuál es esa tarea desde un principio ya se puede servir para
+predecir, reactar, consultar, calcular, clasificar, etcétera
+entonces si yo defino mal ese modelo también voy a tener una una componente
+dentro de la aplicación que estoy haciendo que va a estar me va a estar
+digamos mermando el objetivo o cumplir el objetivo que tengo en un principio
+El tercer componente es verificar las condiciones en las cuales voy a evaluar y voy a implementar el
+nuevo. Tengo que comprobar que el resultado tenga, digamos, un respaldo y cumpla con las
+reglas necesarias, por ejemplo, en el ejemplo de la predicción de los números con mucha probabilidad,
+porque luego de eso, con estos componentes de una aplicación, pasa alguna decisión. Entonces,
+tengo... siempre hay una decisión después de esto y tengo que ver las consecuencias de estos
+o sea, si tengo un móvel que me clasifica todo,
+si lo pongo en el ejemplo del envase,
+si tiene daño o no,
+todo no tiene envase,
+quizás en términos de métrica puede tener
+una buena exactitud porque predice bien,
+pero se predice siempre que no hay envase,
+entonces en términos de métrica,
+de exactitud puede ser bueno,
+pero las repercusiones de eso puede ser bastante mal.
+Entonces, tengo que evaluarlo dentro del contexto.
+Ya.
+Entonces, las aplicaciones van a tener distintos adictos
+de las cuales pueden fallar
+y voy a tener que ir viendo caso a caso.
+Por eso, nuevamente, el plantear el objetivo general,
+el objetivo, la tarea que yo quiero cumplir
+me permite, digamos, desagregar en subcomponentes,
+es decir, ¿qué es lo que quiero hacer?
+Esto es lo que va a necesitar de datos.
+Y ahora, la pregunta natural es, ¿cómo represento estos datos,
+de manera tèctica? No estoy pensando en un Excel.
+en de una forma numérica coherente con la tarea que yo estoy haciendo.
+Ya vimos en el ejemplo de las imágenes que yo puedo representar esa imagen de distinta manera.
+Puedes verlo en cada celda como 3.016, 2.56, como en RGD,
+lo puedo definir como una matriz de detectores.
+Entonces, todas esas formas tengo que dejarlas claras de antemano
+para poder implementar nuevamente.
+Entonces, si por ejemplo yo veo modelos preentrenados de imágenes y ocupan solo imágenes en blanco y negro,
+si lo quiero implementar con una, lo quiero utilizar, digamos, con imágenes de otra dimensión,
+en colores, no va a tener buen resultado.
+Entonces tengo que ver todas estas componentes que describo acá para ver si estos modelos preentrenados
+son aplicables dentro de una aplicación que yo quiero usar, son aplicables dentro de una problemática que yo quiero solucionar.
+Entonces tengo que tener todas esas, digamos, esos detalles que tengo que asegurarme antes de implementarlo.
+Porque si yo empiezo a reentrenar un modelo o utilizarlo y no me di cuenta que eso no era utilizable
+porque alguno de estos componentes no era simple, no era coherente con la aplicación que tengo,
+que quiero realizar. Entonces, voy a perder un tiempo no menor porque todos estos tiempos ya
+conforme vamos avanzando y hablamos por ejemplo de reneuronales profundas o aprendizaje profundo,
+los tiempos de cómputo empiezan a subir bastante, ya no es de manera lineal y sobre todo suben mucho
+con el conjunto de datos que tengo, la complejidad de los datos que tengo, por ejemplo, trabajar
+imágenes con mucha resolución tiende a ser bastante, bastante costoso. Entonces, muchas
+de las metodologías que se ocupan cuando quiero trabajar con imágenes y redes lunares
+computacionales, por ejemplo, es hacer bajarle la resolución, pero a un punto donde siga
+reconociendo la imagen, para poder bajar el costo computacional que requiere entrenar
+una red. Entonces, en general, entrenar a un red neuronal o a algún otro tipo o a algún sistema
+tiene un costo computacional bastante alto. Entonces, por eso todas estas cosas requieren,
+digamos, una máquina bien potente para hacerlo o mucho tiempo, digamos. Mira, el otro, pero puede
+escaparse el tiempo computacional bastante rápido si uno no lo configura y no sabe qué está haciendo
+compartimentarse. Por eso pongo harto énfasis en antes de empezar a hacer cosas, que es lo que vamos a hacer las semanas
+subsidentes, definir bien qué es lo que queremos hacer, cómo lo vamos a hacer y cómo vamos a evaluar que lo que estamos haciendo
+está correctamente definido.
+Entonces,
+volvamos a esta consulta, a este ejemplo de me cobraron dos veces y necesito el confronto y lo vimos en un inicio.
+Entonces, en el primer paso nosotros podemos clasificarla,
+que se vea como una consulta sobre costos y asignar una cierta prioridad, digamos,
+según la regla de algún servicio que se tiene a disposición, un reglamento.
+En el segundo paso, podemos consultar los registros, digamos, y recuperamos el procedimiento pertinente,
+¿ya? Que si se fijan son dos fuentes de información con funciones distintas.
+tengo distintos pasos, si fijan esto una aplicación que tiene distintos objetivos,
+que son distintas tareas como lo definimos en un principio. Estos registros en el segundo
+paso permiten estudiar qué fue lo que sucedió, en este caso en particular, y el procedimiento va a
+digamos, explicar cómo debe tramitarse, ya que estamos acá en consultar y recuperar.
+Y en el tercer paso, reactamos, digamos, un borrador
+de algún correo, por ejemplo, alguna respuesta, y ese texto, digamos, debería
+distinguir lo que está verificado de lo que todavía no conocemos, que estamos
+seguros porque está documentado o no. Entonces, puede explicar el procedimiento y
+información faltante sin atribuirle al caso un resultado que no está
+necesariamente respaldado en el segundo paso. Entonces, si se fijan acá, la tarea
+que nosotros estamos haciendo, que es esta consulta de me cobraron dos veces
+y necesito el comprobante, puede ser desagregada en pequeñas tareas y
+nosotros podemos tener distintos modelos que pueden ser conectados en un
+gran sistema, por eso definí el sistema como una concatenación de actividad de
+es donde pequeñas tareas que permiten resolver este objetivo general, este
+objetivo principal que es mejorando veces necesito entonces necesito comprobar
+primero clasifico clasifico si es la prioridad del cobro o si lo clasifico
+como cobro en principio consulto para el procedimiento y luego reacto
+entonces eso es lo que nosotros tenemos que hacer cuando planteamos una
+aplicación tenemos que definir la separación de cosas esto lo puedo hacer
+por ejemplo con una regliorada. Esto lo puedo hacer con un cláster, esto lo puedo hacer con un modelo
+pre-entrenado que ya sé que sirve. Entonces tenemos que ir desfragmentando porque conforme más puedo
+segmentar eso y más puedo describir cada etapa dentro de la tarea principal, voy a tener herramientas
+más específicas para resolver cada una de esas problemáticas. Entonces si mi problema es netamente
+de clasificación, no quiero ser un modelo que haga todas las clasificaciones posibles. Entonces si lo
+a coto, a clasificar el correo, digamos, o el mensaje en alguna prioridad, entonces
+los modelos van a tener, digamos, una fiabilidad, digamos, una confianza, o nosotros vamos a
+estar más seguros de que ese modelo va a funcionar un poco mejor que simplemente se abarquemos
+algo muy, muy grande de resolver. Entonces tenemos que hacer ese análisis antes de llevar a cabo
+a cabo, qué es implementar herramientas que a veces no necesariamente necesitan metodologías
+tan complejas o costosas computacionalmente. En muchos casos una regresión logística
+tiende a ser suficiente para el uso y la verificación que nosotros estamos haciendo,
+cuál es nuestro objetivo. No tenemos que complejizar las metodologías porque sí.
+que ver separar cada uno de los herramientas. Quizás ciertos pasos pueden ser o
+deben ser resueltos, ciertas etapas deben ser resueltos con metodología un poco
+más avanzada, por ejemplo de aprendizaje profundo, pero muchas de las herramientas
+podrían simplemente ser mueblos clásicos o reglas jurísticas.
+Entonces, pensemos en esta fuente, digamos. La revisión del cobro puede
+tardar hasta cinco días a días y el borrador que me entrega este sistema
+dice su devolución está aprobada y llegará mañana
+entonces vamos a separar el borrador en dos afirmaciones y buscar el respaldo
+en cada uno porque estamos haciendo la verificación de esto
+entonces la primera afirmación dice la devolución está aprobada
+y la fuente no informa una decisión sobre ese caso y solamente lo que hace
+describir un plazo de revisión.
+Por lo tanto, digamos, no se respalda esa aprobación. Y la segunda afirmación, que
+es que el abono llegará mañana, tampoco está respaldando. La fuente habla de
+la revisión, no de la fecha en que será el abono.
+Entonces tenemos que corregir eso si se fijan. Esa respuesta no es compatible
+con el objetivo que nosotros queremos. Entonces, una respuesta compatible con lo
+que nosotros conocemos es la que aparece abajo. El procedimiento indica hasta 5
+días hábiles de revisión. Con esta información no puedo confirmar una
+aprobación ni una fecha abona. Si se fijan, todos estos sistemas tienen que tener
+una verificación sustancial. Porque si no, digamos, puede tener cada una de
+estos pasos, basta que uno de estos pasos falle sustancialmente para que tengamos
+resultados o los outputs y decisiones que tomemos, que las tratamos de automatizar,
+sean bastante erróneas.
+Siguiendo entonces, entonces veamos en este ejemplo otro ejemplo hipotético,
+tenemos el costo de los errores y la carga de revisión.
+Entonces pensemos que tenemos mil piezas de las cuales 20 tienen defectos.
+el sistema que nuevamente lo ocupo como un termino, un concepto un poco más
+amplio porque nuevamente este concepto de sistema de luego lo vamos a ir
+particularizando en herramientas con nombre y abillio para
+distintos objetivos. Entonces el sistema deja pasar cuatro defectos y envía 30
+piezas sanas, digamos, a revisión. Asignamos un costo de 50 unidades, puede ser
+miles de pesos, etcétera, a cada defecto mítido y una anidad a cada falsa alarma.
+Si se fijan esto, los falsos positivos y los falsos negativos caen modistuantes,
+en la mantida de confusión. Entonces, el costo de esos errores es 4 por 50
+más 30 por 1 porque en esencia es
+cuanto me equivoqué? 230
+entonces omitir un defecto cuesta más
+que producir una alarma, por el costo asociado
+ahora vamos a calcular el trabajo de
+revisión entonces de los 20 defectos
+se detectaron 16
+entonces porque a 4 digamos quedaron sin detectar porque son el defecto no
+detectado si se revisaran o sea si se revisan todas las alertas digamos
+llegarán digamos esos 16 casos y los 3 y las 30 falsas alarma entonces en total son
+46 revisiones
+ahora si la capacidad disponible es de 20 revisiones va a alcanzar
+no va a alcanzar, cierto, porque detectar defectos es útil pero necesitamos digamos
+un procedimiento que también pueda ejecutarse con los recursos disponibles.
+Entonces tenemos una limitante, una limitante de costo, una limitante que no
+sé, por ejemplo, después nosotros lo vamos a particularizar en las redes
+neuronales como el número de épocas, ya, que vamos a tener máximas para poder
+entrenar nuestro modelo. Entonces, siempre vamos a tener restricciones adicionales a lo que nosotros
+podemos plantear como el programa puede ser funcional de restricciones de tiempo, de costo
+computacional, de costo financiero. Entonces, necesitamos incorporar todas estas cosas dentro
+de la creación y entrenamiento del sistema. Entonces, para ella, un poco más finalizando,
+siempre nosotros tenemos que ir pensando en la tarea, la tarea, cuáles son
+nuestro conjuntuado, el sistema que lo vamos a particularizar, la salida y cómo vamos a
+comprobar lo que vamos a hacer. Y otro que nos queda es dónde vamos a
+ocupar el conjuntuado, que en esencia es definir bien dónde voy a ocupar
+el modelo, que en esencia es definir bien la tarea en particular. Entonces, si yo
+tengo un uso previsto para nuevas personas de un modelo, entonces tengo que
+para el diseño que voy a tener que realizar es mantener todas las
+observaciones de una persona en el mismo conjunto, es decir, no puedo separar una
+parte de observaciones de la persona, mediciones de la persona en el
+conjunto de plenamiento y el conjunto de pruebas.
+Si ocupa otra cámara o línea tengo que mantener y ser consistente con ocupar
+la misma cámara, la misma línea, ya. Si hago predicciones a futuro no puedo
+separar aleatoriamente mis datos que son en el tiempo, es decir, no puede quedar en
+conjunto entrenamiento datos que son del futuro. Entonces tengo que hacer ventanas
+movibles, ya, o crecientes para hacer mi conjunto de entrenamiento, ya.
+Tengo que tener todas esas particularidades para poder entrenar bien el modelo, porque nuevamente aquí estamos el componente
+de los datos y contexto, es una mezcla entre los datos y el contexto y la configuración propia
+del modelo
+dentro del conjunto entrenamiento, el conjunto de alineación y el conjunto de operación. Tengo que tener las particularidades propias del conjunto de datos
+que van a repercutir o van a tener una repercusión en cómo voy a configurar el entrenamiento de mi modelo.
+Tengo restricciones, por ejemplo
+de tiempo, de costo, datos, mantenimiento.
+Tengo que tener todo ese cúmulo de restricciones que no
+necesariamente vienen del problema mismo,
+sino del contexto o no vienen del objetivo.
+Porque muchos de los problemas no se pueden resolver porque no
+tengo el costo computacional, por ejemplo,
+o no tengo los datos disponibles.
+hacerlo cuesta mucho mucho mucho dinero. Entonces tengo costos adicionales que necesito
+definir ya y estimar antes de hacer una aplicación. Entonces esta parte es como la más famosa de
+toda esta parte porque de todo este aprendizaje automático porque toda la enseñanza de esto es
+no queremos hacer cosas que que no estamos seguros de que van a funcionar o de que son coherentes
+hacerla porque todas estas metodologías son costosas en algún sentido
+computacional, de tiempo, dinero, bla bla bla, entonces tenemos que definir bien
+qué vamos a hacer, cómo lo vamos a hacer, cómo vamos a comprobar que funciona, cómo se va a
+ocupar, todo eso antes de poder hacerlo porque
+cuando uno ya empieza a hacerlo ya los costos subieron y estas cosas no se
+demora un poco. Entrenar una red real, digamos, son un par de días hoy en día.
+Entonces, no, no, a lo menos. Y si uno quiere hacer cosas de verdad viables,
+va a necesitar mucho dato. Y a tener mucho dato, ya estoy hablando de un corto
+de competición muy alto o un tiempo, digamos, prolongado. Y hay, digamos,
+problemáticas que tienen restricciones de tiempo. Por ejemplo, si yo estoy en una
+líneas de producción, digamos, de envíos, quiero organizar cómo voy a hacer los envíos
+para mañana. Entonces, no puedo demorarme más de 24 horas en implementar el modelo porque ya
+pasa el día de mañana. Entonces, todas esas restricciones que tienen cada una de las aplicaciones
+que podemos realizar, tienen que ser consideradas dentro del planteamiento del problema. Y una
+que lo planteamos bien, podemos empezar a jugar con qué herramienta funciona mejor en qué caso
+y cuándo son ciertas recomendaciones más útiles que otras. Ahora, en ese sentido, siguiendo con estas
+restricciones, una de las primeras cosas que uno hace cuando tiene un problema o una tarea un poco
+más complicada es empezar por algo sencillo.
+En esencia siempre nosotros queríamos tener un modelo sencillo para comparar
+porque si hacemos modelos complicados y no le ganamos modelos sencillos
+estamos haciendo cosas sin la necesidad de hacerlo. Entonces hacer regresiones, árboles de
+decisión, representaciones heurísticas también, predicciones digamos pasadas
+simplemente en el historial, como el ejemplo de la predicción de una empresa, en vez de
+decir para mañana cuánto va a ser la demanda, en vez de predecirla, voy a ocuparla del
+lunes de esa semana.
+Esos tipos de jurística, ese tipo de reglas pueden ser lo suficientemente buenas si es
+que mis restricciones son muy altas.
+Dentro del contexto uno tiene que hacer lo que mejor se puede hacer dentro de todas las
+restricciones y a veces tengo muchas restricciones que no puedo implementar
+toda esta metodología porque son muy costosas, tienen mucho tiempo, es un sin
+fin de delimitantes que tengo. Siempre tengo que tener un candidato fácil de
+implementar con el cual comparar estas propuestas de modelos, propuestas de
+sistema. Entonces, voy a querer, digamos, cuando
+tengo ya definido un sistema, tratar de automatizar ciertas partes de este
+sistema porque yo definí el sistema como una concatenación de procesos porque
+tengo una tarea grande que la puedo ir separando en distintas tareas pequeñas
+estas tareas pequeñas las puedo abarcar con distintos modelos de clasificación,
+cuarenta tipo eurística incluso, pero yo al final voy a querer tratar de
+tratar de automatizarlo lo más posible, no es recomendable automatizar todo,
+va a depender mucho del contexto sobre todas las repercusiones que se tienen eso, pero por ejemplo
+si quiero proponer un borrador de correo, el borrador implica que
+alguien por luego a revisar el envío. Si quiero revisar casos, ya voy a tener alguien que vaya a
+revisar, donde lo revise, que los casos que están siendo clasificados como menos
+prioritarios, efectivamente son menos prioritarios. Entonces, tengo que tener una
+evaluación, digamos, constante y, digamos, una vigilancia, digamos, permanente de el
+rendimiento de este modelo, porque tampoco nada más asegura que va a seguir, incluso si el
+modelo funciona muy bien, va a seguir funcionando bien, para siempre. Entonces, pueden
+cambiar la dinámica también. Ahora, veamos un último caso.
+Pensemos que tenemos una empresa, en este momento es una empresa, dispone de 6.000
+fotografías de 1.200 envases. Cada envase tiene 5 vistas y una etiqueta de daño
+visible. Entonces tienen como 5 fotos y yo tengo una etiqueta, si hay daño visible o no.
+Entonces la decisión final es enviar el envase a revisión. Entonces el próximo
+mes se usará una cámara nueva en otra línea y los datos actuales proceden con
+las condiciones anteriores. Entonces la pregunta es ¿qué fotografías deben
+permanecer juntas al separar los datos, qué información falta para evaluar el
+uso del próximo mes y con qué referencia compararíamos y qué errores o
+costos mediríamos. Entonces primero tenemos que identificar la unidad de decisión.
+Tenemos 6.000 fotografías pero decidimos sobre 1.200 envases.
+Entonces las cinco vistas de un mismo envase están relacionadas. Describen el
+mismo objeto que el envase, solo que de distintas posiciones para tener mayor
+grado de expresión. Entonces, pesemos las tres preguntas que están acá.
+¿Cómo respondería a esto?
+Pensemos, una pequeña propuesta.
+Para los 1200 envases, con 5 fotografías de cada uno, la decisión y la evaluación se
+realizan por envase, porque cada envase se define si es que va a enviar a revisión.
+Entonces el uso previsto incorpora una cámara en particular y líneas nuevas, porque se
+define en enunciado.
+Cámara nueva en otra línea.
+Entonces se quiere exportar, digamos, ese sistema.
+Entonces, debe ser una separación.
+todas las vistas de un envase quedan en un conjunto, no lo puedo separar
+cinco o cuatro imágenes del envase
+en el entrenamiento y la otra en prueba, porque si no estoy haciendo trampa al principio
+el en el sencillo, el conjunto de prueba va a conocer los datos que están en el conjunto de entrenamiento
+¿Cuál va a ser el destino? voy a tener que reunir datos de la nueva cámara y la línea
+y voy a tener que reservar envases que no participen en adaptación ni selección
+¿Qué quiere decir eso? que tengo que separar todo lo que es de una cámara, tengo que
+de cierta manera, tengo que repartirlo entre entrenamiento y prueba, porque quiero generalizar digamos
+el propósito y la salida de este sistema.
+Tengo que hacer una comparación, te voy a contestar una referencia con un candidato con un modelo a elegir,
+puede ser sencillo o no,
+pero yo voy a ocupar el conjunto de validación para definir cuál es el modelo
+que efectivamente voy a ocupar para el conjunto de prueba y que después va a ser el uso,
+va a ser usado, digamos, en la nueva imagen.
+En el resultado voy a tener que contar los defectos omitidos, las falsas alarmas y revisiones por envase
+porque en esencial es un problema de clasificación, inherentemente, entonces
+voy a ver si me equivoqueo,
+y voy a tener que
+cuantificar de cierta manera la insectividad con busstrap o remastreo
+para los envases completos,
+para conservar juntas sus vistas.
+Es decir, no puedo separar esas cinco imágenes en conjunto.
+Las tengo que mantener alumeradas, digamos,
+o alubadas, puesto que representan el mismo objeto,
+ya que en esencia es la unidad de entrego.
+Entonces, cambiar el procedimiento después de mirar la prueba,
+es decir, yo generé mi modelo con el conjunto de entrenamiento
+o mis modelos con el conjunto de evaluaciones,
+cogí el modelo y luego lo probé en la prueba.
+Y luego de ver en la prueba, como que entre todos
+escogieron un nuevo modelo, eso es metodológicamente erróneo,
+porque voy a tener que hacer una nueva evaluación independiente
+con otros datos posibles.
+Porque la prueba es el último, digamos,
+la última métrica de evaluación, que es un poco más pura,
+porque no conoce, digamos, los conjuntos con el cual fue
+entrenado el modelo original.
+Entonces, siempre vamos a estar limitados, digamos,
+al contexto o la configuración en la cual nosotros entrenamos
+nuestro modelo.
+En lo que sigue de las siguientes sesiones,
+las próximas semanas, digamos, nosotros vamos a ir
+particularizando esto.
+Con las distintas aplicaciones que hemos visto,
+que mencionamos, el embedding, la red profunda, etcétera,
+la vamos a ir particularizando.
+Por eso mencioné mucho lo que es el sistema,
+porque lo ocupé como din, digamos,
+Porque en lo que sigue, vamos a ir viendo esta metodología que
+tienen distintas aplicaciones.
+Y son un poco más flexibles que las que hemos visto antes.
+Ahora, vamos a empezar por la red neural, el próximo martes,
+definiendo qué es, qué es una capa, qué son las neuronas,
+qué significa que sea profundo, qué son las funciones de
+activación.
+Y lo vamos a formalizar.
+Esta a mi cuisa es un poco la clase un poco más subjetiva,
+porque es previo a hacer lo que nosotros queremos que aprende la
+que es como más entretenido.
+Pero a mi juicio es más importante,
+porque si yo pierdo tiempo en hacer algo que a priori podría
+haber evitado, eso en términos de costo, digamos,
+en cierto sentido, es mucho más valioso.
+Si yo defino bien qué es lo que quiero hacer,
+defino bien cuál es la habilidad, cuál es la hipnopósita,
+cuál es lo que le voy a hacer, cuáles son las distintas
+tareas, qué es mi sistema al principio,
+cómo voy a comprobar y evaluarse efectivamente los resultados
+que estoy obteniendo son coherentes con lo que yo quise
+en principio solucionar en distintos contextos de
+aplicaciones.
+Una, si yo defino eso correctamente,
+el resto es un poco más operativo.
+Sé cómo hacerlo.
+Lo primero requiere saber del contexto del problema,
+darse un pequeño tiempo de entender el contexto en el
+cual estoy realizando mi aplicación.
+Entonces, es un poco más fómel en el sentido de que no es
+tanto número, no es tanta matemática,
+o está de digital o programación,
+pero tiene mayor repercusión en la práctica.
+Cuando uno va afinando un poco más el ojo, digamos,
+uno sabe cuándo se puede implementar ciertas
+metodologías, cuándo se puede solucionar, cuándo no.
+Y una vez cuando ya está un poco más seguro y bien definido,
+uno implementa.
+Esto es lo que tratamos de, digamos,
+afinar con esta sesión.
+tratar de tener un poco el tino de cuándo vale la pena hacer un,
+a estar todo este tiempo, todo este costo en hacer una
+implementación con estos modelos, con estos sistemas que les menciono,
+que son bastante más costosos, computationalmente menos interpretables
+y más difíciles, digamos, de implementar que, por ejemplo,
+reinaurística o regresiones clásicas.
+Entonces, tenemos que tener alto cuidado con cuando empezamos a hacer esto
+y tenemos que estar bien seguros de que efectivamente vale la pena hacerlo.
+Entonces, la próxima semana vamos a empezar con reinauralidad
+y volvemos a las cosas un poco más teóricas, más aplicadas,
+formal, más bien, en la esencia que vamos a definir formalidad, vamos a programar y vamos a hacer, digamos, cosas más concretas.

@@ -1,0 +1,2100 @@
+{
+ "clase": "Clase 37",
+ "titulo": "SVM: hiperplano, margen y vectores de soporte",
+ "cabecera": "Clase 37  ·  SVM: hiperplano, margen y vectores de soporte",
+ "profesora": "Prof. Pedro Luiz Ramos",
+ "voz": "es-MX-DaliaNeural",
+ "rate": "+0%",
+ "fps": 25,
+ "beats": [
+  {
+   "seccion": "Introducción",
+   "say": "Quinta parada: las máquinas de vectores de soporte. Vas a calcular un puntaje, una distancia y el ancho del margen, y a decidir qué puntos son vectores de soporte.",
+   "acciones": [
+    {
+     "id": "t_fondo",
+     "tipo": "caja",
+     "x": 960,
+     "y": 540,
+     "w": 1920,
+     "h": 1080,
+     "radio": 0,
+     "relleno": "navy",
+     "entrada": "ninguna"
+    },
+    {
+     "id": "t_franja",
+     "tipo": "caja",
+     "x": 12,
+     "y": 540,
+     "w": 24,
+     "h": 1080,
+     "radio": 0,
+     "relleno": "#EA580C",
+     "entrada": "ninguna"
+    },
+    {
+     "id": "t_clase",
+     "tipo": "texto",
+     "texto": "CLASE 37  ·  SVM Y CLASIFICADORES",
+     "x": 140,
+     "y": 330,
+     "ancla": "lm",
+     "tam": 40,
+     "peso": "b",
+     "color": "#96D6DC",
+     "entrada": "subir"
+    },
+    {
+     "id": "t_tit",
+     "tipo": "texto",
+     "texto": "SVM: el margen",
+     "x": 140,
+     "y": 450,
+     "ancla": "lm",
+     "tam": 100,
+     "peso": "b",
+     "color": "blanco",
+     "entrada": "subir",
+     "t": 0.1
+    },
+    {
+     "id": "t_lin",
+     "tipo": "caja",
+     "x0": 140,
+     "y0": 540,
+     "x1": 420,
+     "y1": 548,
+     "radio": 0,
+     "relleno": "teal",
+     "desde": {
+      "x1": 140
+     },
+     "t": 0.2
+    },
+    {
+     "id": "t_sub",
+     "tipo": "texto",
+     "texto": "Una frontera con la calle más ancha posible",
+     "x": 140,
+     "y": 610,
+     "ancla": "lm",
+     "tam": 46,
+     "color": "#E2EAF4",
+     "entrada": "subir",
+     "t": 0.25
+    },
+    {
+     "id": "t_pie",
+     "tipo": "texto",
+     "texto": "Diplomado Data Science UC 2026  ·  Prof. Pedro Luiz Ramos",
+     "x": 140,
+     "y": 960,
+     "ancla": "lm",
+     "tam": 32,
+     "color": "#96AAC8",
+     "t": 0.3
+    }
+   ]
+  },
+  {
+   "seccion": "1. Infinitas rectas",
+   "say": "Mira estos dos grupos: treinta y dos casos reales, benignos en azul y malignos en rojo. [[a]]Hay infinitas rectas que los separan sin errores. Esta, [[b]]esta otra, [[c]]o esta. ¿Cuál elegir?",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "¿cuál recta elegir?",
+     "x": 960,
+     "y": 140,
+     "tam": 54,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e1",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "grafico",
+     "x0": 300,
+     "y0": 210,
+     "x1": 1260,
+     "y1": 900,
+     "xmin": -1.6,
+     "xmax": 3.2,
+     "ymin": -1.3,
+     "ymax": 3.2,
+     "series": [
+      {
+       "xs": [
+        -1.364,
+        -1.092,
+        -1.008,
+        -1.0,
+        -0.915,
+        -0.828,
+        -0.806,
+        -0.798,
+        -0.795,
+        -0.774,
+        -0.765,
+        -0.725,
+        -0.678,
+        -0.675,
+        -0.673,
+        -0.624,
+        -0.496,
+        -0.332,
+        50.0
+       ],
+       "ys": [
+        -0.361,
+        -0.974,
+        -0.506,
+        -0.797,
+        -0.916,
+        -0.546,
+        -1.047,
+        -1.097,
+        -1.046,
+        -0.468,
+        -0.809,
+        -0.568,
+        -0.545,
+        -0.911,
+        -0.633,
+        -0.79,
+        -0.779,
+        -0.602,
+        -0.602
+       ],
+       "color": "azul",
+       "linea": null,
+       "marcadores": 9,
+       "revela": 0.01,
+       "lapiz": false,
+       "alfa": 1.0
+      },
+      {
+       "xs": [
+        0.54,
+        0.567,
+        0.592,
+        0.66,
+        0.774,
+        1.039,
+        1.101,
+        1.101,
+        1.251,
+        1.265,
+        1.314,
+        1.458,
+        2.134,
+        3.009,
+        50.0
+       ],
+       "ys": [
+        0.194,
+        1.138,
+        1.153,
+        0.046,
+        1.909,
+        0.391,
+        0.302,
+        1.104,
+        0.215,
+        0.882,
+        0.049,
+        1.635,
+        1.948,
+        3.061,
+        3.061
+       ],
+       "color": "rojo",
+       "linea": null,
+       "marcadores": 9,
+       "revela": 0.01,
+       "lapiz": false,
+       "alfa": 1.0
+      },
+      {
+       "xs": [
+        -0.9,
+        0.225
+       ],
+       "ys": [
+        3.2,
+        -1.3
+       ],
+       "color": "grisclaro",
+       "grosor": 5,
+       "revela": 100.0,
+       "lapiz": false,
+       "alfa": 0.0
+      },
+      {
+       "xs": [
+        -1.6,
+        1.8333
+       ],
+       "ys": [
+        0.76,
+        -1.3
+       ],
+       "color": "grisclaro",
+       "grosor": 5,
+       "revela": 100.0,
+       "lapiz": false,
+       "alfa": 0.0
+      },
+      {
+       "xs": [
+        -1.6,
+        2.68
+       ],
+       "ys": [
+        1.375,
+        -1.3
+       ],
+       "color": "grisclaro",
+       "grosor": 5,
+       "revela": 100.0,
+       "lapiz": false,
+       "alfa": 0.0
+      }
+     ],
+     "xticks": [
+      -1,
+      0,
+      1,
+      2,
+      3
+     ],
+     "yticks": [
+      -1,
+      0,
+      1,
+      2,
+      3
+     ],
+     "yfmt": "{:.0f}",
+     "xlabel": "radio (estandarizado)",
+     "ylabel": "concavidad",
+     "tam_txt": 28,
+     "id": "g1",
+     "entrada": "fade",
+     "dur": 0.7
+    },
+    {
+     "series.0.revela": 1.0,
+     "series.1.revela": 1.0,
+     "id": "g1",
+     "t": 0.3,
+     "dur": 1.4
+    },
+    {
+     "series.2.alfa": 1.0,
+     "id": "g1",
+     "en": "a",
+     "dur": 0.5
+    },
+    {
+     "series.3.alfa": 1.0,
+     "id": "g1",
+     "en": "b",
+     "dur": 0.5
+    },
+    {
+     "series.4.alfa": 1.0,
+     "id": "g1",
+     "en": "c",
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "subconjunto separable de 32 casos de la base",
+     "x": 1860,
+     "y": 1050,
+     "tam": 26,
+     "peso": "sb",
+     "color": "teal",
+     "ancla": "rm",
+     "id": "e2",
+     "entrada": "pop",
+     "t": 0.6
+    }
+   ]
+  },
+  {
+   "say": "La SVM tiene una respuesta precisa: [[a]]la recta que deja la calle más ancha posible entre los dos grupos.",
+   "acciones": [
+    {
+     "series.2.alfa": 0.25,
+     "series.3.alfa": 0.25,
+     "series.4.alfa": 0.25,
+     "id": "g1",
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "la que deja la calle MÁS ANCHA",
+     "x": 1590,
+     "y": 450,
+     "tam": 44,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e3",
+     "entrada": "pop",
+     "en": "a"
+    }
+   ]
+  },
+  {
+   "seccion": "2. Analogía: la calle",
+   "say": "Piensa en una calle nueva entre dos barrios. [[a]]Quieres que sea lo más ancha posible, sin tocar ninguna casa. [[b]]¿Qué casas deciden dónde va la calle? Solo las que quedan en la vereda, las más cercanas al otro barrio. [[c]]Las casas del fondo podrían moverse, y la calle no cambiaría.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "la calle entre dos barrios",
+     "x": 960,
+     "y": 160,
+     "tam": 54,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e4",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "caja",
+     "x": 400,
+     "y": 500,
+     "w": 480,
+     "h": 330,
+     "radio": 30,
+     "relleno": "blanco",
+     "borde": "teal",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e5",
+     "entrada": "subir",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "la calle",
+     "x": 400,
+     "y": 427.4,
+     "tam": 50,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "ancho_max": 420,
+     "id": "e6",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "lo más ancha posible, sin tocar casas",
+     "x": 400,
+     "y": 546.2,
+     "tam": 36,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "ancho_max": 410,
+     "id": "e7",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 500,
+     "w": 480,
+     "h": 330,
+     "radio": 30,
+     "relleno": "blanco",
+     "borde": "ambar",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e8",
+     "entrada": "subir",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "la vereda",
+     "x": 960,
+     "y": 427.4,
+     "tam": 50,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "ancho_max": 420,
+     "id": "e9",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "solo esas casas deciden dónde va",
+     "x": 960,
+     "y": 546.2,
+     "tam": 36,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "ancho_max": 410,
+     "id": "e10",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.2
+    },
+    {
+     "tipo": "caja",
+     "x": 1520,
+     "y": 500,
+     "w": 480,
+     "h": 330,
+     "radio": 30,
+     "relleno": "blanco",
+     "borde": "gris",
+     "grosor": 5,
+     "sombra": true,
+     "id": "e11",
+     "entrada": "subir",
+     "en": "c"
+    },
+    {
+     "tipo": "texto",
+     "texto": "el fondo",
+     "x": 1520,
+     "y": 427.4,
+     "tam": 50,
+     "peso": "b",
+     "color": "gris",
+     "ancla": "mm",
+     "ancho_max": 420,
+     "id": "e12",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "moverlas no cambia nada",
+     "x": 1520,
+     "y": 546.2,
+     "tam": 36,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "ancho_max": 410,
+     "id": "e13",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "casas de la vereda = vectores de soporte",
+     "x": 960,
+     "y": 820,
+     "tam": 48,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e14",
+     "entrada": "pop",
+     "en": "c",
+     "t": 1.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "analogía",
+     "x": 1860,
+     "y": 1000,
+     "tam": 26,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "rm",
+     "id": "e15",
+     "entrada": "pop",
+     "t": 0.6
+    }
+   ]
+  },
+  {
+   "seccion": "3. El hiperplano",
+   "say": "Primero, la frontera. La diapositiva treinta y dos la escribe así: [[a]]{f(x)|efe de equis} es igual a w por x más be, y la frontera es donde {f(x)|efe de equis} vale cero. [[b]]El vector w fija la orientación; be desplaza la frontera. [[c]]Y el signo de {f(x)|efe de equis} decide la clase: positivo, más uno; negativo, menos uno.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "hiperplano y función de decisión · diapositiva 32",
+     "x": 960,
+     "y": 150,
+     "tam": 48,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e16",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 310,
+     "w": 1400,
+     "h": 113.4,
+     "radio": 26,
+     "relleno": "blanco",
+     "borde": "violeta",
+     "grosor": 4,
+     "sombra": true,
+     "id": "e17",
+     "entrada": "subir",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "f(x) = w·x + b        frontera: f(x) = 0",
+     "x": 960,
+     "y": 310,
+     "tam": 54,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "id": "e18",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "w: orientación",
+     "x": 700,
+     "y": 480,
+     "tam": 48,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e19",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "b: desplazamiento",
+     "x": 1220,
+     "y": 480,
+     "tam": 48,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e20",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "f(x) ≥ 0 → +1      f(x) < 0 → −1",
+     "x": 960,
+     "y": 640,
+     "tam": 50,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "mm",
+     "fondo_txt": "rojoclaro",
+     "id": "e21",
+     "entrada": "pop",
+     "en": "c"
+    }
+   ]
+  },
+  {
+   "say": "Un detalle de notación: [[a]]para explicar la geometría usamos las etiquetas menos uno y más uno. En los scripts se mantienen cero y uno. [[b]]Y la distancia de un punto a la frontera es el valor absoluto de {f(x)|efe de equis}, dividido por la norma de w.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "geometría: −1 / +1  ·  scripts: 0 / 1 (diapositiva 31)",
+     "x": 960,
+     "y": 800,
+     "tam": 38,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e22",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "distancia a la frontera = |f(x)| / ‖w‖",
+     "x": 960,
+     "y": 910,
+     "tam": 50,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e23",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "seccion": "4. Cuenta resuelta",
+   "say": "Hagamos la cuenta de la diapositiva treinta y cinco. [[a]]Supón que w es uno, menos uno, y be vale menos 0.5. [[b]]Tomamos el punto x igual a dos, uno.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "cuenta resuelta · diapositiva 35",
+     "x": 960,
+     "y": 150,
+     "tam": 50,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e24",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "texto",
+     "texto": "w = (1, −1)      b = −0.5",
+     "x": 760,
+     "y": 290,
+     "tam": 50,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e25",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "x = (2, 1)",
+     "x": 1360,
+     "y": 290,
+     "tam": 50,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e26",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "ejemplo de la diapositiva 35",
+     "x": 1860,
+     "y": 1000,
+     "tam": 26,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "rm",
+     "id": "e27",
+     "entrada": "pop",
+     "t": 0.6
+    }
+   ]
+  },
+  {
+   "say": "Paso uno, el puntaje: [[a]]uno por dos, menos uno por uno, menos 0.5. Dos menos uno menos 0.5: [[b]]0.5. [[c]]Paso dos, la clase: como {f(x)|efe de equis} es positivo, predecimos más uno.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "f(x) = 1·2 + (−1)·1 − 0.5 = 2 − 1 − 0.5 =",
+     "x": 1180,
+     "y": 430,
+     "tam": 46,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "e28",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.5,
+     "fmt": "{:.1f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 1210,
+     "y": 430,
+     "tam": 58,
+     "color": "violeta",
+     "ancla": "lm",
+     "id": "e29",
+     "entrada": "fade",
+     "en": "b",
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "f(x) > 0  →  clase +1",
+     "x": 960,
+     "y": 540,
+     "tam": 46,
+     "peso": "sb",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e30",
+     "entrada": "pop",
+     "en": "c"
+    }
+   ]
+  },
+  {
+   "say": "Paso tres, la norma de w: [[a]]la raíz de uno al cuadrado más menos uno al cuadrado: raíz de dos, 1.414. [[b]]Paso cuatro, la distancia: 0.5 sobre 1.414, [[c]]0.354. Fíjate que la distancia no es 0.5: el puntaje hay que dividirlo por la norma.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "‖w‖ = √(1² + (−1)²) = √2 =",
+     "x": 1180,
+     "y": 650,
+     "tam": 46,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "e31",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "numero",
+     "valor": 1.414,
+     "fmt": "{:.3f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 1210,
+     "y": 650,
+     "tam": 58,
+     "color": "azul",
+     "ancla": "lm",
+     "id": "e32",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.8,
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "distancia = 0.5 / 1.414 =",
+     "x": 1180,
+     "y": 770,
+     "tam": 46,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "e33",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.354,
+     "fmt": "{:.3f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 1210,
+     "y": 770,
+     "tam": 58,
+     "color": "ambar",
+     "ancla": "lm",
+     "id": "e34",
+     "entrada": "fade",
+     "en": "c",
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "la distancia NO es f(x): se divide por ‖w‖",
+     "x": 960,
+     "y": 900,
+     "tam": 44,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e35",
+     "entrada": "pop",
+     "en": "c",
+     "t": 1.2
+    }
+   ]
+  },
+  {
+   "seccion": "5. El margen",
+   "say": "Ahora, el margen. [[a]]La SVM fija la escala de w y be para que los puntos cumplan {y·f(x)|ye por efe de equis} mayor o igual que uno. [[b]]Así aparecen dos bordes: efe igual a más uno, y efe igual a menos uno. [[c]]Cada borde está a uno sobre la norma de w de la frontera. El ancho total de la calle es dos sobre la norma de w.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "margen máximo: caso separable · diapositiva 34",
+     "x": 960,
+     "y": 150,
+     "tam": 48,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e36",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "texto",
+     "texto": "se exige  yᵢ·f(xᵢ) ≥ 1",
+     "x": 960,
+     "y": 290,
+     "tam": 50,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e37",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "bordes: f(x) = +1  y  f(x) = −1",
+     "x": 960,
+     "y": 410,
+     "tam": 48,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e38",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 570,
+     "w": 1000,
+     "h": 126.0,
+     "radio": 26,
+     "relleno": "blanco",
+     "borde": "ambar",
+     "grosor": 4,
+     "sombra": true,
+     "id": "e39",
+     "entrada": "subir",
+     "en": "c"
+    },
+    {
+     "tipo": "texto",
+     "texto": "ancho del margen = 2 / ‖w‖",
+     "x": 960,
+     "y": 570,
+     "tam": 60,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e40",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.1
+    }
+   ]
+  },
+  {
+   "say": "Por eso la SVM minimiza un medio de la norma de w al cuadrado: [[a]]achicar la norma es ensanchar la calle. [[b]]En el ejemplo anterior, con norma raíz de dos, el ancho sería dos sobre 1.414: 1.414.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "mín ½‖w‖²  ⟶  calle más ancha",
+     "x": 960,
+     "y": 740,
+     "tam": 50,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e41",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "ejemplo: 2 / √2 = 2 / 1.414 = 1.414",
+     "x": 960,
+     "y": 860,
+     "tam": 44,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e42",
+     "entrada": "pop",
+     "en": "b"
+    }
+   ]
+  },
+  {
+   "seccion": "6. El margen con datos reales",
+   "say": "Volvamos a los treinta y dos casos reales. [[a]]La SVM de margen duro encuentra esta frontera, la línea negra. [[b]]Y estos son sus dos bordes: efe igual a más uno, en rojo, y menos uno, en azul. [[c]]Ningún caso queda dentro de la calle.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "margen duro con 32 casos reales",
+     "x": 960,
+     "y": 140,
+     "tam": 50,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e43",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "grafico",
+     "x0": 300,
+     "y0": 210,
+     "x1": 1260,
+     "y1": 900,
+     "xmin": -1.6,
+     "xmax": 3.2,
+     "ymin": -1.3,
+     "ymax": 3.2,
+     "series": [
+      {
+       "xs": [
+        -1.364,
+        -1.092,
+        -1.008,
+        -1.0,
+        -0.915,
+        -0.828,
+        -0.806,
+        -0.798,
+        -0.795,
+        -0.774,
+        -0.765,
+        -0.725,
+        -0.678,
+        -0.675,
+        -0.673,
+        -0.624,
+        -0.496,
+        -0.332,
+        50.0
+       ],
+       "ys": [
+        -0.361,
+        -0.974,
+        -0.506,
+        -0.797,
+        -0.916,
+        -0.546,
+        -1.047,
+        -1.097,
+        -1.046,
+        -0.468,
+        -0.809,
+        -0.568,
+        -0.545,
+        -0.911,
+        -0.633,
+        -0.79,
+        -0.779,
+        -0.602,
+        -0.602
+       ],
+       "color": "azul",
+       "linea": null,
+       "marcadores": 9,
+       "revela": 0.01,
+       "lapiz": false,
+       "alfa": 1.0
+      },
+      {
+       "xs": [
+        0.54,
+        0.567,
+        0.592,
+        0.66,
+        0.774,
+        1.039,
+        1.101,
+        1.101,
+        1.251,
+        1.265,
+        1.314,
+        1.458,
+        2.134,
+        3.009,
+        50.0
+       ],
+       "ys": [
+        0.194,
+        1.138,
+        1.153,
+        0.046,
+        1.909,
+        0.391,
+        0.302,
+        1.104,
+        0.215,
+        0.882,
+        0.049,
+        1.635,
+        1.948,
+        3.061,
+        3.061
+       ],
+       "color": "rojo",
+       "linea": null,
+       "marcadores": 9,
+       "revela": 0.01,
+       "lapiz": false,
+       "alfa": 1.0
+      },
+      {
+       "xs": [
+        -1.6,
+        0.9959
+       ],
+       "ys": [
+        1.8887,
+        -1.3
+       ],
+       "color": "tinta",
+       "grosor": 6,
+       "revela": 100.0,
+       "lapiz": false,
+       "alfa": 0.0
+      },
+      {
+       "xs": [
+        -1.6,
+        1.7559
+       ],
+       "ys": [
+        2.8222,
+        -1.3
+       ],
+       "color": "rojo",
+       "grosor": 3,
+       "revela": 100.0,
+       "lapiz": false,
+       "alfa": 0.0
+      },
+      {
+       "xs": [
+        -1.6,
+        0.2359
+       ],
+       "ys": [
+        0.9552,
+        -1.3
+       ],
+       "color": "azul",
+       "grosor": 3,
+       "revela": 100.0,
+       "lapiz": false,
+       "alfa": 0.0
+      }
+     ],
+     "xticks": [
+      -1,
+      0,
+      1,
+      2,
+      3
+     ],
+     "yticks": [
+      -1,
+      0,
+      1,
+      2,
+      3
+     ],
+     "yfmt": "{:.0f}",
+     "xlabel": "radio (estandarizado)",
+     "ylabel": "concavidad",
+     "tam_txt": 28,
+     "id": "g2",
+     "entrada": "fade",
+     "dur": 0.7
+    },
+    {
+     "series.0.revela": 1.0,
+     "series.1.revela": 1.0,
+     "id": "g2",
+     "t": 0.2,
+     "dur": 1.0
+    },
+    {
+     "series.2.alfa": 1.0,
+     "id": "g2",
+     "en": "a",
+     "dur": 0.6
+    },
+    {
+     "series.3.alfa": 1.0,
+     "series.4.alfa": 1.0,
+     "id": "g2",
+     "en": "b",
+     "dur": 0.6
+    },
+    {
+     "tipo": "texto",
+     "texto": "f = 0",
+     "x": 1420,
+     "y": 330,
+     "tam": 36,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "lm",
+     "id": "e44",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "f = +1",
+     "x": 1420,
+     "y": 390,
+     "tam": 36,
+     "peso": "sb",
+     "color": "rojo",
+     "ancla": "lm",
+     "id": "e45",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "f = −1",
+     "x": 1420,
+     "y": 450,
+     "tam": 36,
+     "peso": "sb",
+     "color": "azul",
+     "ancla": "lm",
+     "id": "e46",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.2
+    },
+    {
+     "tipo": "texto",
+     "texto": "subconjunto separable de 32 casos de la base",
+     "x": 1860,
+     "y": 1050,
+     "tam": 26,
+     "peso": "sb",
+     "color": "teal",
+     "ancla": "rm",
+     "id": "e47",
+     "entrada": "pop"
+    }
+   ]
+  },
+  {
+   "say": "Los números del ajuste: [[a]]w vale 1.316 y 1.071, y be, 0.082. [[b]]La norma de w es la raíz de 1.316 al cuadrado más 1.071 al cuadrado: 1.697. [[c]]Y el ancho del margen: dos sobre 1.697, 1.179 desviaciones estándar.",
+   "acciones": [
+    {
+     "tipo": "texto",
+     "texto": "w = (1.316, 1.071)",
+     "x": 1420,
+     "y": 560,
+     "tam": 38,
+     "peso": "sb",
+     "color": "violeta",
+     "ancla": "lm",
+     "id": "e48",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "b = 0.082",
+     "x": 1420,
+     "y": 615,
+     "tam": 38,
+     "peso": "sb",
+     "color": "violeta",
+     "ancla": "lm",
+     "id": "e49",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "‖w‖ = 1.697",
+     "x": 1420,
+     "y": 700,
+     "tam": 38,
+     "peso": "sb",
+     "color": "azul",
+     "ancla": "lm",
+     "id": "e50",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "ancho = 2 / 1.697 =",
+     "x": 1420,
+     "y": 790,
+     "tam": 38,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "lm",
+     "id": "e51",
+     "entrada": "pop",
+     "en": "c"
+    },
+    {
+     "tipo": "numero",
+     "valor": 1.1788,
+     "fmt": "{:.3f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 1420,
+     "y": 860,
+     "tam": 60,
+     "color": "ambar",
+     "ancla": "lm",
+     "id": "e52",
+     "entrada": "fade",
+     "en": "c",
+     "t": 0.5,
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    }
+   ]
+  },
+  {
+   "seccion": "7. ¿Quiénes son los vectores de soporte?",
+   "say": "¿Quiénes son los vectores de soporte? [[a]]Los puntos que quedan justo sobre los bordes: los que cumplen {y·f(x)|ye por efe de equis} igual a uno. [[b]]Comprobémoslo con un maligno, en zeta igual a 0.54 y 0.194. [[c]]Efe vale 1.316 por 0.54, más 1.071 por 0.194, más 0.082: 0.711 más 0.208 más 0.082, igual a 1.000. Está sobre el borde: es vector de soporte.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "¿quiénes sostienen la calle?",
+     "x": 960,
+     "y": 140,
+     "tam": 50,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e53",
+     "entrada": "subir"
+    },
+    {
+     "tipo": "grafico",
+     "x0": 300,
+     "y0": 210,
+     "x1": 1260,
+     "y1": 900,
+     "xmin": -1.6,
+     "xmax": 3.2,
+     "ymin": -1.3,
+     "ymax": 3.2,
+     "series": [
+      {
+       "xs": [
+        -1.364,
+        -1.092,
+        -1.008,
+        -1.0,
+        -0.915,
+        -0.828,
+        -0.806,
+        -0.798,
+        -0.795,
+        -0.774,
+        -0.765,
+        -0.725,
+        -0.678,
+        -0.675,
+        -0.673,
+        -0.624,
+        -0.496,
+        -0.332,
+        50.0
+       ],
+       "ys": [
+        -0.361,
+        -0.974,
+        -0.506,
+        -0.797,
+        -0.916,
+        -0.546,
+        -1.047,
+        -1.097,
+        -1.046,
+        -0.468,
+        -0.809,
+        -0.568,
+        -0.545,
+        -0.911,
+        -0.633,
+        -0.79,
+        -0.779,
+        -0.602,
+        -0.602
+       ],
+       "color": "azul",
+       "linea": null,
+       "marcadores": 9,
+       "revela": 0.01,
+       "lapiz": false,
+       "alfa": 1.0
+      },
+      {
+       "xs": [
+        0.54,
+        0.567,
+        0.592,
+        0.66,
+        0.774,
+        1.039,
+        1.101,
+        1.101,
+        1.251,
+        1.265,
+        1.314,
+        1.458,
+        2.134,
+        3.009,
+        50.0
+       ],
+       "ys": [
+        0.194,
+        1.138,
+        1.153,
+        0.046,
+        1.909,
+        0.391,
+        0.302,
+        1.104,
+        0.215,
+        0.882,
+        0.049,
+        1.635,
+        1.948,
+        3.061,
+        3.061
+       ],
+       "color": "rojo",
+       "linea": null,
+       "marcadores": 9,
+       "revela": 0.01,
+       "lapiz": false,
+       "alfa": 1.0
+      },
+      {
+       "xs": [
+        -1.6,
+        0.9959
+       ],
+       "ys": [
+        1.8887,
+        -1.3
+       ],
+       "color": "tinta",
+       "grosor": 6,
+       "revela": 100.0,
+       "lapiz": false,
+       "alfa": 0.0
+      },
+      {
+       "xs": [
+        -1.6,
+        1.7559
+       ],
+       "ys": [
+        2.8222,
+        -1.3
+       ],
+       "color": "rojo",
+       "grosor": 3,
+       "revela": 100.0,
+       "lapiz": false,
+       "alfa": 0.0
+      },
+      {
+       "xs": [
+        -1.6,
+        0.2359
+       ],
+       "ys": [
+        0.9552,
+        -1.3
+       ],
+       "color": "azul",
+       "grosor": 3,
+       "revela": 100.0,
+       "lapiz": false,
+       "alfa": 0.0
+      }
+     ],
+     "xticks": [
+      -1,
+      0,
+      1,
+      2,
+      3
+     ],
+     "yticks": [
+      -1,
+      0,
+      1,
+      2,
+      3
+     ],
+     "yfmt": "{:.0f}",
+     "xlabel": "radio (estandarizado)",
+     "ylabel": "concavidad",
+     "tam_txt": 28,
+     "id": "g3",
+     "entrada": "fade",
+     "dur": 0.7
+    },
+    {
+     "series.0.revela": 1.0,
+     "series.1.revela": 1.0,
+     "series.2.alfa": 1.0,
+     "series.3.alfa": 1.0,
+     "series.4.alfa": 1.0,
+     "id": "g3",
+     "dur": 0.6
+    },
+    {
+     "tipo": "anillo",
+     "x": -0.332,
+     "y": -0.602,
+     "w": 46,
+     "h": 46,
+     "radio": 0,
+     "color": "ambar",
+     "grosor": 5,
+     "pulso": true,
+     "ref": "g3",
+     "id": "e54",
+     "entrada": "fade",
+     "en": "a"
+    },
+    {
+     "tipo": "anillo",
+     "x": 0.66,
+     "y": 0.046,
+     "w": 46,
+     "h": 46,
+     "radio": 0,
+     "color": "ambar",
+     "grosor": 5,
+     "pulso": true,
+     "ref": "g3",
+     "id": "e55",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.2
+    },
+    {
+     "tipo": "anillo",
+     "x": 0.54,
+     "y": 0.194,
+     "w": 46,
+     "h": 46,
+     "radio": 0,
+     "color": "ambar",
+     "grosor": 5,
+     "pulso": true,
+     "ref": "g3",
+     "id": "e56",
+     "entrada": "fade",
+     "en": "a",
+     "t": 0.4
+    },
+    {
+     "tipo": "texto",
+     "texto": "vectores de soporte: y·f(x) = 1",
+     "x": 1590,
+     "y": 300,
+     "tam": 36,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e57",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "maligno z = (0.54, 0.194):",
+     "x": 1590,
+     "y": 430,
+     "tam": 34,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e58",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "f = 1.316·0.54 + 1.071·0.194 + 0.082",
+     "x": 1590,
+     "y": 500,
+     "tam": 30,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e59",
+     "entrada": "pop",
+     "en": "c"
+    },
+    {
+     "tipo": "texto",
+     "texto": "= 0.711 + 0.208 + 0.082 = 1.000",
+     "x": 1590,
+     "y": 560,
+     "tam": 34,
+     "peso": "sb",
+     "color": "rojo",
+     "ancla": "mm",
+     "id": "e60",
+     "entrada": "pop",
+     "en": "c",
+     "t": 0.8
+    }
+   ]
+  },
+  {
+   "say": "Ahora un benigno cercano, en menos 0.678 y menos 0.545. [[a]]Efe vale menos 1.394, y como su etiqueta es menos uno, {y·f|ye por efe} da 1.394. [[b]]Es mayor que uno: está más allá del borde, y no es vector de soporte. [[c]]De los treinta y dos casos, solo tres quedan exactamente en el borde. Si borras cualquiera de los otros veintinueve, la frontera no se mueve.",
+   "acciones": [
+    {
+     "tipo": "anillo",
+     "x": -0.678,
+     "y": -0.545,
+     "w": 46,
+     "h": 46,
+     "radio": 0,
+     "color": "gris",
+     "grosor": 4,
+     "pulso": false,
+     "ref": "g3",
+     "id": "e61",
+     "entrada": "fade",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "benigno z = (−0.678, −0.545):",
+     "x": 1590,
+     "y": 660,
+     "tam": 34,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e62",
+     "entrada": "pop"
+    },
+    {
+     "tipo": "texto",
+     "texto": "f = −1.394  →  y·f = 1.394 > 1",
+     "x": 1590,
+     "y": 720,
+     "tam": 34,
+     "peso": "sb",
+     "color": "azul",
+     "ancla": "mm",
+     "id": "e63",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "no es vector de soporte",
+     "x": 1590,
+     "y": 780,
+     "tam": 34,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e64",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "3 de 32 sostienen la frontera",
+     "x": 1590,
+     "y": 880,
+     "tam": 40,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e65",
+     "entrada": "pop",
+     "en": "c"
+    },
+    {
+     "tipo": "texto",
+     "texto": "subconjunto separable de 32 casos de la base",
+     "x": 1860,
+     "y": 1050,
+     "tam": 26,
+     "peso": "sb",
+     "color": "teal",
+     "ancla": "rm",
+     "id": "e66",
+     "entrada": "pop"
+    }
+   ]
+  },
+  {
+   "seccion": "8. El error típico",
+   "say": "El error típico: [[a]]creer que un margen ancho garantiza un buen modelo. [[b]]La diapositiva treinta y cuatro lo advierte: un margen amplio no garantiza, por sí solo, buen rendimiento en datos nuevos. [[c]]Y estos treinta y dos casos se eligieron separables a propósito. Con los 398 casos reales, las clases se mezclan, y el margen duro ni siquiera existe. Eso lo arregla el margen suave.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "marca",
+     "x": 330,
+     "y": 230,
+     "tam": 70,
+     "forma": "cruz",
+     "color": "rojo",
+     "id": "e67",
+     "entrada": "ninguna",
+     "en": "a",
+     "dur": 0.5,
+     "desde": {
+      "progreso": 0
+     }
+    },
+    {
+     "tipo": "texto",
+     "texto": "«margen ancho = buen modelo»",
+     "x": 410,
+     "y": 230,
+     "tam": 48,
+     "peso": "b",
+     "color": "rojo",
+     "ancla": "lm",
+     "id": "e68",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "diapositiva 34: un margen amplio no garantiza buen rendimiento en datos nuevos",
+     "x": 960,
+     "y": 400,
+     "tam": 38,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "mm",
+     "id": "e69",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "con los 398 casos las clases se mezclan: no hay margen duro",
+     "x": 960,
+     "y": 560,
+     "tam": 44,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e70",
+     "entrada": "pop",
+     "en": "c"
+    },
+    {
+     "tipo": "texto",
+     "texto": "→ margen suave (siguiente video)",
+     "x": 960,
+     "y": 680,
+     "tam": 40,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "mm",
+     "id": "e71",
+     "entrada": "pop",
+     "en": "c",
+     "t": 1.0
+    }
+   ]
+  },
+  {
+   "seccion": "9. Piensa un segundo",
+   "say": "Piensa un segundo. [[a]]Si w es tres, cuatro, be vale menos cinco, y el punto es x igual a dos, uno, [[b]]¿cuánto vale {f(x)|efe de equis}? ¿A qué distancia de la frontera está? ¿Y cuál es el ancho del margen?",
+   "pausa": 0.6,
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "w = (3, 4)   ·   b = −5   ·   x = (2, 1)",
+     "x": 960,
+     "y": 300,
+     "tam": 52,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e72",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "f(x) = ?",
+     "x": 560,
+     "y": 470,
+     "tam": 50,
+     "peso": "b",
+     "color": "azul",
+     "ancla": "mm",
+     "fondo_txt": "azulclaro",
+     "id": "e73",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "distancia = ?",
+     "x": 960,
+     "y": 470,
+     "tam": 50,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e74",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.3
+    },
+    {
+     "tipo": "texto",
+     "texto": "ancho = ?",
+     "x": 1360,
+     "y": 470,
+     "tam": 50,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e75",
+     "entrada": "pop",
+     "en": "b",
+     "t": 0.6
+    },
+    {
+     "tipo": "texto",
+     "texto": "ejemplo ilustrativo",
+     "x": 1860,
+     "y": 1000,
+     "tam": 26,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "rm",
+     "id": "e76",
+     "entrada": "pop",
+     "t": 0.6
+    }
+   ]
+  },
+  {
+   "say": "Efe de x: tres por dos más cuatro por uno menos cinco, [[a]]cinco. [[b]]La norma de w: raíz de nueve más dieciséis, raíz de veinticinco, cinco. La distancia: cinco sobre cinco, uno. [[c]]Y el ancho del margen: dos sobre cinco, 0.4.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "f(x) = 3·2 + 4·1 − 5 =",
+     "x": 1000,
+     "y": 300,
+     "tam": 50,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "e77",
+     "entrada": "pop"
+    },
+    {
+     "tipo": "numero",
+     "valor": 5,
+     "fmt": "{:.0f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 1030,
+     "y": 300,
+     "tam": 62,
+     "color": "azul",
+     "ancla": "lm",
+     "id": "e78",
+     "entrada": "fade",
+     "en": "a",
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "‖w‖ = √(9 + 16) = 5   →   distancia = 5 / 5 =",
+     "x": 1000,
+     "y": 430,
+     "tam": 46,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "e79",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "numero",
+     "valor": 1,
+     "fmt": "{:.0f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 1030,
+     "y": 430,
+     "tam": 62,
+     "color": "ambar",
+     "ancla": "lm",
+     "id": "e80",
+     "entrada": "fade",
+     "en": "b",
+     "t": 1.0,
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "ancho = 2 / 5 =",
+     "x": 1000,
+     "y": 560,
+     "tam": 50,
+     "peso": "sb",
+     "color": "tinta",
+     "ancla": "rm",
+     "id": "e81",
+     "entrada": "pop",
+     "en": "c"
+    },
+    {
+     "tipo": "numero",
+     "valor": 0.4,
+     "fmt": "{:.1f}",
+     "sufijo": "",
+     "prefijo": "",
+     "x": 1030,
+     "y": 560,
+     "tam": 62,
+     "color": "teal",
+     "ancla": "lm",
+     "id": "e82",
+     "entrada": "fade",
+     "en": "c",
+     "t": 0.4,
+     "dur": 1.0,
+     "desde": {
+      "valor": 0
+     },
+     "ease": "lineal"
+    },
+    {
+     "tipo": "texto",
+     "texto": "ejemplo ilustrativo",
+     "x": 1860,
+     "y": 1000,
+     "tam": 26,
+     "peso": "sb",
+     "color": "gris",
+     "ancla": "rm",
+     "id": "e83",
+     "entrada": "pop",
+     "t": 0.6
+    }
+   ]
+  },
+  {
+   "seccion": "10. Para llevar",
+   "say": "Para llevarte: [[a]]la SVM usa la frontera {f(x)|efe de equis} igual a cero, y la distancia es el valor absoluto de efe sobre la norma de w. [[b]]El ancho del margen es dos sobre la norma de w, y la SVM lo maximiza. [[c]]Y solo los vectores de soporte, los puntos con {y·f|ye por efe} igual a uno, deciden dónde va la frontera.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "texto",
+     "texto": "distancia = |f(x)| / ‖w‖",
+     "x": 960,
+     "y": 300,
+     "tam": 50,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "fondo_txt": "ambarclaro",
+     "id": "e84",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "ancho = 2 / ‖w‖ → se maximiza",
+     "x": 960,
+     "y": 460,
+     "tam": 50,
+     "peso": "b",
+     "color": "violeta",
+     "ancla": "mm",
+     "fondo_txt": "violetaclaro",
+     "id": "e85",
+     "entrada": "pop",
+     "en": "b"
+    },
+    {
+     "tipo": "texto",
+     "texto": "vectores de soporte: y·f(x) = 1 → deciden la frontera",
+     "x": 960,
+     "y": 620,
+     "tam": 46,
+     "peso": "b",
+     "color": "teal",
+     "ancla": "mm",
+     "fondo_txt": "tealclaro",
+     "id": "e86",
+     "entrada": "pop",
+     "en": "c"
+    }
+   ]
+  },
+  {
+   "seccion": "11. Siguiente parada",
+   "say": "Siguiente parada: [[a]]el margen suave. Qué pasa cuando las clases se mezclan, la holgura, y el parámetro C.",
+   "acciones": [
+    {
+     "limpiar": true,
+     "dur": 0.5
+    },
+    {
+     "tipo": "caja",
+     "x": 960,
+     "y": 480,
+     "w": 760,
+     "h": 260,
+     "radio": 40,
+     "relleno": "ambarclaro",
+     "borde": "ambar",
+     "grosor": 6,
+     "id": "e87",
+     "entrada": "pop",
+     "en": "a"
+    },
+    {
+     "tipo": "texto",
+     "texto": "6",
+     "x": 680,
+     "y": 480,
+     "tam": 120,
+     "peso": "b",
+     "color": "ambar",
+     "ancla": "mm",
+     "id": "e88",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.1
+    },
+    {
+     "tipo": "texto",
+     "texto": "Margen suave, holgura y el parámetro C",
+     "x": 1060,
+     "y": 480,
+     "tam": 40,
+     "peso": "b",
+     "color": "tinta",
+     "ancla": "mm",
+     "ancho_max": 520,
+     "id": "e89",
+     "entrada": "pop",
+     "en": "a",
+     "t": 0.15
+    }
+   ]
+  }
+ ]
+}

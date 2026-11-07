@@ -1,0 +1,355 @@
+1
+00:00:00,250 --> 00:00:02,690
+Octava parada: los hiperparámetros.
+
+2
+00:00:02,810 --> 00:00:05,595
+Cuántos árboles usar, qué ajustar primero, y dos
+
+3
+00:00:05,595 --> 00:00:08,380
+errores del notebook de la clase en la búsqueda.
+
+4
+00:00:08,500 --> 00:00:11,290
+¿Cien árboles, quinientos, cinco mil?
+
+5
+00:00:11,410 --> 00:00:14,059
+Y una duda que casi todos tienen: si pongo
+
+6
+00:00:14,059 --> 00:00:16,960
+demasiados árboles, ¿el bosque se sobreajusta?
+
+7
+00:00:17,080 --> 00:00:19,030
+Piensa en un promedio de encuestas.
+
+8
+00:00:19,150 --> 00:00:22,400
+Con tres encuestas, una más cambia bastante el promedio.
+
+9
+00:00:22,520 --> 00:00:26,290
+Con cien, una más ya casi no lo mueve: solo cuesta dinero.
+
+10
+00:00:26,410 --> 00:00:28,880
+Y agregar encuestas nunca empeora el promedio.
+
+11
+00:00:29,000 --> 00:00:30,600
+Con los árboles pasa igual.
+
+12
+00:00:30,720 --> 00:00:33,880
+Lo medimos en Ames, con un conjunto de validación.
+
+13
+00:00:34,000 --> 00:00:38,030
+Un solo árbol sin podar tiene un error de 36 100 dólares.
+
+14
+00:00:38,150 --> 00:00:42,990
+Un Random Forest con un árbol, 37 300: igual de malo.
+
+15
+00:00:43,110 --> 00:00:46,240
+Con diez árboles, 24 400.
+
+16
+00:00:46,360 --> 00:00:48,990
+Con cincuenta, 23 300.
+
+17
+00:00:49,110 --> 00:00:53,130
+Y con cien y con trescientos, 23 100: ya no se mueve.
+
+18
+00:00:53,250 --> 00:00:54,480
+Dos lecciones.
+
+19
+00:00:54,600 --> 00:00:58,347
+Con unos treinta y cuatro árboles, el bosque ya está a menos de
+
+20
+00:00:58,347 --> 00:01:01,500
+un 2 % de su error final: la mejora se aplana pronto.
+
+21
+00:01:01,620 --> 00:01:04,590
+Y la curva nunca vuelve a subir: más árboles no
+
+22
+00:01:04,590 --> 00:01:07,370
+sobreajustan, solo cuestan tiempo y memoria.
+
+23
+00:01:07,490 --> 00:01:08,920
+¿Por qué no sobreajustan?
+
+24
+00:01:09,040 --> 00:01:12,233
+Vuelve a la fórmula: agregar árboles solo achica el
+
+25
+00:01:12,233 --> 00:01:15,300
+término uno menos ro, sigma al cuadrado, sobre B.
+
+26
+00:01:15,420 --> 00:01:17,280
+No cambia cómo es cada árbol.
+
+27
+00:01:17,400 --> 00:01:21,840
+El sobreajuste se controla con la complejidad de cada árbol, no con cuántos hay.
+
+28
+00:01:21,960 --> 00:01:25,640
+Los hiperparámetros principales, según la diapositiva catorce.
+
+29
+00:01:25,760 --> 00:01:30,980
+n_estimators, el número de árboles: más árboles estabilizan y aumentan el costo.
+
+30
+00:01:31,100 --> 00:01:34,873
+max_features, las variables candidatas por nodo: menos variables
+
+31
+00:01:34,873 --> 00:01:37,820
+reducen la correlación y pueden aumentar el sesgo.
+
+32
+00:01:37,940 --> 00:01:41,449
+Y max_depth y min_samples_leaf, la complejidad de cada árbol:
+
+33
+00:01:41,449 --> 00:01:44,670
+controlan hojas pequeñas y la suavidad de la predicción.
+
+34
+00:01:44,790 --> 00:01:48,223
+Dos más: bootstrap y max_samples, que definen si hay
+
+35
+00:01:48,223 --> 00:01:50,930
+reemplazo y cuántas filas usa cada árbol.
+
+36
+00:01:51,050 --> 00:01:53,829
+Y class_weight, el peso de las clases, que ayuda
+
+37
+00:01:53,829 --> 00:01:56,550
+cuando la variable objetivo está desbalanceada.
+
+38
+00:01:56,670 --> 00:02:00,213
+Y la prioridad práctica de la diapositiva: primero valida
+
+39
+00:02:00,213 --> 00:02:03,570
+n_estimators, max_features y el tamaño mínimo de hoja.
+
+40
+00:02:03,690 --> 00:02:07,650
+Para ajustarlos, el notebook usa GridSearchCV.
+
+41
+00:02:07,770 --> 00:02:09,620
+Calculemos cuánto trabajo es.
+
+42
+00:02:09,740 --> 00:02:14,100
+La grilla del Random Forest prueba tres valores de n_estimators, dos de
+
+43
+00:02:14,100 --> 00:02:17,600
+max_features, dos de max_depth y dos de min_samples_leaf.
+
+44
+00:02:17,720 --> 00:02:21,390
+Tres por dos por dos por dos: 24 combinaciones.
+
+45
+00:02:21,510 --> 00:02:25,949
+Con validación cruzada de cinco bloques, 24 por 5: 120 bosques
+
+46
+00:02:25,949 --> 00:02:29,600
+entrenados, más uno final con la mejor combinación.
+
+47
+00:02:29,720 --> 00:02:32,090
+Y el resultado, replicando el notebook.
+
+48
+00:02:32,210 --> 00:02:36,971
+La configuración base, con cien árboles y sin límites,
+
+49
+00:02:36,971 --> 00:02:40,850
+tenía un AUC de validación cruzada de 0.897.
+
+50
+00:02:40,970 --> 00:02:44,599
+La mejor de la grilla, seiscientos árboles con hojas
+
+51
+00:02:44,599 --> 00:02:47,530
+de al menos tres pacientes, llega a 0.908.
+
+52
+00:02:47,650 --> 00:02:51,880
+Una ganancia de una centésima, menor que el desvío entre particiones.
+
+53
+00:02:52,000 --> 00:02:54,720
+La búsqueda pule; no transforma un modelo.
+
+54
+00:02:54,840 --> 00:02:58,130
+Ahora, dos detalles del notebook que conviene corregir.
+
+55
+00:02:58,250 --> 00:03:00,567
+El primero: el Random Forest base lleva
+
+56
+00:03:00,567 --> 00:03:03,360
+class_weight igual a balanced, y el bagging no.
+
+57
+00:03:03,480 --> 00:03:08,150
+Así, la comparación no es pareja: un modelo tiene un ajuste que el otro no.
+
+58
+00:03:08,270 --> 00:03:11,894
+Y Heart está casi equilibrado, 46 % de positivos,
+
+59
+00:03:11,894 --> 00:03:15,000
+así que el peso ni siquiera era necesario.
+
+60
+00:03:15,120 --> 00:03:16,630
+El segundo es más sutil.
+
+61
+00:03:16,750 --> 00:03:20,375
+En la búsqueda aleatoria, al bagging se le deja sortear
+
+62
+00:03:20,375 --> 00:03:23,670
+max_features del árbol base: raíz cuadrada, o 0.7.
+
+63
+00:03:23,790 --> 00:03:27,900
+Pero un árbol de decisión con max_features sortea variables en cada nodo.
+
+64
+00:03:28,020 --> 00:03:31,296
+Si sale ese valor, ese bagging optimizado es, en
+
+65
+00:03:31,296 --> 00:03:33,890
+realidad, un Random Forest disfrazado.
+
+66
+00:03:34,010 --> 00:03:37,760
+El error típico, y la diapositiva diecisiete lo lista: ajustar
+
+67
+00:03:37,760 --> 00:03:41,390
+hiperparámetros mirando repetidamente el conjunto de prueba.
+
+68
+00:03:41,510 --> 00:03:45,036
+Cada vez que eliges mirando el test, el test se vuelve parte
+
+69
+00:03:45,036 --> 00:03:48,150
+del entrenamiento, y deja de medir la generalización.
+
+70
+00:03:48,270 --> 00:03:54,650
+Se ajusta con validación cruzada u OOB, y el test se mira una sola vez, al final.
+
+71
+00:03:54,770 --> 00:03:55,990
+Piensa un segundo.
+
+72
+00:03:56,110 --> 00:03:59,655
+Tu bosque de quinientos árboles tiene exactitud 1.000 en
+
+73
+00:03:59,655 --> 00:04:03,010
+entrenamiento: acierta a todos los pacientes que vio.
+
+74
+00:04:03,130 --> 00:04:06,000
+Y en el test, 0.855.
+
+75
+00:04:06,120 --> 00:04:07,430
+¿Está sobreajustado?
+
+76
+00:04:07,550 --> 00:04:08,470
+¿Hay que podarlo?
+
+77
+00:04:09,190 --> 00:04:10,500
+No necesariamente.
+
+78
+00:04:10,620 --> 00:04:14,423
+Un bosque con hojas de un solo paciente siempre memoriza su
+
+79
+00:04:14,423 --> 00:04:17,710
+entrenamiento: esa exactitud de 1.000 no dice nada.
+
+80
+00:04:17,830 --> 00:04:27,100
+Lo que importa es el error en datos no vistos: el OOB da 0.811, y el test, 0.855.
+
+81
+00:04:27,220 --> 00:04:30,080
+Si ese error es el menor entre tus alternativas, la
+
+82
+00:04:30,080 --> 00:04:32,660
+brecha con el entrenamiento no es un problema.
+
+83
+00:04:32,780 --> 00:04:36,666
+Para llevarte: más árboles estabilizan y nunca sobreajustan;
+
+84
+00:04:36,666 --> 00:04:39,840
+en Ames, con unos treinta y cuatro, ya casi está.
+
+85
+00:04:39,960 --> 00:04:44,336
+Primero se validan n_estimators, max_features y el tamaño
+
+86
+00:04:44,336 --> 00:04:47,790
+mínimo de hoja, con validación cruzada u OOB.
+
+87
+00:04:47,910 --> 00:04:52,000
+La búsqueda pule unas centésimas, y el test se mira una sola vez.
+
+88
+00:04:52,120 --> 00:04:54,854
+Siguiente parada: cómo explicar lo que aprendió un
+
+89
+00:04:54,854 --> 00:04:57,370
+bosque que no se puede dibujar, y dónde falla.
