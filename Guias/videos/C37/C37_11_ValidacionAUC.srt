@@ -1,0 +1,435 @@
+1
+00:00:00,250 --> 00:00:06,121
+Undécima parada: cómo elegir C y gamma sin tocar la prueba, qué pasó cuando
+
+2
+00:00:06,121 --> 00:00:10,740
+R y Python eligieron distinto, y qué mide de verdad la AUC.
+
+3
+00:00:10,860 --> 00:00:15,130
+¿De dónde salieron C igual a diez y gamma 0.1?
+
+4
+00:00:15,250 --> 00:00:17,890
+La diapositiva cuarenta y tres dice que se fijaron de
+
+5
+00:00:17,890 --> 00:00:20,730
+antemano, y que no se cambiaron después de ver la prueba.
+
+6
+00:00:20,850 --> 00:00:24,230
+Pero en un problema nuevo, nadie te regala esos valores.
+
+7
+00:00:24,350 --> 00:00:26,890
+Hay que elegirlos, y sin tocar la prueba.
+
+8
+00:00:27,010 --> 00:00:29,040
+Para eso está la validación cruzada.
+
+9
+00:00:29,160 --> 00:00:31,550
+Piensa en cómo te preparas para un examen.
+
+10
+00:00:31,670 --> 00:00:36,300
+Practicas con ensayos, ajustas tu forma de estudiar según cómo te va en ellos.
+
+11
+00:00:36,420 --> 00:00:38,870
+Pero el examen real lo das una sola vez.
+
+12
+00:00:38,990 --> 00:00:41,794
+Si te mostraran el examen antes para decidir cómo
+
+13
+00:00:41,794 --> 00:00:44,540
+estudiar, la nota dejaría de medir lo que sabes.
+
+14
+00:00:44,660 --> 00:00:47,500
+La diapositiva once lo ordena en tres etapas.
+
+15
+00:00:47,620 --> 00:00:51,620
+El entrenamiento estima coeficientes, escalas y vectores de soporte.
+
+16
+00:00:51,740 --> 00:00:55,230
+La validación compara hiperparámetros, modelos y umbrales.
+
+17
+00:00:55,350 --> 00:00:58,410
+Y la prueba evalúa el procedimiento que ya fue elegido.
+
+18
+00:00:58,530 --> 00:01:02,440
+Mirar la prueba una y otra vez para decidir la convierte en validación.
+
+19
+00:01:02,560 --> 00:01:07,190
+Así funciona la validación cruzada de cinco folds, de la diapositiva doce.
+
+20
+00:01:07,310 --> 00:01:11,470
+Los 398 casos de entrenamiento se parten en cinco grupos.
+
+21
+00:01:11,590 --> 00:01:15,420
+En la primera vuelta, se ajusta con cuatro y se valida con el quinto.
+
+22
+00:01:15,540 --> 00:01:18,270
+Y se rota: cada grupo valida una vez.
+
+23
+00:01:18,390 --> 00:01:22,490
+El resultado de cada candidato es el promedio de las cinco validaciones.
+
+24
+00:01:22,610 --> 00:01:25,390
+Y todos los candidatos usan los mismos folds.
+
+25
+00:01:25,510 --> 00:01:30,340
+En Python, el bloque opcional de la clase lo hace con GridSearchCV.
+
+26
+00:01:30,460 --> 00:01:35,720
+El modelo es un Pipeline: primero StandardScaler, después la SVM radial.
+
+27
+00:01:35,840 --> 00:01:39,560
+Así la escala se reestima dentro de cada fold, sin fugas.
+
+28
+00:01:39,680 --> 00:01:43,291
+La rejilla prueba tres valores de C y tres de gamma: nueve
+
+29
+00:01:43,291 --> 00:01:46,840
+combinaciones, por cinco folds, cuarenta y cinco ajustes.
+
+30
+00:01:46,960 --> 00:01:50,900
+Y recibe los datos sin escalar, porque el Pipeline escala por dentro.
+
+31
+00:01:51,020 --> 00:01:51,920
+¿Qué elige?
+
+32
+00:01:52,040 --> 00:01:53,210
+Corrimos el bloque.
+
+33
+00:01:53,330 --> 00:01:58,754
+Gana C igual a diez y gamma 0.1, con exactitud media
+
+34
+00:01:58,754 --> 00:02:03,030
+0.940, y desviación entre folds de 0.020.
+
+35
+00:02:03,150 --> 00:02:10,620
+Segunda, C igual a uno y gamma 0.1: 0.935, con desviación 0.044.
+
+36
+00:02:10,740 --> 00:02:15,600
+La diferencia entre las dos es de medio punto: unos dos casos de 398.
+
+37
+00:02:15,720 --> 00:02:18,220
+Está muy por dentro del ruido entre folds.
+
+38
+00:02:18,340 --> 00:02:20,780
+Y aquí aparece algo que puede confundir.
+
+39
+00:02:20,900 --> 00:02:27,136
+Según la diapositiva sesenta y tres, la búsqueda en R eligió C igual a uno y
+
+40
+00:02:27,136 --> 00:02:32,470
+gamma 0.1, mientras que Python eligió C igual a diez y gamma 0.1.
+
+41
+00:02:32,590 --> 00:02:33,560
+¿Contradicción?
+
+42
+00:02:33,680 --> 00:02:34,100
+No.
+
+43
+00:02:34,220 --> 00:02:37,393
+Los dos lenguajes no construyen los mismos folds, y usan
+
+44
+00:02:37,393 --> 00:02:40,850
+convenciones levemente distintas para la desviación estándar.
+
+45
+00:02:40,970 --> 00:02:45,710
+Y en Python, esas dos combinaciones quedaron primera y segunda, a medio punto.
+
+46
+00:02:45,830 --> 00:02:48,320
+Con otros folds, el orden puede cambiar.
+
+47
+00:02:48,440 --> 00:02:50,980
+Un dato más, para no sobreinterpretar.
+
+48
+00:02:51,100 --> 00:02:56,938
+Si se amplía la rejilla a seis valores de C y cinco de gamma, la validación
+
+49
+00:02:56,938 --> 00:03:01,530
+cruzada elige otra: C igual a cien y gamma 0.01, con 0.945.
+
+50
+00:03:01,650 --> 00:03:05,549
+En la prueba, esa elección acierta el 94.7 por ciento,
+
+51
+00:03:05,549 --> 00:03:09,160
+menos que el 97.1 de la configuración de la clase.
+
+52
+00:03:09,280 --> 00:03:12,220
+Y no pasa nada: la prueba no es para elegir.
+
+53
+00:03:12,340 --> 00:03:16,620
+Con 171 casos, uno o tres casos de diferencia son ruido.
+
+54
+00:03:16,740 --> 00:03:21,210
+Ahora, la AUC: el área bajo la curva ROC.
+
+55
+00:03:21,330 --> 00:03:24,873
+La diapositiva sesenta y cuatro la define así: es la probabilidad
+
+56
+00:03:24,873 --> 00:03:28,035
+de que un caso positivo tenga un puntaje mayor que un caso
+
+57
+00:03:28,035 --> 00:03:30,870
+negativo, más la mitad de la probabilidad de empate.
+
+58
+00:03:30,990 --> 00:03:33,670
+O sea: mide el orden de los puntajes.
+
+59
+00:03:33,790 --> 00:03:35,240
+No mira ningún umbral.
+
+60
+00:03:35,360 --> 00:03:38,230
+Calculémosla a mano, con un ejemplo pequeño.
+
+61
+00:03:38,350 --> 00:03:46,870
+Tres malignos, con puntajes 0.9, 0.7 y 0.4; dos benignos, con 0.5 y 0.2.
+
+62
+00:03:46,990 --> 00:03:49,200
+Hay seis pares maligno contra benigno.
+
+63
+00:03:49,320 --> 00:03:52,620
+En cinco de ellos, el maligno tiene el puntaje mayor.
+
+64
+00:03:52,740 --> 00:03:56,030
+El único que falla es 0.4 contra 0.5.
+
+65
+00:03:56,150 --> 00:04:01,260
+La AUC es cinco sextos: 0.833.
+
+66
+00:04:01,380 --> 00:04:03,510
+Con los datos reales, en la prueba.
+
+67
+00:04:03,630 --> 00:04:08,710
+La logística tiene AUC 0.9746.
+
+68
+00:04:08,830 --> 00:04:14,130
+La SVM lineal, también 0.9746: exactamente la misma.
+
+69
+00:04:14,250 --> 00:04:19,730
+Pero sus exactitudes son distintas: 94.2 y 91.8 por ciento.
+
+70
+00:04:19,850 --> 00:04:24,010
+Ordenan los casos igual de bien, y se diferencian en dónde ponen el corte.
+
+71
+00:04:24,130 --> 00:04:27,530
+La SVM radial llega a 0.9834.
+
+72
+00:04:27,650 --> 00:04:33,583
+Y una advertencia que el propio script escribe en un comentario: una AUC de 0.98 no
+
+73
+00:04:33,583 --> 00:04:38,230
+significa noventa y ocho por ciento de clasificaciones correctas.
+
+74
+00:04:38,350 --> 00:04:43,020
+Tampoco define el umbral, ni dice si las probabilidades están bien calibradas.
+
+75
+00:04:43,140 --> 00:04:44,910
+Una inconsistencia del material.
+
+76
+00:04:45,030 --> 00:04:48,552
+La diapositiva sesenta y cuatro termina diciendo:
+
+77
+00:04:48,552 --> 00:04:51,570
+los scripts de esta clase no calculan AUC.
+
+78
+00:04:51,690 --> 00:04:56,270
+Pero el bloque nueve de los dos scripts sí la calcula: en Python, con
+
+79
+00:04:56,270 --> 00:04:59,920
+una función de scikit-learn; en R, con el paquete pROC.
+
+80
+00:05:00,040 --> 00:05:01,520
+Y en la clase se ejecutó.
+
+81
+00:05:01,640 --> 00:05:04,980
+Los valores que acabas de ver son justamente los de ese bloque.
+
+82
+00:05:05,100 --> 00:05:11,330
+Para la AUC de la SVM, el script usa decision function: el puntaje.
+
+83
+00:05:11,450 --> 00:05:13,550
+Ese puntaje no es una probabilidad.
+
+84
+00:05:13,670 --> 00:05:17,796
+Si se pide probability igual a True, scikit-learn calibra el puntaje con
+
+85
+00:05:17,796 --> 00:05:21,120
+el método de Platt, usando una validación cruzada interna.
+
+86
+00:05:21,240 --> 00:05:24,387
+Y esas probabilidades pueden discrepar de predict: en la
+
+87
+00:05:24,387 --> 00:05:26,860
+radial de la clase, en tres casos de prueba.
+
+88
+00:05:26,980 --> 00:05:31,172
+Con pe mayor o igual que 0.5, la exactitud baja a
+
+89
+00:05:31,172 --> 00:05:34,850
+95.3 por ciento, frente al 97.1 de predict.
+
+90
+00:05:34,970 --> 00:05:40,446
+El error típico, de la lista de la diapositiva cincuenta y ocho: calcular la
+
+91
+00:05:40,446 --> 00:05:44,770
+AUC pasándole las clases cero y uno, en vez de los puntajes.
+
+92
+00:05:44,890 --> 00:05:54,350
+Con las clases, la AUC de la SVM radial sale 0.964, y la de la logística, 0.934.
+
+93
+00:05:54,470 --> 00:05:59,160
+Con los puntajes, son 0.983 y 0.975.
+
+94
+00:05:59,280 --> 00:06:05,380
+Con clases, la curva se reduce a un solo punto, y la AUC se subestima.
+
+95
+00:06:05,500 --> 00:06:06,720
+Piensa un segundo.
+
+96
+00:06:06,840 --> 00:06:13,420
+Dos malignos con puntajes 0.8 y 0.6; dos benignos con 0.7 y 0.1.
+
+97
+00:06:13,540 --> 00:06:15,940
+¿Cuánto vale la AUC?
+
+98
+00:06:16,660 --> 00:06:17,830
+Hay cuatro pares.
+
+99
+00:06:17,950 --> 00:06:24,265
+0.8 contra 0.7, bien; 0.8 contra 0.1, bien; 0.6
+
+100
+00:06:24,265 --> 00:06:29,370
+contra 0.7, mal; 0.6 contra 0.1, bien.
+
+101
+00:06:29,490 --> 00:06:34,180
+Tres de cuatro: la AUC es 0.75.
+
+102
+00:06:34,300 --> 00:06:38,429
+Para llevarte: C, gamma y el umbral se eligen con validación cruzada
+
+103
+00:06:38,429 --> 00:06:41,890
+en el entrenamiento, con la escala dentro de un Pipeline.
+
+104
+00:06:42,010 --> 00:06:45,194
+Diferencias de medio punto entre candidatos son ruido:
+
+105
+00:06:45,194 --> 00:06:47,670
+por eso R y Python pueden elegir distinto.
+
+106
+00:06:47,790 --> 00:06:51,919
+Y la AUC mide el orden de los puntajes: se calcula con
+
+107
+00:06:51,919 --> 00:06:56,430
+puntajes, no con clases, y no es un porcentaje de aciertos.
+
+108
+00:06:56,550 --> 00:06:59,900
+Siguiente y última parada: el repaso de toda la clase,
+
+109
+00:06:59,900 --> 00:07:02,630
+y un checklist para tu próximo clasificador.

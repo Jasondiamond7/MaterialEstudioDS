@@ -1,0 +1,331 @@
+1
+00:00:00,250 --> 00:00:03,370
+Tercera parada: cómo partir los datos del hormigón.
+
+2
+00:00:03,490 --> 00:00:06,210
+La pregunta clave es qué cuenta como un caso nuevo.
+
+3
+00:00:06,330 --> 00:00:10,360
+Mira esta receta de hormigón, tal como aparece en los datos de la clase.
+
+4
+00:00:10,480 --> 00:00:18,792
+La misma mezcla, con los mismos siete ingredientes, se midió a distintas edades: a un día
+
+5
+00:00:18,792 --> 00:00:25,330
+resistió 12.6 megapascales; a los 28 días, 44.1; a los 270 días, 55.2.
+
+6
+00:00:25,450 --> 00:00:28,360
+Son ocho filas, pero una sola composición.
+
+7
+00:00:28,480 --> 00:00:31,660
+Si una de esas filas cae en el entrenamiento y otra en la
+
+8
+00:00:31,660 --> 00:00:34,840
+validación, ¿el modelo está prediciendo una mezcla nueva?
+
+9
+00:00:34,960 --> 00:00:37,773
+Piensa en un profesor que arma la prueba copiando los
+
+10
+00:00:37,773 --> 00:00:40,480
+ejercicios de la guía, y solo les cambia un número.
+
+11
+00:00:40,600 --> 00:00:43,670
+Un alumno que memorizó la guía saca muy buena nota.
+
+12
+00:00:43,790 --> 00:00:47,510
+Pero esa nota no dice si sabe resolver un ejercicio realmente nuevo.
+
+13
+00:00:47,630 --> 00:00:51,262
+Con el hormigón pasa lo mismo: si la misma receta aparece en el
+
+14
+00:00:51,262 --> 00:00:54,490
+ajuste y en la validación, el error medido es optimista.
+
+15
+00:00:54,610 --> 00:00:56,040
+Por eso la clase agrupa.
+
+16
+00:00:56,160 --> 00:00:58,767
+Dos filas pertenecen al mismo grupo si tienen
+
+17
+00:00:58,767 --> 00:01:01,200
+exactamente los mismos siete ingredientes.
+
+18
+00:01:01,320 --> 00:01:03,800
+La edad y la respuesta no definen el grupo.
+
+19
+00:01:03,920 --> 00:01:07,349
+Y la partición reserva grupos completos: la composición
+
+20
+00:01:07,349 --> 00:01:10,590
+entera, con todas sus edades, queda de un solo lado.
+
+21
+00:01:10,710 --> 00:01:11,750
+¿Importa mucho?
+
+22
+00:01:11,870 --> 00:01:16,010
+En estos datos, 182 composiciones tienen más de una fila.
+
+23
+00:01:16,130 --> 00:01:20,860
+Y esas composiciones reúnen 784 de las 1030 mediciones.
+
+24
+00:01:20,980 --> 00:01:24,176
+Es decir, si partiéramos fila por fila, la mayoría de las
+
+25
+00:01:24,176 --> 00:01:27,260
+mediciones podría quedar con una hermana del otro lado.
+
+26
+00:01:27,380 --> 00:01:30,080
+¿Y por qué la edad no entra en la definición del grupo?
+
+27
+00:01:30,200 --> 00:01:33,703
+Si la edad definiera el grupo, la misma receta a los siete
+
+28
+00:01:33,703 --> 00:01:36,420
+días y a los 28 días serían grupos distintos.
+
+29
+00:01:36,540 --> 00:01:40,990
+Entonces podrían quedar separadas: una en el ajuste y otra en la validación.
+
+30
+00:01:41,110 --> 00:01:42,810
+Justo lo que queríamos evitar.
+
+31
+00:01:42,930 --> 00:01:46,038
+La edad sigue siendo un predictor, uno de los ocho; lo
+
+32
+00:01:46,038 --> 00:01:48,570
+que no hace es decidir qué filas van juntas.
+
+33
+00:01:48,690 --> 00:01:51,640
+La diapositiva trece muestra la partición de la clase.
+
+34
+00:01:51,760 --> 00:01:55,925
+806 mediciones, de 342 composiciones, para ajustar y
+
+35
+00:01:55,925 --> 00:02:00,250
+seleccionar, con validación cruzada en cinco pliegues.
+
+36
+00:02:00,370 --> 00:02:03,912
+Y 224 mediciones, de 86 composiciones, para la
+
+37
+00:02:03,912 --> 00:02:07,530
+prueba reservada, que evalúa la elección final.
+
+38
+00:02:07,650 --> 00:02:10,830
+En total, 428 composiciones.
+
+39
+00:02:10,950 --> 00:02:15,204
+Un detalle fino: se reservó el 20 por ciento de los
+
+40
+00:02:15,204 --> 00:02:18,540
+grupos: 86 de 428 es el 20.1 por ciento.
+
+41
+00:02:18,660 --> 00:02:23,792
+Pero eso no exige el 20 por ciento de las filas: 224 de 1030 es el 21.7 por
+
+42
+00:02:23,792 --> 00:02:28,240
+ciento, porque algunas composiciones tienen más edades que otras.
+
+43
+00:02:28,360 --> 00:02:31,280
+La partición se piensa en grupos, no en filas.
+
+44
+00:02:31,400 --> 00:02:36,340
+Dentro del entrenamiento, los 342 grupos se reparten en cinco pliegues.
+
+45
+00:02:36,460 --> 00:02:43,660
+Cada pliegue tiene 68 o 69 composiciones, y entre 161 y 162 mediciones.
+
+46
+00:02:43,780 --> 00:02:47,626
+El script lo comprueba con una aserción: ningún grupo aparece en dos
+
+47
+00:02:47,626 --> 00:02:51,190
+pliegues, y ninguno está a la vez en entrenamiento y en prueba.
+
+48
+00:02:51,310 --> 00:02:53,820
+Una precisión sobre lo que se dijo en la grabación.
+
+49
+00:02:53,940 --> 00:02:59,046
+Al explicar el agrupamiento, se dijo: «al juntarlos voy a quedar con 342
+
+50
+00:02:59,046 --> 00:03:03,940
+composiciones distintas, que representan 806 mediciones de las 1030».
+
+51
+00:03:04,060 --> 00:03:09,400
+Al juntar las 1030 mediciones, en realidad quedan 428 composiciones.
+
+52
+00:03:09,520 --> 00:03:14,890
+Las 342 son solo las del entrenamiento; las otras 86 están en la prueba.
+
+53
+00:03:15,010 --> 00:03:18,501
+Más adelante, la misma grabación lo dice bien: 428
+
+54
+00:03:18,501 --> 00:03:22,900
+composiciones, y el 20 por ciento de los grupos para la prueba.
+
+55
+00:03:23,020 --> 00:03:25,590
+La prueba reservada cumple un papel especial.
+
+56
+00:03:25,710 --> 00:03:30,050
+El profesor la llamó un oráculo: se consulta una sola vez, al final.
+
+57
+00:03:30,170 --> 00:03:33,420
+Ninguna composición aparece a ambos lados de la partición.
+
+58
+00:03:33,540 --> 00:03:36,881
+Pero ojo con lo que eso no dice: no acredita que el modelo
+
+59
+00:03:36,881 --> 00:03:39,530
+funcione en otra planta o en otro laboratorio.
+
+60
+00:03:39,650 --> 00:03:43,660
+Solo aproxima composiciones excluidas de esta misma base histórica.
+
+61
+00:03:43,780 --> 00:03:46,843
+El error típico: partir fila por fila, al azar,
+
+62
+00:03:46,843 --> 00:03:49,580
+como si cada medición fuera independiente.
+
+63
+00:03:49,700 --> 00:03:53,115
+Entonces la receta que se midió a los siete días queda en el
+
+64
+00:03:53,115 --> 00:03:57,100
+entrenamiento, y la misma receta a los 28 días queda en la validación.
+
+65
+00:03:57,220 --> 00:04:00,404
+El modelo parece predecir mezclas nuevas, pero solo está
+
+66
+00:04:00,404 --> 00:04:03,190
+completando la curva de una mezcla que ya conoce.
+
+67
+00:04:03,310 --> 00:04:04,530
+Piensa un segundo.
+
+68
+00:04:04,650 --> 00:04:07,820
+Tienes 50 composiciones y reservas 10 para la prueba.
+
+69
+00:04:07,940 --> 00:04:12,750
+Esas 10 composiciones suman 60 filas, de un total de 250.
+
+70
+00:04:12,870 --> 00:04:15,250
+¿Qué porcentaje reservaste de los grupos?
+
+71
+00:04:15,370 --> 00:04:16,430
+¿Y de las filas?
+
+72
+00:04:17,150 --> 00:04:20,640
+De los grupos: 10 de 50, el 20 por ciento.
+
+73
+00:04:20,760 --> 00:04:25,220
+De las filas: 60 de 250, el 24 por ciento.
+
+74
+00:04:25,340 --> 00:04:28,501
+No coinciden, y no tienen por qué coincidir: lo que se
+
+75
+00:04:28,501 --> 00:04:31,720
+controla es que cada composición quede de un solo lado.
+
+76
+00:04:31,840 --> 00:04:34,913
+Para llevarte: la unidad que separas define qué es un
+
+77
+00:04:34,913 --> 00:04:37,580
+caso nuevo; en el hormigón, es la composición.
+
+78
+00:04:37,700 --> 00:04:40,265
+Se reservan grupos completos, con todas sus
+
+79
+00:04:40,265 --> 00:04:42,950
+edades, y los pliegues también son por grupo.
+
+80
+00:04:43,070 --> 00:04:46,026
+Y la prueba es un oráculo que se consulta una sola
+
+81
+00:04:46,026 --> 00:04:48,450
+vez, con un alcance limitado a esta base.
+
+82
+00:04:48,570 --> 00:04:51,860
+Siguiente parada: qué se ajusta y qué se selecciona, y los
+
+83
+00:04:51,860 --> 00:04:54,470
+siete modelos candidatos que vamos a comparar.

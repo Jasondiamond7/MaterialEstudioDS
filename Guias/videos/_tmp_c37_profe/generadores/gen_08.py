@@ -108,7 +108,7 @@ v.b("C y gamma actúan juntos. Esta es la rejilla del bloque opcional de la clas
     *celdas, R(760, 700, 220, 170, "rojo", r=20, en="b"), R(980, 360, 220, 170, "verde", r=20, en="c"),
     P("C y γ chicos → rígido (subajuste)", 1600, 700, "rojo", 30, en="b"), P("C = 10, γ = 0.1 → la mejor", 1600, 360, "verde", 30, en="c"),
     real(1050, en="a"), sec="5. C y γ juntos")
-v.b("Y otra cosa que muestra la rejilla: [[a]]subir C de uno a diez con gamma igual a uno empeora: de 92.7 a 91.5. [[b]]C grande con gamma grande es la combinación más propensa a sobreajustar: castiga cada error y además mira cada punto de cerca.",
+v.b("Y otra cosa que muestra la rejilla: [[a]]subir {C|, ce,} de uno a diez con gamma igual a uno empeora: de 92.7 a 91.5. [[b]]C grande con gamma grande es la combinación más propensa a sobreajustar: castiga cada error y además mira cada punto de cerca.",
     R(1200, 360, 220, 170, "ambar", r=20, en="a"), T("C = 10, γ = 1 < C = 1, γ = 1", 1600, 500, tam=30, c="ambar", w="sb", en="a"),
     P("C y γ grandes → riesgo de sobreajuste", 960, 990, "ambar", 40, en="b"))
 
@@ -130,11 +130,11 @@ v.b("El modelo A sobreajusta: [[a]]una brecha de veintinueve puntos entre entren
     ilustrativo(1000))
 
 # ---- 8. Para llevar
-v.b("Para llevarte: [[a]]gamma chica da fronteras suaves y puede subajustar; gamma grande da islas y sobreajusta. [[b]]C y gamma actúan juntos: grandes los dos, más riesgo de memorizar. [[c]]Y se eligen con validación cruzada, nunca por la exactitud de entrenamiento. En la clase, la mejor combinación fue C igual a diez y gamma 0.1.",
+v.b("Para llevarte: [[a]]gamma chica da fronteras suaves y puede subajustar; gamma grande da islas y sobreajusta. [[b]]C y gamma actúan juntos: grandes los dos, más riesgo de memorizar. [[c]]Y se eligen con validación cruzada, nunca por la exactitud de entrenamiento. En la clase, la mejor combinación fue {C|, ce,} igual a diez y gamma 0.1.",
     CL(), P("γ chica → suave (subajuste) · γ grande → islas (sobreajuste)", 960, 300, "violeta", 44, en="a"),
     P("C y γ grandes → más riesgo de memorizar", 960, 460, "rojo", 46, en="b"),
     P("se eligen con validación cruzada (clase: C = 10, γ = 0.1)", 960, 620, "teal", 44, en="c"), sec="8. Para llevar")
-v.b("Siguiente parada: [[a]]por qué hay que estandarizar antes de una SVM, y un clasificador clásico que depende todavía más de las distancias: los k vecinos más cercanos.",
+v.b("Siguiente parada: [[a]]por qué hay que estandarizar antes de una SVM, y un clasificador clásico que depende todavía más de las distancias: los {k|k,} vecinos más cercanos.",
     CL(), siguiente(9, "Estandarizar: SVM y kNN"), sec="9. Siguiente parada")
 
 n = v.guardar(OUT)

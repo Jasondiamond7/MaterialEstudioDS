@@ -1,0 +1,4739 @@
+1
+00:00:00,250 --> 00:00:04,900
+Clase treinta y ocho: evaluación de modelos supervisados y selección de modelos.
+
+2
+00:00:05,020 --> 00:00:09,510
+Antes de comparar números, hay que responder una pregunta: mejor, ¿para qué?
+
+3
+00:00:09,630 --> 00:00:13,300
+Tienes dos modelos que predicen la resistencia de una mezcla de hormigón.
+
+4
+00:00:13,420 --> 00:00:15,956
+El primero comete errores pequeños casi siempre,
+
+5
+00:00:15,956 --> 00:00:18,280
+pero de vez en cuando se equivoca por mucho.
+
+6
+00:00:18,400 --> 00:00:23,080
+El segundo nunca comete errores enormes, pero rara vez da justo en el blanco.
+
+7
+00:00:23,200 --> 00:00:24,070
+¿Cuál es mejor?
+
+8
+00:00:24,190 --> 00:00:27,750
+La respuesta honesta es: depende de para qué lo vas a usar.
+
+9
+00:00:27,870 --> 00:00:29,890
+Y en clasificación pasa lo mismo.
+
+10
+00:00:30,010 --> 00:00:33,510
+Dos filtros de spam aciertan el mismo porcentaje de correos.
+
+11
+00:00:33,630 --> 00:00:37,860
+Uno bloquea más correos legítimos; el otro deja pasar más spam.
+
+12
+00:00:37,980 --> 00:00:40,323
+El profesor lo dijo así en la clase: este
+
+13
+00:00:40,323 --> 00:00:42,780
+concepto de mejor modelo es un poco etéreo.
+
+14
+00:00:42,900 --> 00:00:43,950
+Hay que definirlo.
+
+15
+00:00:44,070 --> 00:00:46,880
+Piensa en alguien que te pregunta cuál es el mejor auto.
+
+16
+00:00:47,000 --> 00:00:50,620
+Si lo quieres para la ciudad, gana uno pequeño que gaste poco.
+
+17
+00:00:50,740 --> 00:00:54,630
+Si lo quieres para un camino de montaña, gana una camioneta alta.
+
+18
+00:00:54,750 --> 00:00:57,710
+Si es para una carrera, gana el más rápido.
+
+19
+00:00:57,830 --> 00:01:00,420
+El auto no cambió: cambió la pregunta.
+
+20
+00:01:00,540 --> 00:01:03,050
+Con los modelos ocurre exactamente lo mismo.
+
+21
+00:01:03,170 --> 00:01:07,960
+Primera idea de la clase: la salida de un modelo y su uso son cosas distintas.
+
+22
+00:01:08,080 --> 00:01:13,380
+A veces la salida es una cantidad: una resistencia estimada de 35 MPa.
+
+23
+00:01:13,500 --> 00:01:18,400
+Otras veces es una probabilidad: probabilidad de spam igual a 0.70.
+
+24
+00:01:18,520 --> 00:01:22,630
+Y otras veces es una acción: bloquear el correo, o dejarlo pasar.
+
+25
+00:01:22,750 --> 00:01:24,760
+Y cada una se evalúa distinto.
+
+26
+00:01:24,880 --> 00:01:27,880
+La cantidad se compara con el valor real: si la
+
+27
+00:01:27,880 --> 00:01:30,370
+mezcla resistió 40, me equivoqué por 5.
+
+28
+00:01:30,490 --> 00:01:33,424
+La probabilidad expresa incertidumbre: hay que
+
+29
+00:01:33,424 --> 00:01:36,040
+ver si ese 0.70 se cumple en la práctica.
+
+30
+00:01:36,160 --> 00:01:40,380
+Y la acción agrega una regla de decisión, con sus propias consecuencias.
+
+31
+00:01:40,500 --> 00:01:43,455
+Por eso la diapositiva insiste: evaluar bien exige
+
+32
+00:01:43,455 --> 00:01:45,760
+evaluar la salida que se va a utilizar.
+
+33
+00:01:45,880 --> 00:01:49,750
+Antes de elegir, la diapositiva cuatro propone tres preguntas.
+
+34
+00:01:49,870 --> 00:01:53,350
+Dónde se usará el modelo: qué casos futuros nos interesan.
+
+35
+00:01:53,470 --> 00:01:56,590
+Qué importa: la consecuencia de cada tipo de error.
+
+36
+00:01:56,710 --> 00:01:59,730
+Y cómo validar: con datos que imiten ese uso.
+
+37
+00:01:59,850 --> 00:02:02,962
+La métrica representa qué errores importan; la partición
+
+38
+00:02:02,962 --> 00:02:05,740
+representa los casos nuevos que queremos predecir.
+
+39
+00:02:05,860 --> 00:02:08,190
+Ahora, el primer caso de la clase.
+
+40
+00:02:08,310 --> 00:02:10,924
+Queremos predecir la resistencia del hormigón,
+
+41
+00:02:10,924 --> 00:02:13,140
+en megapascales, una unidad de presión.
+
+42
+00:02:13,260 --> 00:02:16,839
+Tenemos 1030 mediciones, con ocho predictores: siete
+
+43
+00:02:16,839 --> 00:02:20,900
+ingredientes, en kilos por metro cúbico, y la edad en días.
+
+44
+00:02:21,020 --> 00:02:24,787
+Los ingredientes son cemento, escoria, ceniza, agua,
+
+45
+00:02:24,787 --> 00:02:28,120
+superplastificante, y agregados grueso y fino.
+
+46
+00:02:28,240 --> 00:02:32,201
+La pregunta que guía todo el caso está en la diapositiva cinco: ¿cuánto nos
+
+47
+00:02:32,201 --> 00:02:35,370
+equivocaremos en una composición que quedó fuera del ajuste?
+
+48
+00:02:35,490 --> 00:02:37,440
+Fíjate en la palabra composición.
+
+49
+00:02:37,560 --> 00:02:40,432
+No basta con predecir una fila cualquiera: queremos
+
+50
+00:02:40,432 --> 00:02:42,740
+predecir mezclas que el modelo no conoce.
+
+51
+00:02:42,860 --> 00:02:45,730
+Esa idea va a decidir cómo partimos los datos.
+
+52
+00:02:45,850 --> 00:02:48,440
+Veamos una predicción real, de la clase.
+
+53
+00:02:48,560 --> 00:02:52,520
+Una mezcla de prueba resistió 61.9 megapascales.
+
+54
+00:02:52,640 --> 00:02:58,790
+El modelo que vamos a terminar eligiendo predijo 59.6: se equivocó por 2.3.
+
+55
+00:02:58,910 --> 00:03:02,220
+Un modelo que siempre dice el promedio del
+
+56
+00:03:02,220 --> 00:03:05,530
+entrenamiento, 35.5, se equivoca por 26.4.
+
+57
+00:03:05,650 --> 00:03:09,220
+Esa comparación con una referencia simple es parte de evaluar.
+
+58
+00:03:09,340 --> 00:03:10,940
+Pero no siempre le va tan bien.
+
+59
+00:03:11,060 --> 00:03:15,145
+Otra mezcla de prueba resistió 42.6, y el mismo
+
+60
+00:03:15,145 --> 00:03:19,230
+modelo predijo 54.0: esta vez se pasó por 11.4.
+
+61
+00:03:19,350 --> 00:03:23,800
+Y en la prueba hay 224 mezclas, cada una con su propio error.
+
+62
+00:03:23,920 --> 00:03:28,800
+¿Cómo resumimos 224 errores en una cifra que sirva para comparar modelos?
+
+63
+00:03:28,920 --> 00:03:31,110
+Esa es la pregunta de la próxima parada.
+
+64
+00:03:31,230 --> 00:03:36,170
+Con eso, el plan de la clase tiene cuatro pasos, que se repiten en los dos casos.
+
+65
+00:03:36,290 --> 00:03:38,280
+Definir la tarea y la métrica.
+
+66
+00:03:38,400 --> 00:03:41,480
+Comparar los candidatos con validación cruzada interna.
+
+67
+00:03:41,600 --> 00:03:43,010
+Elegir y reajustar.
+
+68
+00:03:43,130 --> 00:03:46,770
+Y recién al final, evaluar una sola vez en la prueba reservada.
+
+69
+00:03:46,890 --> 00:03:50,650
+El error típico al empezar: mirar una sola cifra, por ejemplo
+
+70
+00:03:50,650 --> 00:03:53,670
+el porcentaje de aciertos, y declarar un ganador.
+
+71
+00:03:53,790 --> 00:03:57,326
+Recuerda los dos filtros de spam: tenían la misma cifra,
+
+72
+00:03:57,326 --> 00:04:00,230
+y aun así uno bloquea correos que necesitabas.
+
+73
+00:04:00,350 --> 00:04:03,200
+Una sola cifra no responde todas las preguntas.
+
+74
+00:04:03,320 --> 00:04:04,540
+Piensa un segundo.
+
+75
+00:04:04,660 --> 00:04:06,570
+¿Qué tipo de salida es cada una?
+
+76
+00:04:06,690 --> 00:04:10,680
+Primero: «resistencia estimada, 42 megapascales».
+
+77
+00:04:10,800 --> 00:04:14,570
+Segundo: «probabilidad de spam, 0.85».
+
+78
+00:04:14,690 --> 00:04:17,610
+Tercero: «mover el correo a la carpeta de spam».
+
+79
+00:04:18,330 --> 00:04:21,750
+La primera es una cantidad: se compara con el valor real.
+
+80
+00:04:21,870 --> 00:04:25,390
+La segunda es una probabilidad: hay que revisar si se cumple.
+
+81
+00:04:25,510 --> 00:04:28,729
+Y la tercera es una acción: sale de aplicar una regla a la
+
+82
+00:04:28,729 --> 00:04:32,060
+probabilidad, por ejemplo bloquear si pasa de cierto umbral.
+
+83
+00:04:32,180 --> 00:04:34,650
+Tres salidas, tres formas de evaluar.
+
+84
+00:04:34,770 --> 00:04:38,649
+Para llevarte: «mejor modelo» necesita una definición: qué
+
+85
+00:04:38,649 --> 00:04:42,060
+error importa, para qué uso, y en qué datos nuevos.
+
+86
+00:04:42,180 --> 00:04:45,028
+Hay que evaluar la salida que de verdad se va a
+
+87
+00:04:45,028 --> 00:04:47,330
+usar: cantidad, probabilidad o acción.
+
+88
+00:04:47,450 --> 00:04:52,860
+Y el orden es siempre el mismo: definir, comparar, elegir, y evaluar al final.
+
+89
+00:04:52,980 --> 00:04:56,260
+Siguiente parada: cómo medir el error de una cantidad.
+
+90
+00:04:56,380 --> 00:05:03,220
+El MAE, el RMSE y el R cuadrado, y por qué pueden elegir ganadores distintos.
+
+91
+00:05:04,090 --> 00:05:06,681
+Segunda parada: cómo resumir en una cifra los
+
+92
+00:05:06,681 --> 00:05:09,330
+errores de un modelo que predice una cantidad.
+
+93
+00:05:09,450 --> 00:05:13,540
+El MAE, el RMSE y el R cuadrado.
+
+94
+00:05:13,660 --> 00:05:16,010
+Dos modelos predicen cuatro mezclas.
+
+95
+00:05:16,130 --> 00:05:20,970
+El modelo A acierta exacto en tres, y en la cuarta se equivoca por 8 megapascales.
+
+96
+00:05:21,090 --> 00:05:23,590
+El modelo B se equivoca por 3 en las cuatro.
+
+97
+00:05:23,710 --> 00:05:24,580
+¿Cuál es mejor?
+
+98
+00:05:24,700 --> 00:05:28,220
+Vas a ver que con una métrica gana A, y con otra gana B.
+
+99
+00:05:28,340 --> 00:05:30,760
+Piensa en dos buses que tomas cada mañana.
+
+100
+00:05:30,880 --> 00:05:35,140
+El bus A llega puntual tres días, y el cuarto llega 8 minutos tarde.
+
+101
+00:05:35,260 --> 00:05:38,290
+El bus B llega 3 minutos tarde todos los días.
+
+102
+00:05:38,410 --> 00:05:41,650
+Si solo te importa el atraso promedio, prefieres A.
+
+103
+00:05:41,770 --> 00:05:45,112
+Pero si un atraso de 8 minutos te hace perder el tren,
+
+104
+00:05:45,112 --> 00:05:48,020
+prefieres B: los atrasos grandes te duelen más.
+
+105
+00:05:48,140 --> 00:05:51,480
+Para hablar con precisión, la clase usa dos palabras.
+
+106
+00:05:51,600 --> 00:05:54,070
+La pérdida penaliza el error de un caso.
+
+107
+00:05:54,190 --> 00:05:59,400
+Por ejemplo, la pérdida cuadrática: el valor real menos la predicción, al cuadrado.
+
+108
+00:05:59,520 --> 00:06:02,100
+El riesgo es el promedio de esa pérdida en la
+
+109
+00:06:02,100 --> 00:06:04,680
+población que nos interesa: los casos nuevos.
+
+110
+00:06:04,800 --> 00:06:07,585
+Una métrica resume los errores en una muestra; el
+
+111
+00:06:07,585 --> 00:06:10,370
+riesgo describe lo que esperamos en casos nuevos.
+
+112
+00:06:10,490 --> 00:06:14,330
+Las dos métricas de la diapositiva nueve nacen de dos pérdidas.
+
+113
+00:06:14,450 --> 00:06:17,040
+A la izquierda, la pérdida absoluta: cada
+
+114
+00:06:17,040 --> 00:06:19,820
+megapascal adicional de error pesa lo mismo.
+
+115
+00:06:19,940 --> 00:06:24,265
+A la derecha, la pérdida cuadrática: un error de 4 pesa 16,
+
+116
+00:06:24,265 --> 00:06:27,710
+cuatro veces más que un error de 2, que pesa 4.
+
+117
+00:06:27,830 --> 00:06:30,070
+Los errores grandes pesan mucho más.
+
+118
+00:06:30,190 --> 00:06:31,920
+De ahí salen las fórmulas.
+
+119
+00:06:32,040 --> 00:06:36,980
+El MAE, error absoluto medio: el promedio de los errores en valor absoluto.
+
+120
+00:06:37,100 --> 00:06:41,498
+El RMSE, raíz del error cuadrático medio: elevo cada
+
+121
+00:06:41,498 --> 00:06:45,220
+error al cuadrado, promedio, y saco la raíz.
+
+122
+00:06:45,340 --> 00:06:49,600
+La raíz devuelve las unidades: los dos se expresan en megapascales.
+
+123
+00:06:49,720 --> 00:06:51,510
+Volvamos a los dos modelos.
+
+124
+00:06:51,630 --> 00:06:56,540
+MAE de A: cero más cero más cero más ocho, sobre cuatro: 2.
+
+125
+00:06:56,660 --> 00:07:00,460
+MAE de B: tres por cuatro, sobre cuatro: 3.
+
+126
+00:07:00,580 --> 00:07:05,613
+Ahora el RMSE de A: ocho al cuadrado es 64; 64
+
+127
+00:07:05,613 --> 00:07:09,880
+sobre cuatro es 16; la raíz de 16 es 4.
+
+128
+00:07:10,000 --> 00:07:15,060
+Y el de B: nueve por cuatro, sobre cuatro, es nueve; la raíz es 3.
+
+129
+00:07:15,180 --> 00:07:19,750
+Resultado: con el MAE elegimos A, porque 2 es menor que 3.
+
+130
+00:07:19,870 --> 00:07:24,750
+Con el RMSE elegimos B, porque 3 es menor que 4.
+
+131
+00:07:24,870 --> 00:07:27,399
+Por eso la diapositiva dice: el criterio se
+
+132
+00:07:27,399 --> 00:07:29,810
+define antes de consultar los resultados.
+
+133
+00:07:29,930 --> 00:07:32,601
+Si no, siempre podrás encontrar una métrica que
+
+134
+00:07:32,601 --> 00:07:34,760
+favorezca al modelo que ya te gustaba.
+
+135
+00:07:34,880 --> 00:07:37,170
+La tercera métrica es el R cuadrado.
+
+136
+00:07:37,290 --> 00:07:40,789
+Es uno menos un cociente: arriba, la suma de los errores al
+
+137
+00:07:40,789 --> 00:07:44,466
+cuadrado del modelo; abajo, la suma de los errores al cuadrado
+
+138
+00:07:44,466 --> 00:07:47,490
+de predecir siempre la media del conjunto evaluado.
+
+139
+00:07:47,610 --> 00:07:49,710
+Compara el modelo con esa referencia.
+
+140
+00:07:49,830 --> 00:07:54,110
+No tiene unidades, así que no dice cuántos megapascales nos equivocamos.
+
+141
+00:07:54,230 --> 00:07:56,560
+Aquí hay un detalle que conviene precisar.
+
+142
+00:07:56,680 --> 00:07:59,628
+En la grabación, al definir el R cuadrado, se
+
+143
+00:07:59,628 --> 00:08:02,380
+dijo: «es un número que está entre 0 y 1».
+
+144
+00:08:02,500 --> 00:08:05,313
+Eso vale para el ajuste de una regresión lineal con
+
+145
+00:08:05,313 --> 00:08:08,070
+intercepto, en sus propios datos de entrenamiento.
+
+146
+00:08:08,190 --> 00:08:12,380
+Pero en datos de validación o de prueba, el R cuadrado puede ser negativo.
+
+147
+00:08:12,500 --> 00:08:15,000
+Las diapositivas once y doce lo muestran.
+
+148
+00:08:15,120 --> 00:08:18,110
+El ejemplo de la diapositiva doce lo deja clarísimo.
+
+149
+00:08:18,230 --> 00:08:21,010
+Valores reales: uno, dos y tres.
+
+150
+00:08:21,130 --> 00:08:23,830
+Predicciones: once, doce y trece.
+
+151
+00:08:23,950 --> 00:08:27,470
+La correlación es perfecta, 1: el orden se conserva.
+
+152
+00:08:27,590 --> 00:08:33,050
+Pero cada predicción está corrida en diez, así que el RMSE es 10.
+
+153
+00:08:33,170 --> 00:08:38,809
+Y el R cuadrado: arriba, tres errores de diez al cuadrado, 300; abajo,
+
+154
+00:08:38,809 --> 00:08:43,240
+la variación de uno, dos, tres respecto de su media, 2.
+
+155
+00:08:43,360 --> 00:08:47,000
+Uno menos 300 sobre 2: menos 149.
+
+156
+00:08:47,120 --> 00:08:50,110
+Y con los datos reales pasa lo mismo, en pequeño.
+
+157
+00:08:50,230 --> 00:08:53,936
+El modelo que siempre predice la media del entrenamiento
+
+158
+00:08:53,936 --> 00:08:57,510
+tiene, fuera de pliegue, un R cuadrado de menos 0.002.
+
+159
+00:08:57,630 --> 00:09:00,590
+Y en la prueba, menos 0.007.
+
+160
+00:09:00,710 --> 00:09:05,290
+Negativo, porque la media del entrenamiento no es la media del conjunto evaluado.
+
+161
+00:09:05,410 --> 00:09:08,233
+Más adelante en la clase se dijo bien: «al tener un
+
+162
+00:09:08,233 --> 00:09:11,000
+número negativo significa que aquí hay problemas».
+
+163
+00:09:11,120 --> 00:09:13,430
+Entonces, ¿cómo las usa la clase?
+
+164
+00:09:13,550 --> 00:09:16,950
+El RMSE se usa para seleccionar.
+
+165
+00:09:17,070 --> 00:09:20,020
+El MAE y el R cuadrado, para describir.
+
+166
+00:09:20,140 --> 00:09:24,620
+Y la referencia se fija antes de evaluar: predecir la media del entrenamiento.
+
+167
+00:09:24,740 --> 00:09:31,957
+Con datos reales, el modelo elegido tiene, fuera de pliegue, un RMSE de
+
+168
+00:09:31,957 --> 00:09:38,260
+8.229 megapascales, un MAE de 6.234, y un R cuadrado de 0.758.
+
+169
+00:09:38,380 --> 00:09:42,510
+El error típico: elegir la métrica después de mirar los resultados.
+
+170
+00:09:42,630 --> 00:09:45,747
+Primero veo que mi modelo favorito gana en MAE, y
+
+171
+00:09:45,747 --> 00:09:48,610
+entonces decido que el MAE era lo importante.
+
+172
+00:09:48,730 --> 00:09:51,638
+El profesor lo resumió así: el criterio se fija
+
+173
+00:09:51,638 --> 00:09:54,360
+antes, porque si no, «es como hacer trampa».
+
+174
+00:09:54,480 --> 00:09:55,700
+Piensa un segundo.
+
+175
+00:09:55,820 --> 00:10:01,850
+Un modelo comete estos cuatro errores: 4, 0, menos 2 y 2 megapascales.
+
+176
+00:10:01,970 --> 00:10:03,160
+¿Cuál es su MAE?
+
+177
+00:10:03,280 --> 00:10:05,550
+¿Y su RMSE?
+
+178
+00:10:06,270 --> 00:10:11,810
+El MAE: cuatro, más cero, más dos, más dos, sobre cuatro: 2.
+
+179
+00:10:11,930 --> 00:10:17,919
+El RMSE: dieciséis, más cero, más cuatro, más cuatro,
+
+180
+00:10:17,919 --> 00:10:23,230
+son 24; sobre cuatro, 6; y la raíz de 6, 2.449.
+
+181
+00:10:23,350 --> 00:10:28,930
+El RMSE sale más alto que el MAE porque el error de 4 pesa más.
+
+182
+00:10:29,050 --> 00:10:32,250
+Y si todos los errores fueran iguales, coincidirían.
+
+183
+00:10:32,370 --> 00:10:37,689
+Para llevarte: el MAE pesa igual cada megapascal de error; el RMSE pesa
+
+184
+00:10:37,689 --> 00:10:41,960
+más los errores grandes, y los dos están en megapascales.
+
+185
+00:10:42,080 --> 00:10:44,905
+El R cuadrado compara con la media del conjunto
+
+186
+00:10:44,905 --> 00:10:47,910
+evaluado, no tiene unidades, y puede ser negativo.
+
+187
+00:10:48,030 --> 00:10:51,570
+Y la métrica de selección se fija antes de mirar los resultados.
+
+188
+00:10:51,690 --> 00:10:54,390
+Siguiente parada: cómo partir los datos.
+
+189
+00:10:54,510 --> 00:10:58,730
+Por qué en el hormigón no se separan filas, sino composiciones completas.
+
+190
+00:10:59,610 --> 00:11:02,730
+Tercera parada: cómo partir los datos del hormigón.
+
+191
+00:11:02,850 --> 00:11:05,570
+La pregunta clave es qué cuenta como un caso nuevo.
+
+192
+00:11:05,690 --> 00:11:09,720
+Mira esta receta de hormigón, tal como aparece en los datos de la clase.
+
+193
+00:11:09,840 --> 00:11:18,152
+La misma mezcla, con los mismos siete ingredientes, se midió a distintas edades: a un día
+
+194
+00:11:18,152 --> 00:11:24,690
+resistió 12.6 megapascales; a los 28 días, 44.1; a los 270 días, 55.2.
+
+195
+00:11:24,810 --> 00:11:27,720
+Son ocho filas, pero una sola composición.
+
+196
+00:11:27,840 --> 00:11:31,020
+Si una de esas filas cae en el entrenamiento y otra en la
+
+197
+00:11:31,020 --> 00:11:34,200
+validación, ¿el modelo está prediciendo una mezcla nueva?
+
+198
+00:11:34,320 --> 00:11:37,133
+Piensa en un profesor que arma la prueba copiando los
+
+199
+00:11:37,133 --> 00:11:39,840
+ejercicios de la guía, y solo les cambia un número.
+
+200
+00:11:39,960 --> 00:11:43,030
+Un alumno que memorizó la guía saca muy buena nota.
+
+201
+00:11:43,150 --> 00:11:46,870
+Pero esa nota no dice si sabe resolver un ejercicio realmente nuevo.
+
+202
+00:11:46,990 --> 00:11:50,622
+Con el hormigón pasa lo mismo: si la misma receta aparece en el
+
+203
+00:11:50,622 --> 00:11:53,850
+ajuste y en la validación, el error medido es optimista.
+
+204
+00:11:53,970 --> 00:11:55,400
+Por eso la clase agrupa.
+
+205
+00:11:55,520 --> 00:11:58,127
+Dos filas pertenecen al mismo grupo si tienen
+
+206
+00:11:58,127 --> 00:12:00,560
+exactamente los mismos siete ingredientes.
+
+207
+00:12:00,680 --> 00:12:03,160
+La edad y la respuesta no definen el grupo.
+
+208
+00:12:03,280 --> 00:12:06,709
+Y la partición reserva grupos completos: la composición
+
+209
+00:12:06,709 --> 00:12:09,950
+entera, con todas sus edades, queda de un solo lado.
+
+210
+00:12:10,070 --> 00:12:11,110
+¿Importa mucho?
+
+211
+00:12:11,230 --> 00:12:15,370
+En estos datos, 182 composiciones tienen más de una fila.
+
+212
+00:12:15,490 --> 00:12:20,220
+Y esas composiciones reúnen 784 de las 1030 mediciones.
+
+213
+00:12:20,340 --> 00:12:23,536
+Es decir, si partiéramos fila por fila, la mayoría de las
+
+214
+00:12:23,536 --> 00:12:26,620
+mediciones podría quedar con una hermana del otro lado.
+
+215
+00:12:26,740 --> 00:12:29,440
+¿Y por qué la edad no entra en la definición del grupo?
+
+216
+00:12:29,560 --> 00:12:33,063
+Si la edad definiera el grupo, la misma receta a los siete
+
+217
+00:12:33,063 --> 00:12:35,780
+días y a los 28 días serían grupos distintos.
+
+218
+00:12:35,900 --> 00:12:40,350
+Entonces podrían quedar separadas: una en el ajuste y otra en la validación.
+
+219
+00:12:40,470 --> 00:12:42,170
+Justo lo que queríamos evitar.
+
+220
+00:12:42,290 --> 00:12:45,398
+La edad sigue siendo un predictor, uno de los ocho; lo
+
+221
+00:12:45,398 --> 00:12:47,930
+que no hace es decidir qué filas van juntas.
+
+222
+00:12:48,050 --> 00:12:51,000
+La diapositiva trece muestra la partición de la clase.
+
+223
+00:12:51,120 --> 00:12:55,285
+806 mediciones, de 342 composiciones, para ajustar y
+
+224
+00:12:55,285 --> 00:12:59,610
+seleccionar, con validación cruzada en cinco pliegues.
+
+225
+00:12:59,730 --> 00:13:03,272
+Y 224 mediciones, de 86 composiciones, para la
+
+226
+00:13:03,272 --> 00:13:06,890
+prueba reservada, que evalúa la elección final.
+
+227
+00:13:07,010 --> 00:13:10,190
+En total, 428 composiciones.
+
+228
+00:13:10,310 --> 00:13:14,564
+Un detalle fino: se reservó el 20 por ciento de los
+
+229
+00:13:14,564 --> 00:13:17,900
+grupos: 86 de 428 es el 20.1 por ciento.
+
+230
+00:13:18,020 --> 00:13:23,152
+Pero eso no exige el 20 por ciento de las filas: 224 de 1030 es el 21.7 por
+
+231
+00:13:23,152 --> 00:13:27,600
+ciento, porque algunas composiciones tienen más edades que otras.
+
+232
+00:13:27,720 --> 00:13:30,640
+La partición se piensa en grupos, no en filas.
+
+233
+00:13:30,760 --> 00:13:35,700
+Dentro del entrenamiento, los 342 grupos se reparten en cinco pliegues.
+
+234
+00:13:35,820 --> 00:13:43,020
+Cada pliegue tiene 68 o 69 composiciones, y entre 161 y 162 mediciones.
+
+235
+00:13:43,140 --> 00:13:46,986
+El script lo comprueba con una aserción: ningún grupo aparece en dos
+
+236
+00:13:46,986 --> 00:13:50,550
+pliegues, y ninguno está a la vez en entrenamiento y en prueba.
+
+237
+00:13:50,670 --> 00:13:53,180
+Una precisión sobre lo que se dijo en la grabación.
+
+238
+00:13:53,300 --> 00:13:58,406
+Al explicar el agrupamiento, se dijo: «al juntarlos voy a quedar con 342
+
+239
+00:13:58,406 --> 00:14:03,300
+composiciones distintas, que representan 806 mediciones de las 1030».
+
+240
+00:14:03,420 --> 00:14:08,760
+Al juntar las 1030 mediciones, en realidad quedan 428 composiciones.
+
+241
+00:14:08,880 --> 00:14:14,250
+Las 342 son solo las del entrenamiento; las otras 86 están en la prueba.
+
+242
+00:14:14,370 --> 00:14:17,861
+Más adelante, la misma grabación lo dice bien: 428
+
+243
+00:14:17,861 --> 00:14:22,260
+composiciones, y el 20 por ciento de los grupos para la prueba.
+
+244
+00:14:22,380 --> 00:14:24,950
+La prueba reservada cumple un papel especial.
+
+245
+00:14:25,070 --> 00:14:29,410
+El profesor la llamó un oráculo: se consulta una sola vez, al final.
+
+246
+00:14:29,530 --> 00:14:32,780
+Ninguna composición aparece a ambos lados de la partición.
+
+247
+00:14:32,900 --> 00:14:36,241
+Pero ojo con lo que eso no dice: no acredita que el modelo
+
+248
+00:14:36,241 --> 00:14:38,890
+funcione en otra planta o en otro laboratorio.
+
+249
+00:14:39,010 --> 00:14:43,020
+Solo aproxima composiciones excluidas de esta misma base histórica.
+
+250
+00:14:43,140 --> 00:14:46,203
+El error típico: partir fila por fila, al azar,
+
+251
+00:14:46,203 --> 00:14:48,940
+como si cada medición fuera independiente.
+
+252
+00:14:49,060 --> 00:14:52,475
+Entonces la receta que se midió a los siete días queda en el
+
+253
+00:14:52,475 --> 00:14:56,460
+entrenamiento, y la misma receta a los 28 días queda en la validación.
+
+254
+00:14:56,580 --> 00:14:59,764
+El modelo parece predecir mezclas nuevas, pero solo está
+
+255
+00:14:59,764 --> 00:15:02,550
+completando la curva de una mezcla que ya conoce.
+
+256
+00:15:02,670 --> 00:15:03,890
+Piensa un segundo.
+
+257
+00:15:04,010 --> 00:15:07,180
+Tienes 50 composiciones y reservas 10 para la prueba.
+
+258
+00:15:07,300 --> 00:15:12,110
+Esas 10 composiciones suman 60 filas, de un total de 250.
+
+259
+00:15:12,230 --> 00:15:14,610
+¿Qué porcentaje reservaste de los grupos?
+
+260
+00:15:14,730 --> 00:15:15,790
+¿Y de las filas?
+
+261
+00:15:16,510 --> 00:15:20,000
+De los grupos: 10 de 50, el 20 por ciento.
+
+262
+00:15:20,120 --> 00:15:24,580
+De las filas: 60 de 250, el 24 por ciento.
+
+263
+00:15:24,700 --> 00:15:27,861
+No coinciden, y no tienen por qué coincidir: lo que se
+
+264
+00:15:27,861 --> 00:15:31,080
+controla es que cada composición quede de un solo lado.
+
+265
+00:15:31,200 --> 00:15:34,273
+Para llevarte: la unidad que separas define qué es un
+
+266
+00:15:34,273 --> 00:15:36,940
+caso nuevo; en el hormigón, es la composición.
+
+267
+00:15:37,060 --> 00:15:39,625
+Se reservan grupos completos, con todas sus
+
+268
+00:15:39,625 --> 00:15:42,310
+edades, y los pliegues también son por grupo.
+
+269
+00:15:42,430 --> 00:15:45,386
+Y la prueba es un oráculo que se consulta una sola
+
+270
+00:15:45,386 --> 00:15:47,810
+vez, con un alcance limitado a esta base.
+
+271
+00:15:47,930 --> 00:15:51,220
+Siguiente parada: qué se ajusta y qué se selecciona, y los
+
+272
+00:15:51,220 --> 00:15:53,830
+siete modelos candidatos que vamos a comparar.
+
+273
+00:15:54,730 --> 00:15:59,260
+Cuarta parada: la diferencia entre ajustar un modelo y seleccionar entre modelos.
+
+274
+00:15:59,380 --> 00:16:01,790
+Y los siete candidatos que compara la clase.
+
+275
+00:16:01,910 --> 00:16:05,090
+Mira este ejemplo hipotético de la diapositiva catorce.
+
+276
+00:16:05,210 --> 00:16:08,004
+Seis modelos que, en verdad, son igual de
+
+277
+00:16:08,004 --> 00:16:11,070
+buenos: todos tienen un error esperado de 10.
+
+278
+00:16:11,190 --> 00:16:13,796
+Pero en una muestra de validación, cada uno
+
+279
+00:16:13,796 --> 00:16:16,280
+saca un error un poco distinto, por azar.
+
+280
+00:16:16,400 --> 00:16:19,890
+Elegimos el modelo cinco, porque obtuvo 8.7.
+
+281
+00:16:20,010 --> 00:16:23,420
+¿Ese 8.7 es el error que va a tener en casos nuevos?
+
+282
+00:16:23,540 --> 00:16:25,780
+No: esa muestra lo favoreció.
+
+283
+00:16:25,900 --> 00:16:28,090
+Su error esperado sigue siendo 10.
+
+284
+00:16:28,210 --> 00:16:31,470
+Es como seis personas que lanzan una moneda diez veces.
+
+285
+00:16:31,590 --> 00:16:35,180
+Una saca ocho caras y la declaramos «la mejor lanzadora».
+
+286
+00:16:35,300 --> 00:16:38,440
+Pero su moneda es igual a las otras: tuvo suerte.
+
+287
+00:16:38,560 --> 00:16:42,950
+Si la hacemos lanzar de nuevo, lo más probable es que saque alrededor de cinco.
+
+288
+00:16:43,070 --> 00:16:47,080
+Cuando eliges al mejor entre varios, su resultado suele estar inflado.
+
+289
+00:16:47,200 --> 00:16:50,257
+Por eso, para saber cuánto rendirá el elegido, hay que
+
+290
+00:16:50,257 --> 00:16:53,200
+medirlo en datos que no participaron en la elección.
+
+291
+00:16:53,320 --> 00:16:56,240
+La diapositiva quince separa dos actividades.
+
+292
+00:16:56,360 --> 00:17:00,211
+Ajustar, dentro de un candidato: estimar coeficientes,
+
+293
+00:17:00,211 --> 00:17:03,920
+medias y escalas, usando solo las filas autorizadas.
+
+294
+00:17:04,040 --> 00:17:07,268
+Seleccionar, entre candidatos: elegir variables,
+
+295
+00:17:07,268 --> 00:17:10,900
+transformaciones o la penalización, usando el error de
+
+296
+00:17:10,900 --> 00:17:11,640
+validación.
+
+297
+00:17:11,760 --> 00:17:15,280
+Se elige el candidato con el menor error de validación cruzada.
+
+298
+00:17:15,400 --> 00:17:20,220
+Y aquí aparece una idea central de la clase: cada candidato es una receta completa.
+
+299
+00:17:20,340 --> 00:17:23,754
+No es solo «una regresión»: es la regresión con su forma
+
+300
+00:17:23,754 --> 00:17:26,680
+de estandarizar, sus términos y su penalización.
+
+301
+00:17:26,800 --> 00:17:31,180
+En la grabación se dijo así: cada candidato «es una receta completa».
+
+302
+00:17:31,300 --> 00:17:35,500
+Validar un candidato exige ajustar la receta entera de nuevo en cada pliegue.
+
+303
+00:17:35,620 --> 00:17:38,040
+Una corrección importante sobre la grabación.
+
+304
+00:17:38,160 --> 00:17:42,071
+Al explicar el ajuste, se dijo: «el ajuste dentro de los distintos
+
+305
+00:17:42,071 --> 00:17:45,390
+candidatos, voy a realizarlo con el conjunto de prueba».
+
+306
+00:17:45,510 --> 00:17:48,113
+Es al revés: el ajuste se hace con las filas de
+
+307
+00:17:48,113 --> 00:17:50,440
+entrenamiento autorizadas en cada pliegue.
+
+308
+00:17:50,560 --> 00:17:54,500
+La diapositiva quince dice «usando las filas autorizadas».
+
+309
+00:17:54,620 --> 00:17:57,830
+Y el código ajusta con las filas que no son de validación.
+
+310
+00:17:57,950 --> 00:18:02,980
+La prueba no se toca hasta el final; si se usara para ajustar, habría fuga de datos.
+
+311
+00:18:03,100 --> 00:18:06,330
+Ahora, los candidatos de la diapositiva dieciséis.
+
+312
+00:18:06,450 --> 00:18:10,500
+Primero, el modelo constante: siempre predice la media
+
+313
+00:18:10,500 --> 00:18:13,800
+del entrenamiento, que es 35.5 megapascales.
+
+314
+00:18:13,920 --> 00:18:17,340
+Segundo, la regresión lineal múltiple: un intercepto y un
+
+315
+00:18:17,340 --> 00:18:20,280
+coeficiente por cada uno de los ocho predictores.
+
+316
+00:18:20,400 --> 00:18:23,810
+Tercero, la regresión cuadrática con penalización ridge.
+
+317
+00:18:23,930 --> 00:18:26,030
+¿Cuántos términos tiene la cuadrática?
+
+318
+00:18:26,150 --> 00:18:28,840
+Ocho términos lineales, uno por predictor.
+
+319
+00:18:28,960 --> 00:18:31,480
+Ocho cuadrados, como cemento al cuadrado.
+
+320
+00:18:31,600 --> 00:18:35,019
+Y las interacciones entre pares, como cemento por
+
+321
+00:18:35,019 --> 00:18:37,810
+agua: ocho por siete, sobre dos, son 28.
+
+322
+00:18:37,930 --> 00:18:42,640
+En total: ocho más ocho más 28, igual a 44 términos.
+
+323
+00:18:42,760 --> 00:18:46,450
+Con 44 términos, el ajuste puede volverse inestable.
+
+324
+00:18:46,570 --> 00:18:49,500
+Para eso está ridge, en la diapositiva diecisiete.
+
+325
+00:18:49,620 --> 00:18:52,516
+Minimiza la suma de los errores al cuadrado, más alfa
+
+326
+00:18:52,516 --> 00:18:54,920
+por la suma de los coeficientes al cuadrado.
+
+327
+00:18:55,040 --> 00:18:57,828
+Un alfa pequeño permite coeficientes grandes; un
+
+328
+00:18:57,828 --> 00:19:00,210
+alfa grande los restringe con más fuerza.
+
+329
+00:19:00,330 --> 00:19:03,270
+El intercepto no se penaliza, y la escala de los
+
+330
+00:19:03,270 --> 00:19:06,210
+términos importa: por eso se estandarizan antes.
+
+331
+00:19:06,330 --> 00:19:10,310
+Un ejemplo pequeño, con un solo coeficiente, para ver el efecto.
+
+332
+00:19:10,430 --> 00:19:13,578
+Sin penalización, el coeficiente es la suma de x
+
+333
+00:19:13,578 --> 00:19:16,070
+por y, sobre la suma de x al cuadrado.
+
+334
+00:19:16,190 --> 00:19:18,970
+Si esas sumas son 20 y 10, da 2.
+
+335
+00:19:19,090 --> 00:19:25,330
+Con ridge, alfa se suma abajo: con alfa igual a 10, queda 20 sobre 20, igual a 1.
+
+336
+00:19:25,450 --> 00:19:30,910
+Y con alfa igual a mil, 20 sobre 1010: casi cero, 0.02.
+
+337
+00:19:31,030 --> 00:19:33,160
+Alfa empuja el coeficiente hacia cero.
+
+338
+00:19:33,280 --> 00:19:36,500
+En resumen, la clase compara siete candidatos.
+
+339
+00:19:36,620 --> 00:19:40,595
+Uno constante, uno lineal, y cinco cuadráticos con
+
+340
+00:19:40,595 --> 00:19:44,570
+ridge: alfa igual a 0.1, a 1, a 10, a 100 y a mil.
+
+341
+00:19:44,690 --> 00:19:48,710
+Con cinco pliegues, son 35 ajustes de validación cruzada.
+
+342
+00:19:48,830 --> 00:19:51,981
+En el código, la receta cuadrática es una tubería:
+
+343
+00:19:51,981 --> 00:19:55,762
+estandarizar, crear los términos de grado dos con Polynomial
+
+344
+00:19:55,762 --> 00:19:59,480
+Features, estandarizar otra vez, y ajustar el modelo ridge.
+
+345
+00:19:59,600 --> 00:20:02,574
+El error típico: reportar el error de validación del
+
+346
+00:20:02,574 --> 00:20:05,090
+ganador como si fuera su desempeño esperado.
+
+347
+00:20:05,210 --> 00:20:09,868
+Es el 8.7 de la diapositiva catorce: el número que usamos para elegir tiende a
+
+348
+00:20:09,868 --> 00:20:13,750
+ser optimista, justamente porque lo elegimos por ser el más bajo.
+
+349
+00:20:13,870 --> 00:20:18,090
+Por eso existe la prueba reservada: un dato que no participó en la elección.
+
+350
+00:20:18,210 --> 00:20:19,430
+Piensa un segundo.
+
+351
+00:20:19,550 --> 00:20:24,410
+Si tuvieras solo cuatro predictores, en vez de ocho, ¿cuántos términos tendría el
+
+352
+00:20:24,410 --> 00:20:28,490
+modelo cuadrático completo, con lineales, cuadrados e interacciones?
+
+353
+00:20:29,210 --> 00:20:34,970
+Cuatro lineales, cuatro cuadrados, y cuatro por tres, sobre dos, seis interacciones.
+
+354
+00:20:35,090 --> 00:20:37,250
+En total, 14 términos.
+
+355
+00:20:37,370 --> 00:20:40,625
+Con ocho predictores eran 44: el número de términos
+
+356
+00:20:40,625 --> 00:20:43,560
+crece rápido, y por eso la penalización ayuda.
+
+357
+00:20:43,680 --> 00:20:47,843
+Para llevarte: ajustar es estimar dentro de un candidato, con las filas
+
+358
+00:20:47,843 --> 00:20:52,240
+autorizadas; seleccionar es comparar candidatos con el error de validación.
+
+359
+00:20:52,360 --> 00:20:56,970
+Cada candidato es una receta completa, que se reajusta entera en cada pliegue.
+
+360
+00:20:57,090 --> 00:20:59,425
+Y el error del ganador en validación es
+
+361
+00:20:59,425 --> 00:21:02,120
+optimista: su desempeño se mide en la prueba.
+
+362
+00:21:02,240 --> 00:21:05,219
+Siguiente parada: el sobreajuste, y las tres
+
+363
+00:21:05,219 --> 00:21:08,130
+fuentes del error: sesgo, varianza y ruido.
+
+364
+00:21:09,010 --> 00:21:12,433
+Quinta parada: el sobreajuste, y las tres fuentes del
+
+365
+00:21:12,433 --> 00:21:15,340
+error de predicción: sesgo, varianza y ruido.
+
+366
+00:21:15,460 --> 00:21:18,390
+Mira dos curvas ajustadas a los mismos puntos.
+
+367
+00:21:18,510 --> 00:21:21,810
+Una es un polinomio de grado dos: una curva suave.
+
+368
+00:21:21,930 --> 00:21:26,250
+La otra es de grado doce: se dobla para pasar cerca de cada punto.
+
+369
+00:21:26,370 --> 00:21:30,070
+En los datos conocidos, la de grado doce se equivoca menos.
+
+370
+00:21:30,190 --> 00:21:31,010
+¿Es la mejor?
+
+371
+00:21:31,130 --> 00:21:33,240
+Veamos qué pasa con datos nuevos.
+
+372
+00:21:33,360 --> 00:21:36,360
+Las cifras de la diapositiva dieciocho lo dicen todo.
+
+373
+00:21:36,480 --> 00:21:42,730
+Grado dos: error de ajuste 0.67, error en datos nuevos 0.64.
+
+374
+00:21:42,850 --> 00:21:50,970
+Grado doce: error de ajuste 0.58, más bajo; pero en datos nuevos, 0.73, más alto.
+
+375
+00:21:51,090 --> 00:21:55,190
+El grado doce ajusta mejor lo conocido, y predice peor lo nuevo.
+
+376
+00:21:55,310 --> 00:21:56,660
+Eso es sobreajuste.
+
+377
+00:21:56,780 --> 00:21:59,886
+Piensa en un sastre que te hace un traje a la medida, pero
+
+378
+00:21:59,886 --> 00:22:02,670
+copia cada arruga de la camisa que llevabas ese día.
+
+379
+00:22:02,790 --> 00:22:05,380
+Ese día, el traje calza perfecto.
+
+380
+00:22:05,500 --> 00:22:08,650
+Al día siguiente, con otra camisa, ya no calza.
+
+381
+00:22:08,770 --> 00:22:12,998
+El profesor lo definió con una frase muy buena: en el sobreajuste, «no estoy
+
+382
+00:22:12,998 --> 00:22:16,280
+modelando el fenómeno, sino que estoy modelando mis datos».
+
+383
+00:22:16,400 --> 00:22:18,720
+¿De dónde sale el error de una predicción?
+
+384
+00:22:18,840 --> 00:22:22,190
+La diapositiva diecinueve lo descompone en tres partes.
+
+385
+00:22:22,310 --> 00:22:25,145
+El error cuadrático esperado es igual al sesgo al
+
+386
+00:22:25,145 --> 00:22:27,460
+cuadrado, más la varianza, más el ruido.
+
+387
+00:22:27,580 --> 00:22:31,410
+El sesgo es la distancia entre la señal verdadera y el ajuste promedio.
+
+388
+00:22:31,530 --> 00:22:34,950
+La varianza, cuánto cambia el ajuste al cambiar la muestra.
+
+389
+00:22:35,070 --> 00:22:38,568
+Y el ruido es la variación de la respuesta que existe incluso si
+
+390
+00:22:38,568 --> 00:22:41,300
+fijamos los predictores: ningún modelo lo elimina.
+
+391
+00:22:41,420 --> 00:22:44,480
+Una imagen ayuda: tirar dardos a una diana.
+
+392
+00:22:44,600 --> 00:22:48,700
+Sesgo alto: los dardos quedan juntos, pero lejos del centro.
+
+393
+00:22:48,820 --> 00:22:51,010
+Siempre te equivocas hacia el mismo lado.
+
+394
+00:22:51,130 --> 00:22:56,410
+Varianza alta: en promedio apuntas al centro, pero los dardos quedan desparramados.
+
+395
+00:22:56,530 --> 00:22:58,240
+Cada intento sale distinto.
+
+396
+00:22:58,360 --> 00:23:01,295
+El modelo de grado dos se parece al primero si es
+
+397
+00:23:01,295 --> 00:23:04,110
+demasiado simple; el de grado doce, al segundo.
+
+398
+00:23:04,230 --> 00:23:06,560
+Hagamos la cuenta con números inventados.
+
+399
+00:23:06,680 --> 00:23:10,286
+En un punto, la señal verdadera vale 10, y el ajuste
+
+400
+00:23:10,286 --> 00:23:13,130
+promedio, sobre muchas muestras, vale 12.
+
+401
+00:23:13,250 --> 00:23:16,130
+El sesgo es 2, y al cuadrado, 4.
+
+402
+00:23:16,250 --> 00:23:19,990
+Las predicciones varían alrededor de 12 con una varianza de 1.
+
+403
+00:23:20,110 --> 00:23:22,980
+Y el ruido tiene varianza 0.25.
+
+404
+00:23:23,100 --> 00:23:29,400
+El error cuadrático esperado es cuatro, más uno, más 0.25: 5.25.
+
+405
+00:23:29,520 --> 00:23:30,820
+¿Y qué se hace con esto?
+
+406
+00:23:30,940 --> 00:23:35,270
+Aumentar la flexibilidad suele reducir el sesgo, pero aumenta la varianza.
+
+407
+00:23:35,390 --> 00:23:40,854
+En la regresión ridge, la flexibilidad la controla alfa: un alfa grande restringe, más
+
+408
+00:23:40,854 --> 00:23:45,620
+sesgo y menos varianza; un alfa pequeño libera, menos sesgo y más varianza.
+
+409
+00:23:45,740 --> 00:23:48,250
+No sabemos de antemano dónde está el equilibrio.
+
+410
+00:23:48,370 --> 00:23:52,990
+Por eso la diapositiva dice: la validación permite comparar el efecto conjunto.
+
+411
+00:23:53,110 --> 00:23:55,520
+Con los datos reales del hormigón se ve claro.
+
+412
+00:23:55,640 --> 00:23:59,026
+La regresión lineal es demasiado simple: su error
+
+413
+00:23:59,026 --> 00:24:01,790
+fuera de pliegue es 10.560 megapascales.
+
+414
+00:24:01,910 --> 00:24:07,350
+La cuadrática con alfa igual a mil está demasiado restringida: 13.051.
+
+415
+00:24:07,470 --> 00:24:12,940
+Y la cuadrática con alfa igual a 0.1 logra el menor error: 8.229.
+
+416
+00:24:13,060 --> 00:24:14,920
+Ni muy rígida, ni sin freno.
+
+417
+00:24:15,040 --> 00:24:17,430
+Un detalle que adelanta la próxima parada.
+
+418
+00:24:17,550 --> 00:24:21,301
+Para la cuadrática con alfa igual a 0.1, el error en
+
+419
+00:24:21,301 --> 00:24:24,620
+las mismas filas usadas para estimar es 6.958.
+
+420
+00:24:24,740 --> 00:24:27,560
+Y fuera de pliegue, 8.229.
+
+421
+00:24:27,680 --> 00:24:32,160
+La diferencia es optimismo: el modelo siempre se ve mejor en los datos que ya vio.
+
+422
+00:24:32,280 --> 00:24:34,880
+El error de ajuste nunca sirve para elegir.
+
+423
+00:24:35,000 --> 00:24:39,670
+El error típico: elegir el modelo con el menor error en los datos de entrenamiento.
+
+424
+00:24:39,790 --> 00:24:44,556
+Con ese criterio, siempre gana el más flexible: el grado
+
+425
+00:24:44,556 --> 00:24:48,300
+doce le gana al grado dos, 0.58 contra 0.67.
+
+426
+00:24:48,420 --> 00:24:51,530
+Y es justamente el que peor predice casos nuevos.
+
+427
+00:24:51,650 --> 00:24:52,870
+Piensa un segundo.
+
+428
+00:24:52,990 --> 00:24:58,190
+El modelo A tiene sesgo al cuadrado igual a 1, varianza 3 y ruido 0.5.
+
+429
+00:24:58,310 --> 00:25:04,310
+El modelo B tiene sesgo al cuadrado 2.5, varianza 0.5 y ruido 0.5.
+
+430
+00:25:04,430 --> 00:25:06,430
+¿Cuál tiene el menor error esperado?
+
+431
+00:25:07,150 --> 00:25:11,620
+A: uno, más tres, más 0.5: 4.5.
+
+432
+00:25:11,740 --> 00:25:17,550
+B: 2.5, más 0.5, más 0.5: 3.5.
+
+433
+00:25:17,670 --> 00:25:21,750
+Gana B, aunque tenga más sesgo: su varianza es mucho menor.
+
+434
+00:25:21,870 --> 00:25:26,270
+Y fíjate que el ruido es el mismo para los dos, porque no depende del modelo.
+
+435
+00:25:26,390 --> 00:25:29,269
+Para llevarte: ajustar mejor lo conocido no es
+
+436
+00:25:29,269 --> 00:25:32,210
+predecir mejor lo nuevo; eso es el sobreajuste.
+
+437
+00:25:32,330 --> 00:25:36,322
+El error esperado es sesgo al cuadrado, más varianza, más ruido;
+
+438
+00:25:36,322 --> 00:25:39,440
+más flexibilidad baja el sesgo y sube la varianza.
+
+439
+00:25:39,560 --> 00:25:42,074
+Y el equilibrio no se adivina: se busca con
+
+440
+00:25:42,074 --> 00:25:44,880
+validación, nunca con el error de entrenamiento.
+
+441
+00:25:45,000 --> 00:25:48,100
+Siguiente parada: la validación cruzada por dentro.
+
+442
+00:25:48,220 --> 00:25:52,940
+Las predicciones fuera de pliegue, y por qué la receta se reaprende en cada ajuste.
+
+443
+00:25:53,810 --> 00:25:56,910
+Sexta parada: la validación cruzada por dentro.
+
+444
+00:25:57,030 --> 00:26:00,970
+Cómo cada medición recibe una predicción hecha por un modelo que nunca la vio.
+
+445
+00:26:01,090 --> 00:26:04,250
+Esta es la idea más importante de la validación de la clase.
+
+446
+00:26:04,370 --> 00:26:09,530
+Cada una de las 806 mediciones del entrenamiento recibe exactamente una predicción.
+
+447
+00:26:09,650 --> 00:26:12,694
+Y esa predicción la hace un modelo que nunca vio esa
+
+448
+00:26:12,694 --> 00:26:15,620
+medición, ni ninguna otra de su misma composición.
+
+449
+00:26:15,740 --> 00:26:19,518
+A esas predicciones se les llama fuera de pliegue: en
+
+450
+00:26:19,518 --> 00:26:22,440
+inglés, out of fold, o con su sigla, OOF.
+
+451
+00:26:22,560 --> 00:26:26,510
+Piensa en un examen oral por turnos, con cinco grupos de alumnos.
+
+452
+00:26:26,630 --> 00:26:29,138
+En cada ronda, cuatro grupos preparan el
+
+453
+00:26:29,138 --> 00:26:31,960
+material juntos, y el quinto rinde el examen.
+
+454
+00:26:32,080 --> 00:26:36,270
+Después de cinco rondas, cada alumno rindió exactamente una vez.
+
+455
+00:26:36,390 --> 00:26:38,895
+Y siempre lo evaluaron con lo que prepararon los
+
+456
+00:26:38,895 --> 00:26:40,930
+otros cuatro grupos, nunca con lo suyo.
+
+457
+00:26:41,050 --> 00:26:43,050
+En la validación cruzada es igual.
+
+458
+00:26:43,170 --> 00:26:48,280
+Ronda uno: se ajusta con los pliegues dos a cinco, y se predice el pliegue uno.
+
+459
+00:26:48,400 --> 00:26:53,050
+Ronda dos: se ajusta sin el pliegue dos, y se predice el pliegue dos.
+
+460
+00:26:53,170 --> 00:26:54,860
+Y así hasta la ronda cinco.
+
+461
+00:26:54,980 --> 00:26:58,440
+Al final, cada candidato tiene 806 predicciones,
+
+462
+00:26:58,440 --> 00:27:01,180
+obtenidas con cinco ajustes distintos.
+
+463
+00:27:01,300 --> 00:27:03,990
+La diapositiva veinte lo escribe con símbolos.
+
+464
+00:27:04,110 --> 00:27:07,889
+La predicción fuera de pliegue de la fila i usa el modelo ajustado sin
+
+465
+00:27:07,889 --> 00:27:11,020
+el pliegue de esa fila, que aquí deja fuera todo su grupo.
+
+466
+00:27:11,140 --> 00:27:15,784
+Y el RMSE fuera de pliegue reúne todo: sumo los 806
+
+467
+00:27:15,784 --> 00:27:20,520
+errores al cuadrado, divido por 806, y saco la raíz.
+
+468
+00:27:20,640 --> 00:27:22,260
+Cada medición pesa igual.
+
+469
+00:27:22,380 --> 00:27:25,821
+Los grupos controlan la separación, pero no dan el mismo
+
+470
+00:27:25,821 --> 00:27:28,770
+peso a cada grupo: son dos decisiones distintas.
+
+471
+00:27:28,890 --> 00:27:31,990
+Ahora, una sutileza de la diapositiva veintiuno.
+
+472
+00:27:32,110 --> 00:27:35,393
+Dos pliegues del mismo tamaño: en el primero, el
+
+473
+00:27:35,393 --> 00:27:38,540
+error cuadrático medio es 1; en el segundo, 9.
+
+474
+00:27:38,660 --> 00:27:43,300
+Opción uno, promediar los RMSE: la raíz de 1 es
+
+475
+00:27:43,300 --> 00:27:47,150
+1, la raíz de 9 es 3; el promedio es 2.
+
+476
+00:27:47,270 --> 00:27:53,432
+Opción dos, el RMSE fuera de pliegue: primero juntamos los errores, uno
+
+477
+00:27:53,432 --> 00:27:58,640
+más nueve, sobre dos, es cinco; y la raíz de cinco es 2.236.
+
+478
+00:27:58,760 --> 00:28:00,260
+¿Por qué salen distintos?
+
+479
+00:28:00,380 --> 00:28:04,750
+Porque la raíz no es lineal: el orden de las operaciones cambia el resultado.
+
+480
+00:28:04,870 --> 00:28:09,841
+El promedio de RMSE le da el mismo peso a cada pliegue; el RMSE
+
+481
+00:28:09,841 --> 00:28:14,260
+fuera de pliegue le da el mismo peso a cada observación.
+
+482
+00:28:14,380 --> 00:28:17,630
+Los dos son válidos, pero no son intercambiables.
+
+483
+00:28:17,750 --> 00:28:21,900
+La clase selecciona con el RMSE fuera de pliegue.
+
+484
+00:28:22,020 --> 00:28:25,530
+Con los datos reales, la diferencia es chica, pero existe.
+
+485
+00:28:25,650 --> 00:28:33,698
+Para la cuadrática con alfa igual a 0.1, los cinco RMSE por
+
+486
+00:28:33,698 --> 00:28:40,110
+pliegue son 7.110, 7.670, 8.806, 9.320 y 8.058.
+
+487
+00:28:40,230 --> 00:28:42,930
+Su promedio es 8.193.
+
+488
+00:28:43,050 --> 00:28:50,060
+Y el RMSE fuera de pliegue, que junta los 806 errores, es 8.229.
+
+489
+00:28:50,180 --> 00:28:53,240
+Por eso conviene decir siempre cuál de los dos se reporta.
+
+490
+00:28:53,360 --> 00:28:56,268
+Segunda clave, en la diapositiva veintidós: la
+
+491
+00:28:56,268 --> 00:28:59,050
+receta completa se reaprende en cada ajuste.
+
+492
+00:28:59,170 --> 00:29:02,994
+Con las filas de ajuste del pliegue, se estiman la transformación y el
+
+493
+00:29:02,994 --> 00:29:06,490
+modelo: por ejemplo, las medias y las escalas para estandarizar.
+
+494
+00:29:06,610 --> 00:29:08,510
+Esos parámetros quedan fijos.
+
+495
+00:29:08,630 --> 00:29:11,433
+Y a las filas de validación solo se les aplica la
+
+496
+00:29:11,433 --> 00:29:14,980
+transformación ya estimada, se predice, y se calcula el error.
+
+497
+00:29:15,100 --> 00:29:18,380
+La validación no recalcula escalas con sus propias filas.
+
+498
+00:29:18,500 --> 00:29:22,600
+Si no se hace así, aparece la fuga de datos, o data leakage.
+
+499
+00:29:22,720 --> 00:29:28,300
+Un ejemplo mínimo: las filas de ajuste valen 10, 20 y 30, y su media es 20.
+
+500
+00:29:28,420 --> 00:29:31,158
+Si estandarizo usando también la fila de
+
+501
+00:29:31,158 --> 00:29:34,170
+validación, que vale 60, la media pasa a 30.
+
+502
+00:29:34,290 --> 00:29:36,956
+Esa fila ya influyó en la receta antes de ser
+
+503
+00:29:36,956 --> 00:29:39,800
+evaluada: el error de validación sale optimista.
+
+504
+00:29:39,920 --> 00:29:42,860
+El profesor lo llamó, otra vez, hacer trampa.
+
+505
+00:29:42,980 --> 00:29:45,740
+En el código de la sección tres se ve todo esto.
+
+506
+00:29:45,860 --> 00:29:50,210
+Para cada pliegue k, del uno al cinco, se marca qué filas se validan.
+
+507
+00:29:50,330 --> 00:29:53,040
+Se clona el modelo, para partir de cero, y se
+
+508
+00:29:53,040 --> 00:29:55,690
+ajusta solo con las filas que no se validan.
+
+509
+00:29:55,810 --> 00:29:59,263
+Se predicen las filas del pliegue, y al final se
+
+510
+00:29:59,263 --> 00:30:02,860
+calcula el RMSE con todas las predicciones juntas.
+
+511
+00:30:02,980 --> 00:30:05,612
+El script incluso comprueba que la media usada para
+
+512
+00:30:05,612 --> 00:30:07,780
+estandarizar es la de las filas de ajuste.
+
+513
+00:30:07,900 --> 00:30:10,959
+Con todo esto, el protocolo queda fijado antes de
+
+514
+00:30:10,959 --> 00:30:13,830
+comparar, como dice la diapositiva veintitrés.
+
+515
+00:30:13,950 --> 00:30:19,770
+Siete candidatos, cinco pliegues por composición: 35 ajustes de validación cruzada.
+
+516
+00:30:19,890 --> 00:30:23,472
+Se elige el menor RMSE fuera de pliegue; un empate
+
+517
+00:30:23,472 --> 00:30:26,480
+exacto se resuelve por el orden declarado.
+
+518
+00:30:26,600 --> 00:30:31,360
+El MAE y el R cuadrado describen, pero no reemplazan el criterio después.
+
+519
+00:30:31,480 --> 00:30:35,900
+Y la prueba reservada, con su referencia, queda definida desde el inicio.
+
+520
+00:30:36,020 --> 00:30:39,042
+El error típico: estandarizar todos los datos de
+
+521
+00:30:39,042 --> 00:30:41,560
+una vez, antes de la validación cruzada.
+
+522
+00:30:41,680 --> 00:30:44,526
+Parece inofensivo, pero las medias y las escalas ya
+
+523
+00:30:44,526 --> 00:30:46,870
+incluyen las filas que después se validan.
+
+524
+00:30:46,990 --> 00:30:49,847
+La solución es poner la estandarización dentro de la
+
+525
+00:30:49,847 --> 00:30:52,430
+tubería, para que se reaprenda en cada pliegue.
+
+526
+00:30:52,550 --> 00:30:53,770
+Piensa un segundo.
+
+527
+00:30:53,890 --> 00:30:59,380
+Tres pliegues del mismo tamaño tienen errores cuadráticos medios de 4, 16 y 25.
+
+528
+00:30:59,500 --> 00:31:02,680
+¿Cuánto vale el promedio de los RMSE?
+
+529
+00:31:02,800 --> 00:31:05,790
+¿Y el RMSE fuera de pliegue?
+
+530
+00:31:06,510 --> 00:31:14,370
+Los RMSE por pliegue son 2, 4 y 5; su promedio es once tercios, 3.667.
+
+531
+00:31:14,490 --> 00:31:20,439
+El RMSE fuera de pliegue junta primero: cuatro más dieciséis más
+
+532
+00:31:20,439 --> 00:31:26,110
+veinticinco son 45; sobre tres, 15; y la raíz de 15 es 3.873.
+
+533
+00:31:26,230 --> 00:31:30,301
+Otra vez, el RMSE fuera de pliegue sale mayor, porque el
+
+534
+00:31:30,301 --> 00:31:33,790
+pliegue con más error pesa más antes de la raíz.
+
+535
+00:31:33,910 --> 00:31:37,119
+Para llevarte: cada fila recibe una predicción fuera de
+
+536
+00:31:37,119 --> 00:31:39,920
+pliegue, de un modelo que no vio su composición.
+
+537
+00:31:40,040 --> 00:31:44,535
+El RMSE fuera de pliegue pesa igual cada observación, y
+
+538
+00:31:44,535 --> 00:31:48,050
+no es lo mismo que el promedio de los RMSE.
+
+539
+00:31:48,170 --> 00:31:52,007
+Y la receta completa, con su estandarización, se reaprende
+
+540
+00:31:52,007 --> 00:31:55,050
+en cada ajuste: así se evita la fuga de datos.
+
+541
+00:31:55,170 --> 00:31:59,050
+Siguiente parada: leer el ranking de los siete candidatos, la curva
+
+542
+00:31:59,050 --> 00:32:02,120
+de validación, y las diferencias pliegue por pliegue.
+
+543
+00:32:03,010 --> 00:32:07,050
+Séptima parada: los resultados de la validación cruzada del hormigón.
+
+544
+00:32:07,170 --> 00:32:10,030
+Cómo leer el ranking sin creerle más de lo que dice.
+
+545
+00:32:10,150 --> 00:32:15,360
+La validación cruzada ya tiene un ganador: la cuadrática con alfa igual a 0.1.
+
+546
+00:32:15,480 --> 00:32:20,850
+Su RMSE fuera de pliegue es 8.229 megapascales.
+
+547
+00:32:20,970 --> 00:32:25,390
+El segundo lugar, alfa igual a 1, tiene 8.308.
+
+548
+00:32:25,510 --> 00:32:28,940
+La diferencia es 0.079 megapascales.
+
+549
+00:32:29,060 --> 00:32:31,630
+¿Eso prueba que alfa 0.1 es mejor?
+
+550
+00:32:31,750 --> 00:32:33,690
+Esa es la pregunta de esta parada.
+
+551
+00:32:33,810 --> 00:32:37,270
+Piensa en una carrera de cien metros que se define por foto final.
+
+552
+00:32:37,390 --> 00:32:41,330
+Un corredor gana por una centésima de segundo, y se lleva la medalla.
+
+553
+00:32:41,450 --> 00:32:45,160
+La regla de la carrera es clara: el primero que cruza, gana.
+
+554
+00:32:45,280 --> 00:32:48,830
+Pero nadie diría que es claramente más rápido: otro día,
+
+555
+00:32:48,830 --> 00:32:51,620
+con otro viento, el orden podría invertirse.
+
+556
+00:32:51,740 --> 00:32:54,330
+Elegir no es lo mismo que probar superioridad.
+
+557
+00:32:54,450 --> 00:32:57,588
+Este es el ranking completo, como en la diapositiva
+
+558
+00:32:57,588 --> 00:33:00,110
+veintiséis, con los números recalculados.
+
+559
+00:33:00,230 --> 00:33:05,840
+Arriba, las cuadráticas con alfa 0.1, alfa 1, alfa 10 y alfa 100.
+
+560
+00:33:05,960 --> 00:33:12,934
+Después, la regresión lineal, con 10.560; la cuadrática con alfa igual a mil,
+
+561
+00:33:12,934 --> 00:33:18,550
+con 13.051; y al final, la media de entrenamiento, con 16.746.
+
+562
+00:33:18,670 --> 00:33:21,777
+A la derecha, en gris, el MAE fuera de pliegue:
+
+563
+00:33:21,777 --> 00:33:24,950
+ordena a los siete candidatos exactamente igual.
+
+564
+00:33:25,070 --> 00:33:26,020
+¿Cómo se lee?
+
+565
+00:33:26,140 --> 00:33:32,560
+El menor RMSE fuera de pliegue elige al candidato: gana alfa igual a 0.1.
+
+566
+00:33:32,680 --> 00:33:38,794
+La media de entrenamiento muestra cuánto aportan los predictores: pasar de 16.746 a
+
+567
+00:33:38,794 --> 00:33:43,950
+8.229 es bajar el error a menos de la mitad, un 50.9 por ciento menos.
+
+568
+00:33:44,070 --> 00:33:49,580
+Pero la ventaja del ganador sobre alfa igual a 1 es solo 0.079 megapascales.
+
+569
+00:33:49,700 --> 00:33:53,830
+La diapositiva lo dice claro: elegir no prueba superioridad estable.
+
+570
+00:33:53,950 --> 00:33:58,540
+La diapositiva veintisiete dibuja la curva de validación de las cinco cuadráticas.
+
+571
+00:33:58,660 --> 00:34:01,069
+En el eje horizontal, alfa, en escala
+
+572
+00:34:01,069 --> 00:34:04,130
+logarítmica: más penalización hacia la derecha.
+
+573
+00:34:04,250 --> 00:34:08,780
+En verde, el error de ajuste: el de las mismas filas usadas para estimar.
+
+574
+00:34:08,900 --> 00:34:11,350
+En naranja, el error fuera de pliegue.
+
+575
+00:34:11,470 --> 00:34:14,393
+La naranja siempre queda arriba: esa brecha describe
+
+576
+00:34:14,393 --> 00:34:16,810
+el optimismo de medir dentro de la muestra.
+
+577
+00:34:16,930 --> 00:34:18,490
+Tres valores para leerla.
+
+578
+00:34:18,610 --> 00:34:25,280
+Con alfa igual a 0.1: ajuste 6.958, fuera de pliegue 8.229.
+
+579
+00:34:25,400 --> 00:34:30,200
+Con alfa igual a 10: 7.130 y 8.489.
+
+580
+00:34:30,320 --> 00:34:36,540
+Y con alfa igual a mil, suben los dos: 12.511 y 13.051.
+
+581
+00:34:36,660 --> 00:34:38,840
+La penalización restringe demasiado.
+
+582
+00:34:38,960 --> 00:34:43,530
+Dos advertencias de la diapositiva: elegimos con el error fuera de pliegue, no
+
+583
+00:34:43,530 --> 00:34:47,280
+con el de ajuste; y una curva en forma de U no está garantizada.
+
+584
+00:34:47,400 --> 00:34:51,160
+Ahora miremos pliegue por pliegue, como en la diapositiva veintiocho.
+
+585
+00:34:51,280 --> 00:34:57,380
+Restamos el RMSE de alfa 0.1 menos el de alfa 1, en cada pliegue.
+
+586
+00:34:57,500 --> 00:35:02,980
+Si la barra queda bajo cero, gana 0.1; si queda sobre cero, gana 1.
+
+587
+00:35:03,100 --> 00:35:09,580
+Pliegue uno: 7.110 menos 7.099, más 0.011.
+
+588
+00:35:09,700 --> 00:35:12,710
+Pliegue dos: menos 0.399.
+
+589
+00:35:12,830 --> 00:35:15,730
+Pliegue tres: menos 0.030.
+
+590
+00:35:15,850 --> 00:35:18,970
+Pliegue cuatro: menos 0.081.
+
+591
+00:35:19,090 --> 00:35:25,810
+Y pliegue cinco: 8.058 menos 7.957, más 0.101.
+
+592
+00:35:25,930 --> 00:35:31,360
+Entonces: alfa 0.1 gana en tres pliegues, el dos, el tres y el cuatro.
+
+593
+00:35:31,480 --> 00:35:34,540
+Y alfa 1 gana en dos: el uno y el cinco.
+
+594
+00:35:34,660 --> 00:35:37,444
+El ganador del ranking no gana siempre: la mayor
+
+595
+00:35:37,444 --> 00:35:39,880
+parte de su ventaja viene del pliegue dos.
+
+596
+00:35:40,000 --> 00:35:42,090
+Aquí la grabación tiene un desliz.
+
+597
+00:35:42,210 --> 00:35:47,554
+Se dijo: «el alfa 0.1 mejora en tres pliegues: en el segundo, en el tercero y en
+
+598
+00:35:47,554 --> 00:35:51,830
+el cuarto, y en el primero y en el tercero gana alfa igual a 1».
+
+599
+00:35:51,950 --> 00:35:53,720
+La primera parte es correcta.
+
+600
+00:35:53,840 --> 00:35:57,160
+Pero la segunda debe decir: en el primero y en el quinto.
+
+601
+00:35:57,280 --> 00:36:03,550
+Lo confirma la tabla de la diapositiva: 7.110 contra 7.099 en el
+
+602
+00:36:03,550 --> 00:36:08,840
+pliegue uno, y 8.058 contra 7.957 en el pliegue cinco.
+
+603
+00:36:08,960 --> 00:36:14,650
+En el tercero gana 0.1: 8.806 contra 8.836.
+
+604
+00:36:14,770 --> 00:36:18,637
+Y una advertencia de la diapositiva: estas cinco diferencias no son
+
+605
+00:36:18,637 --> 00:36:22,100
+cinco réplicas independientes, ni un intervalo de confianza.
+
+606
+00:36:22,220 --> 00:36:22,840
+¿Por qué?
+
+607
+00:36:22,960 --> 00:36:26,642
+Porque los ajustes comparten datos: dos ajustes cualesquiera de la
+
+608
+00:36:26,642 --> 00:36:29,990
+validación cruzada usan en común tres de los cinco pliegues.
+
+609
+00:36:30,110 --> 00:36:34,600
+Sirven para ver si la ventaja es estable, no para calcular una prueba estadística.
+
+610
+00:36:34,720 --> 00:36:37,820
+La diapositiva veintinueve lo ordena en dos columnas.
+
+611
+00:36:37,940 --> 00:36:42,636
+Lo que decide la regla: alfa 0.1 tiene 8.229, alfa 1
+
+612
+00:36:42,636 --> 00:36:46,700
+tiene 8.308; la menor cifra elige al primero.
+
+613
+00:36:46,820 --> 00:36:50,368
+Lo que no establece: que una diferencia de unos 0.079
+
+614
+00:36:50,368 --> 00:36:53,850
+megapascales sea una ventaja estable en otros datos.
+
+615
+00:36:53,970 --> 00:36:56,821
+Además, el ganador está en el borde de la
+
+616
+00:36:56,821 --> 00:37:00,090
+cuadrícula: 0.1 es el alfa más pequeño probado.
+
+617
+00:37:00,210 --> 00:37:03,552
+Y si quisiéramos preferir el modelo más simple dentro de cierta
+
+618
+00:37:03,552 --> 00:37:06,840
+tolerancia, esa regla también debía fijarse antes de comparar.
+
+619
+00:37:06,960 --> 00:37:10,896
+El error típico: presentar el ganador como «el mejor
+
+620
+00:37:10,896 --> 00:37:14,680
+modelo», con certeza, por una diferencia de 0.079.
+
+621
+00:37:14,800 --> 00:37:18,302
+O al revés: mirar los resultados, ver que alfa 1 está muy
+
+622
+00:37:18,302 --> 00:37:21,620
+cerca, y cambiar la elección porque parece más simple.
+
+623
+00:37:21,740 --> 00:37:25,087
+Las dos cosas rompen el protocolo: la regla se aplica tal
+
+624
+00:37:25,087 --> 00:37:27,730
+como se fijó, y la incertidumbre se comunica.
+
+625
+00:37:27,850 --> 00:37:29,070
+Piensa un segundo.
+
+626
+00:37:29,190 --> 00:37:35,402
+Comparas dos modelos, A menos B, en cinco pliegues, y obtienes:
+
+627
+00:37:35,402 --> 00:37:40,430
+menos 0.2, más 0.1, menos 0.3, más 0.2 y menos 0.1.
+
+628
+00:37:40,550 --> 00:37:42,180
+¿En cuántos pliegues gana A?
+
+629
+00:37:42,300 --> 00:37:44,160
+¿Y cuál es la diferencia promedio?
+
+630
+00:37:44,880 --> 00:37:48,880
+El modelo A gana donde la diferencia es negativa: en tres pliegues.
+
+631
+00:37:49,000 --> 00:37:56,322
+La diferencia promedio: menos 0.2, más 0.1, menos 0.3, más 0.2,
+
+632
+00:37:56,322 --> 00:38:02,250
+menos 0.1, suma menos 0.3; sobre cinco, menos 0.06.
+
+633
+00:38:02,370 --> 00:38:06,049
+El modelo A gana la regla, pero por poco, y no en todos
+
+634
+00:38:06,049 --> 00:38:09,260
+los pliegues: igual que alfa 0.1 en el hormigón.
+
+635
+00:38:09,380 --> 00:38:13,654
+Para llevarte: el menor RMSE fuera de pliegue elige, y la media
+
+636
+00:38:13,654 --> 00:38:17,250
+de entrenamiento dice cuánto aportan los predictores.
+
+637
+00:38:17,370 --> 00:38:22,180
+La curva de validación compara ajuste y validación; se elige con la validación.
+
+638
+00:38:22,300 --> 00:38:25,893
+Y una diferencia pequeña, que cambia de signo entre pliegues,
+
+639
+00:38:25,893 --> 00:38:28,720
+decide la elección, pero no prueba superioridad.
+
+640
+00:38:28,840 --> 00:38:33,143
+Siguiente parada: reajustar el modelo elegido con todo el entrenamiento,
+
+641
+00:38:33,143 --> 00:38:36,610
+evaluarlo una sola vez en la prueba, y mirar sus residuos.
+
+642
+00:38:37,490 --> 00:38:40,420
+Octava parada: se abre la prueba reservada.
+
+643
+00:38:40,540 --> 00:38:43,471
+Reajustamos el modelo elegido, lo evaluamos una
+
+644
+00:38:43,471 --> 00:38:45,840
+sola vez, y miramos dónde se equivoca.
+
+645
+00:38:45,960 --> 00:38:48,960
+Hasta ahora, la prueba reservada no se ha tocado.
+
+646
+00:38:49,080 --> 00:38:51,150
+Ni para ajustar, ni para elegir.
+
+647
+00:38:51,270 --> 00:38:55,700
+Ahora, con la elección cerrada, llega el momento de consultar al oráculo.
+
+648
+00:38:55,820 --> 00:38:58,430
+Y se consulta una sola vez: lo que salga es la
+
+649
+00:38:58,430 --> 00:39:01,040
+estimación del desempeño de la elección final.
+
+650
+00:39:01,160 --> 00:39:03,720
+Piensa en los ensayos antes de un examen final.
+
+651
+00:39:03,840 --> 00:39:06,462
+Los ensayos sirven para practicar y para decidir
+
+652
+00:39:06,462 --> 00:39:08,920
+cómo estudiar: eso fue la validación cruzada.
+
+653
+00:39:09,040 --> 00:39:11,200
+El examen final se rinde una vez.
+
+654
+00:39:11,320 --> 00:39:14,921
+Si después de ver las preguntas pides rendirlo de nuevo, la nota
+
+655
+00:39:14,921 --> 00:39:17,960
+ya no mide lo que sabes: mide lo que viste del examen.
+
+656
+00:39:18,080 --> 00:39:21,450
+Primer paso, en la diapositiva treinta: reajustar.
+
+657
+00:39:21,570 --> 00:39:26,964
+Reajustar significa volver a estimar: se toma la receta ganadora y se aprende de nuevo,
+
+658
+00:39:26,964 --> 00:39:31,180
+con las 806 filas del entrenamiento, sus escalas y sus coeficientes.
+
+659
+00:39:31,300 --> 00:39:35,670
+Con ese único ajuste se predicen las 224 mezclas reservadas.
+
+660
+00:39:35,790 --> 00:39:39,590
+Ojo: no se promedian los cinco modelos de la validación cruzada.
+
+661
+00:39:39,710 --> 00:39:41,600
+Eso sería otro procedimiento.
+
+662
+00:39:41,720 --> 00:39:45,520
+Y este es el resultado, recalculado con el script de la clase.
+
+663
+00:39:45,640 --> 00:39:52,998
+La cuadrática con alfa igual a 0.1 obtiene en la prueba un RMSE de 8.823
+
+664
+00:39:52,998 --> 00:39:58,720
+megapascales, un MAE de 6.494, y un R cuadrado de 0.716.
+
+665
+00:39:58,840 --> 00:40:05,987
+La referencia fijada desde el inicio, la media de entrenamiento, tiene un
+
+666
+00:40:05,987 --> 00:40:12,350
+RMSE de 16.605, un MAE de 12.826, y un R cuadrado de menos 0.007.
+
+667
+00:40:12,470 --> 00:40:17,241
+El RMSE baja un 46.9 por ciento frente a la
+
+668
+00:40:17,241 --> 00:40:21,790
+referencia: uno menos 8.823 sobre 16.605.
+
+669
+00:40:21,910 --> 00:40:26,304
+Comparado con la validación: fuera de pliegue, el
+
+670
+00:40:26,304 --> 00:40:29,980
+ganador tenía 8.229; en la prueba, 8.823.
+
+671
+00:40:30,100 --> 00:40:35,004
+Es un poco más alto, algo esperable: el número usado para elegir tiende a ser
+
+672
+00:40:35,004 --> 00:40:39,590
+optimista, y además la prueba es otra muestra, de solo 86 composiciones.
+
+673
+00:40:39,710 --> 00:40:44,310
+Lo importante: ese 8.823 no se usa para volver a elegir.
+
+674
+00:40:44,430 --> 00:40:48,390
+El script lo dice: no se evalúan los otros candidatos en la prueba.
+
+675
+00:40:48,510 --> 00:40:52,680
+La diapositiva treinta y uno también muestra el gráfico de predicho frente a real.
+
+676
+00:40:52,800 --> 00:40:56,210
+Cada punto es una de las 224 mezclas de prueba.
+
+677
+00:40:56,330 --> 00:41:00,380
+La diagonal representa la predicción perfecta: predicho igual a real.
+
+678
+00:41:00,500 --> 00:41:04,940
+Los puntos siguen la diagonal, pero con dispersión: algunos quedan lejos.
+
+679
+00:41:05,060 --> 00:41:11,550
+Ese número, el RMSE, es un resumen del error; no es una cota para cada caso.
+
+680
+00:41:11,670 --> 00:41:14,740
+Por eso la diapositiva treinta y dos pide diagnosticar.
+
+681
+00:41:14,860 --> 00:41:17,570
+El residuo es el valor real menos el predicho.
+
+682
+00:41:17,690 --> 00:41:20,658
+Un residuo positivo indica subestimación: el modelo
+
+683
+00:41:20,658 --> 00:41:23,160
+predijo menos de lo que resistió la mezcla.
+
+684
+00:41:23,280 --> 00:41:27,512
+En la prueba, el residuo más grande es más 24.39
+
+685
+00:41:27,512 --> 00:41:31,480
+megapascales, y el más negativo, menos 32.81.
+
+686
+00:41:31,600 --> 00:41:34,782
+Hay 25 mezclas con un error mayor que 15 en valor
+
+687
+00:41:34,782 --> 00:41:37,640
+absoluto, y nueve con un error mayor que 20.
+
+688
+00:41:37,760 --> 00:41:41,200
+El otro gráfico de la diapositiva mira los errores según la edad.
+
+689
+00:41:41,320 --> 00:41:46,647
+Si separamos las mezclas por edad, y calculamos el RMSE de cada
+
+690
+00:41:46,647 --> 00:41:51,720
+grupo, para las de uno a siete días es 10.247, con 57 casos.
+
+691
+00:41:51,840 --> 00:41:57,050
+De 14 a 28 días baja a 7.330, con 104 casos.
+
+692
+00:41:57,170 --> 00:42:02,840
+Y de 56 días en adelante sube a 9.649, con 63 casos.
+
+693
+00:42:02,960 --> 00:42:08,200
+El 8.823 global esconde que el modelo se equivoca más en las edades extremas.
+
+694
+00:42:08,320 --> 00:42:12,390
+Y una advertencia final de la clase: estos gráficos describen la prueba.
+
+695
+00:42:12,510 --> 00:42:16,692
+Si los usamos para rediseñar el modelo, por ejemplo agregando una variable
+
+696
+00:42:16,692 --> 00:42:19,970
+para las edades extremas, la prueba deja de estar intacta.
+
+697
+00:42:20,090 --> 00:42:24,400
+El rediseño exige una nueva selección y una nueva evaluación independiente.
+
+698
+00:42:24,520 --> 00:42:26,660
+Lo veremos de nuevo al final de la clase.
+
+699
+00:42:26,780 --> 00:42:29,674
+El error típico: evaluar los siete candidatos en la
+
+700
+00:42:29,674 --> 00:42:32,000
+prueba y quedarse con el que salga mejor.
+
+701
+00:42:32,120 --> 00:42:35,400
+Parece honesto, porque «la prueba es independiente».
+
+702
+00:42:35,520 --> 00:42:39,720
+Pero si la prueba se usa para elegir, ya no es independiente de la elección.
+
+703
+00:42:39,840 --> 00:42:43,920
+Se convierte en otra validación, y su cifra vuelve a ser optimista.
+
+704
+00:42:44,040 --> 00:42:45,260
+Piensa un segundo.
+
+705
+00:42:45,380 --> 00:42:51,370
+Un modelo tiene un RMSE de prueba de 6, y la referencia de la media tiene 15.
+
+706
+00:42:51,490 --> 00:42:54,630
+¿En qué porcentaje baja el RMSE?
+
+707
+00:42:54,750 --> 00:42:59,840
+Y con un RMSE de 6, ¿puede haber un caso con un error de 20?
+
+708
+00:43:00,560 --> 00:43:03,920
+Baja uno menos seis sobre quince: un 60 por ciento.
+
+709
+00:43:04,040 --> 00:43:10,870
+Y sí, puede haber un caso con un error de 20: el RMSE es un promedio, no una cota.
+
+710
+00:43:10,990 --> 00:43:19,280
+En el hormigón, con un RMSE de 8.823, el peor caso se equivocó por 32.81.
+
+711
+00:43:19,400 --> 00:43:22,693
+Para llevarte: la receta elegida se reajusta con todo el
+
+712
+00:43:22,693 --> 00:43:25,810
+entrenamiento, y se evalúa una sola vez en la prueba.
+
+713
+00:43:25,930 --> 00:43:30,616
+El resultado se compara con la referencia fijada desde el
+
+714
+00:43:30,616 --> 00:43:34,480
+inicio: aquí, 8.823 contra 16.605 megapascales.
+
+715
+00:43:34,600 --> 00:43:36,880
+Y los residuos muestran lo que el promedio
+
+716
+00:43:36,880 --> 00:43:39,160
+esconde, sin usarlos para volver a elegir.
+
+717
+00:43:39,280 --> 00:43:41,660
+Siguiente parada: cambiamos de caso.
+
+718
+00:43:41,780 --> 00:43:46,320
+Clasificar correos como spam, y por qué cada error tiene un costo distinto.
+
+719
+00:43:47,210 --> 00:43:49,580
+Novena parada: cambiamos de caso.
+
+720
+00:43:49,700 --> 00:43:52,919
+Ahora clasificamos correos como spam, y vamos a ver por
+
+721
+00:43:52,919 --> 00:43:55,670
+qué cada tipo de error tiene un costo distinto.
+
+722
+00:43:55,790 --> 00:44:00,080
+Te ofrezco un filtro de spam que acierta el 95 por ciento de los correos.
+
+723
+00:44:00,200 --> 00:44:01,170
+¿Lo instalas?
+
+724
+00:44:01,290 --> 00:44:06,390
+Antes, una pregunta: de cada cien correos llegan cinco de spam, y este filtro…
+
+725
+00:44:06,510 --> 00:44:08,430
+nunca marca nada como spam.
+
+726
+00:44:08,550 --> 00:44:12,240
+Acierta 95 de cien, y detecta cero de los cinco.
+
+727
+00:44:12,360 --> 00:44:15,360
+Un porcentaje alto de aciertos puede ser insuficiente.
+
+728
+00:44:15,480 --> 00:44:19,540
+Este es el segundo caso de la clase, en la diapositiva treinta y tres.
+
+729
+00:44:19,660 --> 00:44:25,873
+La base Spambase, del repositorio UCI: 4601 correos, con 57 entradas numéricas,
+
+730
+00:44:25,873 --> 00:44:31,300
+como frecuencias de palabras, de caracteres, y medidas de mayúsculas.
+
+731
+00:44:31,420 --> 00:44:34,600
+La clase positiva, y igual a uno, es spam.
+
+732
+00:44:34,720 --> 00:44:41,380
+Se reservan 921 correos para la prueba, y se usan 3680 para ajustar y seleccionar.
+
+733
+00:44:41,500 --> 00:44:46,577
+En el entrenamiento hay 2230 correos legítimos, el
+
+734
+00:44:46,577 --> 00:44:50,740
+60.6 por ciento, y 1450 de spam, el 39.4.
+
+735
+00:44:50,860 --> 00:44:53,493
+La lógica es la misma del hormigón: separar la
+
+736
+00:44:53,493 --> 00:44:56,470
+selección de la evaluación, con la prueba reservada.
+
+737
+00:44:56,590 --> 00:44:59,660
+Pero ahora aparece algo nuevo: hay que distinguir la
+
+738
+00:44:59,660 --> 00:45:02,790
+calidad de las probabilidades, y el costo de decidir.
+
+739
+00:45:02,910 --> 00:45:05,764
+Y una advertencia de la diapositiva: es un corpus
+
+740
+00:45:05,764 --> 00:45:08,560
+histórico; no es una prueba de un filtro actual.
+
+741
+00:45:08,680 --> 00:45:11,940
+En la diapositiva treinta y cuatro aparecen los dos errores.
+
+742
+00:45:12,060 --> 00:45:16,080
+Falso positivo: el correo es legítimo y lo marcamos como spam.
+
+743
+00:45:16,200 --> 00:45:20,390
+La consecuencia: ocultar un mensaje que el usuario necesitaba recibir.
+
+744
+00:45:20,510 --> 00:45:24,000
+Falso negativo: el correo es spam y lo dejamos pasar.
+
+745
+00:45:24,120 --> 00:45:27,900
+La consecuencia: ruido y trabajo adicional en la bandeja de entrada.
+
+746
+00:45:28,020 --> 00:45:30,640
+Contar errores sin distinguir su tipo supone que
+
+747
+00:45:30,640 --> 00:45:33,150
+equivocarse cuesta lo mismo en ambos sentidos.
+
+748
+00:45:33,270 --> 00:45:35,390
+Piensa en el conserje de un edificio.
+
+749
+00:45:35,510 --> 00:45:40,310
+Si no deja entrar a un vecino que vive ahí, es grave: el vecino se queda afuera.
+
+750
+00:45:40,430 --> 00:45:42,170
+Ese es el falso positivo.
+
+751
+00:45:42,290 --> 00:45:46,940
+Si deja entrar a un vendedor que nadie llamó, es una molestia, pero se resuelve.
+
+752
+00:45:47,060 --> 00:45:48,830
+Ese es el falso negativo.
+
+753
+00:45:48,950 --> 00:45:51,792
+Un buen conserje no se mide solo por cuántas veces
+
+754
+00:45:51,792 --> 00:45:54,350
+acierta, sino por cuánto cuestan sus errores.
+
+755
+00:45:54,470 --> 00:45:58,720
+Volvamos al filtro del inicio, el ejemplo de la diapositiva treinta y cinco.
+
+756
+00:45:58,840 --> 00:46:02,057
+Cinco spam reales, noventa y cinco legítimos, y
+
+757
+00:46:02,057 --> 00:46:04,590
+una regla que siempre dice «no spam».
+
+758
+00:46:04,710 --> 00:46:10,340
+La exactitud, en inglés accuracy, es 95 por ciento: describe los aciertos.
+
+759
+00:46:10,460 --> 00:46:13,660
+Pero no demuestra que resolvamos la tarea de detectar spam.
+
+760
+00:46:13,780 --> 00:46:19,810
+En la clase se dijo: «de 100, 95 le achuntó», pero esos cinco nunca fueron marcados.
+
+761
+00:46:19,930 --> 00:46:22,768
+Sobre este tema de las clases desbalanceadas, en la
+
+762
+00:46:22,768 --> 00:46:25,050
+grabación hay un pequeño error de cuenta.
+
+763
+00:46:25,170 --> 00:46:30,139
+Se dijo: «el evento de interés son 10 de los 1000 datos; entonces yo estoy
+
+764
+00:46:30,139 --> 00:46:34,100
+interesado en 10 observaciones más que los 9990 restantes».
+
+765
+00:46:34,220 --> 00:46:40,710
+Si son mil datos y diez son del evento, los restantes son 990, no 9990.
+
+766
+00:46:40,830 --> 00:46:44,430
+La idea sí es correcta: con tan pocos casos del evento, la
+
+767
+00:46:44,430 --> 00:46:47,720
+exactitud engaña, y aprender de esos diez es difícil.
+
+768
+00:46:47,840 --> 00:46:49,450
+¿Cómo se expresa el costo?
+
+769
+00:46:49,570 --> 00:46:52,580
+La diapositiva treinta y seis propone una métrica.
+
+770
+00:46:52,700 --> 00:46:55,942
+Supongamos un costo de cinco unidades por cada falso
+
+771
+00:46:55,942 --> 00:46:59,060
+positivo, y de una unidad por cada falso negativo.
+
+772
+00:46:59,180 --> 00:47:01,090
+Los aciertos tienen costo cero.
+
+773
+00:47:01,210 --> 00:47:06,870
+El costo promedio es: cinco por FP más FN, dividido por el número de correos.
+
+774
+00:47:06,990 --> 00:47:09,784
+Y se multiplica por mil, para comparar en una
+
+775
+00:47:09,784 --> 00:47:12,330
+escala común: costo por cada mil correos.
+
+776
+00:47:12,450 --> 00:47:14,450
+Dos aclaraciones importantes.
+
+777
+00:47:14,570 --> 00:47:18,568
+La razón cinco a uno es una prioridad elegida antes de comparar; si
+
+778
+00:47:18,568 --> 00:47:21,850
+cambia esa prioridad, puede cambiar la regla preferida.
+
+779
+00:47:21,970 --> 00:47:26,910
+Y son costos hipotéticos, para el ejemplo: no son costos medidos en los datos.
+
+780
+00:47:27,030 --> 00:47:31,020
+En un proyecto real, esos costos se conversan con quien usa el filtro.
+
+781
+00:47:31,140 --> 00:47:36,350
+Ahora, el ejemplo de la diapositiva treinta y siete: mil correos, cien de spam.
+
+782
+00:47:36,470 --> 00:47:41,252
+El filtro A: 890 verdaderos negativos, 10 falsos positivos,
+
+783
+00:47:41,252 --> 00:47:44,980
+40 falsos negativos y 60 verdaderos positivos.
+
+784
+00:47:45,100 --> 00:47:49,310
+El filtro B: 860, 40, 10 y 90.
+
+785
+00:47:49,430 --> 00:47:53,630
+Los dos aciertan 950 de mil: 95 por ciento.
+
+786
+00:47:53,750 --> 00:47:55,560
+Con la exactitud, empatan.
+
+787
+00:47:55,680 --> 00:47:58,140
+Pero con los costos fijados, no empatan.
+
+788
+00:47:58,260 --> 00:48:01,543
+Costo de A: cinco por diez falsos positivos,
+
+789
+00:48:01,543 --> 00:48:04,900
+cincuenta, más cuarenta falsos negativos: 90.
+
+790
+00:48:05,020 --> 00:48:10,280
+Costo de B: cinco por cuarenta, doscientos, más diez: 210.
+
+791
+00:48:10,400 --> 00:48:13,900
+Preferimos A, porque bloquea menos correos legítimos.
+
+792
+00:48:14,020 --> 00:48:17,100
+Mismos aciertos, decisiones de distinto valor.
+
+793
+00:48:17,220 --> 00:48:19,940
+¿Y el F1, que vieron la clase pasada?
+
+794
+00:48:20,060 --> 00:48:21,720
+Diapositiva treinta y ocho.
+
+795
+00:48:21,840 --> 00:48:25,986
+La precisión es verdaderos positivos sobre todo lo marcado como spam;
+
+796
+00:48:25,986 --> 00:48:29,350
+el recall, verdaderos positivos sobre todo el spam real.
+
+797
+00:48:29,470 --> 00:48:31,030
+El F1 los combina.
+
+798
+00:48:31,150 --> 00:48:35,744
+Para A: dos por sesenta, sobre dos por sesenta más
+
+799
+00:48:35,744 --> 00:48:39,420
+diez más cuarenta: 120 sobre 170, 0.706.
+
+800
+00:48:39,540 --> 00:48:44,430
+Para B: 180 sobre 230, 0.783.
+
+801
+00:48:44,550 --> 00:48:46,120
+El F1 prefiere B.
+
+802
+00:48:46,240 --> 00:48:46,860
+¿Por qué?
+
+803
+00:48:46,980 --> 00:48:49,626
+Porque no incorpora la razón de costos cinco a
+
+804
+00:48:49,626 --> 00:48:52,100
+uno: no sustituye nuestra función de costo.
+
+805
+00:48:52,220 --> 00:48:55,709
+El error típico: elegir el filtro por la exactitud o por el
+
+806
+00:48:55,709 --> 00:48:58,430
+F1 cuando los errores tienen costos distintos.
+
+807
+00:48:58,550 --> 00:49:01,482
+Las dos métricas tratan igual, o casi igual, un
+
+808
+00:49:01,482 --> 00:49:04,290
+correo legítimo bloqueado y un spam que pasa.
+
+809
+00:49:04,410 --> 00:49:07,723
+Si ya acordamos que bloquear un legítimo cuesta cinco veces
+
+810
+00:49:07,723 --> 00:49:10,530
+más, la métrica de selección tiene que reflejarlo.
+
+811
+00:49:10,650 --> 00:49:11,870
+Piensa un segundo.
+
+812
+00:49:11,990 --> 00:49:17,915
+Un filtro C, en los mismos mil correos, tiene 895 verdaderos negativos, 5
+
+813
+00:49:17,915 --> 00:49:23,110
+falsos positivos, 50 falsos negativos y 50 verdaderos positivos.
+
+814
+00:49:23,230 --> 00:49:24,370
+¿Cuál es su exactitud?
+
+815
+00:49:24,490 --> 00:49:25,360
+¿Y su costo?
+
+816
+00:49:25,480 --> 00:49:27,190
+¿Lo preferirías al filtro A?
+
+817
+00:49:27,910 --> 00:49:36,110
+Exactitud: 895 más 50, sobre mil: 94.5 por ciento, menos que el 95 de A.
+
+818
+00:49:36,230 --> 00:49:42,840
+Costo: cinco por cinco, veinticinco, más cincuenta: 75, menos que el 90 de A.
+
+819
+00:49:42,960 --> 00:49:47,090
+Con la razón cinco a uno, preferimos C, aunque acierte menos.
+
+820
+00:49:47,210 --> 00:49:50,377
+Para llevarte: en clasificación, falso positivo y
+
+821
+00:49:50,377 --> 00:49:53,350
+falso negativo tienen consecuencias distintas.
+
+822
+00:49:53,470 --> 00:49:56,898
+La exactitud y el F1 no saben de costos; una
+
+823
+00:49:56,898 --> 00:50:00,560
+métrica de costo, como cinco por FP más FN, sí.
+
+824
+00:50:00,680 --> 00:50:04,310
+Y la razón de costos es una prioridad que se fija antes de comparar.
+
+825
+00:50:04,430 --> 00:50:07,010
+Siguiente parada: las probabilidades.
+
+826
+00:50:07,130 --> 00:50:10,823
+Cómo un umbral las convierte en acciones, y cómo se mide si una
+
+827
+00:50:10,823 --> 00:50:13,930
+probabilidad es buena: log loss, Brier y calibración.
+
+828
+00:50:14,810 --> 00:50:17,420
+Décima parada: las probabilidades.
+
+829
+00:50:17,540 --> 00:50:20,172
+Cómo un umbral las convierte en acciones, y cómo
+
+830
+00:50:20,172 --> 00:50:22,200
+se mide si una probabilidad es buena.
+
+831
+00:50:22,320 --> 00:50:25,400
+Un filtro asigna probabilidad de spam a tres correos.
+
+832
+00:50:25,520 --> 00:50:27,820
+Correo A: 0.90.
+
+833
+00:50:27,940 --> 00:50:30,300
+Correo B: 0.60.
+
+834
+00:50:30,420 --> 00:50:32,650
+Correo C: 0.20.
+
+835
+00:50:32,770 --> 00:50:36,570
+Con estos mismos tres números se pueden hacer tres preguntas distintas.
+
+836
+00:50:36,690 --> 00:50:37,860
+¿Qué reviso primero?
+
+837
+00:50:37,980 --> 00:50:40,020
+¿Es fiable ese 0.90?
+
+838
+00:50:40,140 --> 00:50:41,250
+¿Y cuáles bloqueo?
+
+839
+00:50:41,370 --> 00:50:45,835
+La diapositiva treinta y nueve insiste: ordenar bien, estimar bien una
+
+840
+00:50:45,835 --> 00:50:49,280
+probabilidad, y decidir bien, son objetivos distintos.
+
+841
+00:50:49,400 --> 00:50:51,330
+Piensa en el pronóstico del tiempo.
+
+842
+00:50:51,450 --> 00:50:54,439
+Si la meteoróloga ordena bien los días, los días que más
+
+843
+00:50:54,439 --> 00:50:56,840
+llueve son los que ella marcó con más riesgo.
+
+844
+00:50:56,960 --> 00:50:58,010
+Eso es ordenar.
+
+845
+00:50:58,130 --> 00:51:02,264
+Si dice «setenta por ciento de lluvia», entre todos los días en que
+
+846
+00:51:02,264 --> 00:51:05,720
+dijo eso, debería llover más o menos siete de cada diez.
+
+847
+00:51:05,840 --> 00:51:07,360
+Eso es estar calibrada.
+
+848
+00:51:07,480 --> 00:51:10,990
+Y si sacas o no el paraguas depende de cuánto te molesta mojarte.
+
+849
+00:51:11,110 --> 00:51:13,870
+Eso es decidir, y depende de tus costos.
+
+850
+00:51:13,990 --> 00:51:16,680
+La diapositiva cuarenta muestra cómo se decide.
+
+851
+00:51:16,800 --> 00:51:24,580
+Cinco correos, con probabilidades 0.1, 0.4, 0.6, 0.8 y 0.9.
+
+852
+00:51:24,700 --> 00:51:29,560
+La regla: se marca como spam si la probabilidad es mayor o igual que el umbral t.
+
+853
+00:51:29,680 --> 00:51:33,120
+Con t igual a 0.5, se marcan tres correos.
+
+854
+00:51:33,240 --> 00:51:37,179
+Con t igual a 0.8, se marcan dos: el de 0.8 también
+
+855
+00:51:37,179 --> 00:51:40,500
+cuenta, porque la regla dice mayor o igual.
+
+856
+00:51:40,620 --> 00:51:42,530
+Fíjate en lo que cambió y en lo que no.
+
+857
+00:51:42,650 --> 00:51:46,270
+Las probabilidades son las mismas; el modelo es el mismo.
+
+858
+00:51:46,390 --> 00:51:48,070
+Lo que cambió es la decisión.
+
+859
+00:51:48,190 --> 00:51:52,204
+Subir el umbral exige más evidencia para bloquear: pueden disminuir
+
+860
+00:51:52,204 --> 00:51:55,440
+los falsos positivos, y aumentar los falsos negativos.
+
+861
+00:51:55,560 --> 00:51:59,490
+Por eso la diapositiva concluye: el umbral también se selecciona.
+
+862
+00:51:59,610 --> 00:52:02,080
+Ahora, la diapositiva cuarenta y uno.
+
+863
+00:52:02,200 --> 00:52:05,030
+Seis correos, con su etiqueta real abajo.
+
+864
+00:52:05,150 --> 00:52:10,270
+La serie A, en azul, les da probabilidades de 0.1 a 0.9.
+
+865
+00:52:10,390 --> 00:52:15,067
+La serie B, en naranja, los ordena exactamente igual, pero es mucho más
+
+866
+00:52:15,067 --> 00:52:19,020
+extrema: casi cero en los primeros, casi uno en los últimos.
+
+867
+00:52:19,140 --> 00:52:23,820
+Mira el correo cuatro: no es spam, y B le da 0.835.
+
+868
+00:52:23,940 --> 00:52:27,130
+B expresa más certeza, incluso cuando se equivoca.
+
+869
+00:52:27,250 --> 00:52:30,630
+Si solo miráramos el orden, A y B serían idénticas.
+
+870
+00:52:30,750 --> 00:52:33,110
+Pero sus probabilidades no valen lo mismo.
+
+871
+00:52:33,230 --> 00:52:39,980
+La diapositiva les asigna un log loss: 0.415 para A, y 0.602 para B.
+
+872
+00:52:40,100 --> 00:52:43,380
+Menor es mejor: A estima mejor, aunque ordene igual.
+
+873
+00:52:43,500 --> 00:52:46,480
+La calidad de esa certeza requiere otra evaluación.
+
+874
+00:52:46,600 --> 00:52:48,450
+Veamos qué es el log loss.
+
+875
+00:52:48,570 --> 00:52:53,270
+El log loss, o pérdida logarítmica, está en la diapositiva cuarenta y dos.
+
+876
+00:52:53,390 --> 00:52:57,738
+Para cada correo se toma el logaritmo natural de la probabilidad que el modelo le
+
+877
+00:52:57,738 --> 00:53:01,120
+dio a lo que realmente ocurrió, con signo menos, y se promedia.
+
+878
+00:53:01,240 --> 00:53:05,265
+En el gráfico: si el correo es spam, la pérdida es la curva roja,
+
+879
+00:53:05,265 --> 00:53:08,670
+que se dispara cuando la probabilidad se acerca a cero.
+
+880
+00:53:08,790 --> 00:53:17,040
+Para un spam real, predecir 0.9 aporta 0.105; predecir 0.1 aporta 2.303.
+
+881
+00:53:17,160 --> 00:53:20,880
+Asignar casi cero a lo que ocurrió recibe una penalización enorme.
+
+882
+00:53:21,000 --> 00:53:24,530
+Calculemos el log loss de la serie A, correo por correo.
+
+883
+00:53:24,650 --> 00:53:28,800
+Los correos uno y seis aportan 0.105 cada uno.
+
+884
+00:53:28,920 --> 00:53:32,750
+Los correos dos y cinco, 0.223 cada uno.
+
+885
+00:53:32,870 --> 00:53:38,032
+Y los correos tres y cuatro, donde A dudaba, 0.4 para un spam
+
+886
+00:53:38,032 --> 00:53:42,010
+y 0.6 para un legítimo, aportan 0.916 cada uno.
+
+887
+00:53:42,130 --> 00:53:47,730
+La suma es 2.488; dividida por seis, 0.415.
+
+888
+00:53:47,850 --> 00:53:49,790
+El mismo número de la diapositiva.
+
+889
+00:53:49,910 --> 00:53:52,462
+La otra métrica para probabilidades es la de
+
+890
+00:53:52,462 --> 00:53:54,840
+Brier, en la diapositiva cuarenta y tres.
+
+891
+00:53:54,960 --> 00:53:58,531
+Es el error cuadrático de una probabilidad: el promedio de la
+
+892
+00:53:58,531 --> 00:54:01,400
+etiqueta real menos la probabilidad, al cuadrado.
+
+893
+00:54:01,520 --> 00:54:04,100
+Está entre cero y uno, y menor es mejor.
+
+894
+00:54:04,220 --> 00:54:15,330
+Para un spam real: predecir 0.9 aporta 0.01; predecir 0.6, 0.16; predecir 0.1, 0.81.
+
+895
+00:54:15,450 --> 00:54:22,930
+Compara con el log loss: para el 0.1, el log loss daba 2.303, y Brier da 0.81.
+
+896
+00:54:23,050 --> 00:54:26,090
+El log loss castiga mucho más la certeza equivocada.
+
+897
+00:54:26,210 --> 00:54:37,370
+Y para la serie A completa: los cuadrados son 0.01, 0.04, 0.36, 0.36, 0.04 y 0.01.
+
+898
+00:54:37,490 --> 00:54:42,900
+Suman 0.82, y divididos por seis, dan 0.137.
+
+899
+00:54:43,020 --> 00:54:46,835
+Una advertencia de la diapositiva: la pérdida logarítmica y la de
+
+900
+00:54:46,835 --> 00:54:50,414
+Brier valoran probabilidades, con penalizaciones distintas, y
+
+901
+00:54:50,414 --> 00:54:53,290
+ninguno de los dos mide solamente la calibración.
+
+902
+00:54:53,410 --> 00:54:55,760
+Entonces, ¿qué es la calibración?
+
+903
+00:54:55,880 --> 00:54:57,680
+Diapositiva cuarenta y cuatro.
+
+904
+00:54:57,800 --> 00:55:01,515
+Si tomamos todos los correos con probabilidades cercanas a
+
+905
+00:55:01,515 --> 00:55:04,910
+0.8, esperamos que cerca del 80 por ciento sean spam.
+
+906
+00:55:05,030 --> 00:55:08,233
+La calibración compara las probabilidades predichas con las
+
+907
+00:55:08,233 --> 00:55:11,110
+frecuencias observadas, en grupos de casos parecidos.
+
+908
+00:55:11,230 --> 00:55:14,382
+No significa que cada grupo de diez tenga exactamente
+
+909
+00:55:14,382 --> 00:55:16,880
+ocho spam: la muestra introduce variación.
+
+910
+00:55:17,000 --> 00:55:22,225
+En la clase se dijo así: con probabilidad 0.8, «esperamos que cerca del 80 por
+
+911
+00:55:22,225 --> 00:55:26,580
+ciento» sean spam, «si las probabilidades están bien calibradas».
+
+912
+00:55:26,700 --> 00:55:30,890
+Con datos reales, adelanto lo que veremos con el bosque aleatorio de la clase.
+
+913
+00:55:31,010 --> 00:55:36,240
+Agrupamos sus probabilidades fuera de pliegue en cinco grupos de 736 correos.
+
+914
+00:55:36,360 --> 00:55:41,020
+En el cuarto grupo, la probabilidad media predicha es 0.673.
+
+915
+00:55:41,140 --> 00:55:44,680
+Pero la fracción observada de spam es 0.814.
+
+916
+00:55:44,800 --> 00:55:48,296
+El modelo dice sesenta y siete por ciento, y en realidad
+
+917
+00:55:48,296 --> 00:55:50,980
+son ochenta y uno: en ese rango, subestima.
+
+918
+00:55:51,100 --> 00:55:54,147
+El error típico: suponer que un modelo que ordena
+
+919
+00:55:54,147 --> 00:55:56,820
+bien, también da probabilidades confiables.
+
+920
+00:55:56,940 --> 00:55:59,633
+La serie B ordenaba perfecto, y aun así sus
+
+921
+00:55:59,633 --> 00:56:02,200
+probabilidades valían menos que las de A.
+
+922
+00:56:02,320 --> 00:56:06,699
+Ordenar, estimar y decidir se evalúan por separado: el orden, con
+
+923
+00:56:06,699 --> 00:56:11,077
+curvas como la ROC; la estimación, con la pérdida logarítmica, el
+
+924
+00:56:11,077 --> 00:56:14,580
+Brier y la calibración; y la decisión, con el costo.
+
+925
+00:56:14,700 --> 00:56:15,920
+Piensa un segundo.
+
+926
+00:56:16,040 --> 00:56:20,950
+Un correo es spam, y el modelo le da probabilidad 0.5: no sabe.
+
+927
+00:56:21,070 --> 00:56:23,340
+¿Cuánto aporta ese correo al log loss?
+
+928
+00:56:23,460 --> 00:56:24,210
+¿Y al Brier?
+
+929
+00:56:24,930 --> 00:56:30,430
+Al log loss aporta menos el logaritmo natural de 0.5, 0.693.
+
+930
+00:56:30,550 --> 00:56:35,360
+Al Brier, uno menos 0.5, al cuadrado: 0.25.
+
+931
+00:56:35,480 --> 00:56:38,964
+Ese es el aporte de no saber: un modelo que siempre
+
+932
+00:56:38,964 --> 00:56:41,970
+dijera 0.5 tendría exactamente esos valores.
+
+933
+00:56:42,090 --> 00:56:44,162
+Para llevarte: el umbral convierte
+
+934
+00:56:44,162 --> 00:56:46,600
+probabilidades en acciones, y también se
+
+935
+00:56:46,600 --> 00:56:47,270
+selecciona.
+
+936
+00:56:47,390 --> 00:56:51,247
+La pérdida logarítmica y el Brier valoran la probabilidad completa;
+
+937
+00:56:51,247 --> 00:56:54,240
+el log loss castiga mucho más la certeza equivocada.
+
+938
+00:56:54,360 --> 00:57:00,240
+Y la calibración pregunta si un 0.8 significa, de verdad, cerca de un 80 por ciento.
+
+939
+00:57:00,360 --> 00:57:04,011
+Siguiente parada: las curvas ROC y de precisión y recall, y el
+
+940
+00:57:04,011 --> 00:57:07,720
+protocolo completo con el que la clase elige el modelo de spam.
+
+941
+00:57:08,610 --> 00:57:12,318
+Undécima parada: las curvas ROC y de precisión y recall, y el
+
+942
+00:57:12,318 --> 00:57:15,600
+protocolo con el que la clase elige el modelo de spam.
+
+943
+00:57:15,720 --> 00:57:21,120
+El bosque aleatorio de la clase tiene un área bajo la curva ROC de 0.975.
+
+944
+00:57:21,240 --> 00:57:25,640
+¿Eso significa que acierta el 97.5 por ciento de los correos?
+
+945
+00:57:25,760 --> 00:57:26,180
+No.
+
+946
+00:57:26,300 --> 00:57:30,830
+Con el umbral de 0.5, acierta el 93.1 por ciento.
+
+947
+00:57:30,950 --> 00:57:34,381
+El área bajo la curva mide otra cosa: qué tan bien ordena
+
+948
+00:57:34,381 --> 00:57:37,210
+los correos, sobre todos los umbrales a la vez.
+
+949
+00:57:37,330 --> 00:57:38,830
+Veamos qué significa.
+
+950
+00:57:38,950 --> 00:57:42,040
+La diapositiva cuarenta y cinco presenta dos curvas.
+
+951
+00:57:42,160 --> 00:57:46,208
+La curva ROC: en el eje vertical, el recall o sensibilidad,
+
+952
+00:57:46,208 --> 00:57:49,570
+verdaderos positivos sobre todos los spam reales.
+
+953
+00:57:49,690 --> 00:57:52,703
+En el horizontal, la tasa de falsos positivos:
+
+954
+00:57:52,703 --> 00:57:55,520
+falsos positivos sobre todos los legítimos.
+
+955
+00:57:55,640 --> 00:58:00,267
+La curva de precisión y recall: en el eje vertical, la precisión, verdaderos
+
+956
+00:58:00,267 --> 00:58:03,980
+positivos sobre todo lo marcado; en el horizontal, el recall.
+
+957
+00:58:04,100 --> 00:58:07,320
+En las dos curvas, cada punto corresponde a un umbral.
+
+958
+00:58:07,440 --> 00:58:10,800
+Piensa en un detector de metales con una perilla de sensibilidad.
+
+959
+00:58:10,920 --> 00:58:14,219
+Con la perilla baja, casi nunca suena: pocas falsas
+
+960
+00:58:14,219 --> 00:58:17,000
+alarmas, pero se le escapan muchas monedas.
+
+961
+00:58:17,120 --> 00:58:19,911
+Con la perilla alta, encuentra casi todas las
+
+962
+00:58:19,911 --> 00:58:22,640
+monedas, pero también suena con cada tapita.
+
+963
+00:58:22,760 --> 00:58:26,595
+La curva ROC dibuja todas las posiciones de la perilla a la vez:
+
+964
+00:58:26,595 --> 00:58:30,010
+cuánto encuentras, frente a cuántas falsas alarmas pagas.
+
+965
+00:58:30,130 --> 00:58:32,648
+Esta es la curva ROC del bosque, con sus
+
+966
+00:58:32,648 --> 00:58:35,480
+probabilidades fuera de pliegue, recalculada.
+
+967
+00:58:35,600 --> 00:58:38,560
+La diagonal punteada es un modelo que ordena al azar.
+
+968
+00:58:38,680 --> 00:58:41,458
+La curva del bosque se pega a la esquina superior
+
+969
+00:58:41,458 --> 00:58:44,350
+izquierda: mucho recall con pocos falsos positivos.
+
+970
+00:58:44,470 --> 00:58:48,795
+Dos de sus puntos: con umbral 0.5, la tasa de
+
+971
+00:58:48,795 --> 00:58:53,120
+falsos positivos es 0.033 y el recall, 0.875.
+
+972
+00:58:53,240 --> 00:58:57,780
+Con 0.6, 0.020 y 0.825.
+
+973
+00:58:57,900 --> 00:59:02,077
+El área bajo la curva es 0.975, y la precisión
+
+974
+00:59:02,077 --> 00:59:05,890
+promedio, que resume la otra curva, 0.966.
+
+975
+00:59:06,010 --> 00:59:09,093
+Y aquí la advertencia de la diapositiva: el área bajo la
+
+976
+00:59:09,093 --> 00:59:11,900
+curva y la precisión promedio describen el ranking.
+
+977
+00:59:12,020 --> 00:59:16,550
+No fijan un umbral, y no certifican que las probabilidades estén calibradas.
+
+978
+00:59:16,670 --> 00:59:20,660
+Además, la precisión promedio depende de la proporción de positivos.
+
+979
+00:59:20,780 --> 00:59:21,880
+Veamos por qué.
+
+980
+00:59:22,000 --> 00:59:25,260
+La diapositiva cuarenta y seis lo muestra con mil correos.
+
+981
+00:59:25,380 --> 00:59:28,456
+El mismo filtro, con sensibilidad de 80 por ciento y
+
+982
+00:59:28,456 --> 00:59:30,940
+tasa de falsos positivos de 10 por ciento.
+
+983
+00:59:31,060 --> 00:59:36,280
+Si la mitad es spam: 400 verdaderos positivos y 50 falsos positivos.
+
+984
+00:59:36,400 --> 00:59:41,480
+La precisión es 400 sobre 450, 88.9 por ciento.
+
+985
+00:59:41,600 --> 00:59:46,118
+Si solo el 5 por ciento es spam: 40 verdaderos positivos, pero
+
+986
+00:59:46,118 --> 00:59:49,980
+95 falsos positivos, porque los legítimos son muchos.
+
+987
+00:59:50,100 --> 00:59:55,180
+La precisión cae a 40 sobre 135: 29.6 por ciento.
+
+988
+00:59:55,300 --> 00:59:58,613
+Con estas herramientas, la clase fija un protocolo antes de
+
+989
+00:59:58,613 --> 01:00:01,590
+mirar resultados, en la diapositiva cuarenta y siete.
+
+990
+01:00:01,710 --> 01:00:08,800
+Uno: reservar 921 correos para la prueba, y usar 3680 para ajustar y seleccionar.
+
+991
+01:00:08,920 --> 01:00:13,970
+Dos: comparar tres candidatos por log loss fuera de pliegue, con cinco pliegues.
+
+992
+01:00:14,090 --> 01:00:18,515
+Tres: en el ganador, elegir el umbral, entre 0.05 y
+
+993
+01:00:18,515 --> 01:00:22,160
+0.95, por el menor costo fuera de pliegue.
+
+994
+01:00:22,280 --> 01:00:26,660
+Cuatro: reajustar y evaluar una sola vez el modelo y el umbral elegidos.
+
+995
+01:00:26,780 --> 01:00:31,220
+Primero, la calidad de las probabilidades; después, la decisión.
+
+996
+01:00:31,340 --> 01:00:34,269
+Los tres candidatos, en la diapositiva cuarenta y
+
+997
+01:00:34,269 --> 01:00:36,540
+ocho, son instrumentos de comparación.
+
+998
+01:00:36,660 --> 01:00:40,370
+La frecuencia: una probabilidad constante, igual a la
+
+999
+01:00:40,370 --> 01:00:44,430
+proporción de spam en las filas de ajuste, cerca de 0.394.
+
+1000
+01:00:44,550 --> 01:00:46,520
+Es la referencia sin predictores.
+
+1001
+01:00:46,640 --> 01:00:50,012
+La regresión logística, con la escala aprendida dentro
+
+1002
+01:00:50,012 --> 01:00:52,760
+del ajuste y penalización fija, C igual a 1.
+
+1003
+01:00:52,880 --> 01:00:56,564
+Y el bosque aleatorio: el promedio de 150 árboles, con
+
+1004
+01:00:56,564 --> 01:01:00,180
+profundidad máxima 8 y al menos cinco casos por hoja.
+
+1005
+01:01:00,300 --> 01:01:04,920
+En R, el bosque se ajusta con ranger; en Python, con scikit-learn.
+
+1006
+01:01:05,040 --> 01:01:08,270
+Y los resultados fuera de pliegue, en los 3680
+
+1007
+01:01:08,270 --> 01:01:11,220
+correos, como en la diapositiva cincuenta.
+
+1008
+01:01:11,340 --> 01:01:16,860
+La frecuencia tiene un log loss de 0.671, y un Brier de 0.239.
+
+1009
+01:01:16,980 --> 01:01:21,520
+La logística: 0.275 y 0.075.
+
+1010
+01:01:21,640 --> 01:01:25,620
+Y el bosque: 0.228 y 0.061.
+
+1011
+01:01:25,740 --> 01:01:29,580
+El bosque obtiene el menor log loss, y la regla fijada lo elige.
+
+1012
+01:01:29,700 --> 01:01:31,850
+Un cálculo para entender la referencia.
+
+1013
+01:01:31,970 --> 01:01:36,580
+La frecuencia dice, en cada pliegue, cerca de 0.394.
+
+1014
+01:01:36,700 --> 01:01:42,348
+Su log loss es: 0.394 por menos el logaritmo de 0.394,
+
+1015
+01:01:42,348 --> 01:01:46,740
+más 0.606 por menos el logaritmo de 0.606.
+
+1016
+01:01:46,860 --> 01:01:58,900
+Eso es 0.394 por 0.931, más 0.606 por 0.501: 0.367 más 0.304, igual a 0.671.
+
+1017
+01:01:59,020 --> 01:02:05,130
+Y su Brier es simplemente 0.394 por 0.606: 0.239.
+
+1018
+01:02:05,250 --> 01:02:07,790
+Son el piso de no usar ningún predictor.
+
+1019
+01:02:07,910 --> 01:02:10,340
+Aquí conviene corregir algo de la grabación.
+
+1020
+01:02:10,460 --> 01:02:13,867
+Al presentar este protocolo se dijo: «voy a ocupar la pérdida
+
+1021
+01:02:13,867 --> 01:02:17,050
+cuadrática fuera de pliegue, y voy a escoger el ganador».
+
+1022
+01:02:17,170 --> 01:02:20,200
+La pérdida cuadrática de una probabilidad es el Brier.
+
+1023
+01:02:20,320 --> 01:02:24,780
+Pero el script elige por log loss: ordena el ranking por la columna log loss.
+
+1024
+01:02:24,900 --> 01:02:27,857
+Y la diapositiva cincuenta lo dice explícito: el
+
+1025
+01:02:27,857 --> 01:02:30,260
+log loss selecciona; el Brier describe.
+
+1026
+01:02:30,380 --> 01:02:35,020
+En estos datos los dos eligen el bosque, pero el criterio fijado es el log loss.
+
+1027
+01:02:35,140 --> 01:02:40,140
+Elegido el bosque, falta revisar su calibración: diapositiva cincuenta y dos.
+
+1028
+01:02:40,260 --> 01:02:43,417
+Sus probabilidades fuera de pliegue se ordenan y
+
+1029
+01:02:43,417 --> 01:02:46,180
+se dividen en cinco grupos de 736 correos.
+
+1030
+01:02:46,300 --> 01:02:49,128
+Para cada grupo, la probabilidad media en el eje
+
+1031
+01:02:49,128 --> 01:02:52,310
+horizontal, y la fracción real de spam en el vertical.
+
+1032
+01:02:52,430 --> 01:02:57,120
+Bajo la diagonal, el modelo sobreestima; sobre la diagonal, subestima.
+
+1033
+01:02:57,240 --> 01:03:02,810
+En el cuarto grupo: predice 0.673 y se observa 0.814.
+
+1034
+01:03:02,930 --> 01:03:06,200
+Un buen ranking no garantiza probabilidades calibradas.
+
+1035
+01:03:06,320 --> 01:03:07,650
+¿Y qué hacemos con eso?
+
+1036
+01:03:07,770 --> 01:03:09,660
+Se podría recalibrar el modelo.
+
+1037
+01:03:09,780 --> 01:03:15,230
+Pero ojo: recalibrar cambia la receta, y la nueva receta exige su propia validación.
+
+1038
+01:03:15,350 --> 01:03:18,680
+Por ahora, el protocolo sigue con el bosque tal como está.
+
+1039
+01:03:18,800 --> 01:03:22,330
+Y esta subestimación va a reaparecer en la próxima parada, cuando
+
+1040
+01:03:22,330 --> 01:03:25,100
+comparemos el umbral teórico con el umbral elegido.
+
+1041
+01:03:25,220 --> 01:03:29,810
+El error típico: leer el área bajo la curva como un porcentaje de aciertos.
+
+1042
+01:03:29,930 --> 01:03:35,617
+Un 0.975 se lee mejor así: si tomo al azar un spam y un legítimo, en el 97.5
+
+1043
+01:03:35,617 --> 01:03:40,480
+por ciento de los casos el spam recibe una probabilidad más alta.
+
+1044
+01:03:40,600 --> 01:03:44,720
+Es una medida de orden, no de aciertos, y no dice qué umbral usar.
+
+1045
+01:03:44,840 --> 01:03:46,060
+Piensa un segundo.
+
+1046
+01:03:46,180 --> 01:03:48,963
+Mismo filtro: sensibilidad de 80 por ciento y
+
+1047
+01:03:48,963 --> 01:03:51,560
+tasa de falsos positivos de 10 por ciento.
+
+1048
+01:03:51,680 --> 01:03:55,440
+Pero ahora, en mil correos, el 20 por ciento es spam.
+
+1049
+01:03:55,560 --> 01:03:56,730
+¿Cuál es la precisión?
+
+1050
+01:03:57,450 --> 01:04:00,080
+Hay 200 spam y 800 legítimos.
+
+1051
+01:04:00,200 --> 01:04:05,010
+Verdaderos positivos: el 80 por ciento de 200, 160.
+
+1052
+01:04:05,130 --> 01:04:09,140
+Falsos positivos: el 10 por ciento de 800, 80.
+
+1053
+01:04:09,260 --> 01:04:14,480
+Precisión: 160 sobre 240, 66.7 por ciento.
+
+1054
+01:04:14,600 --> 01:04:19,960
+Entre el 88.9 y el 29.6 de la diapositiva, como era de esperar.
+
+1055
+01:04:20,080 --> 01:04:25,010
+Para llevarte: la ROC y la curva de precisión y recall describen el ordenamiento sobre
+
+1056
+01:04:25,010 --> 01:04:29,080
+todos los umbrales; la precisión depende de la frecuencia de positivos.
+
+1057
+01:04:29,200 --> 01:04:31,975
+El protocolo elige primero el modelo con la pérdida
+
+1058
+01:04:31,975 --> 01:04:35,240
+logarítmica fuera de pliegue, y después el umbral por costo.
+
+1059
+01:04:35,360 --> 01:04:38,120
+Y un buen ranking no garantiza buena calibración.
+
+1060
+01:04:38,240 --> 01:04:42,870
+Siguiente parada, la última: elegir el umbral por costo, el umbral teórico,
+
+1061
+01:04:42,870 --> 01:04:46,760
+la evaluación final en la prueba, y el repaso de toda la clase.
+
+1062
+01:04:47,650 --> 01:04:51,336
+Última parada: elegir el umbral por costo, evaluar la regla
+
+1063
+01:04:51,336 --> 01:04:54,210
+cerrada en la prueba, y repasar toda la clase.
+
+1064
+01:04:54,330 --> 01:04:57,370
+El mismo bosque, con las mismas probabilidades.
+
+1065
+01:04:57,490 --> 01:05:03,430
+Con el umbral de 0.5, cuesta 149.7 unidades por cada mil correos.
+
+1066
+01:05:03,550 --> 01:05:07,540
+Con el umbral de 0.6, cuesta 128.8.
+
+1067
+01:05:07,660 --> 01:05:12,010
+No cambiamos el modelo: cambiamos solo la decisión, y el costo bajó.
+
+1068
+01:05:12,130 --> 01:05:14,780
+Elegir el umbral es parte de elegir la regla.
+
+1069
+01:05:14,900 --> 01:05:18,510
+Piensa en un juez que decide cuánta evidencia exigir antes de condenar.
+
+1070
+01:05:18,630 --> 01:05:21,820
+Si exige muy poca, condena a más inocentes.
+
+1071
+01:05:21,940 --> 01:05:25,150
+Si exige demasiada, deja libres a más culpables.
+
+1072
+01:05:25,270 --> 01:05:28,230
+Dónde poner la vara depende de cuánto pesa cada error.
+
+1073
+01:05:28,350 --> 01:05:31,877
+Con el spam, bloquear un correo legítimo pesa cinco veces más
+
+1074
+01:05:31,877 --> 01:05:35,000
+que dejar pasar un spam: la vara tiene que estar alta.
+
+1075
+01:05:35,120 --> 01:05:38,047
+La diapositiva cincuenta y tres muestra el costo fuera de
+
+1076
+01:05:38,047 --> 01:05:40,820
+pliegue del bosque, para cada umbral de la cuadrícula.
+
+1077
+01:05:40,940 --> 01:05:46,489
+Los umbrales bajos bloquean demasiado y cuestan mucho: con 0.05, más de dos
+
+1078
+01:05:46,489 --> 01:05:50,780
+mil unidades por cada mil correos; aquí se ven desde 0.25.
+
+1079
+01:05:50,900 --> 01:05:53,650
+El costo baja hasta un mínimo y vuelve a subir.
+
+1080
+01:05:53,770 --> 01:06:06,040
+Cerca del mínimo: con 0.55, 132.3; con 0.60, 128.8; y con 0.65, 135.3.
+
+1081
+01:06:06,160 --> 01:06:10,730
+Entre los 19 umbrales ensayados, se elige t igual a 0.60.
+
+1082
+01:06:10,850 --> 01:06:12,710
+Y aquí la grabación lo dijo bien.
+
+1083
+01:06:12,830 --> 01:06:19,474
+«Si pongo un umbral 0,55, el costo asociado va a estar en 132; en 0,6 el
+
+1084
+01:06:19,474 --> 01:06:25,380
+costo va a ser 128; y subiendo a 0,65, el costo empezó a subir».
+
+1085
+01:06:25,500 --> 01:06:27,550
+Coincide con la tabla recalculada.
+
+1086
+01:06:27,670 --> 01:06:31,358
+Una advertencia de la diapositiva: el mínimo usado para elegir
+
+1087
+01:06:31,358 --> 01:06:34,690
+todavía necesita la prueba, porque también es optimista.
+
+1088
+01:06:34,810 --> 01:06:37,730
+¿Qué cambió entre 0.5 y 0.6?
+
+1089
+01:06:37,850 --> 01:06:40,350
+La diapositiva cincuenta y cuatro lo detalla.
+
+1090
+01:06:40,470 --> 01:06:48,990
+Con 0.5: 74 falsos positivos y 181 falsos negativos; aciertos, 93.1 por ciento.
+
+1091
+01:06:49,110 --> 01:06:57,520
+Con 0.6: 44 falsos positivos y 254 falsos negativos; aciertos, 91.9.
+
+1092
+01:06:57,640 --> 01:07:01,930
+Son 30 falsos positivos menos y 73 falsos negativos más.
+
+1093
+01:07:02,050 --> 01:07:07,500
+Ahorro: cinco por treinta, menos 73, igual a 77 unidades.
+
+1094
+01:07:07,620 --> 01:07:12,770
+Bajan los aciertos, pero también baja el costo: evitamos los errores que pesan más.
+
+1095
+01:07:12,890 --> 01:07:17,390
+Los costos también sugieren un umbral teórico, en la diapositiva cincuenta y cinco.
+
+1096
+01:07:17,510 --> 01:07:21,460
+Supongamos que p es la probabilidad correcta de que el correo sea spam.
+
+1097
+01:07:21,580 --> 01:07:24,532
+Si lo bloqueo, me equivoco cuando es legítimo:
+
+1098
+01:07:24,532 --> 01:07:26,970
+costo esperado, cinco por uno menos p.
+
+1099
+01:07:27,090 --> 01:07:31,480
+Si lo dejo pasar, me equivoco cuando es spam: costo esperado, p.
+
+1100
+01:07:31,600 --> 01:07:34,860
+Conviene bloquear cuando cinco por uno menos p es menor que p.
+
+1101
+01:07:34,980 --> 01:07:39,520
+Despejando: p mayor que cinco sextos, 0.833.
+
+1102
+01:07:39,640 --> 01:07:41,270
+Probemos con dos correos.
+
+1103
+01:07:41,390 --> 01:07:45,148
+Con p igual a 0.9: bloquear cuesta cinco por
+
+1104
+01:07:45,148 --> 01:07:48,650
+0.1, medio punto; dejar pasar cuesta 0.9.
+
+1105
+01:07:48,770 --> 01:07:49,850
+Conviene bloquear.
+
+1106
+01:07:49,970 --> 01:07:57,630
+Con p igual a 0.7: bloquear cuesta cinco por 0.3, 1.5; dejar pasar, 0.7.
+
+1107
+01:07:57,750 --> 01:07:59,180
+Conviene dejar pasar.
+
+1108
+01:07:59,300 --> 01:08:04,440
+Pero el umbral elegido con los datos fue 0.60, no 0.833.
+
+1109
+01:08:04,560 --> 01:08:05,550
+¿Por qué difieren?
+
+1110
+01:08:05,670 --> 01:08:10,651
+Porque la fórmula supone probabilidades correctas, y las del bosque no lo
+
+1111
+01:08:10,651 --> 01:08:14,950
+son: en la parada anterior vimos que, cerca de 0.67, subestima.
+
+1112
+01:08:15,070 --> 01:08:18,270
+Además, la muestra y la cuadrícula son finitas.
+
+1113
+01:08:18,390 --> 01:08:21,380
+Con eso, la regla completa queda cerrada antes de
+
+1114
+01:08:21,380 --> 01:08:23,820
+la prueba: diapositiva cincuenta y seis.
+
+1115
+01:08:23,940 --> 01:08:26,530
+Modelo: el bosque de profundidad ocho.
+
+1116
+01:08:26,650 --> 01:08:28,790
+Umbral: 0.60.
+
+1117
+01:08:28,910 --> 01:08:31,799
+Se reajusta con los 3680 correos de
+
+1118
+01:08:31,799 --> 01:08:34,852
+entrenamiento, y se evalúa en los 921
+
+1119
+01:08:34,852 --> 01:08:35,760
+reservados.
+
+1120
+01:08:35,880 --> 01:08:39,574
+La referencia de decisión deja pasar todos los correos: no
+
+1121
+01:08:39,574 --> 01:08:42,950
+comete falsos positivos, pero no detecta ningún spam.
+
+1122
+01:08:43,070 --> 01:08:45,816
+La prueba evalúa el procedimiento completo:
+
+1123
+01:08:45,816 --> 01:08:49,200
+preprocesamiento, modelo, umbral y costos declarados.
+
+1124
+01:08:49,320 --> 01:08:52,822
+Y este es el resultado en la prueba, recalculado con el script
+
+1125
+01:08:52,822 --> 01:08:55,760
+de Python, como en la diapositiva cincuenta y siete.
+
+1126
+01:08:55,880 --> 01:09:00,743
+553 verdaderos negativos, solo 5 falsos positivos, 53
+
+1127
+01:09:00,743 --> 01:09:04,780
+falsos negativos y 310 verdaderos positivos.
+
+1128
+01:09:04,900 --> 01:09:12,560
+Aciertos, 93.7 por ciento; precisión, 98.4; recall, 85.4.
+
+1129
+01:09:12,680 --> 01:09:17,600
+Log loss 0.194, y Brier 0.0502.
+
+1130
+01:09:17,720 --> 01:09:22,957
+El costo: cinco por cinco, más 53, son 78; sobre
+
+1131
+01:09:22,957 --> 01:09:27,430
+921 y por mil, 84.7 por cada mil correos.
+
+1132
+01:09:27,550 --> 01:09:35,080
+La referencia de dejar pasar todo cuesta 363 sobre 921, por mil: 394.1.
+
+1133
+01:09:35,200 --> 01:09:39,680
+Y ahora, la regla que cierra la clase, en la diapositiva cincuenta y ocho.
+
+1134
+01:09:39,800 --> 01:09:42,874
+Supongamos que, mirando la prueba, se nos ocurre
+
+1135
+01:09:42,874 --> 01:09:45,500
+otra variable, otro modelo u otro umbral.
+
+1136
+01:09:45,620 --> 01:09:48,462
+La prueba anterior ayuda a formular esa hipótesis,
+
+1137
+01:09:48,462 --> 01:09:50,850
+pero ya no queda intacta para confirmarla.
+
+1138
+01:09:50,970 --> 01:09:55,280
+El rediseño exige una nueva selección y una nueva evaluación independiente.
+
+1139
+01:09:55,400 --> 01:09:59,289
+La regla es la misma para la resistencia y para el spam: el desempeño
+
+1140
+01:09:59,289 --> 01:10:02,670
+usado para elegir no reemplaza una evaluación independiente.
+
+1141
+01:10:02,790 --> 01:10:07,390
+El error típico de esta parte: elegir el umbral mirando el costo en la prueba.
+
+1142
+01:10:07,510 --> 01:10:11,610
+Si en la prueba el mejor umbral resultara ser otro, la tentación es cambiarlo.
+
+1143
+01:10:11,730 --> 01:10:17,270
+Pero entonces el 84.7 ya no estima nada: la prueba se habría usado para elegir.
+
+1144
+01:10:17,390 --> 01:10:21,650
+El umbral se elige con validación, y la prueba se mira una sola vez.
+
+1145
+01:10:21,770 --> 01:10:22,990
+Piensa un segundo.
+
+1146
+01:10:23,110 --> 01:10:26,226
+Si los costos fueran otros: tres unidades por cada
+
+1147
+01:10:26,226 --> 01:10:29,030
+falso positivo y una por cada falso negativo.
+
+1148
+01:10:29,150 --> 01:10:30,920
+¿Cuál sería el umbral teórico?
+
+1149
+01:10:31,640 --> 01:10:35,280
+Bloquear cuesta tres por uno menos p; dejar pasar cuesta p.
+
+1150
+01:10:35,400 --> 01:10:39,565
+Conviene bloquear si tres menos tres p es menor que p, es
+
+1151
+01:10:39,565 --> 01:10:42,780
+decir, si p es mayor que tres cuartos: 0.75.
+
+1152
+01:10:42,900 --> 01:10:46,450
+En general, con costos c para el falso positivo y uno para el
+
+1153
+01:10:46,450 --> 01:10:49,650
+falso negativo, el umbral teórico es c sobre c más uno.
+
+1154
+01:10:49,770 --> 01:10:53,720
+Con cinco, cinco sextos; con tres, tres cuartos.
+
+1155
+01:10:53,840 --> 01:10:56,900
+Repasemos toda la clase con la diapositiva sesenta.
+
+1156
+01:10:57,020 --> 01:10:59,610
+Evaluar responde: ¿qué error esperamos?
+
+1157
+01:10:59,730 --> 01:11:03,576
+Para eso, se predicen casos fuera del ajuste, con una métrica
+
+1158
+01:11:03,576 --> 01:11:06,540
+acorde al uso, y se compara con una referencia.
+
+1159
+01:11:06,660 --> 01:11:09,370
+Seleccionar responde: ¿qué receta usamos?
+
+1160
+01:11:09,490 --> 01:11:13,231
+Se comparan los candidatos en la misma validación, se aplica el
+
+1161
+01:11:13,231 --> 01:11:16,140
+criterio fijado, y se reajusta la receta elegida.
+
+1162
+01:11:16,260 --> 01:11:19,810
+En el hormigón, se eligió por RMSE.
+
+1163
+01:11:19,930 --> 01:11:25,040
+En el spam, las probabilidades con la pérdida logarítmica, y el umbral con el costo.
+
+1164
+01:11:25,160 --> 01:11:28,420
+Y las cuatro recomendaciones de la diapositiva sesenta y uno.
+
+1165
+01:11:28,540 --> 01:11:30,370
+Uno: definir el criterio.
+
+1166
+01:11:30,490 --> 01:11:33,252
+Fijar la métrica principal y la referencia, y en
+
+1167
+01:11:33,252 --> 01:11:36,360
+clasificación distinguir probabilidades de decisiones.
+
+1168
+01:11:36,480 --> 01:11:38,400
+Dos: validar sin fuga.
+
+1169
+01:11:38,520 --> 01:11:41,022
+Respetar los grupos o el tiempo, y aprender las
+
+1170
+01:11:41,022 --> 01:11:43,470
+transformaciones solo con las filas de ajuste.
+
+1171
+01:11:43,590 --> 01:11:45,430
+Tres: cerrar la receta.
+
+1172
+01:11:45,550 --> 01:11:48,686
+Fijar modelo, transformaciones, hiperparámetros y
+
+1173
+01:11:48,686 --> 01:11:51,310
+umbral, y reajustar con el entrenamiento.
+
+1174
+01:11:51,430 --> 01:11:53,290
+Cuatro: valorar la mejora.
+
+1175
+01:11:53,410 --> 01:11:56,885
+Considerar su magnitud y su estabilidad; y ante resultados
+
+1176
+01:11:56,885 --> 01:11:59,760
+parecidos, considerar la simplicidad y el costo.
+
+1177
+01:11:59,880 --> 01:12:05,078
+Para llevarte de esta parada: el umbral se elige con validación, por el costo;
+
+1178
+01:12:05,078 --> 01:12:09,410
+el umbral teórico, cinco sextos, supone probabilidades correctas.
+
+1179
+01:12:09,530 --> 01:12:15,030
+La regla completa se cierra antes de la prueba, y se evalúa una sola vez
+
+1180
+01:12:15,030 --> 01:12:19,690
+contra su referencia: 84.7 contra 394.1 por cada mil correos.
+
+1181
+01:12:19,810 --> 01:12:22,603
+Y si se rediseña después de mirar la prueba, hace
+
+1182
+01:12:22,603 --> 01:12:24,940
+falta una nueva evaluación independiente.
+
+1183
+01:12:25,060 --> 01:12:27,230
+Con esto termina la clase treinta y ocho.
+
+1184
+01:12:27,350 --> 01:12:30,205
+Siguiente parada: la clase treinta y nueve, sobre
+
+1185
+01:12:30,205 --> 01:12:33,410
+clustering, donde ya no hay una respuesta que predecir.

@@ -39,10 +39,13 @@ QUITAR = set()
 PRON_C37_PAL = [
     (r"kernels", "kérnels"), (r"kernel", "kérnel"),                                       # (W) kernel -> «crono o mar»
     (r"RBF", "erre, be, efe"),                                                                # (W) erre be efe -> «rbf» suelto
-    (r"hinge loss", "jinch lós"), (r"hinge", "jinch"),                                    # (W) hinge loss -> «hence was»
+    (r"hinge loss", "jínch lós"), (r"hinge", "jínch"),                                    # (W) hinge loss -> «hence was»; jinch suelto -> «Hing», «ging» (ronda 2)
     (r"soft margin", "sóft márgin"),
     (r"glm", "ge ele eme"), (r"penalty", "pénalti"), (r"None", "nan"),
     (r"VN", "uve ene"), (r"VP", "uve pe"), (r"w", "doble u"),
+    (r"estándar skéiler", "Standard Scaler"),                                                       # (W, ronda 2) estándar skéiler -> «standard scalar»
+    (r"Páizon", "Páiton"),                                                                          # (W, ronda 2) Páizon -> «son», «pison»
+    (r"folds", "fólds"), (r"fold", "fóld"),                                                # (W, ronda 2) fold -> «foul»
     (r"C", "ce"),                                                                             # (W) C -> «se», «el parámetro se»
 ]
 PRON_C37 = PRON_C37_API + [p for p in R36.PRON_C36 if p[0] not in QUITAR] + PRON_C37_PAL

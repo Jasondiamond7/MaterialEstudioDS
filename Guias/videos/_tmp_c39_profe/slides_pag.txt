@@ -1,0 +1,1083 @@
+===== DIAPOSITIVA 1 =====
+     Aprendizaje Automático
+
+ Clase 39: Clustering
+
+K-means, K-modes y K-prototypes
+          Pedro Luiz Ramos
+
+     Martes 29 de septiembre de 2026
+
+===== DIAPOSITIVA 2 =====
+Clasificación y agrupación
+
+Clasificación supervisada             Clustering
+
+Observamos variables x y una clase    Observamos variables x y buscamos
+conocida y .                          una partición.
+Aprendemos a predecir la clase de     Describimos similitudes y diferencias
+nuevos casos.                         entre grupos.
+Logística, SVM, Naive Bayes.          K-means, K-modes, K-prototypes.
+
+La etiqueta de un clúster se construye a partir de los datos.
+El grupo 1 no significa “positivo”, “mejor” ni “mayor riesgo”.
+
+Data Science UC Clase 39: Clustering                                         2 / 57
+
+===== DIAPOSITIVA 3 =====
+El resultado de un agrupamiento
+
+     Observaciones sin etiquetas                                  Una particion en tres grupos
+
+4                                                                 Centros
+
+2Variable 2
+                                                      Variable 2
+0
+
+2
+
+   4  20                                          2  4            4  20          2  4
+                                      Variable 1                     Variable 1
+
+Obtenemos una etiqueta por observación y un perfil de cada grupo.
+
+Ejemplo simulado. Las cruces representan los centros de K-means.
+
+Data Science UC Clase 39: Clustering                                                            3 / 57
+
+===== DIAPOSITIVA 4 =====
+Similitud y propósito
+
+Una misma base puede producir agrupamientos distintos según las variables.
+  ▶ En clientes: frecuencia de compra, gasto o canal preferido.
+  ▶ En vinos: mediciones químicas, sin una nota de calidad observada.
+  ▶ En documentos: una representación de sus contenidos.
+
+Primero definimos qué significa que dos observaciones sean parecidas.
+Un grupo compacto puede ser poco útil para el propósito del análisis.
+
+Data Science UC Clase 39: Clustering                                        4 / 57
+
+===== DIAPOSITIVA 5 =====
+El método depende de las variables
+
+Método                                Variables Representante
+
+K-means                               Numéricas    Media por variable
+K-modes                               Categóricas  Moda por variable
+K-prototypes                          Mixtas       Medias y modas
+
+                Los tres requieren fijar el número de grupos k .
+El costo depende de la representación y de la disimilitud elegidas.
+
+Data Science UC Clase 39: Clustering                                   5 / 57
+
+===== DIAPOSITIVA 6 =====
+Datos: 177 vinos y 13 mediciones
+
+El archivo del curso contiene Codigo y 13 variables numéricas.
+  ▶ Alcohol, ácido málico, ceniza y alcalinidad.
+  ▶ Magnesio, fenoles, flavonoides y otras mediciones.
+  ▶ Color, matiz, OD280/OD315 y prolina.
+
+codigo identifica cada fila y se excluye del ajuste.
+Usamos las mismas 177 filas del material. No agregamos etiquetas de clase.
+
+Adaptación docente de Wine, UCI, con 178 filas en la fuente original. En el archivo recibido hay 177.
+https://doi.org/10.24432/C5PC7J. La recomendación comercial es un escenario hipotético.
+
+Data Science UC Clase 39: Clustering                                                                   6 / 57
+
+===== DIAPOSITIVA 7 =====
+Estandarización
+
+Si una variable tiene una escala mucho mayor, puede dominar las distancias.
+                                                 zij = xij − x¯j .
+                                                           sj
+
+Ejemplo hipotético: alcohol de 14, media 13 y desviación 0.8.
+                                            z = 14 − 13 = 1.25.
+                                                     0.8
+
+Ese vino está 1.25 desviaciones sobre la media de alcohol.
+Estandarizar iguala las escalas. No elimina atípicos ni correlaciones.
+
+Data Science UC Clase 39: Clustering                                         7 / 57
+
+===== DIAPOSITIVA 8 =====
+Datos y escala en R
+
+library(cluster)
+library(klaR)
+library(clustMixType)
+setwd("D:/codigos/clustering")
+
+vinos <- read.csv("vinos.csv")
+head(vinos)
+dim(vinos)
+x <- vinos[, -1]
+z <- scale(x)
+
+  ▶ x contiene solo las 13 mediciones.
+  ▶ scale resta la media y divide por la desviación muestral.
+  ▶ El CSV ya está incluido en D:/codigos/clustering.
+
+Data Science UC Clase 39: Clustering                           8 / 57
+
+===== DIAPOSITIVA 9 =====
+Datos y escala en Python
+
+os.chdir(r"D:\codigos\clustering")
+vinos = pd.read_csv("vinos.csv")
+print(vinos.head())
+print(vinos.shape)
+x = vinos.drop(columns="codigo")
+# ddof=1 usa la misma desviacion estandar muestral que scale() de R.
+z = (x - x.mean()) / x.std(ddof=1)
+
+  ▶ drop retira el identificador.
+  ▶ ddof=1 permite usar la misma escala muestral que en R.
+  ▶ Conservamos x y z sin agregarles etiquetas de clúster.
+
+Una etiqueta obtenida por el algoritmo no debe volver a entrar como predictor.
+
+Data Science UC Clase 39: Clustering  9 / 57
+
+===== DIAPOSITIVA 10 =====
+Distancia euclidiana: una cuenta
+
+Consideremos dos observaciones ya estandarizadas:
+                                        x = (1, 2), c = (3, 1).
+
+La distancia al cuadrado es
+                            ∥x − c∥2 = (1 − 3)2 + (2 − 1)2 = 4 + 1 = 5.
+                                   √
+
+La distancia euclidiana es 5 ≈ 2.236.
+K-means minimiza la suma de distancias euclidianas al cuadrado.
+El cuadrado aumenta el peso de observaciones muy alejadas del centro.
+
+Data Science UC Clase 39: Clustering                                     10 / 57
+
+===== DIAPOSITIVA 11 =====
+K-means: criterio de ajuste
+
+Buscamos grupos C1, . . . , Ck y centros µ1, . . . , µk que reduzcan
+
+                                                       k     ∥zi − µg∥2.
+
+                                      WSS =
+
+                                      g=1 i∈Cg
+
+Para un grupo dado, el centro que minimiza ese costo es su media:
+
+                                      µg =                1        zi .
+
+                                                          ng i∈Cg
+
+Un WSS menor significa mayor compacidad bajo esta escala y este criterio.
+No demuestra por sí solo que encontramos grupos reales o útiles.
+
+Data Science UC Clase 39: Clustering                                       11 / 57
+
+===== DIAPOSITIVA 12 =====
+Iteraciones de K-means
+
+  1. Fijar k y elegir los centros iniciales.
+  2. Asignar cada observación al centro más cercano.
+  3. Recalcular cada centro como la media de su grupo.
+  4. Repetir asignación y actualización hasta estabilizar el ajuste.
+Cada paso reduce o mantiene el costo, pero la solución puede ser local.
+Repetimos el procedimiento desde distintos puntos de partida.
+
+Data Science UC Clase 39: Clustering                                     12 / 57
+
+===== DIAPOSITIVA 13 =====
+Una iteración resuelta
+
+Datos: 1, 2, 3, 8, 9, 10. Fijamos k = 2 y centros iniciales c1 = 1, c2 = 8.
+
+                                      x (x − 1)2 (x − 8)2 Grupo
+
+                                      1   0   49  1
+
+                                      2   1   36  1
+
+                                      3   4   25  1
+
+                                      8   49  0   2
+
+                                      9   64  1   2
+
+                                      10  81  4   2
+
+Nuevos centros: µ1 = (1 + 2 + 3)/3 = 2 y µ2 = (8 + 9 + 10)/3 = 9.
+
+Data Science UC Clase 39: Clustering                                         13 / 57
+
+===== DIAPOSITIVA 14 =====
+El ajuste en dos dimensiones
+
+                     1 iteracion      Hasta 2 iteraciones  Hasta 20 iteraciones
+
+            4
+
+Variable 2  2
+
+            0
+
+            2                         2.5 0.0 2.5 5.0      2.5 0.0 2.5 5.0
+                     2.5 0.0 2.5 5.0      Variable 1           Variable 1
+                         Variable 1
+
+Las cruces cambian de posición al actualizar los centros.
+
+Ejemplo simulado con los mismos datos e inicio. Los colores representan la asignación de cada ajuste.
+
+Data Science UC Clase 39: Clustering                                                                   14 / 57
+
+===== DIAPOSITIVA 15 =====
+La inicialización importa
+
+     1600          Mismos datos y k=3, distintos puntos de partida
+     1500
+     1400    Mejor ajuste de 50 inicios
+     1300
+WSS
+          0
+             5             10  Inicializacion15  20                                                              25
+
+Conservamos el ajuste de menor WSS entre varias inicializaciones.                                                           15 / 57
+
+Vinos estandarizados, k = 3. nstart=50 en R y n_init=50 en Python. Una semilla fija permite repetir el cálculo.
+
+Data Science UC Clase 39: Clustering
+
+===== DIAPOSITIVA 16 =====
+WSS, BSS y variabilidad total
+
+                                      TSS = ∥zi − z¯∥2,
+
+                                                      i
+
+                                      WSS =          ∥zi − µg∥2,
+
+                                             g i∈Cg
+
+                                      BSS = ng∥µg − z¯∥2.
+
+                                                      g
+
+Para estas medias y las mismas observaciones: TSS = WSS + BSS.
+
+BSS compara cada centro con la media global y pondera por el tamaño del
+grupo.
+
+BSS no es el promedio de distancias entre todos los pares de centros.
+
+Data Science UC Clase 39: Clustering                                     16 / 57
+
+===== DIAPOSITIVA 17 =====
+WSS y BSS: cuenta completa
+
+Datos: 1, 2, 3, 8, 9, 10. Centros: 2 y 9. Media global: 5.5.
+
+                                      WSS = 1 + 0 + 1 + 1 + 0 + 1 = 4.
+
+                                      {1,2,3}  {8,9,10}
+
+                   BSS = 3(2 − 5.5)2 + 3(9 − 5.5)2 = 36.75 + 36.75 = 73.5.
+                 TSS = 20.25 + 12.25 + 6.25 + 6.25 + 12.25 + 20.25 = 77.5.
+Verificación: 4 + 73.5 = 77.5.
+
+Al fijar los datos y la escala, reducir WSS equivale a aumentar BSS.
+
+Data Science UC Clase 39: Clustering                                        17 / 57
+
+===== DIAPOSITIVA 18 =====
+Elección del número de grupos
+
+  ▶ Codo: buscar una disminución cada vez menor del WSS.
+  ▶ Silueta: comparar cercanía al propio grupo y al grupo vecino.
+  ▶ Gap: contrastar la compacidad con una referencia simulada.
+  ▶ Revisar tamaños, estabilidad e interpretación de los grupos.
+El menor WSS favorece más grupos. En el extremo, un grupo por fila da WSS cero.
+El costo de ajuste necesita un criterio adicional para elegir k .
+
+Data Science UC Clase 39: Clustering  18 / 57
+
+===== DIAPOSITIVA 19 =====
+Codo en los vinos
+
+     2250
+
+     2000
+
+WSS  1750
+     1500 k=3: 1267,37
+
+     1250
+
+     1000
+
+           1  2    3  4  5                6  7  8
+                      Numero de grupos k
+
+k = 3 es un candidato interpretable. La curva sigue disminuyendo después.                                                    19 / 57
+
+Cálculo con el script Python, 13 variables estandarizadas. El codo no es una prueba formal ni garantiza un único candidato.
+Data Science UC Clase 39: Clustering
+
+===== DIAPOSITIVA 20 =====
+Silueta: interpretación y ejemplo
+
+a(i): distancia media a los otros puntos de su grupo.
+b(i): la menor distancia media a los puntos de otro grupo.
+
+                                          s(i) = b(i) − a(i) .
+                                                    m´ax{a(i), b(i)}
+
+Si a(i) = 2 y b(i) = 6, entonces s(i) = (6 − 2)/6 = 0.667.
+  ▶ Cerca de 1: mayor separación respecto del grupo vecino.
+  ▶ Cerca de 0: observación en una zona de superposición.
+  ▶ Negativa: en promedio, está más cerca de otro grupo.
+
+Se usa distancia euclidiana, no su cuadrado. Por convención, una observación sola en su grupo tiene silueta cero.
+
+Data Science UC Clase 39: Clustering                                                                               20 / 57
+
+===== DIAPOSITIVA 21 =====
+Silueta media en los vinos
+
+               0.3  k=3: 0,284
+
+Silueta media  0.2
+
+               0.1
+
+               0.0 2 3 4 5 6 7 8
+                                                    Numero de grupos k
+
+El mayor valor entre k = 2, . . . , 8 ocurre en k = 3: aproximadamente 0.284.
+
+Es el mejor de estos candidatos, aunque persiste superposición entre grupos.
+
+Cálculo Python sobre las 13 variables. No hay silueta para k = 1 porque falta un grupo vecino.  21 / 57
+Data Science UC Clase 39: Clustering
+
+===== DIAPOSITIVA 22 =====
+Gap: una referencia sin estructura de grupos
+
+Comparamos el WSS observado con el de datos simulados en una región de
+
+referencia.                                      1 ∗ B
+
+                                      Gap(k ) =  B       log Wkb − log Wk .
+
+                                                    b=1
+
+  1. Ajustar K-means a los datos reales para cada k .
+  2. Simular B bases y calcular su WSS para los mismos valores de k .
+  3. Comparar el costo observado con el promedio en escala logarítmica.
+
+Aquí usamos referencia uniforme en el rango de cada columna estandarizada.
+
+Tibshirani, Walther y Hastie (2001). La referencia y la escala forman parte del criterio.
+
+Data Science UC Clase 39: Clustering                                                       22 / 57
+
+===== DIAPOSITIVA 23 =====
+Gap: regla de un error estándar
+
+Elegimos el primer k que cumple
+                                      Gap(k ) ≥ Gap(k + 1) − sk+1.
+
+Ejemplo hipotético:
+
+                                      k Gap sk
+
+                                      1 0.40 0.04
+                                      2 0.62 0.05
+                                      3 0.64 0.04
+
+Para k = 1: 0.40 < 0.62 − 0.05 = 0.57. No cumple.
+Para k = 2: 0.62 ≥ 0.64 − 0.04 = 0.60. Elegimos 2.
+
+Esta regla puede elegir un k menor que el máximo del Gap.
+
+Data Science UC Clase 39: Clustering                                23 / 57
+
+===== DIAPOSITIVA 24 =====
+Cuando los criterios discrepan
+
+     1.3     Regla de un error estandar: k=4
+
+     1.2
+
+Gap  1.1
+
+     1.0
+
+     0.9
+
+     0.8
+
+          1  2  3                             4  5                6  7                                  8
+                                              Numero de grupos k
+
+Silueta: k = 3. Gap con esta referencia y 30 simulaciones: k = 4 en R y Python.
+
+Trabajaremos con k = 3 para describir perfiles y reconoceremos k = 4 como
+alternativa.
+
+Gráfico Python. Una simulación más extensa o una referencia distinta puede modificar la recomendación.     24 / 57
+Data Science UC Clase 39: Clustering
+
+===== DIAPOSITIVA 25 =====
+K-means y silueta en R
+
+set.seed(2026)
+modelos <- vector("list", 8)
+wss <- numeric(8)
+silueta <- rep(NA_real_, 8)
+distancias <- dist(z)
+
+for (k in 1:8) {
+   modelos[[k]] <- kmeans(z, centers = k, nstart = 50,
+                                     iter.max = 100, algorithm = "Lloyd")
+   wss[k] <- modelos[[k]]$tot.withinss
+   if (k > 1) {
+      silueta[k] <- mean(silhouette(modelos[[k]]$cluster, distancias)[, 3])
+   }
+
+}
+
+modelos[[k]] guarda el ajuste. La condición evita calcular silueta con un solo grupo.
+
+Data Science UC Clase 39: Clustering  25 / 57
+
+===== DIAPOSITIVA 26 =====
+K-means y silueta en Python
+
+modelos = []
+wss = []
+silueta = []
+for k in range(1, 9):
+
+      modelo = KMeans(n_clusters=k, n_init=50, max_iter=100,
+                              random_state=2026, algorithm="lloyd", tol=1e-8)
+
+      modelo.fit(z)
+      modelos.append(modelo)
+      wss.append(modelo.inertia_)
+      if k > 1:
+
+            silueta.append(silhouette_score(z, modelo.labels_))
+      else:
+
+            silueta.append(np.nan)
+
+inertia_ es WSS. labels_ contiene los grupos, numerados desde cero.
+
+Data Science UC Clase 39: Clustering                                           26 / 57
+
+===== DIAPOSITIVA 27 =====
+Los números de grupo son etiquetas
+
+Con k = 3, ambos scripts encuentran la misma partición, con distinta numeración.
+
+Grupo R     Grupo Python              Tamaño     Rasgo descriptivo
+
+         1                   3               65  Menor alcohol y color
+         2                   2               50  Mayor color y menor matiz
+         3                   1               62  Más flavonoides y prolina
+
+WSS = 1267.37, BSS = 1020.63, TSS = 2288.
+
+El grupo 1 de R no tiene por qué ser el grupo 1 de Python.
+En otros valores de k , también pueden cambiar las particiones.
+
+Data Science UC Clase 39: Clustering                                              27 / 57
+
+===== DIAPOSITIVA 28 =====
+Perfiles en la escala original
+
+Grupo Python n Alcohol Flavonoides Color
+
+                                      1 62  13.68  3.00 5.45
+                                      2 50  13.14  0.82 7.18
+                                      3 65  12.25  2.05 2.97
+
+Son promedios del grupo. No describen exactamente a todos sus integrantes.
+  ▶ Comparar medias junto con distribuciones y tamaños.
+  ▶ Volver a las unidades originales facilita la descripción.
+
+Estas mediciones no permiten afirmar precio, calidad, preferencia ni potencial
+de guarda.
+
+Data Science UC Clase 39: Clustering                          28 / 57
+
+===== DIAPOSITIVA 29 =====
+Perfiles estandarizados
+
+                                                                          1.5
+
+Grupo 1 (62) 0.8 -0.3 0.4 -0.6 0.6 0.9 1.0 -0.6 0.6 0.2 0.5 0.8 1.1 1.0        Media estandarizada
+
+                                                                          0.5
+
+Grupo 2 (50) 0.2 0.9 0.2 0.5 -0.1 -1.0 -1.2 0.7 -0.8 0.9 -1.2 -1.3 -0.4 0.0
+
+                                                                          0.5
+
+Grupo 3 (65) -0.9 -0.4 -0.5 0.2 -0.5 -0.1 0.0 -0.0 0.0 -0.9 0.5 0.3 -0.8  1.0
+
+Alcoholido malico CenizaAlcalinidadMagnesio Fenoleslavonoidesles no flav.cianidinas Color Matiz80/OD315 Prolina 1.5
+
+   Ac F Feno Proanto OD2
+
+Un valor positivo indica una media de grupo superior a la media general.
+
+Etiquetas Python. Escala común en desviaciones estándar. Los colores resumen las mediciones, no una evaluación de calidad.
+
+Data Science UC Clase 39: Clustering                                                                                        29 / 57
+
+===== DIAPOSITIVA 30 =====
+Una proyección de los grupos
+
+Componente principal 2  2
+
+                        0
+
+                        2  Grupo 1
+                           Grupo 2
+                        4 Grupo 3
+                           4          2  0                       2  4
+                                         Componente principal 1
+
+PCA permite dibujar una aproximación en dos dimensiones.
+
+El agrupamiento se ajustó con las 13 variables, no con estas dos coordenadas.
+
+Data Science UC Clase 39: Clustering                                   30 / 57
+
+===== DIAPOSITIVA 31 =====
+Limitaciones de K-means
+
+            1.0
+
+Variable 2  0.5
+
+            0.0
+
+            0.5
+
+                 1.0                  0.5 0.0  0.5         1.0  1.5  2.0
+                                               Variable 1
+
+K-means puede dividir estructuras curvas en grupos compactos que no siguen su
+forma.
+
+Datos simulados. También conviene revisar atípicos, escalas, variables redundantes y grupos de tamaños o dispersiones muy distintos.
+
+Data Science UC Clase 39: Clustering                                           31 / 57
+
+===== DIAPOSITIVA 32 =====
+K-modes para variables categóricas
+
+No tiene sentido promediar categorías como “App”, “Web” o “Sucursal”.
+  ▶ El centro contiene la categoría más frecuente en cada variable.
+  ▶ La disimilitud cuenta cuántas variables tienen valores diferentes.
+  ▶ Se alternan asignación de observaciones y actualización de modas.
+
+                                                                             p
+
+                                         d(x, m) = 1(xj̸ = mj ).
+
+                                                                           j =1
+
+Cambiar los códigos 1, 2 y 3 por nombres no cambia esta disimilitud.
+No se interpretan las diferencias numéricas entre esos códigos.
+
+Data Science UC Clase 39: Clustering                                             32 / 57
+
+===== DIAPOSITIVA 33 =====
+Desacuerdos: una asignación resuelta
+
+Cliente: (Gold, App, Sur).
+
+Centro                                Plan    Canal  Región  Desacuerdos
+
+A                                     Gold    App    Norte   0+0+1=1
+B                                     Silver  Web    Sur     1+1+0=2
+
+El cliente se asigna al grupo A porque 1 < 2.
+
+Cada variable aporta un desacuerdo como máximo en esta versión no
+ponderada.
+Las categorías no necesitan una codificación ordinal.
+
+Data Science UC Clase 39: Clustering                                      33 / 57
+
+===== DIAPOSITIVA 34 =====
+Actualización de una moda
+
+Supongamos que un grupo contiene estos tres clientes:
+
+                                      Plan    Canal  Región
+
+                                      Gold    App    Norte
+                                      Gold    Web    Norte
+                                      Silver  App    Sur
+
+La moda por columna es (Gold, App, Norte).
+                          Costo del grupo = 0 + 1 + 2 = 3 desacuerdos.
+
+Una moda es la categoría más frecuente. Puede haber empates y no siempre
+supera el 50 %.
+
+Data Science UC Clase 39: Clustering                                      34 / 57
+
+===== DIAPOSITIVA 35 =====
+Categorías para el ejemplo de vinos
+
+Variable                              Bajo     Medio        Alto
+
+Alcohol                               x < 13   No se usa    x ≥ 13
+Flavonoides                           x < 1.5  1.5 ≤ x < 3  x ≥3
+Color                                 x <4     4 ≤ x < 6.5  x ≥ 6.5
+
+Conservamos los cortes del material para ilustrar K-modes.
+
+  ▶ Son cortes docentes, no umbrales de calidad enológica.
+  ▶ Categorizar pierde información de las mediciones originales.
+  ▶ Aquí las categorías se comparan por igualdad, sin usar su orden.
+
+Data Science UC Clase 39: Clustering                                  35 / 57
+
+===== DIAPOSITIVA 36 =====
+Categorías en R
+
+categorias <- data.frame(
+   alcohol = factor(ifelse(vinos$alcohol < 13, "bajo", "alto")),
+   flavonoides = cut(vinos$flavonoides, c(-Inf, 1.5, 3, Inf),
+                              labels = c("bajo", "medio", "alto"), right = FALSE),
+   color = cut(vinos$color, c(-Inf, 4, 6.5, Inf),
+                     labels = c("bajo", "medio", "alto"), right = FALSE)
+
+)
+print(head(categorias))
+
+right=FALSE forma intervalos cerrados por la izquierda.
+Por ejemplo, un valor de flavonoides igual a 1.5 pertenece a “medio”.
+
+Data Science UC Clase 39: Clustering                                                36 / 57
+
+===== DIAPOSITIVA 37 =====
+Categorías en Python
+
+categorias = pd.DataFrame({                                                         "alto")),
+      "alcohol": np.where(vinos.alcohol < 13, "bajo", "alto"),
+      "flavonoides": np.where(vinos.flavonoides < 1.5, "bajo",
+                                          np.where(vinos.flavonoides < 3, "medio",
+      "color": np.where(vinos.color < 4, "bajo",
+                                 np.where(vinos.color < 6.5, "medio", "alto"))
+
+})
+print(categorias.head())
+
+Las condiciones reproducen exactamente los mismos cortes que en R.
+
+K-modes admite estas etiquetas directamente. No necesitamos LabelEncoder.
+
+Data Science UC Clase 39: Clustering                                                           37 / 57
+
+===== DIAPOSITIVA 38 =====
+K-modes en R: varias inicializaciones
+
+ajustar_modos <- function(k) {         = k, iter.max = 100, weighted = FALSE)
+   mejor <- kmodes(categorias, modes
+   for (inicio in 2:20) {              modes = k, iter.max = 100, weighted = FALSE)
+      candidato <- kmodes(categorias,  sum(mejor$withindiff)) {
+      if (sum(candidato$withindiff) <
+         mejor <- candidato
+      }
+   }
+   mejor
+
+}
+
+withindiff contiene un costo por grupo. sum obtiene el total.
+
+La función conserva el mejor de 20 ajustes, con el mismo k .
+
+Data Science UC Clase 39: Clustering                                                 38 / 57
+
+===== DIAPOSITIVA 39 =====
+K-modes en Python
+
+modelos_modos = []
+costo_modos = []
+for k in range(1, 9):
+
+      modelo = KModes(n_clusters=k, init="Huang", n_init=20,
+                              max_iter=100, random_state=2026)
+
+      modelo.fit(categorias)
+      modelos_modos.append(modelo)
+      costo_modos.append(modelo.cost_)
+
+kmodas = modelos_modos[3]
+grupo_modos = kmodas.labels_ + 1
+
+n_init=20 realiza las inicializaciones. cost_ es el costo total.
+
+Data Science UC Clase 39: Clustering                              39 / 57
+
+===== DIAPOSITIVA 40 =====
+Costo de K-modes
+
+Total de desacuerdos  250
+
+                      200
+
+                      150
+
+                      100
+
+                      50
+
+                           1  2  3  4  5                                            6  7  8
+                                    Numero de grupos k
+
+El costo cuenta desacuerdos. No es una suma de cuadrados.
+
+Usaremos k = 4 para ilustrar perfiles, sin afirmar que sea el único valor
+adecuado.
+
+Resultados Python, cortes definidos antes del ajuste y 20 inicializaciones por k .           40 / 57
+Data Science UC Clase 39: Clustering
+
+===== DIAPOSITIVA 41 =====
+Lectura de un perfil categórico
+
+Ejemplo Python, grupo 2 de K-modes: n = 48.
+
+                                      Color  Número            Proporción
+
+                                      Alto          40   40/48 = 83.3 %
+                                      Bajo            1     1/48 = 2.1 %
+                                      Medio           7
+                                                          7/48 = 14.6 %
+
+Su centro modal es (alcohol alto, flavonoides bajos, color alto).
+
+El perfil resume frecuencias. No significa que todos los vinos tengan el mismo
+color.
+R puede repartir los empates de otra forma, incluso con el mismo costo total.
+
+Data Science UC Clase 39: Clustering                                       41 / 57
+
+===== DIAPOSITIVA 42 =====
+K-prototypes para variables mixtas
+
+Combinamos una parte numérica con otra categórica:
+
+                                      d (x, q) = (xj − µj )2 + γ 1(xj̸ = mj ).
+
+                                      j ∈N  j ∈C
+
+  ▶ N: variables numéricas estandarizadas.
+  ▶ C: variables categóricas.
+  ▶ q: prototipo con medias y modas.
+  ▶ γ > 0: peso de los desacuerdos categóricos.
+
+El equilibrio depende del peso y también del número de variables de cada tipo.
+
+Data Science UC Clase 39: Clustering                                            42 / 57
+
+===== DIAPOSITIVA 43 =====
+Costo mixto: una cuenta resuelta
+
+Una observación tiene dos valores numéricos (1, 2) y categorías (App, Sur).
+
+Prototipo                             Parte numérica  Categorías    Costo
+
+A                                     (0, 2)          (App, Norte)  1+γ
+B                                     (2, 3)          (App, Sur)    2
+
+Para A: (1 − 0)2 + (2 − 2)2 = 1 y un desacuerdo.
+Para B: (1 − 2)2 + (2 − 3)2 = 2 y cero desacuerdos.
+
+                       γ = 0.5 : 1.5 < 2 ⇒ A; γ = 3 : 4 > 2 ⇒ B.
+
+Modificar el peso puede cambiar la asignación, aunque los datos sean los
+mismos.
+
+Data Science UC Clase 39: Clustering                                         43 / 57
+
+===== DIAPOSITIVA 44 =====
+Datos mixtos en R
+
+mixtos <- data.frame(z[, c("ceniza", "matiz")], categorias)
+peso <- 1
+
+                           Numéricas Ceniza y matiz, estandarizados
+                           Categóricas Alcohol, flavonoides y color
+
+Las columnas categóricas deben ser factores en clustMixType.
+No incluimos cada medición a la vez como número y como categoría.
+Así evitamos dar peso duplicado a la misma información.
+
+Data Science UC Clase 39: Clustering                                 44 / 57
+
+===== DIAPOSITIVA 45 =====
+Datos mixtos en Python
+
+mixtos = pd.concat([z[["ceniza", "matiz"]], categorias], axis=1)
+peso = 1
+
+                                      Índice   Variable     Tipo
+
+                                            0  Ceniza       Numérica
+                                            1  Matiz        Numérica
+                                            2  Alcohol      Categórica
+                                            3  Flavonoides  Categórica
+                                            4  Color        Categórica
+
+El ajuste usa categorical=[2, 3, 4] porque Python cuenta desde cero.
+
+Data Science UC Clase 39: Clustering                                    45 / 57
+
+===== DIAPOSITIVA 46 =====
+K-prototypes en R
+
+set.seed(2026)
+modelos_proto <- vector("list", 8)
+costo_proto <- numeric(8)
+for (k in 1:8) {
+
+   modelos_proto[[k]] <- kproto(mixtos, k = k, lambda = peso,
+                                              nstart = 20, iter.max = 100, verbose = FALSE)
+
+   costo_proto[k] <- modelos_proto[[k]]$tot.withinss
+}
+
+kprototipos <- modelos_proto[[3]]
+print(table(kprototipos$cluster))
+print(kprototipos$centers)
+
+Aquí lambda es el peso de las categorías. No es la penalización de Ridge.
+
+Data Science UC Clase 39: Clustering                                                         46 / 57
+
+===== DIAPOSITIVA 47 =====
+K-prototypes en Python
+
+modelos_proto = []
+costo_proto = []
+for k in range(1, 9):
+
+      modelo = KPrototypes(n_clusters=k, init="Huang", n_init=20,
+                                     gamma=peso, max_iter=100, random_state=2026)
+
+      modelo.fit(mixtos.to_numpy(), categorical=[2, 3, 4])
+      modelos_proto.append(modelo)
+      costo_proto.append(modelo.cost_)
+
+kprototipos = modelos_proto[2]
+grupo_proto = kprototipos.labels_ + 1
+
+El mismo peso se llama gamma en esta implementación.
+
+Data Science UC Clase 39: Clustering                                               47 / 57
+
+===== DIAPOSITIVA 48 =====
+Costo de K-prototypes
+
+Costo mixto (peso = 1)  600
+
+                        500
+
+                        400
+
+                        300
+
+                        200
+
+                             1  2  3  4  5                                            6  7  8
+                                      Numero de grupos k
+
+Comparamos candidatos con las mismas variables, escala y peso γ = 1.
+
+Para la descripción usamos una solución de ejemplo con k = 3.
+
+Resultados Python. Un costo menor al aumentar k no basta para justificar más grupos.           48 / 57
+Data Science UC Clase 39: Clustering
+
+===== DIAPOSITIVA 49 =====
+Un prototipo combina medias y modas
+
+Resultado Python, k = 3 y peso 1:
+
+Grupo n Ceniza z Matiz z Alcohol Flavon. Color
+
+1 69                                    0.625    0.506  Alto  Medio  Medio
+2 47                                    0.225  −1.258   Alto  Bajo   Alto
+3 61                                  −0.881            Bajo  Medio  Bajo
+                                                 0.396
+
+En el grupo 2, matiz está 1.258 desviaciones bajo la media general. “Color alto” es la
+moda, pero solo 30/47 ≈ 63.8 % tiene esa categoría.
+
+Un prototipo puede no corresponder a ninguna observación real.
+
+Data Science UC Clase 39: Clustering                                        49 / 57
+
+===== DIAPOSITIVA 50 =====
+Sensibilidad al peso de las categorías
+
+Matiz estandarizado          Peso = 0.25                   Peso = 1                   Peso = 4
+
+                     3                             4 20 2                     4 20 2
+                     2                                  Ceniza estandarizada       Ceniza estandarizada
+                     1
+                     0
+                     1
+                     2
+
+                       4 20 2
+                             Ceniza estandarizada
+
+Cambian las particiones al cambiar el peso, manteniendo k = 3.
+
+Ilustración Python con dos variables numéricas y tres categóricas. Solo se muestran ceniza y matiz. Colores alineados por el centro de
+matiz para facilitar la lectura.
+
+Data Science UC Clase 39: Clustering                                                                     50 / 57
+
+===== DIAPOSITIVA 51 =====
+Evaluación sin una respuesta observada
+
+  ▶ No calculamos exactitud ni AUC: no hay una clase observada que predecir.
+  ▶ Usamos criterios internos acordes con las variables y la disimilitud.
+  ▶ Revisamos si los perfiles reaparecen al cambiar inicios o remuestrear.
+  ▶ Contrastamos su utilidad con el problema que motivó el agrupamiento.
+Esta exploración usa las 177 filas. No requiere automáticamente una división 70/30.
+
+Para asignar casos futuros, se fijan el escalamiento y los centros con los datos
+de desarrollo.
+La evaluación de ese uso futuro necesita un diseño separado.
+
+Data Science UC Clase 39: Clustering  51 / 57
+
+===== DIAPOSITIVA 52 =====
+Comparación entre los tres métodos
+
+Método                                k Costo del ejemplo Significado
+
+K-means                               3 1267.37  Distancias al cuadrado
+                                                 Desacuerdos
+K-modes                               4 75       Costo mixto, peso 1
+
+K-prototypes 3 326.64
+
+No elegimos K-modes porque 75 sea el menor número de esta tabla. Los datos
+de entrada, las unidades y las funciones de costo son distintos.
+
+La comparación pertinente comienza por el tipo de variables y el propósito.
+
+Data Science UC Clase 39: Clustering                                     52 / 57
+
+===== DIAPOSITIVA 53 =====
+Interpretación de una segmentación
+
+Antes de usar los grupos, revisamos:
+  1. Variables incluidas, escalas y posibles observaciones atípicas.
+  2. Tamaños, perfiles y variación dentro de cada grupo.
+  3. Sensibilidad a k , inicialización y peso de las categorías.
+  4. Si las conclusiones describen las mediciones o exceden la evidencia.
+
+Un agrupamiento organiza la información. Su utilidad debe justificarse en el
+contexto.
+
+Data Science UC Clase 39: Clustering                                          53 / 57
+
+===== DIAPOSITIVA 54 =====
+Material y referencias
+
+  ▶ Material base: Clase 34, Eduardo Rodríguez Faúndez; y Clase 4: Algoritmos de
+      segmentación, Acosta, Castro y Moraga.
+
+  ▶ Wine, UCI. https://doi.org/10.24432/C5PC7J. Licencia CC BY 4.0.
+  ▶ R: stats::kmeans, cluster::silhouette y cluster::clusGap.
+  ▶ klaR::kmodes. Szepannek (2018), clustMixType.
+  ▶ Python: scikit-learn y kmodes, Nelis J. de Vos.
+  ▶ Tibshirani, Walther y Hastie (2001). Estimating the number of clusters in a data set via the
+
+      gap statistic.
+
+Data Science UC Clase 39: Clustering  54 / 57
+
+===== DIAPOSITIVA 55 =====
+Complemento: Gap en R
+
+set.seed(2026)
+gap <- clusGap(z, FUNcluster = kmeans, K.max = 8, B = 30,
+
+                      nstart = 20, iter.max = 100, algorithm = "Lloyd",
+                      d.power = 2, spaceH0 = "original", verbose = FALSE)
+print(round(gap$Tab[, c("gap", "SE.sim")], 3))
+k_gap <- maxSE(gap$Tab[, "gap"], gap$Tab[, "SE.sim"], method = "Tibs2001SEmax")
+print(k_gap)
+
+  ▶ B=30: número de bases de referencia simuladas.
+  ▶ d.power=2: criterio cuadrático.
+  ▶ spaceH0="original": referencia en el rango de cada columna de z.
+
+Data Science UC Clase 39: Clustering                                             55 / 57
+
+===== DIAPOSITIVA 56 =====
+Complemento: Gap en Python
+
+rng = np.random.default_rng(2026)
+B = 30
+log_wss_ref = np.zeros((B, 8))
+for b in range(B):
+
+      referencia = rng.uniform(z.min().to_numpy(), z.max().to_numpy(), size=z.shape)
+      for k in range(1, 9):
+
+            modelo = KMeans(n_clusters=k, n_init=20, max_iter=100,
+                                    random_state=2026 + b, algorithm="lloyd", tol=1e-8)
+
+            modelo.fit(referencia)
+            log_wss_ref[b, k - 1] = np.log(modelo.inertia_)
+
+log_wss_ref guarda un costo para cada simulación y cada k.
+
+Data Science UC Clase 39: Clustering                                                     56 / 57
+
+===== DIAPOSITIVA 57 =====
+Complemento: la regla en Python
+
+gap = log_wss_ref.mean(axis=0) - np.log(wss)
+error_gap = log_wss_ref.std(axis=0, ddof=1) * np.sqrt(1 + 1 / B)
+k_gap = 8
+for k in range(1, 8):
+
+      if gap[k - 1] >= gap[k] - error_gap[k]:
+            k_gap = k
+            break
+
+print(pd.DataFrame({"k": range(1, 9), "Gap": gap, "Error": error_gap}).round(3))
+print("k segun la regla de un error estandar:", k_gap)
+
+Si ninguna comparación anterior cumple, conservamos el máximo k explorado.
+
+R y Python usan la misma definición y referencia, pero distintas secuencias aleatorias. Se esperan pequeñas diferencias numéricas.
+
+Data Science UC Clase 39: Clustering  57 / 57
+

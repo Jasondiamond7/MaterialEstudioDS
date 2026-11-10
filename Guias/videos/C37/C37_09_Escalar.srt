@@ -1,0 +1,387 @@
+1
+00:00:00,250 --> 00:00:02,390
+Novena parada: estandarizar.
+
+2
+00:00:02,510 --> 00:00:06,186
+Vas a ver con números por qué una SVM o los k vecinos más cercanos
+
+3
+00:00:06,186 --> 00:00:09,360
+sin estandarizar terminan escuchando a una sola variable.
+
+4
+00:00:09,480 --> 00:00:13,380
+En la base de Wisconsin, la textura varía en unidades de a cuatro.
+
+5
+00:00:13,500 --> 00:00:16,810
+La suavidad, en cambio, varía en centésimas.
+
+6
+00:00:16,930 --> 00:00:21,415
+Si mides distancias sin hacer nada, una diferencia de una unidad de textura pesa lo
+
+7
+00:00:21,415 --> 00:00:25,090
+mismo que una diferencia de cien veces todo el rango de la suavidad.
+
+8
+00:00:25,210 --> 00:00:29,290
+Sin estandarizar, la suavidad prácticamente no existe para el modelo.
+
+9
+00:00:29,410 --> 00:00:32,760
+Piensa en comparar dos departamentos por precio y por superficie.
+
+10
+00:00:32,880 --> 00:00:36,512
+Si el precio va en pesos y la superficie en metros cuadrados, una
+
+11
+00:00:36,512 --> 00:00:40,200
+diferencia de mil pesos parece enorme frente a una de diez metros.
+
+12
+00:00:40,320 --> 00:00:44,010
+Pero mil pesos no es nada, y diez metros es una pieza entera.
+
+13
+00:00:44,130 --> 00:00:47,760
+Antes de sumar diferencias, hay que ponerlas en la misma escala.
+
+14
+00:00:47,880 --> 00:00:52,190
+Estas son las desviaciones estándar de las cuatro variables, en el entrenamiento.
+
+15
+00:00:52,310 --> 00:00:57,080
+Radio, 3.67; textura, 4.22.
+
+16
+00:00:57,200 --> 00:01:02,550
+Concavidad, 0.080; y suavidad, 0.014.
+
+17
+00:01:02,670 --> 00:01:06,320
+Entre la textura y la suavidad hay un factor de casi trescientos.
+
+18
+00:01:06,440 --> 00:01:09,430
+Veamos por qué importa, con dos casos reales.
+
+19
+00:01:09,550 --> 00:01:14,070
+El caso nuevo de la clase tiene radio 14 y concavidad 0.08.
+
+20
+00:01:14,190 --> 00:01:19,330
+Un caso del entrenamiento tiene radio 14.26 y concavidad 0.30.
+
+21
+00:01:19,450 --> 00:01:23,460
+Sin estandarizar, las diferencias son 0.26 en radio y
+
+22
+00:01:23,460 --> 00:01:26,940
+0.22 en concavidad: parecen igual de pequeñas.
+
+23
+00:01:27,060 --> 00:01:33,660
+Pero en desviaciones estándar, el radio difiere 0.07, y la concavidad, 2.75.
+
+24
+00:01:33,780 --> 00:01:35,520
+Son casos muy distintos.
+
+25
+00:01:35,640 --> 00:01:39,360
+La SVM radial y los k vecinos miden distancias.
+
+26
+00:01:39,480 --> 00:01:42,777
+Si no estandarizas, la concavidad y la suavidad quedan
+
+27
+00:01:42,777 --> 00:01:46,440
+aplastadas por el radio y la textura, solo por sus unidades.
+
+28
+00:01:46,560 --> 00:01:50,726
+La receta de la diapositiva catorce: a cada valor se le resta la media del
+
+29
+00:01:50,726 --> 00:01:54,780
+entrenamiento, y se divide por la desviación estándar del entrenamiento.
+
+30
+00:01:54,900 --> 00:02:03,650
+Para el caso nuevo: radio 14 menos 14.179, dividido por 3.669, da menos 0.049.
+
+31
+00:02:03,770 --> 00:02:12,400
+Suavidad: 0.10 menos 0.09618, dividido por 0.0144, da 0.265.
+
+32
+00:02:12,520 --> 00:02:14,780
+En Python se hace con StandardScaler.
+
+33
+00:02:14,900 --> 00:02:19,470
+fit transform aprende la media y la escala con el entrenamiento, y lo transforma.
+
+34
+00:02:19,590 --> 00:02:24,340
+transform aplica esa misma media y escala a la prueba, y a cualquier caso nuevo.
+
+35
+00:02:24,460 --> 00:02:28,750
+En R, la función svm lo hace sola con scale igual a TRUE.
+
+36
+00:02:28,870 --> 00:02:30,780
+¿Cuánto cambia en la SVM?
+
+37
+00:02:30,900 --> 00:02:33,160
+Con las cuatro variables, en la prueba.
+
+38
+00:02:33,280 --> 00:02:41,440
+La SVM lineal de la clase: sin estandarizar, 86.0 por ciento; estandarizada, 91.8.
+
+39
+00:02:41,560 --> 00:02:46,640
+La radial de la clase, con C igual a diez y gamma 0.1:
+
+40
+00:02:46,640 --> 00:02:50,780
+sin estandarizar, 90.1; estandarizada, 97.1.
+
+41
+00:02:50,900 --> 00:02:54,150
+Siete puntos de diferencia, solo por las unidades.
+
+42
+00:02:54,270 --> 00:02:58,008
+Hay un clasificador clásico que depende todavía más de
+
+43
+00:02:58,008 --> 00:03:01,330
+las distancias: los k vecinos más cercanos, kNN.
+
+44
+00:03:01,450 --> 00:03:03,450
+No ajusta ningún coeficiente.
+
+45
+00:03:03,570 --> 00:03:08,014
+Para clasificar un caso nuevo, busca los k casos de entrenamiento más
+
+46
+00:03:08,014 --> 00:03:11,750
+cercanos, y vota: gana la clase más frecuente entre ellos.
+
+47
+00:03:11,870 --> 00:03:14,852
+En la clase se mencionó al pasar; aquí lo aplicamos
+
+48
+00:03:14,852 --> 00:03:17,190
+a la misma base, como cálculo adicional.
+
+49
+00:03:17,310 --> 00:03:20,261
+Votemos a mano, con el caso nuevo de la clase y k
+
+50
+00:03:20,261 --> 00:03:22,790
+igual a cinco, en la escala estandarizada.
+
+51
+00:03:22,910 --> 00:03:26,400
+Estos son sus cinco vecinos más cercanos, con su distancia.
+
+52
+00:03:26,520 --> 00:03:30,030
+El primero, a 0.223, es maligno.
+
+53
+00:03:30,150 --> 00:03:33,460
+Después, un benigno, dos malignos y un benigno.
+
+54
+00:03:33,580 --> 00:03:40,140
+Tres votos contra dos: kNN dice maligno, con una proporción de tres quintos, 0.6.
+
+55
+00:03:40,260 --> 00:03:42,950
+Compáralo con los otros modelos para el mismo caso.
+
+56
+00:03:43,070 --> 00:03:47,520
+La logística le da probabilidad 0.392: clase cero.
+
+57
+00:03:47,640 --> 00:03:51,263
+La SVM radial le da un puntaje de apenas 0.046:
+
+58
+00:03:51,263 --> 00:03:54,270
+clase uno, pero casi sobre la frontera.
+
+59
+00:03:54,390 --> 00:03:57,460
+Es un caso límite, y por eso los modelos discrepan.
+
+60
+00:03:57,580 --> 00:04:00,050
+Ahora repite la búsqueda sin estandarizar.
+
+61
+00:04:00,170 --> 00:04:01,840
+Los cinco vecinos cambian.
+
+62
+00:04:01,960 --> 00:04:05,148
+El segundo es aquel caso con concavidad 0.30, que
+
+63
+00:04:05,148 --> 00:04:07,880
+en desviaciones estándar estaba lejísimos.
+
+64
+00:04:08,000 --> 00:04:11,050
+Ahora el voto es dos malignos contra tres benignos.
+
+65
+00:04:11,170 --> 00:04:15,340
+kNN pasa a decir benigno, solo por las unidades de medida.
+
+66
+00:04:15,460 --> 00:04:21,437
+En los 171 casos de prueba: kNN con k igual a cinco, estandarizado,
+
+67
+00:04:21,437 --> 00:04:26,790
+acierta el 92.4 por ciento, y detecta 55 de los 64 malignos.
+
+68
+00:04:26,910 --> 00:04:32,090
+Sin estandarizar, baja a 91.2, y detecta solo 52.
+
+69
+00:04:32,210 --> 00:04:38,220
+Y su AUC cae de 0.978 a 0.910.
+
+70
+00:04:38,340 --> 00:04:41,550
+El orden de los puntajes empeora mucho más que la exactitud.
+
+71
+00:04:41,670 --> 00:04:44,952
+Un cuidado clave, de la diapositiva trece: la media y la
+
+72
+00:04:44,952 --> 00:04:48,000
+desviación se calculan solo con los datos de ajuste.
+
+73
+00:04:48,120 --> 00:04:51,348
+Si se calculan con toda la base y después se divide, la
+
+74
+00:04:51,348 --> 00:04:54,400
+escala ya vio la prueba: eso es fuga de información.
+
+75
+00:04:54,520 --> 00:04:58,430
+En validación cruzada, la escala se reestima dentro de cada fold.
+
+76
+00:04:58,550 --> 00:05:01,510
+Por eso se pone StandardScaler dentro de un Pipeline.
+
+77
+00:05:01,630 --> 00:05:05,860
+El error típico en el código: usar fit transform también en la prueba.
+
+78
+00:05:05,980 --> 00:05:08,754
+Así la prueba se estandariza con su propia media y
+
+79
+00:05:08,754 --> 00:05:11,140
+desviación, y no con las del entrenamiento.
+
+80
+00:05:11,260 --> 00:05:14,920
+Para la prueba, y para cada caso nuevo, siempre transform, con
+
+81
+00:05:14,920 --> 00:05:17,930
+el objeto escala que se ajustó en el entrenamiento.
+
+82
+00:05:18,050 --> 00:05:19,270
+Piensa un segundo.
+
+83
+00:05:19,390 --> 00:05:26,050
+La media de la textura en el entrenamiento es 19.29, y su desviación estándar, 4.21.
+
+84
+00:05:26,170 --> 00:05:30,160
+¿Cuánto vale la textura estandarizada de un caso con textura 25?
+
+85
+00:05:30,880 --> 00:05:34,820
+25 menos 19.29 es 5.71.
+
+86
+00:05:34,940 --> 00:05:38,560
+Dividido por 4.21: 1.36.
+
+87
+00:05:38,680 --> 00:05:41,428
+Ese caso está algo más de una desviación estándar y un
+
+88
+00:05:41,428 --> 00:05:43,870
+tercio por encima del promedio de entrenamiento.
+
+89
+00:05:43,990 --> 00:05:48,296
+Para llevarte: la SVM radial y kNN miden distancias, así que sin
+
+90
+00:05:48,296 --> 00:05:51,930
+estandarizar mandan las variables con números grandes.
+
+91
+00:05:52,050 --> 00:05:54,685
+Se estandariza con la media y la desviación del
+
+92
+00:05:54,685 --> 00:05:56,760
+entrenamiento, dentro de un Pipeline.
+
+93
+00:05:56,880 --> 00:06:01,763
+Y kNN vota con sus k vecinos: en la prueba, 92.4 por ciento
+
+94
+00:06:01,763 --> 00:06:05,570
+estandarizado, frente a 91.2 sin estandarizar.
+
+95
+00:06:05,690 --> 00:06:08,180
+Siguiente parada: la gran comparación.
+
+96
+00:06:08,300 --> 00:06:12,471
+Logística, SVM lineal, SVM radial, y otros clasificadores
+
+97
+00:06:12,471 --> 00:06:16,350
+clásicos, con sus matrices de confusión en la prueba.

@@ -1,0 +1,399 @@
+1
+00:00:00,250 --> 00:00:03,350
+Sexta parada: la validación cruzada por dentro.
+
+2
+00:00:03,470 --> 00:00:07,410
+Cómo cada medición recibe una predicción hecha por un modelo que nunca la vio.
+
+3
+00:00:07,530 --> 00:00:10,690
+Esta es la idea más importante de la validación de la clase.
+
+4
+00:00:10,810 --> 00:00:15,970
+Cada una de las 806 mediciones del entrenamiento recibe exactamente una predicción.
+
+5
+00:00:16,090 --> 00:00:19,134
+Y esa predicción la hace un modelo que nunca vio esa
+
+6
+00:00:19,134 --> 00:00:22,060
+medición, ni ninguna otra de su misma composición.
+
+7
+00:00:22,180 --> 00:00:25,958
+A esas predicciones se les llama fuera de pliegue: en
+
+8
+00:00:25,958 --> 00:00:28,880
+inglés, out of fold, o con su sigla, OOF.
+
+9
+00:00:29,000 --> 00:00:32,950
+Piensa en un examen oral por turnos, con cinco grupos de alumnos.
+
+10
+00:00:33,070 --> 00:00:35,578
+En cada ronda, cuatro grupos preparan el
+
+11
+00:00:35,578 --> 00:00:38,400
+material juntos, y el quinto rinde el examen.
+
+12
+00:00:38,520 --> 00:00:42,710
+Después de cinco rondas, cada alumno rindió exactamente una vez.
+
+13
+00:00:42,830 --> 00:00:45,335
+Y siempre lo evaluaron con lo que prepararon los
+
+14
+00:00:45,335 --> 00:00:47,370
+otros cuatro grupos, nunca con lo suyo.
+
+15
+00:00:47,490 --> 00:00:49,490
+En la validación cruzada es igual.
+
+16
+00:00:49,610 --> 00:00:54,720
+Ronda uno: se ajusta con los pliegues dos a cinco, y se predice el pliegue uno.
+
+17
+00:00:54,840 --> 00:00:59,490
+Ronda dos: se ajusta sin el pliegue dos, y se predice el pliegue dos.
+
+18
+00:00:59,610 --> 00:01:01,300
+Y así hasta la ronda cinco.
+
+19
+00:01:01,420 --> 00:01:04,880
+Al final, cada candidato tiene 806 predicciones,
+
+20
+00:01:04,880 --> 00:01:07,620
+obtenidas con cinco ajustes distintos.
+
+21
+00:01:07,740 --> 00:01:10,430
+La diapositiva veinte lo escribe con símbolos.
+
+22
+00:01:10,550 --> 00:01:14,329
+La predicción fuera de pliegue de la fila i usa el modelo ajustado sin
+
+23
+00:01:14,329 --> 00:01:17,460
+el pliegue de esa fila, que aquí deja fuera todo su grupo.
+
+24
+00:01:17,580 --> 00:01:22,224
+Y el RMSE fuera de pliegue reúne todo: sumo los 806
+
+25
+00:01:22,224 --> 00:01:26,960
+errores al cuadrado, divido por 806, y saco la raíz.
+
+26
+00:01:27,080 --> 00:01:28,700
+Cada medición pesa igual.
+
+27
+00:01:28,820 --> 00:01:32,261
+Los grupos controlan la separación, pero no dan el mismo
+
+28
+00:01:32,261 --> 00:01:35,210
+peso a cada grupo: son dos decisiones distintas.
+
+29
+00:01:35,330 --> 00:01:38,430
+Ahora, una sutileza de la diapositiva veintiuno.
+
+30
+00:01:38,550 --> 00:01:41,833
+Dos pliegues del mismo tamaño: en el primero, el
+
+31
+00:01:41,833 --> 00:01:44,980
+error cuadrático medio es 1; en el segundo, 9.
+
+32
+00:01:45,100 --> 00:01:49,740
+Opción uno, promediar los RMSE: la raíz de 1 es
+
+33
+00:01:49,740 --> 00:01:53,590
+1, la raíz de 9 es 3; el promedio es 2.
+
+34
+00:01:53,710 --> 00:01:59,872
+Opción dos, el RMSE fuera de pliegue: primero juntamos los errores, uno
+
+35
+00:01:59,872 --> 00:02:05,080
+más nueve, sobre dos, es cinco; y la raíz de cinco es 2.236.
+
+36
+00:02:05,200 --> 00:02:06,700
+¿Por qué salen distintos?
+
+37
+00:02:06,820 --> 00:02:11,190
+Porque la raíz no es lineal: el orden de las operaciones cambia el resultado.
+
+38
+00:02:11,310 --> 00:02:16,281
+El promedio de RMSE le da el mismo peso a cada pliegue; el RMSE
+
+39
+00:02:16,281 --> 00:02:20,700
+fuera de pliegue le da el mismo peso a cada observación.
+
+40
+00:02:20,820 --> 00:02:24,070
+Los dos son válidos, pero no son intercambiables.
+
+41
+00:02:24,190 --> 00:02:28,340
+La clase selecciona con el RMSE fuera de pliegue.
+
+42
+00:02:28,460 --> 00:02:31,970
+Con los datos reales, la diferencia es chica, pero existe.
+
+43
+00:02:32,090 --> 00:02:40,138
+Para la cuadrática con alfa igual a 0.1, los cinco RMSE por
+
+44
+00:02:40,138 --> 00:02:46,550
+pliegue son 7.110, 7.670, 8.806, 9.320 y 8.058.
+
+45
+00:02:46,670 --> 00:02:49,370
+Su promedio es 8.193.
+
+46
+00:02:49,490 --> 00:02:56,500
+Y el RMSE fuera de pliegue, que junta los 806 errores, es 8.229.
+
+47
+00:02:56,620 --> 00:02:59,680
+Por eso conviene decir siempre cuál de los dos se reporta.
+
+48
+00:02:59,800 --> 00:03:02,708
+Segunda clave, en la diapositiva veintidós: la
+
+49
+00:03:02,708 --> 00:03:05,490
+receta completa se reaprende en cada ajuste.
+
+50
+00:03:05,610 --> 00:03:09,434
+Con las filas de ajuste del pliegue, se estiman la transformación y el
+
+51
+00:03:09,434 --> 00:03:12,930
+modelo: por ejemplo, las medias y las escalas para estandarizar.
+
+52
+00:03:13,050 --> 00:03:14,950
+Esos parámetros quedan fijos.
+
+53
+00:03:15,070 --> 00:03:17,873
+Y a las filas de validación solo se les aplica la
+
+54
+00:03:17,873 --> 00:03:21,420
+transformación ya estimada, se predice, y se calcula el error.
+
+55
+00:03:21,540 --> 00:03:24,820
+La validación no recalcula escalas con sus propias filas.
+
+56
+00:03:24,940 --> 00:03:29,040
+Si no se hace así, aparece la fuga de datos, o data leakage.
+
+57
+00:03:29,160 --> 00:03:34,740
+Un ejemplo mínimo: las filas de ajuste valen 10, 20 y 30, y su media es 20.
+
+58
+00:03:34,860 --> 00:03:37,598
+Si estandarizo usando también la fila de
+
+59
+00:03:37,598 --> 00:03:40,610
+validación, que vale 60, la media pasa a 30.
+
+60
+00:03:40,730 --> 00:03:43,396
+Esa fila ya influyó en la receta antes de ser
+
+61
+00:03:43,396 --> 00:03:46,240
+evaluada: el error de validación sale optimista.
+
+62
+00:03:46,360 --> 00:03:49,300
+El profesor lo llamó, otra vez, hacer trampa.
+
+63
+00:03:49,420 --> 00:03:52,180
+En el código de la sección tres se ve todo esto.
+
+64
+00:03:52,300 --> 00:03:56,650
+Para cada pliegue k, del uno al cinco, se marca qué filas se validan.
+
+65
+00:03:56,770 --> 00:03:59,480
+Se clona el modelo, para partir de cero, y se
+
+66
+00:03:59,480 --> 00:04:02,130
+ajusta solo con las filas que no se validan.
+
+67
+00:04:02,250 --> 00:04:05,703
+Se predicen las filas del pliegue, y al final se
+
+68
+00:04:05,703 --> 00:04:09,300
+calcula el RMSE con todas las predicciones juntas.
+
+69
+00:04:09,420 --> 00:04:12,052
+El script incluso comprueba que la media usada para
+
+70
+00:04:12,052 --> 00:04:14,220
+estandarizar es la de las filas de ajuste.
+
+71
+00:04:14,340 --> 00:04:17,399
+Con todo esto, el protocolo queda fijado antes de
+
+72
+00:04:17,399 --> 00:04:20,270
+comparar, como dice la diapositiva veintitrés.
+
+73
+00:04:20,390 --> 00:04:26,210
+Siete candidatos, cinco pliegues por composición: 35 ajustes de validación cruzada.
+
+74
+00:04:26,330 --> 00:04:29,912
+Se elige el menor RMSE fuera de pliegue; un empate
+
+75
+00:04:29,912 --> 00:04:32,920
+exacto se resuelve por el orden declarado.
+
+76
+00:04:33,040 --> 00:04:37,800
+El MAE y el R cuadrado describen, pero no reemplazan el criterio después.
+
+77
+00:04:37,920 --> 00:04:42,340
+Y la prueba reservada, con su referencia, queda definida desde el inicio.
+
+78
+00:04:42,460 --> 00:04:45,482
+El error típico: estandarizar todos los datos de
+
+79
+00:04:45,482 --> 00:04:48,000
+una vez, antes de la validación cruzada.
+
+80
+00:04:48,120 --> 00:04:50,966
+Parece inofensivo, pero las medias y las escalas ya
+
+81
+00:04:50,966 --> 00:04:53,310
+incluyen las filas que después se validan.
+
+82
+00:04:53,430 --> 00:04:56,287
+La solución es poner la estandarización dentro de la
+
+83
+00:04:56,287 --> 00:04:58,870
+tubería, para que se reaprenda en cada pliegue.
+
+84
+00:04:58,990 --> 00:05:00,210
+Piensa un segundo.
+
+85
+00:05:00,330 --> 00:05:05,820
+Tres pliegues del mismo tamaño tienen errores cuadráticos medios de 4, 16 y 25.
+
+86
+00:05:05,940 --> 00:05:09,120
+¿Cuánto vale el promedio de los RMSE?
+
+87
+00:05:09,240 --> 00:05:12,230
+¿Y el RMSE fuera de pliegue?
+
+88
+00:05:12,950 --> 00:05:20,810
+Los RMSE por pliegue son 2, 4 y 5; su promedio es once tercios, 3.667.
+
+89
+00:05:20,930 --> 00:05:26,879
+El RMSE fuera de pliegue junta primero: cuatro más dieciséis más
+
+90
+00:05:26,879 --> 00:05:32,550
+veinticinco son 45; sobre tres, 15; y la raíz de 15 es 3.873.
+
+91
+00:05:32,670 --> 00:05:36,741
+Otra vez, el RMSE fuera de pliegue sale mayor, porque el
+
+92
+00:05:36,741 --> 00:05:40,230
+pliegue con más error pesa más antes de la raíz.
+
+93
+00:05:40,350 --> 00:05:43,559
+Para llevarte: cada fila recibe una predicción fuera de
+
+94
+00:05:43,559 --> 00:05:46,360
+pliegue, de un modelo que no vio su composición.
+
+95
+00:05:46,480 --> 00:05:50,975
+El RMSE fuera de pliegue pesa igual cada observación, y
+
+96
+00:05:50,975 --> 00:05:54,490
+no es lo mismo que el promedio de los RMSE.
+
+97
+00:05:54,610 --> 00:05:58,447
+Y la receta completa, con su estandarización, se reaprende
+
+98
+00:05:58,447 --> 00:06:01,490
+en cada ajuste: así se evita la fuga de datos.
+
+99
+00:06:01,610 --> 00:06:05,490
+Siguiente parada: leer el ranking de los siete candidatos, la curva
+
+100
+00:06:05,490 --> 00:06:08,560
+de validación, y las diferencias pliegue por pliegue.

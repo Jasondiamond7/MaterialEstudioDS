@@ -1,0 +1,4431 @@
+1
+00:00:00,250 --> 00:00:05,000
+Clase treinta y siete: máquinas de vectores de soporte y clasificadores clásicos.
+
+2
+00:00:05,120 --> 00:00:07,452
+Empezamos por lo básico: qué significa
+
+3
+00:00:07,452 --> 00:00:09,785
+clasificar, y contra qué regla hay que
+
+4
+00:00:09,785 --> 00:00:10,460
+compararse.
+
+5
+00:00:10,580 --> 00:00:12,620
+Una biopsia llega al laboratorio.
+
+6
+00:00:12,740 --> 00:00:16,890
+Se miden las células: su tamaño, su textura, su forma.
+
+7
+00:00:17,010 --> 00:00:19,440
+Y hay que decidir: ¿benigno o maligno?
+
+8
+00:00:19,560 --> 00:00:24,400
+Un clasificador hace exactamente eso: recibe mediciones y devuelve una clase.
+
+9
+00:00:24,520 --> 00:00:26,250
+Piensa en un detector de humo.
+
+10
+00:00:26,370 --> 00:00:30,000
+Mide partículas en el aire y decide: alarma o silencio.
+
+11
+00:00:30,120 --> 00:00:33,870
+Si suena sin fuego, es una molestia: una falsa alarma.
+
+12
+00:00:33,990 --> 00:00:36,950
+Si se queda callado con fuego, es una tragedia.
+
+13
+00:00:37,070 --> 00:00:40,740
+Clasificar es decidir, y los dos errores no cuestan lo mismo.
+
+14
+00:00:40,860 --> 00:00:45,100
+La diapositiva dos lo dice así: observamos pares, x e y.
+
+15
+00:00:45,220 --> 00:00:49,530
+x son los predictores; y es la etiqueta conocida, cero o uno.
+
+16
+00:00:49,650 --> 00:00:53,530
+Con esos ejemplos etiquetados se ajusta una regla, g(x).
+
+17
+00:00:53,650 --> 00:00:58,270
+Y el objetivo no es acertar en esos ejemplos, sino en casos que el modelo nunca vio.
+
+18
+00:00:58,390 --> 00:01:01,718
+Un detalle importante: que la clase se escriba con un cero y
+
+19
+00:01:01,718 --> 00:01:04,380
+un uno no la convierte en una variable continua.
+
+20
+00:01:04,500 --> 00:01:08,500
+Uno no es el doble de cero: son solo nombres para dos grupos.
+
+21
+00:01:08,620 --> 00:01:12,110
+El caso de trabajo es la base de cáncer de mama de Wisconsin.
+
+22
+00:01:12,230 --> 00:01:19,870
+Tiene 569 muestras: 357 benignas, en azul, y 212 malignas, en rojo.
+
+23
+00:01:19,990 --> 00:01:24,520
+El uno significa maligno: es la clase positiva, la que queremos detectar.
+
+24
+00:01:24,640 --> 00:01:28,543
+Se usan cuatro de las treinta mediciones originales: radio,
+
+25
+00:01:28,543 --> 00:01:31,850
+textura, suavidad y concavidad, todas en promedio.
+
+26
+00:01:31,970 --> 00:01:36,470
+Y una advertencia de la diapositiva cuatro: es una base histórica para enseñar.
+
+27
+00:01:36,590 --> 00:01:41,120
+No representa a la población chilena, ni es una herramienta clínica validada.
+
+28
+00:01:41,240 --> 00:01:44,850
+La partición ya viene en el archivo, en la columna conjunto.
+
+29
+00:01:44,970 --> 00:01:50,750
+398 casos para entrenar: 250 benignos y 148 malignos.
+
+30
+00:01:50,870 --> 00:01:55,900
+Y 171 para la prueba: 107 benignos y 64 malignos.
+
+31
+00:01:56,020 --> 00:01:59,659
+Es estratificada: cerca de un setenta y un treinta por ciento,
+
+32
+00:01:59,659 --> 00:02:02,770
+con la misma proporción de malignos en los dos lados.
+
+33
+00:02:02,890 --> 00:02:06,860
+La regla de oro: todo lo que el modelo aprende sale del entrenamiento.
+
+34
+00:02:06,980 --> 00:02:11,440
+La prueba se guarda, y se usa una sola vez, al final, para evaluar.
+
+35
+00:02:11,560 --> 00:02:13,870
+Una precisión sobre la grabación de la clase.
+
+36
+00:02:13,990 --> 00:02:18,700
+Se dijo: «con la base de 357 vamos a dividir en 70 y 30».
+
+37
+00:02:18,820 --> 00:02:21,850
+Pero 357 son solo los benignos.
+
+38
+00:02:21,970 --> 00:02:29,030
+Lo que se divide es la base completa, de 569 casos: 398 más 171.
+
+39
+00:02:29,150 --> 00:02:32,170
+Ahora, qué entrega cada modelo de esta clase.
+
+40
+00:02:32,290 --> 00:02:36,182
+La regresión logística entrega una probabilidad, p(x), y
+
+41
+00:02:36,182 --> 00:02:39,170
+clasifica como uno si supera un umbral, te.
+
+42
+00:02:39,290 --> 00:02:43,096
+La SVM entrega un puntaje, f(x), y clasifica como uno
+
+43
+00:02:43,096 --> 00:02:46,040
+si ese puntaje es mayor o igual que cero.
+
+44
+00:02:46,160 --> 00:02:50,626
+Y la diapositiva insiste en algo que vamos a repetir muchas veces: el
+
+45
+00:02:50,626 --> 00:02:54,250
+puntaje de una SVM no es, por sí solo, una probabilidad.
+
+46
+00:02:54,370 --> 00:02:57,690
+Un puntaje de dos no significa doscientos por ciento de nada.
+
+47
+00:02:57,810 --> 00:03:01,013
+Antes de entrenar nada, probemos la regla más simple
+
+48
+00:03:01,013 --> 00:03:03,970
+posible: decir siempre benigno, a todo el mundo.
+
+49
+00:03:04,090 --> 00:03:07,390
+En la prueba hay 107 benignos de 171.
+
+50
+00:03:07,510 --> 00:03:12,540
+Exactitud: 107 sobre 171, 0.626.
+
+51
+00:03:12,660 --> 00:03:16,200
+¡Un 62.6 por ciento sin mirar ni un solo dato!
+
+52
+00:03:16,320 --> 00:03:17,350
+¿Es un buen modelo?
+
+53
+00:03:17,470 --> 00:03:22,200
+Mira los malignos: son 64, y la regla no detecta ni uno.
+
+54
+00:03:22,320 --> 00:03:26,020
+Sensibilidad: cero sobre 64, igual a cero.
+
+55
+00:03:26,140 --> 00:03:30,530
+Una exactitud que parece alta puede esconder que una clase nunca se identifica.
+
+56
+00:03:30,650 --> 00:03:32,130
+Otra precisión de la clase.
+
+57
+00:03:32,250 --> 00:03:37,570
+Se dijo: «clasificamos todos como uno», y que así se aciertan 107 casos.
+
+58
+00:03:37,690 --> 00:03:41,200
+Pero con uno igual a maligno, decir siempre uno
+
+59
+00:03:41,200 --> 00:03:44,860
+acierta solo los 64 malignos: un 37.4 por ciento.
+
+60
+00:03:44,980 --> 00:03:48,910
+Los 107 aciertos son de la regla contraria, siempre benigno.
+
+61
+00:03:49,030 --> 00:03:51,090
+La diapositiva siete lo tiene bien.
+
+62
+00:03:51,210 --> 00:03:55,760
+El error típico: celebrar una exactitud alta sin compararla con la línea base.
+
+63
+00:03:55,880 --> 00:03:59,905
+El profesor lo ilustró con un banco: si solo el uno por ciento de
+
+64
+00:03:59,905 --> 00:04:04,116
+los clientes son malos pagadores, decir siempre «buen pagador» da un
+
+65
+00:04:04,116 --> 00:04:07,150
+99 por ciento de exactitud, y no sirve para nada.
+
+66
+00:04:07,270 --> 00:04:08,490
+Piensa un segundo.
+
+67
+00:04:08,610 --> 00:04:12,292
+Si en la prueba hubiera 150 benignos y 21 malignos, ¿qué
+
+68
+00:04:12,292 --> 00:04:15,120
+exactitud tendría la regla siempre benigno?
+
+69
+00:04:15,240 --> 00:04:16,400
+¿Y qué sensibilidad?
+
+70
+00:04:17,120 --> 00:04:24,240
+Exactitud: 150 sobre 171, 0.877, casi un 88 por ciento.
+
+71
+00:04:24,360 --> 00:04:26,460
+Y la sensibilidad sigue siendo cero.
+
+72
+00:04:26,580 --> 00:04:30,470
+Mientras más desbalanceada es la base, más engaña la exactitud.
+
+73
+00:04:30,590 --> 00:04:35,400
+Para llevarte: clasificar es decidir una clase, y los errores no cuestan lo mismo.
+
+74
+00:04:35,520 --> 00:04:42,070
+La base tiene 569 casos, con una partición fija de 398 y 171.
+
+75
+00:04:42,190 --> 00:04:46,240
+Y todo modelo se compara con la línea base: siempre benigno,
+
+76
+00:04:46,240 --> 00:04:49,750
+62.6 por ciento de exactitud y cero de sensibilidad.
+
+77
+00:04:49,870 --> 00:04:54,330
+Siguiente parada: la matriz de confusión, y las métricas que salen de ella.
+
+78
+00:04:55,210 --> 00:04:57,770
+Segunda parada: la matriz de confusión.
+
+79
+00:04:57,890 --> 00:05:00,265
+Cuatro números, y de ellos salen todas las
+
+80
+00:05:00,265 --> 00:05:02,980
+métricas que vamos a usar para comparar modelos.
+
+81
+00:05:03,100 --> 00:05:06,690
+Dos modelos tienen la misma exactitud: noventa por ciento.
+
+82
+00:05:06,810 --> 00:05:09,890
+Uno se equivoca diciéndole maligno a personas sanas.
+
+83
+00:05:10,010 --> 00:05:13,270
+El otro se equivoca mandando a casa a personas enfermas.
+
+84
+00:05:13,390 --> 00:05:15,730
+La exactitud no distingue entre los dos.
+
+85
+00:05:15,850 --> 00:05:18,010
+Para eso existe la matriz de confusión.
+
+86
+00:05:18,130 --> 00:05:21,170
+Piensa en un profesor que corrige un verdadero o falso.
+
+87
+00:05:21,290 --> 00:05:26,120
+Para cada pregunta mira dos cosas: qué era lo correcto, y qué marcó el alumno.
+
+88
+00:05:26,240 --> 00:05:30,410
+Con esas dos cosas, cada respuesta cae en una de cuatro casillas.
+
+89
+00:05:30,530 --> 00:05:34,580
+La matriz de confusión es exactamente esa tabla, pero para un modelo.
+
+90
+00:05:34,700 --> 00:05:36,800
+La diapositiva ocho la arma así.
+
+91
+00:05:36,920 --> 00:05:40,700
+Las filas son la clase real: arriba cero, abajo uno.
+
+92
+00:05:40,820 --> 00:05:45,300
+Las columnas, la clase predicha: cero a la izquierda, uno a la derecha.
+
+93
+00:05:45,420 --> 00:05:50,220
+En la diagonal están los aciertos: verdaderos negativos y verdaderos positivos.
+
+94
+00:05:50,340 --> 00:05:52,590
+Y fuera de la diagonal, los errores.
+
+95
+00:05:52,710 --> 00:05:55,627
+Arriba a la derecha, el falso positivo: un caso
+
+96
+00:05:55,627 --> 00:05:58,110
+negativo que el modelo declara positivo.
+
+97
+00:05:58,230 --> 00:06:01,160
+Aquí, un benigno que se clasifica como maligno.
+
+98
+00:06:01,280 --> 00:06:06,280
+Abajo a la izquierda, el falso negativo: un maligno que se clasifica como benigno.
+
+99
+00:06:06,400 --> 00:06:08,980
+En este problema, ese es el error grave.
+
+100
+00:06:09,100 --> 00:06:12,809
+Por eso la diapositiva insiste: siempre hay que declarar cuál es la
+
+101
+00:06:12,809 --> 00:06:16,130
+clase positiva, y en qué orden van las filas y las columnas.
+
+102
+00:06:16,250 --> 00:06:19,630
+Si no, los mismos cuatro números se pueden leer al revés.
+
+103
+00:06:19,750 --> 00:06:22,900
+Ahora, el ejemplo resuelto de la diapositiva nueve.
+
+104
+00:06:23,020 --> 00:06:27,926
+Cien casos: 56 verdaderos negativos, 14 falsos positivos,
+
+105
+00:06:27,926 --> 00:06:31,800
+6 falsos negativos y 24 verdaderos positivos.
+
+106
+00:06:31,920 --> 00:06:35,530
+Primera métrica, la exactitud: los aciertos sobre el total.
+
+107
+00:06:35,650 --> 00:06:39,720
+24 más 56, sobre cien: 0.80.
+
+108
+00:06:39,840 --> 00:06:44,470
+Segunda, la sensibilidad: de los positivos reales, ¿cuántos detecté?
+
+109
+00:06:44,590 --> 00:06:48,307
+Verdaderos positivos sobre verdaderos positivos
+
+110
+00:06:48,307 --> 00:06:51,470
+más falsos negativos: 24 sobre 30, 0.80.
+
+111
+00:06:51,590 --> 00:06:56,360
+Tercera, la especificidad: de los negativos reales, ¿cuántos dejé bien?
+
+112
+00:06:56,480 --> 00:07:00,000
+56 sobre 70: también 0.80.
+
+113
+00:07:00,120 --> 00:07:03,790
+Para la cuarta métrica, una imagen: un pescador con una red.
+
+114
+00:07:03,910 --> 00:07:06,508
+La sensibilidad pregunta: de todos los peces
+
+115
+00:07:06,508 --> 00:07:08,870
+del lago, ¿qué fracción quedó en la red?
+
+116
+00:07:08,990 --> 00:07:12,491
+La precisión pregunta otra cosa: de todo lo que hay en la
+
+117
+00:07:12,491 --> 00:07:15,440
+red, ¿qué fracción son peces, y no botas viejas?
+
+118
+00:07:15,560 --> 00:07:20,680
+En el ejemplo: verdaderos positivos sobre verdaderos positivos más falsos positivos.
+
+119
+00:07:20,800 --> 00:07:24,570
+24 sobre 38: 0.632.
+
+120
+00:07:24,690 --> 00:07:28,828
+Las otras tres métricas daban 0.80, pero la precisión baja, porque los
+
+121
+00:07:28,828 --> 00:07:32,730
+catorce falsos positivos se mezclan con los veinticuatro aciertos.
+
+122
+00:07:32,850 --> 00:07:35,740
+Dos resúmenes más, de la diapositiva diez.
+
+123
+00:07:35,860 --> 00:07:41,233
+El F1 junta precisión y sensibilidad: dos veces los verdaderos positivos, sobre dos veces
+
+124
+00:07:41,233 --> 00:07:45,640
+los verdaderos positivos más los falsos positivos y los falsos negativos.
+
+125
+00:07:45,760 --> 00:07:49,800
+48 sobre 68: 0.706.
+
+126
+00:07:49,920 --> 00:07:53,400
+Ojo: el F1 no usa los verdaderos negativos.
+
+127
+00:07:53,520 --> 00:07:58,231
+La exactitud balanceada es el promedio de sensibilidad y
+
+128
+00:07:58,231 --> 00:08:02,100
+especificidad: 0.80 más 0.80, sobre dos: 0.80.
+
+129
+00:08:02,220 --> 00:08:07,030
+Le da el mismo peso a las dos clases, sin importar cuántos casos tenga cada una.
+
+130
+00:08:07,150 --> 00:08:12,880
+Con la línea base de siempre benigno, daría uno más cero, sobre dos: 0.5.
+
+131
+00:08:13,000 --> 00:08:15,310
+Ahí se ve que esa regla no sabe nada.
+
+132
+00:08:15,430 --> 00:08:18,828
+Ahora, con datos reales: la regresión logística
+
+133
+00:08:18,828 --> 00:08:21,720
+de la clase, en los 171 casos de prueba.
+
+134
+00:08:21,840 --> 00:08:25,767
+103 verdaderos negativos, 4 falsos positivos, 6
+
+135
+00:08:25,767 --> 00:08:29,360
+falsos negativos y 58 verdaderos positivos.
+
+136
+00:08:29,480 --> 00:08:34,670
+Sensibilidad: 58 sobre 64, 0.906.
+
+137
+00:08:34,790 --> 00:08:39,670
+Y precisión: 58 sobre 62, 0.935.
+
+138
+00:08:39,790 --> 00:08:43,129
+En el código, la tabla sale con confusion matrix, con
+
+139
+00:08:43,129 --> 00:08:46,090
+las filas como clase real y el orden cero, uno.
+
+140
+00:08:46,210 --> 00:08:49,531
+Python cuenta desde cero: la posición cero cero es el
+
+141
+00:08:49,531 --> 00:08:53,040
+verdadero negativo, y la uno uno, el verdadero positivo.
+
+142
+00:08:53,160 --> 00:08:57,815
+En R, la función table cuenta desde uno: el verdadero negativo está en la
+
+143
+00:08:57,815 --> 00:09:01,450
+posición uno uno, y el verdadero positivo, en la dos dos.
+
+144
+00:09:01,570 --> 00:09:05,310
+El error típico: tomar la clase equivocada como positiva.
+
+145
+00:09:05,430 --> 00:09:10,909
+Con la misma matriz de la logística, si alguien toma benigno como
+
+146
+00:09:10,909 --> 00:09:15,460
+positivo, su «sensibilidad» sale 103 sobre 107: 0.963.
+
+147
+00:09:15,580 --> 00:09:18,620
+Suena excelente, pero es la especificidad de verdad.
+
+148
+00:09:18,740 --> 00:09:22,800
+De los malignos, el modelo detecta 0.906.
+
+149
+00:09:22,920 --> 00:09:24,140
+Piensa un segundo.
+
+150
+00:09:24,260 --> 00:09:27,891
+Un modelo tiene 90 verdaderos negativos, 10 falsos
+
+151
+00:09:27,891 --> 00:09:32,030
+positivos, 20 falsos negativos y 80 verdaderos positivos.
+
+152
+00:09:32,150 --> 00:09:33,480
+¿Cuál es su sensibilidad?
+
+153
+00:09:33,600 --> 00:09:34,570
+¿Y su precisión?
+
+154
+00:09:35,290 --> 00:09:38,850
+Sensibilidad: 80 sobre 100, 0.80.
+
+155
+00:09:38,970 --> 00:09:43,060
+Precisión: 80 sobre 90, 0.889.
+
+156
+00:09:43,180 --> 00:09:47,895
+Y de regalo: la especificidad es 90 sobre 100,
+
+157
+00:09:47,895 --> 00:09:52,200
+0.90, y la exactitud, 170 sobre 200, 0.85.
+
+158
+00:09:52,320 --> 00:09:55,755
+Para llevarte: filas, la clase real; columnas, la
+
+159
+00:09:55,755 --> 00:09:59,190
+predicha; y siempre declarando la clase positiva.
+
+160
+00:09:59,310 --> 00:10:02,711
+Sensibilidad, de los positivos reales cuántos detecto;
+
+161
+00:10:02,711 --> 00:10:05,860
+especificidad, de los negativos cuántos dejo bien.
+
+162
+00:10:05,980 --> 00:10:09,680
+Y precisión: de los que declaro positivos, cuántos lo eran.
+
+163
+00:10:09,800 --> 00:10:13,491
+Siguiente parada: la regresión logística, el primer modelo de la
+
+164
+00:10:13,491 --> 00:10:16,490
+clase, que convierte un puntaje en una probabilidad.
+
+165
+00:10:17,370 --> 00:10:20,010
+Tercera parada: la regresión logística.
+
+166
+00:10:20,130 --> 00:10:23,526
+Vas a calcular a mano una probabilidad, y a ver por qué el
+
+167
+00:10:23,526 --> 00:10:26,220
+umbral decide, pero no cambia la probabilidad.
+
+168
+00:10:26,340 --> 00:10:30,240
+¿Por qué no usar una regresión lineal común para predecir el cero y el uno?
+
+169
+00:10:30,360 --> 00:10:32,450
+Porque una recta no sabe detenerse.
+
+170
+00:10:32,570 --> 00:10:37,290
+Con valores grandes predice más que uno, y con valores chicos, menos que cero.
+
+171
+00:10:37,410 --> 00:10:40,641
+Con los datos de Wisconsin, una regresión
+
+172
+00:10:40,641 --> 00:10:44,030
+lineal predice desde menos 0.32 hasta 1.58.
+
+173
+00:10:44,150 --> 00:10:45,860
+Eso no es una probabilidad.
+
+174
+00:10:45,980 --> 00:10:48,410
+Piensa en un regulador de luz, un dimmer.
+
+175
+00:10:48,530 --> 00:10:51,750
+Al principio, girar la perilla cambia mucho la luz.
+
+176
+00:10:51,870 --> 00:10:55,081
+Pero cerca del máximo, por más que gires, la luz ya
+
+177
+00:10:55,081 --> 00:10:57,600
+no sube: se queda en el cien por ciento.
+
+178
+00:10:57,720 --> 00:11:01,136
+La regresión logística hace eso con un puntaje: lo convierte
+
+179
+00:11:01,136 --> 00:11:04,040
+en un número que nunca baja de cero ni pasa de uno.
+
+180
+00:11:04,160 --> 00:11:06,510
+La diapositiva quince escribe el modelo.
+
+181
+00:11:06,630 --> 00:11:09,531
+Lo que se modela es la probabilidad de la clase
+
+182
+00:11:09,531 --> 00:11:12,740
+positiva: pe de x, la probabilidad de que y sea uno.
+
+183
+00:11:12,860 --> 00:11:16,479
+Su logaritmo de los odds, pe sobre uno menos pe, es una
+
+184
+00:11:16,479 --> 00:11:19,440
+combinación lineal: beta cero más beta por x.
+
+185
+00:11:19,560 --> 00:11:23,790
+Al despejar, pe es uno sobre uno más e elevado a menos ese puntaje.
+
+186
+00:11:23,910 --> 00:11:26,330
+A ese puntaje lineal lo llamamos eta.
+
+187
+00:11:26,450 --> 00:11:30,140
+El modelo es lineal en los coeficientes, como una regresión.
+
+188
+00:11:30,260 --> 00:11:33,520
+Pero la probabilidad que sale queda siempre entre cero y uno.
+
+189
+00:11:33,640 --> 00:11:35,090
+Ahora, la curva.
+
+190
+00:11:35,210 --> 00:11:39,920
+En el eje horizontal, el puntaje eta; en el vertical, la probabilidad.
+
+191
+00:11:40,040 --> 00:11:44,400
+Cuando eta vale cero, la probabilidad es exactamente 0.5.
+
+192
+00:11:44,520 --> 00:11:47,348
+Y cuando eta vale uno, como marca la
+
+193
+00:11:47,348 --> 00:11:50,569
+diapositiva dieciséis, la probabilidad es
+
+194
+00:11:50,569 --> 00:11:51,040
+0.731.
+
+195
+00:11:51,160 --> 00:11:54,509
+Y aquí está la clave de la curva: subir eta de
+
+196
+00:11:54,509 --> 00:11:57,640
+cero a uno aumenta la probabilidad en 0.23.
+
+197
+00:11:57,760 --> 00:12:02,030
+Pero subir eta de cuatro a cinco la aumenta apenas en 0.01.
+
+198
+00:12:02,150 --> 00:12:06,670
+Un aumento constante del puntaje no produce un aumento constante de la probabilidad.
+
+199
+00:12:06,790 --> 00:12:11,350
+Hagamos una predicción paso a paso, con el ejemplo de la diapositiva diecisiete.
+
+200
+00:12:11,470 --> 00:12:15,561
+Los coeficientes son hipotéticos: eta es menos uno,
+
+201
+00:12:15,561 --> 00:12:19,010
+más 0.8 por zeta uno, más 0.4 por zeta dos.
+
+202
+00:12:19,130 --> 00:12:22,367
+Y el caso tiene zeta uno igual a 1.5 y zeta dos
+
+203
+00:12:22,367 --> 00:12:25,190
+igual a dos, en variables estandarizadas.
+
+204
+00:12:25,310 --> 00:12:30,650
+Paso uno, el puntaje: menos uno, más 0.8 por 1.5,
+
+205
+00:12:30,650 --> 00:12:35,010
+que es 1.2, más 0.4 por dos, que es 0.8.
+
+206
+00:12:35,130 --> 00:12:39,200
+Menos uno más 1.2 más 0.8: eta vale uno.
+
+207
+00:12:39,320 --> 00:12:43,780
+Paso dos, la probabilidad: uno sobre uno más e elevado a menos uno.
+
+208
+00:12:43,900 --> 00:12:50,080
+e a la menos uno es 0.368; uno sobre 1.368 da 0.731.
+
+209
+00:12:50,200 --> 00:12:51,980
+Paso tres, la decisión.
+
+210
+00:12:52,100 --> 00:12:59,540
+Con el umbral habitual, te igual a 0.5: 0.731 es mayor que 0.5, y la clase es uno.
+
+211
+00:12:59,660 --> 00:13:03,560
+Con un umbral más exigente, te igual a 0.8:
+
+212
+00:13:03,560 --> 00:13:07,460
+0.731 es menor que 0.8, y la clase es cero.
+
+213
+00:13:07,580 --> 00:13:09,980
+Fíjate: la probabilidad no cambió.
+
+214
+00:13:10,100 --> 00:13:11,800
+Lo que cambió fue la decisión.
+
+215
+00:13:11,920 --> 00:13:14,020
+¿Y de dónde salen los coeficientes?
+
+216
+00:13:14,140 --> 00:13:18,650
+Se eligen minimizando la pérdida logística, de la diapositiva diecinueve.
+
+217
+00:13:18,770 --> 00:13:22,978
+Para cada caso, si es positivo, se suma menos el logaritmo de pe;
+
+218
+00:13:22,978 --> 00:13:26,280
+si es negativo, menos el logaritmo de uno menos pe.
+
+219
+00:13:26,400 --> 00:13:30,900
+Veamos cuánto cuesta un caso positivo, según la probabilidad que le dio el modelo.
+
+220
+00:13:31,020 --> 00:13:36,710
+Si le dio 0.9: menos el logaritmo de 0.9, 0.105.
+
+221
+00:13:36,830 --> 00:13:37,330
+Poco.
+
+222
+00:13:37,450 --> 00:13:41,160
+Si le dio 0.5: 0.693.
+
+223
+00:13:41,280 --> 00:13:46,700
+Y si le dio 0.01, muy seguro y equivocado: 4.605.
+
+224
+00:13:46,820 --> 00:13:49,860
+Una predicción muy segura y equivocada se paga caro.
+
+225
+00:13:49,980 --> 00:13:55,215
+Con el umbral 0.5, la regla se puede escribir sin probabilidades: pe es mayor o
+
+226
+00:13:55,215 --> 00:13:59,390
+igual que 0.5 exactamente cuando eta es mayor o igual que cero.
+
+227
+00:13:59,510 --> 00:14:02,080
+Con dos predictores, eso es una recta.
+
+228
+00:14:02,200 --> 00:14:07,940
+Aquí están los 398 casos de entrenamiento, con radio y concavidad estandarizados.
+
+229
+00:14:08,060 --> 00:14:12,410
+Y esta es la frontera de una logística ajustada solo con esas dos variables.
+
+230
+00:14:12,530 --> 00:14:15,850
+Con más predictores, la recta pasa a ser un hiperplano.
+
+231
+00:14:15,970 --> 00:14:18,825
+Y si se agregan interacciones o transformaciones, la
+
+232
+00:14:18,825 --> 00:14:21,680
+frontera puede curvarse en las variables originales.
+
+233
+00:14:21,800 --> 00:14:24,516
+En la clase se usan solo efectos lineales, para
+
+234
+00:14:24,516 --> 00:14:26,770
+que la comparación sea fácil de seguir.
+
+235
+00:14:26,890 --> 00:14:29,910
+En el código de la clase, con las cuatro variables.
+
+236
+00:14:30,030 --> 00:14:35,520
+En R: glm, con la fórmula maligno contra las cuatro variables y la familia binomial.
+
+237
+00:14:35,640 --> 00:14:39,490
+Y predict con type igual a response entrega la probabilidad de maligno.
+
+238
+00:14:39,610 --> 00:14:43,095
+En Python: Logistic Regression con penalty igual a None, y
+
+239
+00:14:43,095 --> 00:14:46,040
+predict proba, quedándose con la segunda columna.
+
+240
+00:14:46,160 --> 00:14:49,310
+Las primeras seis probabilidades de la prueba son estas.
+
+241
+00:14:49,430 --> 00:15:00,200
+0.9997, 0.9949, 0.9, 0.9915, 0.7447 y prácticamente uno.
+
+242
+00:15:00,320 --> 00:15:04,700
+Con el umbral 0.5, los seis casos se clasifican como malignos.
+
+243
+00:15:04,820 --> 00:15:08,068
+El error típico: escribir Logistic Regression con los
+
+244
+00:15:08,068 --> 00:15:11,500
+paréntesis vacíos, creyendo que es la logística clásica.
+
+245
+00:15:11,620 --> 00:15:15,890
+Por defecto, scikit-learn agrega una penalización a los coeficientes.
+
+246
+00:15:16,010 --> 00:15:18,260
+La diapositiva diecinueve lo advierte.
+
+247
+00:15:18,380 --> 00:15:23,063
+En la prueba se nota: sin penalización, 94.2 por ciento de
+
+248
+00:15:23,063 --> 00:15:27,020
+exactitud; con la penalización por defecto, 93.0.
+
+249
+00:15:27,140 --> 00:15:29,470
+No reproduce el glm de R.
+
+250
+00:15:29,590 --> 00:15:32,270
+Piensa un segundo, con el ejemplo del apunte.
+
+251
+00:15:32,390 --> 00:15:38,054
+Si eta es menos dos, más 0.9 por zeta uno, más 0.5 por zeta dos, y el caso tiene
+
+252
+00:15:38,054 --> 00:15:43,010
+zeta uno igual a dos y zeta dos igual a uno, ¿cuál es su probabilidad?
+
+253
+00:15:43,130 --> 00:15:45,310
+¿Y su clase con umbral 0.7?
+
+254
+00:15:46,030 --> 00:15:51,100
+El puntaje: menos dos más 1.8 más 0.5, 0.3.
+
+255
+00:15:51,220 --> 00:15:56,480
+La probabilidad: uno sobre uno más e a la menos
+
+256
+00:15:56,480 --> 00:16:01,180
+0.3, que es 0.741: uno sobre 1.741, 0.574.
+
+257
+00:16:01,300 --> 00:16:06,350
+Con umbral 0.5 sería clase uno; con 0.7, clase cero.
+
+258
+00:16:06,470 --> 00:16:10,494
+Para llevarte: la logística calcula un puntaje lineal, eta, y lo
+
+259
+00:16:10,494 --> 00:16:14,580
+convierte en probabilidad con uno sobre uno más e a la menos eta.
+
+260
+00:16:14,700 --> 00:16:18,040
+El umbral decide la clase, sin cambiar la probabilidad.
+
+261
+00:16:18,160 --> 00:16:22,800
+Y en Python, para la logística clásica, hay que poner penalty igual a None.
+
+262
+00:16:22,920 --> 00:16:26,554
+Siguiente parada: el umbral con datos reales, los odds, y
+
+263
+00:16:26,554 --> 00:16:29,550
+cómo leer los coeficientes sin caer en trampas.
+
+264
+00:16:30,450 --> 00:16:34,471
+Cuarta parada: el umbral con datos reales, los odds, y cómo leer
+
+265
+00:16:34,471 --> 00:16:37,800
+los coeficientes de la logística sin caer en trampas.
+
+266
+00:16:37,920 --> 00:16:40,470
+¿El umbral tiene que ser siempre 0.5?
+
+267
+00:16:40,590 --> 00:16:43,131
+Si un falso negativo es un cáncer que no se
+
+268
+00:16:43,131 --> 00:16:45,790
+detecta, quizás convenga dar la alarma antes.
+
+269
+00:16:45,910 --> 00:16:49,379
+El umbral no es una propiedad del modelo: es una decisión,
+
+270
+00:16:49,379 --> 00:16:52,070
+y se toma pensando en el costo de cada error.
+
+271
+00:16:52,190 --> 00:16:55,240
+Piensa en un guardia de aeropuerto que decide a quién revisar.
+
+272
+00:16:55,360 --> 00:16:58,715
+Si es muy exigente, revisa a casi todos: no se le
+
+273
+00:16:58,715 --> 00:17:02,070
+escapa nada, pero molesta a mucha gente inocente.
+
+274
+00:17:02,190 --> 00:17:06,480
+Si es relajado, casi no molesta, pero se le pueden escapar cosas.
+
+275
+00:17:06,600 --> 00:17:10,470
+Bajar el umbral es volverse exigente; subirlo, relajarse.
+
+276
+00:17:10,590 --> 00:17:14,238
+Ahora con los datos reales: la logística de la clase en
+
+277
+00:17:14,238 --> 00:17:17,090
+los 171 casos de prueba, con tres umbrales.
+
+278
+00:17:17,210 --> 00:17:24,100
+Con te igual a 0.3, detecta 59 de los 64 malignos, pero da 13 falsas alarmas.
+
+279
+00:17:24,220 --> 00:17:28,760
+Con 0.5, detecta 58 y da 4 falsas alarmas.
+
+280
+00:17:28,880 --> 00:17:34,370
+Con 0.8, detecta solo 52, y da apenas 2 falsas alarmas.
+
+281
+00:17:34,490 --> 00:17:41,610
+En métricas: con 0.3, sensibilidad 0.922 y especificidad 0.879.
+
+282
+00:17:41,730 --> 00:17:46,500
+Con 0.5, 0.906 y 0.963.
+
+283
+00:17:46,620 --> 00:17:51,340
+Con 0.8, 0.813 y 0.981.
+
+284
+00:17:51,460 --> 00:17:54,740
+Subir el umbral gana especificidad y pierde sensibilidad.
+
+285
+00:17:54,860 --> 00:17:56,380
+Siempre es un intercambio.
+
+286
+00:17:56,500 --> 00:18:00,960
+Pero ojo: estos números de prueba sirven para ver el efecto, no para elegir.
+
+287
+00:18:01,080 --> 00:18:04,680
+El umbral se elige con validación, dentro del entrenamiento.
+
+288
+00:18:04,800 --> 00:18:10,909
+Con validación cruzada en los 398 casos, la sensibilidad y la especificidad
+
+289
+00:18:10,909 --> 00:18:15,960
+se igualan cerca de te igual a 0.34: ambas, alrededor de 0.93.
+
+290
+00:18:16,080 --> 00:18:19,060
+Para leer los coeficientes, necesitamos los odds.
+
+291
+00:18:19,180 --> 00:18:21,450
+Los odds son pe sobre uno menos pe.
+
+292
+00:18:21,570 --> 00:18:27,070
+Con probabilidad 0.8, los odds son 0.8 sobre 0.2: cuatro.
+
+293
+00:18:27,190 --> 00:18:29,440
+Cuatro a uno, como en las apuestas.
+
+294
+00:18:29,560 --> 00:18:33,000
+Con 0.5, los odds valen uno: es parejo.
+
+295
+00:18:33,120 --> 00:18:35,995
+Y aquí está la conexión con eta: el logaritmo de
+
+296
+00:18:35,995 --> 00:18:38,450
+los odds es justamente el puntaje lineal.
+
+297
+00:18:38,570 --> 00:18:41,230
+O sea, los odds son e elevado a eta.
+
+298
+00:18:41,350 --> 00:18:46,504
+En el ejemplo de la diapositiva diecisiete, eta valía uno:
+
+299
+00:18:46,504 --> 00:18:50,770
+los odds son e, 2.718, y la probabilidad, 0.731.
+
+300
+00:18:50,890 --> 00:18:53,450
+Ahora sí, la diapositiva dieciocho.
+
+301
+00:18:53,570 --> 00:18:57,390
+Si x jota sube en una unidad, con los demás predictores fijos,
+
+302
+00:18:57,390 --> 00:19:00,470
+los odds se multiplican por e elevado a beta jota.
+
+303
+00:19:00,590 --> 00:19:05,570
+Con beta igual a 0.8: e a la 0.8 es 2.23.
+
+304
+00:19:05,690 --> 00:19:08,510
+Los odds se multiplican por 2.23.
+
+305
+00:19:08,630 --> 00:19:12,080
+Pero la probabilidad no se multiplica por 2.23.
+
+306
+00:19:12,200 --> 00:19:19,830
+Sigamos el ejemplo: eta pasa de uno a 1.8, y los odds, de 2.718 a 6.05.
+
+307
+00:19:19,950 --> 00:19:24,530
+La probabilidad pasa de 0.731 a 0.858.
+
+308
+00:19:24,650 --> 00:19:29,402
+Sube, pero no se multiplica: si se multiplicara por 2.23,
+
+309
+00:19:29,402 --> 00:19:33,820
+daría 1.63, y una probabilidad no puede pasar de uno.
+
+310
+00:19:33,940 --> 00:19:36,240
+Dos advertencias más de la diapositiva.
+
+311
+00:19:36,360 --> 00:19:39,086
+Con variables estandarizadas, una unidad es una
+
+312
+00:19:39,086 --> 00:19:41,290
+desviación estándar del entrenamiento.
+
+313
+00:19:41,410 --> 00:19:45,490
+Y la interpretación es una asociación condicional, no un efecto causal.
+
+314
+00:19:45,610 --> 00:19:49,355
+La diapositiva veintiocho muestra los coeficientes del modelo
+
+315
+00:19:49,355 --> 00:19:52,240
+glm que se ajustó en R, en unidades originales.
+
+316
+00:19:52,360 --> 00:19:59,150
+Intercepto menos 42.25; radio, 1.34; textura,
+
+317
+00:19:59,150 --> 00:20:05,940
+0.442; suavidad, 124.98; y concavidad, 21.41.
+
+318
+00:20:06,060 --> 00:20:10,638
+La diapositiva lee la textura: una unidad más de textura
+
+319
+00:20:10,638 --> 00:20:15,380
+multiplica los odds por e a la 0.4421, es decir, por 1.56.
+
+320
+00:20:15,500 --> 00:20:18,670
+Cuidado si alguien aplica esa misma lectura a la suavidad.
+
+321
+00:20:18,790 --> 00:20:23,096
+Una unidad más de suavidad multiplicaría los odds por
+
+322
+00:20:23,096 --> 00:20:26,590
+e elevado a 124.98: un número de 55 cifras.
+
+323
+00:20:26,710 --> 00:20:33,520
+No tiene sentido práctico, porque la suavidad de toda la base va de 0.053 a 0.163.
+
+324
+00:20:33,640 --> 00:20:35,590
+Una unidad completa no existe.
+
+325
+00:20:35,710 --> 00:20:40,592
+La lectura útil es otra: un aumento de 0.01 multiplica
+
+326
+00:20:40,592 --> 00:20:44,390
+los odds por e a la 1.25, o sea, por 3.49.
+
+327
+00:20:44,510 --> 00:20:50,592
+Y en Python los coeficientes salen distintos, porque las variables están estandarizadas:
+
+328
+00:20:50,592 --> 00:20:55,430
+el radio vale 4.92 por desviación estándar, en vez de 1.34 por unidad.
+
+329
+00:20:55,550 --> 00:20:57,810
+Pero las probabilidades son las mismas.
+
+330
+00:20:57,930 --> 00:21:02,630
+Para el caso nuevo de la clase, las dos versiones dan 0.3919.
+
+331
+00:21:02,750 --> 00:21:04,770
+Una precisión sobre lo dicho en clase.
+
+332
+00:21:04,890 --> 00:21:07,570
+Se dijo que el estimador de máxima verosimilitud
+
+333
+00:21:07,570 --> 00:21:09,970
+tiene garantizado que su solución es única.
+
+334
+00:21:10,090 --> 00:21:10,950
+No siempre.
+
+335
+00:21:11,070 --> 00:21:15,436
+Si las clases están perfectamente separadas, la verosimilitud sigue subiendo
+
+336
+00:21:15,436 --> 00:21:18,940
+a medida que el coeficiente crece, y nunca llega a un máximo.
+
+337
+00:21:19,060 --> 00:21:22,409
+Un ejemplo pequeño: seis puntos, los tres negativos a la
+
+338
+00:21:22,409 --> 00:21:25,040
+izquierda y los tres positivos a la derecha.
+
+339
+00:21:25,160 --> 00:21:29,990
+Con beta igual a uno, la log verosimilitud es menos 0.978.
+
+340
+00:21:30,110 --> 00:21:32,950
+Con dos, menos 0.295.
+
+341
+00:21:33,070 --> 00:21:35,940
+Con cinco, menos 0.014.
+
+342
+00:21:36,060 --> 00:21:39,570
+Con diez, menos 0.00009.
+
+343
+00:21:39,690 --> 00:21:42,200
+Siempre sube hacia cero, sin detenerse.
+
+344
+00:21:42,320 --> 00:21:45,990
+En la práctica, el programa se detiene en un valor arbitrario.
+
+345
+00:21:46,110 --> 00:21:50,250
+El error típico de esta parte: elegir el umbral mirando la prueba.
+
+346
+00:21:50,370 --> 00:21:54,214
+Si pruebas varios umbrales en los 171 casos y te quedas con el
+
+347
+00:21:54,214 --> 00:21:57,190
+que dio mejor, ya usaste la prueba para decidir.
+
+348
+00:21:57,310 --> 00:22:01,469
+La diapositiva once lo dice: mirar la prueba para decidir la convierte en
+
+349
+00:22:01,469 --> 00:22:04,830
+validación, y su número deja de ser una evaluación honesta.
+
+350
+00:22:04,950 --> 00:22:06,170
+Piensa un segundo.
+
+351
+00:22:06,290 --> 00:22:09,611
+Si un coeficiente vale menos 0.7, ¿qué les pasa a los
+
+352
+00:22:09,611 --> 00:22:12,180
+odds cuando esa variable sube una unidad?
+
+353
+00:22:13,100 --> 00:22:17,760
+Se multiplican por e a la menos 0.7, que es 0.497.
+
+354
+00:22:17,880 --> 00:22:20,740
+Es decir, los odds se reducen casi a la mitad.
+
+355
+00:22:20,860 --> 00:22:24,650
+Un coeficiente negativo baja los odds; uno positivo los sube.
+
+356
+00:22:24,770 --> 00:22:29,173
+Para llevarte: el umbral es una decisión: bajarlo gana sensibilidad,
+
+357
+00:22:29,173 --> 00:22:32,670
+subirlo gana especificidad, y se elige con validación.
+
+358
+00:22:32,790 --> 00:22:37,080
+Un coeficiente multiplica los odds por e elevado a beta, no la probabilidad.
+
+359
+00:22:37,200 --> 00:22:42,210
+Y hay que leerlo en la escala de su variable: para la suavidad, de a 0.01.
+
+360
+00:22:42,330 --> 00:22:45,460
+Siguiente parada: las máquinas de vectores de soporte.
+
+361
+00:22:45,580 --> 00:22:49,100
+El hiperplano, el margen, y los puntos que lo sostienen.
+
+362
+00:22:49,970 --> 00:22:52,910
+Quinta parada: las máquinas de vectores de soporte.
+
+363
+00:22:53,030 --> 00:22:56,195
+Vas a calcular un puntaje, una distancia y el ancho del
+
+364
+00:22:56,195 --> 00:22:59,360
+margen, y a decidir qué puntos son vectores de soporte.
+
+365
+00:22:59,480 --> 00:23:02,171
+Mira estos dos grupos: treinta y dos casos
+
+366
+00:23:02,171 --> 00:23:04,990
+reales, benignos en azul y malignos en rojo.
+
+367
+00:23:05,110 --> 00:23:07,750
+Hay infinitas rectas que los separan sin errores.
+
+368
+00:23:07,870 --> 00:23:10,080
+Esta, esta otra, o esta.
+
+369
+00:23:10,200 --> 00:23:11,040
+¿Cuál elegir?
+
+370
+00:23:11,160 --> 00:23:14,553
+La SVM tiene una respuesta precisa: la recta que deja la
+
+371
+00:23:14,553 --> 00:23:17,280
+calle más ancha posible entre los dos grupos.
+
+372
+00:23:17,400 --> 00:23:19,960
+Piensa en una calle nueva entre dos barrios.
+
+373
+00:23:20,080 --> 00:23:23,570
+Quieres que sea lo más ancha posible, sin tocar ninguna casa.
+
+374
+00:23:23,690 --> 00:23:25,710
+¿Qué casas deciden dónde va la calle?
+
+375
+00:23:25,830 --> 00:23:29,570
+Solo las que quedan en la vereda, las más cercanas al otro barrio.
+
+376
+00:23:29,690 --> 00:23:33,450
+Las casas del fondo podrían moverse, y la calle no cambiaría.
+
+377
+00:23:33,570 --> 00:23:35,100
+Primero, la frontera.
+
+378
+00:23:35,220 --> 00:23:39,549
+La diapositiva treinta y dos la escribe así: f(x) es igual a w
+
+379
+00:23:39,549 --> 00:23:43,180
+por x más be, y la frontera es donde f(x) vale cero.
+
+380
+00:23:43,300 --> 00:23:47,110
+El vector w fija la orientación; be desplaza la frontera.
+
+381
+00:23:47,230 --> 00:23:53,110
+Y el signo de f(x) decide la clase: positivo, más uno; negativo, menos uno.
+
+382
+00:23:53,230 --> 00:23:56,186
+Un detalle de notación: para explicar la geometría
+
+383
+00:23:56,186 --> 00:23:58,610
+usamos las etiquetas menos uno y más uno.
+
+384
+00:23:58,730 --> 00:24:00,950
+En los scripts se mantienen cero y uno.
+
+385
+00:24:01,070 --> 00:24:04,308
+Y la distancia de un punto a la frontera es el valor
+
+386
+00:24:04,308 --> 00:24:07,110
+absoluto de f(x), dividido por la norma de w.
+
+387
+00:24:07,230 --> 00:24:09,930
+Hagamos la cuenta de la diapositiva treinta y cinco.
+
+388
+00:24:10,050 --> 00:24:14,770
+Supón que w es uno, menos uno, y be vale menos 0.5.
+
+389
+00:24:14,890 --> 00:24:17,500
+Tomamos el punto x igual a dos, uno.
+
+390
+00:24:17,620 --> 00:24:23,320
+Paso uno, el puntaje: uno por dos, menos uno por uno, menos 0.5.
+
+391
+00:24:23,440 --> 00:24:26,990
+Dos menos uno menos 0.5: 0.5.
+
+392
+00:24:27,110 --> 00:24:32,060
+Paso dos, la clase: como f(x) es positivo, predecimos más uno.
+
+393
+00:24:32,180 --> 00:24:36,425
+Paso tres, la norma de w: la raíz de uno al cuadrado
+
+394
+00:24:36,425 --> 00:24:40,180
+más menos uno al cuadrado: raíz de dos, 1.414.
+
+395
+00:24:40,300 --> 00:24:46,820
+Paso cuatro, la distancia: 0.5 sobre 1.414, 0.354.
+
+396
+00:24:46,940 --> 00:24:51,890
+Fíjate que la distancia no es 0.5: el puntaje hay que dividirlo por la norma.
+
+397
+00:24:52,010 --> 00:24:53,520
+Ahora, el margen.
+
+398
+00:24:53,640 --> 00:24:56,665
+La SVM fija la escala de w y be para que los
+
+399
+00:24:56,665 --> 00:24:59,690
+puntos cumplan y·f(x) mayor o igual que uno.
+
+400
+00:24:59,810 --> 00:25:04,640
+Así aparecen dos bordes: efe igual a más uno, y efe igual a menos uno.
+
+401
+00:25:04,760 --> 00:25:08,180
+Cada borde está a uno sobre la norma de w de la frontera.
+
+402
+00:25:08,300 --> 00:25:11,510
+El ancho total de la calle es dos sobre la norma de w.
+
+403
+00:25:11,630 --> 00:25:15,043
+Por eso la SVM minimiza un medio de la norma de w al
+
+404
+00:25:15,043 --> 00:25:18,260
+cuadrado: achicar la norma es ensanchar la calle.
+
+405
+00:25:18,380 --> 00:25:22,531
+En el ejemplo anterior, con norma raíz de dos,
+
+406
+00:25:22,531 --> 00:25:25,960
+el ancho sería dos sobre 1.414: 1.414.
+
+407
+00:25:26,080 --> 00:25:28,510
+Volvamos a los treinta y dos casos reales.
+
+408
+00:25:28,630 --> 00:25:32,720
+La SVM de margen duro encuentra esta frontera, la línea negra.
+
+409
+00:25:32,840 --> 00:25:38,530
+Y estos son sus dos bordes: efe igual a más uno, en rojo, y menos uno, en azul.
+
+410
+00:25:38,650 --> 00:25:40,800
+Ningún caso queda dentro de la calle.
+
+411
+00:25:40,920 --> 00:25:48,540
+Los números del ajuste: w vale 1.316 y 1.071, y be, 0.082.
+
+412
+00:25:48,660 --> 00:25:56,390
+La norma de w es la raíz de 1.316 al cuadrado más 1.071 al cuadrado: 1.697.
+
+413
+00:25:56,510 --> 00:26:02,970
+Y el ancho del margen: dos sobre 1.697, 1.179 desviaciones estándar.
+
+414
+00:26:03,090 --> 00:26:04,930
+¿Quiénes son los vectores de soporte?
+
+415
+00:26:05,050 --> 00:26:10,270
+Los puntos que quedan justo sobre los bordes: los que cumplen y·f(x) igual a uno.
+
+416
+00:26:10,390 --> 00:26:16,270
+Comprobémoslo con un maligno, en zeta igual a 0.54 y 0.194.
+
+417
+00:26:16,390 --> 00:26:24,422
+Efe vale 1.316 por 0.54, más 1.071 por 0.194, más
+
+418
+00:26:24,422 --> 00:26:32,290
+0.082: 0.711 más 0.208 más 0.082, igual a 1.000.
+
+419
+00:26:32,410 --> 00:26:35,130
+Está sobre el borde: es vector de soporte.
+
+420
+00:26:35,250 --> 00:26:41,040
+Ahora un benigno cercano, en menos 0.678 y menos 0.545.
+
+421
+00:26:41,160 --> 00:26:48,180
+Efe vale menos 1.394, y como su etiqueta es menos uno, y·f da 1.394.
+
+422
+00:26:48,300 --> 00:26:52,610
+Es mayor que uno: está más allá del borde, y no es vector de soporte.
+
+423
+00:26:52,730 --> 00:26:56,750
+De los treinta y dos casos, solo tres quedan exactamente en el borde.
+
+424
+00:26:56,870 --> 00:27:00,730
+Si borras cualquiera de los otros veintinueve, la frontera no se mueve.
+
+425
+00:27:00,850 --> 00:27:05,020
+El error típico: creer que un margen ancho garantiza un buen modelo.
+
+426
+00:27:05,140 --> 00:27:08,853
+La diapositiva treinta y cuatro lo advierte: un margen amplio no
+
+427
+00:27:08,853 --> 00:27:12,160
+garantiza, por sí solo, buen rendimiento en datos nuevos.
+
+428
+00:27:12,280 --> 00:27:15,790
+Y estos treinta y dos casos se eligieron separables a propósito.
+
+429
+00:27:15,910 --> 00:27:18,696
+Con los 398 casos reales, las clases se
+
+430
+00:27:18,696 --> 00:27:21,910
+mezclan, y el margen duro ni siquiera existe.
+
+431
+00:27:22,030 --> 00:27:23,790
+Eso lo arregla el margen suave.
+
+432
+00:27:23,910 --> 00:27:25,130
+Piensa un segundo.
+
+433
+00:27:25,250 --> 00:27:29,552
+Si w es tres, cuatro, be vale menos cinco, y el punto
+
+434
+00:27:29,552 --> 00:27:32,880
+es x igual a dos, uno, ¿cuánto vale f(x)?
+
+435
+00:27:33,000 --> 00:27:35,050
+¿A qué distancia de la frontera está?
+
+436
+00:27:35,170 --> 00:27:36,850
+¿Y cuál es el ancho del margen?
+
+437
+00:27:37,570 --> 00:27:41,680
+Efe de x: tres por dos más cuatro por uno menos cinco, cinco.
+
+438
+00:27:41,800 --> 00:27:47,100
+La norma de w: raíz de nueve más dieciséis, raíz de veinticinco, cinco.
+
+439
+00:27:47,220 --> 00:27:50,030
+La distancia: cinco sobre cinco, uno.
+
+440
+00:27:50,150 --> 00:27:53,800
+Y el ancho del margen: dos sobre cinco, 0.4.
+
+441
+00:27:53,920 --> 00:27:58,011
+Para llevarte: la SVM usa la frontera f(x) igual a cero, y la
+
+442
+00:27:58,011 --> 00:28:01,900
+distancia es el valor absoluto de efe sobre la norma de w.
+
+443
+00:28:02,020 --> 00:28:06,780
+El ancho del margen es dos sobre la norma de w, y la SVM lo maximiza.
+
+444
+00:28:06,900 --> 00:28:09,965
+Y solo los vectores de soporte, los puntos con y·f
+
+445
+00:28:09,965 --> 00:28:12,540
+igual a uno, deciden dónde va la frontera.
+
+446
+00:28:12,660 --> 00:28:14,980
+Siguiente parada: el margen suave.
+
+447
+00:28:15,100 --> 00:28:19,040
+Qué pasa cuando las clases se mezclan, la holgura, y el parámetro C.
+
+448
+00:28:19,930 --> 00:28:22,240
+Sexta parada: el margen suave.
+
+449
+00:28:22,360 --> 00:28:25,691
+Vas a calcular holguras a mano, a ver la pérdida hinge, y a
+
+450
+00:28:25,691 --> 00:28:28,570
+mirar qué hace el parámetro C con los datos reales.
+
+451
+00:28:28,690 --> 00:28:34,410
+Estos son los 398 casos de entrenamiento, con radio y concavidad estandarizados.
+
+452
+00:28:34,530 --> 00:28:37,980
+Mira la zona del medio: benignos y malignos se mezclan.
+
+453
+00:28:38,100 --> 00:28:40,990
+No existe ninguna recta que los separe sin errores.
+
+454
+00:28:41,110 --> 00:28:42,780
+¿La SVM se rinde?
+
+455
+00:28:42,900 --> 00:28:43,320
+No.
+
+456
+00:28:43,440 --> 00:28:46,760
+Deja que algunos puntos crucen, pero les cobra por cruzar.
+
+457
+00:28:46,880 --> 00:28:49,740
+Piensa en un estacionamiento con líneas pintadas.
+
+458
+00:28:49,860 --> 00:28:52,544
+Puedes pasarte un poco de la línea, pero te ponen
+
+459
+00:28:52,544 --> 00:28:54,900
+una multa proporcional a cuánto te pasaste.
+
+460
+00:28:55,020 --> 00:28:57,690
+Si la multa es barata, mucha gente se pasa.
+
+461
+00:28:57,810 --> 00:29:01,170
+Si es carísima, todos se esfuerzan por no tocar la línea.
+
+462
+00:29:01,290 --> 00:29:04,350
+En la SVM, el valor de la multa se llama C.
+
+463
+00:29:04,470 --> 00:29:06,990
+La diapositiva treinta y seis lo escribe así.
+
+464
+00:29:07,110 --> 00:29:10,356
+Se minimiza un medio de la norma de w al cuadrado, más
+
+465
+00:29:10,356 --> 00:29:13,000
+C por la suma de las holguras: la letra ksi.
+
+466
+00:29:13,120 --> 00:29:16,667
+La condición se relaja: y·f(x) ya no tiene que ser mayor
+
+467
+00:29:16,667 --> 00:29:19,770
+que uno, sino mayor que uno menos la holgura ksi.
+
+468
+00:29:19,890 --> 00:29:24,490
+Y en la solución, cada holgura vale el máximo entre cero y uno menos y·f.
+
+469
+00:29:24,610 --> 00:29:27,860
+En inglés esto se llama soft margin, margen suave.
+
+470
+00:29:27,980 --> 00:29:31,410
+La holgura mide cuánto se pasó cada punto del borde de su lado.
+
+471
+00:29:31,530 --> 00:29:34,860
+Calculemos tres holguras, con la tabla de la diapositiva.
+
+472
+00:29:34,980 --> 00:29:38,438
+Un punto con y·f igual a 1.4: uno menos 1.4 es
+
+473
+00:29:38,438 --> 00:29:41,520
+negativo, así que la holgura ksi es cero.
+
+474
+00:29:41,640 --> 00:29:43,680
+Correcto, y fuera del margen.
+
+475
+00:29:43,800 --> 00:29:47,600
+Con y·f igual a 0.5: ksi es 0.5.
+
+476
+00:29:47,720 --> 00:29:50,570
+Está bien clasificado, pero dentro de la calle.
+
+477
+00:29:50,690 --> 00:29:56,450
+Y con menos 0.3: la holgura ksi es uno más 0.3, igual a 1.3.
+
+478
+00:29:56,570 --> 00:29:58,060
+Está mal clasificado.
+
+479
+00:29:58,180 --> 00:29:59,850
+Fíjate en el segundo caso.
+
+480
+00:29:59,970 --> 00:30:03,030
+Está bien clasificado, y aun así paga holgura.
+
+481
+00:30:03,150 --> 00:30:05,813
+La holgura penaliza las violaciones del margen,
+
+482
+00:30:05,813 --> 00:30:07,910
+no solo los errores de clasificación.
+
+483
+00:30:08,030 --> 00:30:13,186
+Esa función, el máximo entre cero y uno menos y·f, tiene nombre propio: es la
+
+484
+00:30:13,186 --> 00:30:17,740
+pérdida hinge, la pérdida bisagra, de la diapositiva sesenta y seis.
+
+485
+00:30:17,860 --> 00:30:21,177
+Vale cero cuando el caso queda más allá del margen correcto,
+
+486
+00:30:21,177 --> 00:30:23,830
+y crece en línea recta cuando se acerca o cruza.
+
+487
+00:30:23,950 --> 00:30:28,920
+A su lado, la pérdida logística: logaritmo de uno más e a la menos y·f.
+
+488
+00:30:29,040 --> 00:30:31,240
+Comparemos en los tres puntos de la tabla.
+
+489
+00:30:31,360 --> 00:30:35,810
+Con 1.4: hinge cero, logística 0.220.
+
+490
+00:30:35,930 --> 00:30:41,190
+Con 0.5: hinge 0.5, logística 0.474.
+
+491
+00:30:41,310 --> 00:30:46,920
+Con menos 0.3: hinge 1.3, logística 0.854.
+
+492
+00:30:47,040 --> 00:30:52,260
+La diferencia clave: la hinge se apaga del todo; la logística nunca llega a cero.
+
+493
+00:30:52,380 --> 00:30:55,290
+Y de ahí sale lo más importante de la SVM.
+
+494
+00:30:55,410 --> 00:30:58,508
+Los puntos lejos del margen, del lado correcto,
+
+495
+00:30:58,508 --> 00:31:01,210
+tienen pérdida cero: no influyen en nada.
+
+496
+00:31:01,330 --> 00:31:04,235
+Solo los que están en el borde, dentro de la calle o
+
+497
+00:31:04,235 --> 00:31:06,470
+del lado equivocado, mueven la frontera.
+
+498
+00:31:06,590 --> 00:31:08,400
+Esos son los vectores de soporte.
+
+499
+00:31:08,520 --> 00:31:12,320
+En la logística, en cambio, todos los puntos aportan algo.
+
+500
+00:31:12,440 --> 00:31:14,280
+Ahora, el parámetro C.
+
+501
+00:31:14,400 --> 00:31:18,604
+Según la diapositiva treinta y siete: un C pequeño le da poco peso a las
+
+502
+00:31:18,604 --> 00:31:22,400
+violaciones: el modelo se regulariza más, y la calle se ensancha.
+
+503
+00:31:22,520 --> 00:31:27,040
+Un C grande castiga mucho las violaciones del entrenamiento: la calle se angosta.
+
+504
+00:31:27,160 --> 00:31:31,592
+Un ejemplo: si las holguras suman cuatro, con C igual a 0.1 la
+
+505
+00:31:31,592 --> 00:31:35,310
+multa total es 0.4; con C igual a diez, es cuarenta.
+
+506
+00:31:35,430 --> 00:31:39,970
+Veámoslo con los datos reales, una SVM lineal con dos variables.
+
+507
+00:31:40,090 --> 00:31:43,862
+Con C igual a 0.01, la calle es ancha: 2.24
+
+508
+00:31:43,862 --> 00:31:48,160
+desviaciones estándar, y 188 vectores de soporte.
+
+509
+00:31:48,280 --> 00:31:53,970
+Con C igual a uno, se angosta a 0.86, con 83 vectores de soporte.
+
+510
+00:31:54,090 --> 00:32:00,310
+Y con C igual a cien, apenas cambia: 0.81 de ancho y 78 vectores de soporte.
+
+511
+00:32:00,430 --> 00:32:01,310
+¿Y en la prueba?
+
+512
+00:32:01,430 --> 00:32:06,170
+Los tres modelos aciertan exactamente lo mismo: 88.3 por ciento.
+
+513
+00:32:06,290 --> 00:32:10,310
+Cambiar C movió la calle, pero no mejoró nada.
+
+514
+00:32:10,430 --> 00:32:13,271
+Como dice la diapositiva: un C mayor no siempre
+
+515
+00:32:13,271 --> 00:32:15,810
+mejora el modelo; lo decide la validación.
+
+516
+00:32:15,930 --> 00:32:22,050
+Ahora, el modelo de la clase: SVM lineal con las cuatro variables y C igual a 0.1.
+
+517
+00:32:22,170 --> 00:32:25,889
+De los 398 casos de entrenamiento, 308 quedan bien
+
+518
+00:32:25,889 --> 00:32:29,310
+clasificados y fuera del margen: holgura cero.
+
+519
+00:32:29,430 --> 00:32:33,500
+70 quedan dentro de la calle, y 20 quedan del lado equivocado.
+
+520
+00:32:33,620 --> 00:32:35,480
+¿Cuántos vectores de soporte tiene?
+
+521
+00:32:35,600 --> 00:32:40,530
+93: los que quedan en el borde, dentro de la calle o del lado equivocado.
+
+522
+00:32:40,650 --> 00:32:43,550
+47 benignos y 46 malignos.
+
+523
+00:32:43,670 --> 00:32:48,380
+Los otros 305 casos podrían desaparecer, y la frontera sería la misma.
+
+524
+00:32:48,500 --> 00:32:49,940
+¿Y cómo se elige C?
+
+525
+00:32:50,060 --> 00:32:53,070
+Con validación cruzada, solo en el entrenamiento.
+
+526
+00:32:53,190 --> 00:32:59,080
+Esta curva prueba trece valores de C, de 0.001 a mil, con las cuatro variables.
+
+527
+00:32:59,200 --> 00:33:03,330
+Con C muy chico, el modelo subajusta: 66 por ciento.
+
+528
+00:33:03,450 --> 00:33:09,700
+El máximo de la validación cruzada está justo en C igual a 0.1: 94.0 por ciento.
+
+529
+00:33:09,820 --> 00:33:11,520
+Después la curva se aplana.
+
+530
+00:33:11,640 --> 00:33:15,210
+El error típico: leer el parámetro C como si fuera la fuerza de
+
+531
+00:33:15,210 --> 00:33:18,100
+la regularización, al estilo de la lambda de Lasso.
+
+532
+00:33:18,220 --> 00:33:20,755
+Es al revés: un C grande significa menos
+
+533
+00:33:20,755 --> 00:33:23,860
+regularización, porque las violaciones pesan más.
+
+534
+00:33:23,980 --> 00:33:26,850
+Y en R, el mismo parámetro se llama cost.
+
+535
+00:33:26,970 --> 00:33:28,190
+Piensa un segundo.
+
+536
+00:33:28,310 --> 00:33:32,870
+Tres puntos tienen y·f igual a dos, cero, y menos 1.5.
+
+537
+00:33:32,990 --> 00:33:34,480
+¿Cuánto vale cada holgura?
+
+538
+00:33:34,600 --> 00:33:36,980
+¿Y cuánto suma la multa con C igual a dos?
+
+539
+00:33:37,700 --> 00:33:40,880
+Con dos: cero, porque está más allá del margen.
+
+540
+00:33:41,000 --> 00:33:43,550
+Con cero: uno, justo en la frontera.
+
+541
+00:33:43,670 --> 00:33:46,500
+Con menos 1.5: 2.5.
+
+542
+00:33:46,620 --> 00:33:50,640
+La suma es 3.5, y con C igual a dos la multa es siete.
+
+543
+00:33:50,760 --> 00:33:54,684
+Para llevarte: la holgura es el máximo entre cero y uno menos
+
+544
+00:33:54,684 --> 00:33:57,900
+y·f, la pérdida hinge, y castiga violar el margen.
+
+545
+00:33:58,020 --> 00:34:03,440
+C es el precio de cada violación: chico, calle ancha; grande, calle angosta.
+
+546
+00:34:03,560 --> 00:34:07,201
+Y C se elige con validación cruzada en entrenamiento: con
+
+547
+00:34:07,201 --> 00:34:10,140
+el kernel lineal de la clase, el mejor es 0.1.
+
+548
+00:34:10,260 --> 00:34:12,470
+Siguiente parada: los kernels.
+
+549
+00:34:12,590 --> 00:34:17,030
+Cómo una SVM puede trazar fronteras curvas sin dejar de ser lineal por dentro.
+
+550
+00:34:17,930 --> 00:34:20,210
+Séptima parada: los kernels.
+
+551
+00:34:20,330 --> 00:34:24,136
+Vas a ver por qué un problema que no se separa con una recta se separa al
+
+552
+00:34:24,136 --> 00:34:27,420
+subirlo de dimensión, y vas a calcular el kernel radial a mano.
+
+553
+00:34:27,540 --> 00:34:32,550
+Mira estos puntos sobre una recta: rojos en el centro, azules en los extremos.
+
+554
+00:34:32,670 --> 00:34:34,670
+¿Puedes separarlos con un solo corte?
+
+555
+00:34:34,790 --> 00:34:38,050
+No: cualquier umbral deja azules de los dos lados.
+
+556
+00:34:38,170 --> 00:34:40,870
+Una frontera lineal, aquí, no sirve.
+
+557
+00:34:40,990 --> 00:34:45,550
+Piensa en monedas sobre una mesa: las rojas al centro, rodeadas de azules.
+
+558
+00:34:45,670 --> 00:34:48,670
+Sobre la mesa, ninguna línea recta las separa.
+
+559
+00:34:48,790 --> 00:34:52,664
+Pero si levantas las monedas del centro, si les agregas una altura, una
+
+560
+00:34:52,664 --> 00:34:55,720
+hoja horizontal pasa entre las dos alturas y las separa.
+
+561
+00:34:55,840 --> 00:34:58,840
+Subir a otra dimensión vuelve lineal lo que no lo era.
+
+562
+00:34:58,960 --> 00:35:00,490
+Hagámoslo con números.
+
+563
+00:35:00,610 --> 00:35:04,800
+A cada punto le agregamos una segunda coordenada: su valor al cuadrado.
+
+564
+00:35:04,920 --> 00:35:10,410
+Los azules, en menos dos y 1.6, pasan a cuatro y 2.56.
+
+565
+00:35:10,530 --> 00:35:17,400
+Los rojos, cerca de cero, quedan abajo: el mayor es 0.7 al cuadrado, 0.49.
+
+566
+00:35:17,520 --> 00:35:22,010
+Ahora una recta horizontal, a la altura uno, los separa perfectamente.
+
+567
+00:35:22,130 --> 00:35:25,587
+Y si volvemos a la recta original, esa frontera horizontal
+
+568
+00:35:25,587 --> 00:35:28,270
+se ve como dos cortes: en menos uno y en uno.
+
+569
+00:35:28,390 --> 00:35:32,640
+Una frontera lineal en el espacio nuevo es una frontera curva en el original.
+
+570
+00:35:32,760 --> 00:35:37,400
+El problema es que subir de dimensión puede ser carísimo: muchas coordenadas nuevas.
+
+571
+00:35:37,520 --> 00:35:40,840
+Aquí aparece el truco, de la diapositiva treinta y nueve.
+
+572
+00:35:40,960 --> 00:35:44,188
+Un kernel calcula directamente el producto interno entre
+
+573
+00:35:44,188 --> 00:35:46,840
+los puntos ya transformados, sin construirlos.
+
+574
+00:35:46,960 --> 00:35:50,719
+Los tres kernels de la clase: el lineal, equis por zeta; el
+
+575
+00:35:50,719 --> 00:35:54,861
+polinomial, equis por zeta más erre, elevado a de; y el radial, e
+
+576
+00:35:54,861 --> 00:35:58,110
+elevado a menos gamma por la distancia al cuadrado.
+
+577
+00:35:58,230 --> 00:36:01,410
+Sobre los hiperparámetros: el lineal no tiene gamma.
+
+578
+00:36:01,530 --> 00:36:04,900
+El polinomial tiene el grado, el desplazamiento erre, y en
+
+579
+00:36:04,900 --> 00:36:08,560
+scikit-learn también una gamma que multiplica a equis por zeta.
+
+580
+00:36:08,680 --> 00:36:10,180
+Y el radial tiene gamma.
+
+581
+00:36:10,300 --> 00:36:12,290
+Comprobemos el truco con números.
+
+582
+00:36:12,410 --> 00:36:16,637
+Tomemos x igual a uno, dos, y zeta igual a tres, uno, con el
+
+583
+00:36:16,637 --> 00:36:20,160
+kernel polinomial de grado dos y erre igual a uno.
+
+584
+00:36:20,280 --> 00:36:22,900
+Equis por zeta es tres más dos, cinco.
+
+585
+00:36:23,020 --> 00:36:24,600
+Más uno, seis.
+
+586
+00:36:24,720 --> 00:36:26,670
+Al cuadrado: treinta y seis.
+
+587
+00:36:26,790 --> 00:36:27,930
+Una sola cuenta.
+
+588
+00:36:28,050 --> 00:36:30,010
+Ahora, por el camino largo.
+
+589
+00:36:30,130 --> 00:36:34,986
+Ese kernel equivale a llevar cada punto a seis coordenadas: uno, raíz de dos por
+
+590
+00:36:34,986 --> 00:36:38,750
+cada coordenada, los cuadrados, y raíz de dos por el producto.
+
+591
+00:36:38,870 --> 00:36:44,136
+El producto interno de esos dos vectores de seis coordenadas es uno, más seis, más
+
+592
+00:36:44,136 --> 00:36:48,310
+cuatro, más nueve, más cuatro, más doce: otra vez treinta y seis.
+
+593
+00:36:48,430 --> 00:36:52,310
+El kernel llegó al mismo número sin construir las seis coordenadas.
+
+594
+00:36:52,430 --> 00:36:55,610
+Ahora el kernel radial, con la diapositiva cuarenta.
+
+595
+00:36:55,730 --> 00:36:58,199
+Dos puntos a distancia dos, en el espacio
+
+596
+00:36:58,199 --> 00:37:01,210
+estandarizado: la distancia al cuadrado es cuatro.
+
+597
+00:37:01,330 --> 00:37:09,920
+Con gamma igual a 0.1: e elevado a menos 0.1 por cuatro, e a la menos 0.4: 0.6703.
+
+598
+00:37:10,040 --> 00:37:11,930
+Todavía bastante parecidos.
+
+599
+00:37:12,050 --> 00:37:16,960
+Con gamma igual a uno: e a la menos cuatro, 0.0183.
+
+600
+00:37:17,080 --> 00:37:17,920
+Casi nada.
+
+601
+00:37:18,040 --> 00:37:19,790
+Otro, con coordenadas.
+
+602
+00:37:19,910 --> 00:37:23,790
+x igual a uno, dos, y zeta igual a dos, cero.
+
+603
+00:37:23,910 --> 00:37:29,360
+La diferencia es menos uno, dos; su norma al cuadrado, uno más cuatro, cinco.
+
+604
+00:37:29,480 --> 00:37:35,100
+Con gamma igual a 0.1, e a la menos 0.5: 0.607.
+
+605
+00:37:35,220 --> 00:37:40,020
+Con gamma igual a uno, e a la menos cinco: 0.0067.
+
+606
+00:37:40,140 --> 00:37:45,410
+Mira las curvas completas: similitud contra distancia, para cuatro valores de gamma.
+
+607
+00:37:45,530 --> 00:37:50,840
+Con gamma pequeña, en azul, la similitud decae lento: un punto influye lejos.
+
+608
+00:37:50,960 --> 00:37:54,134
+Con gamma grande, en rojo, se desploma enseguida:
+
+609
+00:37:54,134 --> 00:37:56,790
+cada punto influye solo en su vecindario.
+
+610
+00:37:56,910 --> 00:37:59,740
+Por eso gamma controla el alcance de la similitud.
+
+611
+00:37:59,860 --> 00:38:04,102
+Y así decide la SVM radial: el puntaje de un caso nuevo es una suma de
+
+612
+00:38:04,102 --> 00:38:07,860
+similitudes con los vectores de soporte, cada una con su peso.
+
+613
+00:38:07,980 --> 00:38:11,670
+Cada vector de soporte pone una pequeña colina alrededor de sí.
+
+614
+00:38:11,790 --> 00:38:14,720
+La frontera es donde la suma de colinas cruza el cero.
+
+615
+00:38:14,840 --> 00:38:17,300
+Con los datos reales, en dos variables.
+
+616
+00:38:17,420 --> 00:38:21,586
+Una SVM lineal, con C igual a uno, traza esta recta:
+
+617
+00:38:21,586 --> 00:38:24,790
+acierta el 88.3 por ciento de la prueba.
+
+618
+00:38:24,910 --> 00:38:30,150
+La SVM radial, con la configuración de la clase, C igual a diez y gamma
+
+619
+00:38:30,150 --> 00:38:34,430
+igual a 0.1, traza esta curva: acierta el 90.1 por ciento.
+
+620
+00:38:34,550 --> 00:38:37,140
+La curva se dobla donde las clases se mezclan.
+
+621
+00:38:37,260 --> 00:38:43,301
+En la figura de la guía, con C igual a uno, el kernel polinomial de grado tres
+
+622
+00:38:43,301 --> 00:38:48,180
+acierta el 88.9 por ciento, y el radial con gamma 0.5, el 90.1.
+
+623
+00:38:48,300 --> 00:38:52,350
+Con solo dos variables, las diferencias son de uno o dos casos.
+
+624
+00:38:52,470 --> 00:38:53,410
+En el código.
+
+625
+00:38:53,530 --> 00:38:57,008
+En R, la función svm con kernel igual a radial,
+
+626
+00:38:57,008 --> 00:38:59,820
+cost igual a diez y gamma igual a 0.1.
+
+627
+00:38:59,940 --> 00:39:07,380
+En Python, la clase SVC, con kernel igual a RBF, C igual a diez y gamma igual a 0.1.
+
+628
+00:39:07,500 --> 00:39:10,010
+Python llama RBF al kernel radial.
+
+629
+00:39:10,130 --> 00:39:14,720
+Las dos usan la misma fórmula: e a la menos gamma por la distancia al cuadrado.
+
+630
+00:39:14,840 --> 00:39:18,980
+El error típico al calcular a mano: olvidar el cuadrado de la distancia.
+
+631
+00:39:19,100 --> 00:39:23,297
+Con distancia dos y gamma 0.1, si alguien hace e
+
+632
+00:39:23,297 --> 00:39:26,620
+a la menos 0.1 por dos, obtiene 0.819.
+
+633
+00:39:26,740 --> 00:39:31,460
+Lo correcto es e a la menos 0.1 por cuatro: 0.670.
+
+634
+00:39:31,580 --> 00:39:33,920
+La fórmula usa la distancia al cuadrado.
+
+635
+00:39:34,040 --> 00:39:35,260
+Piensa un segundo.
+
+636
+00:39:35,380 --> 00:39:37,530
+Dos puntos están a distancia tres.
+
+637
+00:39:37,650 --> 00:39:40,680
+¿Cuánto vale el kernel radial con gamma 0.1?
+
+638
+00:39:40,800 --> 00:39:41,980
+¿Y con gamma uno?
+
+639
+00:39:42,700 --> 00:39:44,600
+La distancia al cuadrado es nueve.
+
+640
+00:39:44,720 --> 00:39:49,990
+Con gamma 0.1: e a la menos 0.9, 0.407.
+
+641
+00:39:50,110 --> 00:39:54,550
+Con gamma uno: e a la menos nueve, 0.0001.
+
+642
+00:39:54,670 --> 00:39:58,490
+Con gamma grande, a distancia tres ya no hay ninguna similitud.
+
+643
+00:39:58,610 --> 00:40:02,332
+Para llevarte: un kernel calcula la similitud entre puntos como si
+
+644
+00:40:02,332 --> 00:40:05,320
+estuvieran en un espacio más grande, sin construirlo.
+
+645
+00:40:05,440 --> 00:40:08,590
+El radial es e a la menos gamma por la distancia al cuadrado.
+
+646
+00:40:08,710 --> 00:40:12,898
+Y gamma controla el alcance: chica, influencia lejana y fronteras
+
+647
+00:40:12,898 --> 00:40:16,570
+suaves; grande, influencia local y fronteras irregulares.
+
+648
+00:40:16,690 --> 00:40:20,600
+Siguiente parada: C y gamma juntos, con datos reales.
+
+649
+00:40:20,720 --> 00:40:23,650
+Cuándo el modelo subajusta, y cuándo sobreajusta.
+
+650
+00:40:24,530 --> 00:40:28,550
+Octava parada: C y gamma juntos, con los datos reales.
+
+651
+00:40:28,670 --> 00:40:31,227
+Vas a ver un modelo que memoriza, uno que no
+
+652
+00:40:31,227 --> 00:40:33,610
+aprende, y cómo encontrar el punto justo.
+
+653
+00:40:33,730 --> 00:40:36,527
+Una SVM radial con gamma igual a cincuenta
+
+654
+00:40:36,527 --> 00:40:39,390
+acierta el 96 por ciento del entrenamiento.
+
+655
+00:40:39,510 --> 00:40:42,910
+Con gamma igual a uno, solo el 93.2.
+
+656
+00:40:43,030 --> 00:40:44,400
+¿Gana la de cincuenta?
+
+657
+00:40:44,520 --> 00:40:48,650
+Mira la prueba: 88.9 contra 90.6.
+
+658
+00:40:48,770 --> 00:40:52,130
+La que más acierta en entrenamiento es la peor en casos nuevos.
+
+659
+00:40:52,250 --> 00:40:54,050
+Memorizar no es aprender.
+
+660
+00:40:54,170 --> 00:40:56,670
+Piensa en tres estudiantes antes de una prueba.
+
+661
+00:40:56,790 --> 00:41:01,650
+El primero solo leyó los títulos: no entiende casi nada, y le va mal en todo.
+
+662
+00:41:01,770 --> 00:41:03,000
+Eso es subajuste.
+
+663
+00:41:03,120 --> 00:41:07,511
+El segundo memorizó las respuestas exactas del ensayo: en el ensayo saca
+
+664
+00:41:07,511 --> 00:41:11,170
+siete, pero en la prueba real, con preguntas nuevas, se cae.
+
+665
+00:41:11,290 --> 00:41:12,640
+Eso es sobreajuste.
+
+666
+00:41:12,760 --> 00:41:17,530
+El tercero entendió las ideas: le va bien en el ensayo, y también en la prueba.
+
+667
+00:41:17,650 --> 00:41:21,580
+Ahora lo vemos en el plano, con las dos variables y C igual a uno.
+
+668
+00:41:21,700 --> 00:41:26,160
+Con gamma igual a 0.01, la frontera es casi una recta suave.
+
+669
+00:41:26,280 --> 00:41:30,860
+Entrenamiento, 92.2; prueba, 90.6.
+
+670
+00:41:30,980 --> 00:41:37,110
+Con gamma igual a uno, la frontera se curva un poco más: 93.2 y 90.6.
+
+671
+00:41:37,230 --> 00:41:40,628
+Y con gamma igual a cincuenta, aparecen islas: pequeñas
+
+672
+00:41:40,628 --> 00:41:43,470
+fronteras cerradas alrededor de casos sueltos.
+
+673
+00:41:43,590 --> 00:41:48,340
+Entrenamiento, 96.0; prueba, 88.9.
+
+674
+00:41:48,460 --> 00:41:51,750
+Fíjate en cuántos vectores de soporte necesita cada uno.
+
+675
+00:41:51,870 --> 00:41:55,280
+Con gamma 0.01, 155.
+
+676
+00:41:55,400 --> 00:41:57,480
+Con gamma uno, 92.
+
+677
+00:41:57,600 --> 00:42:02,310
+Con gamma cincuenta, 279 de los 398 casos.
+
+678
+00:42:02,430 --> 00:42:06,540
+El modelo se apoya en casi todos los puntos: los está memorizando.
+
+679
+00:42:06,660 --> 00:42:12,470
+Ahora con las cuatro variables, y dieciséis valores de gamma, de 0.001 a cien.
+
+680
+00:42:12,590 --> 00:42:15,509
+En gris, la exactitud de entrenamiento: sube y
+
+681
+00:42:15,509 --> 00:42:17,920
+sube, hasta llegar al cien por ciento.
+
+682
+00:42:18,040 --> 00:42:23,750
+En azul, la validación cruzada: sube, llega a un máximo, y después se desploma.
+
+683
+00:42:23,870 --> 00:42:29,370
+El máximo está en gamma igual a 0.046: 94.5 por ciento.
+
+684
+00:42:29,490 --> 00:42:31,480
+Las dos puntas cuentan la historia.
+
+685
+00:42:31,600 --> 00:42:36,176
+A la izquierda, con gamma igual a 0.001, la validación da
+
+686
+00:42:36,176 --> 00:42:39,950
+79.2 por ciento: el modelo es demasiado rígido.
+
+687
+00:42:40,070 --> 00:42:41,110
+Subajuste.
+
+688
+00:42:41,230 --> 00:42:44,249
+A la derecha, con gamma igual a cien, el
+
+689
+00:42:44,249 --> 00:42:47,873
+entrenamiento es perfecto, y la validación cae a
+
+690
+00:42:47,873 --> 00:42:48,250
+63.3.
+
+691
+00:42:48,370 --> 00:42:51,815
+En la prueba, ese modelo acierta 62.6 por ciento:
+
+692
+00:42:51,815 --> 00:42:55,120
+exactamente lo mismo que decir siempre benigno.
+
+693
+00:42:55,240 --> 00:42:56,410
+¿Por qué pasa eso?
+
+694
+00:42:56,530 --> 00:43:01,090
+Con gamma enorme, cada vector de soporte solo influye en un radio minúsculo.
+
+695
+00:43:01,210 --> 00:43:04,963
+Un caso nuevo queda lejos de todos, todas sus similitudes valen
+
+696
+00:43:04,963 --> 00:43:08,060
+casi cero, y el puntaje se reduce a la constante be.
+
+697
+00:43:08,180 --> 00:43:12,330
+El modelo termina diciendo lo mismo para todos: la clase más frecuente.
+
+698
+00:43:12,450 --> 00:43:14,210
+C y gamma actúan juntos.
+
+699
+00:43:14,330 --> 00:43:18,229
+Esta es la rejilla del bloque opcional de la clase: tres valores de C
+
+700
+00:43:18,229 --> 00:43:21,450
+por tres de gamma, con validación cruzada de cinco folds.
+
+701
+00:43:21,570 --> 00:43:24,510
+Cada casilla es la exactitud media de validación.
+
+702
+00:43:24,630 --> 00:43:29,788
+Abajo a la izquierda, C igual a 0.1 y gamma 0.01: los dos
+
+703
+00:43:29,788 --> 00:43:33,950
+chicos, el modelo más rígido: 79.4 por ciento.
+
+704
+00:43:34,070 --> 00:43:40,430
+El máximo está en C igual a diez y gamma 0.1, la configuración de la clase: 94.0.
+
+705
+00:43:40,550 --> 00:43:45,697
+Y otra cosa que muestra la rejilla: subir C de uno a diez
+
+706
+00:43:45,697 --> 00:43:49,850
+con gamma igual a uno empeora: de 92.7 a 91.5.
+
+707
+00:43:49,970 --> 00:43:53,325
+C grande con gamma grande es la combinación más propensa a
+
+708
+00:43:53,325 --> 00:43:57,200
+sobreajustar: castiga cada error y además mira cada punto de cerca.
+
+709
+00:43:57,320 --> 00:44:01,440
+El error típico: elegir gamma mirando la exactitud de entrenamiento.
+
+710
+00:44:01,560 --> 00:44:06,870
+Con ese criterio, cualquier gamma de 21 en adelante sería perfecta: cien por ciento.
+
+711
+00:44:06,990 --> 00:44:10,510
+Y en validación esos modelos aciertan un 63 por ciento.
+
+712
+00:44:10,630 --> 00:44:13,640
+La exactitud de entrenamiento siempre premia la memoria.
+
+713
+00:44:13,760 --> 00:44:14,980
+Piensa un segundo.
+
+714
+00:44:15,100 --> 00:44:19,330
+Un modelo da 99 por ciento en entrenamiento y 70 en validación.
+
+715
+00:44:19,450 --> 00:44:21,390
+Otro da 80 y 79.
+
+716
+00:44:21,510 --> 00:44:22,640
+¿Cuál sobreajusta?
+
+717
+00:44:22,760 --> 00:44:25,320
+¿Y el otro, qué problema podría tener?
+
+718
+00:44:26,040 --> 00:44:28,873
+El modelo A sobreajusta: una brecha de veintinueve
+
+719
+00:44:28,873 --> 00:44:31,140
+puntos entre entrenamiento y validación.
+
+720
+00:44:31,260 --> 00:44:34,113
+El modelo B no sobreajusta, pero puede estar
+
+721
+00:44:34,113 --> 00:44:37,680
+subajustando: los dos números son bajos y casi iguales.
+
+722
+00:44:37,800 --> 00:44:42,720
+Lo que buscamos es lo mejor de ambos: validación alta, y cerca del entrenamiento.
+
+723
+00:44:42,840 --> 00:44:46,106
+Para llevarte: gamma chica da fronteras suaves y puede
+
+724
+00:44:46,106 --> 00:44:49,010
+subajustar; gamma grande da islas y sobreajusta.
+
+725
+00:44:49,130 --> 00:44:53,570
+C y gamma actúan juntos: grandes los dos, más riesgo de memorizar.
+
+726
+00:44:53,690 --> 00:44:58,040
+Y se eligen con validación cruzada, nunca por la exactitud de entrenamiento.
+
+727
+00:44:58,160 --> 00:45:03,670
+En la clase, la mejor combinación fue C igual a diez y gamma 0.1.
+
+728
+00:45:03,790 --> 00:45:09,454
+Siguiente parada: por qué hay que estandarizar antes de una SVM, y un clasificador clásico
+
+729
+00:45:09,454 --> 00:45:13,860
+que depende todavía más de las distancias: los k vecinos más cercanos.
+
+730
+00:45:14,730 --> 00:45:16,870
+Novena parada: estandarizar.
+
+731
+00:45:16,990 --> 00:45:20,666
+Vas a ver con números por qué una SVM o los k vecinos más cercanos
+
+732
+00:45:20,666 --> 00:45:23,840
+sin estandarizar terminan escuchando a una sola variable.
+
+733
+00:45:23,960 --> 00:45:27,860
+En la base de Wisconsin, la textura varía en unidades de a cuatro.
+
+734
+00:45:27,980 --> 00:45:31,290
+La suavidad, en cambio, varía en centésimas.
+
+735
+00:45:31,410 --> 00:45:35,895
+Si mides distancias sin hacer nada, una diferencia de una unidad de textura pesa lo
+
+736
+00:45:35,895 --> 00:45:39,570
+mismo que una diferencia de cien veces todo el rango de la suavidad.
+
+737
+00:45:39,690 --> 00:45:43,770
+Sin estandarizar, la suavidad prácticamente no existe para el modelo.
+
+738
+00:45:43,890 --> 00:45:47,240
+Piensa en comparar dos departamentos por precio y por superficie.
+
+739
+00:45:47,360 --> 00:45:50,992
+Si el precio va en pesos y la superficie en metros cuadrados, una
+
+740
+00:45:50,992 --> 00:45:54,680
+diferencia de mil pesos parece enorme frente a una de diez metros.
+
+741
+00:45:54,800 --> 00:45:58,490
+Pero mil pesos no es nada, y diez metros es una pieza entera.
+
+742
+00:45:58,610 --> 00:46:02,240
+Antes de sumar diferencias, hay que ponerlas en la misma escala.
+
+743
+00:46:02,360 --> 00:46:06,670
+Estas son las desviaciones estándar de las cuatro variables, en el entrenamiento.
+
+744
+00:46:06,790 --> 00:46:11,560
+Radio, 3.67; textura, 4.22.
+
+745
+00:46:11,680 --> 00:46:17,030
+Concavidad, 0.080; y suavidad, 0.014.
+
+746
+00:46:17,150 --> 00:46:20,800
+Entre la textura y la suavidad hay un factor de casi trescientos.
+
+747
+00:46:20,920 --> 00:46:23,910
+Veamos por qué importa, con dos casos reales.
+
+748
+00:46:24,030 --> 00:46:28,550
+El caso nuevo de la clase tiene radio 14 y concavidad 0.08.
+
+749
+00:46:28,670 --> 00:46:33,810
+Un caso del entrenamiento tiene radio 14.26 y concavidad 0.30.
+
+750
+00:46:33,930 --> 00:46:37,940
+Sin estandarizar, las diferencias son 0.26 en radio y
+
+751
+00:46:37,940 --> 00:46:41,420
+0.22 en concavidad: parecen igual de pequeñas.
+
+752
+00:46:41,540 --> 00:46:48,140
+Pero en desviaciones estándar, el radio difiere 0.07, y la concavidad, 2.75.
+
+753
+00:46:48,260 --> 00:46:50,000
+Son casos muy distintos.
+
+754
+00:46:50,120 --> 00:46:53,840
+La SVM radial y los k vecinos miden distancias.
+
+755
+00:46:53,960 --> 00:46:57,257
+Si no estandarizas, la concavidad y la suavidad quedan
+
+756
+00:46:57,257 --> 00:47:00,920
+aplastadas por el radio y la textura, solo por sus unidades.
+
+757
+00:47:01,040 --> 00:47:05,206
+La receta de la diapositiva catorce: a cada valor se le resta la media del
+
+758
+00:47:05,206 --> 00:47:09,260
+entrenamiento, y se divide por la desviación estándar del entrenamiento.
+
+759
+00:47:09,380 --> 00:47:18,130
+Para el caso nuevo: radio 14 menos 14.179, dividido por 3.669, da menos 0.049.
+
+760
+00:47:18,250 --> 00:47:26,880
+Suavidad: 0.10 menos 0.09618, dividido por 0.0144, da 0.265.
+
+761
+00:47:27,000 --> 00:47:29,260
+En Python se hace con StandardScaler.
+
+762
+00:47:29,380 --> 00:47:33,950
+fit transform aprende la media y la escala con el entrenamiento, y lo transforma.
+
+763
+00:47:34,070 --> 00:47:38,820
+transform aplica esa misma media y escala a la prueba, y a cualquier caso nuevo.
+
+764
+00:47:38,940 --> 00:47:43,230
+En R, la función svm lo hace sola con scale igual a TRUE.
+
+765
+00:47:43,350 --> 00:47:45,260
+¿Cuánto cambia en la SVM?
+
+766
+00:47:45,380 --> 00:47:47,640
+Con las cuatro variables, en la prueba.
+
+767
+00:47:47,760 --> 00:47:55,920
+La SVM lineal de la clase: sin estandarizar, 86.0 por ciento; estandarizada, 91.8.
+
+768
+00:47:56,040 --> 00:48:01,120
+La radial de la clase, con C igual a diez y gamma 0.1:
+
+769
+00:48:01,120 --> 00:48:05,260
+sin estandarizar, 90.1; estandarizada, 97.1.
+
+770
+00:48:05,380 --> 00:48:08,630
+Siete puntos de diferencia, solo por las unidades.
+
+771
+00:48:08,750 --> 00:48:12,488
+Hay un clasificador clásico que depende todavía más de
+
+772
+00:48:12,488 --> 00:48:15,810
+las distancias: los k vecinos más cercanos, kNN.
+
+773
+00:48:15,930 --> 00:48:17,930
+No ajusta ningún coeficiente.
+
+774
+00:48:18,050 --> 00:48:22,494
+Para clasificar un caso nuevo, busca los k casos de entrenamiento más
+
+775
+00:48:22,494 --> 00:48:26,230
+cercanos, y vota: gana la clase más frecuente entre ellos.
+
+776
+00:48:26,350 --> 00:48:29,332
+En la clase se mencionó al pasar; aquí lo aplicamos
+
+777
+00:48:29,332 --> 00:48:31,670
+a la misma base, como cálculo adicional.
+
+778
+00:48:31,790 --> 00:48:34,741
+Votemos a mano, con el caso nuevo de la clase y k
+
+779
+00:48:34,741 --> 00:48:37,270
+igual a cinco, en la escala estandarizada.
+
+780
+00:48:37,390 --> 00:48:40,880
+Estos son sus cinco vecinos más cercanos, con su distancia.
+
+781
+00:48:41,000 --> 00:48:44,510
+El primero, a 0.223, es maligno.
+
+782
+00:48:44,630 --> 00:48:47,940
+Después, un benigno, dos malignos y un benigno.
+
+783
+00:48:48,060 --> 00:48:54,620
+Tres votos contra dos: kNN dice maligno, con una proporción de tres quintos, 0.6.
+
+784
+00:48:54,740 --> 00:48:57,430
+Compáralo con los otros modelos para el mismo caso.
+
+785
+00:48:57,550 --> 00:49:02,000
+La logística le da probabilidad 0.392: clase cero.
+
+786
+00:49:02,120 --> 00:49:05,743
+La SVM radial le da un puntaje de apenas 0.046:
+
+787
+00:49:05,743 --> 00:49:08,750
+clase uno, pero casi sobre la frontera.
+
+788
+00:49:08,870 --> 00:49:11,940
+Es un caso límite, y por eso los modelos discrepan.
+
+789
+00:49:12,060 --> 00:49:14,530
+Ahora repite la búsqueda sin estandarizar.
+
+790
+00:49:14,650 --> 00:49:16,320
+Los cinco vecinos cambian.
+
+791
+00:49:16,440 --> 00:49:19,628
+El segundo es aquel caso con concavidad 0.30, que
+
+792
+00:49:19,628 --> 00:49:22,360
+en desviaciones estándar estaba lejísimos.
+
+793
+00:49:22,480 --> 00:49:25,530
+Ahora el voto es dos malignos contra tres benignos.
+
+794
+00:49:25,650 --> 00:49:29,820
+kNN pasa a decir benigno, solo por las unidades de medida.
+
+795
+00:49:29,940 --> 00:49:35,917
+En los 171 casos de prueba: kNN con k igual a cinco, estandarizado,
+
+796
+00:49:35,917 --> 00:49:41,270
+acierta el 92.4 por ciento, y detecta 55 de los 64 malignos.
+
+797
+00:49:41,390 --> 00:49:46,570
+Sin estandarizar, baja a 91.2, y detecta solo 52.
+
+798
+00:49:46,690 --> 00:49:52,700
+Y su AUC cae de 0.978 a 0.910.
+
+799
+00:49:52,820 --> 00:49:56,030
+El orden de los puntajes empeora mucho más que la exactitud.
+
+800
+00:49:56,150 --> 00:49:59,432
+Un cuidado clave, de la diapositiva trece: la media y la
+
+801
+00:49:59,432 --> 00:50:02,480
+desviación se calculan solo con los datos de ajuste.
+
+802
+00:50:02,600 --> 00:50:05,828
+Si se calculan con toda la base y después se divide, la
+
+803
+00:50:05,828 --> 00:50:08,880
+escala ya vio la prueba: eso es fuga de información.
+
+804
+00:50:09,000 --> 00:50:12,910
+En validación cruzada, la escala se reestima dentro de cada fold.
+
+805
+00:50:13,030 --> 00:50:15,990
+Por eso se pone StandardScaler dentro de un Pipeline.
+
+806
+00:50:16,110 --> 00:50:20,340
+El error típico en el código: usar fit transform también en la prueba.
+
+807
+00:50:20,460 --> 00:50:23,234
+Así la prueba se estandariza con su propia media y
+
+808
+00:50:23,234 --> 00:50:25,620
+desviación, y no con las del entrenamiento.
+
+809
+00:50:25,740 --> 00:50:29,400
+Para la prueba, y para cada caso nuevo, siempre transform, con
+
+810
+00:50:29,400 --> 00:50:32,410
+el objeto escala que se ajustó en el entrenamiento.
+
+811
+00:50:32,530 --> 00:50:33,750
+Piensa un segundo.
+
+812
+00:50:33,870 --> 00:50:40,530
+La media de la textura en el entrenamiento es 19.29, y su desviación estándar, 4.21.
+
+813
+00:50:40,650 --> 00:50:44,640
+¿Cuánto vale la textura estandarizada de un caso con textura 25?
+
+814
+00:50:45,360 --> 00:50:49,300
+25 menos 19.29 es 5.71.
+
+815
+00:50:49,420 --> 00:50:53,040
+Dividido por 4.21: 1.36.
+
+816
+00:50:53,160 --> 00:50:55,908
+Ese caso está algo más de una desviación estándar y un
+
+817
+00:50:55,908 --> 00:50:58,350
+tercio por encima del promedio de entrenamiento.
+
+818
+00:50:58,470 --> 00:51:02,776
+Para llevarte: la SVM radial y kNN miden distancias, así que sin
+
+819
+00:51:02,776 --> 00:51:06,410
+estandarizar mandan las variables con números grandes.
+
+820
+00:51:06,530 --> 00:51:09,165
+Se estandariza con la media y la desviación del
+
+821
+00:51:09,165 --> 00:51:11,240
+entrenamiento, dentro de un Pipeline.
+
+822
+00:51:11,360 --> 00:51:16,243
+Y kNN vota con sus k vecinos: en la prueba, 92.4 por ciento
+
+823
+00:51:16,243 --> 00:51:20,050
+estandarizado, frente a 91.2 sin estandarizar.
+
+824
+00:51:20,170 --> 00:51:22,660
+Siguiente parada: la gran comparación.
+
+825
+00:51:22,780 --> 00:51:26,951
+Logística, SVM lineal, SVM radial, y otros clasificadores
+
+826
+00:51:26,951 --> 00:51:30,830
+clásicos, con sus matrices de confusión en la prueba.
+
+827
+00:51:31,730 --> 00:51:33,990
+Décima parada: la comparación.
+
+828
+00:51:34,110 --> 00:51:37,766
+Las matrices de confusión de los modelos de la clase en la misma
+
+829
+00:51:37,766 --> 00:51:40,850
+prueba, cómo leerlas, y otros clasificadores clásicos.
+
+830
+00:51:40,970 --> 00:51:44,610
+Tres modelos, los mismos 171 casos de prueba.
+
+831
+00:51:44,730 --> 00:51:50,084
+En la clase, el profesor lo resumió así: la SVM radial solo tiene cinco
+
+832
+00:51:50,084 --> 00:51:54,910
+errores; la regresión logística, diez; y la SVM lineal, catorce.
+
+833
+00:51:55,030 --> 00:51:56,510
+¿Basta eso para elegir?
+
+834
+00:51:56,630 --> 00:51:58,300
+Vamos a mirarlo con cuidado.
+
+835
+00:51:58,420 --> 00:52:00,460
+Piensa en comparar tres médicos.
+
+836
+00:52:00,580 --> 00:52:04,797
+Solo es justo si atienden a los mismos pacientes: si uno atiende casos
+
+837
+00:52:04,797 --> 00:52:08,050
+fáciles y otro difíciles, la comparación no dice nada.
+
+838
+00:52:08,170 --> 00:52:10,551
+Aquí se cumple: los tres modelos usan
+
+839
+00:52:10,551 --> 00:52:13,190
+exactamente la misma partición, en R y en
+
+840
+00:52:13,190 --> 00:52:13,640
+Python.
+
+841
+00:52:13,760 --> 00:52:16,569
+Y aun así, con 171 pacientes, un caso de
+
+842
+00:52:16,569 --> 00:52:20,010
+diferencia es poco más de medio punto porcentual.
+
+843
+00:52:20,130 --> 00:52:22,370
+Estas son las tres matrices de confusión.
+
+844
+00:52:22,490 --> 00:52:26,740
+La logística: 103, 4, 6 y 58.
+
+845
+00:52:26,860 --> 00:52:31,440
+La SVM lineal: 103, 4, 10 y 54.
+
+846
+00:52:31,560 --> 00:52:36,070
+Y la SVM radial: 106, 1, 4 y 60.
+
+847
+00:52:36,190 --> 00:52:40,580
+Fíjate: la logística y la lineal tienen los mismos falsos positivos.
+
+848
+00:52:40,700 --> 00:52:43,290
+Se diferencian en los malignos que se les escapan.
+
+849
+00:52:43,410 --> 00:52:47,030
+Con esas matrices sale la tabla de la diapositiva cincuenta y dos.
+
+850
+00:52:47,150 --> 00:52:54,330
+Exactitud: 0.9415, 0.9181 y 0.9708.
+
+851
+00:52:54,450 --> 00:53:01,400
+Sensibilidad: 0.9062, 0.8438 y 0.9375.
+
+852
+00:53:01,520 --> 00:53:08,410
+Especificidad: 0.9626, 0.9626 y 0.9907.
+
+853
+00:53:08,530 --> 00:53:13,300
+Recalculamos todo desde los datos, y coincide exactamente con la diapositiva.
+
+854
+00:53:13,420 --> 00:53:18,330
+Hagamos a mano la cuenta de la SVM radial, de la diapositiva cincuenta y tres.
+
+855
+00:53:18,450 --> 00:53:24,920
+Exactitud: 106 más 60, sobre 171: 0.9708.
+
+856
+00:53:25,040 --> 00:53:30,200
+Sensibilidad: 60 sobre 64: 0.9375.
+
+857
+00:53:30,320 --> 00:53:35,660
+Especificidad: 106 sobre 107: 0.9907.
+
+858
+00:53:35,780 --> 00:53:40,690
+Y precisión: 60 sobre 61: 0.9836.
+
+859
+00:53:40,810 --> 00:53:44,450
+En esta prueba hubo cuatro falsos negativos y un falso positivo.
+
+860
+00:53:44,570 --> 00:53:47,548
+La diapositiva cincuenta y cuatro mira la sensibilidad,
+
+861
+00:53:47,548 --> 00:53:49,930
+porque aquí los errores no cuestan lo mismo.
+
+862
+00:53:50,050 --> 00:53:59,280
+De los 64 malignos, la logística detecta 58, la SVM lineal, 54, y la SVM radial, 60.
+
+863
+00:53:59,400 --> 00:54:01,310
+Pero cuidado con leer demasiado.
+
+864
+00:54:01,430 --> 00:54:04,526
+La diferencia entre la logística y la radial son dos
+
+865
+00:54:04,526 --> 00:54:07,800
+malignos más detectados, y tres falsos positivos menos.
+
+866
+00:54:07,920 --> 00:54:12,790
+La propia diapositiva lo advierte: es una comparación docente de una sola partición.
+
+867
+00:54:12,910 --> 00:54:16,510
+No implica superioridad universal, ni validación clínica.
+
+868
+00:54:16,630 --> 00:54:19,980
+Hay otros clasificadores clásicos que vale la pena conocer.
+
+869
+00:54:20,100 --> 00:54:23,160
+Ya vimos kNN, los k vecinos.
+
+870
+00:54:23,280 --> 00:54:28,695
+El análisis discriminante lineal, LDA, supone que cada clase es una nube normal, con
+
+871
+00:54:28,695 --> 00:54:32,950
+la misma forma: por eso su frontera es una recta, o un hiperplano.
+
+872
+00:54:33,070 --> 00:54:36,316
+Y su versión cuadrática, QDA, deja que cada clase
+
+873
+00:54:36,316 --> 00:54:39,230
+tenga su propia forma: la frontera se curva.
+
+874
+00:54:39,350 --> 00:54:43,870
+Los ajustamos con la misma partición y las mismas cuatro variables estandarizadas.
+
+875
+00:54:43,990 --> 00:54:49,040
+kNN acierta 92.4 por ciento, con 9 falsos negativos.
+
+876
+00:54:49,160 --> 00:54:56,990
+LDA, 91.2, con la mejor especificidad, 0.981, pero 13 falsos negativos.
+
+877
+00:54:57,110 --> 00:55:06,050
+Y QDA, 92.4, con exactamente la misma matriz que kNN: 103, 4, 9 y 55.
+
+878
+00:55:06,170 --> 00:55:08,880
+Todos juntos, ordenados por sensibilidad.
+
+879
+00:55:09,000 --> 00:55:13,050
+Arriba, la SVM radial, con 60 de 64.
+
+880
+00:55:13,170 --> 00:55:16,280
+Después, la logística, con 58.
+
+881
+00:55:16,400 --> 00:55:19,420
+kNN y QDA, con 55.
+
+882
+00:55:19,540 --> 00:55:24,730
+La SVM lineal, con 54, y LDA, con 51.
+
+883
+00:55:24,850 --> 00:55:27,800
+Y la línea base, siempre benigno, con cero.
+
+884
+00:55:27,920 --> 00:55:30,740
+Todos superan con creces a la línea base, y entre
+
+885
+00:55:30,740 --> 00:55:33,100
+ellos las diferencias son de pocos casos.
+
+886
+00:55:33,220 --> 00:55:34,740
+¿Cómo decidir entonces?
+
+887
+00:55:34,860 --> 00:55:37,290
+Una forma es ponerle precio a cada error.
+
+888
+00:55:37,410 --> 00:55:40,160
+Supón, como ejemplo, que un falso negativo
+
+889
+00:55:40,160 --> 00:55:43,040
+cuesta diez veces más que un falso positivo.
+
+890
+00:55:43,160 --> 00:55:47,310
+El costo es diez por los falsos negativos, más los falsos positivos.
+
+891
+00:55:47,430 --> 00:55:51,530
+La SVM radial: diez por cuatro, más uno, cuarenta y uno.
+
+892
+00:55:51,650 --> 00:55:55,450
+La logística: sesenta, más cuatro, sesenta y cuatro.
+
+893
+00:55:55,570 --> 00:55:59,340
+Y la SVM lineal: cien más cuatro, ciento cuatro.
+
+894
+00:55:59,460 --> 00:56:03,300
+Con ese criterio, la diferencia entre modelos se ve mucho más grande.
+
+895
+00:56:03,420 --> 00:56:06,800
+Y la diapositiva cincuenta y siete agrega más criterios.
+
+896
+00:56:06,920 --> 00:56:11,180
+La logística entrega probabilidades y coeficientes interpretables como odds.
+
+897
+00:56:11,300 --> 00:56:15,069
+La SVM radial capta patrones curvos, pero es más difícil de
+
+898
+00:56:15,069 --> 00:56:18,200
+interpretar, y su puntaje no es una probabilidad.
+
+899
+00:56:18,320 --> 00:56:21,781
+La elección combina la validación, la interpretabilidad, el
+
+900
+00:56:21,781 --> 00:56:24,480
+costo de los errores y el costo computacional.
+
+901
+00:56:24,600 --> 00:56:28,196
+El error típico: comparar modelos evaluados con particiones
+
+902
+00:56:28,196 --> 00:56:31,610
+distintas, y atribuirle toda la diferencia al algoritmo.
+
+903
+00:56:31,730 --> 00:56:35,770
+La diapositiva cincuenta y ocho lo pone en su lista de errores frecuentes.
+
+904
+00:56:35,890 --> 00:56:40,270
+Con otra partición al azar, la logística podría quedar por encima de la radial.
+
+905
+00:56:40,390 --> 00:56:43,360
+Por eso aquí todos usan la misma columna conjunto.
+
+906
+00:56:43,480 --> 00:56:44,700
+Piensa un segundo.
+
+907
+00:56:44,820 --> 00:56:49,050
+El modelo X tiene 4 falsos negativos y 10 falsos positivos.
+
+908
+00:56:49,170 --> 00:56:53,110
+El modelo Y, 8 falsos negativos y 2 falsos positivos.
+
+909
+00:56:53,230 --> 00:56:55,440
+Los dos se equivocan catorce veces.
+
+910
+00:56:55,560 --> 00:56:59,150
+Con un falso negativo diez veces más caro, ¿cuál conviene?
+
+911
+00:56:59,870 --> 00:57:03,570
+El modelo X cuesta diez por cuatro más diez: cincuenta.
+
+912
+00:57:03,690 --> 00:57:07,160
+El modelo Y, diez por ocho más dos: ochenta y dos.
+
+913
+00:57:07,280 --> 00:57:09,928
+Con los mismos catorce errores, X es mucho
+
+914
+00:57:09,928 --> 00:57:12,640
+mejor, porque se le escapan menos malignos.
+
+915
+00:57:12,760 --> 00:57:17,193
+Para llevarte: con la misma partición, la SVM radial comete
+
+916
+00:57:17,193 --> 00:57:21,250
+cinco errores; la logística, diez; la lineal, catorce.
+
+917
+00:57:21,370 --> 00:57:23,810
+Y los números coinciden con la diapositiva.
+
+918
+00:57:23,930 --> 00:57:30,290
+kNN, LDA y QDA quedan en el mismo rango, entre 91 y 92 por ciento.
+
+919
+00:57:30,410 --> 00:57:34,288
+Y para elegir, no basta la exactitud: hay que mirar sensibilidad,
+
+920
+00:57:34,288 --> 00:57:37,450
+el costo de cada error y cuánto se puede interpretar.
+
+921
+00:57:37,570 --> 00:57:42,445
+Siguiente parada: cómo elegir C y gamma sin tocar la prueba,
+
+922
+00:57:42,445 --> 00:57:46,670
+con validación cruzada, y qué mide realmente la AUC.
+
+923
+00:57:47,570 --> 00:57:53,441
+Undécima parada: cómo elegir C y gamma sin tocar la prueba, qué pasó cuando
+
+924
+00:57:53,441 --> 00:57:58,060
+R y Python eligieron distinto, y qué mide de verdad la AUC.
+
+925
+00:57:58,180 --> 00:58:02,450
+¿De dónde salieron C igual a diez y gamma 0.1?
+
+926
+00:58:02,570 --> 00:58:05,210
+La diapositiva cuarenta y tres dice que se fijaron de
+
+927
+00:58:05,210 --> 00:58:08,050
+antemano, y que no se cambiaron después de ver la prueba.
+
+928
+00:58:08,170 --> 00:58:11,550
+Pero en un problema nuevo, nadie te regala esos valores.
+
+929
+00:58:11,670 --> 00:58:14,210
+Hay que elegirlos, y sin tocar la prueba.
+
+930
+00:58:14,330 --> 00:58:16,360
+Para eso está la validación cruzada.
+
+931
+00:58:16,480 --> 00:58:18,870
+Piensa en cómo te preparas para un examen.
+
+932
+00:58:18,990 --> 00:58:23,620
+Practicas con ensayos, ajustas tu forma de estudiar según cómo te va en ellos.
+
+933
+00:58:23,740 --> 00:58:26,190
+Pero el examen real lo das una sola vez.
+
+934
+00:58:26,310 --> 00:58:29,114
+Si te mostraran el examen antes para decidir cómo
+
+935
+00:58:29,114 --> 00:58:31,860
+estudiar, la nota dejaría de medir lo que sabes.
+
+936
+00:58:31,980 --> 00:58:34,820
+La diapositiva once lo ordena en tres etapas.
+
+937
+00:58:34,940 --> 00:58:38,940
+El entrenamiento estima coeficientes, escalas y vectores de soporte.
+
+938
+00:58:39,060 --> 00:58:42,550
+La validación compara hiperparámetros, modelos y umbrales.
+
+939
+00:58:42,670 --> 00:58:45,730
+Y la prueba evalúa el procedimiento que ya fue elegido.
+
+940
+00:58:45,850 --> 00:58:49,760
+Mirar la prueba una y otra vez para decidir la convierte en validación.
+
+941
+00:58:49,880 --> 00:58:54,510
+Así funciona la validación cruzada de cinco folds, de la diapositiva doce.
+
+942
+00:58:54,630 --> 00:58:58,790
+Los 398 casos de entrenamiento se parten en cinco grupos.
+
+943
+00:58:58,910 --> 00:59:02,740
+En la primera vuelta, se ajusta con cuatro y se valida con el quinto.
+
+944
+00:59:02,860 --> 00:59:05,590
+Y se rota: cada grupo valida una vez.
+
+945
+00:59:05,710 --> 00:59:09,810
+El resultado de cada candidato es el promedio de las cinco validaciones.
+
+946
+00:59:09,930 --> 00:59:12,710
+Y todos los candidatos usan los mismos folds.
+
+947
+00:59:12,830 --> 00:59:17,660
+En Python, el bloque opcional de la clase lo hace con GridSearchCV.
+
+948
+00:59:17,780 --> 00:59:23,040
+El modelo es un Pipeline: primero StandardScaler, después la SVM radial.
+
+949
+00:59:23,160 --> 00:59:26,880
+Así la escala se reestima dentro de cada fold, sin fugas.
+
+950
+00:59:27,000 --> 00:59:30,611
+La rejilla prueba tres valores de C y tres de gamma: nueve
+
+951
+00:59:30,611 --> 00:59:34,160
+combinaciones, por cinco folds, cuarenta y cinco ajustes.
+
+952
+00:59:34,280 --> 00:59:38,220
+Y recibe los datos sin escalar, porque el Pipeline escala por dentro.
+
+953
+00:59:38,340 --> 00:59:39,240
+¿Qué elige?
+
+954
+00:59:39,360 --> 00:59:40,530
+Corrimos el bloque.
+
+955
+00:59:40,650 --> 00:59:46,074
+Gana C igual a diez y gamma 0.1, con exactitud media
+
+956
+00:59:46,074 --> 00:59:50,350
+0.940, y desviación entre folds de 0.020.
+
+957
+00:59:50,470 --> 00:59:57,940
+Segunda, C igual a uno y gamma 0.1: 0.935, con desviación 0.044.
+
+958
+00:59:58,060 --> 01:00:02,920
+La diferencia entre las dos es de medio punto: unos dos casos de 398.
+
+959
+01:00:03,040 --> 01:00:05,540
+Está muy por dentro del ruido entre folds.
+
+960
+01:00:05,660 --> 01:00:08,100
+Y aquí aparece algo que puede confundir.
+
+961
+01:00:08,220 --> 01:00:14,456
+Según la diapositiva sesenta y tres, la búsqueda en R eligió C igual a uno y
+
+962
+01:00:14,456 --> 01:00:19,790
+gamma 0.1, mientras que Python eligió C igual a diez y gamma 0.1.
+
+963
+01:00:19,910 --> 01:00:20,880
+¿Contradicción?
+
+964
+01:00:21,000 --> 01:00:21,420
+No.
+
+965
+01:00:21,540 --> 01:00:24,713
+Los dos lenguajes no construyen los mismos folds, y usan
+
+966
+01:00:24,713 --> 01:00:28,170
+convenciones levemente distintas para la desviación estándar.
+
+967
+01:00:28,290 --> 01:00:33,030
+Y en Python, esas dos combinaciones quedaron primera y segunda, a medio punto.
+
+968
+01:00:33,150 --> 01:00:35,640
+Con otros folds, el orden puede cambiar.
+
+969
+01:00:35,760 --> 01:00:38,300
+Un dato más, para no sobreinterpretar.
+
+970
+01:00:38,420 --> 01:00:44,258
+Si se amplía la rejilla a seis valores de C y cinco de gamma, la validación
+
+971
+01:00:44,258 --> 01:00:48,850
+cruzada elige otra: C igual a cien y gamma 0.01, con 0.945.
+
+972
+01:00:48,970 --> 01:00:52,869
+En la prueba, esa elección acierta el 94.7 por ciento,
+
+973
+01:00:52,869 --> 01:00:56,480
+menos que el 97.1 de la configuración de la clase.
+
+974
+01:00:56,600 --> 01:00:59,540
+Y no pasa nada: la prueba no es para elegir.
+
+975
+01:00:59,660 --> 01:01:03,940
+Con 171 casos, uno o tres casos de diferencia son ruido.
+
+976
+01:01:04,060 --> 01:01:08,530
+Ahora, la AUC: el área bajo la curva ROC.
+
+977
+01:01:08,650 --> 01:01:12,193
+La diapositiva sesenta y cuatro la define así: es la probabilidad
+
+978
+01:01:12,193 --> 01:01:15,355
+de que un caso positivo tenga un puntaje mayor que un caso
+
+979
+01:01:15,355 --> 01:01:18,190
+negativo, más la mitad de la probabilidad de empate.
+
+980
+01:01:18,310 --> 01:01:20,990
+O sea: mide el orden de los puntajes.
+
+981
+01:01:21,110 --> 01:01:22,560
+No mira ningún umbral.
+
+982
+01:01:22,680 --> 01:01:25,550
+Calculémosla a mano, con un ejemplo pequeño.
+
+983
+01:01:25,670 --> 01:01:34,190
+Tres malignos, con puntajes 0.9, 0.7 y 0.4; dos benignos, con 0.5 y 0.2.
+
+984
+01:01:34,310 --> 01:01:36,520
+Hay seis pares maligno contra benigno.
+
+985
+01:01:36,640 --> 01:01:39,940
+En cinco de ellos, el maligno tiene el puntaje mayor.
+
+986
+01:01:40,060 --> 01:01:43,350
+El único que falla es 0.4 contra 0.5.
+
+987
+01:01:43,470 --> 01:01:48,580
+La AUC es cinco sextos: 0.833.
+
+988
+01:01:48,700 --> 01:01:50,830
+Con los datos reales, en la prueba.
+
+989
+01:01:50,950 --> 01:01:56,030
+La logística tiene AUC 0.9746.
+
+990
+01:01:56,150 --> 01:02:01,450
+La SVM lineal, también 0.9746: exactamente la misma.
+
+991
+01:02:01,570 --> 01:02:07,050
+Pero sus exactitudes son distintas: 94.2 y 91.8 por ciento.
+
+992
+01:02:07,170 --> 01:02:11,330
+Ordenan los casos igual de bien, y se diferencian en dónde ponen el corte.
+
+993
+01:02:11,450 --> 01:02:14,850
+La SVM radial llega a 0.9834.
+
+994
+01:02:14,970 --> 01:02:20,903
+Y una advertencia que el propio script escribe en un comentario: una AUC de 0.98 no
+
+995
+01:02:20,903 --> 01:02:25,550
+significa noventa y ocho por ciento de clasificaciones correctas.
+
+996
+01:02:25,670 --> 01:02:30,340
+Tampoco define el umbral, ni dice si las probabilidades están bien calibradas.
+
+997
+01:02:30,460 --> 01:02:32,230
+Una inconsistencia del material.
+
+998
+01:02:32,350 --> 01:02:35,872
+La diapositiva sesenta y cuatro termina diciendo:
+
+999
+01:02:35,872 --> 01:02:38,890
+los scripts de esta clase no calculan AUC.
+
+1000
+01:02:39,010 --> 01:02:43,590
+Pero el bloque nueve de los dos scripts sí la calcula: en Python, con
+
+1001
+01:02:43,590 --> 01:02:47,240
+una función de scikit-learn; en R, con el paquete pROC.
+
+1002
+01:02:47,360 --> 01:02:48,840
+Y en la clase se ejecutó.
+
+1003
+01:02:48,960 --> 01:02:52,300
+Los valores que acabas de ver son justamente los de ese bloque.
+
+1004
+01:02:52,420 --> 01:02:58,650
+Para la AUC de la SVM, el script usa decision function: el puntaje.
+
+1005
+01:02:58,770 --> 01:03:00,870
+Ese puntaje no es una probabilidad.
+
+1006
+01:03:00,990 --> 01:03:05,116
+Si se pide probability igual a True, scikit-learn calibra el puntaje con
+
+1007
+01:03:05,116 --> 01:03:08,440
+el método de Platt, usando una validación cruzada interna.
+
+1008
+01:03:08,560 --> 01:03:11,707
+Y esas probabilidades pueden discrepar de predict: en la
+
+1009
+01:03:11,707 --> 01:03:14,180
+radial de la clase, en tres casos de prueba.
+
+1010
+01:03:14,300 --> 01:03:18,492
+Con pe mayor o igual que 0.5, la exactitud baja a
+
+1011
+01:03:18,492 --> 01:03:22,170
+95.3 por ciento, frente al 97.1 de predict.
+
+1012
+01:03:22,290 --> 01:03:27,766
+El error típico, de la lista de la diapositiva cincuenta y ocho: calcular la
+
+1013
+01:03:27,766 --> 01:03:32,090
+AUC pasándole las clases cero y uno, en vez de los puntajes.
+
+1014
+01:03:32,210 --> 01:03:41,670
+Con las clases, la AUC de la SVM radial sale 0.964, y la de la logística, 0.934.
+
+1015
+01:03:41,790 --> 01:03:46,480
+Con los puntajes, son 0.983 y 0.975.
+
+1016
+01:03:46,600 --> 01:03:52,700
+Con clases, la curva se reduce a un solo punto, y la AUC se subestima.
+
+1017
+01:03:52,820 --> 01:03:54,040
+Piensa un segundo.
+
+1018
+01:03:54,160 --> 01:04:00,740
+Dos malignos con puntajes 0.8 y 0.6; dos benignos con 0.7 y 0.1.
+
+1019
+01:04:00,860 --> 01:04:03,260
+¿Cuánto vale la AUC?
+
+1020
+01:04:03,980 --> 01:04:05,150
+Hay cuatro pares.
+
+1021
+01:04:05,270 --> 01:04:11,585
+0.8 contra 0.7, bien; 0.8 contra 0.1, bien; 0.6
+
+1022
+01:04:11,585 --> 01:04:16,690
+contra 0.7, mal; 0.6 contra 0.1, bien.
+
+1023
+01:04:16,810 --> 01:04:21,500
+Tres de cuatro: la AUC es 0.75.
+
+1024
+01:04:21,620 --> 01:04:25,749
+Para llevarte: C, gamma y el umbral se eligen con validación cruzada
+
+1025
+01:04:25,749 --> 01:04:29,210
+en el entrenamiento, con la escala dentro de un Pipeline.
+
+1026
+01:04:29,330 --> 01:04:32,514
+Diferencias de medio punto entre candidatos son ruido:
+
+1027
+01:04:32,514 --> 01:04:34,990
+por eso R y Python pueden elegir distinto.
+
+1028
+01:04:35,110 --> 01:04:39,239
+Y la AUC mide el orden de los puntajes: se calcula con
+
+1029
+01:04:39,239 --> 01:04:43,750
+puntajes, no con clases, y no es un porcentaje de aciertos.
+
+1030
+01:04:43,870 --> 01:04:47,220
+Siguiente y última parada: el repaso de toda la clase,
+
+1031
+01:04:47,220 --> 01:04:49,950
+y un checklist para tu próximo clasificador.
+
+1032
+01:04:50,850 --> 01:04:52,820
+Última parada: el repaso.
+
+1033
+01:04:52,940 --> 01:04:56,512
+Toda la clase de máquinas de vectores de soporte y clasificadores
+
+1034
+01:04:56,512 --> 01:05:00,030
+clásicos en unos minutos, y un checklist para tu próximo modelo.
+
+1035
+01:05:00,150 --> 01:05:02,700
+Primero, los datos y la vara mínima.
+
+1036
+01:05:02,820 --> 01:05:07,622
+La base de Wisconsin tiene 569 casos, con una partición
+
+1037
+01:05:07,622 --> 01:05:11,550
+fija: 398 para entrenar y 171 para la prueba.
+
+1038
+01:05:11,670 --> 01:05:15,312
+La línea base, decir siempre benigno, acierta el
+
+1039
+01:05:15,312 --> 01:05:18,650
+62.6 por ciento, y no detecta ni un maligno.
+
+1040
+01:05:18,770 --> 01:05:20,820
+Todo modelo se compara contra eso.
+
+1041
+01:05:20,940 --> 01:05:23,913
+Las métricas salen de la matriz de confusión:
+
+1042
+01:05:23,913 --> 01:05:26,820
+filas, la clase real; columnas, la predicha.
+
+1043
+01:05:26,940 --> 01:05:31,270
+Sensibilidad: verdaderos positivos sobre todos los positivos reales.
+
+1044
+01:05:31,390 --> 01:05:35,440
+Especificidad: verdaderos negativos sobre los negativos reales.
+
+1045
+01:05:35,560 --> 01:05:39,190
+Precisión: de los que declaro positivos, cuántos lo eran.
+
+1046
+01:05:39,310 --> 01:05:45,490
+En el ejemplo de la diapositiva nueve: 0.80, 0.80 y 0.632.
+
+1047
+01:05:45,610 --> 01:05:49,535
+La regresión logística: un puntaje lineal, eta, convertido en
+
+1048
+01:05:49,535 --> 01:05:52,880
+probabilidad con uno sobre uno más e a la menos eta.
+
+1049
+01:05:53,000 --> 01:05:56,210
+Con eta igual a uno, 0.731.
+
+1050
+01:05:56,330 --> 01:05:59,827
+El umbral decide la clase, sin cambiar la probabilidad:
+
+1051
+01:05:59,827 --> 01:06:03,260
+bajarlo gana sensibilidad, subirlo gana especificidad.
+
+1052
+01:06:03,380 --> 01:06:07,030
+Y e elevado a beta multiplica los odds, no la probabilidad.
+
+1053
+01:06:07,150 --> 01:06:10,186
+Y dos trampas que vimos: en Python, la logística
+
+1054
+01:06:10,186 --> 01:06:12,590
+clásica necesita penalty igual a None.
+
+1055
+01:06:12,710 --> 01:06:17,593
+Y el coeficiente de la suavidad, 124.98, se lee en
+
+1056
+01:06:17,593 --> 01:06:21,890
+pasos de 0.01: multiplica los odds por 3.49.
+
+1057
+01:06:22,010 --> 01:06:26,801
+La SVM: la frontera es efe de equis igual a cero, y la distancia de un punto
+
+1058
+01:06:26,801 --> 01:06:30,710
+es el valor absoluto de efe, dividido por la norma de doble u.
+
+1059
+01:06:30,830 --> 01:06:35,610
+El ancho del margen es dos sobre la norma de doble u, y la SVM lo maximiza.
+
+1060
+01:06:35,730 --> 01:06:38,802
+Solo los vectores de soporte deciden la frontera: en
+
+1061
+01:06:38,802 --> 01:06:41,460
+el ejemplo de treinta y dos casos, eran tres.
+
+1062
+01:06:41,580 --> 01:06:46,218
+Con las clases mezcladas, el margen suave: cada punto paga una holgura,
+
+1063
+01:06:46,218 --> 01:06:49,810
+el máximo entre cero y uno menos y·f: la pérdida hinge.
+
+1064
+01:06:49,930 --> 01:06:55,360
+Y C es el precio de cada violación: chico, calle ancha; grande, calle angosta.
+
+1065
+01:06:55,480 --> 01:06:58,436
+Los kernels: miden la similitud como si los puntos
+
+1066
+01:06:58,436 --> 01:07:01,570
+estuvieran en un espacio más grande, sin construirlo.
+
+1067
+01:07:01,690 --> 01:07:04,840
+El radial es e a la menos gamma por la distancia al cuadrado.
+
+1068
+01:07:04,960 --> 01:07:11,910
+Con distancia dos: 0.670 con gamma 0.1, y 0.018 con gamma uno.
+
+1069
+01:07:12,030 --> 01:07:16,430
+Gamma chica da fronteras suaves; gamma grande, islas que memorizan.
+
+1070
+01:07:16,550 --> 01:07:20,010
+Con gamma cien, la prueba bajó al nivel de la línea base.
+
+1071
+01:07:20,130 --> 01:07:24,448
+Estandarizar: la SVM radial y kNN miden distancias, así que sin
+
+1072
+01:07:24,448 --> 01:07:28,150
+estandarizar mandan las variables con números grandes.
+
+1073
+01:07:28,270 --> 01:07:34,200
+La SVM radial de la clase baja de 97.1 a 90.1 por ciento sin estandarizar.
+
+1074
+01:07:34,320 --> 01:07:38,420
+Y la escala se ajusta solo con el entrenamiento, dentro de un Pipeline.
+
+1075
+01:07:38,540 --> 01:07:43,775
+La comparación, con la misma partición: la SVM radial comete cinco
+
+1076
+01:07:43,775 --> 01:07:47,900
+errores; la logística, diez; la SVM lineal, catorce.
+
+1077
+01:07:48,020 --> 01:07:50,550
+Coincide con la diapositiva cincuenta y dos.
+
+1078
+01:07:50,670 --> 01:07:55,720
+kNN, LDA y QDA quedan entre 91 y 92 por ciento.
+
+1079
+01:07:55,840 --> 01:08:01,167
+Y la AUC de la logística y la lineal es la misma, 0.9746:
+
+1080
+01:08:01,167 --> 01:08:05,560
+mide el orden de los puntajes, no los aciertos.
+
+1081
+01:08:05,680 --> 01:08:08,310
+Y las precisiones del material que verificamos.
+
+1082
+01:08:08,430 --> 01:08:14,300
+La base tiene 569 casos, no 357: esos son los benignos.
+
+1083
+01:08:14,420 --> 01:08:18,440
+La regla que acierta 107 es siempre benigno, no siempre uno.
+
+1084
+01:08:18,560 --> 01:08:21,702
+El estimador de máxima verosimilitud no siempre tiene
+
+1085
+01:08:21,702 --> 01:08:24,370
+solución: con separación perfecta, no existe.
+
+1086
+01:08:24,490 --> 01:08:27,717
+Y aunque la diapositiva sesenta y cuatro diga lo
+
+1087
+01:08:27,717 --> 01:08:30,540
+contrario, los scripts sí calculan la AUC.
+
+1088
+01:08:30,660 --> 01:08:34,660
+La diapositiva cincuenta y ocho junta los errores frecuentes al implementar.
+
+1089
+01:08:34,780 --> 01:08:37,200
+No verificar cuál etiqueta es la positiva.
+
+1090
+01:08:37,320 --> 01:08:40,320
+Escalar toda la base antes de la validación cruzada.
+
+1091
+01:08:40,440 --> 01:08:44,300
+Elegir C, gamma o el umbral mirando la prueba.
+
+1092
+01:08:44,420 --> 01:08:48,600
+Pasarle clases a la AUC en vez de puntajes.
+
+1093
+01:08:48,720 --> 01:08:51,720
+Leer el puntaje de la SVM como probabilidad.
+
+1094
+01:08:51,840 --> 01:08:54,510
+Y comparar modelos con particiones distintas.
+
+1095
+01:08:54,630 --> 01:08:58,990
+Y el checklist para una aplicación nueva, de la diapositiva cincuenta y nueve.
+
+1096
+01:08:59,110 --> 01:09:02,670
+Uno: definir la clase positiva y qué errores importan.
+
+1097
+01:09:02,790 --> 01:09:06,240
+Dos: reservar la prueba y armar folds apropiados.
+
+1098
+01:09:06,360 --> 01:09:09,850
+Tres: ajustar el preprocesamiento dentro de cada fold.
+
+1099
+01:09:09,970 --> 01:09:14,520
+Cuatro: comparar logística, SVM lineal y SVM radial.
+
+1100
+01:09:14,640 --> 01:09:18,120
+Cinco: elegir configuración y umbral con validación.
+
+1101
+01:09:18,240 --> 01:09:23,040
+Y seis: evaluar una sola vez en la prueba, y documentar las limitaciones.
+
+1102
+01:09:23,160 --> 01:09:26,310
+Con datos en el tiempo, o con varias filas por persona,
+
+1103
+01:09:26,310 --> 01:09:29,060
+los folds deben respetar el tiempo o los grupos.
+
+1104
+01:09:29,180 --> 01:09:33,890
+Y recuerda: es una base histórica para aprender, no una herramienta clínica.
+
+1105
+01:09:34,010 --> 01:09:35,700
+Eso es todo por esta clase.
+
+1106
+01:09:35,820 --> 01:09:39,994
+Ahora te toca a ti: abre el cuaderno de ejercicios y el notebook de la clase
+
+1107
+01:09:39,994 --> 01:09:43,400
+treinta y siete, y repite estas cuentas con tus propias manos.
+
+1108
+01:09:43,520 --> 01:09:48,080
+La próxima clase: evaluación de modelos supervisados y selección de modelos.

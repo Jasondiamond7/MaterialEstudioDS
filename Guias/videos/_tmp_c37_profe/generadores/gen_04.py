@@ -72,7 +72,7 @@ v.b("Dos advertencias más de la diapositiva. [[a]]Con variables estandarizadas,
 # ---- 6. Los coeficientes de R
 COEF = [("intercepto", GR["intercepto"]), ("radio", GR["coef"]["radio"]), ("textura", GR["coef"]["textura"]),
         ("suavidad", GR["coef"]["suavidad"]), ("concavidad", GR["coef"]["concavidad"])]
-v.b("La diapositiva veintiocho muestra los coeficientes del glm de R, en unidades originales. [[a]]Intercepto menos 42.25; radio, 1.34; textura, 0.442; [[b]]suavidad, 124.98; y concavidad, 21.41. [[c]]La diapositiva lee la textura: una unidad más de textura multiplica los odds por e a la 0.4421, es decir, por 1.56.",
+v.b("La diapositiva veintiocho muestra los coeficientes del modelo glm que se ajustó en R, en unidades originales. [[a]]Intercepto menos 42.25; radio, 1.34; textura, 0.442; [[b]]suavidad, 124.98; y concavidad, 21.41. [[c]]La diapositiva lee la textura: una unidad más de textura multiplica los odds por e a la 0.4421, es decir, por 1.56.",
     CL(), T("los coeficientes de glm en R · diapositiva 28", 960, 140, tam=48, c="tinta", ent="subir"),
     *[fila(270 + 90 * i, [(n, 640), (f"{c:.4f}", 1180)], tams=[40, 40], colores=["tinta", "violeta"], en=("a" if i < 3 else "b"), t=0.15 * (i % 3),
            fondo=("violetaclaro" if n == "suavidad" else None), x0=460, x1=1460, h=80) for i, (n, c) in enumerate(COEF)],

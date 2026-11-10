@@ -1,0 +1,1662 @@
+Herramientas Computacionales para Data Science
+Evaluación de modelos supervisados y selección de modelos
+Sesión 38 · 24 de septiembre de 2026 Eloy Alvarado Narváez
+
+Tenemos predicciones. ¿Cuál conviene usar?
+
+Estimar una cantidad Dos modelos predicen la resistencia de una mezcla de hormigón.
+Uno comete errores pequeños casi siempre; otro evita errores muy grandes.
+
+Tomar una decisión Dos filtros identifican spam con el mismo porcentaje de aciertos.
+Uno bloquea más correos legítimos; otro deja pasar más spam.
+
+“Mejor modelo” necesita una definición: qué error importa, para qué uso y en qué datos nuevos.
+
+Data Science UC | Evaluación y selección
+
+2 / 61
+
+La salida del modelo y su uso son cosas distintas
+
+Cantidad Resistencia
+estimada y = 35 MPa
+
+Probabilidad Probabilidad
+de spam p = 0.70
+
+Acción Bloquear o dejar pasar y ∈ {0, 1}
+
+La cantidad se compara con un valor real. Una probabilidad expresa incertidumbre; una acción añade una regla de decisión.
+Evaluar bien exige evaluar la salida que se va a utilizar. Una sola cifra no responde todas las preguntas.
+
+Data Science UC | Evaluación y selección
+
+3 / 61
+
+Antes de elegir: ¿mejor para qué y para quién?
+
+Dónde se usará Casos futuros
+que nos interesan
+
+Qué importa Consecuencia de
+cada error
+
+Cómo validar Datos que imitan
+ese uso
+
+La métrica representa qué errores importan; la partición representa los casos nuevos que queremos predecir.
+Con ese problema definido, comparamos en validación y evaluamos la elección final en prueba reservada.
+
+Data Science UC | Evaluación y selección
+
+4 / 61
+
+Resistencia (MPa) Número de mediciones
+
+Una predicción útil necesita una evaluación útil
+
+80 70 60 50 40 30 20 10 0
+100
+
+Solo entrenamiento
+
+101
+
+102
+
+Edad (días, escala log)
+
+La respuesta es continua
+80 60 40 20 0 0 10 20 30 40 50 60 70 80
+Resistencia (MPa)
+
+Queremos predecir la resistencia del hormigón usando su composición y edad.
+Se mide en megapascales (MPa), una unidad de presión.
+¿Cuánto nos equivocaremos en una composición que quedó fuera del ajuste?
+
+La pregunta no termina al obtener una predicción: hay que elegir cómo compararla y dónde evaluarla.
+
+Yeh (1998), Concrete Compressive Strength, UCI. Gráficos: solo entrenamiento.
+
+Data Science UC | Evaluación y selección
+
+5 / 61
+
+De los datos a la tarea supervisada
+
+Siete ingredientes (kg/m3) y edad (días)
+xi = (xi1, . . . , xi8)
+
+Procedimiento ajustado f
+
+Resistencia predicha
+yi = f (xi ) en MPa
+
+1030 mediciones; ocho predictores numéricos; respuesta continua yi . Los ingredientes son cemento, escoria, ceniza, agua, superplastificante y agregados grueso y fino. yi es el valor observado; yi es la predicción. Un identificador no es un predictor.
+Datos UCI, DOI 10.24432/C5PK67; licencia CC BY 4.0.
+
+Data Science UC | Evaluación y selección
+
+6 / 61
+
+¿Una fila nueva representa una composición nueva?
+
+Se reserva la composición completa, con todas sus edades
+A: composición repetida
+
+B: otra composición
+
+7 28
+
+C: otra composición 90 Edad de medición (días)
+
+Hay mediciones con los mismos siete ingredientes y distintas edades. Separar sus filas puede dejar la misma composición en ajuste y validación.
+
+Agrupamos por igualdad exacta de ingredientes y reservamos grupos completos. Edad y respuesta no definen el grupo.
+
+Data Science UC | Evaluación y selección
+
+7 / 61
+
+La pérdida define qué significa equivocarse
+Con entrenamiento T , ajustamos fT y consideramos un caso nuevo (X , Y ): R(fT ) = E L Y , fT (X ) | T .
+
+Pérdida
+
+Riesgo
+
+Penaliza el error de un caso.
+
+Promedia la pérdida en la población de
+
+L(y , y ) = (y − y )2.
+
+interés. Esa población debe concordar con la forma de validar.
+
+La métrica resume errores en una muestra; el riesgo describe lo que esperamos en casos
+
+nuevos.
+
+Aquí aproximamos el desempeño en composiciones excluidas de la misma base histórica.
+
+Data Science UC | Evaluación y selección
+
+8 / 61
+
+Dos formas de resumir el error: MAE y RMSE
+
+Pérdida absoluta (MPa) Pérdida cuadrática (MPa²)
+
+Cada unidad adicional pesa igual
+4
+
+3
+
+2
+
+1
+
+0
+
+−4
+
+−2
+
+0
+
+2
+
+4
+
+Error real − predicha (MPa)
+
+Los errores grandes pesan más
+15
+
+10
+
+5
+
+0
+
+−4
+
+−2
+
+0
+
+2
+
+4
+
+Error real − predicha (MPa)
+
+MAE: error absoluto medio Mean Absolute Error
+
+RMSE: raíz del error cuadrático medio Root Mean Squared Error
+
+MAE = 1 |yi − yi |. n
+i
+
+RMSE =
+
+1 (yi − yi )2. ni
+
+Ambos se expresan en MPa. RMSE da mayor peso a los errores grandes.
+
+Data Science UC | Evaluación y selección
+
+9 / 61
+
+Cambiar la métrica puede cambiar el ganador
+
+Error absoluto (MPa) MPa
+
+8
+
+A
+
+6B
+
+La métrica puede cambiar la elección
+4 3
+
+4
+
+2
+
+2
+
+1
+
+0 1 2 3 4 0 MAE RMSE Caso
+
+A tiene MAE = 2 y RMSE = 4; B tiene MAE = 3 y RMSE = 3.
+
+Con MAE elegimos A; con RMSE elegimos B. El criterio se define antes de consultar los resultados.
+
+Cuatro errores construidos para ilustrar la decisión; no son resultados de hormigón.
+
+Data Science UC | Evaluación y selección
+
+10 / 61
+
+R2 necesita una referencia clara
+
+Reval 2 = 1 −
+
+i (yi − yi )2 . i (yi − y eval)2
+
+• Compara contra la media del conjunto evaluado; puede ser negativo. • No tiene unidades y no expresa el tamaño del error en MPa. • Una referencia ejecutable predice la media de entrenamiento, calculada sin las
+respuestas de prueba.
+Un R2 < 0 indica más error cuadrático que usar la media del conjunto evaluado.
+Usaremos RMSE para seleccionar; MAE y R2 para describir. La referencia se fija antes de evaluar.
+
+Data Science UC | Evaluación y selección
+
+11 / 61
+
+Una correlación alta puede ocultar errores grandes
+
+Si y = (1, 2, 3) y y = (11, 12, 13):
+
+cor(y , y )2 = 1,
+
+RMSE = 10,
+
+R2 = 1 − 300 = −149. 2
+
+La predicción conserva el orden, pero tiene un desplazamiento de 10 unidades.
+
+Evaluar el error de predicción directamente. Si la respuesta es constante, la fórmula usual de R2 no se define.
+
+Data Science UC | Evaluación y selección
+
+12 / 61
+
+La unidad de separación determina el alcance
+
+806 mediciones / 342 composiciones Ajustar y seleccionar Validación cruzada (CV) en cinco pliegues
+
+224 mediciones / 86 composiciones Prueba reservada Evaluar la elección final
+
+428 composiciones en total. Se reservó 20 % de los grupos; eso no exige 20 % exacto de las filas.
+Ninguna composición aparece a ambos lados de una partición. Esto no acredita generalización a otra planta o laboratorio.
+
+Data Science UC | Evaluación y selección
+
+13 / 61
+
+El menor error de validación puede ser optimista
+
+Error (ejemplo hipotético)
+
+Error esperado = 10 para todos los modelos
+
+11
+
+Error medido en esta muestra de validación
+
+10
+
+9
+
+8 Elegimos el modelo 5: 8.7
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+Modelo candidato
+
+Los seis modelos tienen error esperado 10. Elegimos el modelo 5 porque su error de validación fue 8.7: esa muestra lo favoreció.
+
+Para estimar cómo rendirá el modelo elegido, lo evaluamos en datos de prueba que no participaron en la elección.
+
+Ejemplo hipotético. El 8.7 usado para elegir subestima aquí el error esperado de 10.
+
+Data Science UC | Evaluación y selección
+
+14 / 61
+
+Qué se ajusta y qué se selecciona
+
+Ajuste dentro de un candidato
+Estimar coeficientes, medias y escalas usando las filas autorizadas.
+βT .
+
+Selección entre candidatos
+Elegir variables, transformaciones o penalización usando el error de validación.
+m = arg m´ın RCV(m).
+m∈M
+
+Validar un candidato exige ajustarlo de nuevo en cada pliegue; seleccionar compara los errores de esos ajustes.
+Cada candidato es una receta completa. La prueba se reserva para evaluar la receta seleccionada y reajustada.
+
+Data Science UC | Evaluación y selección
+
+15 / 61
+
+Qué modelos vamos a comparar
+
+1. Modelo constante
+
+2. Regresión lineal múltiple
+
+y = yT . 3. Regresión cuadrática con penalización ridge
+
+8
+y = β0 + βj xj .
+j =1
+
+8
+
+8
+
+y = β0 + βj xj + γj xj2 + δjk xj xk .
+
+j =1
+
+j =1
+
+j <k
+
+8 lineales 8 cuadrados 28 interacciones
+
+Ejemplos: cemento2 y cemento × agua. Ridge controla el tamaño de los coeficientes.
+
+7 candidatos: 1 constante, 1 lineal y 5 ridge (α = 0.1, 1, 10, 100, 1000).
+
+Data Science UC | Evaluación y selección
+
+16 / 61
+
+Cómo ajustamos el modelo cuadrático: ridge
+
+En zi reunimos los 44 términos del modelo anterior, estandarizados. Ridge ajusta:
+
+
+
+
+
+
+
+44 
+
+m´ın β0,β 
+
+(yi − β0 − z⊤i β)2 + α
+
+βj2 .
+
+i ∈T
+
+j =1
+
+• α pequeño permite coeficientes de mayor magnitud. • α grande restringe el ajuste con más fuerza. • El intercepto no se penaliza. La escala de los términos importa.
+Los coeficientes se estiman al ajustar; α se elige al comparar errores de validación.
+
+Data Science UC | Evaluación y selección
+
+17 / 61
+
+Sobreajuste: comparar ajuste y datos nuevos
+
+Grado 2
+2 0 −2 −4
+
+Grado 12
+2 0 −2 −4
+
+y y
+
+−1
+
+0
+
+1
+
+−1
+
+0
+
+1
+
+x
+
+x
+
+RMSE de ajuste: 0.67 RMSE en datos nuevos: 0.64
+
+RMSE de ajuste: 0.58 RMSE en datos nuevos: 0.73
+
+Azul: ajuste; discontinua: señal del ejemplo simulado.
+
+El grado 12 ajusta mejor los datos conocidos, pero predice peor los nuevos. El grado 2 generaliza mejor en este ejemplo.
+
+Data Science UC | Evaluación y selección
+
+18 / 61
+
+Sesgo, varianza y ruido: tres fuentes de error
+Para una nueva respuesta en x, el error cuadrático esperado se descompone en: Error cuadrático esperado = Sesgo2 + Varianza + Ruido.
+
+Sesgo Distancia entre
+la señal y el ajuste promedio
+
+Varianza Cuánto cambia
+el ajuste al cambiar la muestra
+
+Ruido Variación de Y incluso al fijar
+X =x
+
+Para x fijo, bajo Y = f (x) + ε, con ruido de media cero, varianza σ2 e independiente del ajuste.
+Aumentar la flexibilidad puede reducir el sesgo y aumentar la varianza. La validación permite comparar el efecto conjunto.
+
+Data Science UC | Evaluación y selección
+
+19 / 61
+
+Predicciones fuera de pliegue: OOF
+OOF significa out-of-fold: cada predicción se obtiene con un modelo ajustado sin el pliegue de esa observación.
+Aquí el pliegue k(i) deja fuera también todo el grupo de i:
+
+yiOOF = f (−k(i))(xi ),
+
+RMSEOOF =
+
+806
+1 806 (yi − y OOF i )2.
+i =1
+
+• Cada candidato produce 806 predicciones mediante cinco ajustes distintos. • Sumamos errores cuadrados, dividimos por 806 y extraemos la raíz. • Cada medición pesa igual; los grupos controlan la separación.
+
+Separar por grupos no implica dar el mismo peso a cada grupo. Son dos decisiones distintas.
+
+Data Science UC | Evaluación y selección
+
+20 / 61
+
+Promedio de RMSE y RMSE OOF: qué resumen
+
+Dos pliegues de igual tamaño: MSE1 = 1 y MSE2 = 9. MSE: error cuadrático medio (Mean Squared Error ).
+
+Promedio de RMSE
+
+√√
+
+1 + 9 = 1 + 3 = 2.
+
+2
+
+2
+
+Calcula la raíz en cada pliegue y luego promedia. Cada pliegue pesa igual.
+
+RMSE OOF
+1 + 9 = √5 ≈ 2.236. 2
+Reúne los errores cuadrados y luego toma una raíz. Cada observación pesa igual.
+
+La raíz es no lineal: el orden de las operaciones puede cambiar el resultado.
+
+Ambos son válidos, pero no intercambiables. Aquí seleccionamos con RMSE OOF: 2.236 en este ejemplo.
+
+Data Science UC | Evaluación y selección
+
+21 / 61
+
+La receta completa se reaprende en cada ajuste
+
+Filas de ajuste del pliegue
+
+Estimar transformación
+y modelo
+
+Parámetros fijados
+
+Filas de validación del pliegue
+
+Aplicar transformación
+y predecir
+
+Calcular el error
+
+En el candidato cuadrático: estandarizar entradas, expandir términos, estandarizar términos y ajustar ridge. La validación recibe las escalas ya estimadas; no vuelve a calcularlas con sus propias filas.
+Así evitamos fuga de datos (data leakage): las escalas se aprenden sin usar el pliegue reservado para validar.
+
+Data Science UC | Evaluación y selección
+
+22 / 61
+
+Un protocolo fijado antes de comparar
+
+Definir tarea y métrica
+
+Comparar CV interna
+
+Elegir y reajustar
+
+Evaluar prueba final
+
+• Siete candidatos; cinco pliegues por composición; 35 ajustes de CV. • Menor RMSE OOF; empate numérico exacto según orden declarado. • MAE y R2 describen; no reemplazan el criterio a posteriori. • Prueba reservada y referencia de la media definida desde el inicio.
+
+Data Science UC | Evaluación y selección
+
+23 / 61
+
+Material para seguir los ejemplos
+
+Guardar los dos scripts y los dos CSV en una misma carpeta.
+Utilizar el editor o entorno de su preferencia. Ambos códigos desarrollan el mismo recorrido.
+
+Python 38_evaluacion_seleccion.py
+
+R 38_evaluacion_seleccion.R
+
+Datos comunes: hormigon_s38.csv y spam_s38.csv.
+
+Seguir los tramos numerados en orden, comenzando por 00, para interpretar cada resultado antes de continuar.
+
+Data Science UC | Evaluación y selección
+
+24 / 61
+
+Seguir una predicción hasta su origen
+
+Python · sección 03
+for k in range(1, 6): valida = folds == k ajuste = clone(modelo).fit( x.loc[~valida], y[~valida]) oof[valida] = ajuste.predict( x.loc[valida])
+rmse = np.sqrt(np.mean((y-oof)**2))
+
+R · sección 03
+for (k in 1:5) { valida <- entrenamiento$fold == k ajuste <- ajustar_regresion(nombre, x[!valida, ], y[!valida]) oof[valida] <- predecir_regresion( ajuste, x[valida, ])
+} rmse <- sqrt(mean((y-oof)^2))
+
+Las transformaciones se aprenden dentro del ajuste. Los pliegues conservan composiciones completas.
+Misma operación en ambos lenguajes: predecir sin usar el pliegue de la observación para ajustar.
+
+Data Science UC | Evaluación y selección
+
+25 / 61
+
+Leer el ranking sin perder las unidades
+
+Candidato
+Cuadrática, α = 0.1 Cuadrática, α = 1 Cuadrática, α = 10 Cuadrática, α = 100 Regresión lineal Cuadrática, α = 1000 Media de entrenamiento
+
+RMSE OOF (MPa)
+8.229 8.308 8.489 9.640 10.560 13.051 16.746
+
+MAE OOF (MPa)
+6.234 6.260 6.390 7.638 8.426 10.595 13.631
+
+Cómo leerla Menor RMSE OOF elige el candidato. MAE describe otra dimensión del error.
+La media muestra cuánto aporta usar los predictores.
+
+Gana α = 0.1, pero la ventaja sobre α = 1 es solo 0.079 MPa. Elegir no prueba superioridad estable.
+
+Data Science UC | Evaluación y selección
+
+26 / 61
+
+RMSE (MPa)
+
+Curva de validación: leer ambos errores
+
+Error de ajuste y error de validación
+
+13
+
+Ajuste: filas usadas para estimar
+
+Validación: predicciones OOF
+
+12
+
+11
+
+10
+
+9
+
+8
+
+7
+
+10−1
+
+100
+
+101
+
+102
+
+103
+
+alpha (mayor penalización hacia la derecha)
+
+Tres valores de la cuadrícula RMSE en MPa; R y Python.
+
+α
+
+Ajuste OOF
+
+0.1 10 1000
+
+6.958 7.130 12.511
+
+8.229 8.489 13.051
+
+Con α = 1000 aumentan ambos errores: la penalización restringe demasiado el ajuste en esta comparación.
+
+Elegimos con OOF. La brecha con ajuste describe optimismo dentro de muestra; una curva en U no está garantizada.
+
+Data Science UC | Evaluación y selección
+
+27 / 61
+
+La diferencia no es idéntica en cada pliegue
+
+RMSE por pliegue (MPa) Pliegue α = 0.1 α = 1
+
+1
+
+7.110 7.099
+
+2
+
+7.670 8.069
+
+3
+
+8.806 8.836
+
+4
+
+9.320 9.401
+
+5
+
+8.058 7.957
+
+Diferencia de RMSE (MPa)
+
+Cuadrática: alfa=0.1 menos Cuadrática: alfa=1
+0.1
+
+0.0
+
+−0.1
+
+−0.2
+
+−0.3
+
+−0.4
+
+1
+
+2
+
+3
+
+4
+
+5
+
+Pliegue de composiciones excluidas
+
+α = 0.1 mejora en tres pliegues, pero empeora en dos. Bajo cero favorece 0.1; sobre cero, 1.
+Los ajustes comparten datos. Cinco diferencias de pliegues no son cinco réplicas independientes ni un intervalo de confianza.
+
+Data Science UC | Evaluación y selección
+
+28 / 61
+
+Una regla de elección no prueba superioridad
+
+Lo que decide la regla
+α = 0.1: 8.229 MPa. α = 1: 8.308 MPa.
+La menor cifra elige el primer candidato.
+
+Lo que no establece
+Una diferencia de unos 0.079 MPa no acredita una ventaja estable en otros datos.
+El ganador está en el borde de la cuadrícula; no prueba un óptimo global.
+
+Si queremos preferir simplicidad dentro de una tolerancia, esa regla también debe fijarse antes de comparar.
+
+Data Science UC | Evaluación y selección
+
+29 / 61
+
+Reajustar significa volver a estimar
+
+Python · sección 05
+ganador = ranking.modelo.iloc[0] modelo_final = clone(modelos[ganador]) modelo_final.fit(
+entrenamiento[variables], entrenamiento.resistencia) pred_prueba = modelo_final.predict( prueba[variables])
+
+R · sección 05
+ganador <- ranking$modelo[1] modelo_final <- ajustar_regresion(
+ganador, entrenamiento[variables], entrenamiento$resistencia) pred_prueba <- predecir_regresion( modelo_final, prueba[variables])
+
+Reaprender escalas y coeficientes con las 806 filas; predecir las 224 reservadas con ese único ajuste.
+No promediamos los cinco modelos de CV: ese sería otro procedimiento.
+
+Data Science UC | Evaluación y selección
+
+30 / 61
+
+La evaluación final se expresa en MPa
+
+Procedimiento
+Cuadrática, α = 0.1 Media de entrenamiento
+
+RMSE
+8.823 16.605
+
+MAE
+6.494 12.826
+
+R2
+0.716 -0.007
+
+Predicción (MPa)
+
+80
+
+60
+
+40
+
+20
+
+20
+
+40
+
+60
+
+80
+
+Resistencia real (MPa)
+
+224 observaciones de prueba. R y Python coinciden en las cifras mostradas; RMSE y MAE están en MPa.
+El RMSE baja 46.9 % frente a la media de entrenamiento. La diagonal representa predicción perfecta.
+
+RMSE resume el error; no es una cota para cada caso. Esta mejora corresponde a la prueba por composición.
+
+Data Science UC | Evaluación y selección
+
+31 / 61
+
+Una cifra promedio no reemplaza el diagnóstico
+
+Real − predicha (MPa) Error absoluto (MPa)
+
+¿El promedio oculta un patrón?
+
+20
+
+10
+
+0
+
+−10
+
+−20
+
+−30
+
+20
+
+40
+
+60
+
+80
+
+Predicha (MPa)
+
+30 25 20 15 10 5 0
+100
+
+Errores según edad
+
+101
+
+102
+
+Edad (días, escala log)
+
+Residuos positivos indican subestimación. Los gráficos permiten localizar errores grandes y patrones que un promedio oculta.
+
+Elegimos con validación y evaluamos en prueba. Los residuos muestran límites que el RMSE global puede ocultar.
+
+Data Science UC | Evaluación y selección
+
+32 / 61
+
+Correos
+
+Clasificación: misma lógica, otras preguntas
+
+La referencia empieza por la frecuencia: entrenamiento
+2500 2230 (60.6%) 2000
+
+1500
+
+1450 (39.4%)
+
+1000
+
+500
+
+0 No spam (0)
+
+Spam (1)
+
+Caso: detectar spam y = 1: spam. y = 0: correo legítimo.
+4601 correos; 57 entradas numéricas: frecuencias de palabras, caracteres y medidas de mayúsculas.
+
+Conservamos la separación entre seleccionar y evaluar. Ahora distinguimos calidad de las probabilidades y costo de decidir.
+
+Spambase, UCI, Hopkins et al. (1999), DOI 10.24432/C53G6X. Corpus histórico; no es una prueba de un filtro actual.
+
+Data Science UC | Evaluación y selección
+
+33 / 61
+
+Dos errores con consecuencias diferentes
+
+Falso positivo: FP
+El correo es legítimo y lo marcamos como spam.
+Consecuencia: ocultar un mensaje que el usuario necesitaba recibir.
+
+Falso negativo: FN
+El correo es spam y lo dejamos pasar. Consecuencia: ruido y trabajo adicional en la bandeja de entrada.
+
+La matriz de confusión conserva estos conteos; la métrica decide cuánto pesa cada uno.
+Contar errores sin distinguir su tipo supone que equivocarse cuesta lo mismo en ambos sentidos.
+
+Data Science UC | Evaluación y selección
+
+34 / 61
+
+Un porcentaje alto de aciertos puede ser insuficiente
+5 spam reales; 95 no spam. La regla predice siempre «no spam».
+
+La regla “siempre no spam” acierta 95 de 100 correos, pero detecta 0 de los 5 spam. Accuracy = 95 % describe los aciertos. No demuestra que resolvamos la tarea de detectar spam.
+Ejemplo hipotético con 5 % de spam; no es la proporción de Spambase.
+
+Data Science UC | Evaluación y selección
+
+35 / 61
+
+La métrica puede expresar el costo del error
+
+Supongamos un costo de 5 unidades por FP y 1 por FN. Los aciertos tienen costo
+
+cero.
+
+C = 5 FP + FN . n
+
+Bloquear correo legítimo 5 unidades por caso
+
+Dejar pasar spam 1 unidad por caso
+
+Multiplicaremos C por 1000 para comparar costos en una escala común, aunque cambie el tamaño del conjunto.
+
+La razón 5:1 representa una prioridad elegida antes de comparar. Si cambia esa prioridad, puede cambiar la regla preferida.
+
+Costos hipotéticos para el ejemplo; no son costos medidos en UCI.
+
+Data Science UC | Evaluación y selección
+
+36 / 61
+
+Mismos aciertos, decisiones de distinto valor
+
+A: accuracy 95%; costo 90
+
+B: accuracy 95%; costo 210
+
+No spam 890 10
+
+No spam 860 40
+
+Real Real
+
+Spam 40 60
+
+Spam 10 90
+
+No spam Spam Predicha
+
+No spam Spam Predicha
+
+A: 5(10) + 40 = 90.
+
+B: 5(40) + 10 = 210.
+
+Ambos aciertan 95 %. Con los costos fijados, preferimos A porque bloquea menos correos legítimos.
+
+Ejemplo hipotético: 1000 correos, 100 spam. Filas reales, columnas predichas; orden 0,1.
+
+Data Science UC | Evaluación y selección
+
+37 / 61
+
+F1 y costo pueden preferir modelos distintos
+
+F1 (mayor es mejor) Costo en 1000 correos (menor es mejor)
+
+1.0
+
+250
+
+0.8 0.706 0.783 200 210
+
+0.6
+
+150
+
+0.4
+
+100
+
+90
+
+0.2
+
+50
+
+0.0 A B 0 A B
+
+Precision = VP/(VP + FP); Recall = VP/(VP + FN).
+
+2 Precision Recall
+
+F1 =
+
+.
+
+Precision + Recall
+
+F1 favorece B en este ejemplo. No incorpora la razón de costos 5:1; no sustituye nuestra función de costo.
+
+Data Science UC | Evaluación y selección
+
+38 / 61
+
+Tres preguntas para las mismas probabilidades
+Ejemplo: un filtro asigna probabilidad de spam a tres correos.
+
+Correo A: 0.90
+
+Correo B: 0.60
+
+Correo C: 0.20
+
+¿Qué revisar primero? A, luego B, luego C.
+Evaluamos si los spam reales suelen quedar antes que los legítimos.
+
+¿Es fiable el 0.90? Entre muchos correos con esa probabilidad, esperamos cerca de 90 % de spam.
+Contrastamos probabilidades con lo observado.
+
+¿Cuáles bloquear? Con t = 0.80: solo A. Con t = 0.50: A y B.
+Evaluamos los FP, los FN y el costo de esa decisión.
+
+Ordenar bien, estimar bien una probabilidad y decidir bien son objetivos distintos. Una sola métrica no responde las tres preguntas.
+
+Data Science UC | Evaluación y selección
+
+39 / 61
+
+El umbral convierte una probabilidad en una acción
+
+Probabilidad estimada de spam
+
+1.0 t=0.5
+
+0.8
+
+t=0.8
+
+0.6
+
+0.4
+
+0.2
+
+0.0 1 2 3 4 5 Correo
+
+yi (t) = 1 si pi ≥ t, 0 en otro caso.
+
+Subir el umbral exige más evidencia para bloquear: pueden disminuir FP y aumentar FN.
+
+Cambiar t cambia las decisiones, aunque el modelo y sus probabilidades permanezcan iguales. El umbral también se selecciona.
+Probabilidades hipotéticas. Con t = 0.5 se marcan 3 correos; con t = 0.8, se marcan 2.
+
+Data Science UC | Evaluación y selección
+
+40 / 61
+
+Ordenar igual no significa estimar igual
+
+Probabilidad estimada
+
+1.0 A: log loss 0.415
+
+0.8
+
+B: log loss 0.602
+
+0.6
+
+0.4
+
+0.2
+
+0.0 1 2 3 4 5 6
+
+y=0
+
+y=0
+
+y=1
+
+y=0
+
+y=1
+
+y=1
+
+Correo y etiqueta real
+
+Ambas series ordenan los correos igual, pero asignan probabilidades distintas. El orden no cambia al aumentar la certeza.
+
+B expresa más certeza, incluso cuando se equivoca. La calidad de esa certeza requiere otra evaluación.
+
+Ejemplo hipotético. Log loss: A = 0.415; B = 0.602. Se define a continuación.
+
+Data Science UC | Evaluación y selección
+
+41 / 61
+
+Log loss: penalizar probabilidades equivocadas
+
+Pérdida logarítmica
+
+4
+
+Real: spam (y=1)
+
+Real: no spam (y=0)
+
+3
+
+2
+
+1
+
+0 0.0 0.2 0.4 0.6 0.8 1.0 Probabilidad predicha de spam
+
+LogLoss = − 1 ni
+
+yi log pi + (1 − yi ) log(1 − pi ) .
+
+Pérdida logarítmica, o entropía cruzada binaria; usamos logaritmo natural. Menor es mejor. Para un spam real (y = 1), predecir 0.9 aporta 0.105; predecir 0.1 aporta 2.303.
+Asignar probabilidad casi cero a lo que ocurrió recibe una penalización grande. Importa la probabilidad completa, no solo la clase.
+
+Data Science UC | Evaluación y selección
+
+42 / 61
+
+Brier: error cuadrático de una probabilidad
+
+Pérdida de Brier
+
+Brier = 1 (yi − pi )2. ni
+
+1.0 0.8 0.81
+
+0.6
+
+0.4
+
+0.2
+
+0.16
+
+0.0 0.01
+
+0.9
+
+0.6
+
+0.1
+
+Probabilidad predicha de spam, siendo y=1
+
+Con yi ∈ {0, 1}, el score binario está entre 0 y 1. Menor es mejor. Para y = 1, predecir 0.9 aporta 0.01; predecir 0.1 aporta 0.81.
+
+Log loss y Brier valoran probabilidades. Sus penalizaciones son distintas y ninguno mide solo calibración.
+
+Data Science UC | Evaluación y selección
+
+43 / 61
+
+Qué debería significar una probabilidad de 0.8
+Correos con probabilidades cercanas a 0.8
+
+Esperamos cerca de 80 % de spam si las probabilidades están bien calibradas
+
+La calibración compara probabilidades predichas con frecuencias observadas en conjuntos de casos similares.
+
+No significa que cada grupo de diez tenga exactamente ocho spam. La muestra introduce variación.
+
+Esquema ilustrativo de calibración; no son diez observaciones del corpus.
+
+Data Science UC | Evaluación y selección
+
+44 / 61
+
+ROC y precision–recall miran aspectos diferentes
+
+ROC: Receiver Operating Characteristic, curva característica operativa del receptor.
+
+Curva ROC Eje vertical: recall o sensibilidad, VP/(VP + FN).
+Eje horizontal: tasa de falsos positivos, FP/(FP + VN).
+
+Curva precision–recall (PR) Eje vertical: precision, VP/(VP + FP).
+Eje horizontal: recall. En ambas curvas, cada punto corresponde a un umbral.
+
+AUC (Area Under the Curve) significa área bajo la curva. ROC AUC resume el área bajo ROC. AP (average precision) resume PR ponderando precision por los incrementos de recall.
+
+ROC AUC y AP describen el ranking; no fijan un umbral ni certifican calibración. AP depende de la proporción de positivos.
+
+Data Science UC | Evaluación y selección
+
+45 / 61
+
+La frecuencia de spam cambia la precision
+
+Misma sensibilidad = 80 % y misma tasa de FP = 10 %, en 1000 correos:
+
+Precision: VP / (VP + FP)
+
+1.0
+
+88.9%
+
+0.8
+
+0.6
+
+0.4
+
+0.2
+
+0.0 50% spam VP=400; FP=50
+
+29.6%
+5% spam VP=40; FP=95
+
+Si hay pocos spam, los negativos son muchos: incluso una tasa de FP pequeña puede producir numerosos falsos avisos.
+
+El desempeño útil depende también de la población. Una precision medida en un corpus no se traslada automáticamente a otro.
+
+Data Science UC | Evaluación y selección
+
+46 / 61
+
+Un protocolo para probabilidades y decisiones
+1. Reservar 921 correos para prueba; usar 3680 para ajuste y selección. 2. Comparar tres candidatos por log loss OOF, con cinco pliegues. 3. En el ganador, elegir t ∈ {0.05, 0.10, . . . , 0.95} por menor costo OOF. 4. Reajustar y evaluar una vez el modelo y umbral elegidos. Primero calidad probabilística, después decisión. Este protocolo no busca conjuntamente el menor costo entre todos los modelos y umbrales.
+Entradas idénticas se conservan en el mismo grupo y partición. Empates: orden declarado de modelos; mayor umbral.
+
+Data Science UC | Evaluación y selección
+
+47 / 61
+
+Los candidatos son instrumentos de comparación
+
+Frecuencia Probabilidad constante: proporción de spam en las filas de ajuste.
+
+Regresión logística Escala aprendida dentro del ajuste y penalización fija, C = 1.
+
+Bosque aleatorio Promedio de 150 árboles; profundidad máxima 8; mínimo 5 casos por hoja.
+
+Referencia sin usar los predictores.
+
+C regula la penalización: menor C, mayor penalización.
+
+R usa ranger y Python scikit-learn para el bosque. Mismo protocolo; las implementaciones pueden producir probabilidades distintas.
+
+Data Science UC | Evaluación y selección
+
+48 / 61
+
+En código: una probabilidad OOF por correo
+
+Python · sección 08
+for k in range(1, 6): valida = tr.fold.to_numpy() == k ajuste = clone(recipe).fit( x.loc[~valida], y[~valida]) p[valida] = ajuste.predict_proba( x.loc[valida])[:, 1]
+error = log_loss(y, p)
+
+R · sección 08
+for (k in 1:5) { valida <- tr$fold == k ajuste <- ajustar_clasificador(nombre, x[!valida, ], y[!valida]) p[valida] <- predecir_probabilidad( ajuste, x[valida, ])
+} error <- probabilisticas(y, p)$log_loss
+
+En ambos casos obtenemos la probabilidad de spam (y = 1).
+La selección utiliza probabilidades fuera de ajuste; las etiquetas de prueba permanecen reservadas.
+
+Data Science UC | Evaluación y selección
+
+49 / 61
+
+La regla fijada elige por calidad probabilística
+
+Validación OOF: 3680 correos. En ambas métricas, menor es mejor.
+
+Candidato
+Frecuencia Logística (C = 1) Bosque (prof. 8)
+
+Log loss Python
+0.671 0.275 0.228
+
+Log loss R
+0.671 0.275 0.223
+
+Brier Python
+0.239 0.075 0.061
+
+Brier R
+0.239 0.075 0.060
+
+El bosque obtiene el menor log loss en ambas versiones. La frecuencia es la referencia para valorar el aporte de los predictores.
+Log loss selecciona; Brier describe. Elegimos el bosque, pero aún falta revisar calibración y decidir el umbral.
+
+Data Science UC | Evaluación y selección
+
+50 / 61
+
+Cómo ordena el ganador los correos
+
+Recall Precision
+
+ROC 1.0
+
+Precision–recall 1.0
+
+0.8
+
+0.8
+
+0.6
+
+0.6
+
+0.4
+
+0.4
+
+0.2
+
+Python
+
+0.2
+
+Python
+
+R
+
+R
+
+0.0
+
+0.0
+
+0.0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1.0
+
+0.0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1.0
+
+Tasa de falsos positivos
+
+Recall
+
+Versión
+Python R
+
+ROC AUC
+0.975 0.976
+
+AP
+0.966 0.967
+
+AUC de 0.975 no significa 97.5 % de aciertos: resume ordenamiento sobre múltiples umbrales.
+
+Data Science UC | Evaluación y selección
+
+51 / 61
+
+Fracción observada de spam
+
+Una AUC alta no garantiza calibración
+
+1.0 Python
+
+0.8
+
+R
+
+0.6
+
+Cuarto quintil 736 correos por versión.
+
+Versión
+
+Prob. media
+
+Fracción spam
+
+0.4
+
+Python 0.673
+
+0.814
+
+0.2
+
+R
+
+0.678
+
+0.819
+
+0.0 0.0 0.2 0.4 0.6 0.8 1.0 Probabilidad media OOF
+
+Predice 67–68 %; observamos 81–82 % de spam. Subestima en este rango.
+
+Bajo la diagonal sobreestima; sobre ella subestima. Cada curva resume cinco grupos de probabilidades OOF.
+
+Un buen ranking no garantiza probabilidades calibradas. Recalibrar cambia la receta y exige validación.
+
+Data Science UC | Evaluación y selección
+
+52 / 61
+
+Costo OOF por 1000 correos
+
+Elegimos el umbral usando el costo en validación
+
+600
+
+Se amplía el rango de costos 0–600;
+
+los primeros umbrales tienen costos mayores.
+
+500
+
+400
+
+300
+
+200
+
+100
+
+0 0.2 0.4 0.6 Umbral de bloqueo
+
+Cerca del mínimo
+
+Python R
+
+Costo OOF por 1000 correos.
+
+Umbral Python
+
+R
+
+0.55
+
+132.3 133.7
+
+0.60
+
+128.8 123.4
+
+0.8
+
+0.65
+
+135.3 132.9
+
+Entre los 19 umbrales ensayados, ambos eligen t = 0.60. La tabla muestra el mínimo y sus vecinos.
+Las probabilidades son las mismas al variar el umbral. Cambian las decisiones; el mínimo usado para elegir aún necesita prueba.
+
+Data Science UC | Evaluación y selección
+
+53 / 61
+
+El mismo modelo, otra combinación de errores
+
+Versión Umbral FP
+
+Aciertos Costo por
+
+FN
+
+( %)
+
+1000
+
+Python
+
+0.50 74 181
+
+93.1
+
+149.7
+
+Python
+
+0.60 44 254
+
+91.9
+
+128.8
+
+R
+
+0.50 78 176
+
+93.1
+
+153.8
+
+R
+
+0.60 41 249
+
+92.1
+
+123.4
+
+Python: 30 FP menos y 73 FN más. Ahorro: 5 × 30 − 73 = 77 unidades.
+
+R: 37 FP menos y 73 FN más. Ahorro: 5 × 37 − 73 = 112 unidades.
+
+Baja el porcentaje de aciertos, pero también baja el costo: evitamos errores que pesan más, según la razón 5:1.
+
+Data Science UC | Evaluación y selección
+
+54 / 61
+
+Los costos también sugieren un umbral teórico
+
+Si p = P(Y = 1 | x) es la probabilidad correcta:
+
+Bloquear Costo esperado = 5(1 − p).
+
+Dejar pasar Costo esperado = p.
+
+5(1 − p) < p ⇐⇒ p > 5 ≈ 0.833. 6
+
+El umbral empírico puede diferir: probabilidades imperfectas, muestra finita y una
+
+cuadrícula de búsqueda finita.
+
+La fórmula supone probabilidades correctas, costos conocidos y aciertos sin costo. No reemplazamos el umbral elegido después de mirar prueba.
+
+Data Science UC | Evaluación y selección
+
+55 / 61
+
+La regla completa queda cerrada antes de prueba
+
+Modelo elegido Bosque
+Profundidad 8
+
+Umbral elegido t = 0.60
+
+Reajustar con 3680 Evaluar en 921
+
+La referencia de decisión deja pasar todos los correos. No comete FP, pero no detecta ningún spam.
+Prueba evalúa el procedimiento completo: preprocesamiento, modelo, umbral y costos declarados.
+
+Data Science UC | Evaluación y selección
+
+56 / 61
+
+Qué obtiene la regla en datos reservados
+
+Real Real
+
+Python
+No spam 553 5
+Spam 53 310
+No spam Spam Predicha
+
+R
+No spam 551 7
+Spam 51 312
+No spam Spam Predicha
+
+Versión
+Python R
+
+Log loss
+0.194 0.192
+
+Brier
+0.0502 0.0497
+
+Aciertos ( %)
+93.7 93.7
+
+Precision ( %)
+98.4 97.8
+
+Recall ( %)
+85.4 86.0
+
+Costo por 1000
+84.7 93.4
+
+Iguales aciertos; distinto costo por la combinación de FP y FN.
+
+La referencia “siempre no spam” cuesta 394.1 por 1000. La mejora evalúa la regla cerrada en este corpus.
+
+Data Science UC | Evaluación y selección
+
+57 / 61
+
+Cambiar la receta después de prueba cambia la evidencia
+
+Evaluamos la regla elegida
+
+Diagnóstico: otra variable, modelo o umbral
+
+Nueva selección y nueva evaluación
+independiente
+
+La prueba anterior ayuda a formular una hipótesis, pero ya no queda intacta para confirmar el rediseño.
+La regla es la misma para resistencia y spam: el desempeño usado para elegir no reemplaza una evaluación independiente.
+
+Data Science UC | Evaluación y selección
+
+58 / 61
+
+Referencias y material para reproducir la sesión
+• Yeh (1998). Concrete Compressive Strength. UCI, DOI 10.24432/C5PK67. • Hopkins et al. (1999). Spambase. UCI, DOI 10.24432/C53G6X. Ambos conjuntos: CC BY
+4.0. • James et al. (2021). An Introduction to Statistical Learning, caps. 2, 5 y 6.
+statlearning.com. • Scikit-learn: métricas, calibración, selección del umbral y validación cruzada.
+Dos archivos completos: uno en R y otro en Python. Cada uno reproduce regresión y clasificación con los datos incluidos.
+
+Data Science UC | Evaluación y selección
+
+59 / 61
+
+¿Cómo evaluamos y seleccionamos modelos?
+
+Evaluar: ¿qué error esperamos? Predecir casos fuera del ajuste, medir con una métrica acorde al uso y comparar con una referencia.
+
+Seleccionar: ¿qué receta usar? Comparar candidatos en la misma validación, aplicar el criterio fijado y reajustar la receta elegida.
+
+Definir tarea y métrica
+
+Comparar CV interna
+
+Elegir y reajustar
+
+Evaluar prueba final
+
+Hormigón: elegir por RMSE. Spam: elegir probabilidades por log loss y umbral por costo.
+
+La validación orienta la elección. La prueba reservada estima el desempeño de la elección final.
+
+Data Science UC | Evaluación y selección
+
+60 / 61
+
+Recomendaciones para elegir y evaluar bien
+
+1. Definir el criterio Fijar métrica principal y referencia. Distinguir probabilidades de decisiones en clasificación.
+3. Cerrar la receta Fijar modelo, transformaciones, hiperparámetros y umbral. Reajustar con entrenamiento.
+
+2. Validar sin fuga Respetar grupos o tiempo. Aprender las transformaciones solo con las filas de ajuste.
+4. Valorar la mejora Considerar magnitud y estabilidad. Ante resultados similares, considerar simplicidad y costo.
+
+Seleccionar con validación; evaluar la elección en prueba; comunicar el resultado con su referencia y sus límites.
+
+Data Science UC | Evaluación y selección
+
+61 / 61
+
+

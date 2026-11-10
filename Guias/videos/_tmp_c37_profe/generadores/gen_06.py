@@ -47,7 +47,7 @@ v.b("Piensa en un estacionamiento con líneas pintadas. [[a]]Puedes pasarte un p
     P("el valor de la multa = C", 960, 820, "ambar", 54, en="c", t=1.2), ilustrativo(1000, texto="analogía"), sec="2. Analogía: las multas")
 
 # ---- 3. La holgura
-v.b("La diapositiva treinta y seis lo escribe así. [[a]]Se minimiza un medio de la norma de w al cuadrado, más C por la suma de las holguras, ksi i. [[b]]La condición se relaja: {y·f(x)|ye por efe de equis} ya no tiene que ser mayor que uno, sino mayor que uno menos ksi. [[c]]Y en la solución, cada holgura vale el máximo entre cero y uno menos {y·f|ye por efe}.",
+v.b("La diapositiva treinta y seis lo escribe así. [[a]]Se minimiza un medio de la norma de w al cuadrado, más C por la suma de las holguras: la letra ksi. [[b]]La condición se relaja: {y·f(x)|ye por efe de equis} ya no tiene que ser mayor que uno, sino mayor que uno menos la holgura ksi. [[c]]Y en la solución, cada holgura vale el máximo entre cero y uno menos {y·f|ye por efe}.",
     CL(), T("margen suave · diapositiva 36", 960, 150, tam=50, c="tinta", ent="subir"),
     caja_formula("mín  ½‖w‖² + C · Σ ξᵢ", y=310, c="violeta", tam=58, w=1000, en="a", wf="sb"),
     P("yᵢ·f(xᵢ) ≥ 1 − ξᵢ ,   ξᵢ ≥ 0", 960, 470, "azul", 50, en="b"),
@@ -58,7 +58,7 @@ v.b("En inglés esto se llama soft margin, margen suave. [[a]]La holgura mide cu
 # ---- 4. Holgura a mano (tabla de la diapositiva 36)
 FIL = [("1.4", "0", "correcto y fuera del margen", "verde"), ("0.5", "0.5", "correcto, pero dentro del margen", "ambar"),
        ("−0.3", "1.3", "mal clasificado", "rojo")]
-v.b("Calculemos tres holguras, con la tabla de la diapositiva. [[a]]Un punto con {y·f|ye por efe} igual a 1.4: uno menos 1.4 es negativo, así que ksi es cero. Correcto, y fuera del margen. [[b]]Con {y·f|ye por efe} igual a 0.5: ksi es 0.5. Está bien clasificado, pero dentro de la calle. [[c]]Y con menos 0.3: ksi es uno más 0.3, igual a 1.3. Está mal clasificado.",
+v.b("Calculemos tres holguras, con la tabla de la diapositiva. [[a]]Un punto con {y·f|ye por efe} igual a 1.4: uno menos 1.4 es negativo, así que la holgura ksi es cero. Correcto, y fuera del margen. [[b]]Con {y·f|ye por efe} igual a 0.5: ksi es 0.5. Está bien clasificado, pero dentro de la calle. [[c]]Y con menos 0.3: la holgura ksi es uno más 0.3, igual a 1.3. Está mal clasificado.",
     CL(), T("holgura a mano · diapositiva 36", 960, 150, tam=50, c="tinta", ent="subir"),
     fila(270, [("y·f(x)", 500), ("ξ = máx(0, 1 − y·f)", 900), ("lectura", 1400)], tams=[38, 38, 38], colores=["gris"] * 3),
     *[fila(380 + 120 * i, [(a, 500), (b, 900), (c, 1400)], tams=[48, 52, 38], colores=["tinta", col, col], en=k, fondo=col + "claro", x0=300, x1=1720, h=96)
@@ -98,7 +98,7 @@ v.b("Ahora, el parámetro C. Según la diapositiva treinta y siete: [[a]]un C pe
 
 # ---- 7. C con datos reales
 EX = margen_series(L2["0.01"]["w"], L2["0.01"]["b"]) + margen_series(L2["1"]["w"], L2["1"]["b"]) + margen_series(L2["100"]["w"], L2["100"]["b"])
-v.b("Veámoslo con los datos reales, una SVM lineal con dos variables. [[a]]Con C igual a 0.01, la calle es ancha: 2.24 desviaciones estándar, y 188 vectores de soporte. [[b]]Con C igual a uno, se angosta a 0.86, con 83 vectores de soporte. [[c]]Y con C igual a cien, apenas cambia: 0.82 de ancho y 78 vectores de soporte.",
+v.b("Veámoslo con los datos reales, una SVM lineal con dos variables. [[a]]Con C igual a 0.01, la calle es ancha: 2.24 desviaciones estándar, y 188 vectores de soporte. [[b]]Con C igual a uno, se angosta a 0.86, con 83 vectores de soporte. [[c]]Y con C igual a cien, apenas cambia: 0.81 de ancho y 78 vectores de soporte.",
     CL(), T("SVM lineal con 2 variables: tres valores de C", 960, 140, tam=48, c="tinta", ent="subir"),
     nube398("g2", extra=EX), U("g2", **{"series.0.revela": 1.0, "series.1.revela": 1.0}, t=0.2, dur=1.0),
     U("g2", **{"series.2.alfa": 1.0, "series.3.alfa": 1.0, "series.4.alfa": 1.0}, en="a", dur=0.6),
@@ -106,9 +106,9 @@ v.b("Veámoslo con los datos reales, una SVM lineal con dos variables. [[a]]Con 
     U("g2", **{"series.2.alfa": 0.0, "series.3.alfa": 0.0, "series.4.alfa": 0.0, "series.5.alfa": 1.0, "series.6.alfa": 1.0, "series.7.alfa": 1.0}, en="b", dur=0.8),
     T("C = 1:  ancho 0.86 · 83 SV", 1600, 450, tam=34, c="azul", w="sb", en="b", t=0.3),
     U("g2", **{"series.5.alfa": 0.0, "series.6.alfa": 0.0, "series.7.alfa": 0.0, "series.8.alfa": 1.0, "series.9.alfa": 1.0, "series.10.alfa": 1.0}, en="c", dur=0.8),
-    T("C = 100:  ancho 0.82 · 78 SV", 1600, 520, tam=34, c="rojo", w="sb", en="c", t=0.3),
+    T("C = 100:  ancho 0.81 · 78 SV", 1600, 520, tam=34, c="rojo", w="sb", en="c", t=0.3),
     real(1050, en="a"), sec="7. C con datos reales")
-v.b("¿Y en la prueba? [[a]]Los tres modelos aciertan exactamente lo mismo: 88.3 por ciento. [[b]]Cambiar C movió la calle, pero no mejoró nada. Como dice la diapositiva: un C mayor no siempre mejora el modelo; lo decide la validación.",
+v.b("¿Y en la prueba? [[a]]Los tres modelos aciertan exactamente lo mismo: 88.3 por ciento. [[b]]Cambiar {C|, ce,} movió la calle, pero no mejoró nada. Como dice la diapositiva: un C mayor no siempre mejora el modelo; lo decide la validación.",
     P("prueba: 88.3 % con los tres", 1600, 660, "teal", 40, en="a"), T("un C mayor no siempre mejora", 1600, 750, tam=34, c="gris", w="sb", en="b"),
     T("lo decide la validación", 1600, 810, tam=34, c="gris", w="sb", en="b", t=0.4))
 
@@ -135,7 +135,7 @@ v.b("¿Y cómo se elige C? Con validación cruzada, solo en el entrenamiento. [[
     real(1050, en="a"), sec="9. ¿Qué C elegir?")
 
 # ---- 10. El error típico
-v.b("El error típico: [[a]]leer C como si fuera la fuerza de la regularización, al estilo de la lambda de Lasso. [[b]]Es al revés: un C grande significa menos regularización, porque las violaciones pesan más. [[c]]Y en R, el mismo parámetro se llama cost.",
+v.b("El error típico: [[a]]leer el parámetro C como si fuera la fuerza de la regularización, al estilo de la lambda de Lasso. [[b]]Es al revés: un C grande significa menos regularización, porque las violaciones pesan más. [[c]]Y en R, el mismo parámetro se llama cost.",
     CL(), K(330, 230, "cruz", 70, en="a"), T("«C grande = más regularización»", 410, 230, tam=48, c="rojo", anc="lm", en="a"),
     P("al revés: C grande → MENOS regularización", 960, 420, "verde", 50, en="b"),
     P("en R se llama cost: svm(…, cost = 0.1)", 960, 580, "teal", 46, en="c"), sec="10. El error típico")
