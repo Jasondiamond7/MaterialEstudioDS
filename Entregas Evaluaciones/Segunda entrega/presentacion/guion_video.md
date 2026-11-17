@@ -2,7 +2,7 @@
 
 Máximo 5 minutos. Ritmo natural de unas 140 palabras por minuto.
 
-**Total: 623 palabras, unos 4,5 minutos.** Ensayar con cronómetro: la meta es terminar antes de 4:45.
+**Total: 634 palabras, unos 4,5 minutos.** Ensayar con cronómetro: la meta es terminar antes de 4:45.
 
 ## Slide 1 - Pronóstico de rendimiento por cuartel en kiwi Hayward
 _32 palabras, unos 14 s_
@@ -55,9 +55,9 @@ _51 palabras, unos 22 s_
 Por temporada, el modelo gana en cuatro de cinco años: justo cuando el promedio erraba entre 16 y 25 %. Solo pierde en 2025, cuando el promedio ya acertaba. Y en la prueba ciega de 2026, elegido sin mirar ese año, bajó el error del huerto de 21,6 a 7,0 %.
 
 ## Slide 11 - Baseline y momento del pronóstico
-_50 palabras, unos 21 s_
+_61 palabras, unos 26 s_
 
-El baseline es la regla actual, el promedio del cuartel, y es justo: con toda la historia desde 2019 da 16,8 %. En diciembre el modelo ya baja el error a 10,3 % y en enero a 9,6; febrero no mejora. Por eso el corte es el 31 de enero.
+El baseline es la regla actual, el promedio del cuartel. Con la misma historia que el modelo erra 17,4 %, y con toda la historia desde 2019, 16,8 %: la comparación es justa. En diciembre el modelo ya baja el error a 10,3 % y en enero a 9,6; febrero no mejora. Por eso el corte es el 31 de enero.
 
 ## Slide 12 - Del satélite a la decisión de cosecha
 _48 palabras, unos 21 s_

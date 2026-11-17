@@ -1,0 +1,423 @@
+1
+00:00:00,250 --> 00:00:03,620
+Cuarta parada: el supuesto que le da nombre al método.
+
+2
+00:00:03,740 --> 00:00:06,409
+Con él vamos a calcular, de principio a fin, la
+
+3
+00:00:06,409 --> 00:00:09,590
+probabilidad de spam del correo con oferta y sin enlace.
+
+4
+00:00:09,710 --> 00:00:12,300
+La diapositiva catorce plantea el supuesto.
+
+5
+00:00:12,420 --> 00:00:15,281
+Dentro de los spam, y por separado dentro de los
+
+6
+00:00:15,281 --> 00:00:18,440
+legítimos, las señales se tratan como independientes.
+
+7
+00:00:18,560 --> 00:00:23,808
+Eso permite multiplicar sus probabilidades: la probabilidad de oferta y sin enlace, dado
+
+8
+00:00:23,808 --> 00:00:28,340
+spam, es la probabilidad de oferta dado spam por la de sin enlace dado spam.
+
+9
+00:00:28,460 --> 00:00:31,560
+Se repite el producto dentro de los legítimos, y con más
+
+10
+00:00:31,560 --> 00:00:33,940
+variables se agrega un factor por variable.
+
+11
+00:00:34,060 --> 00:00:39,190
+Fíjate en las palabras: independencia condicional, es decir, dentro de cada clase.
+
+12
+00:00:39,310 --> 00:00:42,560
+No dice que oferta y enlace sean independientes en general.
+
+13
+00:00:42,680 --> 00:00:46,310
+De hecho no lo son: los dos son más frecuentes en el spam.
+
+14
+00:00:46,430 --> 00:00:49,413
+Dice que, una vez que sabemos la clase, saber que hay
+
+15
+00:00:49,413 --> 00:00:52,340
+oferta no cambia la probabilidad de que haya enlace.
+
+16
+00:00:52,460 --> 00:00:56,080
+Esta simplificación es la que le da al método el apellido de ingenuo.
+
+17
+00:00:56,200 --> 00:00:58,887
+Hace posible el cálculo, pero no demuestra que las
+
+18
+00:00:58,887 --> 00:01:01,090
+señales sean independientes en los datos.
+
+19
+00:01:01,210 --> 00:01:04,269
+El profesor lo dijo con claridad: nada asegura que la
+
+20
+00:01:04,269 --> 00:01:06,750
+probabilidad conjunta se pueda separar así.
+
+21
+00:01:06,870 --> 00:01:10,324
+Es un primer acercamiento que funciona relativamente bien, y en la
+
+22
+00:01:10,324 --> 00:01:13,150
+parada diez veremos qué pasa cuando el supuesto falla.
+
+23
+00:01:13,270 --> 00:01:15,170
+Una analogía para el supuesto.
+
+24
+00:01:15,290 --> 00:01:17,690
+Imagina dos testigos de un mismo hecho.
+
+25
+00:01:17,810 --> 00:01:20,178
+Si cada uno lo vio por su cuenta, sus
+
+26
+00:01:20,178 --> 00:01:22,290
+testimonios se suman: dos pruebas
+
+27
+00:01:22,290 --> 00:01:23,250
+independientes.
+
+28
+00:01:23,370 --> 00:01:26,011
+Pero si el segundo solo repite lo que le contó el
+
+29
+00:01:26,011 --> 00:01:28,220
+primero, en realidad hay una sola prueba.
+
+30
+00:01:28,340 --> 00:01:31,064
+El clasificador bayesiano ingenuo trata a todas
+
+31
+00:01:31,064 --> 00:01:33,440
+las señales como testigos independientes.
+
+32
+00:01:33,560 --> 00:01:37,800
+Cuando dos señales se repiten, el modelo cuenta dos veces la misma prueba.
+
+33
+00:01:37,920 --> 00:01:41,700
+Calculemos el patrón que observamos, como en la diapositiva quince.
+
+34
+00:01:41,820 --> 00:01:45,390
+Dentro de los spam: oferta, dieciséis de veinte; sin
+
+35
+00:01:45,390 --> 00:01:48,480
+enlace, veinte menos catorce, seis de veinte.
+
+36
+00:01:48,600 --> 00:01:53,320
+El producto: 0.80 por 0.30, 0.24.
+
+37
+00:01:53,440 --> 00:01:57,533
+Dentro de los legítimos: oferta, ocho de ochenta; sin enlace,
+
+38
+00:01:57,533 --> 00:02:01,090
+ochenta menos dieciséis, sesenta y cuatro de ochenta.
+
+39
+00:02:01,210 --> 00:02:05,890
+El producto: 0.10 por 0.80, 0.08.
+
+40
+00:02:06,010 --> 00:02:10,570
+Son cálculos bajo el supuesto; no son conteos observados del patrón completo.
+
+41
+00:02:10,690 --> 00:02:14,390
+Para clasificar, falta incorporar la frecuencia de cada clase.
+
+42
+00:02:14,510 --> 00:02:17,730
+La diapositiva dieciséis prepara todos los factores.
+
+43
+00:02:17,850 --> 00:02:25,040
+Legítimo: frecuencia de clase 0.80, oferta presente 0.10, enlace ausente 0.80.
+
+44
+00:02:25,160 --> 00:02:32,180
+Spam: frecuencia de clase 0.20, oferta presente 0.80, enlace ausente 0.30.
+
+45
+00:02:32,300 --> 00:02:35,815
+En cada columna buscamos la probabilidad de lo que efectivamente
+
+46
+00:02:35,815 --> 00:02:39,330
+observamos en el correo: la oferta presente y el enlace ausente.
+
+47
+00:02:39,450 --> 00:02:41,030
+Mira la última columna.
+
+48
+00:02:41,150 --> 00:02:44,433
+La ausencia de enlace es más frecuente entre los legítimos:
+
+49
+00:02:44,433 --> 00:02:47,660
+sesenta y cuatro de ochenta, frente a seis de veinte spam.
+
+50
+00:02:47,780 --> 00:02:51,510
+Es decir, no ver el enlace es una pista a favor de legítimo.
+
+51
+00:02:51,630 --> 00:02:53,830
+Esa pista va a pesar en el resultado.
+
+52
+00:02:53,950 --> 00:02:56,740
+Aquí, una pequeña precisión sobre la grabación.
+
+53
+00:02:56,860 --> 00:03:01,180
+Al repasar esta tabla, cerca del minuto cincuenta, se dijo: seis correos
+
+54
+00:03:01,180 --> 00:03:04,780
+que no tienen enlace dentro de los veinte que son legítimos.
+
+55
+00:03:04,900 --> 00:03:07,570
+Los seis sin enlace están entre los veinte spam.
+
+56
+00:03:07,690 --> 00:03:11,840
+Entre los legítimos, que son ochenta, hay sesenta y cuatro sin enlace.
+
+57
+00:03:11,960 --> 00:03:15,340
+Ahora multiplicamos, como en la diapositiva diecisiete.
+
+58
+00:03:15,460 --> 00:03:20,174
+El producto para legítimo, que llamamos ese cero:
+
+59
+00:03:20,174 --> 00:03:23,830
+0.80 por 0.10 por 0.80, igual a 0.064.
+
+60
+00:03:23,950 --> 00:03:31,690
+El producto para spam, ese uno: 0.20 por 0.80 por 0.30, igual a 0.048.
+
+61
+00:03:31,810 --> 00:03:38,366
+Y normalizamos: la probabilidad de spam dado oferta y sin enlace es
+
+62
+00:03:38,366 --> 00:03:44,140
+0.048 dividido por 0.064 más 0.048: aproximadamente 0.4286.
+
+63
+00:03:44,260 --> 00:03:46,310
+Dos advertencias de la diapositiva.
+
+64
+00:03:46,430 --> 00:03:50,046
+Los productos ese cero y ese uno todavía no son probabilidades
+
+65
+00:03:50,046 --> 00:03:53,020
+de clase del correo: primero hay que normalizarlos.
+
+66
+00:03:53,140 --> 00:03:56,550
+Y fíjate en el resultado: aunque el correo trae oferta, la
+
+67
+00:03:56,550 --> 00:03:59,490
+probabilidad de spam queda por debajo de un medio.
+
+68
+00:03:59,610 --> 00:04:02,420
+La ausencia del enlace pesó a favor de legítimo.
+
+69
+00:04:02,540 --> 00:04:05,580
+La diapositiva dieciocho compara tres situaciones.
+
+70
+00:04:05,700 --> 00:04:13,500
+Si solo miramos oferta: 0.16 sobre 0.08 más 0.16, que es 0.6667.
+
+71
+00:04:13,620 --> 00:04:18,670
+Si vemos oferta y además vemos que no hay enlace: 0.4286.
+
+72
+00:04:18,790 --> 00:04:27,526
+Y si vemos oferta y enlace, los dos presentes: el producto del spam es 0.20 por 0.80 por
+
+73
+00:04:27,526 --> 00:04:35,070
+0.70, igual a 0.112; el del legítimo, 0.80 por 0.10 por 0.20, igual a 0.016.
+
+74
+00:04:35,190 --> 00:04:41,920
+El resultado: 0.112 sobre 0.128, que es 0.8750.
+
+75
+00:04:42,040 --> 00:04:44,090
+La lectura de la diapositiva es fina.
+
+76
+00:04:44,210 --> 00:04:47,590
+No observar el enlace no es lo mismo que desconocer si existe.
+
+77
+00:04:47,710 --> 00:04:52,640
+Cuando sabemos que no está, la probabilidad baja; cuando sabemos que está, sube.
+
+78
+00:04:52,760 --> 00:04:57,631
+Y con un umbral de 0.50, la ausencia del enlace cambia la decisión: con
+
+79
+00:04:57,631 --> 00:05:01,610
+solo oferta sería spam; con oferta y sin enlace, legítimo.
+
+80
+00:05:01,730 --> 00:05:04,894
+Para completar el cuadro, un cálculo adicional con los
+
+81
+00:05:04,894 --> 00:05:07,590
+mismos factores: los cuatro patrones posibles.
+
+82
+00:05:07,710 --> 00:05:12,870
+Sin oferta y sin enlace: 0.0204, apenas dos por ciento.
+
+83
+00:05:12,990 --> 00:05:16,680
+Sin oferta y con enlace: 0.1628.
+
+84
+00:05:16,800 --> 00:05:21,960
+Con oferta y sin enlace, el de la diapositiva: 0.4286.
+
+85
+00:05:22,080 --> 00:05:25,640
+Y con ambas señales: 0.8750.
+
+86
+00:05:25,760 --> 00:05:30,460
+Cada señal presente empuja hacia spam, y cada ausencia empuja hacia legítimo.
+
+87
+00:05:30,580 --> 00:05:34,100
+Error típico: multiplicar solo las señales presentes.
+
+88
+00:05:34,220 --> 00:05:37,249
+Si ignoramos que el enlace está ausente,
+
+89
+00:05:37,249 --> 00:05:40,580
+volvemos al cálculo con solo oferta: 0.6667.
+
+90
+00:05:40,700 --> 00:05:44,265
+El modelo de Bernoulli usa también las ausencias: el factor del
+
+91
+00:05:44,265 --> 00:05:47,490
+enlace ausente es uno menos la probabilidad de presencia.
+
+92
+00:05:47,610 --> 00:05:52,990
+Y en este correo, esa ausencia baja la probabilidad hasta 0.4286.
+
+93
+00:05:53,110 --> 00:05:54,330
+Piensa un segundo.
+
+94
+00:05:54,450 --> 00:05:57,450
+Un correo no trae oferta, pero sí trae enlace.
+
+95
+00:05:57,570 --> 00:06:02,010
+Con los factores de la diapositiva dieciséis, ¿cuál es su probabilidad de spam?
+
+96
+00:06:02,730 --> 00:06:08,760
+Legítimo: 0.80 por 0.90 por 0.20, 0.144.
+
+97
+00:06:08,880 --> 00:06:14,680
+Spam: 0.20 por 0.20 por 0.70, 0.028.
+
+98
+00:06:14,800 --> 00:06:22,340
+Normalizando, 0.028 sobre 0.172: aproximadamente 0.1628.
+
+99
+00:06:22,460 --> 00:06:26,590
+El enlace sube la probabilidad, pero la falta de oferta pesa más.
+
+100
+00:06:26,710 --> 00:06:30,963
+Para llevarte: el modelo supone que, dentro de cada clase, las señales
+
+101
+00:06:30,963 --> 00:06:34,670
+son independientes, y por eso multiplica un factor por señal.
+
+102
+00:06:34,790 --> 00:06:38,215
+El producto de cada clase lleva la previa, los factores de las
+
+103
+00:06:38,215 --> 00:06:41,530
+señales presentes y los de las ausentes; luego se normaliza.
+
+104
+00:06:41,650 --> 00:06:50,070
+Con oferta y sin enlace: 0.064 y 0.048, y una probabilidad de spam de 0.4286.
+
+105
+00:06:50,190 --> 00:06:54,130
+Siguiente parada: ¿qué pasa si una señal nunca apareció en una clase?
+
+106
+00:06:54,250 --> 00:06:56,990
+El problema de los ceros y el suavizado de Laplace.

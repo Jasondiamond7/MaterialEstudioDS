@@ -1,0 +1,419 @@
+1
+00:00:00,250 --> 00:00:02,340
+Clase cuarenta, primera parada.
+
+2
+00:00:02,460 --> 00:00:06,140
+Hoy vamos a construir un filtro de spam que entrega una probabilidad.
+
+3
+00:00:06,260 --> 00:00:09,104
+Y antes de cualquier fórmula, vamos a separar tres
+
+4
+00:00:09,104 --> 00:00:11,720
+preguntas que parecen iguales, pero no lo son.
+
+5
+00:00:11,840 --> 00:00:15,722
+En la clase anterior, con los vinos, buscábamos grupos sin ninguna
+
+6
+00:00:15,722 --> 00:00:18,780
+etiqueta: los grupos eran un resultado del análisis.
+
+7
+00:00:18,900 --> 00:00:20,290
+Hoy la situación cambia.
+
+8
+00:00:20,410 --> 00:00:24,130
+Tenemos correos que ya vienen marcados como spam o como legítimos.
+
+9
+00:00:24,250 --> 00:00:27,683
+Ya no buscamos grupos: aprendemos una clase que conocemos,
+
+10
+00:00:27,683 --> 00:00:30,820
+para poder clasificar el siguiente correo que llegue.
+
+11
+00:00:30,940 --> 00:00:32,390
+La notación es sencilla.
+
+12
+00:00:32,510 --> 00:00:33,760
+La respuesta es Y.
+
+13
+00:00:33,880 --> 00:00:37,460
+Vale uno si el correo es spam, y cero si es legítimo.
+
+14
+00:00:37,580 --> 00:00:42,420
+Las entradas son características del mensaje; por ejemplo, qué palabras aparecen.
+
+15
+00:00:42,540 --> 00:00:44,440
+En la clase las llamamos señales.
+
+16
+00:00:44,560 --> 00:00:47,484
+Y la pregunta de hoy es una sola: cómo construir una
+
+17
+00:00:47,484 --> 00:00:50,520
+probabilidad de spam a partir de ejemplos etiquetados.
+
+18
+00:00:50,640 --> 00:00:52,650
+El recorrido tiene tres pasos.
+
+19
+00:00:52,770 --> 00:00:57,620
+Primero, aprender de los correos: qué señales aparecen dentro de cada clase.
+
+20
+00:00:57,740 --> 00:01:01,309
+Segundo, calcular y comprobar: cómo se combinan esas señales y
+
+21
+00:01:01,309 --> 00:01:04,130
+qué tan fiables son las probabilidades que salen.
+
+22
+00:01:04,250 --> 00:01:07,595
+Y tercero, tomar una decisión: cuándo conviene bloquear,
+
+23
+00:01:07,595 --> 00:01:10,760
+considerando que los dos errores no cuestan lo mismo.
+
+24
+00:01:10,880 --> 00:01:14,580
+El profesor insistió en una distinción que vamos a usar toda la clase.
+
+25
+00:01:14,700 --> 00:01:17,224
+Predecir es llegar a una probabilidad: este
+
+26
+00:01:17,224 --> 00:01:19,690
+correo tiene tal probabilidad de ser spam.
+
+27
+00:01:19,810 --> 00:01:24,430
+Decidir es aplicar una regla sobre esa probabilidad: lo bloqueo o lo dejo pasar.
+
+28
+00:01:24,550 --> 00:01:28,110
+Una cosa alimenta a la otra, pero son pasos distintos.
+
+29
+00:01:28,230 --> 00:01:32,990
+Las primeras diez paradas son sobre predecir; la parada once, sobre decidir.
+
+30
+00:01:33,110 --> 00:01:35,380
+El método de hoy se llama Naive Bayes.
+
+31
+00:01:35,500 --> 00:01:38,370
+En español, clasificador bayesiano ingenuo.
+
+32
+00:01:38,490 --> 00:01:42,330
+Bayes, por el teorema de probabilidad condicional que vamos a usar.
+
+33
+00:01:42,450 --> 00:01:45,685
+E ingenuo, por un supuesto simplificador que haremos en la
+
+34
+00:01:45,685 --> 00:01:48,530
+parada cuatro, y que casi nunca se cumple del todo.
+
+35
+00:01:48,650 --> 00:01:52,740
+Lo interesante es que, aun así, funciona razonablemente bien.
+
+36
+00:01:52,860 --> 00:01:55,280
+Antes de los números, una analogía.
+
+37
+00:01:55,400 --> 00:01:57,180
+Piensa en una alarma de humo.
+
+38
+00:01:57,300 --> 00:02:00,196
+Una pregunta es: de todas las veces que hubo un
+
+39
+00:02:00,196 --> 00:02:02,660
+incendio, ¿cuántas veces sonó la alarma?
+
+40
+00:02:02,780 --> 00:02:05,714
+Otra pregunta es: de todas las veces que sonó la
+
+41
+00:02:05,714 --> 00:02:08,220
+alarma, ¿cuántas veces había un incendio?
+
+42
+00:02:08,340 --> 00:02:12,363
+La primera puede ser casi cien por ciento, y la segunda, bastante baja,
+
+43
+00:02:12,363 --> 00:02:15,480
+porque la alarma también suena con una tostada quemada.
+
+44
+00:02:15,600 --> 00:02:19,790
+Con los correos pasa lo mismo, y la diapositiva cuatro les pone nombre.
+
+45
+00:02:19,910 --> 00:02:22,860
+La previa: ¿qué fracción de los correos es spam?
+
+46
+00:02:22,980 --> 00:02:24,690
+Ahí solo miramos la clase.
+
+47
+00:02:24,810 --> 00:02:29,400
+La condicional: entre los spam, ¿qué fracción contiene la palabra oferta?
+
+48
+00:02:29,520 --> 00:02:31,570
+Miramos la palabra dentro de la clase.
+
+49
+00:02:31,690 --> 00:02:35,970
+Y la posterior: entre los correos con oferta, ¿qué fracción es spam?
+
+50
+00:02:36,090 --> 00:02:38,730
+Miramos la clase cuando ya conocemos la palabra.
+
+51
+00:02:38,850 --> 00:02:42,212
+La idea central de Bayes es justamente esa: pasar de lo que
+
+52
+00:02:42,212 --> 00:02:45,858
+sabemos dentro de cada clase, la condicional, a una probabilidad
+
+53
+00:02:45,858 --> 00:02:48,650
+para el correo que estamos mirando, la posterior.
+
+54
+00:02:48,770 --> 00:02:51,555
+Para clasificar necesitamos la posterior; pero los
+
+55
+00:02:51,555 --> 00:02:53,950
+datos nos dan con facilidad la condicional.
+
+56
+00:02:54,070 --> 00:02:55,940
+Ahora sí, los números.
+
+57
+00:02:56,060 --> 00:02:59,620
+La diapositiva cinco construye un ejemplo con cien correos.
+
+58
+00:02:59,740 --> 00:03:04,000
+Hay ochenta legítimos: ocho tienen la palabra oferta y setenta y dos no.
+
+59
+00:03:04,120 --> 00:03:07,360
+Hay veinte spam: dieciséis tienen oferta y cuatro no.
+
+60
+00:03:07,480 --> 00:03:11,340
+En total, veinticuatro correos traen oferta y setenta y seis no.
+
+61
+00:03:11,460 --> 00:03:15,760
+Es un ejemplo construido para las cuentas, no son conteos de Spambase.
+
+62
+00:03:15,880 --> 00:03:18,050
+Mira esta tabla con dos lecturas.
+
+63
+00:03:18,170 --> 00:03:20,952
+Si recorres la fila del spam, ves que la palabra
+
+64
+00:03:20,952 --> 00:03:23,270
+aparece en dieciséis de los veinte spam.
+
+65
+00:03:23,390 --> 00:03:26,203
+Si recorres la columna de oferta, ves que de los
+
+66
+00:03:26,203 --> 00:03:29,250
+veinticuatro correos con oferta, dieciséis son spam.
+
+67
+00:03:29,370 --> 00:03:32,930
+El mismo dieciséis, pero dividido por cosas distintas.
+
+68
+00:03:33,050 --> 00:03:36,380
+Calculemos la condicional, como en la diapositiva seis.
+
+69
+00:03:36,500 --> 00:03:41,180
+La probabilidad de oferta dado spam es dieciséis sobre veinte: 0.80.
+
+70
+00:03:41,300 --> 00:03:46,070
+La probabilidad de oferta dado legítimo es ocho sobre ochenta: 0.10.
+
+71
+00:03:46,190 --> 00:03:49,471
+Ojo: estas dos no suman uno, y no tienen por qué,
+
+72
+00:03:49,471 --> 00:03:52,350
+porque cada una vive en una clase distinta.
+
+73
+00:03:52,470 --> 00:03:56,240
+Lo que sí suma uno es oferta y no oferta dentro de la misma clase:
+
+74
+00:03:56,240 --> 00:03:59,210
+ocho sobre ochenta, más setenta y dos sobre ochenta.
+
+75
+00:03:59,330 --> 00:04:00,670
+Y ahora la posterior.
+
+76
+00:04:00,790 --> 00:04:03,831
+Para clasificar no tomamos como referencia todos los
+
+77
+00:04:03,831 --> 00:04:06,170
+spam, sino todos los correos con oferta.
+
+78
+00:04:06,290 --> 00:04:11,449
+La probabilidad de spam dado oferta es dieciséis sobre dieciséis más ocho:
+
+79
+00:04:11,449 --> 00:04:16,050
+dieciséis sobre veinticuatro, dos tercios, aproximadamente 0.6667.
+
+80
+00:04:16,170 --> 00:04:21,033
+La frase que resume la diapositiva: el ochenta por ciento de los spam contiene
+
+81
+00:04:21,033 --> 00:04:25,460
+oferta, pero solo el 66.7 por ciento de los correos con oferta es spam.
+
+82
+00:04:25,580 --> 00:04:29,837
+Y el resto, ocho de veinticuatro, un tercio, son legítimos: las dos
+
+83
+00:04:29,837 --> 00:04:33,840
+posteriores sí suman uno, porque comparten la misma referencia.
+
+84
+00:04:33,960 --> 00:04:37,260
+Error típico, y es el más clásico de la probabilidad.
+
+85
+00:04:37,380 --> 00:04:41,460
+Confundir la probabilidad de oferta dado spam con la de spam dado oferta.
+
+86
+00:04:41,580 --> 00:04:45,093
+Decir: como el ochenta por ciento de los spam trae oferta, un
+
+87
+00:04:45,093 --> 00:04:48,260
+correo con oferta tiene ochenta por ciento de ser spam.
+
+88
+00:04:48,380 --> 00:04:51,028
+Es falso: depende también de cuántos legítimos
+
+89
+00:04:51,028 --> 00:04:53,560
+traen oferta y de cuántos spam hay en total.
+
+90
+00:04:53,680 --> 00:04:57,030
+Eso es lo que hace el teorema de Bayes, en la próxima parada.
+
+91
+00:04:57,150 --> 00:04:58,370
+Piensa un segundo.
+
+92
+00:04:58,490 --> 00:05:01,386
+Con la misma tabla: entre los correos que no traen
+
+93
+00:05:01,386 --> 00:05:03,760
+la palabra oferta, ¿qué fracción es spam?
+
+94
+00:05:04,480 --> 00:05:07,296
+Miramos la columna sin oferta: hay setenta y
+
+95
+00:05:07,296 --> 00:05:09,920
+seis correos, y de ellos cuatro son spam.
+
+96
+00:05:10,040 --> 00:05:14,520
+Cuatro sobre setenta y seis, aproximadamente 0.053.
+
+97
+00:05:14,640 --> 00:05:18,940
+Sin la palabra, la probabilidad de spam cae a cerca del cinco por ciento.
+
+98
+00:05:19,060 --> 00:05:23,538
+Para llevarte: la previa mira la clase; la condicional, la señal dentro de
+
+99
+00:05:23,538 --> 00:05:27,290
+la clase; la posterior, la clase cuando ya conocemos la señal.
+
+100
+00:05:27,410 --> 00:05:30,857
+Con los cien correos: oferta dado spam es 0.80,
+
+101
+00:05:30,857 --> 00:05:33,570
+pero spam dado oferta es dos tercios.
+
+102
+00:05:33,690 --> 00:05:36,494
+Y para clasificar necesitamos la posterior: eso
+
+103
+00:05:36,494 --> 00:05:38,880
+es lo que construye el teorema de Bayes.
+
+104
+00:05:39,000 --> 00:05:42,588
+Siguiente parada: el teorema de Bayes, que recupera esta misma
+
+105
+00:05:42,588 --> 00:05:46,060
+cuenta, y por qué la frecuencia de spam cambia la respuesta.

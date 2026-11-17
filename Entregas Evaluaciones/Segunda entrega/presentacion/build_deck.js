@@ -364,14 +364,18 @@ s.addChart(pres.charts.BAR, [
   valAxisMinVal: 0, valAxisMaxVal: 20, valAxisHidden: true, valGridLine: { style: 'none' }, showLegend: true, legendPos: 'b',
   showTitle: true, title: 'Error del total del huerto (%) según fecha de corte',
 });
+// Two baseline versions on the same 55 test cases: same history as the model (from 2020, the chart value)
+// and full history from 2019 (fair-comparison check). Both are named so the card does not contradict the chart.
 const bJusto = ROB.baseline_justo.find((r) => r.modelo.startsWith('B0b'));
+const bMismo = ROB.baseline_justo.find((r) => r.modelo.startsWith('B0 '));
+const mElegido = ROB.baseline_justo.find((r) => r.modelo.startsWith('M2'));
 card(s, { x: 7.85, y: 1.45, w: 4.88, h: 2.75, name: 'baseline' });
 txt(s, 'Baseline: promedio histórico del cuartel', { x: 8.15, y: 1.65, w: 4.3, h: 0.4, valign: 'top', fontSize: 17, bold: true, color: C.text2 });
-txt(s, `Es la regla que hoy usa el huerto: si el modelo no le gana, no aporta. Con toda la historia desde 2019 el baseline da ${dec(bJusto['Error_huerto_%'])} %, así que la comparación no favorece al modelo.`, { x: 8.15, y: 2.15, w: 4.3, h: 1.95, fontSize: 14 });
+txt(s, `Es la regla que hoy usa el huerto. Con la misma historia que el modelo (desde 2020) su error es ${dec(bMismo['Error_huerto_%'])} %; con toda la historia desde 2019 baja apenas a ${dec(bJusto['Error_huerto_%'])} %. El modelo queda en ${dec(mElegido['Error_huerto_%'])} %: la comparación es justa.`, { x: 8.15, y: 2.15, w: 4.3, h: 1.95, fontSize: 14 });
 card(s, { x: 7.85, y: 4.4, w: 4.88, h: 2.0, name: 'corte' });
 txt(s, 'Corte propuesto: 31 de enero', { x: 8.15, y: 4.6, w: 4.3, h: 0.4, fontSize: 17, bold: true, color: C.text2 });
 txt(s, 'En diciembre el modelo ya supera al baseline; en enero logra su mejor error, dos a tres meses antes de la cosecha.', { x: 8.15, y: 5.05, w: 4.3, h: 1.25, fontSize: 14 });
-notas(s, 'Baseline y momento del pronóstico', `El baseline es la regla actual, el promedio del cuartel, y es justo: con toda la historia desde 2019 da ${dec(bJusto['Error_huerto_%'])} %. En diciembre el modelo ya baja el error a 10,3 % y en enero a 9,6; febrero no mejora. Por eso el corte es el 31 de enero.`);
+notas(s, 'Baseline y momento del pronóstico', `El baseline es la regla actual, el promedio del cuartel. Con la misma historia que el modelo erra ${dec(bMismo['Error_huerto_%'])} %, y con toda la historia desde 2019, ${dec(bJusto['Error_huerto_%'])} %: la comparación es justa. En diciembre el modelo ya baja el error a 10,3 % y en enero a 9,6; febrero no mejora. Por eso el corte es el 31 de enero.`);
 
 // ---------- 12. Implementación ----------
 pres.addSection({ title: 'Implementación' });

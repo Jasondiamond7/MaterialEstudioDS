@@ -1,0 +1,495 @@
+1
+00:00:00,250 --> 00:00:02,810
+Quinta parada: el problema de los ceros.
+
+2
+00:00:02,930 --> 00:00:06,810
+Una señal que nunca apareció en una clase puede anular todo el cálculo.
+
+3
+00:00:06,930 --> 00:00:10,150
+El suavizado de Laplace lo evita con una idea muy simple.
+
+4
+00:00:10,270 --> 00:00:13,520
+La diapositiva diecinueve plantea un caso hipotético.
+
+5
+00:00:13,640 --> 00:00:16,263
+Agregamos la palabra premio, que no apareció en
+
+6
+00:00:16,263 --> 00:00:18,440
+ninguno de los veinte spam del ejemplo.
+
+7
+00:00:18,560 --> 00:00:22,800
+Entonces la probabilidad de premio dado spam es cero sobre veinte: cero.
+
+8
+00:00:22,920 --> 00:00:26,977
+Si el próximo correo trae premio, multiplicar por cero anula el producto
+
+9
+00:00:26,977 --> 00:00:30,470
+del spam, aunque todas las demás señales favorezcan esa clase.
+
+10
+00:00:30,590 --> 00:00:34,008
+El punto de la diapositiva es este: observar cero casos en una
+
+11
+00:00:34,008 --> 00:00:37,150
+muestra pequeña no demuestra que el evento sea imposible.
+
+12
+00:00:37,270 --> 00:00:42,050
+El profesor dio un ejemplo práctico: el nombre de una empresa conocida por estafas.
+
+13
+00:00:42,170 --> 00:00:47,100
+Puede aparecer muy pocas veces, pero cuando aparece es una señal muy fuerte de spam.
+
+14
+00:00:47,220 --> 00:00:51,360
+Si su probabilidad queda en cero, perdemos justamente esa señal.
+
+15
+00:00:51,480 --> 00:00:52,650
+Una analogía.
+
+16
+00:00:52,770 --> 00:00:57,300
+Un restaurante nuevo tiene tres reseñas, y ninguna habla de un plato frío.
+
+17
+00:00:57,420 --> 00:01:00,040
+¿Concluyes que ahí nunca sirven un plato frío?
+
+18
+00:01:00,160 --> 00:01:02,950
+Claro que no: tres visitas son muy pocas.
+
+19
+00:01:03,070 --> 00:01:07,100
+Lo razonable es asignarle una probabilidad pequeña, pero no cero.
+
+20
+00:01:07,220 --> 00:01:09,610
+Eso es exactamente lo que hace el suavizado.
+
+21
+00:01:09,730 --> 00:01:13,860
+La diapositiva veinte muestra la solución: el suavizado de Laplace.
+
+22
+00:01:13,980 --> 00:01:17,060
+Agregamos uno al conteo de presente y uno al de ausente.
+
+23
+00:01:17,180 --> 00:01:20,552
+Para premio entre los spam: cero presencias más uno,
+
+24
+00:01:20,552 --> 00:01:23,210
+dividido por veinte correos spam más dos.
+
+25
+00:01:23,330 --> 00:01:27,910
+Uno sobre veintidós: aproximadamente 0.0455.
+
+26
+00:01:28,030 --> 00:01:29,960
+Pequeña, pero ya no es cero.
+
+27
+00:01:30,080 --> 00:01:32,180
+¿Por qué el denominador aumenta en dos?
+
+28
+00:01:32,300 --> 00:01:37,550
+Porque hay dos respuestas posibles, presente y ausente, y a cada una le sumamos uno.
+
+29
+00:01:37,670 --> 00:01:41,625
+Así, las dos probabilidades siguen sumando uno: uno sobre veintidós
+
+30
+00:01:41,625 --> 00:01:44,930
+para presente, y veintiuno sobre veintidós para ausente.
+
+31
+00:01:45,050 --> 00:01:49,722
+Ojo con lo que no se toca: el suavizado modifica las probabilidades de las señales,
+
+32
+00:01:49,722 --> 00:01:53,550
+pero conservamos las frecuencias de clase, ochenta y veinte de cien.
+
+33
+00:01:53,670 --> 00:01:57,420
+En general, llamamos alfa al peso agregado a cada respuesta.
+
+34
+00:01:57,540 --> 00:02:00,506
+La probabilidad de presencia es el conteo más alfa,
+
+35
+00:02:00,506 --> 00:02:03,240
+dividido por el total de la clase más dos alfa.
+
+36
+00:02:03,360 --> 00:02:07,368
+Aquí usamos alfa igual a uno; otros valores, como 0.5
+
+37
+00:02:07,368 --> 00:02:10,620
+o 2, pueden compararse mediante validación.
+
+38
+00:02:10,740 --> 00:02:14,520
+En la grabación a este parámetro se le llama también lambda; en el
+
+39
+00:02:14,520 --> 00:02:18,300
+material, en scikit-learn y en el paquete de R es alfa, o laplace.
+
+40
+00:02:18,420 --> 00:02:22,870
+Volvamos al correo con oferta y sin enlace, ahora con alfa igual a uno.
+
+41
+00:02:22,990 --> 00:02:25,980
+La diapositiva veintiuno reconstruye los factores.
+
+42
+00:02:26,100 --> 00:02:29,387
+Legítimo, oferta presente: ocho más uno, sobre
+
+43
+00:02:29,387 --> 00:02:32,460
+ochenta más dos: nueve sobre ochenta y dos.
+
+44
+00:02:32,580 --> 00:02:36,110
+Enlace ausente: sesenta y cuatro más uno, sobre ochenta
+
+45
+00:02:36,110 --> 00:02:38,870
+y dos: sesenta y cinco sobre ochenta y dos.
+
+46
+00:02:38,990 --> 00:02:42,400
+Spam, oferta presente: dieciséis más uno, sobre
+
+47
+00:02:42,400 --> 00:02:45,520
+veinte más dos: diecisiete sobre veintidós.
+
+48
+00:02:45,640 --> 00:02:50,620
+Enlace ausente: seis más uno, sobre veintidós: siete sobre veintidós.
+
+49
+00:02:50,740 --> 00:02:53,220
+Una precisión sobre la grabación en este punto.
+
+50
+00:02:53,340 --> 00:02:57,393
+Al explicar el siete sobre veintidós, cerca del minuto sesenta y siete, se
+
+51
+00:02:57,393 --> 00:03:00,680
+dijo que los veinte spam observados son ochenta de los cien.
+
+52
+00:03:00,800 --> 00:03:02,180
+Son veinte de los cien.
+
+53
+00:03:02,300 --> 00:03:05,633
+Por eso el denominador es veinte más dos, veintidós:
+
+54
+00:03:05,633 --> 00:03:08,390
+los veinte spam, más los dos del suavizado.
+
+55
+00:03:08,510 --> 00:03:11,440
+Completamos, como en la diapositiva veintidós.
+
+56
+00:03:11,560 --> 00:03:16,635
+El producto del legítimo: 0.80 por nueve sobre ochenta y dos, por
+
+57
+00:03:16,635 --> 00:03:21,320
+sesenta y cinco sobre ochenta y dos: aproximadamente 0.0696.
+
+58
+00:03:21,440 --> 00:03:26,023
+El del spam: 0.20 por diecisiete sobre veintidós, por
+
+59
+00:03:26,023 --> 00:03:30,000
+siete sobre veintidós: aproximadamente 0.0492.
+
+60
+00:03:30,120 --> 00:03:35,820
+Normalizando: la probabilidad de spam queda en aproximadamente 0.4140.
+
+61
+00:03:35,940 --> 00:03:38,293
+El resultado se calcula con las fracciones
+
+62
+00:03:38,293 --> 00:03:41,150
+completas, sin redondear los productos intermedios.
+
+63
+00:03:41,270 --> 00:03:45,490
+Pasamos de 0.4286 a 0.4140.
+
+64
+00:03:45,610 --> 00:03:49,701
+La diapositiva agrega una advertencia importante: el suavizado evita
+
+65
+00:03:49,701 --> 00:03:53,070
+los ceros, pero no corrige la dependencia entre señales.
+
+66
+00:03:53,190 --> 00:03:55,970
+Si oferta y enlace estuvieran repitiendo la misma
+
+67
+00:03:55,970 --> 00:03:58,410
+información, el suavizado no lo arreglaría.
+
+68
+00:03:58,530 --> 00:04:01,591
+La diapositiva veinticuatro repite esta cuenta en R y
+
+69
+00:04:01,591 --> 00:04:04,190
+en Python, y es el primer cálculo del script.
+
+70
+00:04:04,310 --> 00:04:08,050
+El producto del legítimo, el del spam, y la normalización.
+
+71
+00:04:08,170 --> 00:04:14,020
+En los dos lenguajes, la salida es la misma: aproximadamente 0.4140.
+
+72
+00:04:14,140 --> 00:04:16,820
+La diapositiva veinticinco ordena la salida.
+
+73
+00:04:16,940 --> 00:04:22,149
+Oferta entre los spam: sin suavizado, 0.8000; con alfa
+
+74
+00:04:22,149 --> 00:04:26,780
+igual a uno, diecisiete sobre veintidós, 0.7727.
+
+75
+00:04:26,900 --> 00:04:31,320
+Enlace entre los spam: 0.7000 sin suavizado, y
+
+76
+00:04:31,320 --> 00:04:35,740
+quince sobre veintidós, 0.6818, con suavizado.
+
+77
+00:04:35,860 --> 00:04:41,860
+Y la probabilidad de spam del correo: 0.4286 y 0.4140.
+
+78
+00:04:41,980 --> 00:04:44,576
+Las primeras filas describen señales dentro de
+
+79
+00:04:44,576 --> 00:04:46,890
+una clase; la última clasifica el correo.
+
+80
+00:04:47,010 --> 00:04:49,980
+Sobre este cambio, una precisión de la grabación.
+
+81
+00:04:50,100 --> 00:04:53,195
+Cerca del minuto setenta y cinco se dijo que, a modo
+
+82
+00:04:53,195 --> 00:04:56,410
+global, el resultado cambió casi en un uno por ciento.
+
+83
+00:04:56,530 --> 00:05:01,570
+La diferencia es 0.4286 menos 0.4140: 0.0146, es
+
+84
+00:05:01,570 --> 00:05:06,190
+decir, cerca de un punto y medio porcentual.
+
+85
+00:05:06,310 --> 00:05:10,040
+Un cambio pequeño, como se dijo, pero algo mayor que uno.
+
+86
+00:05:10,160 --> 00:05:12,916
+La diapositiva veintiséis muestra cómo el programa
+
+87
+00:05:12,916 --> 00:05:15,120
+aprende estas probabilidades de una vez.
+
+88
+00:05:15,240 --> 00:05:19,491
+Un vector con los correos por clase, ochenta y veinte; una matriz de
+
+89
+00:05:19,491 --> 00:05:23,430
+conteos, con filas legítimo y spam, y columnas oferta y enlace.
+
+90
+00:05:23,550 --> 00:05:26,424
+La probabilidad de presencia es conteos más alfa,
+
+91
+00:05:26,424 --> 00:05:29,180
+dividido por el total de la clase más dos alfa.
+
+92
+00:05:29,300 --> 00:05:33,410
+Para el spam sale diecisiete sobre veintidós y quince sobre veintidós.
+
+93
+00:05:33,530 --> 00:05:36,530
+Y para una ausencia se usa uno menos ese valor.
+
+94
+00:05:36,650 --> 00:05:38,230
+¿Cuándo importa el suavizado?
+
+95
+00:05:38,350 --> 00:05:41,220
+El profesor fue claro: sobre todo cuando hay pocos
+
+96
+00:05:41,220 --> 00:05:44,090
+datos, o señales muy raras que queremos conservar.
+
+97
+00:05:44,210 --> 00:05:48,490
+Con muchos datos y un alfa pequeño, las probabilidades casi no cambian.
+
+98
+00:05:48,610 --> 00:05:53,445
+En Spambase, un cálculo adicional lo confirma: la señal más rara entre los spam
+
+99
+00:05:53,445 --> 00:05:57,730
+aparece en un solo correo, y la más rara entre los legítimos, en ocho.
+
+100
+00:05:57,850 --> 00:05:59,310
+Ninguna queda en cero.
+
+101
+00:05:59,430 --> 00:06:05,720
+Por eso, en la parada nueve, alfa 0.5, uno y dos van a dar resultados casi iguales.
+
+102
+00:06:05,840 --> 00:06:07,190
+Errores típicos.
+
+103
+00:06:07,310 --> 00:06:10,090
+Uno: suavizar también las frecuencias de clase.
+
+104
+00:06:10,210 --> 00:06:13,250
+El suavizado va en las probabilidades de las señales.
+
+105
+00:06:13,370 --> 00:06:17,430
+Dos: creer que el suavizado arregla la dependencia entre señales.
+
+106
+00:06:17,550 --> 00:06:18,620
+No la arregla.
+
+107
+00:06:18,740 --> 00:06:21,520
+Y tres: confundir suavizar con decidir.
+
+108
+00:06:21,640 --> 00:06:25,128
+Alfa cambia el cálculo de la probabilidad; el umbral, que
+
+109
+00:06:25,128 --> 00:06:27,820
+veremos en la parada once, cambia la acción.
+
+110
+00:06:27,940 --> 00:06:29,160
+Piensa un segundo.
+
+111
+00:06:29,280 --> 00:06:32,670
+Una palabra no apareció en ninguno de los ochenta legítimos.
+
+112
+00:06:32,790 --> 00:06:37,350
+Con alfa igual a uno, ¿cuál es su probabilidad de presencia entre los legítimos?
+
+113
+00:06:38,070 --> 00:06:41,964
+Cero más uno, sobre ochenta más dos: uno sobre
+
+114
+00:06:41,964 --> 00:06:45,180
+ochenta y dos, aproximadamente 0.0122.
+
+115
+00:06:45,300 --> 00:06:48,949
+Más pequeña que el 0.0455 de los spam, porque hay más
+
+116
+00:06:48,949 --> 00:06:53,080
+legítimos: la evidencia de que es rara entre ellos es mayor.
+
+117
+00:06:53,200 --> 00:06:56,464
+Para llevarte: un conteo cero haría cero todo el producto
+
+118
+00:06:56,464 --> 00:06:59,040
+de una clase, aunque el evento sea solo raro.
+
+119
+00:06:59,160 --> 00:07:03,835
+Con el suavizado de Laplace, se suma alfa a presente y alfa a
+
+120
+00:07:03,835 --> 00:07:07,820
+ausente: con alfa uno, premio pasa de cero a 0.0455.
+
+121
+00:07:07,940 --> 00:07:14,320
+En el ejemplo, la probabilidad de spam pasa de 0.4286 a 0.4140.
+
+122
+00:07:14,440 --> 00:07:17,410
+Evita ceros, pero no corrige la dependencia.
+
+123
+00:07:17,530 --> 00:07:22,097
+Siguiente parada: separamos aprender de predecir, generalizamos a varias clases y
+
+124
+00:07:22,097 --> 00:07:26,100
+vemos por qué en la práctica se suman logaritmos en vez de multiplicar.

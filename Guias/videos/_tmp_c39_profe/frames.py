@@ -15,6 +15,10 @@ for n in range(1, 13):
     cand = [i for i, b in enumerate(g["beats"]) if any(a.get("tipo") in ("numero", "grafico") for a in b["acciones"])]
     cand = cand or list(range(1, len(g["beats"])))
     elegidos = sorted({cand[0], cand[len(cand) // 2], cand[-1]})
+    nb = len(g["beats"])
+    for extra in (nb // 4, nb // 2, 3 * nb // 4, nb - 2):     # C39: siempre 3 frames por video
+        if len(elegidos) < 3 and extra not in elegidos:
+            elegidos = sorted(set(elegidos) | {extra})
     bt = json.loads((AQUI / f"{n:02}" / "informe.json").read_text(encoding="utf-8"))["beats_t"]
     for b in elegidos:
         t = round(bt[b][1] - 0.4, 2)

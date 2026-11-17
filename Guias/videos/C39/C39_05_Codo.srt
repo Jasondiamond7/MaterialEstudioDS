@@ -1,0 +1,347 @@
+1
+00:00:00,250 --> 00:00:02,390
+Quinta parada: cuántos grupos.
+
+2
+00:00:02,510 --> 00:00:05,930
+El primer criterio es el más visual de todos: el codo.
+
+3
+00:00:06,050 --> 00:00:09,486
+Si K-means minimiza el WSS, ¿por qué no elegimos
+
+4
+00:00:09,486 --> 00:00:12,350
+el número de grupos que da el menor WSS?
+
+5
+00:00:12,470 --> 00:00:15,830
+Porque el WSS siempre baja cuando agregas grupos.
+
+6
+00:00:15,950 --> 00:00:20,105
+En el extremo, con un grupo por cada vino, cada vino es su
+
+7
+00:00:20,105 --> 00:00:23,400
+propio centro, y el WSS vale exactamente cero.
+
+8
+00:00:23,520 --> 00:00:27,300
+Cero error, y ninguna información: eso no es agrupar.
+
+9
+00:00:27,420 --> 00:00:30,990
+El costo de ajuste necesita un criterio adicional para elegir k.
+
+10
+00:00:31,110 --> 00:00:32,280
+Una analogía.
+
+11
+00:00:32,400 --> 00:00:34,800
+Un restaurante lleno contrata meseros.
+
+12
+00:00:34,920 --> 00:00:38,680
+El primero cambia todo: de nadie atendiendo a alguien atendiendo.
+
+13
+00:00:38,800 --> 00:00:40,620
+El segundo también ayuda mucho.
+
+14
+00:00:40,740 --> 00:00:42,500
+El tercero, bastante.
+
+15
+00:00:42,620 --> 00:00:45,200
+Pero el décimo mesero casi no reduce la espera.
+
+16
+00:00:45,320 --> 00:00:48,000
+Hay un punto en que agregar uno más ya no compensa.
+
+17
+00:00:48,120 --> 00:00:51,860
+El método del codo busca ese punto en la curva del WSS.
+
+18
+00:00:51,980 --> 00:00:55,100
+La diapositiva dieciocho lista los criterios de la clase.
+
+19
+00:00:55,220 --> 00:01:00,170
+El codo: buscar dónde la disminución del WSS se vuelve cada vez menor.
+
+20
+00:01:00,290 --> 00:01:05,070
+La silueta: comparar la cercanía al propio grupo con la cercanía al grupo vecino.
+
+21
+00:01:05,190 --> 00:01:09,590
+El Gap: contrastar la compacidad con una referencia simulada sin grupos.
+
+22
+00:01:09,710 --> 00:01:13,560
+Y siempre, revisar tamaños, estabilidad e interpretación.
+
+23
+00:01:13,680 --> 00:01:16,020
+Ningún número reemplaza esa revisión.
+
+24
+00:01:16,140 --> 00:01:20,280
+Este es el codo de los vinos, recalculado con el script de Python.
+
+25
+00:01:20,400 --> 00:01:26,040
+Con un grupo, el WSS es igual al TSS: 2288.
+
+26
+00:01:26,160 --> 00:01:29,790
+Con dos grupos baja a 1643.90.
+
+27
+00:01:29,910 --> 00:01:33,310
+Con tres, a 1267.37.
+
+28
+00:01:33,430 --> 00:01:40,202
+Y desde ahí la curva sigue bajando, pero mucho más despacio: 1164.91
+
+29
+00:01:40,202 --> 00:01:45,480
+con cuatro, 1092.18 con cinco, hasta 931.19 con ocho.
+
+30
+00:01:45,600 --> 00:01:50,330
+Para ver el codo con números, miremos cuánto baja el WSS en cada paso.
+
+31
+00:01:50,450 --> 00:01:54,320
+De uno a dos grupos, baja 644.1.
+
+32
+00:01:54,440 --> 00:01:57,630
+De dos a tres, 376.5.
+
+33
+00:01:57,750 --> 00:02:00,690
+De tres a cuatro, solo 102.5.
+
+34
+00:02:00,810 --> 00:02:07,900
+Y después, 72.7, 58.8, 62.9 y 39.2.
+
+35
+00:02:08,020 --> 00:02:13,490
+El quiebre está en tres: hasta ahí, cada grupo nuevo aporta mucho; después, poco.
+
+36
+00:02:13,610 --> 00:02:17,386
+Por eso la diapositiva dice que k igual a tres es un candidato
+
+37
+00:02:17,386 --> 00:02:20,370
+interpretable, aunque la curva siga disminuyendo.
+
+38
+00:02:20,490 --> 00:02:22,940
+Dos advertencias de la misma diapositiva.
+
+39
+00:02:23,060 --> 00:02:26,554
+El codo no es una prueba formal: es una lectura visual, y dos
+
+40
+00:02:26,554 --> 00:02:29,360
+personas pueden ver el codo en lugares distintos.
+
+41
+00:02:29,480 --> 00:02:31,700
+Y no garantiza un único candidato.
+
+42
+00:02:31,820 --> 00:02:35,280
+Aquí, por ejemplo, también se podría defender cuatro.
+
+43
+00:02:35,400 --> 00:02:40,380
+Por eso no se usa solo: se contrasta con la silueta y con el Gap, que veremos ahora.
+
+44
+00:02:40,500 --> 00:02:43,460
+El código de Python de la diapositiva veintiséis.
+
+45
+00:02:43,580 --> 00:02:45,720
+Un ciclo for recorre los valores de k.
+
+46
+00:02:45,840 --> 00:02:51,405
+En cada vuelta se ajusta K-means con cincuenta inicios, un máximo de cien iteraciones, la
+
+47
+00:02:51,405 --> 00:02:55,970
+semilla 2026 y el algoritmo de Lloyd, el clásico de asignar y actualizar.
+
+48
+00:02:56,090 --> 00:03:01,240
+Se guarda el modelo, y su atributo inertia, que es justamente el WSS.
+
+49
+00:03:01,360 --> 00:03:04,650
+El mismo ciclo en R, de la diapositiva veinticinco.
+
+50
+00:03:04,770 --> 00:03:09,743
+La función kmeans recibe los datos estandarizados, el número de centros, cincuenta
+
+51
+00:03:09,743 --> 00:03:14,230
+inicios con nstart, cien iteraciones como máximo, y el algoritmo de Lloyd.
+
+52
+00:03:14,350 --> 00:03:17,760
+En cada vuelta se guarda el WSS total del ajuste.
+
+53
+00:03:17,880 --> 00:03:22,930
+Y la semilla se fija una sola vez, al comienzo, con el valor 2026.
+
+54
+00:03:23,050 --> 00:03:26,149
+Mismo procedimiento, distinto lenguaje: por eso
+
+55
+00:03:26,149 --> 00:03:28,720
+R y Python llegan a la misma partición.
+
+56
+00:03:28,840 --> 00:03:31,420
+Otra forma de leer el codo es en porcentaje.
+
+57
+00:03:31,540 --> 00:03:37,000
+Con dos grupos, el WSS es un 28.2 por ciento menor que el TSS.
+
+58
+00:03:37,120 --> 00:03:40,430
+Con tres, un 44.6 por ciento menor.
+
+59
+00:03:40,550 --> 00:03:47,000
+Con cuatro, apenas sube a 49.1, y con ocho grupos llega solo a 59.3.
+
+60
+00:03:47,120 --> 00:03:50,621
+Es decir: el tercer grupo agrega más de dieciséis puntos
+
+61
+00:03:50,621 --> 00:03:54,810
+porcentuales; los cinco grupos siguientes, juntos, menos de quince.
+
+62
+00:03:54,930 --> 00:03:57,440
+Un detalle de Python que vale la pena fijar.
+
+63
+00:03:57,560 --> 00:04:00,925
+En la grabación, al mostrar este código, se dijo que el
+
+64
+00:04:00,925 --> 00:04:03,800
+ciclo va a variar de uno hasta nueve clústeres.
+
+65
+00:04:03,920 --> 00:04:07,568
+Pero range de uno a nueve se detiene antes del nueve:
+
+66
+00:04:07,568 --> 00:04:10,390
+entrega uno, dos, tres, y así hasta ocho.
+
+67
+00:04:10,510 --> 00:04:14,580
+Son ocho valores de k, igual que el uno a ocho del script de R.
+
+68
+00:04:14,700 --> 00:04:18,580
+Por eso la tabla y el gráfico llegan hasta k igual a ocho.
+
+69
+00:04:18,700 --> 00:04:23,490
+El error típico: elegir k mirando solo el valor más bajo del WSS.
+
+70
+00:04:23,610 --> 00:04:26,755
+Siempre ganará el k más grande que hayas probado:
+
+71
+00:04:26,755 --> 00:04:29,580
+con ocho probados, ocho; con veinte, veinte.
+
+72
+00:04:29,700 --> 00:04:32,481
+El WSS se usa para comparar ganancias entre
+
+73
+00:04:32,481 --> 00:04:35,520
+valores de k vecinos, no para elegir su mínimo.
+
+74
+00:04:35,640 --> 00:04:36,860
+Piensa un segundo.
+
+75
+00:04:36,980 --> 00:04:41,139
+Un análisis entrega estos WSS para k de uno a cinco: cien,
+
+76
+00:04:41,139 --> 00:04:44,940
+sesenta, treinta y cinco, treinta y uno y veintiocho.
+
+77
+00:04:45,060 --> 00:04:46,220
+¿Dónde está el codo?
+
+78
+00:04:46,940 --> 00:04:51,190
+Las bajadas son: cuarenta, veinticinco, cuatro y tres.
+
+79
+00:04:51,310 --> 00:04:56,940
+Hasta k igual a tres cada grupo aporta mucho; el cuarto grupo apenas reduce cuatro.
+
+80
+00:04:57,060 --> 00:04:59,810
+El codo está en k igual a tres.
+
+81
+00:04:59,930 --> 00:05:03,070
+Para llevarte: el WSS siempre baja al agregar
+
+82
+00:05:03,070 --> 00:05:06,000
+grupos, y con un grupo por fila vale cero.
+
+83
+00:05:06,120 --> 00:05:08,705
+El codo busca el punto donde la ganancia se
+
+84
+00:05:08,705 --> 00:05:11,410
+vuelve pequeña; en los vinos, k igual a tres.
+
+85
+00:05:11,530 --> 00:05:16,320
+Es una lectura visual, no una prueba: hay que contrastarla con otros criterios.
+
+86
+00:05:16,440 --> 00:05:19,732
+Siguiente parada: la silueta, que mide si cada vino está
+
+87
+00:05:19,732 --> 00:05:22,260
+más cerca de su grupo que del grupo vecino.

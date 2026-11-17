@@ -1,0 +1,391 @@
+1
+00:00:00,250 --> 00:00:04,220
+Bienvenidos a la clase treinta y nueve: clustering, o agrupamiento.
+
+2
+00:00:04,340 --> 00:00:08,240
+Vamos a aprender a encontrar grupos en datos que no traen ninguna etiqueta.
+
+3
+00:00:08,360 --> 00:00:10,340
+Imagina que trabajas en un banco.
+
+4
+00:00:10,460 --> 00:00:13,417
+Quieres ofrecer inversiones de riesgo bajo, medio
+
+5
+00:00:13,417 --> 00:00:15,830
+o alto, según el perfil de cada cliente.
+
+6
+00:00:15,950 --> 00:00:18,813
+Pero no puedes llamar a cada persona y preguntarle:
+
+7
+00:00:18,813 --> 00:00:21,170
+¿usted es de riesgo bajo o de riesgo alto?
+
+8
+00:00:21,290 --> 00:00:22,860
+Muchas ni siquiera lo saben.
+
+9
+00:00:22,980 --> 00:00:27,970
+Lo que sí tienes son datos: cuánto ahorran, cuánto gastan, qué productos usan.
+
+10
+00:00:28,090 --> 00:00:32,810
+La pregunta de esta clase es: ¿podemos construir esos grupos solo con los datos?
+
+11
+00:00:32,930 --> 00:00:34,100
+Una analogía.
+
+12
+00:00:34,220 --> 00:00:37,220
+Te entregan una caja con cientos de botones mezclados y
+
+13
+00:00:37,220 --> 00:00:39,620
+te piden que los ordenes, sin instrucciones.
+
+14
+00:00:39,740 --> 00:00:41,450
+Podrías separarlos por color.
+
+15
+00:00:41,570 --> 00:00:42,490
+O por tamaño.
+
+16
+00:00:42,610 --> 00:00:44,280
+O por número de agujeros.
+
+17
+00:00:44,400 --> 00:00:47,317
+Las tres respuestas son razonables, y ninguna es la
+
+18
+00:00:47,317 --> 00:00:50,120
+correcta: depende de para qué quieres los grupos.
+
+19
+00:00:50,240 --> 00:00:52,400
+Eso es exactamente el clustering.
+
+20
+00:00:52,520 --> 00:00:54,730
+Pongamos esto junto a lo que ya sabes.
+
+21
+00:00:54,850 --> 00:00:58,881
+En clasificación supervisada, como la regresión logística, SVM o
+
+22
+00:00:58,881 --> 00:01:03,101
+Naive Bayes, observamos las variables y también una clase conocida,
+
+23
+00:01:03,101 --> 00:01:06,250
+y aprendemos a predecir esa clase en casos nuevos.
+
+24
+00:01:06,370 --> 00:01:08,950
+En clustering solo observamos las variables.
+
+25
+00:01:09,070 --> 00:01:12,852
+No hay respuesta que predecir: buscamos una partición, y describimos
+
+26
+00:01:12,852 --> 00:01:15,800
+en qué se parecen y en qué se diferencian los grupos.
+
+27
+00:01:15,920 --> 00:01:19,950
+Por eso, la etiqueta de un clúster se construye a partir de los datos.
+
+28
+00:01:20,070 --> 00:01:22,770
+Y una advertencia que la diapositiva dos subraya.
+
+29
+00:01:22,890 --> 00:01:27,230
+El grupo uno no significa positivo, ni mejor, ni de mayor riesgo.
+
+30
+00:01:27,350 --> 00:01:28,460
+Es solo un nombre.
+
+31
+00:01:28,580 --> 00:01:32,480
+Si mañana el algoritmo numera distinto, el grupo uno puede pasar a
+
+32
+00:01:32,480 --> 00:01:35,790
+llamarse grupo tres, y nada habrá cambiado en los datos.
+
+33
+00:01:35,910 --> 00:01:37,650
+¿Qué entrega un agrupamiento?
+
+34
+00:01:37,770 --> 00:01:41,450
+Miremos un ejemplo simulado, como el de la diapositiva tres.
+
+35
+00:01:41,570 --> 00:01:46,770
+Noventa observaciones en dos variables, sin ninguna etiqueta: todas del mismo color.
+
+36
+00:01:46,890 --> 00:01:51,670
+K-means las reparte en tres grupos, y marca con una cruz el centro de cada uno.
+
+37
+00:01:51,790 --> 00:01:55,450
+Al final obtenemos dos cosas: una etiqueta por observación, y
+
+38
+00:01:55,450 --> 00:01:58,270
+un perfil de cada grupo, que aquí es su centro.
+
+39
+00:01:58,390 --> 00:02:00,440
+¿Por qué no basta con mirar el gráfico?
+
+40
+00:02:00,560 --> 00:02:04,440
+Porque aquí hay solo dos variables, y los grupos se separan solos.
+
+41
+00:02:04,560 --> 00:02:07,414
+En la práctica tendrás diez, trece o cincuenta
+
+42
+00:02:07,414 --> 00:02:10,020
+variables, y los grupos estarán mezclados.
+
+43
+00:02:10,140 --> 00:02:13,833
+Ahí nadie puede ver los grupos a ojo: necesitamos una regla para
+
+44
+00:02:13,833 --> 00:02:17,700
+encontrar los centros, y otra para decidir cuántos grupos proponer.
+
+45
+00:02:17,820 --> 00:02:20,380
+Esas son las dos dificultades de esta clase.
+
+46
+00:02:20,500 --> 00:02:23,924
+Antes de agrupar hay una decisión que ningún algoritmo toma por
+
+47
+00:02:23,924 --> 00:02:26,750
+ti: qué significa que dos observaciones se parezcan.
+
+48
+00:02:26,870 --> 00:02:31,870
+En clientes, podrías usar la frecuencia de compra, el gasto o el canal preferido.
+
+49
+00:02:31,990 --> 00:02:36,060
+En vinos, sus mediciones químicas, sin ninguna nota de calidad.
+
+50
+00:02:36,180 --> 00:02:39,310
+En documentos, alguna representación de su contenido.
+
+51
+00:02:39,430 --> 00:02:42,120
+Cambia las variables, y cambian los grupos.
+
+52
+00:02:42,240 --> 00:02:45,065
+Y ojo con esto: un grupo muy compacto puede ser
+
+53
+00:02:45,065 --> 00:02:47,530
+poco útil para el propósito del análisis.
+
+54
+00:02:47,650 --> 00:02:49,980
+Que los puntos queden juntos no garantiza que
+
+55
+00:02:49,980 --> 00:02:52,000
+el grupo sirva para tomar una decisión.
+
+56
+00:02:52,120 --> 00:02:53,460
+¿Dónde se usa esto?
+
+57
+00:02:53,580 --> 00:02:55,700
+El profesor contó varios casos.
+
+58
+00:02:55,820 --> 00:03:00,590
+Segmentar clientes, para ofrecer productos o publicidad distinta a cada grupo.
+
+59
+00:03:00,710 --> 00:03:05,097
+Tractores del mismo modelo, donde algunos fallan cuatro o cinco veces más que
+
+60
+00:03:05,097 --> 00:03:08,630
+otros: se agrupan, y después se investiga qué tienen en común.
+
+61
+00:03:08,750 --> 00:03:12,286
+O edificios en construcción que se comportan distinto porque están
+
+62
+00:03:12,286 --> 00:03:15,340
+cerca del metro, una variable que nadie había registrado.
+
+63
+00:03:15,460 --> 00:03:18,294
+El patrón es el mismo: primero se encuentran los
+
+64
+00:03:18,294 --> 00:03:20,950
+grupos, y después se explica por qué existen.
+
+65
+00:03:21,070 --> 00:03:25,620
+La clase presenta tres métodos, y la elección depende del tipo de variables.
+
+66
+00:03:25,740 --> 00:03:28,717
+K-means, para variables numéricas: cada grupo se
+
+67
+00:03:28,717 --> 00:03:31,260
+representa por la media de cada variable.
+
+68
+00:03:31,380 --> 00:03:34,786
+K-modes, para variables categóricas: se representa
+
+69
+00:03:34,786 --> 00:03:37,510
+por la moda, la categoría más frecuente.
+
+70
+00:03:37,630 --> 00:03:40,807
+Y K-prototypes, para variables mixtas: medias para
+
+71
+00:03:40,807 --> 00:03:43,540
+las numéricas y modas para las categóricas.
+
+72
+00:03:43,660 --> 00:03:46,524
+Los tres tienen algo en común: hay que fijar el
+
+73
+00:03:46,524 --> 00:03:48,840
+número de grupos, k, antes de ajustar.
+
+74
+00:03:48,960 --> 00:03:52,064
+Y el costo que minimizan depende de cómo representamos los
+
+75
+00:03:52,064 --> 00:03:54,740
+datos y de cómo medimos la diferencia entre ellos.
+
+76
+00:03:54,860 --> 00:03:57,740
+Elegir k será uno de los grandes temas de la clase.
+
+77
+00:03:57,860 --> 00:04:00,842
+El error típico al empezar: leer el número del grupo
+
+78
+00:04:00,842 --> 00:04:03,250
+como si fuera un orden o una calificación.
+
+79
+00:04:03,370 --> 00:04:07,360
+Decir, por ejemplo, el grupo uno son los mejores clientes.
+
+80
+00:04:07,480 --> 00:04:10,540
+El número lo pone el algoritmo, y es arbitrario.
+
+81
+00:04:10,660 --> 00:04:14,330
+El significado de un grupo hay que construirlo después,
+
+82
+00:04:14,330 --> 00:04:17,800
+mirando su perfil: sus medias, sus modas, su tamaño.
+
+83
+00:04:17,920 --> 00:04:19,140
+Piensa un segundo.
+
+84
+00:04:19,260 --> 00:04:23,216
+Una tienda quiere agrupar a sus clientes usando el gasto mensual,
+
+85
+00:04:23,216 --> 00:04:26,380
+en pesos, y el canal preferido: app, web o sucursal.
+
+86
+00:04:26,500 --> 00:04:28,480
+¿Cuál de los tres métodos usarías?
+
+87
+00:04:29,200 --> 00:04:30,360
+K-prototypes.
+
+88
+00:04:30,480 --> 00:04:34,900
+El gasto es numérico y el canal es categórico: son variables mixtas.
+
+89
+00:04:35,020 --> 00:04:37,586
+Con K-means tendrías que convertir el canal en
+
+90
+00:04:37,586 --> 00:04:40,320
+números, y eso inventa distancias que no existen.
+
+91
+00:04:40,440 --> 00:04:45,360
+Con K-modes tendrías que cortar el gasto en categorías, y perderías información.
+
+92
+00:04:45,480 --> 00:04:48,440
+Para llevarte: el clustering busca grupos sin una
+
+93
+00:04:48,440 --> 00:04:51,520
+respuesta observada; la etiqueta sale de los datos.
+
+94
+00:04:51,640 --> 00:04:55,270
+Qué significa parecerse depende de las variables y del propósito.
+
+95
+00:04:55,390 --> 00:04:59,822
+Y el método se elige según el tipo de variables: K-means, K-modes o
+
+96
+00:04:59,822 --> 00:05:03,990
+K-prototypes, todos con un número de grupos fijado de antemano.
+
+97
+00:05:04,110 --> 00:05:08,236
+Siguiente parada: los datos de la clase, ciento setenta y siete vinos, y
+
+98
+00:05:08,236 --> 00:05:11,560
+por qué hay que estandarizarlos antes de medir distancias.

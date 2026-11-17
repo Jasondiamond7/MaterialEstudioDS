@@ -200,6 +200,15 @@ def main():
            (["a", "u", "ce"], ["a", "u", "ce"]), (["ap"], ["a", "pe"]), (["mpa"], ["megapascales"]),
            (["rms", "e"], ["erre", "eme", "ese", "e"]), (["rms"], ["erre", "eme", "ese"]), (["rmse"], ["erre", "eme", "ese", "e"]),
            (["mega", "pascal"], ["megapascal"]), (["mega", "pascales"], ["megapascales"]), (["r", "dos"], ["erre", "cuadrado"])]
+    # C39: el mismo sonido escrito de otra forma por Whisper (palabras unidas, mayusculas; se listan en el informe)
+    eq += [(["kmeans"], ["kei", "mins"]), (["kmodes"], ["k", "modes"]), (["kprototypes"], ["kei", "prototaips"]),
+           (["dbscan"], ["di", "bi", "scan"]), (["vss"], ["bss"]), (["ddof"], ["ddof"]),
+           (["kemins"], ["kei", "mins"]), (["keymins"], ["kei", "mins"]), (["keyminz"], ["kei", "mins"]), (["kmins"], ["kei", "mins"]),
+           (["scal"], ["scale"]), (["clusters"], ["clusteres"]),
+           (["caymins"], ["kei", "mins"]), (["keymin"], ["kei", "mins"]), (["kemin"], ["kei", "mins"]), (["kmin"], ["kei", "mins"]),
+           (["k", "mods"], ["k", "modes"]), (["kmods"], ["k", "modes"]), (["kmos"], ["k", "modes"]),
+           (["k", "mins"], ["kei", "mins"]), (["k", "min"], ["kei", "mins"]), (["k", "mims"], ["kei", "mins"]), (["k", "minx"], ["kei", "mins"])]
+    eq.sort(key=lambda e: -len(e[0]))      # C39: las secuencias largas primero (k mins antes que k)
     ref_words, ref_frase = [], []
     for k, fr in enumerate(voz["frases"]):
         ws = canon([w for w in (norm(x) for x in tokens(fr["voz"])) if w], eq)
@@ -222,6 +231,7 @@ def main():
         cache.write_text(hyp_raw, encoding="utf-8")
 
     # expandir cifras de la hipotesis con la lectura que aparece en la referencia
+    hyp_raw = re.sub(r"(?<![\d.,])0 (\d{3})(?![\d])", r"0,\1", hyp_raw)     # C39: Whisper escribe «0 625» por 0,625 (mismo sonido)
     hyp_words = []
     for tk in tokens(hyp_raw):
         if re.search(r"\d", tk):
@@ -243,6 +253,13 @@ def main():
         elif op in ("sub", "del"):
             malas.setdefault(ref_words[i], []).append(hyp_words[j] if j is not None else "∅")
     # recuperacion por termino
+    # C39: contexto de cada error (ventana de la referencia) para decidir respellings
+    ctx = []
+    for op, i, j in ops:
+        if op in ("sub", "del") and i is not None:
+            ctx.append([op, " ".join(ref_words[max(0, i - 4):i + 4]), hyp_words[j] if j is not None else "-"])
+        elif op == "ins":
+            ctx.append([op, "", hyp_words[j]])
     terminos = {}
     for k, fr in enumerate(voz["frases"]):
         idx = [i for i, f in enumerate(ref_frase) if f == k]
@@ -271,7 +288,7 @@ def main():
                errores=dist, wer=round(dist / max(1, len(ref_words)), 4),
                decimales_N_NNN=voz.get("decimales_leidos_como_miles", 0),
                no_recuperadas=sorted(((w, len(v), sorted(set(v))[:4]) for w, v in malas.items()), key=lambda x: -x[1]),
-               terminos=terminos)
+               terminos=terminos, contexto=ctx)
     (AQUI / "whisper" / f"res_{MODO}_{N:02}.json").write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"[{MODO} {N:02}] WER {res['wer'] * 100:.2f} %  ({dist}/{len(ref_words)})  modelo {MODELO}")
     for term, e in sorted(terminos.items()):

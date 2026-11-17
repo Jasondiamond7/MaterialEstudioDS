@@ -1,0 +1,356 @@
+ Clase 40 · Naive Bayes y clasificación probabilística
+
+ Profesor Eloy Alvarado · usa Bayes (Clase 23), retoma OOF, log loss, calibración y umbral por costo (Clase 38) y
+ prepara el Taller 3 (pregunta 2)
+
+La gran idea de la clase
+Un clasificador probabilístico entrega una probabilidad, no solo una etiqueta, y predecir no es decidir:
+primero se construye P(clase | señales) y después un umbral, elegido con los costos de cada error, convierte esa
+probabilidad en una acción. Naive Bayes usa el teorema de Bayes y supone que, dentro de cada clase, las señales
+son independientes: así multiplica un factor por señal (o suma logaritmos) en vez de estimar toda la tabla
+conjunta. Hay que suavizar para evitar ceros, comprobar con predicciones fuera de pliegue y mirar la
+calibración: ordena bien, pero con señales dependientes sus probabilidades salen demasiado seguras.
+
+La clase en una imagen
+
+Lo que necesitas ANTES                                        Ruta de la clase y datos
+
+• Bayes y priors (Clase 23): P(A | B) = P(B | A) P(A) / P(B)  • Ejemplo de 100 correos → independencia y suavizado
+• Regresión logística y clasificadores (Clases 31 y 37):          → 54 señales reales → variantes (Bernoulli, gaussiana,
+                                                                  multinomial) → OOF y calibración → umbral por costo
+    probabilidad de la clase 1 y umbral
+• OOF, log loss, Brier, calibración y umbral por costo        • spam_s40.csv: 4 601 correos de Spambase y 54
+                                                                  frecuencias (48 palabras y 6 caracteres); 3 680 de
+    (Clase 38), con los mismos correos de spam                    desarrollo en 5 pliegues y 921 de prueba histórica. Es el
+• R ↔ Python: el profesor trae el mismo flujo en los dos          mismo spam de la Clase 38
+
+    lenguajes                                                 • Pregunta guía: ¿qué probabilidad de spam tiene este
+                                                                  correo y conviene bloquearlo?
+
+Puentes con otras clases (sin repetirlas)
+C23 → C40: allí el prior y la verosimilitud actualizaban un parámetro; hoy actualizan la clase de un correo. C37 → C40: la
+regresión logística es el clasificador de referencia; con los mismos 57 predictores de la Clase 38 da log loss 0.275, frente a 0.556
+de Naive Bayes Bernoulli, con AUC parecido (0.958 y 0.952). C38 → C40: OOF, log loss, Brier, curva de calibración y umbral con
+costo FP = 5 y FN = 1 se aplican igual; aquí se agrega la lectura de por qué las probabilidades salen extremas. Taller 3,
+pregunta 2: esta clase respalda el Naive Bayes del taller y su análisis (independencia condicional, variables 0/1, AUC frente a
+log loss); aquí solo hay ejemplos con spam, no con los datos del taller.
+
+Recuadro: ¿una probabilidad alta es certeza?
+No. En el correo ID 1 el modelo da 99.64 % de spam, pero entre los 1 157 correos con probabilidad ≥ 0.9 la predicción media
+es 99.4 % y la fracción real de spam es 92.1 %. Una probabilidad alta expresa una preferencia del modelo; su fiabilidad se
+comprueba con la calibración (diapositiva 58).
+
+Clase 40 · Naive Bayes                                                                                                                1
+ Clase 40 · Bayes para clasificar: previa, condicional y posterior
+
+ Fuente: transcripción + diapositivas DipDS_2026_S40.pdf + 40_naive_bayes.py / .R del profesor Eloy Alvarado +
+ spam_s40.csv
+
+Hay tres preguntas distintas: la previa (¿qué fracción de los correos es spam?), la
+condicional (entre los spam, ¿qué fracción trae «oferta»?) y la posterior (entre los
+correos con «oferta», ¿qué fracción es spam?). Bayes pasa de la segunda a la tercera.
+
+Conceptos clave
+
+1 La tabla de 100 correos. 80 legítimos y 20 spam; «oferta» aparece en 8 legítimos y en 16 spam. P(oferta |
+        spam) = 16/20 = 0.80 (se mira la fila), pero P(spam | oferta) = 16/24 = 0.667 (se mira la columna).
+
+2 Normalizar. Producto de cada clase: legítimo 0.80 × 0.10 = 0.08; spam 0.20 × 0.80 = 0.16. Se divide por la
+        suma (0.24): 0.6667. Los dos resultados suman 1.
+
+3 La prevalencia importa. Con las mismas condicionales, si el spam fuera 2 % en vez de 20 %, P(spam | oferta)
+        baja a 0.1404. La palabra ayuda, pero no decide por sí sola.
+
+Izquierda: la posterior de «oferta» según la previa (diapositiva 10). Centro: las tres preguntas. Derecha: con «enlace» se agrega
+información: solo oferta 0.6667, oferta sin enlace 0.4286 y oferta con enlace 0.8750.
+
+Fórmulas y reglas                                  Con los números de la clase
+
+P(spam | x) = π₁ f₁(x) / [π₀ f₀(x) + π₁ f₁(x)]     • Con oferta presente y enlace ausente: s0 = 0.80 × 0.10 ×
+π_k: frecuencia de la clase k (previa)                 0.80 = 0.064 y s1 = 0.20 × 0.80 × 0.30 = 0.048 → 0.4286
+                                                       (diap. 17)
+
+f_k(x): probabilidad de las señales en la clase k  • Con oferta y enlace presentes: 0.112 y 0.016 → 0.8750
+con K clases: se suman K productos abajo               (diap. 18)
+
+s1 = 0.20 * 0.80                                   • Con umbral 0.5, solo «oferta» y «oferta con enlace» se
+s0 = 0.80 * 0.10                                       clasificarían como spam
+p = s1 / (s0 + s1) # 0.6667
+                                                   • Cuidado. Confundir P(oferta | spam) con P(spam | oferta)
+                                                       es el error clásico: el 80 % de los spam trae «oferta», pero
+                                                       solo dos tercios de los correos con «oferta» son spam.
+
+Clase 40 · Naive Bayes                                                                                                             2
+ Clase 40 · Independencia condicional y el costo de ignorarla
+
+ Fuente: transcripción + diapositivas DipDS_2026_S40.pdf + 40_naive_bayes.py / .R del profesor Eloy Alvarado +
+ spam_s40.csv
+
+No se puede contar todas las combinaciones de señales: con d señales hay 2^d
+patrones por clase. Naive Bayes supone independencia dentro de cada clase y
+multiplica un factor por señal. Es un supuesto, no un hecho: si falla, el modelo cuenta
+dos veces la misma evidencia.
+
+Conceptos clave
+
+1 Por qué «naive». Con 10 señales hay 1 024 patrones por clase y con 54 hay 2^54: muchos no aparecerían
+        nunca en los datos. Con independencia bastan d probabilidades por clase.
+
+2 El supuesto. P(oferta, sin enlace | spam) = P(oferta | spam) × P(sin enlace | spam) = 0.80 × 0.30 = 0.24. Nada
+        garantiza que se cumpla: se asume y se comprueba con los resultados.
+
+3 Duplicar una señal. Si una señal (80 % en spam y 20 % en legítimos) se copia, la probabilidad sube de 0.80 a
+        0.9412 con 2 copias y a 0.9961 con 4, sin información nueva.
+
+Izquierda: parámetros por clase con y sin independencia. Centro: los productos s0 y s1 de la diapositiva 17 y los de la 22 con
+suavizado. Derecha: las cuatro combinaciones de oferta y enlace.
+
+Izquierda: el experimento controlado (diapositivas 46 y 47). Derecha: con los correos reales, repetir las 54 señales 1, 2, 4 y 8 veces
+lleva el log loss OOF de 0.557 a 2.766 mientras el AUC se mantiene en 0.951.
+
+Fórmulas y reglas                                         Con los números de la clase
+
+f_k(x) = Π_j f_jk(x_j)                                    • Con las 54 señales el 81 % de las probabilidades OOF
+P(C_k | x) = π_k Π_j f_jk(x_j) / (suma sobre las clases)      queda fuera de (0.01, 0.99); con 4 repeticiones, el 96 %
+d factores en lugar de 2^d patrones
+copias: el factor se repite y la certeza sube             • El orden no cambia (AUC 0.951 → 0.951) pero el log loss se
+                                                              multiplica por 3.4
+
+                                                          • En la regresión, dos predictores idénticos no «suman»
+                                                              información; en Naive Bayes sí aumentan la certeza
+
+# duplicar columnas                                       • Cuidado. Duplicar una señal no mejora el modelo: lo hace
+Xdup = np.hstack([Xb, Xb])                                    más seguro de sí mismo. No es lo mismo que el
+BernoulliNB(alpha=1).fit(Xdup, y)                             sobreajuste (ajustar el ruido); es sobreconfianza por
+                                                              dependencia.
+
+Clase 40 · Naive Bayes                                                                                                                  3
+ Clase 40 · Bernoulli sobre correos reales y suavizado de Laplace
+
+ Fuente: transcripción + diapositivas DipDS_2026_S40.pdf + 40_naive_bayes.py / .R del profesor Eloy Alvarado +
+ spam_s40.csv
+
+En la variante Bernoulli cada una de las 54 frecuencias se convierte en presente (1) o
+ausente (0); se aprende, por clase, la probabilidad de presencia, y se combinan
+presencias y ausencias. El suavizado de Laplace suma α a presente y a ausente para que
+ningún conteo cero anule el producto.
+
+Conceptos clave
+
+1 Aprender y predecir. Se cuentan correos por clase (legítimos 2 230, spam 1 450) y presencias por señal. Para
+        «address» presente: legítimo 226/2 230 ≈ 0.1017, spam 498/1 450 ≈ 0.3437 (con α = 1, diap. 49).
+
+2 Suavizado. θ̂ = (conteo + α)/(n + 2α). Una palabra («premio») con 0 de 20 pasa de 0 a 1/22 = 0.0455. En el
+        ejemplo de 100 correos, 0.4286 → 0.4140 (diap. 22).
+
+3 Con datos reales. El log loss OOF es casi igual para α entre 0 y 2 (0.5554 con α ≈ 0; 0.5563 con 0.5; 0.5585
+        con 2): con 3 680 correos ninguna señal queda con cero casos. El profesor eligió α = 0.5.
+
+Izquierda: ocho de las 54 señales del correo ID 1 (diap. 50). Centro: las probabilidades OOF se concentran en 0 y 1 (81 % fuera de
+(0.01, 0.99)). Derecha: probabilidad de presencia por clase de las 54 señales.
+
+Izquierda: cómo cambia θ̂ con α. Centro: la posterior del ejemplo de 100 correos. Derecha: el log loss OOF con 3 680 correos según α.
+
+Fórmulas y reglas                             Con los números de la clase
+
+θ̂_jk = (c_jk + α)/(n_k + 2α)                 • Correo ID 1: previa de spam 0.3940; suma de aportes 6.065
+presente: θ̂; ausente: 1 − θ̂                     en log-odds; P(spam) = 0.9964
+α = 1 es el suavizado clásico; puede ser 0.5
+el suavizado no corrige la dependencia        • Entre las 54 señales, 34 empujan hacia spam y 20 hacia
+                                                  legítimo para ese correo
+
+                                              • En el ejemplo de la diapositiva 25: oferta entre spam 17/22
+                                                  = 0.7727 y enlace 15/22 = 0.6818
+
+m = BernoulliNB(alpha=0.5, binarize=0.0)      • Cuidado. Suavizar y decidir son pasos distintos: α cambia
+m.fit(X, y)                                       el cálculo de la probabilidad; el umbral cambia la acción. Y
+m.predict_proba(X_nuevo)[:, 1]                    el suavizado importa sobre todo con pocos datos o
+                                                  señales muy raras.
+
+Clase 40 · Naive Bayes                                                                                                                 4
+ Clase 40 · Gaussiana, log-probabilidades y variantes
+
+ Fuente: transcripción + diapositivas DipDS_2026_S40.pdf + 40_naive_bayes.py / .R del profesor Eloy Alvarado +
+ spam_s40.csv
+
+Cuando la señal es una medición, Naive Bayes gaussiano aprende una media y una
+desviación por clase y variable y multiplica alturas de curvas normales (densidades). En
+la práctica los productos se calculan como sumas de logaritmos: así no se pierde
+precisión y el resultado es una función logística de la evidencia.
+
+Conceptos clave
+
+1 Densidad, no probabilidad. Ejemplo de la clase: x = 1.5, medias 0 y 2, desviaciones 1 y previas 0.8 y 0.2:
+        densidades 0.1295 y 0.3521; productos 0.1036 y 0.0704; P(clase 1) = 0.4046. La altura no es una probabilidad.
+
+2 Transformar. El profesor usa z = log(1 + x) para comprimir valores grandes y conservar los ceros. No
+        garantiza normalidad: en «you» hay 40 % de ceros en legítimos y en «!» 73 %; la curva normal no calza.
+
+3 Sumar logaritmos. Con 54 factores el producto no es problema, pero con 619 factores de 0.3 ya vale 0 en
+        doble precisión. Los log-odds se suman: previa -0.43 + aportes = 5.63 → 0.9964.
+
+Izquierda: dos curvas normales ponderadas por su previa (diapositiva 37 y script 04). Centro y derecha: histogramas de log(1 + x) por
+clase con la normal ajustada.
+
+Izquierda: el producto de muchos factores pequeños desborda; la suma de logaritmos no. Centro: la evidencia del correo ID 1 se
+acumula. Derecha: log-odds → probabilidad.
+
+Fórmulas y reglas                                   Con los números de la clase
+
+f(x) = exp(−(x − μ)²/2σ²)/(σ√2π)                    • Gaussiana log(1 + x): log loss OOF 4.931 y exactitud 80.8 %
+log P(C_k | x) = log π_k + Σ_j log f_jk(x_j) + cte      (con umbral 0.5); Bernoulli α = 0.5: 0.556
+log-odds = log(π₁/π₀) + Σ_j log(f_j1/f_j0)
+P(spam | x) = 1/(1 + e^(−log-odds))                 • El AUC de la gaussiana es 0.940: ordena bien pero muchas
+                                                        probabilidades quedan en 0 o 1
+GaussianNB(var_smoothing=1e-9)
+.fit(np.log1p(X), y)                                • Multinomial: necesita conteos de términos (cuántas veces
+.predict_log_proba(...) # sumas de logs                 aparece cada palabra); un porcentaje no basta sin la
+                                                        longitud del mensaje
+
+                                                    • Cuidado. La exactitud no ve la sobreconfianza: la
+                                                        gaussiana acierta 80.8 % y su log loss es nueve veces el del
+                                                        Bernoulli. Con evidencia extrema la probabilidad se
+                                                        redondea a 0 o a 1: conviene mirar también los log-odds.
+
+Clase 40 · Naive Bayes                                                                                                                 5
+ Clase 40 · Gaussiano sobre columnas 0/1 y fronteras de decisión
+
+ Fuente: transcripción + diapositivas DipDS_2026_S40.pdf + 40_naive_bayes.py / .R del profesor Eloy Alvarado +
+ spam_s40.csv
+
+Aplicar un Naive Bayes gaussiano a una columna 0/1 la trata como una medición
+normal con media p y varianza p(1 − p). Es una aproximación torpe: la densidad no es
+una probabilidad, la varianza puede ser casi cero y el aporte de «presente» se exagera.
+Con las fronteras se compara Naive Bayes con LDA, QDA y regresión logística.
+
+Conceptos clave
+
+1 Qué se aprende. Para «3d» (presente en 8 de 2 230 legítimos y 33 de 1 450 spam): media 0.0036 y 0.0228,
+        varianzas 0.0036 y 0.0222. La normal es un pico muy angosto en p.
+
+2 Qué se distorsiona. Cuando la señal está presente, el aporte en log-razón es 1.85 con Bernoulli y 116 con la
+        normal; para señales casi siempre ausentes llega a -714. Una sola columna domina el producto.
+
+3 Cómo se lee. Log loss OOF: Bernoulli 0.56; gaussiano sobre 0/1 2.08 (con var_smoothing = 1e-2: 1.58); AUC
+        casi igual. Ordena bien y calibra mal; la causa es el modelo de la columna, no el algoritmo.
+
+Izquierda: una columna 0/1 rara; la pmf de Bernoulli frente a la normal (reescalada). Centro: aporte de «presente» por columna (escala
+simétrica logarítmica). Derecha: log loss OOF de las cuatro versiones.
+
+Dos señales (log(1 + «!») y log(1 + «your»)) con regiones P = 0.5 de cuatro modelos. Naive Bayes y QDA dan fronteras curvas; LDA y
+logística, rectas. El resultado en los 921 correos de prueba está en cada panel.
+
+Fórmulas y reglas                            Con los números de la clase
+
+Normal en 0/1: μ = p, σ² = p(1 − p)          • En la prueba con dos señales: NB 80.3 % y log loss 0.491;
+NB gaussiano = QDA con covarianza diagonal       LDA 81.0 %; QDA 80.1 %; logística 82.4 % y 0.425
+LDA: covarianza común → frontera lineal
+logística: modela P(clase | x) directamente  • Variables dummy 0/1 no son normales: con una sola
+                                                 dummy la «campana» no existe
+
+                                             • Una variable con media 0 en una clase (siempre ausente)
+                                                 deja varianza casi nula: la densidad explota
+
+GaussianNB().fit((X > 0).astype(float), y)   • Cuidado. Bernoulli es la variante natural para 0/1; un
+LinearDiscriminantAnalysis().fit(Z, y)           gaussiano sobre dummies funciona como aproximación,
+QuadraticDiscriminantAnalysis().fit(Z, y)        pero con probabilidades poco confiables. Aquí se explica
+                                                 solo con los correos de spam.
+
+Clase 40 · Naive Bayes                                                                                                                  6
+ Clase 40 · Calibración y decisión por costo
+
+ Fuente: transcripción + diapositivas DipDS_2026_S40.pdf + 40_naive_bayes.py / .R del profesor Eloy Alvarado +
+ spam_s40.csv
+
+Ordenar bien no es calibrar bien. Naive Bayes y la regresión logística tienen un AUC
+parecido, pero las probabilidades de Naive Bayes son más extremas y el log loss es el
+doble. Una vez que se tiene una probabilidad, el umbral se elige con los costos de cada
+error (FP = 5, FN = 1), con predicciones OOF.
+
+Conceptos clave
+
+1 Comparar con la logística. Log loss OOF: frecuencia 0.671, Bernoulli α = 0.5 0.556, logística (54 señales)
+        0.318 y logística (57, Clase 38) 0.275; Brier 0.099 frente a 0.075; AUC 0.952 y 0.958.
+
+2 Recalibrar. Una sigmoide ajustada dentro de cada pliegue lleva el log loss del Naive Bayes Bernoulli de 0.557
+        a 0.329: el orden casi no cambia, las probabilidades sí.
+
+3 Umbral por costo. Con probabilidades calibradas, bloquear conviene si 5(1 − p) < p, es decir p > 5/6 ≈
+        0.833. Con OOF el menor costo está en 0.95 (219.0 por 1000); en los 921 correos: FP 17, FN 89 y costo 188.9,
+        frente a 394.1 si todo pasa.
+
+Izquierda: log loss OOF y AUC de cada receta. Centro: diagrama de calibración. Derecha: distribución de las probabilidades OOF de
+Naive Bayes y de la logística.
+
+Izquierda: ROC OOF. Centro: costo por 1000 correos según el umbral para Naive Bayes y la logística; el umbral teórico es 5/6.
+Derecha: matriz de confusión en los 921 correos históricos con α = 0.5 y umbral 0.95.
+
+Fórmulas y reglas                          Con los números de la clase
+
+costo bloquear: 5 (1 − p)                  • p = 0.90: bloquear cuesta 0.50 y dejar pasar 0.90 →
+costo dejar pasar: 1 · p                       bloquear; p = 0.70: 1.50 frente a 0.70 → dejar pasar (diap.
+                                               51)
+
+bloquear si p ≥ 5/(5 + 1) = 0.833          • Con la logística (57), la prueba de 921 correos da FP 6, FN
+costo por 1000 = 1000 (5 FP + FN)/n            158 y costo 204.1 con umbral 0.95; con Naive Bayes, 188.9
+
+costo = 1000 * (5 * fp + fn) / n           • El 0.95 está en el borde de la rejilla: con otra rejilla podría
+umbrales = np.arange(1, 20) / 20               haber un umbral mejor
+# elegir en OOF; probar una vez en prueba
+                                           • Cuidado. Los 921 correos ya se usaron al comparar
+                                               clasificadores: es una comprobación retrospectiva, no
+                                               una prueba independiente. Elegir modelo y umbral en
+                                               desarrollo, y probar una sola vez.
+
+Clase 40 · Naive Bayes                                                                                                             7
+Alertas del material, repaso y criterio de dominio
+
+ Diferencias entre materiales y qué conviene precisar (verificado con código)
+
+Lo dicho en clase (transcripción)
+• Enlace en la tabla: se dijo «16 correos legítimos tienen enlace y 14 spam no tienen enlace». La diapositiva 11 dice: 16
+
+    legítimos con enlace y 14 spam con enlace (6 sin enlace). Después se usa bien.
+• «6 correos sin enlace dentro de los 20 legítimos»: son los 20 spam (los legítimos son 80, con 64 sin enlace). Y «20 de los
+
+    spam observados son 80 de los 100» debe leerse 20 de 100 (denominador 20 + 2).
+• Costo de umbral: la transcripción habló de un costo «216»; las diapositivas y el código dan 219.0 por 1000 (78 FP y 416
+
+    FN) con umbral 0.95. El log loss de la frecuencia es 0.671 (no 0.61) y el total son 4 601 correos (no 6 000).
+• «Es sobre ajuste» (duplicar una columna): es sobreconfianza por dependencia; en regresión, columnas idénticas no
+
+    suman información, en Naive Bayes sí aumentan la certeza.
+• Umbral y calibración: con probabilidades calibradas el umbral teórico sería 5/6; el óptimo empírico (0.95) está en el borde
+
+    de la rejilla de 19 valores. No demuestra que 0.95 sea el mejor umbral posible.
+• Suavizar no arregla la dependencia (se dijo, y es correcto). Lo que sí corrige un desbalance fuerte es remuestrear y luego
+
+    «reponer» la prevalencia real: las probabilidades quedan sobreestimadas si no se compensa.
+
+Diapositivas, scripts y verificación
+• Reproducido con el script: ejemplo de 100 correos (0.6667, 0.1404, 0.4286, 0.4140), suavizado, duplicación (0.80, 0.9412,
+
+    0.9961), gaussiana (0.4046), multinomial (0.8333 y 0.9615) y OOF: log loss 0.671, 0.556, 0.557, 0.558 y 4.931; AUC 0.952 y
+    0.940.
+• Prueba histórica: 541 / 17 / 89 / 274, costo 188.9, log loss 0.533 y Brier 0.094; el correo ID 1 da 0.9964.
+• Qué no hace el script: no compara con la regresión logística ni usa LDA o QDA; esas comparaciones son de esta guía (la
+    logística con la receta de la Clase 38, 57 entradas, StandardScaler, C = 1).
+• Multinomial: solo se vio un ejemplo construido; con frecuencias en % no se puede aplicar sin conocer la longitud del
+    mensaje.
+• Transcripción con ruido: «Nahid Valles / naivayes / NUGI» = Naive Bayes y Bernoulli, «suavizamiento de la plaza» = de
+    Laplace, «el láser / el lazo» = el enlace, «cátera» = cátedra. El recreo (hacia 1:26:33) quedó marcado y el video continúa sin
+    hueco.
+
+Checklist, criterio de dominio y lo que viene
+☐ Calculo P(spam | señales) a mano desde una tabla de frecuencias y distingo previa, condicional y posterior
+☐ Explico qué supone Naive Bayes y qué pasa si dos señales repiten la misma información
+☐ Aplico el suavizado de Laplace a un conteo cero y digo cuándo importa
+☐ Calculo la verosimilitud gaussiana con medias y desviaciones dadas y explico por qué se usan logaritmos
+☐ Explico por qué un gaussiano sobre columnas 0/1 es una aproximación débil
+☐ Comparo Naive Bayes con la logística: mismo orden, distinta calibración (AUC frente a log loss)
+☐ Elijo el umbral con costos y lo pruebo una sola vez
+☐ Resuelvo los bloques 1 a 7 del cuaderno con al menos 80 % de aciertos
+☐ Siguiente: Clase 41 (anomalías) y el Taller 3, pregunta 2 (Naive Bayes).
+
+Clase 40 · Naive Bayes                                                                                                              8
+

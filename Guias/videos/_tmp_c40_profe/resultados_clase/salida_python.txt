@@ -1,0 +1,137 @@
+
+01_bayes
+ prior_spam  posterior_oferta
+       0.20           0.66667
+       0.02           0.14035
+Spam para oferta sin enlace, con suavizado: 0.41400598949871575
+
+02_bernoulli
+ alfa  theta_oferta_0  theta_enlace_0  theta_oferta_1  theta_enlace_1  posterior
+  0.0         0.10000         0.20000         0.80000         0.70000    0.42857
+  1.0         0.10976         0.20732         0.77273         0.68182    0.41401
+
+03_duplicacion
+ copias  posterior_nb  posterior_correcto
+      1       0.80000                 0.8
+      2       0.94118                 0.8
+      4       0.99611                 0.8
+
+04_gaussiana
+  x  densidad_0  densidad_1  producto_0  producto_1  posterior
+1.5     0.12952     0.35207     0.10361     0.07041    0.40461
+
+04_multinomial
+ oferta  reunion  hoy  posterior
+    1.0      0.0  1.0    0.83333
+    2.0      0.0  1.0    0.96154
+
+05_particion
+     conjunto  spam    n
+entrenamiento     0 2230
+entrenamiento     1 1450
+       prueba     0  558
+       prueba     1  363
+
+06_comparacion_oof
+    modelo  log_loss   brier     auc  accuracy   VN  FP   FN   VP  costo_1000
+FRECUENCIA   0.67051 0.23877 0.49946   0.60598 2230   0 1450    0   394.02174
+   BERN_05   0.55631 0.09908 0.95172   0.88723 2078 152  263 1187   277.98913
+    BERN_1   0.55709 0.09941 0.95136   0.88614 2078 152  267 1183   279.07609
+    BERN_2   0.55847 0.10002 0.95075   0.88451 2076 154  271 1179   282.88043
+ GAUSS_LOG   4.93070 0.19018 0.94035   0.80842 1603 627   78 1372   873.09783
+
+06_predicciones_oof
+ id  y  fold  FRECUENCIA  BERN_05  BERN_1  BERN_2  GAUSS_LOG
+  1  1     2     0.39389  0.99603 0.99598 0.99588        1.0
+  2  1     4     0.39389  1.00000 1.00000 1.00000        1.0
+  3  1     3     0.39416  1.00000 1.00000 1.00000        1.0
+  4  1     2     0.39389  1.00000 1.00000 1.00000        1.0
+  5  1     3     0.39416  1.00000 1.00000 1.00000        1.0
+  6  1     3     0.39416  0.00176 0.00176 0.00176        1.0
+  7  1     2     0.39389  0.99987 0.99987 0.99987        1.0
+  8  1     1     0.39402  0.00242 0.00242 0.00241        1.0
+  9  1     1     0.39402  1.00000 1.00000 1.00000        1.0
+ 10  1     2     0.39389  1.00000 1.00000 1.00000        1.0
+ 11  1     5     0.39416  0.99452 0.99435 0.99402        1.0
+ 12  1     1     0.39402  0.99985 0.99985 0.99984        1.0
+Mostradas 12 de 3680 filas. El CSV contiene la tabla completa.
+Selección por log loss OOF: Bernoulli: alfa 0.5
+
+07_calibracion
+   modelo  bin    n  prob_media  fraccion_spam
+   BERN_1    0 2169     0.00405        0.09036
+   BERN_1    1   88     0.13496        0.30682
+   BERN_1    2   31     0.24735        0.38710
+   BERN_1    3   27     0.34619        0.51852
+   BERN_1    4   30     0.46328        0.60000
+   BERN_1    5   32     0.54277        0.71875
+   BERN_1    6   33     0.65572        0.48485
+   BERN_1    7   37     0.75295        0.62162
+   BERN_1    8   76     0.85730        0.72368
+   BERN_1    9 1157     0.99444        0.92135
+GAUSS_LOG    0 1668     0.00042        0.04616
+GAUSS_LOG    1    5     0.14553        0.20000
+Mostradas 12 de 20 filas. El CSV contiene la tabla completa.
+
+08_aportes
+          variable  presente  conteo_legitimo  n_legitimo  conteo_spam  n_spam  prob_legitimo  prob_spam  aporte_log_odds
+    word_freq_make         0             1893        2230          939    1450        0.84857    0.64738         -0.27061
+ word_freq_address         1              226        2230          498    1450        0.10170    0.34366          1.21761
+     word_freq_all         1              616        2230          883    1450        0.27643    0.60882          0.78954
+      word_freq_3d         0             2222        2230         1417    1450        0.99597    0.97658         -0.01965
+     word_freq_our         1              497        2230          913    1450        0.22312    0.62948          1.03719
+    word_freq_over         0             1981        2230          912    1450        0.88799    0.62879         -0.34517
+  word_freq_remove         0             2198        2230          849    1450        0.98522    0.58540         -0.52057
+word_freq_internet         0             2075        2230          965    1450        0.93011    0.66529         -0.33508
+   word_freq_order         0             2050        2230         1017    1450        0.91891    0.70110         -0.27053
+    word_freq_mail         0             1849        2230          794    1450        0.82885    0.54752         -0.41464
+ word_freq_receive         0             2109        2230         1002    1450        0.94534    0.69077         -0.31374
+    word_freq_will         1              939        2230          917    1450        0.42115    0.63223          0.40627
+Mostradas 12 de 54 filas. El CSV contiene la tabla completa.
+
+08_correo
+ id  log_odds_prior  suma_aportes  posterior
+  1        -0.43044       6.06529    0.99644
+
+09_umbrales
+ umbral  log_loss   brier     auc  accuracy   VN  FP  FN   VP  costo_1000
+   0.05   0.55631 0.09908 0.95172   0.87174 1935 295 177 1273   448.91304
+   0.10   0.55631 0.09908 0.95172   0.87745 1975 255 196 1254   399.72826
+   0.15   0.55631 0.09908 0.95172   0.88424 2020 210 216 1234   344.02174
+   0.20   0.55631 0.09908 0.95172   0.88641 2035 195 223 1227   325.54348
+   0.25   0.55631 0.09908 0.95172   0.88668 2044 186 231 1219   315.48913
+   0.30   0.55631 0.09908 0.95172   0.88832 2055 175 236 1214   301.90217
+   0.35   0.55631 0.09908 0.95172   0.88832 2062 168 243 1207   294.29348
+   0.40   0.55631 0.09908 0.95172   0.88832 2068 162 249 1201   287.77174
+   0.45   0.55631 0.09908 0.95172   0.88777 2071 159 254 1196   285.05435
+   0.50   0.55631 0.09908 0.95172   0.88723 2078 152 263 1187   277.98913
+   0.55   0.55631 0.09908 0.95172   0.88478 2085 145 279 1171   272.82609
+   0.60   0.55631 0.09908 0.95172   0.88261 2088 142 290 1160   271.73913
+Mostradas 12 de 19 filas. El CSV contiene la tabla completa.
+
+09_comprobacion_historica
+         modelo  umbral  log_loss   brier     auc  accuracy  VN  FP  FN  VP  costo_1000
+        BERN_05    0.95   0.53332 0.09406 0.95811   0.88491 541  17  89 274   188.92508
+SIEMPRE_NO_SPAM    1.00   0.67056 0.23879 0.50000   0.60586 558   0 363   0   394.13681
+
+09_predicciones_historicas
+ id  y       p  pred
+ 26  1 1.00000     1
+ 30  1 1.00000     1
+ 40  1 0.99697     1
+ 41  1 1.00000     1
+ 50  1 1.00000     1
+ 53  1 1.00000     1
+ 66  1 0.98662     1
+ 69  1 1.00000     1
+ 78  1 1.00000     1
+ 80  1 0.01142     0
+ 82  1 0.99999     1
+ 83  1 0.99969     1
+Mostradas 12 de 921 filas. El CSV contiene la tabla completa.
+Los 921 correos ya se utilizaron al comparar clasificadores: esta es una comprobación retrospectiva, no una nueva prueba independiente.
+Prior de clase, verosimilitud y normalización producen la probabilidad.
+La representación determina la variante de Naive Bayes.
+Suavizar evita ceros; la independencia y la calibración requieren otra evaluación.
+Python 3.12.14
+numpy 2.5.3 pandas 3.0.5 scikit-learn 1.9.0

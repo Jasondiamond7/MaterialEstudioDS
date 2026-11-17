@@ -1,0 +1,419 @@
+1
+00:00:00,250 --> 00:00:02,710
+Séptima parada: el estadístico Gap.
+
+2
+00:00:02,830 --> 00:00:05,499
+Y una situación muy real: qué hacer cuando dos
+
+3
+00:00:05,499 --> 00:00:07,820
+criterios recomiendan números distintos.
+
+4
+00:00:07,940 --> 00:00:11,800
+Aquí va una verdad incómoda: K-means siempre entrega grupos.
+
+5
+00:00:11,920 --> 00:00:15,683
+Aunque los datos no tengan ninguna estructura, aunque sean puro
+
+6
+00:00:15,683 --> 00:00:18,670
+ruido, si le pides tres grupos, te da tres grupos.
+
+7
+00:00:18,790 --> 00:00:21,705
+Entonces, ¿cómo sabemos si los grupos que encontramos
+
+8
+00:00:21,705 --> 00:00:24,180
+son más compactos de lo que saldría por azar?
+
+9
+00:00:24,300 --> 00:00:28,620
+Esa es la idea del Gap: comparar con datos simulados que no tienen grupos.
+
+10
+00:00:28,740 --> 00:00:29,910
+Una analogía.
+
+11
+00:00:30,030 --> 00:00:32,770
+Sacaste un seis en una prueba de alternativas.
+
+12
+00:00:32,890 --> 00:00:33,590
+¿Es bueno?
+
+13
+00:00:33,710 --> 00:00:34,460
+Depende.
+
+14
+00:00:34,580 --> 00:00:38,450
+Si alguien que responde al azar saca un dos, tu seis es muy bueno.
+
+15
+00:00:38,570 --> 00:00:42,530
+Si el azar saca un cinco y medio, tu seis casi no dice nada.
+
+16
+00:00:42,650 --> 00:00:47,418
+El Gap hace eso: compara tu WSS con el WSS que saldría en datos
+
+17
+00:00:47,418 --> 00:00:51,430
+al azar, y mira la distancia, la brecha, entre ambos.
+
+18
+00:00:51,550 --> 00:00:53,070
+Gap significa brecha.
+
+19
+00:00:53,190 --> 00:00:56,025
+La definición de la diapositiva veintidós, de
+
+20
+00:00:56,025 --> 00:00:58,860
+Tibshirani, Walther y Hastie, de dos mil uno.
+
+21
+00:00:58,980 --> 00:01:04,570
+Primero, se ajusta K-means a los datos reales para cada k, y se guarda su WSS.
+
+22
+00:01:04,690 --> 00:01:08,610
+Segundo, se simulan B bases de referencia, sin grupos, y
+
+23
+00:01:08,610 --> 00:01:11,900
+se calcula su WSS para los mismos valores de k.
+
+24
+00:01:12,020 --> 00:01:16,696
+Tercero, se comparan en escala logarítmica: el Gap es el promedio del
+
+25
+00:01:16,696 --> 00:01:21,440
+logaritmo del WSS de referencia, menos el logaritmo del WSS observado.
+
+26
+00:01:21,560 --> 00:01:25,140
+Un Gap grande significa: mucho más compacto que el azar.
+
+27
+00:01:25,260 --> 00:01:27,040
+¿Y cómo se elige k con el Gap?
+
+28
+00:01:27,160 --> 00:01:28,650
+No se toma el máximo.
+
+29
+00:01:28,770 --> 00:01:32,228
+La diapositiva veintitrés usa la regla de un error estándar:
+
+30
+00:01:32,228 --> 00:01:35,802
+elegimos el primer k cuyo Gap sea mayor o igual que el Gap del
+
+31
+00:01:35,802 --> 00:01:39,030
+siguiente k, menos el error estándar de ese siguiente k.
+
+32
+00:01:39,150 --> 00:01:42,325
+La idea: si dar un paso más mejora el Gap menos que el
+
+33
+00:01:42,325 --> 00:01:45,030
+ruido de la simulación, no vale la pena darlo.
+
+34
+00:01:45,150 --> 00:01:47,380
+El ejemplo hipotético de la diapositiva.
+
+35
+00:01:47,500 --> 00:01:54,309
+Gap de 0.40, 0.62 y 0.64 para k igual a uno, dos y
+
+36
+00:01:54,309 --> 00:01:59,620
+tres, con errores de 0.04, 0.05 y 0.04.
+
+37
+00:01:59,740 --> 00:02:08,610
+Para k igual a uno: ¿0.40 es mayor o igual que 0.62 menos 0.05, que es 0.57?
+
+38
+00:02:08,730 --> 00:02:10,110
+No: no cumple.
+
+39
+00:02:10,230 --> 00:02:19,130
+Para k igual a dos: ¿0.62 es mayor o igual que 0.64 menos 0.04, que es 0.60?
+
+40
+00:02:19,250 --> 00:02:19,720
+Sí.
+
+41
+00:02:19,840 --> 00:02:23,080
+Elegimos dos, aunque el Gap más alto esté en tres.
+
+42
+00:02:23,200 --> 00:02:25,750
+Aquí conviene una precisión sobre la grabación.
+
+43
+00:02:25,870 --> 00:02:28,956
+Después de resolver este ejemplo, se dijo que el algoritmo
+
+44
+00:02:28,956 --> 00:02:31,830
+sigue corriendo hasta parar donde k es igual a cuatro.
+
+45
+00:02:31,950 --> 00:02:36,079
+En el ejemplo hipotético la regla se detiene en k igual a dos; el
+
+46
+00:02:36,079 --> 00:02:39,700
+cuatro es el resultado de los vinos, que vemos enseguida.
+
+47
+00:02:39,820 --> 00:02:42,533
+Y otra precisión: se dijo que se mira el próximo
+
+48
+00:02:42,533 --> 00:02:44,850
+Gap menos el error estándar del k actual.
+
+49
+00:02:44,970 --> 00:02:47,785
+El error que se resta es el del siguiente valor de
+
+50
+00:02:47,785 --> 00:02:50,150
+k, como dice la fórmula de la diapositiva.
+
+51
+00:02:50,270 --> 00:02:53,170
+Ahora los vinos, con treinta simulaciones.
+
+52
+00:02:53,290 --> 00:02:58,834
+El Gap crece desde 0.800 con un grupo, a 1.015 con
+
+53
+00:02:58,834 --> 00:03:03,270
+dos, 1.199 con tres, y 1.227 con cuatro.
+
+54
+00:03:03,390 --> 00:03:12,970
+Para k igual a tres: ¿1.199 es mayor o igual que 1.227 menos 0.022, que es 1.205?
+
+55
+00:03:13,090 --> 00:03:14,640
+No, por muy poco.
+
+56
+00:03:14,760 --> 00:03:24,100
+Para k igual a cuatro: ¿1.227 es mayor o igual que 1.245 menos 0.021, que es 1.224?
+
+57
+00:03:24,220 --> 00:03:24,690
+Sí.
+
+58
+00:03:24,810 --> 00:03:29,280
+El Gap recomienda k igual a cuatro, tanto en R como en Python.
+
+59
+00:03:29,400 --> 00:03:34,380
+Fíjate en la forma de la curva: el Gap sigue subiendo hasta k igual a ocho.
+
+60
+00:03:34,500 --> 00:03:37,670
+Si eligiéramos el máximo, tendríamos ocho grupos.
+
+61
+00:03:37,790 --> 00:03:40,748
+La regla de un error estándar frena antes, donde la
+
+62
+00:03:40,748 --> 00:03:43,590
+mejora deja de superar el ruido de la simulación.
+
+63
+00:03:43,710 --> 00:03:47,290
+Y el profesor lo notó: de tres a cuatro el Gap cambia poco.
+
+64
+00:03:47,410 --> 00:03:49,942
+Con otra semilla, más simulaciones o otra
+
+65
+00:03:49,942 --> 00:03:52,660
+referencia, la recomendación podría moverse.
+
+66
+00:03:52,780 --> 00:03:54,640
+Entonces tenemos un desacuerdo.
+
+67
+00:03:54,760 --> 00:03:56,310
+El codo sugiere tres.
+
+68
+00:03:56,430 --> 00:03:58,020
+La silueta, tres.
+
+69
+00:03:58,140 --> 00:04:01,980
+El Gap, con esta referencia y treinta simulaciones, cuatro.
+
+70
+00:04:02,100 --> 00:04:02,990
+¿Qué se hace?
+
+71
+00:04:03,110 --> 00:04:07,919
+La diapositiva veinticuatro decide: se trabaja con k igual a tres para
+
+72
+00:04:07,919 --> 00:04:12,590
+describir perfiles, y se reconoce k igual a cuatro como alternativa.
+
+73
+00:04:12,710 --> 00:04:14,840
+No hay un k verdadero garantizado.
+
+74
+00:04:14,960 --> 00:04:18,054
+Los criterios son evidencia, y la decisión final también
+
+75
+00:04:18,054 --> 00:04:20,430
+considera la interpretación y el propósito.
+
+76
+00:04:20,550 --> 00:04:23,780
+En el código de la clase, el Gap son pocas líneas.
+
+77
+00:04:23,900 --> 00:04:28,340
+Se generan treinta bases uniformes entre el mínimo y el máximo de cada columna
+
+78
+00:04:28,340 --> 00:04:32,210
+estandarizada, y para cada una se ajusta K-means con veinte inicios.
+
+79
+00:04:32,330 --> 00:04:35,840
+Se guarda el logaritmo del WSS de cada simulación.
+
+80
+00:04:35,960 --> 00:04:40,680
+El Gap es el promedio de esos logaritmos menos el logaritmo del WSS real.
+
+81
+00:04:40,800 --> 00:04:44,041
+Y el error estándar es la desviación de las simulaciones,
+
+82
+00:04:44,041 --> 00:04:46,770
+multiplicada por la raíz de uno más uno sobre B.
+
+83
+00:04:46,890 --> 00:04:50,630
+El error típico con el Gap: elegir el k con el Gap más alto.
+
+84
+00:04:50,750 --> 00:04:52,300
+En los vinos daría ocho.
+
+85
+00:04:52,420 --> 00:04:55,555
+El otro error es olvidar que la referencia y el número de
+
+86
+00:04:55,555 --> 00:04:58,635
+simulaciones forman parte del criterio: el Gap no es una
+
+87
+00:04:58,635 --> 00:05:01,990
+propiedad fija de los datos, depende de con qué los comparas.
+
+88
+00:05:02,110 --> 00:05:03,330
+Piensa un segundo.
+
+89
+00:05:03,450 --> 00:05:10,330
+Gap de 0.50, 0.70, 0.75 y 0.76 para k de uno a
+
+90
+00:05:10,330 --> 00:05:17,360
+cuatro, con errores de 0.03, 0.04, 0.06 y 0.05.
+
+91
+00:05:17,480 --> 00:05:19,950
+¿Qué k elige la regla de un error estándar?
+
+92
+00:05:20,670 --> 00:05:29,210
+Para k igual a uno: ¿0.50 es mayor o igual que 0.70 menos 0.04, o sea 0.66?
+
+93
+00:05:29,330 --> 00:05:29,750
+No.
+
+94
+00:05:29,870 --> 00:05:38,750
+Para k igual a dos: ¿0.70 es mayor o igual que 0.75 menos 0.06, o sea 0.69?
+
+95
+00:05:38,870 --> 00:05:39,340
+Sí.
+
+96
+00:05:39,460 --> 00:05:42,940
+La regla elige dos, aunque el Gap siga subiendo hasta cuatro.
+
+97
+00:05:43,060 --> 00:05:45,952
+Para llevarte: el Gap compara el logaritmo del
+
+98
+00:05:45,952 --> 00:05:48,530
+WSS con el de datos simulados sin grupos.
+
+99
+00:05:48,650 --> 00:05:51,846
+Se elige con la regla de un error estándar, no con
+
+100
+00:05:51,846 --> 00:05:54,530
+el máximo; en los vinos, k igual a cuatro.
+
+101
+00:05:54,650 --> 00:05:59,138
+Y cuando los criterios discrepan, se elige con criterio, y se reporta la
+
+102
+00:05:59,138 --> 00:06:02,940
+alternativa: aquí, tres para describir, y cuatro como opción.
+
+103
+00:06:03,060 --> 00:06:05,830
+Siguiente parada: ya tenemos tres grupos.
+
+104
+00:06:05,950 --> 00:06:07,580
+¿Qué vinos hay en cada uno?
+
+105
+00:06:07,700 --> 00:06:11,490
+Los perfiles, y por qué el número de grupo es solo una etiqueta.

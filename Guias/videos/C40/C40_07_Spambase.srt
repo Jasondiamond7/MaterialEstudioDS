@@ -1,0 +1,431 @@
+1
+00:00:00,250 --> 00:00:01,410
+Séptima parada.
+
+2
+00:00:01,530 --> 00:00:07,230
+Dejamos los cien correos construidos y pasamos a 4601 correos reales de Spambase.
+
+3
+00:00:07,350 --> 00:00:10,474
+Vamos a ver qué contiene cada fila, cómo se separan los
+
+4
+00:00:10,474 --> 00:00:13,370
+datos y qué probabilidad recibe un correo concreto.
+
+5
+00:00:13,490 --> 00:00:16,280
+La diapositiva treinta y uno presenta los datos.
+
+6
+00:00:16,400 --> 00:00:19,990
+Cuarenta y ocho frecuencias de palabras, que describen el contenido.
+
+7
+00:00:20,110 --> 00:00:24,670
+Seis frecuencias de caracteres, como el signo de exclamación o el signo pesos.
+
+8
+00:00:24,790 --> 00:00:27,940
+Y la etiqueta de cada correo: spam o legítimo.
+
+9
+00:00:28,060 --> 00:00:30,640
+En total, cincuenta y cuatro señales.
+
+10
+00:00:30,760 --> 00:00:35,290
+El archivo trae además tres medidas de mayúsculas, que se excluyen del modelo.
+
+11
+00:00:35,410 --> 00:00:40,497
+Sobre la fuente: es el conjunto Spambase, de Hopkins y coautores, de mil novecientos
+
+12
+00:00:40,497 --> 00:00:45,100
+noventa y nueve, publicado en el repositorio de la UCI con licencia abierta.
+
+13
+00:00:45,220 --> 00:00:49,160
+Son correos históricos, de fines de los noventa: el mismo conjunto que
+
+14
+00:00:49,160 --> 00:00:52,650
+usamos en la clase treinta y ocho para evaluar clasificadores.
+
+15
+00:00:52,770 --> 00:00:56,223
+Y la pregunta es la misma de siempre: dadas las señales de un
+
+16
+00:00:56,223 --> 00:00:59,280
+correo, ¿qué probabilidad de spam le asigna el modelo?
+
+17
+00:00:59,400 --> 00:01:02,974
+La diapositiva treinta y dos muestra una fila: el correo con
+
+18
+00:01:02,974 --> 00:01:06,250
+identificador uno, el menor del conjunto de desarrollo.
+
+19
+00:01:06,370 --> 00:01:11,510
+La palabra free: 0.32 por ciento de las palabras; presencia, uno.
+
+20
+00:01:11,630 --> 00:01:15,380
+La palabra money: cero por ciento; presencia, cero.
+
+21
+00:01:15,500 --> 00:01:21,840
+El carácter de exclamación: 0.778 por ciento de los caracteres; presencia, uno.
+
+22
+00:01:21,960 --> 00:01:27,880
+Ojo con la escala: el archivo guarda 0.32 para representar 0.32 por ciento.
+
+23
+00:01:28,000 --> 00:01:29,340
+Dos detalles más.
+
+24
+00:01:29,460 --> 00:01:32,721
+La predicción usa solo las señales: el identificador y la
+
+25
+00:01:32,721 --> 00:01:35,410
+etiqueta del correo no son entradas del modelo.
+
+26
+00:01:35,530 --> 00:01:38,971
+Y un dato adicional: de las cincuenta y cuatro señales de este
+
+27
+00:01:38,971 --> 00:01:42,190
+correo, nueve están presentes y cuarenta y cinco ausentes.
+
+28
+00:01:42,310 --> 00:01:45,830
+Para Bernoulli, las cuarenta y cinco ausencias también cuentan.
+
+29
+00:01:45,950 --> 00:01:48,655
+En código, la diapositiva treinta y tres lee el
+
+30
+00:01:48,655 --> 00:01:50,900
+archivo y separa entradas de respuesta.
+
+31
+00:01:51,020 --> 00:01:54,625
+Las variables se eligen por el nombre: las que empiezan con el prefijo de
+
+32
+00:01:54,625 --> 00:01:57,440
+frecuencia de palabra o con el de frecuencia de carácter.
+
+33
+00:01:57,560 --> 00:02:00,698
+Se toma el conjunto de entrenamiento, se arma la matriz X
+
+34
+00:02:00,698 --> 00:02:03,340
+con esas columnas y el vector y con la etiqueta.
+
+35
+00:02:03,460 --> 00:02:06,291
+Resultado: X tiene tres mil seiscientos ochenta
+
+36
+00:02:06,291 --> 00:02:08,760
+correos y cincuenta y cuatro frecuencias.
+
+37
+00:02:08,880 --> 00:02:11,768
+Elegir por nombre deja fuera identificadores,
+
+38
+00:02:11,768 --> 00:02:14,270
+grupos, pliegues y la propia respuesta.
+
+39
+00:02:14,390 --> 00:02:18,390
+La diapositiva treinta y cuatro conserva la partición guardada en los datos.
+
+40
+00:02:18,510 --> 00:02:23,830
+Desarrollo: tres mil seiscientos ochenta correos, para aprender y comparar recetas.
+
+41
+00:02:23,950 --> 00:02:28,490
+Prueba histórica: novecientos veintiuno, para comprobar la receta elegida.
+
+42
+00:02:28,610 --> 00:02:33,148
+Contando los datos: en desarrollo hay dos mil doscientos treinta legítimos y
+
+43
+00:02:33,148 --> 00:02:37,626
+mil cuatrocientos cincuenta spam, un 39.4 por ciento de spam; en la prueba,
+
+44
+00:02:37,626 --> 00:02:41,030
+quinientos cincuenta y ocho y trescientos sesenta y tres.
+
+45
+00:02:41,150 --> 00:02:44,200
+Dentro del desarrollo, se usan cinco pliegues.
+
+46
+00:02:44,320 --> 00:02:47,530
+En cada vuelta se aprende con cuatro y se predice el restante.
+
+47
+00:02:47,650 --> 00:02:51,090
+Al repetirlo cinco veces, cada correo recibe una
+
+48
+00:02:51,090 --> 00:02:54,530
+predicción fuera de pliegue, que abreviamos OOF.
+
+49
+00:02:54,650 --> 00:02:58,005
+Un detalle de diseño: las filas con las mismas cincuenta y siete
+
+50
+00:02:58,005 --> 00:03:01,150
+entradas originales se mantienen juntas en el mismo pliegue.
+
+51
+00:03:01,270 --> 00:03:07,060
+En los datos hay 4601 filas, pero solo cuatro mil doscientos siete grupos distintos.
+
+52
+00:03:07,180 --> 00:03:11,610
+Así, un correo repetido no puede estar a la vez en el ajuste y en la validación.
+
+53
+00:03:11,730 --> 00:03:16,387
+Y una advertencia honesta de la diapositiva: los novecientos veintiuno correos de prueba
+
+54
+00:03:16,387 --> 00:03:20,250
+ya se usaron al evaluar otros clasificadores, en la clase treinta y ocho.
+
+55
+00:03:20,370 --> 00:03:24,650
+Por eso la comprobación final es histórica, no una nueva prueba independiente.
+
+56
+00:03:24,770 --> 00:03:29,100
+Ahora, la primera predicción real, de la diapositiva treinta y cinco.
+
+57
+00:03:29,220 --> 00:03:32,640
+La función ajustar predecir, incluida en los dos scripts,
+
+58
+00:03:32,640 --> 00:03:35,880
+recibe los datos de ajuste y los correos por predecir.
+
+59
+00:03:36,000 --> 00:03:38,330
+Usamos Bernoulli con alfa igual a uno.
+
+60
+00:03:38,450 --> 00:03:41,160
+Internamente transforma cada frecuencia positiva en
+
+61
+00:03:41,160 --> 00:03:43,870
+presencia y combina las cincuenta y cuatro señales.
+
+62
+00:03:43,990 --> 00:03:46,820
+Para el correo de identificador uno, la
+
+63
+00:03:46,820 --> 00:03:50,230
+probabilidad de spam es aproximadamente 0.9964.
+
+64
+00:03:50,350 --> 00:03:52,170
+Una precisión sobre la grabación.
+
+65
+00:03:52,290 --> 00:03:56,288
+Al mostrar este resultado, cerca del minuto noventa
+
+66
+00:03:56,288 --> 00:03:59,580
+y dos, se leyó una probabilidad de 0.9954.
+
+67
+00:03:59,700 --> 00:04:07,770
+La diapositiva y el script dan 0.9964; recalculado con el script, 0.996442.
+
+68
+00:04:07,890 --> 00:04:10,810
+Y una advertencia importante de la misma diapositiva.
+
+69
+00:04:10,930 --> 00:04:14,670
+Este correo participa en el ajuste: el modelo aprendió con él.
+
+70
+00:04:14,790 --> 00:04:19,990
+Por eso el 0.9964 ilustra una predicción, pero no evalúa nada.
+
+71
+00:04:20,110 --> 00:04:23,880
+La calidad del filtro se va a medir con las probabilidades fuera de pliegue.
+
+72
+00:04:24,000 --> 00:04:26,967
+La diapositiva treinta y seis hace una pregunta clave:
+
+73
+00:04:26,967 --> 00:04:29,550
+¿basta con saber que una palabra está presente?
+
+74
+00:04:29,670 --> 00:04:33,563
+Con presencia, free entra como uno, porque 0.32 es mayor
+
+75
+00:04:33,563 --> 00:04:36,760
+que cero: solo sabemos que la palabra aparece.
+
+76
+00:04:36,880 --> 00:04:39,794
+Con frecuencia, entra como 0.32: sabemos qué
+
+77
+00:04:39,794 --> 00:04:42,840
+proporción de las palabras corresponde a free.
+
+78
+00:04:42,960 --> 00:04:48,350
+Bernoulli trata igual cualquier frecuencia positiva: 0.01 o diez da lo mismo.
+
+79
+00:04:48,470 --> 00:04:49,640
+Una analogía.
+
+80
+00:04:49,760 --> 00:04:52,770
+Presencia es preguntar: ¿tienes fiebre, sí o no?
+
+81
+00:04:52,890 --> 00:04:56,760
+Frecuencia es mirar el termómetro: treinta y siete y medio o cuarenta.
+
+82
+00:04:56,880 --> 00:05:00,490
+El termómetro da más información, pero para usarla hay que suponer
+
+83
+00:05:00,490 --> 00:05:03,280
+cómo se distribuyen las temperaturas en cada clase.
+
+84
+00:05:03,400 --> 00:05:07,890
+Y la diapositiva lo dice así: conservar más detalle exige otro supuesto, y
+
+85
+00:05:07,890 --> 00:05:11,470
+hay que comprobar si ese detalle mejora las probabilidades.
+
+86
+00:05:11,590 --> 00:05:13,760
+Errores típicos con datos reales.
+
+87
+00:05:13,880 --> 00:05:16,877
+Uno: dejar entrar el identificador, el pliegue o
+
+88
+00:05:16,877 --> 00:05:19,500
+la propia etiqueta como si fueran señales.
+
+89
+00:05:19,620 --> 00:05:22,090
+Seleccionar las columnas por nombre lo evita.
+
+90
+00:05:22,210 --> 00:05:25,253
+Dos: evaluar el filtro con un correo que participó
+
+91
+00:05:25,253 --> 00:05:27,870
+en el ajuste, como el de identificador uno.
+
+92
+00:05:27,990 --> 00:05:32,830
+Y tres: mirar los correos de prueba mientras todavía se están comparando recetas.
+
+93
+00:05:32,950 --> 00:05:34,170
+Piensa un segundo.
+
+94
+00:05:34,290 --> 00:05:39,320
+En un correo de doscientas palabras, la frecuencia de free es 1.5 por ciento.
+
+95
+00:05:39,440 --> 00:05:43,890
+¿Cuántas veces aparece la palabra, y qué valor entra en el modelo de Bernoulli?
+
+96
+00:05:44,610 --> 00:05:48,640
+El 1.5 por ciento de doscientas palabras son tres apariciones.
+
+97
+00:05:48,760 --> 00:05:51,550
+Pero en Bernoulli entra solo un uno: presente.
+
+98
+00:05:51,670 --> 00:05:54,960
+Fíjate que para saber las tres apariciones necesitamos la
+
+99
+00:05:54,960 --> 00:05:58,250
+longitud del correo; con el porcentaje solo, no se puede.
+
+100
+00:05:58,370 --> 00:06:00,600
+Eso va a importar en la próxima parada.
+
+101
+00:06:00,720 --> 00:06:05,999
+Para llevarte: Spambase tiene 4601 correos y cincuenta y cuatro frecuencias; se aprende
+
+102
+00:06:05,999 --> 00:06:10,490
+con tres mil seiscientos ochenta y se comprueba con novecientos veintiuno.
+
+103
+00:06:10,610 --> 00:06:13,860
+Bernoulli convierte cada frecuencia positiva en presencia.
+
+104
+00:06:13,980 --> 00:06:18,798
+Y el correo de identificador uno recibe 0.9964 de probabilidad de
+
+105
+00:06:18,798 --> 00:06:22,800
+spam, pero participó en el ajuste: ilustra, no evalúa.
+
+106
+00:06:22,920 --> 00:06:25,210
+Siguiente parada: las variantes.
+
+107
+00:06:25,330 --> 00:06:28,411
+La gaussiana, que usa la frecuencia transformada,
+
+108
+00:06:28,411 --> 00:06:30,800
+y la multinomial, que cuenta palabras.

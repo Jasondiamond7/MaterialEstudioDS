@@ -1,0 +1,1410 @@
+Herramientas Computacionales para Data Science
+Naive Bayes y clasificación probabilística
+Sesión 40 · 1 de octubre de 2026 Eloy Alvarado Narváez
+
+Ahora conocemos la clase que queremos predecir
+
+En los vinos: buscar grupos Comparamos perfiles químicos para descubrir vinos parecidos. Los grupos eran un resultado del análisis.
+
+En los correos: aprender una clase Tenemos mensajes ya etiquetados como spam o legítimos. Buscamos señales que permitan clasificar el siguiente correo.
+
+Usaremos Y = 1 para spam y Y = 0 para legítimo. Las entradas serán características del mensaje, como las palabras que aparecen.
+
+La pregunta de hoy es cómo construir una probabilidad de spam a partir de ejemplos etiquetados.
+
+Data Science UC | Naive Bayes
+
+2 / 61
+
+Construir un filtro que podamos explicar
+Un correo contiene oferta. Queremos saber qué probabilidad de spam asignarle y si conviene bloquearlo.
+
+Paso
+Aprender de correos Calcular y comprobar Tomar una decisión
+
+Pregunta que responderemos
+¿Qué señales aparecen dentro de cada clase?
+¿Cómo se combinan y qué tan fiables son las probabilidades? ¿Cuándo conviene bloquear, considerando los errores?
+
+Primero seguiremos las cuentas en 100 correos construidos; después aplicaremos el mismo proceso a los 4601 correos de Spambase.
+
+Data Science UC | Naive Bayes
+
+3 / 61
+
+Tres preguntas distintas
+
+Nombre Previa Condicional Posterior
+
+Pregunta en el ejemplo
+¿Qué fracción de los correos es spam?
+Entre los spam, ¿qué fracción contiene oferta?
+Entre los correos con oferta, ¿qué fracción es spam?
+
+Qué observamos
+La clase
+La palabra dentro de la clase La clase al conocer la palabra
+
+Bayes permite pasar de lo que sabemos de cada clase a una probabilidad para el correo que estamos mirando.
+
+Data Science UC | Naive Bayes
+
+4 / 61
+
+Un ejemplo con 100 correos
+
+Clase
+
+Con “oferta” Sin “oferta” Total
+
+Legítimo (0) Spam (1)
+
+8
+
+72 80
+
+16
+
+4 20
+
+Total
+
+24
+
+76 100
+
+La palabra aparece en 16 de los 20 spam y en 8 de los 80 correos legítimos. Entre los 24 correos que contienen “oferta”, 16 son spam.
+Ejemplo construido para los cálculos de las diapositivas 5–25; no son conteos de Spambase.
+
+Data Science UC | Naive Bayes
+
+5 / 61
+
+La dirección del condicionamiento
+
+P(oferta | spam) = 16 = 0.80, 20
+
+P(oferta | legítimo) = 8 = 0.10. 80
+
+La primera cantidad toma como referencia todos los spam. Para clasificar necesitamos tomar como referencia los correos con oferta.
+
+P(spam | oferta) = 16 = 2 ≈ 0.6667. 16 + 8 3
+
+El 80 % de los spam contiene “oferta”, pero sólo el 66.7 % de los correos con “oferta” es spam.
+
+Data Science UC | Naive Bayes
+
+6 / 61
+
+Bayes recupera el mismo cálculo
+Y = 1: spam; Y = 0: correo legítimo. Aplicamos Bayes:
+
+P(spam | oferta) =
+
+P(spam) P(oferta | spam) .
+
+P(legítimo) P(oferta | legítimo) + P(spam) P(oferta | spam)
+
+Reemplazamos con las frecuencias de la tabla:
+
+0.20 × 0.80
+
+P(spam | oferta) =
+
+20/100 16/20
+
+0.80 × 0.10 + 0.20 × 0.80
+
+80/100 8/80 20/100 16/20
+
+= 0.16 = 0.16 ≈ 0.6667. 0.08 + 0.16 0.24
+
+El denominador suma las dos formas de observar un correo con “oferta”.
+
+Data Science UC | Naive Bayes
+
+7 / 61
+
+Convertir los productos en probabilidades
+Seguimos observando sólo la palabra oferta.
+
+Clase
+
+Producto: clase y oferta Dividir por el total
+
+Legítimo Spam
+
+(80/100)(8/80) = 0.08 (20/100)(16/20) = 0.16
+
+0.08/0.24 ≈ 0.3333 0.16/0.24 ≈ 0.6667
+
+0.24 = 0.08 + 0.16 .
+total con oferta legítimos con oferta spam con oferta
+
+Normalizar significa dividir cada producto por la suma de ambos. Así las dos probabilidades suman uno.
+
+Data Science UC | Naive Bayes
+
+8 / 61
+
+La frecuencia de spam cambia la respuesta
+Mantenemos P(oferta | spam) = 0.80 y P(oferta | legítimo) = 0.10.
+
+Probabilidad
+P(spam) P(legítimo) Spam y oferta Legítimo y oferta
+P(spam | oferta)
+
+Ejemplo inicial
+20/100 = 0.20 1 − 0.20 = 0.80 0.20 × 0.80 = 0.16 0.80 × 0.10 = 0.08 0.16 ≈ 0.6667 0.08 + 0.16
+
+Nuevo escenario
+0.02 (supuesto) 1 − 0.02 = 0.98 0.02 × 0.80 = 0.016 0.98 × 0.10 = 0.098 0.016 ≈ 0.1404 0.098 + 0.016
+
+Con “oferta”: 20 % → 66.7 % en el primer caso; 2 % → 14.0 % en el segundo.
+
+En la última fila dividimos spam con oferta por todos los correos con oferta. El 2 % define un escenario hipotético.
+
+Data Science UC | Naive Bayes
+
+9 / 61
+
+P(spam | oferta)
+
+La misma palabra, dos puntos de partida
+
+1.0
+
+0.8
+
+0.6 Horizontal: frecuencia
+
+previa de spam.
+
+0.4
+
+0.2 Vertical: probabilidad de
+
+spam al observar oferta.
+
+0.0
+
+0.0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1.0
+
+Probabilidad previa de spam
+
+Los puntos repiten la tabla anterior: 20 % → 66.7 % y 2 % → 14.0 %.
+
+La palabra ayuda, pero no decide por sí sola. Volvamos al ejemplo inicial y agreguemos otra señal del correo.
+
+Data Science UC | Naive Bayes
+
+10 / 61
+
+Dos señales en un mismo correo
+
+Agregamos el indicador “enlace” al ejemplo de 100 correos.
+
+Clase Correos Con oferta Con enlace
+
+Legítimo
+
+80
+
+8
+
+16
+
+Spam
+
+20
+
+16
+
+14
+
+Queremos clasificar un correo con x = (1, 0): oferta presente y enlace ausente.
+Sabemos cuánto aparece cada señal por separado. Para clasificar este correo necesitamos combinarlas dentro de cada clase.
+
+Data Science UC | Naive Bayes
+
+11 / 61
+
+Presente o ausente: aquí aparece Bernoulli
+Cada señal responde una pregunta con dos respuestas: ¿aparece oferta?, ¿hay enlace?
+Una variable Bernoulli representa precisamente un resultado sí/no: usamos 1 para presente y 0 para ausente.
+
+En los 20 spam del ejemplo Conteo Probabilidad
+
+Enlace presente (1) Enlace ausente (0)
+
+14
+
+14/20 = 0.70
+
+20 − 14 = 6 6/20 = 0.30
+
+Naive Bayes Bernoulli combina estas preguntas de presencia o ausencia para clasificar un correo.
+
+Un cero significa ausencia observada de la señal; no significa dato faltante.
+
+Data Science UC | Naive Bayes
+
+12 / 61
+
+¿Podemos contar todas las combinaciones?
+Con dos señales, necesitamos distinguir cuatro tipos de correo:
+
+Oferta Enlace
+
+No
+
+No
+
+No
+
+Sí
+
+Sí
+
+No
+
+Sí
+
+Sí
+
+Cada señal nueva duplica las combinaciones. Con diez señales hay 210 = 1024 patrones posibles por clase.
+
+Con pocos correos, muchos patrones quedan sin observar. Naive Bayes propone combinar lo que aprendimos de cada señal por separado.
+
+Data Science UC | Naive Bayes
+
+13 / 61
+
+Naive Bayes combina señales dentro de cada clase
+El modelo supone que, dentro de spam y dentro de legítimos, las señales son independientes. Así podemos multiplicar sus probabilidades.
+P(oferta, sin enlace | spam) = P(oferta | spam) P(sin enlace | spam).
+
+• Repetimos el producto dentro de los correos legítimos. • Cada señal aporta el estado observado: aquí, oferta presente y enlace ausente. • Con más variables, incorporamos un factor por variable.
+Esta simplificación da el nombre naive. Hace posible el cálculo; no demuestra que las señales sean independientes en los datos.
+
+Data Science UC | Naive Bayes
+
+14 / 61
+
+Calcular el patrón que realmente observamos
+
+El correo tiene oferta y no tiene enlace. Recuperamos los conteos de las dos clases:
+
+P(oferta, sin enlace | spam) = 16 × 20 − 14 = 0.80 × 0.30 = 0.24.
+
+20
+
+20
+
+oferta sin enlace: 6 de 20 spam
+
+P(oferta, sin enlace | legítimo) = 8 × 80
+
+80 − 16 80
+
+= 0.10 × 0.80 = 0.08.
+
+oferta
+
+sin enlace:
+
+64 de 80 legítimos
+
+Estos productos describen el patrón dentro de cada clase. Para obtener la probabilidad de spam falta incorporar las frecuencias de clase y normalizar.
+
+Cálculo bajo independencia condicional; no son conteos observados del patrón completo.
+
+Data Science UC | Naive Bayes
+
+15 / 61
+
+Preparar los factores del correo nuevo
+Queremos clasificar: oferta presente, enlace ausente.
+
+Clase Frecuencia de clase Oferta presente Enlace ausente
+
+Legítimo Spam
+
+80/100 = 0.80 20/100 = 0.20
+
+8/80 = 0.10 16/20 = 0.80
+
+(80 − 16)/80 = 0.80 (20 − 14)/20 = 0.30
+
+La ausencia de enlace es más frecuente entre legítimos: 64 de 80, frente a 6 de 20 spam.
+En cada columna buscamos la probabilidad de lo que efectivamente observamos en el correo.
+
+Data Science UC | Naive Bayes
+
+16 / 61
+
+Oferta presente, enlace ausente
+
+s0: producto para legítimo. s1: producto para spam.
+
+s0 = 0.80 × 0.10 × 0.80 = 0.064
+
+clase legítima 80/100
+
+oferta presente 8/80
+
+enlace ausente 64/80
+
+s1 = 0.20 × 0.80 × 0.30 = 0.048
+
+clase spam 20/100
+
+oferta presente 16/20
+
+enlace ausente 6/20
+
+P(spam | oferta, sin enlace) = s1 = 0.048 ≈ 0.4286. s0 + s1 0.064 + 0.048
+
+Los productos s0 y s1 aún no son las probabilidades de clase del correo. Primero debemos normalizarlos.
+
+Data Science UC | Naive Bayes
+
+17 / 61
+
+¿Qué cambia cuando vemos el enlace?
+
+Lo que observamos Cálculo de la probabilidad de spam Resultado
+
+Sólo oferta Oferta, sin enlace Oferta y enlace
+
+0.16/(0.08 + 0.16) 0.048/(0.064 + 0.048) 0.112/(0.016 + 0.112)
+
+0.6667 0.4286 0.8750
+
+En la última fila, oferta y enlace están presentes. Usamos sus frecuencias dentro de
+
+cada clase:
+
+20 100 × 16 20 × 14 20 = 0.112,
+
+80 100 × 880 × 16 80 = 0.016 .
+
+spam y ambas señales
+
+legítimo y ambas señales
+
+No observar el enlace no es lo mismo que desconocer si existe. Con umbral 0.50, su ausencia cambia la decisión a legítimo.
+
+Data Science UC | Naive Bayes
+
+18 / 61
+
+¿No apareció o es imposible que aparezca?
+
+Agreguemos una palabra hipotética, premio, que no apareció en ninguno de los 20
+
+spam del ejemplo:
+
+P(premio | spam) = 0 = 0. 20
+
+Si el próximo correo contiene premio, multiplicar por cero anula el producto para
+
+spam, aunque las demás señales favorezcan esa clase.
+
+Observar cero casos en una muestra pequeña no demuestra que el evento sea imposible.
+
+Necesitamos evitar que un conteo cero cierre por completo una posibilidad.
+
+Data Science UC | Naive Bayes
+
+19 / 61
+
+Suavizar: dar un pequeño peso a ambas respuestas
+
+Con suavizado de Laplace, agregamos uno a presente y uno a ausente. Para premio entre los spam:
+
+0
+
++1
+
+P(premio | spam) = presencias observadas 20 +
+
+peso agregado = 1 ≈ 0.0455.
+
+2
+
+22
+
+correos spam uno por cada respuesta
+
+Llamamos α al peso agregado a cada respuesta. Aquí usamos α = 1; otros valores pueden compararse mediante validación.
+
+El denominador aumenta en dos porque existen dos respuestas posibles: presente y ausente.
+
+El suavizado modifica las probabilidades de las señales. Conservamos las frecuencias de clase: 80/100 y 20/100.
+
+Data Science UC | Naive Bayes
+
+20 / 61
+
+Reconstruir los factores con suavizado
+Correo con oferta presente y enlace ausente; α = 1.
+
+Clase Oferta presente Enlace ausente
+
+Legítimo Spam
+
+8+1 = 9 80 + 2 82 16 + 1 = 17 20 + 2 22
+
+(80 − 16) + 1 = 65
+
+80 + 2
+
+82
+
+(20 − 14) + 1 = 7
+
+20 + 2
+
+22
+
+7= 22
+
+6
+
++1
+
+spam sin enlace suavizado . 20 + 2
+
+spam observados dos respuestas
+
+Spam sin enlace: 20 − 14 = 6. Con suavizado: 6 + 1 = 7 sobre 20 + 2 = 22.
+
+Data Science UC | Naive Bayes
+
+21 / 61
+
+Completar el cálculo con suavizado
+
+Usamos los factores de la tabla anterior y las mismas frecuencias de clase:
+
+9
+
+65
+
+s0 = 0.80 × ×
+
+≈ 0.0696
+
+82
+
+82
+
+legítimo
+
+oferta sin enlace
+
+17
+
+7
+
+s1 = 0.20 × ×
+
+≈ 0.0492
+
+22
+
+22
+
+spam
+
+oferta sin enlace
+
+P(spam | oferta, sin enlace) = s1 ≈ 0.4140. s0 + s1
+
+Pasamos de 0.4286 a 0.4140. El suavizado evita ceros; no corrige la dependencia entre señales.
+El resultado se calcula con las fracciones completas, sin redondear los productos intermedios. Data Science UC | Naive Bayes
+
+22 / 61
+
+Separar lo que aprendemos de lo que predecimos
+
+Ajustar con correos etiquetados Contamos cuántos correos hay en cada clase y cuántos presentan cada señal.
+Con esos conteos y el suavizado obtenemos las probabilidades que usará el modelo.
+
+Predecir un correo Leemos qué señales están presentes y cuáles ausentes, sin conocer su etiqueta.
+Elegimos los factores correspondientes, multiplicamos por la previa y normalizamos.
+
+Las probabilidades se aprenden una vez durante el ajuste. Después podemos utilizarlas para clasificar distintos correos.
+
+Data Science UC | Naive Bayes
+
+23 / 61
+
+El mismo cálculo en R y Python
+
+Oferta presente y enlace ausente; suavizado α = 1.
+
+Python
+
+R
+
+s_legitimo = (80/100)*(9/82)*(65/82) s_spam = (20/100)*(17/22)*(7/22) p_spam = s_spam/(s_legitimo+s_spam) print(p_spam)
+
+s_legitimo <- (80/100)*(9/82)*(65/82) s_spam <- (20/100)*(17/22)*(7/22) p_spam <- s_spam/(s_legitimo+s_spam) print(p_spam)
+
+Salida en ambos lenguajes: pspam ≈ 0.4140. Ambos lenguajes reproducen el cálculo que hicimos a mano.
+
+Data Science UC | Naive Bayes
+
+24 / 61
+
+Leer la salida sin perder los conteos
+
+Probabilidad
+
+Sin suavizado
+
+Con α = 1
+
+Oferta entre spam Enlace entre spam Spam para oferta sin enlace
+
+16/20 = 0.8000 14/20 = 0.7000
+0.4286
+
+17/22 ≈ 0.7727 15/22 ≈ 0.6818
+0.4140
+
+Las primeras filas describen señales dentro de una clase. La última clasifica el correo combinando ambas clases y la ausencia de enlace.
+En el CSV, theta identifica una probabilidad de presencia por clase; posterior es la probabilidad de spam del correo nuevo.
+
+Data Science UC | Naive Bayes
+
+25 / 61
+
+El programa aprende las mismas probabilidades
+
+Filas: legítimo y spam; columnas: oferta y enlace. Con α = 1:
+
+Python
+
+R
+
+n = np.array([80., 20.]) conteos = np.array([[8., 16.],
+[16., 14.]]) alfa = 1 prior = n / n.sum() theta = (conteos + alfa) / (
+n[:, None] + 2*alfa) print(theta)
+
+n <- c(80, 20) conteos <- rbind(c(8, 16),
+c(16, 14)) alfa <- 1 prior <- n / sum(n) theta <- (conteos + alfa) /
+(n + 2*alfa) print(theta)
+
+Salida para spam: (17/22, 15/22) ≈ (0.7727, 0.6818). La previa es (0.80, 0.20).
+
+Cada celda estima una presencia por clase. Para una ausencia usamos 1 − theta.
+Fragmento del cálculo de los scripts. Python utiliza numpy, importado como np en el entorno inicial.
+
+Data Science UC | Naive Bayes
+
+26 / 61
+
+Cada salida del modelo responde una pregunta
+Para el correo con oferta y sin enlace, usando α = 1:
+
+Cantidad Entrada
+Previa Condicional
+Posterior
+
+Qué significa
+Señales que observamos en el correo Frecuencia de clase antes de leerlo Frecuencia de una señal dentro de clase Probabilidad de clase al combinar las señales
+
+En nuestro ejemplo
+Oferta sí, enlace no
+P(spam) = 0.20 Oferta en spam: 17/22 0.4140 de spam
+
+El 0.7727 describe oferta dentro de spam. El 0.4140 describe spam para este correo: son preguntas diferentes.
+
+Data Science UC | Naive Bayes
+
+27 / 61
+
+La misma cuenta para varias clases
+
+La cuenta anterior también sirve para K clases c1, . . . , cK . Por ejemplo: spam, personal y trabajo. Para un correo con entradas x:
+
+• πk = P(Y = ck ): probabilidad previa de la clase ck . • fk (x): probabilidad de las entradas x dentro de esa clase; para entradas
+continuas, su densidad.
+
+πk ×
+
+fk (x)
+
+P(Y = ck | X = x) =
+
+previa entradas en esa clase .
+K
+πℓfℓ(x )
+ℓ=1
+
+suma de los productos de todas las clases
+El índice ℓ recorre las clases: con tres clases, el denominador suma tres productos.
+
+Normalizamos igual que con spam y legítimo, ahora entre K clases.
+
+Data Science UC | Naive Bayes
+
+28 / 61
+
+Naive Bayes: un factor por variable
+
+Tenemos d variables, x = (x1, . . . , xd ); fjk (xj ) es el factor del valor observado de la variable j en la clase ck .
+Por independencia dentro de clase, fk (x) = j=1 d fjk (xj ):
+
+d
+
+πk
+
+fjk (xj )
+
+j =1
+
+P(Y = ck | X = x) =
+
+multiplicar los factores de las variables .
+
+K
+
+d
+
+πℓ fjℓ(xj )
+
+ℓ=1 j=1
+
+Con oferta y enlace, d = 2: el numerador para spam es 0.20(17/22)(7/22).
+
+El producto recorre las variables; la suma recorre las clases.
+
+Data Science UC | Naive Bayes
+
+29 / 61
+
+Ya construimos una probabilidad: falta ponerla a prueba
+Para el correo con oferta y sin enlace, los conteos de 100 correos y el suavizado α = 1 dieron P(spam | x) ≈ 0.4140. Sabemos qué representa cada factor y cómo R y Python repiten el cálculo. Con umbral 0.50, el mensaje se clasifica como legítimo. Al volver a los datos reales, aplicaremos la receta a 54 señales y comprobaremos sus probabilidades en correos que no participaron en el ajuste. La segunda parte responderá las preguntas pendientes: qué tan fiables son esas probabilidades y cuándo conviene bloquear.
+
+Data Science UC | Naive Bayes
+
+30 / 61
+
+Construyamos el filtro con 4601 correos
+Aplicaremos la receta a los correos etiquetados de Spambase.
+
+Qué contiene
+
+Qué utilizaremos Para qué
+
+48 frecuencias de palabras 6 frecuencias de caracteres Etiqueta de cada correo
+
+Las 48 columnas Las 6 columnas Spam o legítimo
+
+Describir el contenido Describir otras señales Aprender por clase
+
+Usamos 54 frecuencias; excluimos las tres medidas de mayúsculas.
+
+Dadas las señales de un correo, ¿qué probabilidad de spam le asigna el modelo?
+
+Hopkins et al. (1999), Spambase, UCI, DOI 10.24432/C53G6X; CC BY 4.0. Corpus histórico.
+
+Data Science UC | Naive Bayes
+
+31 / 61
+
+Una fila describe las señales de un correo
+El correo ID 1 tiene el menor identificador de desarrollo. Mostramos tres de sus 54 frecuencias:
+
+Señal
+Palabra free Palabra money Carácter !
+
+Frecuencia registrada
+0.32 % de las palabras 0 % de las palabras
+0.778 % de los caracteres
+
+Presencia: frecuencia > 0
+1: presente 0: ausente 1: presente
+
+El CSV guarda 0.32 para representar 0.32 %. Bernoulli utiliza el indicador de presencia mostrado en la última columna.
+
+La predicción utiliza las señales. El identificador y la etiqueta del correo no son entradas del modelo.
+
+Valores del archivo local spam_s40.csv. Caso elegido por identificador, sin consultar su clase. Data Science UC | Naive Bayes
+
+32 / 61
+
+Leer los datos y separar entradas de respuesta
+
+En los scripts, DATOS es la carpeta del CSV. El entorno de Python ya dispone de
+
+pandas como pd.
+
+Python
+
+R
+
+datos = pd.read_csv(DATOS/"spam_s40.csv") variables = [c for c in datos
+if c.startswith(("word_freq_", "char_freq_"))]
+ent = datos[ datos.conjunto == "entrenamiento"]
+X = ent[variables].to_numpy() y = ent.spam.to_numpy()
+
+datos <- read.csv( file.path(DATOS,"spam_s40.csv"), check.names=FALSE)
+variables <- grep("^(word_freq_|char_freq_)", names(datos), value=TRUE)
+ent <- datos[ datos$conjunto=="entrenamiento", ]
+X <- as.matrix(ent[,variables]) y <- ent$spam
+
+X contiene 3680 correos y 54 frecuencias; y, sus clases (1: spam; 0: legítimo).
+
+Seleccionar las columnas por su nombre deja fuera identificadores, grupos, pliegues y la propia respuesta.
+
+Data Science UC | Naive Bayes
+
+33 / 61
+
+Aprender con unos correos y predecir otros
+Conservamos la partición guardada en los datos:
+
+Conjunto
+Desarrollo Prueba histórica
+
+Correos
+3680 921
+
+Uso
+Aprender y comparar recetas Comprobar la receta elegida
+
+En cinco pliegues, aprendemos con cuatro y predecimos el restante. Al repetirlo, cada correo recibe una predicción fuera de pliegue (OOF).
+Los 921 correos ya se usaron al evaluar otros clasificadores: la comprobación es histórica, no una nueva prueba independiente.
+
+Compararemos recetas con predicciones de correos excluidos de su respectivo ajuste.
+
+Las filas con las mismas 57 entradas originales se mantienen juntas. Estos grupos no identifican remitentes ni fechas. Data Science UC | Naive Bayes
+
+34 / 61
+
+Del correo real a su probabilidad de spam
+
+La función ajustar_predecir, incluida en ambos scripts, recibe datos de ajuste y
+
+correos por predecir. Usamos Bernoulli con α = 1.
+
+Python
+
+R
+
+i = int(np.argmin(ent.id.to_numpy())) correo = X[i:i+1] p, modelo, logp = ajustar_predecir(
+X, y, correo, "bern", 1) print(ent.id.iloc[i]) print(p[0])
+
+i <- which.min(ent$id) correo <- X[i,,drop=FALSE] ajuste <- ajustar_predecir(
+X, y, correo, "bern", 1) print(ent$id[i]) print(ajuste$p[1])
+
+Ambos devuelven ID 1 y probabilidad de spam p ≈ 0.9964. La función transforma cada frecuencia positiva en presencia y combina las 54 señales.
+Este correo participa en el ajuste: el cálculo ilustra una predicción. Evaluaremos la calidad del filtro con las probabilidades OOF.
+
+Data Science UC | Naive Bayes
+
+35 / 61
+
+¿Basta con saber que una palabra está presente?
+La frecuencia de free en ID 1 es 0.32 %. Dos representaciones posibles:
+
+Representación
+Presencia Frecuencia
+
+Valor que entra
+1, porque 0.32 > 0 0.32
+
+Información conservada
+La palabra aparece Qué proporción de palabras corresponde a free
+
+Bernoulli trata igual cualquier frecuencia positiva. Conservar el valor permite distinguir cuánto aparece la palabra.
+
+Conservar más detalle exige otro supuesto sobre los datos. Comprobaremos si ese detalle mejora las probabilidades.
+
+Data Science UC | Naive Bayes
+
+36 / 61
+
+La variante gaussiana describe valores con curvas
+
+Naive Bayes gaussiano describe los valores de cada variable con una curva normal dentro de cada clase.
+
+Qué aprende Una media, que sitúa el centro de la curva, y una dispersión, que determina su amplitud, para cada variable y clase.
+
+Cómo predice Evalúa las alturas en los valores del correo. Multiplica esas alturas y la previa de clase; luego normaliza.
+
+La altura es una densidad, no la probabilidad de un valor exacto. Se conserva la independencia entre variables dentro de clase.
+
+Evaluaremos si esta aproximación normal produce buenas probabilidades para los correos.
+
+Data Science UC | Naive Bayes
+
+37 / 61
+
+Transformar la frecuencia antes de ajustar
+Las frecuencias son no negativas y algunas pueden ser grandes. En la receta gaussiana usaremos z = log(1 + x), con logaritmo natural.
+
+Señal del correo ID 1 Valor x en el CSV Valor transformado z
+
+free money
+
+0.32
+
+log(1.32) ≈ 0.2776
+
+0
+
+log(1) = 0
+
+La transformación comprime valores grandes y conserva los ceros. Las medias y dispersiones se aprenden en esta escala transformada.
+
+Transformar no garantiza normalidad ni independencia. La comparación OOF mostrará cómo funciona esta receta en los correos disponibles.
+
+Python y R usan log1p(x) para calcular log(1 + x) con precisión numérica. Data Science UC | Naive Bayes
+
+38 / 61
+
+Contar repeticiones requiere el texto
+Con los mensajes disponibles, fijamos un vocabulario y contamos las apariciones:
+
+Mensaje
+
+oferta reunion hoy
+
+oferta hoy
+
+1
+
+oferta oferta hoy
+
+2
+
+01 01
+
+Bernoulli: ambos mensajes tienen las presencias (1, 0, 1). Multinomial: cada aparición aporta un factor; la repetición sí cambia el cálculo.
+Multinomial aprende proporciones de términos contando palabras de cada clase. La previa se estima contando documentos.
+
+Multinomial conserva las repeticiones; Bernoulli conserva sólo las presencias.
+
+Mensajes construidos para ilustrar las representaciones; no proceden de Spambase.
+
+Data Science UC | Naive Bayes
+
+39 / 61
+
+La información disponible determina qué comparar
+Volvamos a las 54 frecuencias del archivo local:
+
+Variante
+Bernoulli Gaussiana Multinomial
+
+Entrada que necesita
+Presencias o ausencias Mediciones numéricas Conteos de términos
+
+Decisión para este caso
+Usar frecuencia > 0 Probar log(1 + frecuencia) Requiere información adicional
+
+Un porcentaje no permite recuperar cuántas veces apareció una palabra sin conocer la longitud del mensaje. No trataremos estas frecuencias como conteos de palabras.
+
+Compararemos Bernoulli y la receta gaussiana sobre los mismos correos y pliegues. La siguiente pregunta es cuál produce mejores probabilidades.
+
+Data Science UC | Naive Bayes
+
+40 / 61
+
+Qué recetas compararemos y cómo elegiremos
+Usamos las mismas 54 frecuencias y los mismos cinco pliegues de desarrollo.
+
+Receta
+Frecuencia de spam Bernoulli Gaussiana
+
+Qué aprende
+Una probabilidad sin usar señales Presencias y ausencias Medias y dispersiones de log(1 + x)
+
+Opciones
+Una referencia α = 0.5, 1, 2 Una receta
+
+Son cinco candidatos: una referencia, tres suavizados y una gaussiana.
+1. Elegimos el menor log loss: penaliza asignar poca probabilidad a la clase que realmente ocurrió.
+2. Después elegimos el umbral del ganador: queremos una regla de bloqueo.
+
+Primero comparamos las probabilidades; después decidimos qué hacer con ellas.
+
+Data Science UC | Naive Bayes
+
+41 / 61
+
+Una predicción sin participar en su ajuste
+Los 3680 correos de desarrollo están repartidos en cinco pliegues.
+
+Ajustar Cuatro pliegues para aprender
+
+Predecir El pliegue que apartamos
+
+Repetir Una probabilidad
+por correo
+
+Repetimos cinco veces y reunimos las probabilidades OOF (out of fold, fuera de pliegue). Las comparamos con las etiquetas reales.
+
+Cinco recetas y cinco pliegues requieren 5 × 5 = 25 ajustes.
+
+La fila que recibe una predicción no aportó al ajuste que la produjo.
+
+La selección usa desarrollo; los 921 correos de prueba histórica se mantienen aparte.
+
+Data Science UC | Naive Bayes
+
+42 / 61
+
+El mismo recorrido de validación en R y Python
+
+Para Bernoulli con α = 1, val identifica el pliegue que apartamos:
+
+Python
+
+R
+
+pred = np.empty(len(y)) for k in sorted(np.unique(folds)):
+val = folds == k pred[val], _, _ = ajustar_predecir(
+X[~val], y[~val], X[val], "bern", 1.)
+
+pred <- numeric(length(y)) for (k in sort(unique(folds))) {
+val <- folds == k ajuste <- ajustar_predecir(
+X[!val, ], y[!val], X[val, ], "bern", 1) pred[val] <- ajuste$p }
+
+X: 54 frecuencias; y: etiquetas; folds: pliegue de cada correo. pred reúne las 3680 probabilidades OOF de spam.
+Repetimos este recorrido para cada receta. El script conserva también las log-probabilidades para evaluar con precisión.
+
+Data Science UC | Naive Bayes
+
+43 / 61
+
+Bernoulli obtiene el menor error probabilístico
+Predicciones OOF de los mismos 3680 correos.
+
+Receta
+Frecuencia de spam Bernoulli, α = 0.5 Bernoulli, α = 1 Bernoulli, α = 2 Gaussiana, log(1 + x)
+
+Log loss
+0.671 0.556 0.557 0.558 4.931
+
+Brier
+0.239 0.099 0.099 0.100 0.190
+
+AUC
+0.499 0.952 0.951 0.951 0.940
+
+Brier promedia el error cuadrático entre probabilidad y etiqueta (0 o 1): menor es mejor. AUC mide el ordenamiento entre clases: mayor es mejor.
+
+Elegimos Bernoulli con α = 0.5: log loss 0.556. Los tres suavizados dan resultados cercanos.
+
+El mínimo OOF intervino en la selección; no constituye una evaluación independiente del ganador. Data Science UC | Naive Bayes
+
+44 / 61
+
+Los aciertos pueden esconder certeza equivocada
+
+Frecuencia de spam
+
+Bernoulli: alfa 0.5
+
+Bernoulli: alfa 1
+
+Bernoulli: alfa 2
+
+Gaussiana: log(1+x)
+
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+Log loss OOF (menor es mejor)
+
+La gaussiana acierta el 80.8 % con umbral 0.5, pero su log loss es 4.931, frente a 0.556 de Bernoulli.
+
+El log loss penaliza los errores con certeza excesiva. El porcentaje de aciertos no muestra esa diferencia.
+
+Data Science UC | Naive Bayes
+
+45 / 61
+
+Copiar una señal aumenta la certeza del modelo
+
+Experimento controlado: 100 spam y 100 legítimos; una señal aparece en 80 spam y 20 legítimos.
+
+0.5 × 0.8
+
+P(spam | señal) =
+
+100/200 80/100
+
+= 0.8000.
+
+0.5 × 0.8 + 0.5 × 0.2
+
+20/100
+
+Copiamos esa misma columna. Naive Bayes multiplica las dos copias:
+
+p = 0.5 × 0.8 × 0.8 ≈ 0.9412. 0.5 × 0.8 × 0.8 + 0.5 × 0.2 × 0.2
+
+El correo y su información son los mismos. El modelo contó dos veces una señal y aumentó su certeza.
+
+Ejemplo construido sobre dependencia; no explica por sí solo los resultados de Spambase.
+
+Data Science UC | Naive Bayes
+
+46 / 61
+
+La clase se mantiene; la certeza sigue creciendo
+
+1.0
+
+Probabilidad de clase 1
+
+0.9
+
+0.8
+
+0.7 1
+
+NB: trata las copias como independientes Información disponible: la misma señal
+
+2
+
+4
+
+Número de copias de la señal
+
+Cuatro copias repiten cuatro veces los factores del ejemplo anterior:
+
+0.5(0.8)4 p = 0.5(0.8)4 + 0.5(0.2)4 ≈ 0.9961.
+
+Las tres versiones predicen spam a umbral 0.5. Ninguna copia aporta información que justifique pasar de 80 % a 99.6 %.
+
+Data Science UC | Naive Bayes
+
+47 / 61
+
+Fracción observada de spam
+
+Contrastar la probabilidad con lo que ocurrió
+
+1.0 Bernoulli: alfa 1
+0.8 0.6 0.4 0.2
+
+Gaussiana: log(1+x)
+
+Bernoulli, α = 1 Intervalo 0.9–1: 1157 correos.
+Predicción media: 99.44 %. Spam observado:
+
+0.0
+
+0.0 0.2 0.4 0.6 0.8 1.0 0.0 0.2 0.4 0.6 0.8 1.0
+
+Probabilidad media
+
+Probabilidad media
+
+1066 ≈ 92.13 %. 1157
+
+Ejes: probabilidad media y fracción de spam. Tamaño: número de correos; intervalos de
+
+amplitud 0.1.
+
+En ese grupo, 99.44 % predicho supera 92.13 % observado. La diagonal marca coincidencia entre probabilidad y frecuencia.
+
+Diagnóstico OOF: Bernoulli usa α = 1; el ganador de la selección usa α = 0.5. No se ajustó un calibrador.
+
+Data Science UC | Naive Bayes
+
+48 / 61
+
+Reconstruir una señal del correo real
+Correo ID 1: address presente. Conteos de desarrollo; α = 1:
+
+Clase Legítimo Spam
+
+Presencias 226 498
+
+Total 2230 1450
+
+Probabilidad suavizada
+226 + 1 ≈ 0.1017 2230 + 2 498 + 1 ≈ 0.3437 1450 + 2
+
+Suavizado: uno por presencia y otro por ausencia; el total aumenta en dos.
+
+Address presente favorece spam: 0.3437 > 0.1017. Aún falta combinar las otras 53 señales.
+
+Son probabilidades de una señal dentro de cada clase, no probabilidades posteriores de spam.
+
+Data Science UC | Naive Bayes
+
+49 / 61
+
+Combinar las señales de un correo real
+
+Dentro de legítimos
+
+Dentro de spam
+
+free (presente) address (presente) carácter ! (presente)
+email (presente) our (presente) your (presente) all (presente)
+carácter $ (ausente)
+
+0.0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1.0
+
+P(señal observada | clase)
+
+Ocho señales del correo Cada par compara la probabilidad del estado observado dentro de cada clase.
+Predicción completa Las 54 señales y las frecuencias de clase producen pspam = 0.9964.
+
+La predicción combina presencias y ausencias. Las alturas de las barras son factores: no se suman ni representan efectos causales.
+
+ID 1, el menor de desarrollo; Bernoulli con α = 1. El correo participó en el ajuste: es explicación del modelo, no evaluación OOF.
+
+Data Science UC | Naive Bayes
+
+50 / 61
+
+¿Cuándo conviene bloquear un correo?
+Un falso positivo (FP) bloquea un legítimo (costo 5); un falso negativo (FN) deja pasar spam (costo 1). Los aciertos cuestan cero.
+
+Probabilidad
+
+Bloquear
+
+Dejar pasar Menor costo
+
+p = 0.90 p = 0.70
+
+5(1 − 0.90) = 0.50 5(1 − 0.70) = 1.50
+
+1(0.90) = 0.90 1(0.70) = 0.70
+
+Bloquear Dejar pasar
+
+Si p es la probabilidad de spam, bloquear arriesga el costo de un legítimo (1 − p); dejar pasar, el de un spam (p).
+
+Como la calibración es imperfecta, compararemos umbrales con los errores observados.
+
+Costos y probabilidades hipotéticos para explicar la decisión; la búsqueda siguiente usa predicciones OOF.
+
+Data Science UC | Naive Bayes
+
+51 / 61
+
+Buscar el umbral en las predicciones del ganador
+
+La función medir cuenta FP y FN y calcula 1000(5 FP + FN)/n, el costo por 1000
+
+correos.
+
+Python
+
+R
+
+umbrales = np.arange(1, 20)/20 costos = pd.DataFrame([
+dict(umbral=t, **medir( y, oof[ganador], t))
+for t in umbrales]) elegido = costos.sort_values(
+["costo_1000", "umbral"], ascending=[True, False]).iloc[0]
+
+umbrales <- (1:19)/20 costos <- do.call(rbind,
+lapply(umbrales, function(t) cbind(umbral=t, medir( y, oof[[ganador]], t))))
+elegido <- costos[order( costos$costo_1000,-costos$umbral),][1,]
+
+Usamos las probabilidades OOF del Bernoulli seleccionado (α = 0.5).
+
+Entre 19 umbrales, de 0.05 a 0.95, elegimos 0.95. Si dos costos empatan, preferimos el umbral mayor.
+
+Data Science UC | Naive Bayes
+
+52 / 61
+
+Costo OOF por 1000 correos
+
+El umbral elegido cambia los errores del filtro
+450 400 350 300 250 Umbral elegido: 0.95
+0.2 0.4 Umbral 0.6 0.8
+
+Con t = 0.95: 78 legítimos bloqueados y 416 spam que pasan, entre 3680 correos.
+
+5 × 78 + 416
+
+Costo por 1000 =
+
+FP FN × 1000 = 219.0. 3680
+
+0.95 tiene el menor costo entre los 19 umbrales. Estar en el borde no demuestra que sea el mejor umbral posible.
+
+Búsqueda sobre probabilidades OOF del ganador; no se usaron los correos de prueba histórica para elegir.
+
+Data Science UC | Naive Bayes
+
+53 / 61
+
+Qué obtiene la regla en los 921 correos históricos
+
+Real / predicha Legítimo Spam
+
+Costo del clasificador 17 legítimos bloqueados y 89 spam que pasan:
+
+Legítimo Spam
+
+541
+
+17
+
+89 274
+
+Filas: clase real. Columnas: decisión. Bernoulli, α = 0.5; umbral 0.95. Log loss: 0.533. Brier: 0.094.
+
+5 × 17 + 89 × 1000 = 188.9. 921
+Si dejamos pasar todos Los 89 + 274 = 363 spam pasan:
+363 × 1000 = 394.1. 921
+
+La regla reduce el costo frente a dejar pasar todos. Es una comprobación retrospectiva: estos correos ya se habían utilizado.
+
+Modelo y umbral se eligieron en desarrollo. El resultado no acredita rendimiento en correos actuales.
+
+Data Science UC | Naive Bayes
+
+54 / 61
+
+Qué revisar antes de usar el filtro en otra bandeja
+
+Lo que aprendimos
+Con oferta: 66.7 % → 14.0 % al pasar de 20 % a 2 % de spam
+Copiar una señal elevó la certeza sin agregar información Spambase contiene correos históricos
+
+Qué revisar en la nueva bandeja
+Si la frecuencia de spam del ajuste sigue representando a los nuevos correos Dependencia entre señales y calibración de las probabilidades Resultados en correos actuales aún no utilizados
+
+Cambiar o calibrar el filtro exige evaluar la receta completa con datos separados.
+
+Data Science UC | Naive Bayes
+
+55 / 61
+
+La regla que construimos, de los datos a la acción
+
+Paso Representar Aprender Predecir
+Actuar Comprobar
+
+Decisión del caso de correos
+54 frecuencias convertidas en presencia o ausencia Frecuencias por clase con suavizado α = 0.5 Combinar presencias y ausencias; normalizar entre las dos clases Bloquear cuando la probabilidad de spam sea al menos 0.95 Contar errores y costo; revisar si las probabilidades reflejan frecuencias
+
+Suavizado y umbral cumplen tareas distintas: uno modifica el cálculo de la probabilidad; el otro modifica la acción.
+
+Data Science UC | Naive Bayes
+
+56 / 61
+
+Reproducir el recorrido con los archivos de la sesión
+
+1. Guardar juntos spam_s40.csv y el script del lenguaje elegido: 40_naive_bayes.R o 40_naive_bayes.py.
+2. Ejecutar el script completo o sus secciones 00–10 en orden, conservando la misma sesión de trabajo.
+3. Leer las tablas y figuras que se generan: primero los ejemplos pequeños; después la comparación, el correo explicado y la regla de bloqueo.
+
+Cada salida conserva los resultados para revisarlos sin repetir las cuentas a mano. No es necesario ejecutar ambos lenguajes para seguir el análisis.
+La presentación explica las decisiones; los scripts permiten reconstruir sus números con los mismos datos y pliegues.
+R usa funciones base. Python requiere numpy, pandas, matplotlib y scikit-learn. Los datos se leen localmente.
+
+Data Science UC | Naive Bayes
+
+57 / 61
+
+¿Qué significa una probabilidad de spam muy alta?
+
+En el correo explicado obtuvimos p = 0.9964. ¿Qué podemos concluir?
+• Sí: bajo ese ajuste Bernoulli, las señales del correo favorecen mucho a spam frente a legítimo.
+• Aún no: que el 99.64 % de correos similares sea realmente spam; esa lectura requiere comprobar calibración.
+• Tampoco: que el correo sea habitual. Un clasificador reparte probabilidad entre sus clases aunque el caso resulte extraño.
+Una probabilidad alta de clase expresa una preferencia del modelo. Su fiabilidad y la rareza del caso son preguntas adicionales.
+El correo ID 1 se explicó con α = 1 y participó en el ajuste; no fue una predicción OOF.
+
+Data Science UC | Naive Bayes
+
+58 / 61
+
+Referencias y material de la sesión
+• Manning, C. D., Raghavan, P. y Schütze, H. (2008). Introduction to Information Retrieval, capítulo 13. Texto de los autores.
+• scikit-learn. Naive Bayes y calibración de probabilidades. Fórmulas e implementación. • Hopkins, M., Reeber, E., Forman, G. y Suermondt, J. (1999). Spambase. UCI. DOI
+10.24432/C53G6X, CC BY 4.0.
+Material: presentación, 40_naive_bayes.py, 40_naive_bayes.R y spam_s40.csv. Los scripts contienen cálculos, figuras y tablas. Pueden ejecutarse sin conexión una vez instaladas sus dependencias.
+
+Data Science UC | Naive Bayes
+
+59 / 61
+
+De observar una palabra a decidir qué hacer
+¿Basta con que un correo contenga oferta para bloquearlo? 1. Construir la probabilidad. En el ejemplo de 100 correos, oferta sin enlace produjo p ≈ 0.4140 con suavizado: también importan las ausencias y la frecuencia de clase. 2. Comprobar su calidad. En Spambase elegimos Bernoulli con α = 0.5 por el menor log loss OOF entre las recetas comparadas. 3. Decidir con un propósito. Con costos de 5 por bloquear un legítimo y 1 por dejar pasar spam, elegimos umbral 0.95 en desarrollo.
+Una señal aporta información; Bayes la combina, la evaluación contrasta la probabilidad y el costo orienta la decisión.
+
+Data Science UC | Naive Bayes
+
+60 / 61
+
+Para continuar: Naive Bayes en R y Python
+Las bibliotecas automatizan el ajuste y la predicción que construimos paso a paso.
+
+Variante
+
+R: naivebayes
+
+Python: scikit-learn
+
+Bernoulli Gaussiana Multinomial
+
+bernoulli_naive_bayes() gaussian_naive_bayes() multinomial_naive_bayes()
+
+BernoulliNB() GaussianNB() MultinomialNB()
+
+R: obtener probabilidades predict(modelo, nuevos, type="prob")
+
+Python: obtener probabilidades modelo.predict_proba(nuevos)
+
+Bernoulli usa entradas binarias. Suavizado: laplace en R; alpha en Python.
+
+La biblioteca automatiza las cuentas; conservamos la representación, la validación y el umbral.
+
+Documentación: naivebayes (R) y Naive Bayes en scikit-learn (Python).
+
+Data Science UC | Naive Bayes
+
+61 / 61
+
+

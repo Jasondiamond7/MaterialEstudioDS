@@ -1,0 +1,4819 @@
+1
+00:00:00,250 --> 00:00:04,220
+Bienvenidos a la clase treinta y nueve: clustering, o agrupamiento.
+
+2
+00:00:04,340 --> 00:00:08,240
+Vamos a aprender a encontrar grupos en datos que no traen ninguna etiqueta.
+
+3
+00:00:08,360 --> 00:00:10,340
+Imagina que trabajas en un banco.
+
+4
+00:00:10,460 --> 00:00:13,417
+Quieres ofrecer inversiones de riesgo bajo, medio
+
+5
+00:00:13,417 --> 00:00:15,830
+o alto, según el perfil de cada cliente.
+
+6
+00:00:15,950 --> 00:00:18,813
+Pero no puedes llamar a cada persona y preguntarle:
+
+7
+00:00:18,813 --> 00:00:21,170
+¿usted es de riesgo bajo o de riesgo alto?
+
+8
+00:00:21,290 --> 00:00:22,860
+Muchas ni siquiera lo saben.
+
+9
+00:00:22,980 --> 00:00:27,970
+Lo que sí tienes son datos: cuánto ahorran, cuánto gastan, qué productos usan.
+
+10
+00:00:28,090 --> 00:00:32,810
+La pregunta de esta clase es: ¿podemos construir esos grupos solo con los datos?
+
+11
+00:00:32,930 --> 00:00:34,100
+Una analogía.
+
+12
+00:00:34,220 --> 00:00:37,220
+Te entregan una caja con cientos de botones mezclados y
+
+13
+00:00:37,220 --> 00:00:39,620
+te piden que los ordenes, sin instrucciones.
+
+14
+00:00:39,740 --> 00:00:41,450
+Podrías separarlos por color.
+
+15
+00:00:41,570 --> 00:00:42,490
+O por tamaño.
+
+16
+00:00:42,610 --> 00:00:44,280
+O por número de agujeros.
+
+17
+00:00:44,400 --> 00:00:47,317
+Las tres respuestas son razonables, y ninguna es la
+
+18
+00:00:47,317 --> 00:00:50,120
+correcta: depende de para qué quieres los grupos.
+
+19
+00:00:50,240 --> 00:00:52,400
+Eso es exactamente el clustering.
+
+20
+00:00:52,520 --> 00:00:54,730
+Pongamos esto junto a lo que ya sabes.
+
+21
+00:00:54,850 --> 00:00:58,881
+En clasificación supervisada, como la regresión logística, SVM o
+
+22
+00:00:58,881 --> 00:01:03,101
+Naive Bayes, observamos las variables y también una clase conocida,
+
+23
+00:01:03,101 --> 00:01:06,250
+y aprendemos a predecir esa clase en casos nuevos.
+
+24
+00:01:06,370 --> 00:01:08,950
+En clustering solo observamos las variables.
+
+25
+00:01:09,070 --> 00:01:12,852
+No hay respuesta que predecir: buscamos una partición, y describimos
+
+26
+00:01:12,852 --> 00:01:15,800
+en qué se parecen y en qué se diferencian los grupos.
+
+27
+00:01:15,920 --> 00:01:19,950
+Por eso, la etiqueta de un clúster se construye a partir de los datos.
+
+28
+00:01:20,070 --> 00:01:22,770
+Y una advertencia que la diapositiva dos subraya.
+
+29
+00:01:22,890 --> 00:01:27,230
+El grupo uno no significa positivo, ni mejor, ni de mayor riesgo.
+
+30
+00:01:27,350 --> 00:01:28,460
+Es solo un nombre.
+
+31
+00:01:28,580 --> 00:01:32,480
+Si mañana el algoritmo numera distinto, el grupo uno puede pasar a
+
+32
+00:01:32,480 --> 00:01:35,790
+llamarse grupo tres, y nada habrá cambiado en los datos.
+
+33
+00:01:35,910 --> 00:01:37,650
+¿Qué entrega un agrupamiento?
+
+34
+00:01:37,770 --> 00:01:41,450
+Miremos un ejemplo simulado, como el de la diapositiva tres.
+
+35
+00:01:41,570 --> 00:01:46,770
+Noventa observaciones en dos variables, sin ninguna etiqueta: todas del mismo color.
+
+36
+00:01:46,890 --> 00:01:51,670
+K-means las reparte en tres grupos, y marca con una cruz el centro de cada uno.
+
+37
+00:01:51,790 --> 00:01:55,450
+Al final obtenemos dos cosas: una etiqueta por observación, y
+
+38
+00:01:55,450 --> 00:01:58,270
+un perfil de cada grupo, que aquí es su centro.
+
+39
+00:01:58,390 --> 00:02:00,440
+¿Por qué no basta con mirar el gráfico?
+
+40
+00:02:00,560 --> 00:02:04,440
+Porque aquí hay solo dos variables, y los grupos se separan solos.
+
+41
+00:02:04,560 --> 00:02:07,414
+En la práctica tendrás diez, trece o cincuenta
+
+42
+00:02:07,414 --> 00:02:10,020
+variables, y los grupos estarán mezclados.
+
+43
+00:02:10,140 --> 00:02:13,833
+Ahí nadie puede ver los grupos a ojo: necesitamos una regla para
+
+44
+00:02:13,833 --> 00:02:17,700
+encontrar los centros, y otra para decidir cuántos grupos proponer.
+
+45
+00:02:17,820 --> 00:02:20,380
+Esas son las dos dificultades de esta clase.
+
+46
+00:02:20,500 --> 00:02:23,924
+Antes de agrupar hay una decisión que ningún algoritmo toma por
+
+47
+00:02:23,924 --> 00:02:26,750
+ti: qué significa que dos observaciones se parezcan.
+
+48
+00:02:26,870 --> 00:02:31,870
+En clientes, podrías usar la frecuencia de compra, el gasto o el canal preferido.
+
+49
+00:02:31,990 --> 00:02:36,060
+En vinos, sus mediciones químicas, sin ninguna nota de calidad.
+
+50
+00:02:36,180 --> 00:02:39,310
+En documentos, alguna representación de su contenido.
+
+51
+00:02:39,430 --> 00:02:42,120
+Cambia las variables, y cambian los grupos.
+
+52
+00:02:42,240 --> 00:02:45,065
+Y ojo con esto: un grupo muy compacto puede ser
+
+53
+00:02:45,065 --> 00:02:47,530
+poco útil para el propósito del análisis.
+
+54
+00:02:47,650 --> 00:02:49,980
+Que los puntos queden juntos no garantiza que
+
+55
+00:02:49,980 --> 00:02:52,000
+el grupo sirva para tomar una decisión.
+
+56
+00:02:52,120 --> 00:02:53,460
+¿Dónde se usa esto?
+
+57
+00:02:53,580 --> 00:02:55,700
+El profesor contó varios casos.
+
+58
+00:02:55,820 --> 00:03:00,590
+Segmentar clientes, para ofrecer productos o publicidad distinta a cada grupo.
+
+59
+00:03:00,710 --> 00:03:05,097
+Tractores del mismo modelo, donde algunos fallan cuatro o cinco veces más que
+
+60
+00:03:05,097 --> 00:03:08,630
+otros: se agrupan, y después se investiga qué tienen en común.
+
+61
+00:03:08,750 --> 00:03:12,286
+O edificios en construcción que se comportan distinto porque están
+
+62
+00:03:12,286 --> 00:03:15,340
+cerca del metro, una variable que nadie había registrado.
+
+63
+00:03:15,460 --> 00:03:18,294
+El patrón es el mismo: primero se encuentran los
+
+64
+00:03:18,294 --> 00:03:20,950
+grupos, y después se explica por qué existen.
+
+65
+00:03:21,070 --> 00:03:25,620
+La clase presenta tres métodos, y la elección depende del tipo de variables.
+
+66
+00:03:25,740 --> 00:03:28,717
+K-means, para variables numéricas: cada grupo se
+
+67
+00:03:28,717 --> 00:03:31,260
+representa por la media de cada variable.
+
+68
+00:03:31,380 --> 00:03:34,786
+K-modes, para variables categóricas: se representa
+
+69
+00:03:34,786 --> 00:03:37,510
+por la moda, la categoría más frecuente.
+
+70
+00:03:37,630 --> 00:03:40,807
+Y K-prototypes, para variables mixtas: medias para
+
+71
+00:03:40,807 --> 00:03:43,540
+las numéricas y modas para las categóricas.
+
+72
+00:03:43,660 --> 00:03:46,524
+Los tres tienen algo en común: hay que fijar el
+
+73
+00:03:46,524 --> 00:03:48,840
+número de grupos, k, antes de ajustar.
+
+74
+00:03:48,960 --> 00:03:52,064
+Y el costo que minimizan depende de cómo representamos los
+
+75
+00:03:52,064 --> 00:03:54,740
+datos y de cómo medimos la diferencia entre ellos.
+
+76
+00:03:54,860 --> 00:03:57,740
+Elegir k será uno de los grandes temas de la clase.
+
+77
+00:03:57,860 --> 00:04:00,842
+El error típico al empezar: leer el número del grupo
+
+78
+00:04:00,842 --> 00:04:03,250
+como si fuera un orden o una calificación.
+
+79
+00:04:03,370 --> 00:04:07,360
+Decir, por ejemplo, el grupo uno son los mejores clientes.
+
+80
+00:04:07,480 --> 00:04:10,540
+El número lo pone el algoritmo, y es arbitrario.
+
+81
+00:04:10,660 --> 00:04:14,330
+El significado de un grupo hay que construirlo después,
+
+82
+00:04:14,330 --> 00:04:17,800
+mirando su perfil: sus medias, sus modas, su tamaño.
+
+83
+00:04:17,920 --> 00:04:19,140
+Piensa un segundo.
+
+84
+00:04:19,260 --> 00:04:23,216
+Una tienda quiere agrupar a sus clientes usando el gasto mensual,
+
+85
+00:04:23,216 --> 00:04:26,380
+en pesos, y el canal preferido: app, web o sucursal.
+
+86
+00:04:26,500 --> 00:04:28,480
+¿Cuál de los tres métodos usarías?
+
+87
+00:04:29,200 --> 00:04:30,360
+K-prototypes.
+
+88
+00:04:30,480 --> 00:04:34,900
+El gasto es numérico y el canal es categórico: son variables mixtas.
+
+89
+00:04:35,020 --> 00:04:37,586
+Con K-means tendrías que convertir el canal en
+
+90
+00:04:37,586 --> 00:04:40,320
+números, y eso inventa distancias que no existen.
+
+91
+00:04:40,440 --> 00:04:45,360
+Con K-modes tendrías que cortar el gasto en categorías, y perderías información.
+
+92
+00:04:45,480 --> 00:04:48,440
+Para llevarte: el clustering busca grupos sin una
+
+93
+00:04:48,440 --> 00:04:51,520
+respuesta observada; la etiqueta sale de los datos.
+
+94
+00:04:51,640 --> 00:04:55,270
+Qué significa parecerse depende de las variables y del propósito.
+
+95
+00:04:55,390 --> 00:04:59,822
+Y el método se elige según el tipo de variables: K-means, K-modes o
+
+96
+00:04:59,822 --> 00:05:03,990
+K-prototypes, todos con un número de grupos fijado de antemano.
+
+97
+00:05:04,110 --> 00:05:08,236
+Siguiente parada: los datos de la clase, ciento setenta y siete vinos, y
+
+98
+00:05:08,236 --> 00:05:11,560
+por qué hay que estandarizarlos antes de medir distancias.
+
+99
+00:05:12,450 --> 00:05:15,744
+Segunda parada: los datos de la clase, y el paso que va
+
+100
+00:05:15,744 --> 00:05:18,320
+antes de cualquier distancia: estandarizar.
+
+101
+00:05:18,440 --> 00:05:20,920
+Mira estas dos mediciones de un mismo vino.
+
+102
+00:05:21,040 --> 00:05:24,010
+La ceniza vale alrededor de 2.37.
+
+103
+00:05:24,130 --> 00:05:27,350
+La prolina, alrededor de 748.
+
+104
+00:05:27,470 --> 00:05:31,469
+Si calculas distancias con esos números tal cual, una diferencia de 100 en
+
+105
+00:05:31,469 --> 00:05:34,820
+prolina pesa muchísimo más que cualquier diferencia en ceniza.
+
+106
+00:05:34,940 --> 00:05:38,200
+Y los grupos los terminaría decidiendo una sola variable.
+
+107
+00:05:38,320 --> 00:05:40,270
+Los datos de la clase son vinos.
+
+108
+00:05:40,390 --> 00:05:45,501
+Ciento setenta y siete vinos, y trece mediciones químicas de cada
+
+109
+00:05:45,501 --> 00:05:50,062
+uno: alcohol, ácido málico, ceniza, alcalinidad, magnesio,
+
+110
+00:05:50,062 --> 00:05:54,230
+fenoles, flavonoides, color, matiz, prolina, y otras.
+
+111
+00:05:54,350 --> 00:05:57,076
+Hay además una columna, código, que solo
+
+112
+00:05:57,076 --> 00:06:00,210
+identifica a cada vino: se excluye del ajuste.
+
+113
+00:06:00,330 --> 00:06:02,300
+Y no hay ninguna etiqueta de clase.
+
+114
+00:06:02,420 --> 00:06:04,810
+Vamos a buscar grupos solo con la química.
+
+115
+00:06:04,930 --> 00:06:06,370
+Un dato de contexto.
+
+116
+00:06:06,490 --> 00:06:11,467
+La base es una adaptación docente de la base de vinos del repositorio UCI, que tiene ciento
+
+117
+00:06:11,467 --> 00:06:15,350
+setenta y ocho filas: el archivo del curso trae ciento setenta y siete.
+
+118
+00:06:15,470 --> 00:06:18,869
+Según la ficha de UCI, son vinos de una misma región de
+
+119
+00:06:18,869 --> 00:06:22,330
+Italia, elaborados con tres variedades de uva distintas.
+
+120
+00:06:22,450 --> 00:06:25,810
+En la grabación se mencionaron vinos blancos, un Merlot y
+
+121
+00:06:25,810 --> 00:06:28,640
+un Cabernet; esos nombres no están en los datos.
+
+122
+00:06:28,760 --> 00:06:31,290
+El archivo no dice qué variedad es cada vino.
+
+123
+00:06:31,410 --> 00:06:32,580
+Una analogía.
+
+124
+00:06:32,700 --> 00:06:37,390
+Quieres comparar personas por su estatura, en metros, y su sueldo, en pesos.
+
+125
+00:06:37,510 --> 00:06:41,292
+Dos personas que difieren treinta centímetros de estatura, pero mil
+
+126
+00:06:41,292 --> 00:06:44,340
+pesos de sueldo, parecen lejísimos solo por el sueldo.
+
+127
+00:06:44,460 --> 00:06:47,580
+El problema no es la persona: es la unidad de medida.
+
+128
+00:06:47,700 --> 00:06:52,610
+Estandarizar es poner todas las variables en la misma unidad: desviaciones estándar.
+
+129
+00:06:52,730 --> 00:06:54,860
+La fórmula de la diapositiva siete.
+
+130
+00:06:54,980 --> 00:06:57,907
+A cada valor le restamos la media de su variable, y lo
+
+131
+00:06:57,907 --> 00:07:00,780
+dividimos por la desviación estándar de esa variable.
+
+132
+00:07:00,900 --> 00:07:04,295
+El ejemplo hipotético: un vino con alcohol 14,
+
+133
+00:07:04,295 --> 00:07:07,100
+si la media es 13 y la desviación 0.8.
+
+134
+00:07:07,220 --> 00:07:12,470
+Catorce menos trece es uno; uno dividido por 0.8 da 1.25.
+
+135
+00:07:12,590 --> 00:07:16,980
+Ese vino está 1.25 desviaciones estándar sobre la media de alcohol.
+
+136
+00:07:17,100 --> 00:07:18,270
+Con un vino real.
+
+137
+00:07:18,390 --> 00:07:21,970
+El primer vino del archivo tiene 14.23 de alcohol.
+
+138
+00:07:22,090 --> 00:07:28,470
+La media de los ciento setenta y siete es 13.00, y la desviación, 0.814.
+
+139
+00:07:28,590 --> 00:07:36,640
+Catorce coma veintitrés menos trece es 1.23; dividido por 0.814, da 1.511.
+
+140
+00:07:36,760 --> 00:07:43,720
+Con la media y la desviación sin redondear, sale 1.509; el script imprime 1.51.
+
+141
+00:07:43,840 --> 00:07:48,360
+Después de estandarizar, todas las variables tienen media cero y desviación uno.
+
+142
+00:07:48,480 --> 00:07:50,670
+¿Cuánto domina la prolina, de verdad?
+
+143
+00:07:50,790 --> 00:07:54,560
+La varianza de la prolina es casi noventa y nueve mil trescientos.
+
+144
+00:07:54,680 --> 00:07:56,960
+La del magnesio, 204.
+
+145
+00:07:57,080 --> 00:07:59,470
+La de la alcalinidad, 11.2.
+
+146
+00:07:59,590 --> 00:08:02,050
+La del color, 5.27.
+
+147
+00:08:02,170 --> 00:08:06,600
+La suma de distancias al cuadrado entre vinos se reparte según estas varianzas.
+
+148
+00:08:06,720 --> 00:08:10,060
+Y la prolina se lleva el 99.8 por ciento.
+
+149
+00:08:10,180 --> 00:08:13,267
+Sin estandarizar, K-means prácticamente agrupa por
+
+150
+00:08:13,267 --> 00:08:16,540
+prolina, y las otras doce mediciones casi no cuentan.
+
+151
+00:08:16,660 --> 00:08:18,320
+Y eso cambia el resultado.
+
+152
+00:08:18,440 --> 00:08:22,494
+Con los datos sin estandarizar, los tres grupos de K-means coinciden con la
+
+153
+00:08:22,494 --> 00:08:26,170
+variedad real en ciento veinticinco de ciento setenta y siete vinos.
+
+154
+00:08:26,290 --> 00:08:29,460
+Con los datos estandarizados, en ciento setenta y uno.
+
+155
+00:08:29,580 --> 00:08:32,633
+Lo veremos en detalle más adelante; por ahora, la
+
+156
+00:08:32,633 --> 00:08:35,500
+lección es clara: la escala decide los grupos.
+
+157
+00:08:35,620 --> 00:08:39,442
+Una precisión de la diapositiva siete: estandarizar iguala las
+
+158
+00:08:39,442 --> 00:08:43,080
+escalas, pero no elimina los atípicos ni las correlaciones.
+
+159
+00:08:43,200 --> 00:08:47,500
+Un vino extremo sigue siendo extremo, ahora medido en desviaciones estándar.
+
+160
+00:08:47,620 --> 00:08:48,470
+En código.
+
+161
+00:08:48,590 --> 00:08:52,800
+En R, la función scale resta la media y divide por la desviación muestral.
+
+162
+00:08:52,920 --> 00:08:57,610
+En Python, la clase lo escribe a mano: se quita la columna código con drop, y se
+
+163
+00:08:57,610 --> 00:09:01,480
+resta la media y se divide por la desviación con ddof igual a uno.
+
+164
+00:09:01,600 --> 00:09:04,154
+Ese ddof igual a uno es el que hace que Python
+
+165
+00:09:04,154 --> 00:09:06,320
+use la misma desviación muestral que R.
+
+166
+00:09:06,440 --> 00:09:10,430
+¿Y si usaras la desviación con ddof igual a cero, la de NumPy?
+
+167
+00:09:10,550 --> 00:09:13,847
+Todos los valores estandarizados se multiplican por la misma
+
+168
+00:09:13,847 --> 00:09:16,980
+constante, así que los grupos son exactamente los mismos.
+
+169
+00:09:17,100 --> 00:09:25,283
+Lo único que cambia es la escala del costo: el WSS pasa de 1267.37 a 1274.57, que
+
+170
+00:09:25,283 --> 00:09:31,950
+es 1267.37 por ciento setenta y siete sobre ciento setenta y seis.
+
+171
+00:09:32,070 --> 00:09:35,010
+Más adelante veremos qué es ese WSS.
+
+172
+00:09:35,130 --> 00:09:36,750
+Dos errores típicos.
+
+173
+00:09:36,870 --> 00:09:40,576
+El primero, dejar la columna código dentro del ajuste: es un
+
+174
+00:09:40,576 --> 00:09:44,220
+identificador, y K-means lo trataría como si fuera química.
+
+175
+00:09:44,340 --> 00:09:47,446
+El segundo lo advierte la diapositiva nueve: una etiqueta de
+
+176
+00:09:47,446 --> 00:09:50,552
+clúster que obtuvo el algoritmo no debe volver a entrar como
+
+177
+00:09:50,552 --> 00:09:53,140
+predictor, ni como variable para agrupar de nuevo.
+
+178
+00:09:53,260 --> 00:09:54,480
+Piensa un segundo.
+
+179
+00:09:54,600 --> 00:09:56,830
+Un vino tiene color 7.6.
+
+180
+00:09:56,950 --> 00:10:01,700
+La media del color es 5.03, y su desviación, 2.30.
+
+181
+00:10:01,820 --> 00:10:03,850
+¿Cuánto vale su color estandarizado?
+
+182
+00:10:04,570 --> 00:10:08,660
+Siete coma seis menos cinco coma cero tres es 2.57.
+
+183
+00:10:08,780 --> 00:10:12,600
+Dividido por 2.30, da 1.117.
+
+184
+00:10:12,720 --> 00:10:16,430
+Ese vino está algo más de una desviación estándar sobre el color medio.
+
+185
+00:10:16,550 --> 00:10:20,035
+Para llevarte: las distancias dependen de las unidades;
+
+186
+00:10:20,035 --> 00:10:22,950
+sin estandarizar, la prolina decide casi todo.
+
+187
+00:10:23,070 --> 00:10:26,737
+Estandarizar es restar la media y dividir por la desviación, y en
+
+188
+00:10:26,737 --> 00:10:29,670
+Python se usa ddof igual a uno para coincidir con R.
+
+189
+00:10:29,790 --> 00:10:32,509
+Y solo entran las mediciones: ni el código, ni
+
+190
+00:10:32,509 --> 00:10:35,110
+etiquetas obtenidas por el propio algoritmo.
+
+191
+00:10:35,230 --> 00:10:39,383
+Siguiente parada: la distancia euclidiana, el criterio WSS que
+
+192
+00:10:39,383 --> 00:10:43,470
+minimiza K-means, y cómo se descompone la variabilidad total.
+
+193
+00:10:44,370 --> 00:10:47,520
+Tercera parada: la cuenta que hay debajo de K-means.
+
+194
+00:10:47,640 --> 00:10:51,680
+Distancia al centro, al cuadrado, sumada dentro de cada grupo.
+
+195
+00:10:51,800 --> 00:10:55,444
+Todo K-means se apoya en una sola pregunta, repetida miles de
+
+196
+00:10:55,444 --> 00:10:58,610
+veces: ¿qué tan lejos está este punto de este centro?
+
+197
+00:10:58,730 --> 00:11:01,864
+Si entiendes cómo se mide esa distancia, y qué se suma
+
+198
+00:11:01,864 --> 00:11:04,360
+con ella, entiendes qué busca el algoritmo.
+
+199
+00:11:04,480 --> 00:11:10,010
+Y vas a poder leer sus números: el WSS, el BSS y el TSS.
+
+200
+00:11:10,130 --> 00:11:13,980
+La diapositiva diez hace la cuenta con dos puntos ya estandarizados.
+
+201
+00:11:14,100 --> 00:11:17,930
+Una observación en uno, dos, y un centro en tres, uno.
+
+202
+00:11:18,050 --> 00:11:23,027
+La distancia al cuadrado suma las diferencias al cuadrado en cada variable: uno
+
+203
+00:11:23,027 --> 00:11:27,500
+menos tres, al cuadrado, es cuatro; dos menos uno, al cuadrado, es uno.
+
+204
+00:11:27,620 --> 00:11:28,870
+Total: cinco.
+
+205
+00:11:28,990 --> 00:11:34,110
+La distancia euclidiana es la raíz de cinco, aproximadamente 2.236.
+
+206
+00:11:34,230 --> 00:11:37,290
+Y un detalle clave: K-means minimiza la suma de las
+
+207
+00:11:37,290 --> 00:11:39,990
+distancias al cuadrado, no de las distancias.
+
+208
+00:11:40,110 --> 00:11:43,060
+El cuadrado aumenta el peso de los puntos alejados.
+
+209
+00:11:43,180 --> 00:11:47,830
+Un punto a distancia uno aporta uno; a distancia tres, aporta nueve.
+
+210
+00:11:47,950 --> 00:11:51,720
+Por eso un vino muy extremo puede tirar de un centro con mucha fuerza.
+
+211
+00:11:51,840 --> 00:11:53,010
+Una analogía.
+
+212
+00:11:53,130 --> 00:11:55,625
+Un grupo de amigos vive en la misma calle y quiere
+
+213
+00:11:55,625 --> 00:11:57,670
+elegir dónde poner un punto de encuentro.
+
+214
+00:11:57,790 --> 00:12:01,277
+Si el costo de caminar crece con el cuadrado de la distancia, el
+
+215
+00:12:01,277 --> 00:12:04,110
+mejor lugar es exactamente el promedio de las casas.
+
+216
+00:12:04,230 --> 00:12:08,810
+K-means hace eso con cada grupo: pone su centro en el promedio de sus miembros.
+
+217
+00:12:08,930 --> 00:12:12,100
+Ahora el criterio completo, de la diapositiva once.
+
+218
+00:12:12,220 --> 00:12:16,550
+Buscamos k grupos y sus centros que hagan mínimo el WSS: para cada
+
+219
+00:12:16,550 --> 00:12:20,486
+grupo, sumamos las distancias al cuadrado de sus puntos a su
+
+220
+00:12:20,486 --> 00:12:23,700
+centro, y después sumamos sobre todos los grupos.
+
+221
+00:12:23,820 --> 00:12:27,980
+Para un grupo ya formado, el centro que minimiza ese costo es su media.
+
+222
+00:12:28,100 --> 00:12:31,200
+Por eso el método se llama K-means: k medias.
+
+223
+00:12:31,320 --> 00:12:32,340
+¿Por qué la media?
+
+224
+00:12:32,460 --> 00:12:36,620
+Hagamos la prueba con un grupo de tres valores: uno, dos y seis.
+
+225
+00:12:36,740 --> 00:12:38,050
+Su media es tres.
+
+226
+00:12:38,170 --> 00:12:42,420
+Las distancias al cuadrado son cuatro, uno y nueve: suman 14.
+
+227
+00:12:42,540 --> 00:12:48,680
+Si pusiéramos el centro en dos, la mediana, sumarían uno, cero y dieciséis: 17.
+
+228
+00:12:48,800 --> 00:12:52,830
+Y en cuatro, nueve, cuatro y cuatro: también 17.
+
+229
+00:12:52,950 --> 00:12:54,030
+La media gana.
+
+230
+00:12:54,150 --> 00:12:58,330
+Una advertencia de la misma diapositiva: un WSS menor significa
+
+231
+00:12:58,330 --> 00:13:01,980
+grupos más compactos, bajo esta escala y este criterio.
+
+232
+00:13:02,100 --> 00:13:06,440
+No demuestra, por sí solo, que encontramos grupos reales ni útiles.
+
+233
+00:13:06,560 --> 00:13:09,100
+El WSS tiene dos compañeros.
+
+234
+00:13:09,220 --> 00:13:12,429
+El TSS es la variabilidad total: las distancias al
+
+235
+00:13:12,429 --> 00:13:15,830
+cuadrado de cada punto a la media global, sin grupos.
+
+236
+00:13:15,950 --> 00:13:19,828
+El BSS mide la separación: compara el centro de cada grupo con la
+
+237
+00:13:19,828 --> 00:13:22,870
+media global, y lo pondera por el tamaño del grupo.
+
+238
+00:13:22,990 --> 00:13:26,506
+Y para estas medias y las mismas observaciones
+
+239
+00:13:26,506 --> 00:13:29,410
+se cumple: TSS es igual a WSS más BSS.
+
+240
+00:13:29,530 --> 00:13:31,310
+Dos lecturas importantes.
+
+241
+00:13:31,430 --> 00:13:36,621
+Como el TSS no depende de los grupos, bajar el WSS es exactamente lo mismo
+
+242
+00:13:36,621 --> 00:13:41,110
+que subir el BSS: grupos más compactos son grupos más separados.
+
+243
+00:13:41,230 --> 00:13:46,107
+Y el BSS no es el promedio de las distancias entre todos los pares de centros: es cada
+
+244
+00:13:46,107 --> 00:13:50,020
+centro contra la media global, multiplicado por cuántos puntos tiene.
+
+245
+00:13:50,140 --> 00:13:53,090
+La cuenta completa, en la diapositiva diecisiete.
+
+246
+00:13:53,210 --> 00:13:57,620
+Datos: uno, dos, tres, ocho, nueve y diez.
+
+247
+00:13:57,740 --> 00:14:04,650
+Grupos: uno, dos, tres, con centro dos; y ocho, nueve, diez, con centro nueve.
+
+248
+00:14:04,770 --> 00:14:06,900
+La media global es 5.5.
+
+249
+00:14:07,020 --> 00:14:13,920
+WSS: uno menos dos al cuadrado, uno; dos menos dos, cero; tres menos dos, uno.
+
+250
+00:14:14,040 --> 00:14:15,710
+Lo mismo en el otro grupo.
+
+251
+00:14:15,830 --> 00:14:17,150
+Total: cuatro.
+
+252
+00:14:17,270 --> 00:14:22,935
+BSS: el centro dos está a tres coma cinco de la media global; al
+
+253
+00:14:22,935 --> 00:14:27,980
+cuadrado, 12.25, y como el grupo tiene tres datos, 36.75.
+
+254
+00:14:28,100 --> 00:14:33,140
+El centro nueve está a la misma distancia: otra vez 36.75.
+
+255
+00:14:33,260 --> 00:14:35,600
+Total: 73.5.
+
+256
+00:14:35,720 --> 00:14:43,285
+Y el TSS: las distancias de cada dato a cinco coma cinco, al
+
+257
+00:14:43,285 --> 00:14:49,590
+cuadrado: 20.25, 12.25, 6.25, 6.25, 12.25 y 20.25.
+
+258
+00:14:49,710 --> 00:14:51,800
+Suman 77.5.
+
+259
+00:14:51,920 --> 00:14:56,670
+Verificación: cuatro más setenta y tres coma cinco es setenta y siete coma cinco.
+
+260
+00:14:56,790 --> 00:14:58,310
+La descomposición cuadra.
+
+261
+00:14:58,430 --> 00:15:00,690
+Aquí hay una precisión sobre la grabación.
+
+262
+00:15:00,810 --> 00:15:04,308
+Al explicar este WSS, se dijo: uno menos dos al
+
+263
+00:15:04,308 --> 00:15:07,880
+cuadrado, después sacamos la raíz, va a ser uno.
+
+264
+00:15:08,000 --> 00:15:12,600
+El WSS no saca ninguna raíz: suma distancias al cuadrado.
+
+265
+00:15:12,720 --> 00:15:15,881
+En este ejemplo da lo mismo, porque las diferencias
+
+266
+00:15:15,881 --> 00:15:18,360
+son cero o uno, y la raíz de uno es uno.
+
+267
+00:15:18,480 --> 00:15:22,710
+Pero con una diferencia de dos, el cuadrado es cuatro y la raíz es dos.
+
+268
+00:15:22,830 --> 00:15:25,100
+Sacar la raíz cambiaría el criterio.
+
+269
+00:15:25,220 --> 00:15:31,350
+Con los vinos reales y tres grupos: el WSS es 1267.37.
+
+270
+00:15:31,470 --> 00:15:34,610
+El BSS, 1020.63.
+
+271
+00:15:34,730 --> 00:15:38,880
+Y su suma, el TSS, es 2288.
+
+272
+00:15:39,000 --> 00:15:42,524
+Ese número no es casualidad: cada una de las trece variables
+
+273
+00:15:42,524 --> 00:15:46,401
+estandarizadas tiene varianza uno, así que su suma de cuadrados es
+
+274
+00:15:46,401 --> 00:15:49,690
+ciento setenta y siete menos uno, ciento setenta y seis.
+
+275
+00:15:49,810 --> 00:15:54,020
+Trece por ciento setenta y seis da exactamente 2288.
+
+276
+00:15:54,140 --> 00:15:59,042
+El error típico: comparar el WSS de dos análisis con escalas distintas, o
+
+277
+00:15:59,042 --> 00:16:02,870
+con variables distintas, y concluir que uno agrupa mejor.
+
+278
+00:16:02,990 --> 00:16:08,351
+Ya viste que solo cambiar de ddof cambia el WSS de
+
+279
+00:16:08,351 --> 00:16:12,640
+1267.37 a 1274.57 con los mismos grupos.
+
+280
+00:16:12,760 --> 00:16:16,100
+El WSS solo se compara entre soluciones con los mismos
+
+281
+00:16:16,100 --> 00:16:18,760
+datos, la misma escala y el mismo criterio.
+
+282
+00:16:18,880 --> 00:16:20,100
+Piensa un segundo.
+
+283
+00:16:20,220 --> 00:16:23,600
+Datos: cero, dos, cuatro y diez.
+
+284
+00:16:23,720 --> 00:16:28,040
+Grupos: cero, dos y cuatro en uno; el diez solo en el otro.
+
+285
+00:16:28,160 --> 00:16:29,700
+La media global es cuatro.
+
+286
+00:16:29,820 --> 00:16:33,810
+¿Cuánto valen el WSS, el BSS y el TSS?
+
+287
+00:16:34,530 --> 00:16:36,310
+Los centros son dos y diez.
+
+288
+00:16:36,430 --> 00:16:40,810
+WSS: cuatro más cero más cuatro, más cero: ocho.
+
+289
+00:16:40,930 --> 00:16:44,498
+BSS: el centro dos está a dos de la media; al
+
+290
+00:16:44,498 --> 00:16:47,590
+cuadrado, cuatro, por tres datos, doce.
+
+291
+00:16:47,710 --> 00:16:52,240
+El centro diez está a seis; al cuadrado, treinta y seis, por un dato.
+
+292
+00:16:52,360 --> 00:16:54,010
+Total: 48.
+
+293
+00:16:54,130 --> 00:16:59,080
+TSS: dieciséis más cuatro más cero más treinta y seis: 56.
+
+294
+00:16:59,200 --> 00:17:02,020
+Y ocho más cuarenta y ocho, cincuenta y seis.
+
+295
+00:17:02,140 --> 00:17:06,069
+Para llevarte: K-means minimiza el WSS, la suma de distancias
+
+296
+00:17:06,069 --> 00:17:09,290
+euclidianas al cuadrado de cada punto a su centro.
+
+297
+00:17:09,410 --> 00:17:11,670
+El mejor centro de un grupo es su media.
+
+298
+00:17:11,790 --> 00:17:17,232
+Y la variabilidad total se reparte en dentro y entre: TSS es igual
+
+299
+00:17:17,232 --> 00:17:21,520
+a WSS más BSS, así que bajar el WSS es subir el BSS.
+
+300
+00:17:21,640 --> 00:17:25,287
+Siguiente parada: cómo encuentra K-means esos grupos, paso a
+
+301
+00:17:25,287 --> 00:17:28,690
+paso, y por qué hay que probar muchos puntos de partida.
+
+302
+00:17:29,570 --> 00:17:32,840
+Cuarta parada: cómo encuentra K-means los grupos.
+
+303
+00:17:32,960 --> 00:17:35,900
+Un procedimiento de dos pasos que se repite, y un
+
+304
+00:17:35,900 --> 00:17:38,780
+detalle que lo cambia todo: el punto de partida.
+
+305
+00:17:38,900 --> 00:17:42,640
+No existe una fórmula que te entregue directamente los mejores grupos.
+
+306
+00:17:42,760 --> 00:17:46,292
+Con ciento setenta y siete vinos y tres grupos hay una cantidad
+
+307
+00:17:46,292 --> 00:17:49,880
+astronómica de particiones posibles: no se pueden revisar todas.
+
+308
+00:17:50,000 --> 00:17:54,463
+Lo que hace K-means es más modesto, y muy ingenioso: parte de un intento,
+
+309
+00:17:54,463 --> 00:17:58,070
+lo corrige, y repite hasta que ya no hay nada que corregir.
+
+310
+00:17:58,190 --> 00:17:59,360
+Una analogía.
+
+311
+00:17:59,480 --> 00:18:02,780
+Tienes tres carritos de helados para una playa llena de gente.
+
+312
+00:18:02,900 --> 00:18:04,950
+Los pones en tres lugares cualquiera.
+
+313
+00:18:05,070 --> 00:18:07,670
+Cada bañista camina al carrito más cercano.
+
+314
+00:18:07,790 --> 00:18:11,070
+Después mueves cada carrito al centro de la gente que lo eligió.
+
+315
+00:18:11,190 --> 00:18:15,190
+Con los carritos en su nuevo lugar, algunos bañistas cambian de carrito.
+
+316
+00:18:15,310 --> 00:18:17,590
+Repites, hasta que nadie cambia.
+
+317
+00:18:17,710 --> 00:18:19,100
+Ese es K-means.
+
+318
+00:18:19,220 --> 00:18:23,020
+Formalmente, la diapositiva doce lo escribe en cuatro pasos.
+
+319
+00:18:23,140 --> 00:18:26,430
+Uno: fijar k y elegir los centros iniciales.
+
+320
+00:18:26,550 --> 00:18:30,140
+Dos: asignar cada observación al centro más cercano.
+
+321
+00:18:30,260 --> 00:18:33,730
+Tres: recalcular cada centro como la media de su grupo.
+
+322
+00:18:33,850 --> 00:18:38,460
+Cuatro: repetir la asignación y la actualización hasta que el ajuste se estabilice.
+
+323
+00:18:38,580 --> 00:18:40,400
+Hay una garantía y una trampa.
+
+324
+00:18:40,520 --> 00:18:45,940
+La garantía: cada paso reduce el WSS o lo deja igual; nunca lo empeora.
+
+325
+00:18:46,060 --> 00:18:48,130
+Por eso el algoritmo siempre se detiene.
+
+326
+00:18:48,250 --> 00:18:52,202
+La trampa: se detiene en una solución local, la mejor alrededor del
+
+327
+00:18:52,202 --> 00:18:55,800
+punto de partida, que no tiene por qué ser la mejor de todas.
+
+328
+00:18:55,920 --> 00:18:58,860
+Una iteración resuelta, de la diapositiva trece.
+
+329
+00:18:58,980 --> 00:19:03,390
+Datos: uno, dos, tres, ocho, nueve y diez.
+
+330
+00:19:03,510 --> 00:19:08,170
+Fijamos k igual a dos, con centros iniciales en uno y en ocho.
+
+331
+00:19:08,290 --> 00:19:12,037
+Distancias al cuadrado al centro uno: cero, uno, cuatro,
+
+332
+00:19:12,037 --> 00:19:15,450
+cuarenta y nueve, sesenta y cuatro y ochenta y uno.
+
+333
+00:19:15,570 --> 00:19:21,410
+Al centro ocho: cuarenta y nueve, treinta y seis, veinticinco, cero, uno y cuatro.
+
+334
+00:19:21,530 --> 00:19:25,383
+Cada dato va al centro con la distancia menor: uno, dos y
+
+335
+00:19:25,383 --> 00:19:28,830
+tres al grupo uno; ocho, nueve y diez al grupo dos.
+
+336
+00:19:28,950 --> 00:19:30,900
+Ahora recalculamos los centros.
+
+337
+00:19:31,020 --> 00:19:35,160
+El nuevo centro uno es la media de uno, dos y tres: dos.
+
+338
+00:19:35,280 --> 00:19:39,550
+El nuevo centro dos, la media de ocho, nueve y diez: nueve.
+
+339
+00:19:39,670 --> 00:19:44,330
+Si repetimos la asignación con los centros dos y nueve, ningún dato cambia de grupo.
+
+340
+00:19:44,450 --> 00:19:47,020
+El algoritmo convergió en la segunda iteración.
+
+341
+00:19:47,140 --> 00:19:50,543
+Ahora con vinos de verdad, en solo dos variables para
+
+342
+00:19:50,543 --> 00:19:53,690
+poder verlo: flavonoides y color, estandarizados.
+
+343
+00:19:53,810 --> 00:19:56,240
+Estos son los ciento setenta y siete vinos.
+
+344
+00:19:56,360 --> 00:20:00,650
+Elegimos tres vinos cualquiera como centros iniciales: las tres cruces.
+
+345
+00:20:00,770 --> 00:20:04,780
+Primera asignación: cada vino toma el color del centro más cercano.
+
+346
+00:20:04,900 --> 00:20:08,930
+Segundo paso: cada cruz se mueve a la media de los vinos de su color.
+
+347
+00:20:09,050 --> 00:20:11,713
+Con los centros en su nuevo lugar, se reasigna:
+
+348
+00:20:11,713 --> 00:20:14,320
+algunos vinos de la frontera cambian de color.
+
+349
+00:20:14,440 --> 00:20:15,370
+Y se repite.
+
+350
+00:20:15,490 --> 00:20:23,227
+El WSS baja de 165.83 en la primera asignación a 105.50 en la
+
+351
+00:20:23,227 --> 00:20:29,950
+segunda, y después a 103.24, 102.90, 102.78 y 102.58.
+
+352
+00:20:30,070 --> 00:20:35,975
+En la iteración siete, ningún vino cambia de grupo: el algoritmo convergió, con WSS
+
+353
+00:20:35,975 --> 00:20:41,240
+102.54 y grupos de cuarenta y dos, setenta y cuatro y sesenta y uno vinos.
+
+354
+00:20:41,360 --> 00:20:45,036
+Fíjate en la curva: la mayor parte de la mejora ocurre en las
+
+355
+00:20:45,036 --> 00:20:48,170
+dos primeras iteraciones; después son ajustes finos.
+
+356
+00:20:48,290 --> 00:20:50,160
+¿Cuántas iteraciones hacen falta?
+
+357
+00:20:50,280 --> 00:20:51,670
+Hasta que nada cambie.
+
+358
+00:20:51,790 --> 00:20:55,270
+El script de la clase fija un máximo de cien iteraciones.
+
+359
+00:20:55,390 --> 00:21:00,000
+Con las trece variables y tres grupos, el ajuste elegido convergió en seis.
+
+360
+00:21:00,120 --> 00:21:04,600
+En la grabación se dijo que los algoritmos corren cincuenta mil o sesenta mil veces.
+
+361
+00:21:04,720 --> 00:21:09,307
+Ojo: el cincuenta del código no son iteraciones, son cincuenta puntos de
+
+362
+00:21:09,307 --> 00:21:13,130
+partida distintos, y cada uno converge en pocas iteraciones.
+
+363
+00:21:13,250 --> 00:21:16,690
+Ahora la trampa del óptimo local, con un ejemplo mínimo.
+
+364
+00:21:16,810 --> 00:21:20,882
+Cuatro puntos en las esquinas de un rectángulo largo:
+
+365
+00:21:20,882 --> 00:21:24,800
+cero, cero; cero, uno; cuatro, cero; y cuatro, uno.
+
+366
+00:21:24,920 --> 00:21:26,310
+Queremos dos grupos.
+
+367
+00:21:26,430 --> 00:21:30,091
+La partición natural es izquierda contra derecha: centros en
+
+368
+00:21:30,091 --> 00:21:33,020
+cero, cero coma cinco y cuatro, cero coma cinco.
+
+369
+00:21:33,140 --> 00:21:36,552
+Cada punto está a cero coma cinco de su centro: WSS
+
+370
+00:21:36,552 --> 00:21:39,630
+igual a cuatro por cero coma veinticinco, uno.
+
+371
+00:21:39,750 --> 00:21:43,999
+Pero si partimos con un centro abajo y otro arriba, el algoritmo
+
+372
+00:21:43,999 --> 00:21:48,116
+encuentra arriba contra abajo, con centros en dos, cero y dos,
+
+373
+00:21:48,116 --> 00:21:51,170
+uno: WSS igual a cuatro por cuatro, dieciséis.
+
+374
+00:21:51,290 --> 00:21:55,050
+Y se queda ahí: cada punto ya está más cerca de su propio centro.
+
+375
+00:21:55,170 --> 00:21:57,190
+Con los vinos reales pasa lo mismo.
+
+376
+00:21:57,310 --> 00:22:00,484
+Corrimos K-means con tres grupos cincuenta veces, cada
+
+377
+00:22:00,484 --> 00:22:03,070
+vez desde un único punto de partida al azar.
+
+378
+00:22:03,190 --> 00:22:08,079
+El WSS final va desde 1267.37, el mejor, hasta
+
+379
+00:22:08,079 --> 00:22:13,180
+1604.15, el peor: un veintisiete por ciento más.
+
+380
+00:22:13,300 --> 00:22:16,775
+Por eso la regla de la diapositiva quince: se prueban
+
+381
+00:22:16,775 --> 00:22:20,250
+varios inicios, y se conserva el ajuste de menor WSS.
+
+382
+00:22:20,370 --> 00:22:25,400
+Con cincuenta inicios, el script obtiene 1267.37.
+
+383
+00:22:25,520 --> 00:22:27,540
+Una precisión sobre lo dicho en clase.
+
+384
+00:22:27,660 --> 00:22:31,087
+Se dijo: después evaluamos cuáles fueron los clústeres que
+
+385
+00:22:31,087 --> 00:22:34,100
+más aparecieron, y definimos esos como los finales.
+
+386
+00:22:34,220 --> 00:22:38,656
+El criterio no es el más frecuente: es el de menor WSS, como dice la
+
+387
+00:22:38,656 --> 00:22:42,310
+diapositiva quince, y como el profesor agregó enseguida.
+
+388
+00:22:42,430 --> 00:22:45,570
+En nuestros cincuenta inicios coinciden: el mejor valor
+
+389
+00:22:45,570 --> 00:22:48,310
+aparece dieciocho veces, más que cualquier otro.
+
+390
+00:22:48,430 --> 00:22:51,333
+Pero no tiene por qué ser así: con k grande, el
+
+391
+00:22:51,333 --> 00:22:54,050
+mejor ajuste puede aparecer muy pocas veces.
+
+392
+00:22:54,170 --> 00:22:57,551
+El error típico: correr K-means una sola vez, con
+
+393
+00:22:57,551 --> 00:23:00,380
+una sola semilla, y reportar esos grupos.
+
+394
+00:23:00,500 --> 00:23:04,600
+Si tuviste mala suerte, puedes estar en un óptimo local mucho peor.
+
+395
+00:23:04,720 --> 00:23:10,057
+Lo correcto: muchos inicios, quedarse con el menor WSS, y fijar la semilla, el
+
+396
+00:23:10,057 --> 00:23:14,230
+random_state, para que otra persona pueda repetir el cálculo.
+
+397
+00:23:14,350 --> 00:23:15,570
+Piensa un segundo.
+
+398
+00:23:15,690 --> 00:23:18,950
+Datos: cero, uno, cinco y seis.
+
+399
+00:23:19,070 --> 00:23:22,400
+Dos grupos, con centros iniciales en cero y en uno.
+
+400
+00:23:22,520 --> 00:23:26,620
+¿Dónde terminan los centros, y cuánto vale el WSS final?
+
+401
+00:23:27,340 --> 00:23:33,660
+Iteración uno: el cero va al centro cero; el uno, el cinco y el seis, al centro uno.
+
+402
+00:23:33,780 --> 00:23:36,370
+Nuevos centros: cero, y cuatro.
+
+403
+00:23:36,490 --> 00:23:40,510
+Iteración dos: el uno ahora está más cerca del cero que del cuatro.
+
+404
+00:23:40,630 --> 00:23:43,720
+Grupos: cero y uno; cinco y seis.
+
+405
+00:23:43,840 --> 00:23:47,070
+Centros: cero coma cinco y cinco coma cinco.
+
+406
+00:23:47,190 --> 00:23:49,380
+Iteración tres: nada cambia.
+
+407
+00:23:49,500 --> 00:23:53,420
+WSS: cuatro veces cero coma veinticinco, uno.
+
+408
+00:23:53,540 --> 00:23:57,459
+Para llevarte: K-means alterna dos pasos, asignar al centro más
+
+409
+00:23:57,459 --> 00:24:00,880
+cercano y recalcular las medias, hasta que nada cambia.
+
+410
+00:24:01,000 --> 00:24:06,130
+Cada paso baja o mantiene el WSS, pero el resultado puede ser un óptimo local.
+
+411
+00:24:06,250 --> 00:24:09,313
+Por eso se prueban muchos inicios, cincuenta en
+
+412
+00:24:09,313 --> 00:24:11,920
+la clase, y se conserva el de menor WSS.
+
+413
+00:24:12,040 --> 00:24:15,010
+Siguiente parada: elegir el número de grupos.
+
+414
+00:24:15,130 --> 00:24:17,100
+Empezamos por el método del codo.
+
+415
+00:24:17,970 --> 00:24:20,110
+Quinta parada: cuántos grupos.
+
+416
+00:24:20,230 --> 00:24:23,650
+El primer criterio es el más visual de todos: el codo.
+
+417
+00:24:23,770 --> 00:24:27,206
+Si K-means minimiza el WSS, ¿por qué no elegimos
+
+418
+00:24:27,206 --> 00:24:30,070
+el número de grupos que da el menor WSS?
+
+419
+00:24:30,190 --> 00:24:33,550
+Porque el WSS siempre baja cuando agregas grupos.
+
+420
+00:24:33,670 --> 00:24:37,825
+En el extremo, con un grupo por cada vino, cada vino es su
+
+421
+00:24:37,825 --> 00:24:41,120
+propio centro, y el WSS vale exactamente cero.
+
+422
+00:24:41,240 --> 00:24:45,020
+Cero error, y ninguna información: eso no es agrupar.
+
+423
+00:24:45,140 --> 00:24:48,710
+El costo de ajuste necesita un criterio adicional para elegir k.
+
+424
+00:24:48,830 --> 00:24:50,000
+Una analogía.
+
+425
+00:24:50,120 --> 00:24:52,520
+Un restaurante lleno contrata meseros.
+
+426
+00:24:52,640 --> 00:24:56,400
+El primero cambia todo: de nadie atendiendo a alguien atendiendo.
+
+427
+00:24:56,520 --> 00:24:58,340
+El segundo también ayuda mucho.
+
+428
+00:24:58,460 --> 00:25:00,220
+El tercero, bastante.
+
+429
+00:25:00,340 --> 00:25:02,920
+Pero el décimo mesero casi no reduce la espera.
+
+430
+00:25:03,040 --> 00:25:05,720
+Hay un punto en que agregar uno más ya no compensa.
+
+431
+00:25:05,840 --> 00:25:09,580
+El método del codo busca ese punto en la curva del WSS.
+
+432
+00:25:09,700 --> 00:25:12,820
+La diapositiva dieciocho lista los criterios de la clase.
+
+433
+00:25:12,940 --> 00:25:17,890
+El codo: buscar dónde la disminución del WSS se vuelve cada vez menor.
+
+434
+00:25:18,010 --> 00:25:22,790
+La silueta: comparar la cercanía al propio grupo con la cercanía al grupo vecino.
+
+435
+00:25:22,910 --> 00:25:27,310
+El Gap: contrastar la compacidad con una referencia simulada sin grupos.
+
+436
+00:25:27,430 --> 00:25:31,280
+Y siempre, revisar tamaños, estabilidad e interpretación.
+
+437
+00:25:31,400 --> 00:25:33,740
+Ningún número reemplaza esa revisión.
+
+438
+00:25:33,860 --> 00:25:38,000
+Este es el codo de los vinos, recalculado con el script de Python.
+
+439
+00:25:38,120 --> 00:25:43,760
+Con un grupo, el WSS es igual al TSS: 2288.
+
+440
+00:25:43,880 --> 00:25:47,510
+Con dos grupos baja a 1643.90.
+
+441
+00:25:47,630 --> 00:25:51,030
+Con tres, a 1267.37.
+
+442
+00:25:51,150 --> 00:25:57,922
+Y desde ahí la curva sigue bajando, pero mucho más despacio: 1164.91
+
+443
+00:25:57,922 --> 00:26:03,200
+con cuatro, 1092.18 con cinco, hasta 931.19 con ocho.
+
+444
+00:26:03,320 --> 00:26:08,050
+Para ver el codo con números, miremos cuánto baja el WSS en cada paso.
+
+445
+00:26:08,170 --> 00:26:12,040
+De uno a dos grupos, baja 644.1.
+
+446
+00:26:12,160 --> 00:26:15,350
+De dos a tres, 376.5.
+
+447
+00:26:15,470 --> 00:26:18,410
+De tres a cuatro, solo 102.5.
+
+448
+00:26:18,530 --> 00:26:25,620
+Y después, 72.7, 58.8, 62.9 y 39.2.
+
+449
+00:26:25,740 --> 00:26:31,210
+El quiebre está en tres: hasta ahí, cada grupo nuevo aporta mucho; después, poco.
+
+450
+00:26:31,330 --> 00:26:35,106
+Por eso la diapositiva dice que k igual a tres es un candidato
+
+451
+00:26:35,106 --> 00:26:38,090
+interpretable, aunque la curva siga disminuyendo.
+
+452
+00:26:38,210 --> 00:26:40,660
+Dos advertencias de la misma diapositiva.
+
+453
+00:26:40,780 --> 00:26:44,274
+El codo no es una prueba formal: es una lectura visual, y dos
+
+454
+00:26:44,274 --> 00:26:47,080
+personas pueden ver el codo en lugares distintos.
+
+455
+00:26:47,200 --> 00:26:49,420
+Y no garantiza un único candidato.
+
+456
+00:26:49,540 --> 00:26:53,000
+Aquí, por ejemplo, también se podría defender cuatro.
+
+457
+00:26:53,120 --> 00:26:58,100
+Por eso no se usa solo: se contrasta con la silueta y con el Gap, que veremos ahora.
+
+458
+00:26:58,220 --> 00:27:01,180
+El código de Python de la diapositiva veintiséis.
+
+459
+00:27:01,300 --> 00:27:03,440
+Un ciclo for recorre los valores de k.
+
+460
+00:27:03,560 --> 00:27:09,125
+En cada vuelta se ajusta K-means con cincuenta inicios, un máximo de cien iteraciones, la
+
+461
+00:27:09,125 --> 00:27:13,690
+semilla 2026 y el algoritmo de Lloyd, el clásico de asignar y actualizar.
+
+462
+00:27:13,810 --> 00:27:18,960
+Se guarda el modelo, y su atributo inertia, que es justamente el WSS.
+
+463
+00:27:19,080 --> 00:27:22,370
+El mismo ciclo en R, de la diapositiva veinticinco.
+
+464
+00:27:22,490 --> 00:27:27,463
+La función kmeans recibe los datos estandarizados, el número de centros, cincuenta
+
+465
+00:27:27,463 --> 00:27:31,950
+inicios con nstart, cien iteraciones como máximo, y el algoritmo de Lloyd.
+
+466
+00:27:32,070 --> 00:27:35,480
+En cada vuelta se guarda el WSS total del ajuste.
+
+467
+00:27:35,600 --> 00:27:40,650
+Y la semilla se fija una sola vez, al comienzo, con el valor 2026.
+
+468
+00:27:40,770 --> 00:27:43,869
+Mismo procedimiento, distinto lenguaje: por eso
+
+469
+00:27:43,869 --> 00:27:46,440
+R y Python llegan a la misma partición.
+
+470
+00:27:46,560 --> 00:27:49,140
+Otra forma de leer el codo es en porcentaje.
+
+471
+00:27:49,260 --> 00:27:54,720
+Con dos grupos, el WSS es un 28.2 por ciento menor que el TSS.
+
+472
+00:27:54,840 --> 00:27:58,150
+Con tres, un 44.6 por ciento menor.
+
+473
+00:27:58,270 --> 00:28:04,720
+Con cuatro, apenas sube a 49.1, y con ocho grupos llega solo a 59.3.
+
+474
+00:28:04,840 --> 00:28:08,341
+Es decir: el tercer grupo agrega más de dieciséis puntos
+
+475
+00:28:08,341 --> 00:28:12,530
+porcentuales; los cinco grupos siguientes, juntos, menos de quince.
+
+476
+00:28:12,650 --> 00:28:15,160
+Un detalle de Python que vale la pena fijar.
+
+477
+00:28:15,280 --> 00:28:18,645
+En la grabación, al mostrar este código, se dijo que el
+
+478
+00:28:18,645 --> 00:28:21,520
+ciclo va a variar de uno hasta nueve clústeres.
+
+479
+00:28:21,640 --> 00:28:25,288
+Pero range de uno a nueve se detiene antes del nueve:
+
+480
+00:28:25,288 --> 00:28:28,110
+entrega uno, dos, tres, y así hasta ocho.
+
+481
+00:28:28,230 --> 00:28:32,300
+Son ocho valores de k, igual que el uno a ocho del script de R.
+
+482
+00:28:32,420 --> 00:28:36,300
+Por eso la tabla y el gráfico llegan hasta k igual a ocho.
+
+483
+00:28:36,420 --> 00:28:41,210
+El error típico: elegir k mirando solo el valor más bajo del WSS.
+
+484
+00:28:41,330 --> 00:28:44,475
+Siempre ganará el k más grande que hayas probado:
+
+485
+00:28:44,475 --> 00:28:47,300
+con ocho probados, ocho; con veinte, veinte.
+
+486
+00:28:47,420 --> 00:28:50,201
+El WSS se usa para comparar ganancias entre
+
+487
+00:28:50,201 --> 00:28:53,240
+valores de k vecinos, no para elegir su mínimo.
+
+488
+00:28:53,360 --> 00:28:54,580
+Piensa un segundo.
+
+489
+00:28:54,700 --> 00:28:58,859
+Un análisis entrega estos WSS para k de uno a cinco: cien,
+
+490
+00:28:58,859 --> 00:29:02,660
+sesenta, treinta y cinco, treinta y uno y veintiocho.
+
+491
+00:29:02,780 --> 00:29:03,940
+¿Dónde está el codo?
+
+492
+00:29:04,660 --> 00:29:08,910
+Las bajadas son: cuarenta, veinticinco, cuatro y tres.
+
+493
+00:29:09,030 --> 00:29:14,660
+Hasta k igual a tres cada grupo aporta mucho; el cuarto grupo apenas reduce cuatro.
+
+494
+00:29:14,780 --> 00:29:17,530
+El codo está en k igual a tres.
+
+495
+00:29:17,650 --> 00:29:20,790
+Para llevarte: el WSS siempre baja al agregar
+
+496
+00:29:20,790 --> 00:29:23,720
+grupos, y con un grupo por fila vale cero.
+
+497
+00:29:23,840 --> 00:29:26,425
+El codo busca el punto donde la ganancia se
+
+498
+00:29:26,425 --> 00:29:29,130
+vuelve pequeña; en los vinos, k igual a tres.
+
+499
+00:29:29,250 --> 00:29:34,040
+Es una lectura visual, no una prueba: hay que contrastarla con otros criterios.
+
+500
+00:29:34,160 --> 00:29:37,452
+Siguiente parada: la silueta, que mide si cada vino está
+
+501
+00:29:37,452 --> 00:29:39,980
+más cerca de su grupo que del grupo vecino.
+
+502
+00:29:40,850 --> 00:29:42,850
+Sexta parada: la silueta.
+
+503
+00:29:42,970 --> 00:29:45,585
+Un criterio que no solo mira si los grupos son
+
+504
+00:29:45,585 --> 00:29:48,030
+compactos, sino también si están separados.
+
+505
+00:29:48,150 --> 00:29:52,040
+El codo solo mira una cosa: qué tan compactos son los grupos.
+
+506
+00:29:52,160 --> 00:29:55,490
+Pero un grupo puede ser compacto y estar pegado a otro grupo.
+
+507
+00:29:55,610 --> 00:29:59,970
+La silueta hace una pregunta más completa, punto por punto: ¿está este punto
+
+508
+00:29:59,970 --> 00:30:03,470
+claramente más cerca de su propio grupo que del grupo vecino?
+
+509
+00:30:03,590 --> 00:30:07,800
+Si la respuesta es sí para casi todos, los grupos están bien separados.
+
+510
+00:30:07,920 --> 00:30:09,090
+Una analogía.
+
+511
+00:30:09,210 --> 00:30:12,590
+En una fiesta, cada invitado está sentado en una mesa.
+
+512
+00:30:12,710 --> 00:30:16,247
+Para cada persona, mides la distancia promedio a la gente de su
+
+513
+00:30:16,247 --> 00:30:19,560
+mesa, y la distancia promedio a la mesa vecina más cercana.
+
+514
+00:30:19,680 --> 00:30:23,130
+Si está mucho más cerca de los suyos, está bien ubicado.
+
+515
+00:30:23,250 --> 00:30:26,390
+Si está igual de cerca de ambos, está en la frontera.
+
+516
+00:30:26,510 --> 00:30:29,880
+Y si está más cerca de la otra mesa, debería cambiarse.
+
+517
+00:30:30,000 --> 00:30:32,110
+La diapositiva veinte lo formaliza.
+
+518
+00:30:32,230 --> 00:30:34,920
+Para cada observación se calculan dos números.
+
+519
+00:30:35,040 --> 00:30:39,010
+El primero: la distancia media a los otros puntos de su propio grupo.
+
+520
+00:30:39,130 --> 00:30:42,701
+El segundo: la menor distancia media a los puntos de otro
+
+521
+00:30:42,701 --> 00:30:45,520
+grupo; es decir, el grupo vecino más cercano.
+
+522
+00:30:45,640 --> 00:30:50,100
+La silueta es el segundo menos el primero, dividido por el mayor de los dos.
+
+523
+00:30:50,220 --> 00:30:53,709
+El ejemplo de la diapositiva: distancia media a su
+
+524
+00:30:53,709 --> 00:30:56,780
+grupo, dos; distancia media al vecino, seis.
+
+525
+00:30:56,900 --> 00:31:02,450
+Seis menos dos es cuatro; dividido por seis, el mayor, da 0.667.
+
+526
+00:31:02,570 --> 00:31:07,450
+Una aclaración importante: aquí se usa la distancia euclidiana, no su cuadrado.
+
+527
+00:31:07,570 --> 00:31:11,520
+Y por convención, un punto que está solo en su grupo tiene silueta cero.
+
+528
+00:31:11,640 --> 00:31:12,590
+¿Cómo se lee?
+
+529
+00:31:12,710 --> 00:31:14,830
+La silueta va de menos uno a uno.
+
+530
+00:31:14,950 --> 00:31:17,917
+Cerca de uno: el punto está mucho más cerca de su
+
+531
+00:31:17,917 --> 00:31:20,520
+grupo que del vecino; hay buena separación.
+
+532
+00:31:20,640 --> 00:31:25,800
+Cerca de cero: está en una zona de superposición, en la frontera entre dos grupos.
+
+533
+00:31:25,920 --> 00:31:30,190
+Negativa: en promedio, está más cerca de otro grupo que del suyo.
+
+534
+00:31:30,310 --> 00:31:34,102
+Hagamos una cuenta completa con los datos de siempre: uno, dos
+
+535
+00:31:34,102 --> 00:31:37,160
+y tres en un grupo; ocho, nueve y diez en el otro.
+
+536
+00:31:37,280 --> 00:31:38,740
+Tomemos el punto tres.
+
+537
+00:31:38,860 --> 00:31:44,920
+Su distancia media a su grupo: dos hasta el uno, uno hasta el dos; promedio, 1.5.
+
+538
+00:31:45,040 --> 00:31:50,340
+Su distancia media al otro grupo: cinco, seis y siete; promedio, seis.
+
+539
+00:31:50,460 --> 00:31:57,230
+Silueta: seis menos uno coma cinco, cuatro coma cinco, dividido por seis: 0.75.
+
+540
+00:31:57,350 --> 00:32:00,100
+Un punto bien ubicado, aunque sea el del borde.
+
+541
+00:32:00,220 --> 00:32:05,225
+Y el punto uno, en el extremo izquierdo: su distancia media a su grupo también es
+
+542
+00:32:05,225 --> 00:32:09,180
+uno coma cinco, pero al otro grupo es siete, ocho y nueve: ocho.
+
+543
+00:32:09,300 --> 00:32:14,590
+Su silueta es ocho menos uno coma cinco, sobre ocho: 0.813.
+
+544
+00:32:14,710 --> 00:32:19,320
+Para tener la silueta media, se calcula esto para todos los puntos y se promedia.
+
+545
+00:32:19,440 --> 00:32:21,620
+Con los vinos y las trece variables.
+
+546
+00:32:21,740 --> 00:32:26,110
+La silueta media para k igual a dos es 0.258.
+
+547
+00:32:26,230 --> 00:32:28,690
+Para tres, 0.284.
+
+548
+00:32:28,810 --> 00:32:31,370
+Para cuatro, 0.258.
+
+549
+00:32:31,490 --> 00:32:39,490
+Y después baja: 0.235, 0.192, 0.199 y 0.136.
+
+550
+00:32:39,610 --> 00:32:44,350
+El máximo está en k igual a tres: la silueta coincide con el codo.
+
+551
+00:32:44,470 --> 00:32:49,120
+No hay silueta para k igual a uno, porque no existe un grupo vecino.
+
+552
+00:32:49,240 --> 00:32:51,210
+Pero ojo con el tamaño del número.
+
+553
+00:32:51,330 --> 00:32:55,033
+Una silueta de 0.284 es modesta: indica que los grupos
+
+554
+00:32:55,033 --> 00:32:58,050
+se separan, pero que persiste superposición.
+
+555
+00:32:58,170 --> 00:33:03,374
+Mirando por dentro, en un cálculo adicional: los grupos uno y dos
+
+556
+00:33:03,374 --> 00:33:08,337
+tienen silueta media cerca de 0.34 y 0.35; el grupo tres, solo
+
+557
+00:33:08,337 --> 00:33:12,340
+0.177, y ahí hay siete vinos con silueta negativa.
+
+558
+00:33:12,460 --> 00:33:16,230
+Es el mejor de estos candidatos, no una separación perfecta.
+
+559
+00:33:16,350 --> 00:33:20,610
+En R, la silueta se calcula con la función silhouette del paquete cluster.
+
+560
+00:33:20,730 --> 00:33:24,077
+Recibe los grupos del ajuste y la matriz de distancias entre
+
+561
+00:33:24,077 --> 00:33:27,090
+todos los vinos, que se calcula una sola vez con dist.
+
+562
+00:33:27,210 --> 00:33:30,014
+La tercera columna del resultado es la silueta de
+
+563
+00:33:30,014 --> 00:33:32,590
+cada vino, y su promedio es la silueta media.
+
+564
+00:33:32,710 --> 00:33:37,320
+En Python, todo eso lo hace una sola función, que ya entrega el promedio.
+
+565
+00:33:37,440 --> 00:33:39,310
+Errores típicos con la silueta.
+
+566
+00:33:39,430 --> 00:33:44,100
+Uno: leer 0.284 como un veintiocho por ciento de aciertos.
+
+567
+00:33:44,220 --> 00:33:47,820
+No es un porcentaje; es una medida de separación relativa.
+
+568
+00:33:47,940 --> 00:33:52,390
+Dos: calcularla con distancias al cuadrado, como el WSS.
+
+569
+00:33:52,510 --> 00:33:55,770
+La silueta usa la distancia euclidiana, sin cuadrado.
+
+570
+00:33:55,890 --> 00:33:58,370
+Y tres: pedirla con un solo grupo.
+
+571
+00:33:58,490 --> 00:34:03,810
+Con k igual a uno no hay vecino, por eso el script guarda un valor faltante.
+
+572
+00:34:03,930 --> 00:34:05,150
+Piensa un segundo.
+
+573
+00:34:05,270 --> 00:34:09,690
+Un vino tiene distancia media tres a su propio grupo, y dos al grupo vecino.
+
+574
+00:34:09,810 --> 00:34:12,420
+¿Cuánto vale su silueta, y qué significa?
+
+575
+00:34:13,140 --> 00:34:19,400
+Dos menos tres es menos uno; dividido por tres, el mayor, da menos 0.333.
+
+576
+00:34:19,520 --> 00:34:24,750
+Es negativa: ese vino está, en promedio, más cerca del grupo vecino que del suyo.
+
+577
+00:34:24,870 --> 00:34:26,940
+Probablemente está mal asignado.
+
+578
+00:34:27,060 --> 00:34:30,884
+Para llevarte: la silueta compara, para cada punto, la distancia
+
+579
+00:34:30,884 --> 00:34:34,230
+media a su grupo con la distancia media al grupo vecino.
+
+580
+00:34:34,350 --> 00:34:38,405
+Va de menos uno a uno: cerca de uno es buena separación, cerca
+
+581
+00:34:38,405 --> 00:34:41,610
+de cero es frontera, negativa es mala asignación.
+
+582
+00:34:41,730 --> 00:34:46,070
+En los vinos, el máximo está en k igual a tres, con
+
+583
+00:34:46,070 --> 00:34:49,900
+0.284: el mejor candidato, con superposición.
+
+584
+00:34:50,020 --> 00:34:52,820
+Siguiente parada: el estadístico Gap, que compara
+
+585
+00:34:52,820 --> 00:34:55,620
+nuestros grupos con datos sin ninguna estructura.
+
+586
+00:34:55,740 --> 00:34:58,470
+Y qué hacer cuando los criterios no se ponen de acuerdo.
+
+587
+00:34:59,370 --> 00:35:01,830
+Séptima parada: el estadístico Gap.
+
+588
+00:35:01,950 --> 00:35:04,619
+Y una situación muy real: qué hacer cuando dos
+
+589
+00:35:04,619 --> 00:35:06,940
+criterios recomiendan números distintos.
+
+590
+00:35:07,060 --> 00:35:10,920
+Aquí va una verdad incómoda: K-means siempre entrega grupos.
+
+591
+00:35:11,040 --> 00:35:14,803
+Aunque los datos no tengan ninguna estructura, aunque sean puro
+
+592
+00:35:14,803 --> 00:35:17,790
+ruido, si le pides tres grupos, te da tres grupos.
+
+593
+00:35:17,910 --> 00:35:20,825
+Entonces, ¿cómo sabemos si los grupos que encontramos
+
+594
+00:35:20,825 --> 00:35:23,300
+son más compactos de lo que saldría por azar?
+
+595
+00:35:23,420 --> 00:35:27,740
+Esa es la idea del Gap: comparar con datos simulados que no tienen grupos.
+
+596
+00:35:27,860 --> 00:35:29,030
+Una analogía.
+
+597
+00:35:29,150 --> 00:35:31,890
+Sacaste un seis en una prueba de alternativas.
+
+598
+00:35:32,010 --> 00:35:32,710
+¿Es bueno?
+
+599
+00:35:32,830 --> 00:35:33,580
+Depende.
+
+600
+00:35:33,700 --> 00:35:37,570
+Si alguien que responde al azar saca un dos, tu seis es muy bueno.
+
+601
+00:35:37,690 --> 00:35:41,650
+Si el azar saca un cinco y medio, tu seis casi no dice nada.
+
+602
+00:35:41,770 --> 00:35:46,538
+El Gap hace eso: compara tu WSS con el WSS que saldría en datos
+
+603
+00:35:46,538 --> 00:35:50,550
+al azar, y mira la distancia, la brecha, entre ambos.
+
+604
+00:35:50,670 --> 00:35:52,190
+Gap significa brecha.
+
+605
+00:35:52,310 --> 00:35:55,145
+La definición de la diapositiva veintidós, de
+
+606
+00:35:55,145 --> 00:35:57,980
+Tibshirani, Walther y Hastie, de dos mil uno.
+
+607
+00:35:58,100 --> 00:36:03,690
+Primero, se ajusta K-means a los datos reales para cada k, y se guarda su WSS.
+
+608
+00:36:03,810 --> 00:36:07,730
+Segundo, se simulan B bases de referencia, sin grupos, y
+
+609
+00:36:07,730 --> 00:36:11,020
+se calcula su WSS para los mismos valores de k.
+
+610
+00:36:11,140 --> 00:36:15,816
+Tercero, se comparan en escala logarítmica: el Gap es el promedio del
+
+611
+00:36:15,816 --> 00:36:20,560
+logaritmo del WSS de referencia, menos el logaritmo del WSS observado.
+
+612
+00:36:20,680 --> 00:36:24,260
+Un Gap grande significa: mucho más compacto que el azar.
+
+613
+00:36:24,380 --> 00:36:26,160
+¿Y cómo se elige k con el Gap?
+
+614
+00:36:26,280 --> 00:36:27,770
+No se toma el máximo.
+
+615
+00:36:27,890 --> 00:36:31,348
+La diapositiva veintitrés usa la regla de un error estándar:
+
+616
+00:36:31,348 --> 00:36:34,922
+elegimos el primer k cuyo Gap sea mayor o igual que el Gap del
+
+617
+00:36:34,922 --> 00:36:38,150
+siguiente k, menos el error estándar de ese siguiente k.
+
+618
+00:36:38,270 --> 00:36:41,445
+La idea: si dar un paso más mejora el Gap menos que el
+
+619
+00:36:41,445 --> 00:36:44,150
+ruido de la simulación, no vale la pena darlo.
+
+620
+00:36:44,270 --> 00:36:46,500
+El ejemplo hipotético de la diapositiva.
+
+621
+00:36:46,620 --> 00:36:53,429
+Gap de 0.40, 0.62 y 0.64 para k igual a uno, dos y
+
+622
+00:36:53,429 --> 00:36:58,740
+tres, con errores de 0.04, 0.05 y 0.04.
+
+623
+00:36:58,860 --> 00:37:07,730
+Para k igual a uno: ¿0.40 es mayor o igual que 0.62 menos 0.05, que es 0.57?
+
+624
+00:37:07,850 --> 00:37:09,230
+No: no cumple.
+
+625
+00:37:09,350 --> 00:37:18,250
+Para k igual a dos: ¿0.62 es mayor o igual que 0.64 menos 0.04, que es 0.60?
+
+626
+00:37:18,370 --> 00:37:18,840
+Sí.
+
+627
+00:37:18,960 --> 00:37:22,200
+Elegimos dos, aunque el Gap más alto esté en tres.
+
+628
+00:37:22,320 --> 00:37:24,870
+Aquí conviene una precisión sobre la grabación.
+
+629
+00:37:24,990 --> 00:37:28,076
+Después de resolver este ejemplo, se dijo que el algoritmo
+
+630
+00:37:28,076 --> 00:37:30,950
+sigue corriendo hasta parar donde k es igual a cuatro.
+
+631
+00:37:31,070 --> 00:37:35,199
+En el ejemplo hipotético la regla se detiene en k igual a dos; el
+
+632
+00:37:35,199 --> 00:37:38,820
+cuatro es el resultado de los vinos, que vemos enseguida.
+
+633
+00:37:38,940 --> 00:37:41,653
+Y otra precisión: se dijo que se mira el próximo
+
+634
+00:37:41,653 --> 00:37:43,970
+Gap menos el error estándar del k actual.
+
+635
+00:37:44,090 --> 00:37:46,905
+El error que se resta es el del siguiente valor de
+
+636
+00:37:46,905 --> 00:37:49,270
+k, como dice la fórmula de la diapositiva.
+
+637
+00:37:49,390 --> 00:37:52,290
+Ahora los vinos, con treinta simulaciones.
+
+638
+00:37:52,410 --> 00:37:57,954
+El Gap crece desde 0.800 con un grupo, a 1.015 con
+
+639
+00:37:57,954 --> 00:38:02,390
+dos, 1.199 con tres, y 1.227 con cuatro.
+
+640
+00:38:02,510 --> 00:38:12,090
+Para k igual a tres: ¿1.199 es mayor o igual que 1.227 menos 0.022, que es 1.205?
+
+641
+00:38:12,210 --> 00:38:13,760
+No, por muy poco.
+
+642
+00:38:13,880 --> 00:38:23,220
+Para k igual a cuatro: ¿1.227 es mayor o igual que 1.245 menos 0.021, que es 1.224?
+
+643
+00:38:23,340 --> 00:38:23,810
+Sí.
+
+644
+00:38:23,930 --> 00:38:28,400
+El Gap recomienda k igual a cuatro, tanto en R como en Python.
+
+645
+00:38:28,520 --> 00:38:33,500
+Fíjate en la forma de la curva: el Gap sigue subiendo hasta k igual a ocho.
+
+646
+00:38:33,620 --> 00:38:36,790
+Si eligiéramos el máximo, tendríamos ocho grupos.
+
+647
+00:38:36,910 --> 00:38:39,868
+La regla de un error estándar frena antes, donde la
+
+648
+00:38:39,868 --> 00:38:42,710
+mejora deja de superar el ruido de la simulación.
+
+649
+00:38:42,830 --> 00:38:46,410
+Y el profesor lo notó: de tres a cuatro el Gap cambia poco.
+
+650
+00:38:46,530 --> 00:38:49,062
+Con otra semilla, más simulaciones o otra
+
+651
+00:38:49,062 --> 00:38:51,780
+referencia, la recomendación podría moverse.
+
+652
+00:38:51,900 --> 00:38:53,760
+Entonces tenemos un desacuerdo.
+
+653
+00:38:53,880 --> 00:38:55,430
+El codo sugiere tres.
+
+654
+00:38:55,550 --> 00:38:57,140
+La silueta, tres.
+
+655
+00:38:57,260 --> 00:39:01,100
+El Gap, con esta referencia y treinta simulaciones, cuatro.
+
+656
+00:39:01,220 --> 00:39:02,110
+¿Qué se hace?
+
+657
+00:39:02,230 --> 00:39:07,039
+La diapositiva veinticuatro decide: se trabaja con k igual a tres para
+
+658
+00:39:07,039 --> 00:39:11,710
+describir perfiles, y se reconoce k igual a cuatro como alternativa.
+
+659
+00:39:11,830 --> 00:39:13,960
+No hay un k verdadero garantizado.
+
+660
+00:39:14,080 --> 00:39:17,174
+Los criterios son evidencia, y la decisión final también
+
+661
+00:39:17,174 --> 00:39:19,550
+considera la interpretación y el propósito.
+
+662
+00:39:19,670 --> 00:39:22,900
+En el código de la clase, el Gap son pocas líneas.
+
+663
+00:39:23,020 --> 00:39:27,460
+Se generan treinta bases uniformes entre el mínimo y el máximo de cada columna
+
+664
+00:39:27,460 --> 00:39:31,330
+estandarizada, y para cada una se ajusta K-means con veinte inicios.
+
+665
+00:39:31,450 --> 00:39:34,960
+Se guarda el logaritmo del WSS de cada simulación.
+
+666
+00:39:35,080 --> 00:39:39,800
+El Gap es el promedio de esos logaritmos menos el logaritmo del WSS real.
+
+667
+00:39:39,920 --> 00:39:43,161
+Y el error estándar es la desviación de las simulaciones,
+
+668
+00:39:43,161 --> 00:39:45,890
+multiplicada por la raíz de uno más uno sobre B.
+
+669
+00:39:46,010 --> 00:39:49,750
+El error típico con el Gap: elegir el k con el Gap más alto.
+
+670
+00:39:49,870 --> 00:39:51,420
+En los vinos daría ocho.
+
+671
+00:39:51,540 --> 00:39:54,675
+El otro error es olvidar que la referencia y el número de
+
+672
+00:39:54,675 --> 00:39:57,755
+simulaciones forman parte del criterio: el Gap no es una
+
+673
+00:39:57,755 --> 00:40:01,110
+propiedad fija de los datos, depende de con qué los comparas.
+
+674
+00:40:01,230 --> 00:40:02,450
+Piensa un segundo.
+
+675
+00:40:02,570 --> 00:40:09,450
+Gap de 0.50, 0.70, 0.75 y 0.76 para k de uno a
+
+676
+00:40:09,450 --> 00:40:16,480
+cuatro, con errores de 0.03, 0.04, 0.06 y 0.05.
+
+677
+00:40:16,600 --> 00:40:19,070
+¿Qué k elige la regla de un error estándar?
+
+678
+00:40:19,790 --> 00:40:28,330
+Para k igual a uno: ¿0.50 es mayor o igual que 0.70 menos 0.04, o sea 0.66?
+
+679
+00:40:28,450 --> 00:40:28,870
+No.
+
+680
+00:40:28,990 --> 00:40:37,870
+Para k igual a dos: ¿0.70 es mayor o igual que 0.75 menos 0.06, o sea 0.69?
+
+681
+00:40:37,990 --> 00:40:38,460
+Sí.
+
+682
+00:40:38,580 --> 00:40:42,060
+La regla elige dos, aunque el Gap siga subiendo hasta cuatro.
+
+683
+00:40:42,180 --> 00:40:45,072
+Para llevarte: el Gap compara el logaritmo del
+
+684
+00:40:45,072 --> 00:40:47,650
+WSS con el de datos simulados sin grupos.
+
+685
+00:40:47,770 --> 00:40:50,966
+Se elige con la regla de un error estándar, no con
+
+686
+00:40:50,966 --> 00:40:53,650
+el máximo; en los vinos, k igual a cuatro.
+
+687
+00:40:53,770 --> 00:40:58,258
+Y cuando los criterios discrepan, se elige con criterio, y se reporta la
+
+688
+00:40:58,258 --> 00:41:02,060
+alternativa: aquí, tres para describir, y cuatro como opción.
+
+689
+00:41:02,180 --> 00:41:04,950
+Siguiente parada: ya tenemos tres grupos.
+
+690
+00:41:05,070 --> 00:41:06,700
+¿Qué vinos hay en cada uno?
+
+691
+00:41:06,820 --> 00:41:10,610
+Los perfiles, y por qué el número de grupo es solo una etiqueta.
+
+692
+00:41:11,490 --> 00:41:14,630
+Octava parada: ya tenemos tres grupos de vinos.
+
+693
+00:41:14,750 --> 00:41:17,930
+Ahora hay que darles significado, con sus perfiles.
+
+694
+00:41:18,050 --> 00:41:21,099
+K-means terminó, y entregó tres grupos de sesenta
+
+695
+00:41:21,099 --> 00:41:23,650
+y dos, cincuenta y sesenta y cinco vinos.
+
+696
+00:41:23,770 --> 00:41:25,210
+¿Qué sabemos de ellos?
+
+697
+00:41:25,330 --> 00:41:30,010
+Por ahora, nada: solo que el algoritmo los numeró uno, dos y tres.
+
+698
+00:41:30,130 --> 00:41:34,040
+El trabajo de verdad empieza ahora: describir en qué se diferencian.
+
+699
+00:41:34,160 --> 00:41:37,680
+Porque un grupo sin perfil no sirve para tomar ninguna decisión.
+
+700
+00:41:37,800 --> 00:41:38,970
+Una analogía.
+
+701
+00:41:39,090 --> 00:41:42,740
+En un matrimonio, las mesas están numeradas del uno al diez.
+
+702
+00:41:42,860 --> 00:41:45,633
+Nadie piensa que la mesa uno es mejor que la mesa
+
+703
+00:41:45,633 --> 00:41:48,180
+siete: el número solo sirve para encontrarla.
+
+704
+00:41:48,300 --> 00:41:52,390
+Para saber quiénes se sientan en cada mesa, miras la lista de invitados.
+
+705
+00:41:52,510 --> 00:41:55,450
+En clustering, esa lista es el perfil del grupo.
+
+706
+00:41:55,570 --> 00:41:58,810
+La diapositiva veintisiete lo muestra con un caso concreto.
+
+707
+00:41:58,930 --> 00:42:02,392
+Con k igual a tres, el script de R y el de Python
+
+708
+00:42:02,392 --> 00:42:05,360
+encuentran exactamente la misma partición.
+
+709
+00:42:05,480 --> 00:42:08,552
+Pero la numeran distinto: el grupo uno de R, de
+
+710
+00:42:08,552 --> 00:42:11,820
+sesenta y cinco vinos, es el grupo tres de Python.
+
+711
+00:42:11,940 --> 00:42:13,120
+El dos coincide.
+
+712
+00:42:13,240 --> 00:42:17,370
+Y el tres de R, de sesenta y dos vinos, es el uno de Python.
+
+713
+00:42:17,490 --> 00:42:23,890
+Mismos vinos, mismo WSS de 1267.37, otros nombres.
+
+714
+00:42:24,010 --> 00:42:27,610
+Desde aquí usamos siempre la numeración de Python, la del script.
+
+715
+00:42:27,730 --> 00:42:32,111
+Y recuerda la advertencia de la diapositiva: con otros valores de k, no solo
+
+716
+00:42:32,111 --> 00:42:35,570
+cambian los números; también pueden cambiar las particiones.
+
+717
+00:42:35,690 --> 00:42:40,100
+Primero, los perfiles en la escala original, de la diapositiva veintiocho.
+
+718
+00:42:40,220 --> 00:42:49,060
+El grupo uno, de sesenta y dos vinos: alcohol 13.68, flavonoides 3.00, color 5.45.
+
+719
+00:42:49,180 --> 00:42:57,050
+El grupo dos, de cincuenta: alcohol 13.14, flavonoides 0.82, color 7.18.
+
+720
+00:42:57,170 --> 00:43:05,470
+El grupo tres, de sesenta y cinco: alcohol 12.25, flavonoides 2.05, color 2.97.
+
+721
+00:43:05,590 --> 00:43:12,230
+Como referencia, las medias generales son 13.00, 2.04 y 5.03.
+
+722
+00:43:12,350 --> 00:43:17,260
+Con eso ya se puede describir: el grupo uno tiene más alcohol y más flavonoides.
+
+723
+00:43:17,380 --> 00:43:20,370
+El dos, muy pocos flavonoides y mucho color.
+
+724
+00:43:20,490 --> 00:43:23,010
+El tres, menos alcohol y poco color.
+
+725
+00:43:23,130 --> 00:43:25,530
+Pero cuidado: son promedios del grupo.
+
+726
+00:43:25,650 --> 00:43:27,990
+No describen exactamente a cada vino.
+
+727
+00:43:28,110 --> 00:43:31,834
+Conviene mirarlos junto con las distribuciones y los tamaños, y no
+
+728
+00:43:31,834 --> 00:43:35,502
+sacar conclusiones que los datos no permiten: estas mediciones no
+
+729
+00:43:35,502 --> 00:43:38,210
+dicen nada sobre precio, calidad ni preferencia.
+
+730
+00:43:38,330 --> 00:43:41,734
+Ahora, la vista de las trece variables a la vez, en la
+
+731
+00:43:41,734 --> 00:43:44,570
+escala estandarizada: los centros de K-means.
+
+732
+00:43:44,690 --> 00:43:49,192
+El grupo uno está sobre la media en casi todo: prolina
+
+733
+00:43:49,192 --> 00:43:53,110
+1.1 desviaciones, flavonoides 1.0, alcohol 0.8.
+
+734
+00:43:53,230 --> 00:43:57,292
+El grupo dos está bajo la media en flavonoides y matiz, alrededor
+
+735
+00:43:57,292 --> 00:44:00,730
+de menos 1.2, y sobre la media en color y ácido málico.
+
+736
+00:44:00,850 --> 00:44:04,310
+El grupo tres está bajo la media en alcohol, color y prolina.
+
+737
+00:44:04,430 --> 00:44:08,440
+Un valor positivo indica una media de grupo superior a la media general.
+
+738
+00:44:08,560 --> 00:44:12,260
+Aquí hay dos precisiones sobre la grabación, y las dos importan.
+
+739
+00:44:12,380 --> 00:44:15,890
+Primera: se dijo que el grupo uno tiene menor alcohol y un color
+
+740
+00:44:15,890 --> 00:44:19,400
+específico, y que el grupo tres tiene más flavonoides y prolina.
+
+741
+00:44:19,520 --> 00:44:21,340
+Esa es la numeración de R.
+
+742
+00:44:21,460 --> 00:44:24,977
+Un minuto después, que el grupo uno tiene 13.68 de
+
+743
+00:44:24,977 --> 00:44:27,790
+alcohol: esa es la numeración de Python.
+
+744
+00:44:27,910 --> 00:44:32,100
+El mismo nombre, grupo uno, se usó para dos grupos distintos.
+
+745
+00:44:32,220 --> 00:44:35,100
+Justamente lo que advierte la diapositiva veintisiete.
+
+746
+00:44:35,220 --> 00:44:39,342
+Segunda precisión: se dijo que el grupo uno tiene cero coma ocho más de
+
+747
+00:44:39,342 --> 00:44:42,710
+alcohol, y el grupo tres, menos cero coma ochenta y nueve.
+
+748
+00:44:42,830 --> 00:44:46,320
+Esos números son desviaciones estándar, no grados de alcohol.
+
+749
+00:44:46,440 --> 00:44:51,704
+El grupo uno está 0.83 desviaciones sobre la media; en
+
+750
+00:44:51,704 --> 00:44:56,480
+unidades, son 13.68 menos 13.00: 0.68 de alcohol.
+
+751
+00:44:56,600 --> 00:45:02,661
+El grupo tres está a menos 0.92 desviaciones, no menos
+
+752
+00:45:02,661 --> 00:45:08,160
+0.89; en unidades, 12.25 menos 13.00: menos 0.75.
+
+753
+00:45:08,280 --> 00:45:11,694
+El error típico al leer perfiles: comparar diferencias en
+
+754
+00:45:11,694 --> 00:45:14,450
+unidades originales entre variables distintas.
+
+755
+00:45:14,570 --> 00:45:20,060
+Una diferencia de cien en prolina parece enorme, y una de 0.5 en matiz, mínima.
+
+756
+00:45:20,180 --> 00:45:23,626
+Pero cien de prolina es apenas un tercio de desviación,
+
+757
+00:45:23,626 --> 00:45:26,320
+y 0.5 de matiz son más de dos desviaciones.
+
+758
+00:45:26,440 --> 00:45:30,710
+Para comparar variables entre sí, se usan los perfiles estandarizados.
+
+759
+00:45:30,830 --> 00:45:34,980
+Para describir un grupo con palabras, se vuelve a las unidades originales.
+
+760
+00:45:35,100 --> 00:45:36,320
+Piensa un segundo.
+
+761
+00:45:36,440 --> 00:45:39,460
+El grupo dos tiene color medio 7.18.
+
+762
+00:45:39,580 --> 00:45:44,760
+La media general del color es 5.03, y su desviación, 2.30.
+
+763
+00:45:44,880 --> 00:45:47,460
+¿Cuánto vale ese color en desviaciones estándar?
+
+764
+00:45:48,180 --> 00:45:52,060
+Siete coma dieciocho menos cinco coma cero tres es 2.15.
+
+765
+00:45:52,180 --> 00:45:55,960
+Dividido por 2.30, da 0.935.
+
+766
+00:45:56,080 --> 00:46:01,330
+Casi una desviación sobre la media: en la diapositiva veintinueve aparece como 0.9.
+
+767
+00:46:01,450 --> 00:46:04,980
+Para llevarte: el número de un grupo es solo una etiqueta;
+
+768
+00:46:04,980 --> 00:46:07,840
+R y Python numeran distinto la misma partición.
+
+769
+00:46:07,960 --> 00:46:11,257
+El significado sale del perfil: medias originales para
+
+770
+00:46:11,257 --> 00:46:14,860
+describir, perfiles estandarizados para comparar variables.
+
+771
+00:46:14,980 --> 00:46:19,940
+Y son promedios: no describen a cada vino, ni permiten hablar de calidad o precio.
+
+772
+00:46:20,060 --> 00:46:24,189
+Siguiente parada: dibujar los grupos con una proyección, compararlos
+
+773
+00:46:24,189 --> 00:46:27,590
+con las variedades reales, y ver los límites de K-means.
+
+774
+00:46:28,490 --> 00:46:33,283
+Novena parada: vamos a dibujar los grupos, a compararlos con las variedades reales
+
+775
+00:46:33,283 --> 00:46:37,200
+de los vinos, y a ver cuándo K-means no es la herramienta adecuada.
+
+776
+00:46:37,320 --> 00:46:39,790
+Los grupos se formaron con trece variables.
+
+777
+00:46:39,910 --> 00:46:42,920
+Nadie puede dibujar un espacio de trece dimensiones.
+
+778
+00:46:43,040 --> 00:46:46,106
+Si dibujas solo dos variables, por ejemplo alcohol y
+
+779
+00:46:46,106 --> 00:46:49,290
+flavonoides, ves una parte muy pequeña de la historia.
+
+780
+00:46:49,410 --> 00:46:53,940
+Necesitamos una forma de resumir las trece en dos ejes que conserven lo más posible.
+
+781
+00:46:54,060 --> 00:46:57,800
+Para eso está el análisis de componentes principales, PCA.
+
+782
+00:46:57,920 --> 00:46:59,090
+Una analogía.
+
+783
+00:46:59,210 --> 00:47:00,980
+La sombra de una mano en la pared.
+
+784
+00:47:01,100 --> 00:47:04,164
+Si pones bien la luz, la sombra muestra un perro,
+
+785
+00:47:04,164 --> 00:47:06,540
+un pájaro: conserva mucho de la forma.
+
+786
+00:47:06,660 --> 00:47:08,170
+Pero pierde la profundidad.
+
+787
+00:47:08,290 --> 00:47:13,300
+Dos dedos que están lejos, uno delante del otro, en la sombra pueden verse juntos.
+
+788
+00:47:13,420 --> 00:47:15,866
+PCA busca la mejor posición de la luz: la
+
+789
+00:47:15,866 --> 00:47:18,610
+proyección que conserva la mayor variabilidad.
+
+790
+00:47:18,730 --> 00:47:20,560
+Aun así, es una sombra.
+
+791
+00:47:20,680 --> 00:47:23,157
+Esta es la proyección de los vinos en los dos
+
+792
+00:47:23,157 --> 00:47:25,800
+primeros componentes, recalculada con el script.
+
+793
+00:47:25,920 --> 00:47:29,678
+El primer componente conserva el 36.0 por ciento
+
+794
+00:47:29,678 --> 00:47:32,810
+de la variabilidad; el segundo, el 19.4.
+
+795
+00:47:32,930 --> 00:47:36,030
+Juntos, el 55.3 por ciento.
+
+796
+00:47:36,150 --> 00:47:38,990
+Cada vino tiene el color de su grupo de K-means.
+
+797
+00:47:39,110 --> 00:47:41,439
+Los tres grupos ocupan zonas distintas de la
+
+798
+00:47:41,439 --> 00:47:43,610
+sombra, aunque en las fronteras se tocan.
+
+799
+00:47:43,730 --> 00:47:48,770
+Ojo: K-means se ajustó con las trece variables, no con estas dos coordenadas.
+
+800
+00:47:48,890 --> 00:47:52,639
+Una precisión menor sobre la grabación: se dijo que los dos componentes
+
+801
+00:47:52,639 --> 00:47:55,860
+conservan casi el cincuenta y seis por ciento de la varianza.
+
+802
+00:47:55,980 --> 00:48:00,890
+El valor exacto es 55.3 por ciento: más cerca de cincuenta y cinco.
+
+803
+00:48:01,010 --> 00:48:05,480
+Lo importante se mantiene: casi la mitad de la información queda fuera del dibujo.
+
+804
+00:48:05,600 --> 00:48:09,690
+Ahora una comparación que en un problema real casi nunca se puede hacer.
+
+805
+00:48:09,810 --> 00:48:13,890
+Este archivo tiene, aparte, la variedad real de cada vino.
+
+806
+00:48:14,010 --> 00:48:17,190
+No se usó para ajustar K-means, ni para elegir k.
+
+807
+00:48:17,310 --> 00:48:20,760
+A la izquierda, los vinos coloreados por su variedad real.
+
+808
+00:48:20,880 --> 00:48:24,013
+A la derecha, por el grupo de K-means, pintado con el
+
+809
+00:48:24,013 --> 00:48:26,850
+color de la variedad más frecuente en ese grupo.
+
+810
+00:48:26,970 --> 00:48:30,100
+Los círculos negros marcan los vinos donde no coinciden.
+
+811
+00:48:30,220 --> 00:48:32,820
+La tabla cruzada, del script de la clase.
+
+812
+00:48:32,940 --> 00:48:36,780
+Los cincuenta y nueve vinos de la variedad uno caen todos en el grupo uno.
+
+813
+00:48:36,900 --> 00:48:40,690
+Los cuarenta y siete de la variedad tres, todos en el grupo dos.
+
+814
+00:48:40,810 --> 00:48:44,486
+De los setenta y uno de la variedad dos, sesenta y cinco caen
+
+815
+00:48:44,486 --> 00:48:47,500
+en el grupo tres, tres en el uno y tres en el dos.
+
+816
+00:48:47,620 --> 00:48:52,153
+En total, ciento setenta y uno de ciento setenta y siete vinos coinciden
+
+817
+00:48:52,153 --> 00:48:55,930
+con la variedad mayoritaria de su grupo: un 96.6 por ciento.
+
+818
+00:48:56,050 --> 00:48:58,950
+Las seis discrepancias son todas de la variedad dos.
+
+819
+00:48:59,070 --> 00:49:00,890
+Una precisión sobre la grabación.
+
+820
+00:49:01,010 --> 00:49:04,310
+Se dijo que debía haber alrededor de ocho o nueve puntos mal
+
+821
+00:49:04,310 --> 00:49:07,555
+clasificados de ciento setenta y siete, y una clasificación
+
+822
+00:49:07,555 --> 00:49:10,360
+buena de más del noventa, noventa y dos por ciento.
+
+823
+00:49:10,480 --> 00:49:14,231
+El script entrega seis discrepancias, y ciento setenta y
+
+824
+00:49:14,231 --> 00:49:17,380
+uno de ciento setenta y siete: 96.6 por ciento.
+
+825
+00:49:17,500 --> 00:49:20,470
+El propio profesor había contado seis en el gráfico.
+
+826
+00:49:20,590 --> 00:49:24,630
+Y una advertencia de fondo: esto no es exactitud en datos nuevos.
+
+827
+00:49:24,750 --> 00:49:27,853
+Es una comparación descriptiva de estos mismos vinos,
+
+828
+00:49:27,853 --> 00:49:30,370
+con una etiqueta que normalmente no existe.
+
+829
+00:49:30,490 --> 00:49:34,690
+En la clase, Matías hizo una gran pregunta: ¿la agrupación se hizo con
+
+830
+00:49:34,690 --> 00:49:37,990
+las trece variables, o con los dos componentes del PCA?
+
+831
+00:49:38,110 --> 00:49:38,970
+Con las trece.
+
+832
+00:49:39,090 --> 00:49:40,920
+La proyección es solo para mirar.
+
+833
+00:49:41,040 --> 00:49:44,442
+Agrupar sobre dos componentes descarta casi la mitad de la
+
+834
+00:49:44,442 --> 00:49:48,195
+variabilidad, y con datos categóricos, que son la mayoría en una
+
+835
+00:49:48,195 --> 00:49:51,010
+empresa, el PCA ni siquiera aplica directamente.
+
+836
+00:49:51,130 --> 00:49:54,680
+La recomendación del profesor: agrupar con la base original.
+
+837
+00:49:54,800 --> 00:49:58,570
+Ahora los límites de K-means, de la diapositiva treinta y uno.
+
+838
+00:49:58,690 --> 00:50:02,840
+Estos datos simulados forman dos medias lunas, una dentro de la otra.
+
+839
+00:50:02,960 --> 00:50:07,161
+K-means busca grupos compactos alrededor de un centro, así que corta
+
+840
+00:50:07,161 --> 00:50:10,620
+el dibujo con una recta: mitad izquierda, mitad derecha.
+
+841
+00:50:10,740 --> 00:50:12,868
+Solo el setenta y cinco por ciento de los
+
+842
+00:50:12,868 --> 00:50:15,100
+puntos queda en el grupo de su propia luna.
+
+843
+00:50:15,220 --> 00:50:19,710
+K-means puede dividir estructuras curvas en grupos compactos que no siguen su forma.
+
+844
+00:50:19,830 --> 00:50:22,300
+Para formas así existen otros métodos.
+
+845
+00:50:22,420 --> 00:50:26,189
+El profesor mencionó DBSCAN, que no busca centros sino zonas de
+
+846
+00:50:26,189 --> 00:50:29,360
+alta densidad de puntos: sigue la forma de cada luna.
+
+847
+00:50:29,480 --> 00:50:33,508
+K-means, K-modes y K-prototypes no son los únicos métodos de
+
+848
+00:50:33,508 --> 00:50:36,730
+agrupamiento; son los más sencillos y conocidos.
+
+849
+00:50:36,850 --> 00:50:41,250
+Otro límite, que el profesor dibujó al final de la clase: los atípicos.
+
+850
+00:50:41,370 --> 00:50:45,720
+Aquí hay dos nubes claras, y un solo punto muy lejos, a la derecha.
+
+851
+00:50:45,840 --> 00:50:49,300
+Pedimos dos grupos, esperando una nube en cada uno.
+
+852
+00:50:49,420 --> 00:50:53,643
+Pero K-means deja al punto lejano solo, en un grupo de un elemento, y
+
+853
+00:50:53,643 --> 00:50:57,070
+junta las dos nubes en el otro grupo, de ochenta puntos.
+
+854
+00:50:57,190 --> 00:51:01,670
+El cuadrado de su distancia pesa tanto, que le conviene darle un centro propio.
+
+855
+00:51:01,790 --> 00:51:05,846
+La recomendación: revisar atípicos antes de agrupar, por ejemplo con una
+
+856
+00:51:05,846 --> 00:51:10,070
+proyección o con métodos de detección de atípicos, que verán en otra clase.
+
+857
+00:51:10,190 --> 00:51:14,320
+Y la diapositiva agrega más cosas que revisar: escalas, variables
+
+858
+00:51:14,320 --> 00:51:18,260
+redundantes, y grupos de tamaños o dispersiones muy distintos.
+
+859
+00:51:18,380 --> 00:51:22,210
+K-means funciona mejor con grupos compactos y de tamaño parecido.
+
+860
+00:51:22,330 --> 00:51:26,224
+El error típico de esta parada: reportar el 96.6 por ciento
+
+861
+00:51:26,224 --> 00:51:29,260
+como si fuera la exactitud de un clasificador.
+
+862
+00:51:29,380 --> 00:51:33,410
+En un problema real no hay variedad conocida: no se puede calcular.
+
+863
+00:51:33,530 --> 00:51:36,890
+Aquí se pudo solo porque el archivo docente la trae aparte.
+
+864
+00:51:37,010 --> 00:51:40,840
+Sirve como ilustración de que K-means puede recuperar estructura real,
+
+865
+00:51:40,840 --> 00:51:43,850
+no como métrica para elegir k ni para vender el modelo.
+
+866
+00:51:43,970 --> 00:51:45,190
+Piensa un segundo.
+
+867
+00:51:45,310 --> 00:51:49,370
+Un grupo A tiene cuarenta vinos de la variedad uno y diez de la variedad dos.
+
+868
+00:51:49,490 --> 00:51:53,880
+Un grupo B tiene cinco de la variedad uno y cuarenta y cinco de la variedad dos.
+
+869
+00:51:54,000 --> 00:51:56,325
+¿Cuántos vinos coinciden con la variedad
+
+870
+00:51:56,325 --> 00:51:58,940
+mayoritaria de su grupo, y qué porcentaje es?
+
+871
+00:51:59,660 --> 00:52:03,620
+En A, la mayoritaria es la variedad uno: son cuarenta vinos.
+
+872
+00:52:03,740 --> 00:52:07,470
+En B, la variedad dos: son cuarenta y cinco vinos.
+
+873
+00:52:07,590 --> 00:52:10,614
+Cuarenta más cuarenta y cinco son ochenta y cinco, de
+
+874
+00:52:10,614 --> 00:52:13,010
+cien vinos: un ochenta y cinco por ciento.
+
+875
+00:52:13,130 --> 00:52:19,122
+Para llevarte: PCA sirve para dibujar los grupos, pero es una sombra: aquí conserva el 55.3
+
+876
+00:52:19,122 --> 00:52:24,060
+por ciento de la variabilidad, y el ajuste se hace con las trece variables.
+
+877
+00:52:24,180 --> 00:52:29,281
+Con la variedad real, que no se usó, ciento setenta y uno de ciento setenta y siete vinos
+
+878
+00:52:29,281 --> 00:52:33,350
+coinciden con su variedad: el algoritmo K-means recuperó la estructura.
+
+879
+00:52:33,470 --> 00:52:38,510
+Y K-means sufre con formas curvas, atípicos y grupos de tamaños muy distintos.
+
+880
+00:52:38,630 --> 00:52:43,120
+Siguiente parada: ¿y si las variables no son números, sino categorías?
+
+881
+00:52:43,240 --> 00:52:44,470
+K-modes.
+
+882
+00:52:45,370 --> 00:52:47,760
+Décima parada: K-modes.
+
+883
+00:52:47,880 --> 00:52:51,620
+Qué cambia cuando las variables no son números, sino categorías.
+
+884
+00:52:51,740 --> 00:52:55,980
+Una pregunta tramposa: ¿cuál es el promedio entre App, Web y Sucursal?
+
+885
+00:52:56,100 --> 00:52:57,010
+No existe.
+
+886
+00:52:57,130 --> 00:53:02,550
+Puedes codificarlas como uno, dos y tres, y calcular que el promedio es dos, la Web.
+
+887
+00:53:02,670 --> 00:53:04,500
+Pero eso no significa nada.
+
+888
+00:53:04,620 --> 00:53:06,925
+Con variables categóricas, la media y la
+
+889
+00:53:06,925 --> 00:53:09,460
+distancia euclidiana dejan de tener sentido.
+
+890
+00:53:09,580 --> 00:53:13,340
+Necesitamos otro representante y otra forma de medir diferencias.
+
+891
+00:53:13,460 --> 00:53:14,630
+Una analogía.
+
+892
+00:53:14,750 --> 00:53:18,640
+Quieres describir el uniforme típico de los hinchas de un equipo en el estadio.
+
+893
+00:53:18,760 --> 00:53:22,117
+No promedias colores: miras la camiseta más común,
+
+894
+00:53:22,117 --> 00:53:24,870
+el gorro más común, la bufanda más común.
+
+895
+00:53:24,990 --> 00:53:27,431
+Y para ver si una persona se parece al hincha
+
+896
+00:53:27,431 --> 00:53:29,980
+típico, cuentas en cuántas prendas no coincide.
+
+897
+00:53:30,100 --> 00:53:34,980
+Eso es K-modes: la moda como centro, y los desacuerdos como distancia.
+
+898
+00:53:35,100 --> 00:53:38,880
+La diapositiva treinta y dos define K-modes en tres ideas.
+
+899
+00:53:39,000 --> 00:53:41,674
+El centro de cada grupo contiene la categoría
+
+900
+00:53:41,674 --> 00:53:44,050
+más frecuente de cada variable: su moda.
+
+901
+00:53:44,170 --> 00:53:47,082
+La disimilitud entre una observación y un centro cuenta
+
+902
+00:53:47,082 --> 00:53:49,570
+en cuántas variables tienen valores diferentes.
+
+903
+00:53:49,690 --> 00:53:52,678
+Y el algoritmo alterna, igual que K-means, entre
+
+904
+00:53:52,678 --> 00:53:55,230
+asignar observaciones y actualizar modas.
+
+905
+00:53:55,350 --> 00:53:59,021
+Una consecuencia elegante: si cambias los códigos uno, dos
+
+906
+00:53:59,021 --> 00:54:01,870
+y tres por nombres, la disimilitud no cambia.
+
+907
+00:54:01,990 --> 00:54:05,050
+Solo importa si dos valores son iguales o distintos.
+
+908
+00:54:05,170 --> 00:54:07,964
+No se interpretan las diferencias numéricas entre
+
+909
+00:54:07,964 --> 00:54:10,930
+códigos, y las categorías no necesitan ningún orden.
+
+910
+00:54:11,050 --> 00:54:14,570
+Una asignación resuelta, de la diapositiva treinta y tres.
+
+911
+00:54:14,690 --> 00:54:18,050
+Un cliente tiene plan Gold, usa la App y vive en el Sur.
+
+912
+00:54:18,170 --> 00:54:23,390
+El centro A es Gold, App, Norte: coincide en plan y canal, y difiere en región.
+
+913
+00:54:23,510 --> 00:54:26,060
+Cero más cero más uno: un desacuerdo.
+
+914
+00:54:26,180 --> 00:54:31,670
+El centro B es Silver, Web, Sur: difiere en plan y en canal, y coincide en región.
+
+915
+00:54:31,790 --> 00:54:34,510
+Uno más uno más cero: dos desacuerdos.
+
+916
+00:54:34,630 --> 00:54:38,090
+El cliente va al grupo A, porque uno es menor que dos.
+
+917
+00:54:38,210 --> 00:54:41,630
+Ahora la actualización, de la diapositiva treinta y cuatro.
+
+918
+00:54:41,750 --> 00:54:45,572
+Un grupo tiene tres clientes: Gold, App, Norte;
+
+919
+00:54:45,572 --> 00:54:48,580
+Gold, Web, Norte; y Silver, App, Sur.
+
+920
+00:54:48,700 --> 00:54:53,850
+La moda de cada columna: en plan, Gold, que aparece dos veces; en
+
+921
+00:54:53,850 --> 00:54:57,890
+canal, App, dos veces; en región, Norte, dos veces.
+
+922
+00:54:58,010 --> 00:55:00,190
+El centro es Gold, App, Norte.
+
+923
+00:55:00,310 --> 00:55:03,270
+El costo del grupo suma los desacuerdos de cada
+
+924
+00:55:03,270 --> 00:55:05,790
+cliente con ese centro: cero, uno y dos.
+
+925
+00:55:05,910 --> 00:55:07,840
+Total: tres desacuerdos.
+
+926
+00:55:07,960 --> 00:55:11,235
+Dos detalles de la misma diapositiva: la moda puede tener
+
+927
+00:55:11,235 --> 00:55:14,280
+empates, y no siempre supera el cincuenta por ciento.
+
+928
+00:55:14,400 --> 00:55:17,842
+Si tres clientes usan App, Web y Sucursal, cualquiera de
+
+929
+00:55:17,842 --> 00:55:20,670
+las tres es moda, y ninguna pasa de un tercio.
+
+930
+00:55:20,790 --> 00:55:23,475
+Para practicar con datos de la clase, el profesor
+
+931
+00:55:23,475 --> 00:55:26,380
+convirtió tres mediciones de los vinos en categorías.
+
+932
+00:55:26,500 --> 00:55:31,410
+Alcohol: bajo si es menor que trece, alto si es trece o más; no hay medio.
+
+933
+00:55:31,530 --> 00:55:38,310
+Flavonoides: bajo si es menor que 1.5, medio entre 1.5 y 3, alto desde 3.
+
+934
+00:55:38,430 --> 00:55:44,640
+Color: bajo si es menor que 4, medio entre 4 y 6.5, alto desde 6.5.
+
+935
+00:55:44,760 --> 00:55:48,500
+Son cortes docentes, no umbrales de calidad enológica.
+
+936
+00:55:48,620 --> 00:55:53,676
+Con esos cortes, hay noventa y dos vinos de alcohol alto y ochenta y cinco de alcohol
+
+937
+00:55:53,676 --> 00:55:57,900
+bajo; en color, setenta bajos, sesenta y siete medios y cuarenta altos.
+
+938
+00:55:58,020 --> 00:56:02,966
+Un detalle fino de la diapositiva treinta y seis: los intervalos son cerrados por la
+
+939
+00:56:02,966 --> 00:56:06,970
+izquierda, así que un valor de flavonoides igual a 1.5 cae en medio.
+
+940
+00:56:07,090 --> 00:56:10,815
+En estos datos hay exactamente un vino con flavonoides
+
+941
+00:56:10,815 --> 00:56:13,850
+1.5, y uno con color 4: los dos van a medio.
+
+942
+00:56:13,970 --> 00:56:18,776
+Y dos advertencias: categorizar pierde información de las mediciones originales, y
+
+943
+00:56:18,776 --> 00:56:22,820
+aquí las categorías se comparan solo por igualdad, sin usar su orden.
+
+944
+00:56:22,940 --> 00:56:29,021
+En Python, con el paquete K-modes de la diapositiva treinta y nueve, se ajusta K-modes para
+
+945
+00:56:29,021 --> 00:56:33,900
+k de uno a ocho, con veinte inicios cada uno, y se guarda el costo total.
+
+946
+00:56:34,020 --> 00:56:41,079
+El costo baja de 283 desacuerdos con un grupo, a 148, 102,
+
+947
+00:56:41,079 --> 00:56:46,800
+75 con cuatro grupos, y sigue: 58, 48, 38 y 26.
+
+948
+00:56:46,920 --> 00:56:48,340
+No hay un codo claro.
+
+949
+00:56:48,460 --> 00:56:51,646
+La clase usa k igual a cuatro solo para ilustrar
+
+950
+00:56:51,646 --> 00:56:55,230
+perfiles, sin afirmar que sea el único valor adecuado.
+
+951
+00:56:55,350 --> 00:57:00,110
+Y recuerda: este costo cuenta desacuerdos; no es una suma de cuadrados.
+
+952
+00:57:00,230 --> 00:57:03,976
+Leamos un perfil, el de la diapositiva cuarenta y uno: el
+
+953
+00:57:03,976 --> 00:57:07,130
+grupo dos de K-modes, con cuarenta y ocho vinos.
+
+954
+00:57:07,250 --> 00:57:11,180
+Su centro modal es alcohol alto, flavonoides bajos y color alto.
+
+955
+00:57:11,300 --> 00:57:17,762
+Pero mira el color por dentro: cuarenta vinos tienen color alto, el 83.3 por ciento;
+
+956
+00:57:17,762 --> 00:57:22,840
+siete tienen color medio, el 14.6; y uno tiene color bajo, el 2.1.
+
+957
+00:57:22,960 --> 00:57:24,860
+El perfil resume frecuencias.
+
+958
+00:57:24,980 --> 00:57:28,290
+No significa que todos los vinos del grupo tengan color alto.
+
+959
+00:57:28,410 --> 00:57:30,230
+Una precisión sobre la grabación.
+
+960
+00:57:30,350 --> 00:57:34,294
+Al ver la curva de costo, se dijo: me parece que el método debería
+
+961
+00:57:34,294 --> 00:57:37,820
+haber elegido en torno a cuatro, pero sabemos que son tres.
+
+962
+00:57:37,940 --> 00:57:41,350
+Ese sabemos que son tres viene de las variedades reales, una
+
+963
+00:57:41,350 --> 00:57:44,590
+etiqueta que en un problema de clustering real no existe.
+
+964
+00:57:44,710 --> 00:57:48,975
+Y además, K-modes aquí solo ve tres mediciones cortadas en dos o
+
+965
+00:57:48,975 --> 00:57:52,440
+tres categorías: apenas dieciocho perfiles posibles.
+
+966
+00:57:52,560 --> 00:57:55,740
+No hay razón para esperar que recupere las tres variedades.
+
+967
+00:57:55,860 --> 00:58:00,980
+El error típico: codificar las categorías con números y correr K-means como si nada.
+
+968
+00:58:01,100 --> 00:58:05,763
+Si App es uno, Web es dos y Sucursal es tres, K-means cree que App está más cerca
+
+969
+00:58:05,763 --> 00:58:09,620
+de Web que de Sucursal, y que el promedio de App y Sucursal es Web.
+
+970
+00:58:09,740 --> 00:58:12,520
+Esas distancias son un invento de la codificación.
+
+971
+00:58:12,640 --> 00:58:16,370
+La diapositiva treinta y siete lo dice: K-modes admite las
+
+972
+00:58:16,370 --> 00:58:19,650
+etiquetas directamente; no hace falta codificarlas.
+
+973
+00:58:19,770 --> 00:58:20,990
+Piensa un segundo.
+
+974
+00:58:21,110 --> 00:58:23,610
+Un cliente es Silver, Web, Norte.
+
+975
+00:58:23,730 --> 00:58:30,230
+Los centros son los mismos de antes: A, Gold, App, Norte; y B, Silver, Web, Sur.
+
+976
+00:58:30,350 --> 00:58:31,440
+¿A qué grupo va?
+
+977
+00:58:32,160 --> 00:58:35,331
+Con A: difiere en plan y en canal, y coincide en
+
+978
+00:58:35,331 --> 00:58:38,370
+región: uno más uno más cero, dos desacuerdos.
+
+979
+00:58:38,490 --> 00:58:43,020
+Con B: coincide en plan y canal, y difiere en región: un desacuerdo.
+
+980
+00:58:43,140 --> 00:58:44,320
+Va al grupo B.
+
+981
+00:58:44,440 --> 00:58:48,824
+Para llevarte: K-modes es K-means para categorías: el centro es la
+
+982
+00:58:48,824 --> 00:58:52,610
+moda de cada variable, y la distancia cuenta desacuerdos.
+
+983
+00:58:52,730 --> 00:58:56,800
+Su costo es un número de desacuerdos, no una suma de cuadrados.
+
+984
+00:58:56,920 --> 00:58:59,945
+Y un perfil modal resume frecuencias: siempre conviene
+
+985
+00:58:59,945 --> 00:59:02,410
+mirar las proporciones dentro de cada grupo.
+
+986
+00:59:02,530 --> 00:59:07,250
+Siguiente parada: la mayoría de los datos reales mezclan números y categorías.
+
+987
+00:59:07,370 --> 00:59:09,830
+K-prototypes combina las dos ideas.
+
+988
+00:59:10,730 --> 00:59:14,277
+Undécima parada: K-prototypes, para cuando la base mezcla
+
+989
+00:59:14,277 --> 00:59:17,700
+variables numéricas y categóricas, que es lo más común.
+
+990
+00:59:17,820 --> 00:59:22,780
+En la práctica, casi ninguna base es puramente numérica ni puramente categórica.
+
+991
+00:59:22,900 --> 00:59:28,300
+Un banco tiene edad y saldo, que son números; y plan y región, que son categorías.
+
+992
+00:59:28,420 --> 00:59:32,350
+Si usas K-means, tienes que inventar números para las categorías.
+
+993
+00:59:32,470 --> 00:59:37,580
+Si usas K-modes, tienes que cortar los números en categorías y perder información.
+
+994
+00:59:37,700 --> 00:59:42,340
+K-prototypes evita las dos cosas: usa cada variable en su propio idioma.
+
+995
+00:59:42,460 --> 00:59:43,630
+Una analogía.
+
+996
+00:59:43,750 --> 00:59:47,610
+Comparas departamentos: metros cuadrados y precio, que son
+
+997
+00:59:47,610 --> 00:59:51,070
+números; y comuna y orientación, que son categorías.
+
+998
+00:59:51,190 --> 00:59:55,141
+Para decir qué tan distintos son dos departamentos, sumas la diferencia
+
+999
+00:59:55,141 --> 00:59:58,480
+en números más una penalización por cada categoría distinta.
+
+1000
+00:59:58,600 --> 01:00:02,566
+La gran pregunta es cuánto vale esa penalización: ¿estar en otra comuna
+
+1001
+01:00:02,566 --> 01:00:05,750
+equivale a diez metros cuadrados de diferencia, o a cien?
+
+1002
+01:00:05,870 --> 01:00:07,700
+Ese precio es el peso gamma.
+
+1003
+01:00:07,820 --> 01:00:10,370
+La fórmula de la diapositiva cuarenta y dos.
+
+1004
+01:00:10,490 --> 01:00:14,568
+Para las variables numéricas, estandarizadas, se suman las diferencias
+
+1005
+01:00:14,568 --> 01:00:17,830
+al cuadrado con la media del prototipo, como en K-means.
+
+1006
+01:00:17,950 --> 01:00:21,758
+Para las categóricas, se cuentan los desacuerdos con la moda del
+
+1007
+01:00:21,758 --> 01:00:25,030
+prototipo, como en K-modes, y se multiplican por gamma.
+
+1008
+01:00:25,150 --> 01:00:29,710
+El prototipo de cada grupo tiene medias en las numéricas y modas en las categóricas.
+
+1009
+01:00:29,830 --> 01:00:33,500
+Y gamma, mayor que cero, es el peso de los desacuerdos.
+
+1010
+01:00:33,620 --> 01:00:37,236
+Un detalle que la diapositiva subraya: el equilibrio depende del
+
+1011
+01:00:37,236 --> 01:00:40,400
+peso, pero también del número de variables de cada tipo.
+
+1012
+01:00:40,520 --> 01:00:45,530
+Con diez numéricas y una categórica, la parte numérica domina aunque gamma sea uno.
+
+1013
+01:00:45,650 --> 01:00:48,600
+La cuenta resuelta de la diapositiva cuarenta y tres.
+
+1014
+01:00:48,720 --> 01:00:51,737
+Una observación tiene valores numéricos uno y
+
+1015
+01:00:51,737 --> 01:00:54,620
+dos, y categorías: la app, y la región sur.
+
+1016
+01:00:54,740 --> 01:01:00,280
+Prototipo A: números cero y dos, categorías: la app, y la región norte.
+
+1017
+01:01:00,400 --> 01:01:05,390
+Parte numérica: uno menos cero al cuadrado, más dos menos dos al cuadrado: uno.
+
+1018
+01:01:05,510 --> 01:01:07,370
+Y un desacuerdo, en región.
+
+1019
+01:01:07,490 --> 01:01:09,200
+Costo: uno más gamma.
+
+1020
+01:01:09,320 --> 01:01:14,750
+Prototipo B: números dos y tres, categorías: la app, y la región sur.
+
+1021
+01:01:14,870 --> 01:01:17,530
+Parte numérica: uno más uno, dos.
+
+1022
+01:01:17,650 --> 01:01:19,030
+Cero desacuerdos.
+
+1023
+01:01:19,150 --> 01:01:20,410
+Costo: dos.
+
+1024
+01:01:20,530 --> 01:01:22,040
+Y ahora el peso decide.
+
+1025
+01:01:22,160 --> 01:01:26,546
+Con gamma igual a 0.5, el costo del prototipo A es 1.5, menor
+
+1026
+01:01:26,546 --> 01:01:30,070
+que dos: la observación se asigna al prototipo A.
+
+1027
+01:01:30,190 --> 01:01:33,576
+Con gamma igual a tres, el costo de A sube a cuatro,
+
+1028
+01:01:33,576 --> 01:01:36,180
+mayor que dos: se asigna al prototipo B.
+
+1029
+01:01:36,300 --> 01:01:40,390
+Mismos datos, distinta asignación, solo por cambiar el peso.
+
+1030
+01:01:40,510 --> 01:01:45,750
+En un cálculo adicional: con gamma igual a uno hay empate exacto, dos contra dos.
+
+1031
+01:01:45,870 --> 01:01:48,820
+Con los vinos, la clase arma una base mixta.
+
+1032
+01:01:48,940 --> 01:01:52,770
+Dos variables numéricas estandarizadas: ceniza y matiz.
+
+1033
+01:01:52,890 --> 01:01:56,147
+Y tres categóricas: el alcohol, los flavonoides
+
+1034
+01:01:56,147 --> 01:01:58,780
+y el color, con los cortes de K-modes.
+
+1035
+01:01:58,900 --> 01:02:02,868
+Fíjate en una decisión de diseño: alcohol, flavonoides y color
+
+1036
+01:02:02,868 --> 01:02:06,260
+entran solo como categorías, no también como números.
+
+1037
+01:02:06,380 --> 01:02:11,120
+Incluir la misma medición dos veces le daría peso duplicado a la misma información.
+
+1038
+01:02:11,240 --> 01:02:16,447
+En el código de Python, hay que decirle a K-prototypes qué columnas son categóricas:
+
+1039
+01:02:16,447 --> 01:02:20,910
+categorical igual a dos, tres y cuatro, porque Python cuenta desde cero.
+
+1040
+01:02:21,030 --> 01:02:24,830
+El peso se llama gamma en Python, y lambda en la función de R.
+
+1041
+01:02:24,950 --> 01:02:28,386
+Y la diapositiva cuarenta y seis aclara: ese lambda es el
+
+1042
+01:02:28,386 --> 01:02:31,520
+peso de las categorías, no la penalización de Ridge.
+
+1043
+01:02:31,640 --> 01:02:35,770
+El costo de K-prototypes para k de uno a ocho, con peso uno.
+
+1044
+01:02:35,890 --> 01:02:38,280
+Con un grupo vale 635.
+
+1045
+01:02:38,400 --> 01:02:43,380
+Un cálculo adicional lo explica: la parte numérica es dos variables
+
+1046
+01:02:43,380 --> 01:02:47,915
+por ciento setenta y seis, 352; y la parte categórica son 283
+
+1047
+01:02:47,915 --> 01:02:51,780
+desacuerdos, el mismo costo de K-modes con un grupo.
+
+1048
+01:02:51,900 --> 01:02:54,117
+Trescientos cincuenta y dos más doscientos
+
+1049
+01:02:54,117 --> 01:02:56,440
+ochenta y tres, seiscientos treinta y cinco.
+
+1050
+01:02:56,560 --> 01:03:06,340
+Después baja a 439.61, a 326.64 con tres grupos, y a 285.73 con cuatro.
+
+1051
+01:03:06,460 --> 01:03:10,220
+La clase usa k igual a tres como solución de ejemplo.
+
+1052
+01:03:10,340 --> 01:03:15,090
+Y advierte: que el costo baje al aumentar k no basta para justificar más grupos.
+
+1053
+01:03:15,210 --> 01:03:19,020
+Los prototipos con tres grupos, de la diapositiva cuarenta y nueve.
+
+1054
+01:03:19,140 --> 01:03:25,088
+Grupo uno, sesenta y nueve vinos: ceniza 0.625 y matiz 0.506 desviaciones
+
+1055
+01:03:25,088 --> 01:03:30,140
+sobre la media; alcohol alto, flavonoides medios, color medio.
+
+1056
+01:03:30,260 --> 01:03:35,676
+Grupo dos, cuarenta y siete vinos: ceniza 0.225, matiz menos
+
+1057
+01:03:35,676 --> 01:03:40,280
+1.258; alcohol alto, flavonoides bajos, color alto.
+
+1058
+01:03:40,400 --> 01:03:45,430
+Grupo tres, sesenta y uno: ceniza menos 0.881, matiz
+
+1059
+01:03:45,430 --> 01:03:50,460
+0.396; alcohol bajo, flavonoides medios, color bajo.
+
+1060
+01:03:50,580 --> 01:03:51,730
+Dos lecturas.
+
+1061
+01:03:51,850 --> 01:03:57,020
+En el grupo dos, matiz está 1.258 desviaciones bajo la media general.
+
+1062
+01:03:57,140 --> 01:04:00,722
+Y color alto es la moda, pero solo treinta de cuarenta
+
+1063
+01:04:00,722 --> 01:04:03,640
+y siete vinos la tienen: un 63.8 por ciento.
+
+1064
+01:04:03,760 --> 01:04:07,903
+Y un prototipo puede no corresponder a ninguna observación real: es un
+
+1065
+01:04:07,903 --> 01:04:11,690
+resumen, como el hincha típico, que quizás nadie es exactamente.
+
+1066
+01:04:11,810 --> 01:04:15,090
+¿Qué pasa si cambiamos el peso, manteniendo tres grupos?
+
+1067
+01:04:15,210 --> 01:04:18,910
+La diapositiva cincuenta lo dibuja en el plano de ceniza y matiz.
+
+1068
+01:04:19,030 --> 01:04:23,741
+Con peso 0.25 mandan las variables numéricas: los grupos se ordenan casi en
+
+1069
+01:04:23,741 --> 01:04:27,950
+franjas de matiz, con tamaños sesenta, sesenta y cincuenta y siete.
+
+1070
+01:04:28,070 --> 01:04:31,071
+Con peso uno, la solución que vimos: sesenta y
+
+1071
+01:04:31,071 --> 01:04:33,680
+nueve, cuarenta y siete y sesenta y uno.
+
+1072
+01:04:33,800 --> 01:04:37,958
+Con peso cuatro mandan las categorías, y en este plano los grupos se ven
+
+1073
+01:04:37,958 --> 01:04:41,770
+mezclados: cincuenta y cinco, sesenta y ocho y cincuenta y cuatro.
+
+1074
+01:04:41,890 --> 01:04:45,124
+Un matiz sobre lo dicho en clase: con peso 0.25 se
+
+1075
+01:04:45,124 --> 01:04:47,840
+dijo que se logra una buena clasificación.
+
+1076
+01:04:47,960 --> 01:04:52,000
+Se ve más ordenado en este dibujo porque el dibujo usa justamente las dos
+
+1077
+01:04:52,000 --> 01:04:55,210
+variables numéricas, que son las que mandan con peso bajo.
+
+1078
+01:04:55,330 --> 01:04:58,091
+Eso no prueba que esos grupos sean mejores: solo
+
+1079
+01:04:58,091 --> 01:05:00,450
+que el peso cambia qué variables deciden.
+
+1080
+01:05:00,570 --> 01:05:03,895
+Y como no hay variable respuesta, el peso no se puede elegir
+
+1081
+01:05:03,895 --> 01:05:06,610
+por validación cruzada ni por área bajo la curva.
+
+1082
+01:05:06,730 --> 01:05:09,310
+Hay que probar varios y juzgar los perfiles.
+
+1083
+01:05:09,430 --> 01:05:13,910
+El error típico con K-prototypes: no estandarizar la parte numérica.
+
+1084
+01:05:14,030 --> 01:05:18,688
+Si la prolina entra en sus unidades, con varianza cercana a cien mil, cualquier
+
+1085
+01:05:18,688 --> 01:05:22,580
+gamma razonable queda aplastado, y las categorías no cuentan nada.
+
+1086
+01:05:22,700 --> 01:05:26,980
+El segundo error: meter la misma medición como número y como categoría.
+
+1087
+01:05:27,100 --> 01:05:31,357
+Lo correcto: numéricas estandarizadas, cada medición una sola vez,
+
+1088
+01:05:31,357 --> 01:05:34,840
+y varios valores de gamma comparados por sus perfiles.
+
+1089
+01:05:34,960 --> 01:05:36,180
+Piensa un segundo.
+
+1090
+01:05:36,300 --> 01:05:40,470
+Una observación tiene números cero y cero, y categorías Web y Norte.
+
+1091
+01:05:40,590 --> 01:05:43,570
+El prototipo P tiene uno y uno, Web y Norte.
+
+1092
+01:05:43,690 --> 01:05:47,440
+El prototipo Q tiene cero y uno, la app, y la región sur.
+
+1093
+01:05:47,560 --> 01:05:49,770
+Con gamma igual a uno, ¿a cuál va?
+
+1094
+01:05:49,890 --> 01:05:52,160
+¿Y desde qué peso cambiaría de prototipo?
+
+1095
+01:05:52,880 --> 01:05:57,430
+P: uno más uno, dos, y cero desacuerdos: costo dos.
+
+1096
+01:05:57,550 --> 01:06:02,320
+Q: cero más uno, uno, y dos desacuerdos: uno más dos gamma.
+
+1097
+01:06:02,440 --> 01:06:05,900
+Con gamma igual a uno, Q cuesta tres: va a P.
+
+1098
+01:06:06,020 --> 01:06:09,218
+Q gana solo si uno más dos gamma es menor que
+
+1099
+01:06:09,218 --> 01:06:11,990
+dos, es decir, con gamma menor que 0.5.
+
+1100
+01:06:12,110 --> 01:06:16,231
+Para llevarte: el algoritmo K-prototypes suma la parte de K-means,
+
+1101
+01:06:16,231 --> 01:06:20,165
+distancias al cuadrado en las numéricas, y la parte de K-modes,
+
+1102
+01:06:20,165 --> 01:06:23,600
+desacuerdos en las categóricas, multiplicada por gamma.
+
+1103
+01:06:23,720 --> 01:06:28,470
+El prototipo combina medias y modas, y puede no parecerse a ninguna observación.
+
+1104
+01:06:28,590 --> 01:06:31,534
+Y el peso gamma cambia las particiones: no se puede
+
+1105
+01:06:31,534 --> 01:06:34,420
+elegir por validación cruzada, hay que explorarlo.
+
+1106
+01:06:34,540 --> 01:06:39,041
+Siguiente parada, la última: cómo comparar los tres métodos, cómo evaluar
+
+1107
+01:06:39,041 --> 01:06:42,740
+un agrupamiento sin respuesta, y un repaso de toda la clase.
+
+1108
+01:06:43,610 --> 01:06:48,076
+Última parada: cómo comparar los tres métodos, cómo evaluar un agrupamiento
+
+1109
+01:06:48,076 --> 01:06:51,530
+sin una respuesta observada, y el repaso de toda la clase.
+
+1110
+01:06:51,650 --> 01:06:55,070
+Tenemos tres soluciones de ejemplo, cada una con su costo.
+
+1111
+01:06:55,190 --> 01:06:59,520
+K-means con tres grupos: 1267.37.
+
+1112
+01:06:59,640 --> 01:07:02,380
+K-modes con cuatro: 75.
+
+1113
+01:07:02,500 --> 01:07:06,560
+K-prototypes con tres: 326.64.
+
+1114
+01:07:06,680 --> 01:07:10,820
+¿Gana K-modes, porque setenta y cinco es el número más chico?
+
+1115
+01:07:10,940 --> 01:07:11,360
+No.
+
+1116
+01:07:11,480 --> 01:07:14,920
+Y entender por qué es la lección más importante de esta parada.
+
+1117
+01:07:15,040 --> 01:07:16,210
+Una analogía.
+
+1118
+01:07:16,330 --> 01:07:20,010
+Un estudiante sacó un 6 en una prueba con escala de uno a siete.
+
+1119
+01:07:20,130 --> 01:07:22,920
+Otro sacó un 80 en una prueba de cero a cien.
+
+1120
+01:07:23,040 --> 01:07:25,980
+Un tercero, un 15 en una de cero a veinte.
+
+1121
+01:07:26,100 --> 01:07:29,940
+Nadie diría que el 6 es la peor nota porque es el número más chico.
+
+1122
+01:07:30,060 --> 01:07:33,050
+Son escalas distintas, de pruebas distintas.
+
+1123
+01:07:33,170 --> 01:07:36,100
+Los costos de los tres métodos son exactamente así.
+
+1124
+01:07:36,220 --> 01:07:40,336
+La diapositiva cincuenta y dos lo dice sin rodeos: no elegimos K-modes
+
+1125
+01:07:40,336 --> 01:07:43,570
+porque setenta y cinco sea el menor número de la tabla.
+
+1126
+01:07:43,690 --> 01:07:49,240
+Los datos de entrada son distintos: trece mediciones, tres categorías, o una mezcla.
+
+1127
+01:07:49,360 --> 01:07:52,533
+Las unidades son distintas: distancias al cuadrado,
+
+1128
+01:07:52,533 --> 01:07:55,270
+desacuerdos, o una suma ponderada por gamma.
+
+1129
+01:07:55,390 --> 01:07:57,750
+Y las funciones de costo son distintas.
+
+1130
+01:07:57,870 --> 01:08:00,478
+La comparación pertinente comienza por el tipo de
+
+1131
+01:08:00,478 --> 01:08:02,500
+variables y el propósito del análisis.
+
+1132
+01:08:02,620 --> 01:08:06,427
+Una precisión sobre la grabación: al pasar a K-modes se habló de
+
+1133
+01:08:06,427 --> 01:08:09,580
+un cambio en el costo, o en la varianza, básicamente.
+
+1134
+01:08:09,700 --> 01:08:14,380
+El costo de K-modes no es una varianza: es un conteo de desacuerdos.
+
+1135
+01:08:14,500 --> 01:08:18,900
+Solo el WSS de K-means tiene la forma de una suma de cuadrados.
+
+1136
+01:08:19,020 --> 01:08:21,570
+Entonces, ¿cómo se elige el método?
+
+1137
+01:08:21,690 --> 01:08:24,300
+El profesor lo resumió de forma muy sencilla.
+
+1138
+01:08:24,420 --> 01:08:27,370
+Si tienes solo variables numéricas: K-means.
+
+1139
+01:08:27,490 --> 01:08:30,440
+Si tienes solo categóricas: K-modes.
+
+1140
+01:08:30,560 --> 01:08:33,200
+Si tienes una mezcla: K-prototypes.
+
+1141
+01:08:33,320 --> 01:08:35,962
+Y dentro de cada método, el número de grupos se
+
+1142
+01:08:35,962 --> 01:08:38,380
+elige con los criterios internos que vimos.
+
+1143
+01:08:38,500 --> 01:08:42,280
+Y ahora, la evaluación, de la diapositiva cincuenta y uno.
+
+1144
+01:08:42,400 --> 01:08:45,090
+No calculamos exactitud ni área bajo la curva:
+
+1145
+01:08:45,090 --> 01:08:47,430
+no hay una clase observada que predecir.
+
+1146
+01:08:47,550 --> 01:08:51,483
+Usamos criterios internos acordes con las variables y
+
+1147
+01:08:51,483 --> 01:08:54,600
+la disimilitud: WSS, silueta, Gap, costos.
+
+1148
+01:08:54,720 --> 01:08:57,234
+Revisamos si los perfiles reaparecen al cambiar
+
+1149
+01:08:57,234 --> 01:08:59,320
+los inicios o al remuestrear los datos.
+
+1150
+01:08:59,440 --> 01:09:03,140
+Y contrastamos su utilidad con el problema que motivó el agrupamiento.
+
+1151
+01:09:03,260 --> 01:09:05,540
+Dos detalles de la misma diapositiva.
+
+1152
+01:09:05,660 --> 01:09:10,361
+Esta exploración usa las ciento setenta y siete filas: no requiere automáticamente una
+
+1153
+01:09:10,361 --> 01:09:14,680
+división setenta treinta, porque no se está entrenando un modelo para predecir.
+
+1154
+01:09:14,800 --> 01:09:18,617
+Pero si después quieres asignar casos futuros a estos grupos, debes fijar
+
+1155
+01:09:18,617 --> 01:09:21,650
+el escalamiento y los centros con los datos de desarrollo.
+
+1156
+01:09:21,770 --> 01:09:25,000
+Y evaluar ese uso futuro necesita un diseño separado.
+
+1157
+01:09:25,120 --> 01:09:28,069
+Antes de usar unos grupos para tomar decisiones, la
+
+1158
+01:09:28,069 --> 01:09:31,250
+diapositiva cincuenta y tres pide revisar cuatro cosas.
+
+1159
+01:09:31,370 --> 01:09:36,290
+Uno: qué variables entraron, en qué escalas, y si hay observaciones atípicas.
+
+1160
+01:09:36,410 --> 01:09:40,840
+Dos: los tamaños, los perfiles y la variación dentro de cada grupo.
+
+1161
+01:09:40,960 --> 01:09:45,860
+Tres: la sensibilidad a k, a la inicialización y al peso de las categorías.
+
+1162
+01:09:45,980 --> 01:09:50,070
+Cuatro: si las conclusiones describen las mediciones o exceden la evidencia.
+
+1163
+01:09:50,190 --> 01:09:52,795
+Un agrupamiento organiza la información; su
+
+1164
+01:09:52,795 --> 01:09:55,340
+utilidad debe justificarse en el contexto.
+
+1165
+01:09:55,460 --> 01:09:58,280
+Repasemos la clase completa como un solo flujo.
+
+1166
+01:09:58,400 --> 01:10:03,080
+Primero, decidir qué significa parecerse, y estandarizar las numéricas.
+
+1167
+01:10:03,200 --> 01:10:08,780
+Después, ajustar K-means con muchos inicios, quedándose con el menor WSS.
+
+1168
+01:10:08,900 --> 01:10:13,590
+Elegir k con el codo, la silueta y el Gap, y aceptar que pueden discrepar.
+
+1169
+01:10:13,710 --> 01:10:16,747
+Y finalmente, describir los grupos con perfiles,
+
+1170
+01:10:16,747 --> 01:10:20,100
+dibujarlos con una proyección, y revisar sus límites.
+
+1171
+01:10:20,220 --> 01:10:22,820
+Y los números que conviene recordar de los vinos.
+
+1172
+01:10:22,940 --> 01:10:26,990
+Ciento setenta y siete vinos, trece mediciones estandarizadas.
+
+1173
+01:10:27,110 --> 01:10:34,199
+Con tres grupos, un WSS de 1267.37, frente a un TSS de 2288;
+
+1174
+01:10:34,199 --> 01:10:39,870
+silueta 0.284, la mayor; el Gap prefería cuatro.
+
+1175
+01:10:39,990 --> 01:10:43,352
+Grupos de sesenta y dos, cincuenta y sesenta y cinco vinos, y
+
+1176
+01:10:43,352 --> 01:10:46,824
+ciento setenta y uno de ciento setenta y siete coincidiendo con
+
+1177
+01:10:46,824 --> 01:10:49,470
+la variedad real, que nunca se usó para ajustar.
+
+1178
+01:10:49,590 --> 01:10:53,290
+Y los errores que vimos a lo largo de la clase, en una sola lista.
+
+1179
+01:10:53,410 --> 01:10:55,060
+Agrupar sin estandarizar.
+
+1180
+01:10:55,180 --> 01:10:57,160
+Correr K-means una sola vez.
+
+1181
+01:10:57,280 --> 01:10:59,650
+Elegir k con el menor WSS.
+
+1182
+01:10:59,770 --> 01:11:02,590
+Leer el número del grupo como una calificación.
+
+1183
+01:11:02,710 --> 01:11:05,880
+Codificar categorías con números para usar K-means.
+
+1184
+01:11:06,000 --> 01:11:08,530
+Comparar costos entre métodos distintos.
+
+1185
+01:11:08,650 --> 01:11:12,330
+Y reportar la coincidencia con una etiqueta como si fuera exactitud.
+
+1186
+01:11:12,450 --> 01:11:14,230
+Un último piensa un segundo.
+
+1187
+01:11:14,350 --> 01:11:16,941
+Una empresa tiene clientes con edad, gasto
+
+1188
+01:11:16,941 --> 01:11:19,840
+mensual, plan Gold o Silver, y canal App o Web.
+
+1189
+01:11:19,960 --> 01:11:21,220
+Quiere segmentarlos.
+
+1190
+01:11:21,340 --> 01:11:24,870
+¿Qué método usas, y qué tienes que decidir antes de ajustarlo?
+
+1191
+01:11:25,590 --> 01:11:29,370
+K-prototypes, porque hay variables numéricas y categóricas.
+
+1192
+01:11:29,490 --> 01:11:33,639
+Antes de ajustar: estandarizar la edad y el gasto, decidir el peso
+
+1193
+01:11:33,639 --> 01:11:36,970
+gamma, y probar varios valores de k y varios inicios.
+
+1194
+01:11:37,090 --> 01:11:41,104
+Después, comparar los perfiles para distintos k y gamma, y quedarse con la
+
+1195
+01:11:41,104 --> 01:11:44,250
+solución estable que sirva para la decisión de la empresa.
+
+1196
+01:11:44,370 --> 01:11:48,412
+Para llevarte de toda la clase: el clustering construye grupos sin una
+
+1197
+01:11:48,412 --> 01:11:52,050
+respuesta observada, y el método depende del tipo de variables.
+
+1198
+01:11:52,170 --> 01:11:57,344
+Los números internos, WSS, silueta, Gap y costos, ayudan a elegir, pero no
+
+1199
+01:11:57,344 --> 01:12:01,540
+se comparan entre métodos y no reemplazan la interpretación.
+
+1200
+01:12:01,660 --> 01:12:04,039
+Y un buen agrupamiento es el que es estable,
+
+1201
+01:12:04,039 --> 01:12:06,850
+interpretable y útil para el problema que lo motivó.
+
+1202
+01:12:06,970 --> 01:12:09,150
+Con esto termina la clase treinta y nueve.
+
+1203
+01:12:09,270 --> 01:12:12,472
+La próxima clase vuelve al aprendizaje supervisado, con
+
+1204
+01:12:12,472 --> 01:12:15,150
+Naive Bayes y la clasificación probabilística.
+
+1205
+01:12:15,270 --> 01:12:16,190
+¡Nos vemos ahí!

@@ -1,0 +1,471 @@
+1
+00:00:00,250 --> 00:00:01,370
+Novena parada.
+
+2
+00:00:01,490 --> 00:00:03,630
+Tenemos cinco recetas candidatas.
+
+3
+00:00:03,750 --> 00:00:07,912
+Las vamos a comparar con predicciones fuera de pliegue, y vamos a ver por qué un
+
+4
+00:00:07,912 --> 00:00:11,190
+modelo que acierta bastante puede dar probabilidades muy malas.
+
+5
+00:00:11,310 --> 00:00:15,237
+La diapositiva cuarenta y uno define los candidatos, todos con las mismas
+
+6
+00:00:15,237 --> 00:00:18,410
+cincuenta y cuatro frecuencias y los mismos cinco pliegues.
+
+7
+00:00:18,530 --> 00:00:23,550
+Una referencia: la frecuencia de spam, una probabilidad sin usar ninguna señal.
+
+8
+00:00:23,670 --> 00:00:27,830
+Tres recetas de Bernoulli, con alfa 0.5, uno y dos.
+
+9
+00:00:27,950 --> 00:00:32,720
+Y una receta gaussiana, con medias y dispersiones del logaritmo de uno más equis.
+
+10
+00:00:32,840 --> 00:00:34,490
+Son cinco candidatos.
+
+11
+00:00:34,610 --> 00:00:37,390
+¿Por qué incluir una referencia que no usa señales?
+
+12
+00:00:37,510 --> 00:00:42,210
+Porque si una receta complicada no le gana a dividir dos números, no vale la pena.
+
+13
+00:00:42,330 --> 00:00:45,057
+El profesor lo dijo así: por qué complicarse la
+
+14
+00:00:45,057 --> 00:00:47,320
+vida si con dos divisiones queda mejor.
+
+15
+00:00:47,440 --> 00:00:50,979
+Y la regla de elección tiene dos pasos: primero, el
+
+16
+00:00:50,979 --> 00:00:54,240
+menor log loss; después, el umbral del ganador.
+
+17
+00:00:54,360 --> 00:00:58,630
+Primero comparamos probabilidades; después decidimos qué hacer con ellas.
+
+18
+00:00:58,750 --> 00:01:02,570
+Recordemos el log loss, que ya usamos en la clase treinta y ocho.
+
+19
+00:01:02,690 --> 00:01:06,442
+Para cada correo, miramos la probabilidad que el modelo le dio a la
+
+20
+00:01:06,442 --> 00:01:09,690
+clase que realmente ocurrió, y tomamos menos su logaritmo.
+
+21
+00:01:09,810 --> 00:01:11,160
+Luego promediamos.
+
+22
+00:01:11,280 --> 00:01:15,332
+Un cálculo adicional para sentirlo: si era spam y
+
+23
+00:01:15,332 --> 00:01:18,640
+el modelo dijo 0.9, el castigo es 0.105.
+
+24
+00:01:18,760 --> 00:01:22,800
+Si dijo 0.1, el castigo es 2.303.
+
+25
+00:01:22,920 --> 00:01:27,690
+Y si dijo 0.001, el castigo es 6.908.
+
+26
+00:01:27,810 --> 00:01:30,690
+Equivocarse con mucha seguridad sale carísimo.
+
+27
+00:01:30,810 --> 00:01:32,510
+¿Con qué predicciones se calcula?
+
+28
+00:01:32,630 --> 00:01:34,940
+La diapositiva cuarenta y dos lo dibuja.
+
+29
+00:01:35,060 --> 00:01:37,374
+Los tres mil seiscientos ochenta correos de
+
+30
+00:01:37,374 --> 00:01:39,850
+desarrollo están repartidos en cinco pliegues.
+
+31
+00:01:39,970 --> 00:01:44,920
+Se ajusta con cuatro, se predice el pliegue apartado, y se repite cinco veces.
+
+32
+00:01:45,040 --> 00:01:48,634
+Así, cada correo recibe una probabilidad que no participó en
+
+33
+00:01:48,634 --> 00:01:51,570
+su propio ajuste: la predicción fuera de pliegue.
+
+34
+00:01:51,690 --> 00:01:55,410
+Cinco recetas por cinco pliegues: veinticinco ajustes.
+
+35
+00:01:55,530 --> 00:01:58,247
+En código, la diapositiva cuarenta y tres muestra
+
+36
+00:01:58,247 --> 00:02:00,520
+el recorrido para Bernoulli con alfa uno.
+
+37
+00:02:00,640 --> 00:02:05,582
+Un vector vacío para las predicciones, un ciclo sobre los pliegues, y en cada vuelta:
+
+38
+00:02:05,582 --> 00:02:09,710
+val marca el pliegue apartado, se ajusta con el resto y se predice val.
+
+39
+00:02:09,830 --> 00:02:12,445
+Al final, pred reúne las tres mil seiscientos
+
+40
+00:02:12,445 --> 00:02:14,770
+ochenta probabilidades fuera de pliegue.
+
+41
+00:02:14,890 --> 00:02:19,290
+El script conserva también las log-probabilidades, para evaluar con precisión.
+
+42
+00:02:19,410 --> 00:02:21,230
+Una precisión sobre la grabación.
+
+43
+00:02:21,350 --> 00:02:25,297
+Al presentar esta comparación, cerca de los minutos ciento cuatro y ciento
+
+44
+00:02:25,297 --> 00:02:28,870
+nueve, se dijo que las recetas se evalúan en el conjunto de prueba.
+
+45
+00:02:28,990 --> 00:02:32,591
+En el material, la comparación usa las predicciones fuera de pliegue de
+
+46
+00:02:32,591 --> 00:02:35,380
+los tres mil seiscientos ochenta correos de desarrollo.
+
+47
+00:02:35,500 --> 00:02:39,007
+Los novecientos veintiuno de prueba se usan una sola vez,
+
+48
+00:02:39,007 --> 00:02:41,960
+al final, con la receta y el umbral ya elegidos.
+
+49
+00:02:42,080 --> 00:02:44,721
+Y estos son los resultados, de la diapositiva
+
+50
+00:02:44,721 --> 00:02:47,420
+cuarenta y cuatro, recalculados con el script.
+
+51
+00:02:47,540 --> 00:02:55,060
+La frecuencia de spam: log loss 0.671, Brier 0.239 y AUC 0.499.
+
+52
+00:02:55,180 --> 00:02:57,520
+Es la referencia: no ordena nada.
+
+53
+00:02:57,640 --> 00:03:06,630
+Bernoulli con alfa 0.5: log loss 0.556, Brier 0.099 y AUC 0.952.
+
+54
+00:03:06,750 --> 00:03:12,960
+Con alfa uno y dos, casi lo mismo: 0.557 y 0.558.
+
+55
+00:03:13,080 --> 00:03:21,070
+Y la gaussiana: Brier 0.190 y AUC 0.940, pero un log loss de 4.931.
+
+56
+00:03:21,190 --> 00:03:22,770
+Cómo se lee cada columna.
+
+57
+00:03:22,890 --> 00:03:25,668
+El Brier promedia el error cuadrático entre la
+
+58
+00:03:25,668 --> 00:03:28,990
+probabilidad y la etiqueta, cero o uno: menor es mejor.
+
+59
+00:03:29,110 --> 00:03:32,920
+El AUC mide el ordenamiento entre clases: mayor es mejor.
+
+60
+00:03:33,040 --> 00:03:36,670
+Por el menor log loss se elige Bernoulli con alfa 0.5.
+
+61
+00:03:36,790 --> 00:03:40,722
+Los tres suavizados dan resultados cercanos, como anticipamos:
+
+62
+00:03:40,722 --> 00:03:43,830
+con tantos correos, el suavizado casi no importa.
+
+63
+00:03:43,950 --> 00:03:46,328
+Y la advertencia de la diapositiva: el mínimo
+
+64
+00:03:46,328 --> 00:03:48,600
+fuera de pliegue intervino en la selección.
+
+65
+00:03:48,720 --> 00:03:53,060
+Elegimos al que salió mejor; por eso su número tiende a ser un poco optimista.
+
+66
+00:03:53,180 --> 00:03:56,290
+No constituye una evaluación independiente del ganador.
+
+67
+00:03:56,410 --> 00:03:59,940
+Esa la intentaremos con la prueba histórica, en la parada once.
+
+68
+00:04:00,060 --> 00:04:03,850
+La diapositiva cuarenta y cinco dibuja el log loss de cada receta.
+
+69
+00:04:03,970 --> 00:04:11,270
+Los tres Bernoulli quedan juntos, alrededor de 0.56; la referencia, en 0.67.
+
+70
+00:04:11,390 --> 00:04:13,960
+Y la gaussiana se dispara hasta casi cinco.
+
+71
+00:04:14,080 --> 00:04:20,610
+Lo curioso: con umbral 0.5, la gaussiana acierta el 80.8 por ciento de los correos.
+
+72
+00:04:20,730 --> 00:04:25,530
+No es un clasificador inútil; es un clasificador demasiado seguro de sí mismo.
+
+73
+00:04:25,650 --> 00:04:28,500
+¿Cómo puede acertar tanto y tener un log loss tan malo?
+
+74
+00:04:28,620 --> 00:04:30,500
+Un cálculo adicional lo explica.
+
+75
+00:04:30,620 --> 00:04:35,949
+La gaussiana pone el 98.6 por ciento de sus probabilidades fuera del
+
+76
+00:04:35,949 --> 00:04:40,260
+intervalo de 0.01 a 0.99: casi siempre dice cero o uno.
+
+77
+00:04:40,380 --> 00:04:44,788
+Y se equivoca con esa seguridad: quinientos noventa y dos correos
+
+78
+00:04:44,788 --> 00:04:48,450
+legítimos reciben probabilidad de spam de 0.999 o más.
+
+79
+00:04:48,570 --> 00:04:50,720
+Bernoulli hace eso con veintisiete.
+
+80
+00:04:50,840 --> 00:04:54,174
+Cada uno de esos errores suma al menos 6.9 al log
+
+81
+00:04:54,174 --> 00:04:56,760
+loss: el castigo de la tabla anterior.
+
+82
+00:04:56,880 --> 00:04:59,453
+La conclusión de la diapositiva: el log loss
+
+83
+00:04:59,453 --> 00:05:01,910
+penaliza los errores con certeza excesiva.
+
+84
+00:05:02,030 --> 00:05:05,070
+El porcentaje de aciertos no muestra esa diferencia.
+
+85
+00:05:05,190 --> 00:05:08,610
+Por eso se elige con el log loss, y no con la exactitud.
+
+86
+00:05:08,730 --> 00:05:11,770
+Una analogía: dos pronosticadores del tiempo.
+
+87
+00:05:11,890 --> 00:05:15,370
+El primero siempre dice cero por ciento o cien por ciento de lluvia.
+
+88
+00:05:15,490 --> 00:05:20,560
+Acierta muchos días, pero cuando falla, alguien sale sin paraguas bajo un aguacero.
+
+89
+00:05:20,680 --> 00:05:23,300
+El segundo dice setenta o veinte por ciento.
+
+90
+00:05:23,420 --> 00:05:27,620
+Acierta un poco menos de forma tajante, pero sus números significan algo.
+
+91
+00:05:27,740 --> 00:05:31,840
+Para decidir, a partir de una probabilidad, nos sirve el segundo.
+
+92
+00:05:31,960 --> 00:05:34,960
+Esa es la diferencia entre la gaussiana y Bernoulli aquí.
+
+93
+00:05:35,080 --> 00:05:36,810
+Errores típicos al comparar.
+
+94
+00:05:36,930 --> 00:05:40,461
+Uno: elegir la receta por la exactitud, y quedarse con un
+
+95
+00:05:40,461 --> 00:05:43,620
+modelo que acierta pero da probabilidades extremas.
+
+96
+00:05:43,740 --> 00:05:47,274
+Dos: leer el log loss del ganador como si fuera una evaluación
+
+97
+00:05:47,274 --> 00:05:50,010
+independiente, cuando participó en la selección.
+
+98
+00:05:50,130 --> 00:05:53,390
+Y tres: comparar recetas con distintos pliegues.
+
+99
+00:05:53,510 --> 00:05:56,880
+Todas deben usar los mismos correos y los mismos pliegues.
+
+100
+00:05:57,000 --> 00:05:58,220
+Piensa un segundo.
+
+101
+00:05:58,340 --> 00:05:59,450
+Dos correos.
+
+102
+00:05:59,570 --> 00:06:03,350
+El primero es spam, y el modelo le dio 0.8 de spam.
+
+103
+00:06:03,470 --> 00:06:07,610
+El segundo es legítimo, y el modelo le dio 0.4 de spam.
+
+104
+00:06:07,730 --> 00:06:09,270
+¿Cuál es el log loss promedio?
+
+105
+00:06:09,990 --> 00:06:15,970
+Para el spam, la probabilidad de lo que ocurrió es 0.8: castigo 0.223.
+
+106
+00:06:16,090 --> 00:06:20,496
+Para el legítimo, lo que ocurrió tiene probabilidad
+
+107
+00:06:20,496 --> 00:06:24,210
+uno menos 0.4, es decir 0.6: castigo 0.511.
+
+108
+00:06:24,330 --> 00:06:27,930
+El promedio: aproximadamente 0.367.
+
+109
+00:06:28,050 --> 00:06:31,447
+El error típico aquí es usar 0.4 en el segundo correo:
+
+110
+00:06:31,447 --> 00:06:34,340
+hay que usar la probabilidad de la clase real.
+
+111
+00:06:34,460 --> 00:06:38,455
+Para llevarte: se comparan cinco recetas con las mismas predicciones fuera de
+
+112
+00:06:38,455 --> 00:06:41,880
+pliegue de los tres mil seiscientos ochenta correos de desarrollo.
+
+113
+00:06:42,000 --> 00:06:49,160
+Gana Bernoulli con alfa 0.5, con log loss 0.556; los tres suavizados casi empatan.
+
+114
+00:06:49,280 --> 00:06:53,184
+Y la gaussiana acierta el 80.8 por ciento, pero
+
+115
+00:06:53,184 --> 00:06:56,590
+su log loss es 4.931: certeza equivocada.
+
+116
+00:06:56,710 --> 00:07:00,650
+Siguiente parada: por qué las probabilidades salen tan extremas.
+
+117
+00:07:00,770 --> 00:07:04,284
+Copiamos una señal, miramos la calibración y explicamos el
+
+118
+00:07:04,284 --> 00:07:07,010
+correo de identificador uno, señal por señal.
