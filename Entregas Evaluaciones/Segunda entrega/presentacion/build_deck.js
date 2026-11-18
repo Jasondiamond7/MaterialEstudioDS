@@ -159,7 +159,8 @@ txt(s, 'En la Entrega 1 la canopia de toda la temporada daba r = 0,67, pero incl
 const hall = [
   ['1', 'Panel pequeño', '77 cuartel-temporadas con canopia (11 cuarteles × 7 años) → pocos predictores y modelos regularizados.'],
   ['2', 'Efecto cuartel persistente', 'Cada cuartel mantiene su nivel entre años → el modelo debe incluir un efecto propio por cuartel.'],
-  ['3', 'Clima aún no estimable', 'Solo 4 temporadas con invierno completo y variables colineales (|r| > 0,8) → se usa como análisis de sensibilidad.'],
+  // "Estimable" read as "forecast the weather"; the point is that its effect on yield cannot be measured yet.
+  ['3', 'Efecto del clima aún no medible', 'Solo 4 temporadas con invierno completo y variables muy correlacionadas (|r| > 0,8): aún no se puede medir su efecto → se prueba aparte, como análisis de sensibilidad.'],
 ];
 hall.forEach(([n, t, d], i) => {
   const y = 1.45 + i * 1.75;
@@ -167,7 +168,7 @@ hall.forEach(([n, t, d], i) => {
   txt(s, t, { x: 8.0, y: y - 0.02, w: 4.7, h: 0.4, fontSize: 18, bold: true, color: C.text2 });
   txt(s, d, { x: 8.0, y: y + 0.42, w: 4.7, h: 1.1, fontSize: 15 });
 });
-notas(s, 'Tres hallazgos del EDA definen la metodología', `Tres hallazgos del EDA definen la metodología. La canopia hasta enero se correlaciona 0,66 con el rendimiento, casi igual que la temporada completa de la Entrega 1: podemos pronosticar antes de cosechar. El panel es pequeño, 77 casos; cada cuartel mantiene su nivel; y el clima, con solo cuatro temporadas, queda como sensibilidad.`);
+notas(s, 'Tres hallazgos del EDA definen la metodología', `Tres hallazgos del EDA definen la metodología. La canopia hasta enero se correlaciona 0,66 con el rendimiento, casi igual que la temporada completa de la Entrega 1: podemos pronosticar antes de cosechar. El panel es pequeño, 77 casos; cada cuartel mantiene su nivel; y con solo cuatro inviernos completos aún no se puede medir el efecto del clima, así que lo probamos aparte, como sensibilidad.`);
 
 // ---------- 4. Enfoque ----------
 pres.addSection({ title: 'Metodología' });

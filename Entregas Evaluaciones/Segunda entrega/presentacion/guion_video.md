@@ -2,7 +2,7 @@
 
 Máximo 5 minutos. Ritmo natural de unas 140 palabras por minuto.
 
-**Total: 634 palabras, unos 4,5 minutos.** Ensayar con cronómetro: la meta es terminar antes de 4:45.
+**Total: 646 palabras, unos 4,6 minutos.** Ensayar con cronómetro: la meta es terminar antes de 4:45.
 
 ## Slide 1 - Pronóstico de rendimiento por cuartel en kiwi Hayward
 _32 palabras, unos 14 s_
@@ -15,9 +15,9 @@ _43 palabras, unos 18 s_
 Breve recordatorio: el huerto planifica con el promedio histórico de cada cuartel, y ese método falla un 17 % en el total del huerto. Nuestro objetivo es estimar al 31 de enero el rendimiento de cada cuartel con menos error que ese promedio.
 
 ## Slide 3 - Tres hallazgos del EDA definen la metodología
-_53 palabras, unos 23 s_
+_65 palabras, unos 28 s_
 
-Tres hallazgos del EDA definen la metodología. La canopia hasta enero se correlaciona 0,66 con el rendimiento, casi igual que la temporada completa de la Entrega 1: podemos pronosticar antes de cosechar. El panel es pequeño, 77 casos; cada cuartel mantiene su nivel; y el clima, con solo cuatro temporadas, queda como sensibilidad.
+Tres hallazgos del EDA definen la metodología. La canopia hasta enero se correlaciona 0,66 con el rendimiento, casi igual que la temporada completa de la Entrega 1: podemos pronosticar antes de cosechar. El panel es pequeño, 77 casos; cada cuartel mantiene su nivel; y con solo cuatro inviernos completos aún no se puede medir el efecto del clima, así que lo probamos aparte, como sensibilidad.
 
 ## Slide 4 - Regresión supervisada sobre un panel cuartel-temporada
 _43 palabras, unos 18 s_

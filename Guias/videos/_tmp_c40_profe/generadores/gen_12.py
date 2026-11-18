@@ -57,7 +57,7 @@ v.b("Una analogía para ese último punto. [[a]]Si a un detector de spam le mues
     P("probabilidad de clase ≠ qué tan raro es el caso", 960, 660, "violeta", 48, en="c"), analogia(1050), sec="5. Analogía: lo nunca visto")
 
 # ---- 6. Bibliotecas
-v.b("Por último, las bibliotecas, de la diapositiva sesenta y uno. Automatizan el ajuste y la predicción que construimos paso a paso. [[a]]En R, el paquete naivebayes tiene una función para cada variante: Bernoulli, gaussiana y multinomial. [[b]]En Python, scikit-learn tiene una clase para cada una, con los mismos nombres de variante. [[c]]Para obtener probabilidades: en R, predict con el tipo prob; en Python, el método predict proba.",
+v.b("Por último, las bibliotecas, de la diapositiva sesenta y uno. Automatizan el ajuste y la predicción que construimos paso a paso. [[a]]En R, hay un paquete con una función para cada variante: Bernoulli, gaussiana y multinomial. [[b]]En Python, scikit-learn tiene una clase para cada una, con los mismos nombres de variante. [[c]]Para obtener probabilidades: en R, predict con el tipo prob; en Python, el método predict proba.",
     CL(), T("Naive Bayes en R y Python · diapositiva 61", 960, 120, tam=50, c="tinta", ent="subir"),
     tabla([["variante", "R: naivebayes", "Python: scikit-learn"], ["Bernoulli", "bernoulli_naive_bayes()", "BernoulliNB()"],
            ["gaussiana", "gaussian_naive_bayes()", "GaussianNB()"], ["multinomial", "multinomial_naive_bayes()", "MultinomialNB()"],
@@ -80,19 +80,19 @@ v.b("La diapositiva sesenta cierra con la pregunta del inicio: ¿basta con que u
     diapo(60, en="a"), sec="7. Síntesis")
 
 # ---- 8. Repaso de las paradas
-v.b("Repasemos el recorrido con sus números. [[a]]Previa, condicional y posterior: oferta dado spam 0.80, spam dado oferta dos tercios. Con dos por ciento de spam, 0.1404. [[b]]Independencia dentro de cada clase: oferta sin enlace, 0.4286; con Laplace, 0.4140. [[c]]Variantes: la representación decide; con porcentajes, Bernoulli frente a la gaussiana sobre el logaritmo de uno más equis.",
+v.b("Repasemos el recorrido con sus números. [[a]]Previa, condicional y posterior: oferta dado spam 0.80, spam dado oferta dos tercios. Con dos por ciento de spam, 0.1404. [[b]]Independencia dentro de cada clase: oferta sin enlace, 0.4286; con el suavizado de Laplace, 0.4140. [[c]]Variantes: la representación decide; con porcentajes, Bernoulli frente a la gaussiana sobre el logaritmo de uno más equis.",
     CL(), T("repaso: la primera mitad", 960, 140, tam=54, c="tinta", ent="subir"),
     P("P(oferta | spam) = 0.80 · P(spam | oferta) = 2/3 · con 2 % de spam: 0.1404", 960, 300, "violeta", 40, en="a"),
     P("independencia: 0.4286 · con Laplace (α = 1): 0.4140", 960, 460, "teal", 44, en="b"),
     P("la representación decide la variante", 960, 620, "azul", 46, en="c"), sec="8. Repaso")
-v.b("Y la segunda mitad. [[a]]Fuera de pliegue gana Bernoulli con alfa 0.5, log loss 0.556; la gaussiana acierta 80.8 por ciento con log loss 4.931. [[b]]Las señales dependientes exageran la certeza: en el intervalo de arriba, 99.44 por ciento predicho frente a 92.13 observado. [[c]]Y la decisión: umbral 0.95, con costo 219.0 fuera de pliegue y 188.9 en la prueba histórica, frente a 394.1 sin filtrar.",
+v.b("Y la segunda mitad. [[a]]Fuera de pliegue gana Bernoulli con alfa 0.5, un log loss de 0.556; la gaussiana acierta 80.8 por ciento con un log loss de 4.931. [[b]]Las señales dependientes exageran la certeza: en el intervalo de arriba, 99.44 por ciento predicho frente a 92.13 por ciento observado. [[c]]Y la decisión: umbral 0.95, con costo de 219.0 por mil fuera de pliegue, y de 188.9 por mil en la prueba histórica, frente a 394.1 sin filtrar.",
     CL(), T("repaso: la segunda mitad", 960, 140, tam=54, c="tinta", ent="subir"),
     P("OOF: Bernoulli α = 0.5 (0.556) · gaussiana 80.8 % pero 4.931", 960, 300, "verde", 42, en="a"),
     P("calibración: 99.44 % predicho frente a 92.13 % observado", 960, 460, "ambar", 44, en="b"),
     P("umbral 0.95: 219.0 (OOF) · 188.9 (prueba) frente a 394.1", 960, 620, "violeta", 44, en="c"))
 
 # ---- 9. Precisiones de la grabación
-v.b("En la serie marcamos algunas precisiones sobre la grabación; aquí van juntas. [[a]]Catorce spam tienen enlace, y seis no. Los seis sin enlace son spam, no legítimos. Y los veinte spam son veinte de cien. [[b]]El suavizado cambió la probabilidad en cerca de un punto y medio. El correo de identificador uno tiene 0.9964. Y las frecuencias del archivo son porcentajes, no van de cero a uno. [[c]]La comparación de recetas usa predicciones fuera de pliegue, no la prueba. El ejemplo de las copias tiene cien spam. Y copiar una señal no es sobreajuste, sino evidencia contada dos veces.",
+v.b("En la serie marcamos algunas precisiones sobre la grabación; aquí van juntas. [[a]]Catorce correos spam tienen enlace, y seis no. Los seis sin enlace son spam, no legítimos. Y los veinte spam son veinte de cien. [[b]]El suavizado cambió la probabilidad en cerca de un punto y medio. El correo de identificador uno tiene 0.9964. Y las frecuencias del archivo son porcentajes, no van de cero a uno. [[c]]La comparación de recetas usa predicciones fuera de pliegue, no la prueba. El ejemplo de las copias tiene cien spam. Y copiar una señal no es sobreajuste, sino evidencia contada dos veces.",
     CL(), T("precisiones sobre la grabación, en un vistazo", 960, 110, tam=50, c="tinta", ent="subir"),
     tabla([["minuto", "lo correcto"], ["00:32:22", "14 spam con enlace, 6 sin enlace"], ["00:49:54", "los 6 sin enlace son spam (no legítimos)"],
            ["01:07:22", "los spam son 20 de los 100"], ["01:14:58", "0.4286 → 0.4140: cerca de 1.5 puntos"], ["01:32:34", "identificador 1: p ≈ 0.9964"],

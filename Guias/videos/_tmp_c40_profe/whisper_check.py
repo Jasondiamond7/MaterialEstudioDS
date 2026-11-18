@@ -216,7 +216,7 @@ def main():
     # C40: el mismo sonido escrito de otra forma por Whisper (palabras unidas o separadas; se listan en el informe)
     eq += [(["e", "mail"], ["email"]), (["nb"], ["ene", "be"]), (["la", "plas"], ["lapplas"]), (["la", "plaz"], ["lapplas"]),
            (["spam", "base"], ["spam", "beis"]), (["log1p"], ["log", "uno", "pe"]), (["naive", "bayes"], ["naive", "beis"]),
-           (["la", "place"], ["lapplas"]), (["su", "avisado"], ["suavizado"]), (["loglos"], ["log", "los"])]
+           (["la", "place"], ["lapplas"]), (["su", "avisado"], ["suavizado"]), (["sobre", "ajuste"], ["sobreajuste"]),(["loglos"], ["log", "los"])]
     eq.sort(key=lambda e: -len(e[0]))      # C39: las secuencias largas primero (k mins antes que k)
     ref_words, ref_frase = [], []
     for k, fr in enumerate(voz["frases"]):
@@ -241,7 +241,11 @@ def main():
 
     # expandir cifras de la hipotesis con la lectura que aparece en la referencia
     hyp_raw = re.sub(r"(?<![\d.,])0 (\d{3})(?![\d])", r"0,\1", hyp_raw)     # C39: Whisper escribe «0 625» por 0,625 (mismo sonido)
-    hyp_raw = re.sub(r"(?<![\d.,])(\d+[.,]\d{1,3}) (\d{3})(?![\d.,])", r"\1\2", hyp_raw)  # C40: «0,4 140» por 0,4140 (mismo sonido)
+    def _unir(m):            # C40: «0,4 140» por 0,4140 (mismo sonido), solo si esa lectura cifra a cifra esta en la referencia
+        e, d = re.split(r"[.,]", m.group(1))
+        lect = f"{ent(int(e))} coma " + " ".join(_UNI[int(c)] for c in d + m.group(2))
+        return m.group(1) + m.group(2) if f" {lect} " in f" {ref_txt} " else m.group(0)
+    hyp_raw = re.sub(r"(?<![\d.,])(\d+[.,]\d{1,3}) (\d{3})(?![\d.,])", _unir, hyp_raw)
     hyp_raw = re.sub(r"(?<=\d)\s*[x×]\s*(?=\d)", " por ", hyp_raw)     # C40: «0,80 x 0,10»: el signo de multiplicar se lee «por»
     hyp_words = []
     for tk in tokens(hyp_raw):

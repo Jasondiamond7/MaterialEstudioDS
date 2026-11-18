@@ -36,7 +36,7 @@ for f in sorted(C40.glob("C40_[0-9][0-9]_*.mp4")):
     tot += d
     cs = caps(f)
     print(f"{f.name:34s} {d:7.1f} s  caps={len(cs):2d} max_cap={max(b - a for a, b, _ in cs):5.1f}  silencios>1.5s={silencios(f)}  {streams(f)}")
-full = C40 / "C40_Completo_Clustering.mp4"
+full = C40 / "C40_Completo_NaiveBayes.mp4"
 if full.exists():
     cs = caps(full)
     print(f"\n{full.name}: {dur(full):.1f} s (suma partes {tot:.1f} s, dif {dur(full) - tot:+.2f} s)  capitulos={len(cs)}  "

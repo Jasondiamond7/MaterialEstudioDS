@@ -1,0 +1,5459 @@
+1
+00:00:00,250 --> 00:00:02,340
+Clase cuarenta, primera parada.
+
+2
+00:00:02,460 --> 00:00:06,140
+Hoy vamos a construir un filtro de spam que entrega una probabilidad.
+
+3
+00:00:06,260 --> 00:00:09,104
+Y antes de cualquier fórmula, vamos a separar tres
+
+4
+00:00:09,104 --> 00:00:11,720
+preguntas que parecen iguales, pero no lo son.
+
+5
+00:00:11,840 --> 00:00:15,722
+En la clase anterior, con los vinos, buscábamos grupos sin ninguna
+
+6
+00:00:15,722 --> 00:00:18,780
+etiqueta: los grupos eran un resultado del análisis.
+
+7
+00:00:18,900 --> 00:00:20,290
+Hoy la situación cambia.
+
+8
+00:00:20,410 --> 00:00:24,130
+Tenemos correos que ya vienen marcados como spam o como legítimos.
+
+9
+00:00:24,250 --> 00:00:27,683
+Ya no buscamos grupos: aprendemos una clase que conocemos,
+
+10
+00:00:27,683 --> 00:00:30,820
+para poder clasificar el siguiente correo que llegue.
+
+11
+00:00:30,940 --> 00:00:32,390
+La notación es sencilla.
+
+12
+00:00:32,510 --> 00:00:33,760
+La respuesta es Y.
+
+13
+00:00:33,880 --> 00:00:37,460
+Vale uno si el correo es spam, y cero si es legítimo.
+
+14
+00:00:37,580 --> 00:00:42,420
+Las entradas son características del mensaje; por ejemplo, qué palabras aparecen.
+
+15
+00:00:42,540 --> 00:00:44,440
+En la clase las llamamos señales.
+
+16
+00:00:44,560 --> 00:00:47,484
+Y la pregunta de hoy es una sola: cómo construir una
+
+17
+00:00:47,484 --> 00:00:50,520
+probabilidad de spam a partir de ejemplos etiquetados.
+
+18
+00:00:50,640 --> 00:00:52,650
+El recorrido tiene tres pasos.
+
+19
+00:00:52,770 --> 00:00:57,620
+Primero, aprender de los correos: qué señales aparecen dentro de cada clase.
+
+20
+00:00:57,740 --> 00:01:01,309
+Segundo, calcular y comprobar: cómo se combinan esas señales y
+
+21
+00:01:01,309 --> 00:01:04,130
+qué tan fiables son las probabilidades que salen.
+
+22
+00:01:04,250 --> 00:01:07,595
+Y tercero, tomar una decisión: cuándo conviene bloquear,
+
+23
+00:01:07,595 --> 00:01:10,760
+considerando que los dos errores no cuestan lo mismo.
+
+24
+00:01:10,880 --> 00:01:14,580
+El profesor insistió en una distinción que vamos a usar toda la clase.
+
+25
+00:01:14,700 --> 00:01:17,224
+Predecir es llegar a una probabilidad: este
+
+26
+00:01:17,224 --> 00:01:19,690
+correo tiene tal probabilidad de ser spam.
+
+27
+00:01:19,810 --> 00:01:24,430
+Decidir es aplicar una regla sobre esa probabilidad: lo bloqueo o lo dejo pasar.
+
+28
+00:01:24,550 --> 00:01:28,110
+Una cosa alimenta a la otra, pero son pasos distintos.
+
+29
+00:01:28,230 --> 00:01:32,990
+Las primeras diez paradas son sobre predecir; la parada once, sobre decidir.
+
+30
+00:01:33,110 --> 00:01:35,380
+El método de hoy se llama Naive Bayes.
+
+31
+00:01:35,500 --> 00:01:38,370
+En español, clasificador bayesiano ingenuo.
+
+32
+00:01:38,490 --> 00:01:42,330
+Bayes, por el teorema de probabilidad condicional que vamos a usar.
+
+33
+00:01:42,450 --> 00:01:45,685
+E ingenuo, por un supuesto simplificador que haremos en la
+
+34
+00:01:45,685 --> 00:01:48,530
+parada cuatro, y que casi nunca se cumple del todo.
+
+35
+00:01:48,650 --> 00:01:52,740
+Lo interesante es que, aun así, funciona razonablemente bien.
+
+36
+00:01:52,860 --> 00:01:55,280
+Antes de los números, una analogía.
+
+37
+00:01:55,400 --> 00:01:57,180
+Piensa en una alarma de humo.
+
+38
+00:01:57,300 --> 00:02:00,196
+Una pregunta es: de todas las veces que hubo un
+
+39
+00:02:00,196 --> 00:02:02,660
+incendio, ¿cuántas veces sonó la alarma?
+
+40
+00:02:02,780 --> 00:02:05,714
+Otra pregunta es: de todas las veces que sonó la
+
+41
+00:02:05,714 --> 00:02:08,220
+alarma, ¿cuántas veces había un incendio?
+
+42
+00:02:08,340 --> 00:02:12,363
+La primera puede ser casi cien por ciento, y la segunda, bastante baja,
+
+43
+00:02:12,363 --> 00:02:15,480
+porque la alarma también suena con una tostada quemada.
+
+44
+00:02:15,600 --> 00:02:19,790
+Con los correos pasa lo mismo, y la diapositiva cuatro les pone nombre.
+
+45
+00:02:19,910 --> 00:02:22,860
+La previa: ¿qué fracción de los correos es spam?
+
+46
+00:02:22,980 --> 00:02:24,690
+Ahí solo miramos la clase.
+
+47
+00:02:24,810 --> 00:02:29,400
+La condicional: entre los spam, ¿qué fracción contiene la palabra oferta?
+
+48
+00:02:29,520 --> 00:02:31,570
+Miramos la palabra dentro de la clase.
+
+49
+00:02:31,690 --> 00:02:35,970
+Y la posterior: entre los correos con oferta, ¿qué fracción es spam?
+
+50
+00:02:36,090 --> 00:02:38,730
+Miramos la clase cuando ya conocemos la palabra.
+
+51
+00:02:38,850 --> 00:02:42,212
+La idea central de Bayes es justamente esa: pasar de lo que
+
+52
+00:02:42,212 --> 00:02:45,858
+sabemos dentro de cada clase, la condicional, a una probabilidad
+
+53
+00:02:45,858 --> 00:02:48,650
+para el correo que estamos mirando, la posterior.
+
+54
+00:02:48,770 --> 00:02:51,555
+Para clasificar necesitamos la posterior; pero los
+
+55
+00:02:51,555 --> 00:02:53,950
+datos nos dan con facilidad la condicional.
+
+56
+00:02:54,070 --> 00:02:55,940
+Ahora sí, los números.
+
+57
+00:02:56,060 --> 00:02:59,620
+La diapositiva cinco construye un ejemplo con cien correos.
+
+58
+00:02:59,740 --> 00:03:04,000
+Hay ochenta legítimos: ocho tienen la palabra oferta y setenta y dos no.
+
+59
+00:03:04,120 --> 00:03:07,360
+Hay veinte spam: dieciséis tienen oferta y cuatro no.
+
+60
+00:03:07,480 --> 00:03:11,340
+En total, veinticuatro correos traen oferta y setenta y seis no.
+
+61
+00:03:11,460 --> 00:03:15,760
+Es un ejemplo construido para las cuentas, no son conteos de Spambase.
+
+62
+00:03:15,880 --> 00:03:18,050
+Mira esta tabla con dos lecturas.
+
+63
+00:03:18,170 --> 00:03:20,952
+Si recorres la fila del spam, ves que la palabra
+
+64
+00:03:20,952 --> 00:03:23,270
+aparece en dieciséis de los veinte spam.
+
+65
+00:03:23,390 --> 00:03:26,203
+Si recorres la columna de oferta, ves que de los
+
+66
+00:03:26,203 --> 00:03:29,250
+veinticuatro correos con oferta, dieciséis son spam.
+
+67
+00:03:29,370 --> 00:03:32,930
+El mismo dieciséis, pero dividido por cosas distintas.
+
+68
+00:03:33,050 --> 00:03:36,380
+Calculemos la condicional, como en la diapositiva seis.
+
+69
+00:03:36,500 --> 00:03:41,180
+La probabilidad de oferta dado spam es dieciséis sobre veinte: 0.80.
+
+70
+00:03:41,300 --> 00:03:46,070
+La probabilidad de oferta dado legítimo es ocho sobre ochenta: 0.10.
+
+71
+00:03:46,190 --> 00:03:49,471
+Ojo: estas dos no suman uno, y no tienen por qué,
+
+72
+00:03:49,471 --> 00:03:52,350
+porque cada una vive en una clase distinta.
+
+73
+00:03:52,470 --> 00:03:56,240
+Lo que sí suma uno es oferta y no oferta dentro de la misma clase:
+
+74
+00:03:56,240 --> 00:03:59,210
+ocho sobre ochenta, más setenta y dos sobre ochenta.
+
+75
+00:03:59,330 --> 00:04:00,670
+Y ahora la posterior.
+
+76
+00:04:00,790 --> 00:04:03,831
+Para clasificar no tomamos como referencia todos los
+
+77
+00:04:03,831 --> 00:04:06,170
+spam, sino todos los correos con oferta.
+
+78
+00:04:06,290 --> 00:04:11,449
+La probabilidad de spam dado oferta es dieciséis sobre dieciséis más ocho:
+
+79
+00:04:11,449 --> 00:04:16,050
+dieciséis sobre veinticuatro, dos tercios, aproximadamente 0.6667.
+
+80
+00:04:16,170 --> 00:04:21,033
+La frase que resume la diapositiva: el ochenta por ciento de los spam contiene
+
+81
+00:04:21,033 --> 00:04:25,460
+oferta, pero solo el 66.7 por ciento de los correos con oferta es spam.
+
+82
+00:04:25,580 --> 00:04:29,837
+Y el resto, ocho de veinticuatro, un tercio, son legítimos: las dos
+
+83
+00:04:29,837 --> 00:04:33,840
+posteriores sí suman uno, porque comparten la misma referencia.
+
+84
+00:04:33,960 --> 00:04:37,260
+Error típico, y es el más clásico de la probabilidad.
+
+85
+00:04:37,380 --> 00:04:41,460
+Confundir la probabilidad de oferta dado spam con la de spam dado oferta.
+
+86
+00:04:41,580 --> 00:04:45,093
+Decir: como el ochenta por ciento de los spam trae oferta, un
+
+87
+00:04:45,093 --> 00:04:48,260
+correo con oferta tiene ochenta por ciento de ser spam.
+
+88
+00:04:48,380 --> 00:04:51,028
+Es falso: depende también de cuántos legítimos
+
+89
+00:04:51,028 --> 00:04:53,560
+traen oferta y de cuántos spam hay en total.
+
+90
+00:04:53,680 --> 00:04:57,030
+Eso es lo que hace el teorema de Bayes, en la próxima parada.
+
+91
+00:04:57,150 --> 00:04:58,370
+Piensa un segundo.
+
+92
+00:04:58,490 --> 00:05:01,386
+Con la misma tabla: entre los correos que no traen
+
+93
+00:05:01,386 --> 00:05:03,760
+la palabra oferta, ¿qué fracción es spam?
+
+94
+00:05:04,480 --> 00:05:07,296
+Miramos la columna sin oferta: hay setenta y
+
+95
+00:05:07,296 --> 00:05:09,920
+seis correos, y de ellos cuatro son spam.
+
+96
+00:05:10,040 --> 00:05:14,520
+Cuatro sobre setenta y seis, aproximadamente 0.053.
+
+97
+00:05:14,640 --> 00:05:18,940
+Sin la palabra, la probabilidad de spam cae a cerca del cinco por ciento.
+
+98
+00:05:19,060 --> 00:05:23,538
+Para llevarte: la previa mira la clase; la condicional, la señal dentro de
+
+99
+00:05:23,538 --> 00:05:27,290
+la clase; la posterior, la clase cuando ya conocemos la señal.
+
+100
+00:05:27,410 --> 00:05:30,857
+Con los cien correos: oferta dado spam es 0.80,
+
+101
+00:05:30,857 --> 00:05:33,570
+pero spam dado oferta es dos tercios.
+
+102
+00:05:33,690 --> 00:05:36,494
+Y para clasificar necesitamos la posterior: eso
+
+103
+00:05:36,494 --> 00:05:38,880
+es lo que construye el teorema de Bayes.
+
+104
+00:05:39,000 --> 00:05:42,588
+Siguiente parada: el teorema de Bayes, que recupera esta misma
+
+105
+00:05:42,588 --> 00:05:46,060
+cuenta, y por qué la frecuencia de spam cambia la respuesta.
+
+106
+00:05:46,930 --> 00:05:49,450
+Segunda parada: el teorema de Bayes.
+
+107
+00:05:49,570 --> 00:05:54,074
+Vamos a recuperar el dos tercios de la tabla con una fórmula, y vamos a ver por qué la
+
+108
+00:05:54,074 --> 00:05:57,950
+misma palabra puede significar cosas muy distintas según cuánto spam haya.
+
+109
+00:05:58,070 --> 00:06:02,520
+En la parada anterior contamos directamente en la tabla: dieciséis de veinticuatro.
+
+110
+00:06:02,640 --> 00:06:05,108
+Pero con muchas señales nunca vamos a tener esa
+
+111
+00:06:05,108 --> 00:06:07,680
+columna ya contada para cada combinación posible.
+
+112
+00:06:07,800 --> 00:06:11,187
+Lo que sí podemos estimar con facilidad es cuánto spam hay, y
+
+113
+00:06:11,187 --> 00:06:14,130
+qué tan frecuente es cada señal dentro de cada clase.
+
+114
+00:06:14,250 --> 00:06:18,280
+El teorema de Bayes arma la posterior justamente con esas dos piezas.
+
+115
+00:06:18,400 --> 00:06:20,820
+Esta es la fórmula de la diapositiva siete.
+
+116
+00:06:20,940 --> 00:06:23,746
+Arriba: la probabilidad de spam, multiplicada
+
+117
+00:06:23,746 --> 00:06:26,240
+por la probabilidad de oferta dado spam.
+
+118
+00:06:26,360 --> 00:06:30,771
+Abajo: la suma de dos productos del mismo tipo, uno por cada clase:
+
+119
+00:06:30,771 --> 00:06:35,050
+legítimo por oferta dado legítimo, más spam por oferta dado spam.
+
+120
+00:06:35,170 --> 00:06:37,922
+Fíjate que el producto de arriba aparece también
+
+121
+00:06:37,922 --> 00:06:40,560
+abajo: por eso el resultado nunca pasa de uno.
+
+122
+00:06:40,680 --> 00:06:42,930
+Reemplazamos con las frecuencias de la tabla.
+
+123
+00:06:43,050 --> 00:06:46,550
+Previa de spam: veinte sobre cien, 0.20.
+
+124
+00:06:46,670 --> 00:06:49,350
+Oferta dado spam: 0.80.
+
+125
+00:06:49,470 --> 00:06:52,080
+Su producto: 0.16.
+
+126
+00:06:52,200 --> 00:06:54,800
+Previa de legítimo: 0.80.
+
+127
+00:06:54,920 --> 00:06:57,780
+Oferta dado legítimo: 0.10.
+
+128
+00:06:57,900 --> 00:07:00,470
+Su producto: 0.08.
+
+129
+00:07:00,590 --> 00:07:07,209
+Entonces, 0.16 dividido por 0.08 más 0.16, es decir,
+
+130
+00:07:07,209 --> 00:07:12,300
+0.16 sobre 0.24: aproximadamente 0.6667.
+
+131
+00:07:12,420 --> 00:07:14,700
+El mismo dos tercios que contamos a mano.
+
+132
+00:07:14,820 --> 00:07:16,300
+¿Qué es ese denominador?
+
+133
+00:07:16,420 --> 00:07:21,160
+La diapositiva lo dice así: suma las dos formas de observar un correo con oferta.
+
+134
+00:07:21,280 --> 00:07:24,306
+Cero coma cero ocho es la fracción de los cien correos
+
+135
+00:07:24,306 --> 00:07:26,940
+que son legítimos y traen oferta: ocho de cien.
+
+136
+00:07:27,060 --> 00:07:31,830
+Cero coma dieciséis es la fracción que son spam y traen oferta: dieciséis de cien.
+
+137
+00:07:31,950 --> 00:07:36,800
+Y la suma, 0.24, son los veinticuatro de cien que traen la palabra.
+
+138
+00:07:36,920 --> 00:07:40,720
+La diapositiva ocho le pone nombre a este paso: normalizar.
+
+139
+00:07:40,840 --> 00:07:44,610
+Primero calculamos un producto por clase: previa por condicional.
+
+140
+00:07:44,730 --> 00:07:49,730
+Para legítimo, 0.08; para spam, 0.16.
+
+141
+00:07:49,850 --> 00:07:54,120
+Esos productos todavía no son probabilidades del correo: no suman uno.
+
+142
+00:07:54,240 --> 00:07:57,520
+Normalizar es dividir cada producto por la suma de ambos.
+
+143
+00:07:57,640 --> 00:08:02,472
+Cero coma cero ocho entre 0.24 da 0.3333, y
+
+144
+00:08:02,472 --> 00:08:07,080
+cero coma dieciséis entre 0.24 da 0.6667.
+
+145
+00:08:07,200 --> 00:08:08,610
+Ahora sí suman uno.
+
+146
+00:08:08,730 --> 00:08:10,710
+Una analogía para normalizar.
+
+147
+00:08:10,830 --> 00:08:13,460
+Imagina una votación con dos candidatos.
+
+148
+00:08:13,580 --> 00:08:16,240
+Uno saca ocho votos y el otro dieciséis.
+
+149
+00:08:16,360 --> 00:08:19,705
+Para pasar a porcentajes, divides cada cuenta por el
+
+150
+00:08:19,705 --> 00:08:22,600
+total, veinticuatro: un tercio y dos tercios.
+
+151
+00:08:22,720 --> 00:08:26,738
+Los productos del teorema funcionan igual: son como votos de cada clase,
+
+152
+00:08:26,738 --> 00:08:30,030
+y normalizar los convierte en probabilidades que suman uno.
+
+153
+00:08:30,150 --> 00:08:34,540
+En código son tres líneas, y en R y en Python se ven casi iguales.
+
+154
+00:08:34,660 --> 00:08:38,470
+El producto del spam, el producto del legítimo, y la división.
+
+155
+00:08:38,590 --> 00:08:42,790
+No hace falta ningún paquete: son multiplicaciones y una división.
+
+156
+00:08:42,910 --> 00:08:47,350
+Ahora el experimento más importante de esta parada, de la diapositiva nueve.
+
+157
+00:08:47,470 --> 00:08:54,620
+Mantenemos las condicionales: oferta dado spam, 0.80; oferta dado legítimo, 0.10.
+
+158
+00:08:54,740 --> 00:08:57,413
+Solo cambiamos la previa: en vez de veinte por
+
+159
+00:08:57,413 --> 00:08:59,970
+ciento de spam, suponemos un dos por ciento.
+
+160
+00:09:00,090 --> 00:09:01,760
+Es un escenario hipotético.
+
+161
+00:09:01,880 --> 00:09:07,240
+Entonces la previa de legítimo es uno menos 0.02: 0.98.
+
+162
+00:09:07,360 --> 00:09:08,850
+Hacemos la misma cuenta.
+
+163
+00:09:08,970 --> 00:09:14,510
+Spam y oferta: 0.02 por 0.80, 0.016.
+
+164
+00:09:14,630 --> 00:09:20,560
+Legítimo y oferta: 0.98 por 0.10, 0.098.
+
+165
+00:09:20,680 --> 00:09:26,297
+La probabilidad de spam dado oferta es 0.016 dividido
+
+166
+00:09:26,297 --> 00:09:30,960
+por 0.098 más 0.016: aproximadamente 0.1404.
+
+167
+00:09:31,080 --> 00:09:35,410
+Con las mismas condicionales, pasamos de dos tercios a un catorce por ciento.
+
+168
+00:09:35,530 --> 00:09:40,364
+En la grabación, el profesor lo resume así: pasamos de casi sesenta y siete por ciento
+
+169
+00:09:40,364 --> 00:09:44,130
+a casi catorce, y lo único que cambiamos fue la proporción de spam.
+
+170
+00:09:44,250 --> 00:09:49,650
+Si el spam es raro, tenga o no la palabra oferta, es difícil que un correo sea spam.
+
+171
+00:09:49,770 --> 00:09:53,000
+Si la fórmula se siente abstracta, piensa en cuentas.
+
+172
+00:09:53,120 --> 00:09:54,900
+Este es un cálculo adicional.
+
+173
+00:09:55,020 --> 00:09:57,959
+Imagina mil correos con dos por ciento de spam:
+
+174
+00:09:57,959 --> 00:10:00,710
+veinte spam y novecientos ochenta legítimos.
+
+175
+00:10:00,830 --> 00:10:05,010
+De los veinte spam, el ochenta por ciento trae oferta: dieciséis.
+
+176
+00:10:05,130 --> 00:10:07,900
+De los novecientos ochenta legítimos, el diez
+
+177
+00:10:07,900 --> 00:10:10,300
+por ciento trae oferta: noventa y ocho.
+
+178
+00:10:10,420 --> 00:10:14,360
+Hay ciento catorce correos con oferta, y solo dieciséis son spam.
+
+179
+00:10:14,480 --> 00:10:18,960
+Dieciséis sobre ciento catorce: otra vez 0.1404.
+
+180
+00:10:19,080 --> 00:10:22,940
+La diapositiva diez dibuja la cuenta para todas las previas posibles.
+
+181
+00:10:23,060 --> 00:10:26,407
+En el eje horizontal, la frecuencia previa de spam; en el
+
+182
+00:10:26,407 --> 00:10:29,520
+vertical, la probabilidad de spam al observar oferta.
+
+183
+00:10:29,640 --> 00:10:33,220
+La curva no es una recta: sube muy rápido al principio.
+
+184
+00:10:33,340 --> 00:10:36,897
+Los dos puntos son los de la tabla: dos por ciento da catorce por
+
+185
+00:10:36,897 --> 00:10:40,070
+ciento, y veinte por ciento da sesenta y siete por ciento.
+
+186
+00:10:40,190 --> 00:10:46,095
+Y en el otro extremo, como comentó el profesor: si el noventa y ocho por ciento de los
+
+187
+00:10:46,095 --> 00:10:51,520
+correos fuera spam, la probabilidad de spam dado oferta sería casi uno, 0.9975.
+
+188
+00:10:51,640 --> 00:10:54,490
+Tenga o no la palabra, casi todo es spam.
+
+189
+00:10:54,610 --> 00:10:57,735
+La conclusión de la diapositiva diez es una frase para
+
+190
+00:10:57,735 --> 00:11:00,860
+guardar: la palabra ayuda, pero no decide por sí sola.
+
+191
+00:11:00,980 --> 00:11:04,530
+La misma señal, con las mismas frecuencias dentro de cada clase,
+
+192
+00:11:04,530 --> 00:11:07,470
+lleva a probabilidades muy distintas según la previa.
+
+193
+00:11:07,590 --> 00:11:12,175
+Por eso, en la parada once, antes de usar el filtro en otra bandeja de correo, vamos a
+
+194
+00:11:12,175 --> 00:11:15,960
+revisar si su frecuencia de spam se parece a la de los datos de ajuste.
+
+195
+00:11:16,080 --> 00:11:18,410
+Error típico: olvidar la previa.
+
+196
+00:11:18,530 --> 00:11:20,160
+Hay dos formas de cometerlo.
+
+197
+00:11:20,280 --> 00:11:22,649
+Una: leer la condicional como si fuera la
+
+198
+00:11:22,649 --> 00:11:25,480
+posterior, que es el error de la parada anterior.
+
+199
+00:11:25,600 --> 00:11:29,515
+Otra: entrenar con datos donde el spam es frecuente, y aplicar el
+
+200
+00:11:29,515 --> 00:11:33,250
+filtro en una bandeja donde el spam es raro, sin ajustar nada.
+
+201
+00:11:33,370 --> 00:11:36,343
+El modelo seguirá creyendo que el spam es frecuente,
+
+202
+00:11:36,343 --> 00:11:38,630
+y va a exagerar la probabilidad de spam.
+
+203
+00:11:38,750 --> 00:11:39,970
+Piensa un segundo.
+
+204
+00:11:40,090 --> 00:11:44,523
+Con las mismas condicionales, 0.80 y 0.10, ¿qué probabilidad de spam
+
+205
+00:11:44,523 --> 00:11:48,370
+dado oferta obtienes si la mitad de los correos fuera spam?
+
+206
+00:11:49,090 --> 00:11:53,830
+El producto del spam es 0.5 por 0.80: 0.40.
+
+207
+00:11:53,950 --> 00:11:58,800
+El del legítimo, 0.5 por 0.10: 0.05.
+
+208
+00:11:58,920 --> 00:12:05,430
+Cero coma cuarenta dividido por 0.45: aproximadamente 0.8889.
+
+209
+00:12:05,550 --> 00:12:10,420
+Con previas iguales, solo decide la razón entre las condicionales: ocho a uno.
+
+210
+00:12:10,540 --> 00:12:13,373
+Para llevarte: el teorema de Bayes dice que la posterior
+
+211
+00:12:13,373 --> 00:12:15,750
+es proporcional a la previa por la condicional.
+
+212
+00:12:15,870 --> 00:12:19,690
+Calculamos un producto por clase y normalizamos dividiendo por la suma.
+
+213
+00:12:19,810 --> 00:12:24,664
+Y la previa importa mucho: con oferta, veinte por ciento de spam da
+
+214
+00:12:24,664 --> 00:12:29,010
+66.7 por ciento, y dos por ciento da apenas 14.0 por ciento.
+
+215
+00:12:29,130 --> 00:12:32,809
+Siguiente parada: agregamos una segunda señal, el enlace, y
+
+216
+00:12:32,809 --> 00:12:36,300
+vemos por qué no podemos contar todas las combinaciones.
+
+217
+00:12:37,170 --> 00:12:38,220
+Tercera parada.
+
+218
+00:12:38,340 --> 00:12:41,310
+Un correo real tiene muchas señales, no una.
+
+219
+00:12:41,430 --> 00:12:44,922
+Vamos a agregar la segunda, el enlace, y a ver por qué contar
+
+220
+00:12:44,922 --> 00:12:48,070
+todas las combinaciones se vuelve imposible muy rápido.
+
+221
+00:12:48,190 --> 00:12:51,318
+La diapositiva once agrega un segundo indicador a los
+
+222
+00:12:51,318 --> 00:12:54,210
+mismos cien correos: si el correo trae un enlace.
+
+223
+00:12:54,330 --> 00:12:58,750
+Entre los ochenta legítimos, ocho traen oferta y dieciséis traen enlace.
+
+224
+00:12:58,870 --> 00:13:03,160
+Entre los veinte spam, dieciséis traen oferta y catorce traen enlace.
+
+225
+00:13:03,280 --> 00:13:07,400
+Y el correo que queremos clasificar tiene oferta presente y enlace ausente.
+
+226
+00:13:07,520 --> 00:13:10,330
+Lo escribimos como equis igual a uno, cero.
+
+227
+00:13:10,450 --> 00:13:12,600
+Fíjate en lo que esta tabla no dice.
+
+228
+00:13:12,720 --> 00:13:15,835
+Sabemos cuántos legítimos traen oferta y cuántos traen
+
+229
+00:13:15,835 --> 00:13:18,720
+enlace, pero no sabemos si son los mismos correos.
+
+230
+00:13:18,840 --> 00:13:23,478
+Como dijo el profesor, puede que esos ocho con oferta no tengan el enlace; no lo
+
+231
+00:13:23,478 --> 00:13:27,130
+sabemos, solo sabemos la frecuencia de cada señal por separado.
+
+232
+00:13:27,250 --> 00:13:29,140
+Una aclaración sobre la grabación.
+
+233
+00:13:29,260 --> 00:13:32,789
+Al presentar esta tabla, cerca del minuto treinta y dos, se
+
+234
+00:13:32,789 --> 00:13:35,780
+dijo que dentro de spam, catorce no tienen enlace.
+
+235
+00:13:35,900 --> 00:13:39,204
+La diapositiva dice lo contrario: catorce spam tienen
+
+236
+00:13:39,204 --> 00:13:41,760
+enlace, y por lo tanto seis no lo tienen.
+
+237
+00:13:41,880 --> 00:13:47,240
+Unos minutos después, en la clase se usa bien: catorce con enlace, seis sin enlace.
+
+238
+00:13:47,360 --> 00:13:52,320
+Cada señal responde una pregunta con dos respuestas: ¿aparece oferta?, ¿hay enlace?
+
+239
+00:13:52,440 --> 00:13:56,420
+Una variable de Bernoulli representa justamente un resultado sí o no.
+
+240
+00:13:56,540 --> 00:13:59,160
+Usamos uno para presente y cero para ausente.
+
+241
+00:13:59,280 --> 00:14:02,480
+No nos importa cuántas veces aparece la palabra, ni
+
+242
+00:14:02,480 --> 00:14:05,240
+cuántos enlaces hay: solo si está o no está.
+
+243
+00:14:05,360 --> 00:14:08,675
+Con los veinte spam del ejemplo: el enlace está
+
+244
+00:14:08,675 --> 00:14:12,060
+presente en catorce: catorce sobre veinte, 0.70.
+
+245
+00:14:12,180 --> 00:14:17,580
+Y ausente en veinte menos catorce, seis: seis sobre veinte, 0.30.
+
+246
+00:14:17,700 --> 00:14:21,350
+Dentro de la misma clase, presente y ausente sí suman uno.
+
+247
+00:14:21,470 --> 00:14:24,900
+Una sola probabilidad describe la señal: la de presencia.
+
+248
+00:14:25,020 --> 00:14:27,000
+La de ausencia es uno menos esa.
+
+249
+00:14:27,120 --> 00:14:29,360
+Un detalle que la diapositiva subraya.
+
+250
+00:14:29,480 --> 00:14:32,497
+Un cero significa ausencia observada de la señal:
+
+251
+00:14:32,497 --> 00:14:34,960
+miramos el correo y el enlace no estaba.
+
+252
+00:14:35,080 --> 00:14:36,920
+No significa dato faltante.
+
+253
+00:14:37,040 --> 00:14:40,263
+Si no supiéramos si el correo trae enlace, eso sería
+
+254
+00:14:40,263 --> 00:14:42,990
+otra situación, y el cálculo sería distinto.
+
+255
+00:14:43,110 --> 00:14:44,280
+Una analogía.
+
+256
+00:14:44,400 --> 00:14:47,018
+Piensa en un formulario de casillas: ¿trae
+
+257
+00:14:47,018 --> 00:14:50,010
+oferta?, ¿trae enlace?, ¿trae la palabra gratis?
+
+258
+00:14:50,130 --> 00:14:52,080
+Cada casilla se marca sí o no.
+
+259
+00:14:52,200 --> 00:14:55,840
+Para cada clase aprendemos qué tan seguido se marca cada casilla.
+
+260
+00:14:55,960 --> 00:15:00,580
+Ese es el modelo de Bernoulli: una probabilidad de sí por casilla y por clase.
+
+261
+00:15:00,700 --> 00:15:05,990
+Ahora, la pregunta de la diapositiva trece: ¿podemos contar todas las combinaciones?
+
+262
+00:15:06,110 --> 00:15:11,161
+Con dos señales hay cuatro tipos de correo: sin oferta y sin enlace, sin oferta y
+
+263
+00:15:11,161 --> 00:15:15,090
+con enlace, con oferta y sin enlace, y con oferta y con enlace.
+
+264
+00:15:15,210 --> 00:15:18,883
+Para usar la cuenta directa de la parada uno, necesitaríamos
+
+265
+00:15:18,883 --> 00:15:22,250
+saber, en cada clase, cuántos correos hay de cada tipo.
+
+266
+00:15:22,370 --> 00:15:24,220
+Y esa tabla no la tenemos.
+
+267
+00:15:24,340 --> 00:15:26,220
+Y el problema crece muy rápido.
+
+268
+00:15:26,340 --> 00:15:28,990
+Cada señal nueva duplica las combinaciones.
+
+269
+00:15:29,110 --> 00:15:32,609
+Con tres señales, ocho; con diez, dos elevado a diez:
+
+270
+00:15:32,609 --> 00:15:35,580
+mil veinticuatro patrones posibles por clase.
+
+271
+00:15:35,700 --> 00:15:39,158
+Con las cincuenta y cuatro señales de Spambase, dos elevado a
+
+272
+00:15:39,158 --> 00:15:42,560
+cincuenta y cuatro: unos dieciocho mil billones de patrones.
+
+273
+00:15:42,680 --> 00:15:46,940
+Y en los datos reales tenemos tres mil seiscientos ochenta correos para aprender.
+
+274
+00:15:47,060 --> 00:15:48,870
+¿Qué pasa con tantos patrones?
+
+275
+00:15:48,990 --> 00:15:51,420
+La mayoría nunca aparece en los datos.
+
+276
+00:15:51,540 --> 00:15:54,556
+Y si un patrón no aparece, su frecuencia es cero, y
+
+277
+00:15:54,556 --> 00:15:56,980
+la probabilidad estimada también es cero.
+
+278
+00:15:57,100 --> 00:16:00,507
+El profesor lo explicó como el argumento frecuentista: estamos
+
+279
+00:16:00,507 --> 00:16:03,200
+usando la frecuencia observada como probabilidad.
+
+280
+00:16:03,320 --> 00:16:07,159
+Con pocos correos, muchos patrones quedan sin observar, y un correo
+
+281
+00:16:07,159 --> 00:16:10,310
+nuevo con un patrón nunca visto quedaría sin respuesta.
+
+282
+00:16:10,430 --> 00:16:13,430
+Y hay otra forma de verlo, contando parámetros.
+
+283
+00:16:13,550 --> 00:16:14,980
+Es un cálculo adicional.
+
+284
+00:16:15,100 --> 00:16:19,602
+La tabla completa de diez señales necesita, en cada clase, mil veintitrés
+
+285
+00:16:19,602 --> 00:16:23,610
+probabilidades: una por patrón, menos una porque todas suman uno.
+
+286
+00:16:23,730 --> 00:16:26,975
+Si en cambio aprendemos cada señal por separado, bastan
+
+287
+00:16:26,975 --> 00:16:29,630
+diez probabilidades por clase, una por señal.
+
+288
+00:16:29,750 --> 00:16:32,845
+Esa es exactamente la propuesta de la diapositiva trece:
+
+289
+00:16:32,845 --> 00:16:35,830
+combinar lo que aprendimos de cada señal por separado.
+
+290
+00:16:35,950 --> 00:16:37,880
+Errores típicos en esta parada.
+
+291
+00:16:38,000 --> 00:16:40,570
+Uno: leer el cero como dato faltante.
+
+292
+00:16:40,690 --> 00:16:43,800
+El cero es una observación: la señal no estaba.
+
+293
+00:16:43,920 --> 00:16:46,769
+Dos: suponer que las dos columnas de la tabla nos
+
+294
+00:16:46,769 --> 00:16:49,270
+dicen cuántos correos tienen ambas señales.
+
+295
+00:16:49,390 --> 00:16:52,980
+No lo dicen: cada columna es una frecuencia por separado.
+
+296
+00:16:53,100 --> 00:16:57,340
+Y tres: creer que con más señales siempre podremos contar los patrones.
+
+297
+00:16:57,460 --> 00:17:00,820
+Con cincuenta y cuatro señales, ni con millones de correos.
+
+298
+00:17:00,940 --> 00:17:02,160
+Piensa un segundo.
+
+299
+00:17:02,280 --> 00:17:05,605
+Si agregamos una tercera señal, la palabra cuenta, ¿cuántos
+
+300
+00:17:05,605 --> 00:17:09,042
+patrones hay por clase, y cuántas probabilidades de presencia
+
+301
+00:17:09,042 --> 00:17:11,860
+necesitamos si aprendemos cada señal por separado?
+
+302
+00:17:12,580 --> 00:17:16,310
+Tres señales dan dos elevado a tres: ocho patrones por clase.
+
+303
+00:17:16,430 --> 00:17:20,970
+Pero por separado bastan tres probabilidades de presencia por clase, una por señal.
+
+304
+00:17:21,090 --> 00:17:26,120
+La diferencia, que aquí es pequeña, se vuelve gigantesca con decenas de señales.
+
+305
+00:17:26,240 --> 00:17:30,349
+Para llevarte: cada señal es una variable de Bernoulli: uno si está
+
+306
+00:17:30,349 --> 00:17:34,090
+presente, cero si está ausente, y el cero es una observación.
+
+307
+00:17:34,210 --> 00:17:38,593
+Dentro de una clase, una sola probabilidad la describe: en
+
+308
+00:17:38,593 --> 00:17:42,070
+los spam, enlace presente 0.70 y ausente 0.30.
+
+309
+00:17:42,190 --> 00:17:47,050
+Y contar todos los patrones es imposible: cada señal duplica las combinaciones.
+
+310
+00:17:47,170 --> 00:17:48,910
+Por eso necesitamos un atajo.
+
+311
+00:17:49,030 --> 00:17:51,020
+Siguiente parada: el atajo.
+
+312
+00:17:51,140 --> 00:17:54,539
+El supuesto ingenuo de independencia dentro de cada clase, y la
+
+313
+00:17:54,539 --> 00:17:57,290
+cuenta completa del correo con oferta y sin enlace.
+
+314
+00:17:58,170 --> 00:18:01,540
+Cuarta parada: el supuesto que le da nombre al método.
+
+315
+00:18:01,660 --> 00:18:04,329
+Con él vamos a calcular, de principio a fin, la
+
+316
+00:18:04,329 --> 00:18:07,510
+probabilidad de spam del correo con oferta y sin enlace.
+
+317
+00:18:07,630 --> 00:18:10,220
+La diapositiva catorce plantea el supuesto.
+
+318
+00:18:10,340 --> 00:18:13,201
+Dentro de los spam, y por separado dentro de los
+
+319
+00:18:13,201 --> 00:18:16,360
+legítimos, las señales se tratan como independientes.
+
+320
+00:18:16,480 --> 00:18:21,728
+Eso permite multiplicar sus probabilidades: la probabilidad de oferta y sin enlace, dado
+
+321
+00:18:21,728 --> 00:18:26,260
+spam, es la probabilidad de oferta dado spam por la de sin enlace dado spam.
+
+322
+00:18:26,380 --> 00:18:29,480
+Se repite el producto dentro de los legítimos, y con más
+
+323
+00:18:29,480 --> 00:18:31,860
+variables se agrega un factor por variable.
+
+324
+00:18:31,980 --> 00:18:37,110
+Fíjate en las palabras: independencia condicional, es decir, dentro de cada clase.
+
+325
+00:18:37,230 --> 00:18:40,480
+No dice que oferta y enlace sean independientes en general.
+
+326
+00:18:40,600 --> 00:18:44,230
+De hecho no lo son: los dos son más frecuentes en el spam.
+
+327
+00:18:44,350 --> 00:18:47,333
+Dice que, una vez que sabemos la clase, saber que hay
+
+328
+00:18:47,333 --> 00:18:50,260
+oferta no cambia la probabilidad de que haya enlace.
+
+329
+00:18:50,380 --> 00:18:54,000
+Esta simplificación es la que le da al método el apellido de ingenuo.
+
+330
+00:18:54,120 --> 00:18:56,807
+Hace posible el cálculo, pero no demuestra que las
+
+331
+00:18:56,807 --> 00:18:59,010
+señales sean independientes en los datos.
+
+332
+00:18:59,130 --> 00:19:02,189
+El profesor lo dijo con claridad: nada asegura que la
+
+333
+00:19:02,189 --> 00:19:04,670
+probabilidad conjunta se pueda separar así.
+
+334
+00:19:04,790 --> 00:19:08,244
+Es un primer acercamiento que funciona relativamente bien, y en la
+
+335
+00:19:08,244 --> 00:19:11,070
+parada diez veremos qué pasa cuando el supuesto falla.
+
+336
+00:19:11,190 --> 00:19:13,090
+Una analogía para el supuesto.
+
+337
+00:19:13,210 --> 00:19:15,610
+Imagina dos testigos de un mismo hecho.
+
+338
+00:19:15,730 --> 00:19:18,098
+Si cada uno lo vio por su cuenta, sus
+
+339
+00:19:18,098 --> 00:19:20,210
+testimonios se suman: dos pruebas
+
+340
+00:19:20,210 --> 00:19:21,170
+independientes.
+
+341
+00:19:21,290 --> 00:19:23,931
+Pero si el segundo solo repite lo que le contó el
+
+342
+00:19:23,931 --> 00:19:26,140
+primero, en realidad hay una sola prueba.
+
+343
+00:19:26,260 --> 00:19:28,984
+El clasificador bayesiano ingenuo trata a todas
+
+344
+00:19:28,984 --> 00:19:31,360
+las señales como testigos independientes.
+
+345
+00:19:31,480 --> 00:19:35,720
+Cuando dos señales se repiten, el modelo cuenta dos veces la misma prueba.
+
+346
+00:19:35,840 --> 00:19:39,620
+Calculemos el patrón que observamos, como en la diapositiva quince.
+
+347
+00:19:39,740 --> 00:19:43,310
+Dentro de los spam: oferta, dieciséis de veinte; sin
+
+348
+00:19:43,310 --> 00:19:46,400
+enlace, veinte menos catorce, seis de veinte.
+
+349
+00:19:46,520 --> 00:19:51,240
+El producto: 0.80 por 0.30, 0.24.
+
+350
+00:19:51,360 --> 00:19:55,453
+Dentro de los legítimos: oferta, ocho de ochenta; sin enlace,
+
+351
+00:19:55,453 --> 00:19:59,010
+ochenta menos dieciséis, sesenta y cuatro de ochenta.
+
+352
+00:19:59,130 --> 00:20:03,810
+El producto: 0.10 por 0.80, 0.08.
+
+353
+00:20:03,930 --> 00:20:08,490
+Son cálculos bajo el supuesto; no son conteos observados del patrón completo.
+
+354
+00:20:08,610 --> 00:20:12,310
+Para clasificar, falta incorporar la frecuencia de cada clase.
+
+355
+00:20:12,430 --> 00:20:15,650
+La diapositiva dieciséis prepara todos los factores.
+
+356
+00:20:15,770 --> 00:20:22,960
+Legítimo: frecuencia de clase 0.80, oferta presente 0.10, enlace ausente 0.80.
+
+357
+00:20:23,080 --> 00:20:30,100
+Spam: frecuencia de clase 0.20, oferta presente 0.80, enlace ausente 0.30.
+
+358
+00:20:30,220 --> 00:20:33,735
+En cada columna buscamos la probabilidad de lo que efectivamente
+
+359
+00:20:33,735 --> 00:20:37,250
+observamos en el correo: la oferta presente y el enlace ausente.
+
+360
+00:20:37,370 --> 00:20:38,950
+Mira la última columna.
+
+361
+00:20:39,070 --> 00:20:42,353
+La ausencia de enlace es más frecuente entre los legítimos:
+
+362
+00:20:42,353 --> 00:20:45,580
+sesenta y cuatro de ochenta, frente a seis de veinte spam.
+
+363
+00:20:45,700 --> 00:20:49,430
+Es decir, no ver el enlace es una pista a favor de legítimo.
+
+364
+00:20:49,550 --> 00:20:51,750
+Esa pista va a pesar en el resultado.
+
+365
+00:20:51,870 --> 00:20:54,660
+Aquí, una pequeña precisión sobre la grabación.
+
+366
+00:20:54,780 --> 00:20:59,100
+Al repasar esta tabla, cerca del minuto cincuenta, se dijo: seis correos
+
+367
+00:20:59,100 --> 00:21:02,700
+que no tienen enlace dentro de los veinte que son legítimos.
+
+368
+00:21:02,820 --> 00:21:05,490
+Los seis sin enlace están entre los veinte spam.
+
+369
+00:21:05,610 --> 00:21:09,760
+Entre los legítimos, que son ochenta, hay sesenta y cuatro sin enlace.
+
+370
+00:21:09,880 --> 00:21:13,260
+Ahora multiplicamos, como en la diapositiva diecisiete.
+
+371
+00:21:13,380 --> 00:21:18,094
+El producto para legítimo, que llamamos ese cero:
+
+372
+00:21:18,094 --> 00:21:21,750
+0.80 por 0.10 por 0.80, igual a 0.064.
+
+373
+00:21:21,870 --> 00:21:29,610
+El producto para spam, ese uno: 0.20 por 0.80 por 0.30, igual a 0.048.
+
+374
+00:21:29,730 --> 00:21:36,286
+Y normalizamos: la probabilidad de spam dado oferta y sin enlace es
+
+375
+00:21:36,286 --> 00:21:42,060
+0.048 dividido por 0.064 más 0.048: aproximadamente 0.4286.
+
+376
+00:21:42,180 --> 00:21:44,230
+Dos advertencias de la diapositiva.
+
+377
+00:21:44,350 --> 00:21:47,966
+Los productos ese cero y ese uno todavía no son probabilidades
+
+378
+00:21:47,966 --> 00:21:50,940
+de clase del correo: primero hay que normalizarlos.
+
+379
+00:21:51,060 --> 00:21:54,470
+Y fíjate en el resultado: aunque el correo trae oferta, la
+
+380
+00:21:54,470 --> 00:21:57,410
+probabilidad de spam queda por debajo de un medio.
+
+381
+00:21:57,530 --> 00:22:00,340
+La ausencia del enlace pesó a favor de legítimo.
+
+382
+00:22:00,460 --> 00:22:03,500
+La diapositiva dieciocho compara tres situaciones.
+
+383
+00:22:03,620 --> 00:22:11,420
+Si solo miramos oferta: 0.16 sobre 0.08 más 0.16, que es 0.6667.
+
+384
+00:22:11,540 --> 00:22:16,590
+Si vemos oferta y además vemos que no hay enlace: 0.4286.
+
+385
+00:22:16,710 --> 00:22:25,446
+Y si vemos oferta y enlace, los dos presentes: el producto del spam es 0.20 por 0.80 por
+
+386
+00:22:25,446 --> 00:22:32,990
+0.70, igual a 0.112; el del legítimo, 0.80 por 0.10 por 0.20, igual a 0.016.
+
+387
+00:22:33,110 --> 00:22:39,840
+El resultado: 0.112 sobre 0.128, que es 0.8750.
+
+388
+00:22:39,960 --> 00:22:42,010
+La lectura de la diapositiva es fina.
+
+389
+00:22:42,130 --> 00:22:45,510
+No observar el enlace no es lo mismo que desconocer si existe.
+
+390
+00:22:45,630 --> 00:22:50,560
+Cuando sabemos que no está, la probabilidad baja; cuando sabemos que está, sube.
+
+391
+00:22:50,680 --> 00:22:55,551
+Y con un umbral de 0.50, la ausencia del enlace cambia la decisión: con
+
+392
+00:22:55,551 --> 00:22:59,530
+solo oferta sería spam; con oferta y sin enlace, legítimo.
+
+393
+00:22:59,650 --> 00:23:02,814
+Para completar el cuadro, un cálculo adicional con los
+
+394
+00:23:02,814 --> 00:23:05,510
+mismos factores: los cuatro patrones posibles.
+
+395
+00:23:05,630 --> 00:23:10,790
+Sin oferta y sin enlace: 0.0204, apenas dos por ciento.
+
+396
+00:23:10,910 --> 00:23:14,600
+Sin oferta y con enlace: 0.1628.
+
+397
+00:23:14,720 --> 00:23:19,880
+Con oferta y sin enlace, el de la diapositiva: 0.4286.
+
+398
+00:23:20,000 --> 00:23:23,560
+Y con ambas señales: 0.8750.
+
+399
+00:23:23,680 --> 00:23:28,380
+Cada señal presente empuja hacia spam, y cada ausencia empuja hacia legítimo.
+
+400
+00:23:28,500 --> 00:23:32,020
+Error típico: multiplicar solo las señales presentes.
+
+401
+00:23:32,140 --> 00:23:35,169
+Si ignoramos que el enlace está ausente,
+
+402
+00:23:35,169 --> 00:23:38,500
+volvemos al cálculo con solo oferta: 0.6667.
+
+403
+00:23:38,620 --> 00:23:42,185
+El modelo de Bernoulli usa también las ausencias: el factor del
+
+404
+00:23:42,185 --> 00:23:45,410
+enlace ausente es uno menos la probabilidad de presencia.
+
+405
+00:23:45,530 --> 00:23:50,910
+Y en este correo, esa ausencia baja la probabilidad hasta 0.4286.
+
+406
+00:23:51,030 --> 00:23:52,250
+Piensa un segundo.
+
+407
+00:23:52,370 --> 00:23:55,370
+Un correo no trae oferta, pero sí trae enlace.
+
+408
+00:23:55,490 --> 00:23:59,930
+Con los factores de la diapositiva dieciséis, ¿cuál es su probabilidad de spam?
+
+409
+00:24:00,650 --> 00:24:06,680
+Legítimo: 0.80 por 0.90 por 0.20, 0.144.
+
+410
+00:24:06,800 --> 00:24:12,600
+Spam: 0.20 por 0.20 por 0.70, 0.028.
+
+411
+00:24:12,720 --> 00:24:20,260
+Normalizando, 0.028 sobre 0.172: aproximadamente 0.1628.
+
+412
+00:24:20,380 --> 00:24:24,510
+El enlace sube la probabilidad, pero la falta de oferta pesa más.
+
+413
+00:24:24,630 --> 00:24:28,883
+Para llevarte: el modelo supone que, dentro de cada clase, las señales
+
+414
+00:24:28,883 --> 00:24:32,590
+son independientes, y por eso multiplica un factor por señal.
+
+415
+00:24:32,710 --> 00:24:36,135
+El producto de cada clase lleva la previa, los factores de las
+
+416
+00:24:36,135 --> 00:24:39,450
+señales presentes y los de las ausentes; luego se normaliza.
+
+417
+00:24:39,570 --> 00:24:47,990
+Con oferta y sin enlace: 0.064 y 0.048, y una probabilidad de spam de 0.4286.
+
+418
+00:24:48,110 --> 00:24:52,050
+Siguiente parada: ¿qué pasa si una señal nunca apareció en una clase?
+
+419
+00:24:52,170 --> 00:24:54,910
+El problema de los ceros y el suavizado de Laplace.
+
+420
+00:24:55,810 --> 00:24:58,370
+Quinta parada: el problema de los ceros.
+
+421
+00:24:58,490 --> 00:25:02,370
+Una señal que nunca apareció en una clase puede anular todo el cálculo.
+
+422
+00:25:02,490 --> 00:25:05,710
+El suavizado de Laplace lo evita con una idea muy simple.
+
+423
+00:25:05,830 --> 00:25:09,080
+La diapositiva diecinueve plantea un caso hipotético.
+
+424
+00:25:09,200 --> 00:25:11,823
+Agregamos la palabra premio, que no apareció en
+
+425
+00:25:11,823 --> 00:25:14,000
+ninguno de los veinte spam del ejemplo.
+
+426
+00:25:14,120 --> 00:25:18,360
+Entonces la probabilidad de premio dado spam es cero sobre veinte: cero.
+
+427
+00:25:18,480 --> 00:25:22,537
+Si el próximo correo trae premio, multiplicar por cero anula el producto
+
+428
+00:25:22,537 --> 00:25:26,030
+del spam, aunque todas las demás señales favorezcan esa clase.
+
+429
+00:25:26,150 --> 00:25:29,568
+El punto de la diapositiva es este: observar cero casos en una
+
+430
+00:25:29,568 --> 00:25:32,710
+muestra pequeña no demuestra que el evento sea imposible.
+
+431
+00:25:32,830 --> 00:25:37,610
+El profesor dio un ejemplo práctico: el nombre de una empresa conocida por estafas.
+
+432
+00:25:37,730 --> 00:25:42,660
+Puede aparecer muy pocas veces, pero cuando aparece es una señal muy fuerte de spam.
+
+433
+00:25:42,780 --> 00:25:46,920
+Si su probabilidad queda en cero, perdemos justamente esa señal.
+
+434
+00:25:47,040 --> 00:25:48,210
+Una analogía.
+
+435
+00:25:48,330 --> 00:25:52,860
+Un restaurante nuevo tiene tres reseñas, y ninguna habla de un plato frío.
+
+436
+00:25:52,980 --> 00:25:55,600
+¿Concluyes que ahí nunca sirven un plato frío?
+
+437
+00:25:55,720 --> 00:25:58,510
+Claro que no: tres visitas son muy pocas.
+
+438
+00:25:58,630 --> 00:26:02,660
+Lo razonable es asignarle una probabilidad pequeña, pero no cero.
+
+439
+00:26:02,780 --> 00:26:05,170
+Eso es exactamente lo que hace el suavizado.
+
+440
+00:26:05,290 --> 00:26:09,420
+La diapositiva veinte muestra la solución: el suavizado de Laplace.
+
+441
+00:26:09,540 --> 00:26:12,620
+Agregamos uno al conteo de presente y uno al de ausente.
+
+442
+00:26:12,740 --> 00:26:16,112
+Para premio entre los spam: cero presencias más uno,
+
+443
+00:26:16,112 --> 00:26:18,770
+dividido por veinte correos spam más dos.
+
+444
+00:26:18,890 --> 00:26:23,470
+Uno sobre veintidós: aproximadamente 0.0455.
+
+445
+00:26:23,590 --> 00:26:25,520
+Pequeña, pero ya no es cero.
+
+446
+00:26:25,640 --> 00:26:27,740
+¿Por qué el denominador aumenta en dos?
+
+447
+00:26:27,860 --> 00:26:33,110
+Porque hay dos respuestas posibles, presente y ausente, y a cada una le sumamos uno.
+
+448
+00:26:33,230 --> 00:26:37,185
+Así, las dos probabilidades siguen sumando uno: uno sobre veintidós
+
+449
+00:26:37,185 --> 00:26:40,490
+para presente, y veintiuno sobre veintidós para ausente.
+
+450
+00:26:40,610 --> 00:26:45,282
+Ojo con lo que no se toca: el suavizado modifica las probabilidades de las señales,
+
+451
+00:26:45,282 --> 00:26:49,110
+pero conservamos las frecuencias de clase, ochenta y veinte de cien.
+
+452
+00:26:49,230 --> 00:26:52,980
+En general, llamamos alfa al peso agregado a cada respuesta.
+
+453
+00:26:53,100 --> 00:26:56,066
+La probabilidad de presencia es el conteo más alfa,
+
+454
+00:26:56,066 --> 00:26:58,800
+dividido por el total de la clase más dos alfa.
+
+455
+00:26:58,920 --> 00:27:02,928
+Aquí usamos alfa igual a uno; otros valores, como 0.5
+
+456
+00:27:02,928 --> 00:27:06,180
+o 2, pueden compararse mediante validación.
+
+457
+00:27:06,300 --> 00:27:10,080
+En la grabación a este parámetro se le llama también lambda; en el
+
+458
+00:27:10,080 --> 00:27:13,860
+material, en scikit-learn y en el paquete de R es alfa, o laplace.
+
+459
+00:27:13,980 --> 00:27:18,430
+Volvamos al correo con oferta y sin enlace, ahora con alfa igual a uno.
+
+460
+00:27:18,550 --> 00:27:21,540
+La diapositiva veintiuno reconstruye los factores.
+
+461
+00:27:21,660 --> 00:27:24,947
+Legítimo, oferta presente: ocho más uno, sobre
+
+462
+00:27:24,947 --> 00:27:28,020
+ochenta más dos: nueve sobre ochenta y dos.
+
+463
+00:27:28,140 --> 00:27:31,670
+Enlace ausente: sesenta y cuatro más uno, sobre ochenta
+
+464
+00:27:31,670 --> 00:27:34,430
+y dos: sesenta y cinco sobre ochenta y dos.
+
+465
+00:27:34,550 --> 00:27:37,960
+Spam, oferta presente: dieciséis más uno, sobre
+
+466
+00:27:37,960 --> 00:27:41,080
+veinte más dos: diecisiete sobre veintidós.
+
+467
+00:27:41,200 --> 00:27:46,180
+Enlace ausente: seis más uno, sobre veintidós: siete sobre veintidós.
+
+468
+00:27:46,300 --> 00:27:48,780
+Una precisión sobre la grabación en este punto.
+
+469
+00:27:48,900 --> 00:27:52,953
+Al explicar el siete sobre veintidós, cerca del minuto sesenta y siete, se
+
+470
+00:27:52,953 --> 00:27:56,240
+dijo que los veinte spam observados son ochenta de los cien.
+
+471
+00:27:56,360 --> 00:27:57,740
+Son veinte de los cien.
+
+472
+00:27:57,860 --> 00:28:01,193
+Por eso el denominador es veinte más dos, veintidós:
+
+473
+00:28:01,193 --> 00:28:03,950
+los veinte spam, más los dos del suavizado.
+
+474
+00:28:04,070 --> 00:28:07,000
+Completamos, como en la diapositiva veintidós.
+
+475
+00:28:07,120 --> 00:28:12,195
+El producto del legítimo: 0.80 por nueve sobre ochenta y dos, por
+
+476
+00:28:12,195 --> 00:28:16,880
+sesenta y cinco sobre ochenta y dos: aproximadamente 0.0696.
+
+477
+00:28:17,000 --> 00:28:21,583
+El del spam: 0.20 por diecisiete sobre veintidós, por
+
+478
+00:28:21,583 --> 00:28:25,560
+siete sobre veintidós: aproximadamente 0.0492.
+
+479
+00:28:25,680 --> 00:28:31,380
+Normalizando: la probabilidad de spam queda en aproximadamente 0.4140.
+
+480
+00:28:31,500 --> 00:28:33,853
+El resultado se calcula con las fracciones
+
+481
+00:28:33,853 --> 00:28:36,710
+completas, sin redondear los productos intermedios.
+
+482
+00:28:36,830 --> 00:28:41,050
+Pasamos de 0.4286 a 0.4140.
+
+483
+00:28:41,170 --> 00:28:45,261
+La diapositiva agrega una advertencia importante: el suavizado evita
+
+484
+00:28:45,261 --> 00:28:48,630
+los ceros, pero no corrige la dependencia entre señales.
+
+485
+00:28:48,750 --> 00:28:51,530
+Si oferta y enlace estuvieran repitiendo la misma
+
+486
+00:28:51,530 --> 00:28:53,970
+información, el suavizado no lo arreglaría.
+
+487
+00:28:54,090 --> 00:28:57,151
+La diapositiva veinticuatro repite esta cuenta en R y
+
+488
+00:28:57,151 --> 00:28:59,750
+en Python, y es el primer cálculo del script.
+
+489
+00:28:59,870 --> 00:29:03,610
+El producto del legítimo, el del spam, y la normalización.
+
+490
+00:29:03,730 --> 00:29:09,580
+En los dos lenguajes, la salida es la misma: aproximadamente 0.4140.
+
+491
+00:29:09,700 --> 00:29:12,380
+La diapositiva veinticinco ordena la salida.
+
+492
+00:29:12,500 --> 00:29:17,709
+Oferta entre los spam: sin suavizado, 0.8000; con alfa
+
+493
+00:29:17,709 --> 00:29:22,340
+igual a uno, diecisiete sobre veintidós, 0.7727.
+
+494
+00:29:22,460 --> 00:29:26,880
+Enlace entre los spam: 0.7000 sin suavizado, y
+
+495
+00:29:26,880 --> 00:29:31,300
+quince sobre veintidós, 0.6818, con suavizado.
+
+496
+00:29:31,420 --> 00:29:37,420
+Y la probabilidad de spam del correo: 0.4286 y 0.4140.
+
+497
+00:29:37,540 --> 00:29:40,136
+Las primeras filas describen señales dentro de
+
+498
+00:29:40,136 --> 00:29:42,450
+una clase; la última clasifica el correo.
+
+499
+00:29:42,570 --> 00:29:45,540
+Sobre este cambio, una precisión de la grabación.
+
+500
+00:29:45,660 --> 00:29:48,755
+Cerca del minuto setenta y cinco se dijo que, a modo
+
+501
+00:29:48,755 --> 00:29:51,970
+global, el resultado cambió casi en un uno por ciento.
+
+502
+00:29:52,090 --> 00:29:57,130
+La diferencia es 0.4286 menos 0.4140: 0.0146, es
+
+503
+00:29:57,130 --> 00:30:01,750
+decir, cerca de un punto y medio porcentual.
+
+504
+00:30:01,870 --> 00:30:05,600
+Un cambio pequeño, como se dijo, pero algo mayor que uno.
+
+505
+00:30:05,720 --> 00:30:08,476
+La diapositiva veintiséis muestra cómo el programa
+
+506
+00:30:08,476 --> 00:30:10,680
+aprende estas probabilidades de una vez.
+
+507
+00:30:10,800 --> 00:30:15,051
+Un vector con los correos por clase, ochenta y veinte; una matriz de
+
+508
+00:30:15,051 --> 00:30:18,990
+conteos, con filas legítimo y spam, y columnas oferta y enlace.
+
+509
+00:30:19,110 --> 00:30:21,984
+La probabilidad de presencia es conteos más alfa,
+
+510
+00:30:21,984 --> 00:30:24,740
+dividido por el total de la clase más dos alfa.
+
+511
+00:30:24,860 --> 00:30:28,970
+Para el spam sale diecisiete sobre veintidós y quince sobre veintidós.
+
+512
+00:30:29,090 --> 00:30:32,090
+Y para una ausencia se usa uno menos ese valor.
+
+513
+00:30:32,210 --> 00:30:33,790
+¿Cuándo importa el suavizado?
+
+514
+00:30:33,910 --> 00:30:36,780
+El profesor fue claro: sobre todo cuando hay pocos
+
+515
+00:30:36,780 --> 00:30:39,650
+datos, o señales muy raras que queremos conservar.
+
+516
+00:30:39,770 --> 00:30:44,050
+Con muchos datos y un alfa pequeño, las probabilidades casi no cambian.
+
+517
+00:30:44,170 --> 00:30:49,005
+En Spambase, un cálculo adicional lo confirma: la señal más rara entre los spam
+
+518
+00:30:49,005 --> 00:30:53,290
+aparece en un solo correo, y la más rara entre los legítimos, en ocho.
+
+519
+00:30:53,410 --> 00:30:54,870
+Ninguna queda en cero.
+
+520
+00:30:54,990 --> 00:31:01,280
+Por eso, en la parada nueve, alfa 0.5, uno y dos van a dar resultados casi iguales.
+
+521
+00:31:01,400 --> 00:31:02,750
+Errores típicos.
+
+522
+00:31:02,870 --> 00:31:05,650
+Uno: suavizar también las frecuencias de clase.
+
+523
+00:31:05,770 --> 00:31:08,810
+El suavizado va en las probabilidades de las señales.
+
+524
+00:31:08,930 --> 00:31:12,990
+Dos: creer que el suavizado arregla la dependencia entre señales.
+
+525
+00:31:13,110 --> 00:31:14,180
+No la arregla.
+
+526
+00:31:14,300 --> 00:31:17,080
+Y tres: confundir suavizar con decidir.
+
+527
+00:31:17,200 --> 00:31:20,688
+Alfa cambia el cálculo de la probabilidad; el umbral, que
+
+528
+00:31:20,688 --> 00:31:23,380
+veremos en la parada once, cambia la acción.
+
+529
+00:31:23,500 --> 00:31:24,720
+Piensa un segundo.
+
+530
+00:31:24,840 --> 00:31:28,230
+Una palabra no apareció en ninguno de los ochenta legítimos.
+
+531
+00:31:28,350 --> 00:31:32,910
+Con alfa igual a uno, ¿cuál es su probabilidad de presencia entre los legítimos?
+
+532
+00:31:33,630 --> 00:31:37,524
+Cero más uno, sobre ochenta más dos: uno sobre
+
+533
+00:31:37,524 --> 00:31:40,740
+ochenta y dos, aproximadamente 0.0122.
+
+534
+00:31:40,860 --> 00:31:44,509
+Más pequeña que el 0.0455 de los spam, porque hay más
+
+535
+00:31:44,509 --> 00:31:48,640
+legítimos: la evidencia de que es rara entre ellos es mayor.
+
+536
+00:31:48,760 --> 00:31:52,024
+Para llevarte: un conteo cero haría cero todo el producto
+
+537
+00:31:52,024 --> 00:31:54,600
+de una clase, aunque el evento sea solo raro.
+
+538
+00:31:54,720 --> 00:31:59,395
+Con el suavizado de Laplace, se suma alfa a presente y alfa a
+
+539
+00:31:59,395 --> 00:32:03,380
+ausente: con alfa uno, premio pasa de cero a 0.0455.
+
+540
+00:32:03,500 --> 00:32:09,880
+En el ejemplo, la probabilidad de spam pasa de 0.4286 a 0.4140.
+
+541
+00:32:10,000 --> 00:32:12,970
+Evita ceros, pero no corrige la dependencia.
+
+542
+00:32:13,090 --> 00:32:17,657
+Siguiente parada: separamos aprender de predecir, generalizamos a varias clases y
+
+543
+00:32:17,657 --> 00:32:21,660
+vemos por qué en la práctica se suman logaritmos en vez de multiplicar.
+
+544
+00:32:22,530 --> 00:32:23,630
+Sexta parada.
+
+545
+00:32:23,750 --> 00:32:27,490
+Ordenamos lo que ya sabemos hacer: qué se aprende y qué se predice.
+
+546
+00:32:27,610 --> 00:32:31,132
+Después lo generalizamos a varias clases y a muchas variables,
+
+547
+00:32:31,132 --> 00:32:34,030
+y vemos por qué en la práctica se suman logaritmos.
+
+548
+00:32:34,150 --> 00:32:36,960
+La diapositiva veintitrés separa dos momentos.
+
+549
+00:32:37,080 --> 00:32:40,701
+Ajustar, con correos etiquetados: contamos cuántos correos
+
+550
+00:32:40,701 --> 00:32:43,760
+hay en cada clase y cuántos presentan cada señal.
+
+551
+00:32:43,880 --> 00:32:48,160
+Con esos conteos y el suavizado obtenemos las probabilidades que usará el modelo.
+
+552
+00:32:48,280 --> 00:32:52,074
+Predecir un correo: leemos qué señales están presentes y cuáles
+
+553
+00:32:52,074 --> 00:32:55,446
+ausentes, sin conocer su etiqueta; elegimos los factores
+
+554
+00:32:55,446 --> 00:32:59,120
+correspondientes, multiplicamos por la previa y normalizamos.
+
+555
+00:32:59,240 --> 00:33:01,980
+La consecuencia práctica: las probabilidades se
+
+556
+00:33:01,980 --> 00:33:04,370
+aprenden una sola vez, durante el ajuste.
+
+557
+00:33:04,490 --> 00:33:09,060
+Después sirven para clasificar todos los correos que lleguen, sin volver a contar.
+
+558
+00:33:09,180 --> 00:33:13,288
+Y como explicó el profesor, cuando alguien marca un correo como spam en su
+
+559
+00:33:13,288 --> 00:33:17,340
+bandeja, está agregando un ejemplo etiquetado más para el próximo ajuste.
+
+560
+00:33:17,460 --> 00:33:18,630
+Una analogía.
+
+561
+00:33:18,750 --> 00:33:21,875
+Ajustar es como escribir una tabla de consulta: para
+
+562
+00:33:21,875 --> 00:33:24,520
+cada clase, qué tan frecuente es cada señal.
+
+563
+00:33:24,640 --> 00:33:27,911
+Predecir es consultar esa tabla: buscas las filas de las
+
+564
+00:33:27,911 --> 00:33:30,540
+señales del correo, multiplicas y normalizas.
+
+565
+00:33:30,660 --> 00:33:35,470
+Por eso Naive Bayes es tan rápido: aprender es contar, y predecir es multiplicar.
+
+566
+00:33:35,590 --> 00:33:39,742
+La diapositiva veintisiete pone en una tabla qué responde cada cantidad,
+
+567
+00:33:39,742 --> 00:33:43,260
+para el correo con oferta y sin enlace, con alfa igual a uno.
+
+568
+00:33:43,380 --> 00:33:47,700
+La entrada: las señales que observamos; oferta sí, enlace no.
+
+569
+00:33:47,820 --> 00:33:51,109
+La previa: la frecuencia de clase antes de leer el
+
+570
+00:33:51,109 --> 00:33:53,740
+correo; la probabilidad de spam es 0.20.
+
+571
+00:33:53,860 --> 00:33:57,378
+La condicional: la frecuencia de una señal dentro de una
+
+572
+00:33:57,378 --> 00:34:00,520
+clase; oferta en spam, diecisiete sobre veintidós.
+
+573
+00:34:00,640 --> 00:34:06,970
+Y la posterior: la probabilidad de clase al combinar las señales: 0.4140 de spam.
+
+574
+00:34:07,090 --> 00:34:13,159
+La frase de cierre de esa diapositiva vale oro: el 0.7727 describe la oferta
+
+575
+00:34:13,159 --> 00:34:18,030
+dentro del spam; el 0.4140 describe el spam para este correo.
+
+576
+00:34:18,150 --> 00:34:21,380
+Son preguntas diferentes, igual que en la primera parada.
+
+577
+00:34:21,500 --> 00:34:24,320
+Todo esto sirve también para más de dos clases.
+
+578
+00:34:24,440 --> 00:34:29,600
+La diapositiva veintiocho usa K clases, por ejemplo spam, personal y trabajo.
+
+579
+00:34:29,720 --> 00:34:32,640
+Pi sub ka es la probabilidad previa de la clase ka.
+
+580
+00:34:32,760 --> 00:34:36,443
+Efe sub ka de equis es la probabilidad de las entradas dentro de
+
+581
+00:34:36,443 --> 00:34:39,550
+esa clase; si las entradas son continuas, su densidad.
+
+582
+00:34:39,670 --> 00:34:42,805
+La posterior de la clase ka es su producto, pi por efe,
+
+583
+00:34:42,805 --> 00:34:46,110
+dividido por la suma de los productos de todas las clases.
+
+584
+00:34:46,230 --> 00:34:48,600
+Un ejemplo ilustrativo con tres clases.
+
+585
+00:34:48,720 --> 00:34:55,613
+Tomemos los productos del correo con oferta y sin enlace, 0.064 para legítimo y 0.048
+
+586
+00:34:55,613 --> 00:35:01,370
+para spam, y agreguemos una tercera clase, trabajo, con producto 0.016.
+
+587
+00:35:01,490 --> 00:35:03,730
+La suma es 0.128.
+
+588
+00:35:03,850 --> 00:35:10,790
+Normalizando: legítimo 0.5, spam 0.375 y trabajo 0.125.
+
+589
+00:35:10,910 --> 00:35:15,266
+Al agregar una clase, la probabilidad de spam bajó de
+
+590
+00:35:15,266 --> 00:35:19,540
+0.4286 a 0.375: el denominador tiene un término más.
+
+591
+00:35:19,660 --> 00:35:22,363
+Ahora agregamos el supuesto ingenuo a la fórmula
+
+592
+00:35:22,363 --> 00:35:24,840
+general, como en la diapositiva veintinueve.
+
+593
+00:35:24,960 --> 00:35:29,529
+Con d variables, efe sub ka de equis se reemplaza por el producto de un factor por
+
+594
+00:35:29,529 --> 00:35:33,430
+variable: el factor del valor observado de cada variable en esa clase.
+
+595
+00:35:33,550 --> 00:35:36,580
+Arriba, la previa por el producto de los factores.
+
+596
+00:35:36,700 --> 00:35:40,750
+Abajo, la suma de esos mismos productos sobre todas las clases.
+
+597
+00:35:40,870 --> 00:35:44,004
+La diapositiva lo resume así: el producto recorre
+
+598
+00:35:44,004 --> 00:35:46,690
+las variables; la suma recorre las clases.
+
+599
+00:35:46,810 --> 00:35:49,400
+Con nuestro correo, d es igual a dos.
+
+600
+00:35:49,520 --> 00:35:54,730
+El numerador para spam es 0.20 por diecisiete sobre veintidós, por siete sobre veintidós:
+
+601
+00:35:54,730 --> 00:35:59,120
+exactamente el producto que calculamos con suavizado en la parada anterior.
+
+602
+00:35:59,240 --> 00:36:02,225
+Y aquí aparece un problema práctico, que el script de
+
+603
+00:36:02,225 --> 00:36:04,590
+la clase resuelve sin decirlo en voz alta.
+
+604
+00:36:04,710 --> 00:36:06,140
+Es un cálculo adicional.
+
+605
+00:36:06,260 --> 00:36:11,030
+Al multiplicar muchas probabilidades menores que uno, el producto se hace diminuto.
+
+606
+00:36:11,150 --> 00:36:14,458
+Cero coma tres elevado a seiscientos dieciocho ya es el número
+
+607
+00:36:14,458 --> 00:36:17,500
+positivo más pequeño que el computador puede representar.
+
+608
+00:36:17,620 --> 00:36:21,630
+Y cero coma tres elevado a seiscientos diecinueve da exactamente cero.
+
+609
+00:36:21,750 --> 00:36:25,012
+Con miles de palabras, todos los productos de todas las
+
+610
+00:36:25,012 --> 00:36:27,740
+clases serían cero, y no podríamos normalizar.
+
+611
+00:36:27,860 --> 00:36:30,180
+La solución es trabajar con logaritmos.
+
+612
+00:36:30,300 --> 00:36:33,390
+El logaritmo de un producto es la suma de los logaritmos.
+
+613
+00:36:33,510 --> 00:36:37,439
+Seiscientos diecinueve veces el logaritmo de 0.3 es
+
+614
+00:36:37,439 --> 00:36:42,370
+aproximadamente menos 745.26: un número perfectamente manejable.
+
+615
+00:36:42,490 --> 00:36:46,180
+Así, el logaritmo del producto de cada clase es el logaritmo de la
+
+616
+00:36:46,180 --> 00:36:49,200
+previa, más la suma de los logaritmos de los factores.
+
+617
+00:36:49,320 --> 00:36:51,920
+¿Y cómo se normaliza si tenemos logaritmos?
+
+618
+00:36:52,040 --> 00:36:55,550
+El script de la clase lo hace con una función llamada posterior.
+
+619
+00:36:55,670 --> 00:36:59,190
+Primero, a cada logaritmo le resta el mayor de ellos.
+
+620
+00:36:59,310 --> 00:37:03,050
+Después aplica la exponencial, y finalmente divide por la suma.
+
+621
+00:37:03,170 --> 00:37:07,666
+Restar el máximo no cambia el resultado, porque es dividir todos los productos por el
+
+622
+00:37:07,666 --> 00:37:11,580
+mismo número; pero evita que la exponencial dé cero para todas las clases.
+
+623
+00:37:11,700 --> 00:37:15,710
+Hagámoslo a mano con el correo de oferta y sin enlace, sin suavizado.
+
+624
+00:37:15,830 --> 00:37:24,820
+El logaritmo de 0.064 es menos 2.7489, y el de 0.048, menos 3.0366.
+
+625
+00:37:24,940 --> 00:37:31,560
+Restamos el mayor, menos 2.7489: quedan cero y menos 0.2877.
+
+626
+00:37:31,680 --> 00:37:34,620
+La exponencial da uno y 0.75.
+
+627
+00:37:34,740 --> 00:37:41,670
+Normalizando, 0.75 dividido por 1.75: 0.4286.
+
+628
+00:37:41,790 --> 00:37:46,640
+El mismo resultado de la parada cuatro, sin haber multiplicado números diminutos.
+
+629
+00:37:46,760 --> 00:37:50,440
+Por eso el script de la clase trabaja con logaritmos de principio a fin.
+
+630
+00:37:50,560 --> 00:37:53,227
+Los modelos de scikit-learn tienen un método que
+
+631
+00:37:53,227 --> 00:37:55,450
+entrega directamente log-probabilidades.
+
+632
+00:37:55,570 --> 00:37:59,390
+Y la función medir calcula el log loss con esas log-probabilidades.
+
+633
+00:37:59,510 --> 00:38:02,864
+Su comentario lo explica: los logaritmos estables evitan
+
+634
+00:38:02,864 --> 00:38:05,500
+restar de uno probabilidades casi unitarias.
+
+635
+00:38:05,620 --> 00:38:08,740
+Es un detalle técnico, pero sin él, las
+
+636
+00:38:08,740 --> 00:38:12,660
+probabilidades de 0.99999 o más se redondearían a
+
+637
+00:38:12,660 --> 00:38:12,980
+uno.
+
+638
+00:38:13,100 --> 00:38:14,450
+Errores típicos.
+
+639
+00:38:14,570 --> 00:38:17,104
+Uno: multiplicar cientos de probabilidades
+
+640
+00:38:17,104 --> 00:38:20,000
+directamente y obtener cero en todas las clases.
+
+641
+00:38:20,120 --> 00:38:22,718
+Dos: olvidar que el logaritmo de la previa
+
+642
+00:38:22,718 --> 00:38:25,440
+también se suma; la previa es un factor más.
+
+643
+00:38:25,560 --> 00:38:29,860
+Y tres: tratar la suma de logaritmos como si ya fuera una probabilidad.
+
+644
+00:38:29,980 --> 00:38:33,370
+Es solo un puntaje por clase: todavía hay que normalizar.
+
+645
+00:38:33,490 --> 00:38:34,710
+Piensa un segundo.
+
+646
+00:38:34,830 --> 00:38:39,990
+Tres clases tienen productos 0.02, 0.06 y 0.12.
+
+647
+00:38:40,110 --> 00:38:43,020
+¿Cuál es la probabilidad posterior de la tercera clase?
+
+648
+00:38:43,740 --> 00:38:45,490
+La suma es 0.20.
+
+649
+00:38:45,610 --> 00:38:49,450
+Cero coma doce dividido por 0.20 da 0.6.
+
+650
+00:38:49,570 --> 00:38:53,090
+Y las otras dos: 0.1 y 0.3.
+
+651
+00:38:53,210 --> 00:38:54,520
+Las tres suman uno.
+
+652
+00:38:54,640 --> 00:38:59,250
+Hasta aquí, la primera mitad de la clase, y la diapositiva treinta la resume.
+
+653
+00:38:59,370 --> 00:39:05,305
+Con los cien correos y alfa igual a uno, el correo con oferta y sin enlace tiene
+
+654
+00:39:05,305 --> 00:39:10,720
+probabilidad de spam 0.4140; con umbral 0.50, se clasifica como legítimo.
+
+655
+00:39:10,840 --> 00:39:15,740
+Ahora viene la segunda parte: aplicar la receta a cincuenta y cuatro señales reales, y
+
+656
+00:39:15,740 --> 00:39:19,900
+comprobar las probabilidades en correos que no participaron en el ajuste.
+
+657
+00:39:20,020 --> 00:39:23,935
+Para llevarte: ajustar es contar y suavizar; predecir es elegir
+
+658
+00:39:23,935 --> 00:39:26,980
+factores, multiplicar por la previa y normalizar.
+
+659
+00:39:27,100 --> 00:39:30,663
+Con K clases, el denominador suma K productos; con d
+
+660
+00:39:30,663 --> 00:39:33,540
+variables, cada producto tiene d factores.
+
+661
+00:39:33,660 --> 00:39:35,996
+Y en la práctica se suman logaritmos y se
+
+662
+00:39:35,996 --> 00:39:38,730
+normaliza restando el máximo, para no desbordar.
+
+663
+00:39:38,850 --> 00:39:41,080
+Siguiente parada: Spambase.
+
+664
+00:39:41,200 --> 00:39:44,779
+Cuatro mil seiscientos un correos reales, cincuenta y cuatro
+
+665
+00:39:44,779 --> 00:39:48,180
+señales, y la probabilidad de spam de un correo concreto.
+
+666
+00:39:49,050 --> 00:39:50,210
+Séptima parada.
+
+667
+00:39:50,330 --> 00:39:56,030
+Dejamos los cien correos construidos y pasamos a 4601 correos reales de Spambase.
+
+668
+00:39:56,150 --> 00:39:59,274
+Vamos a ver qué contiene cada fila, cómo se separan los
+
+669
+00:39:59,274 --> 00:40:02,170
+datos y qué probabilidad recibe un correo concreto.
+
+670
+00:40:02,290 --> 00:40:05,080
+La diapositiva treinta y uno presenta los datos.
+
+671
+00:40:05,200 --> 00:40:08,790
+Cuarenta y ocho frecuencias de palabras, que describen el contenido.
+
+672
+00:40:08,910 --> 00:40:13,470
+Seis frecuencias de caracteres, como el signo de exclamación o el signo pesos.
+
+673
+00:40:13,590 --> 00:40:16,740
+Y la etiqueta de cada correo: spam o legítimo.
+
+674
+00:40:16,860 --> 00:40:19,440
+En total, cincuenta y cuatro señales.
+
+675
+00:40:19,560 --> 00:40:24,090
+El archivo trae además tres medidas de mayúsculas, que se excluyen del modelo.
+
+676
+00:40:24,210 --> 00:40:29,297
+Sobre la fuente: es el conjunto Spambase, de Hopkins y coautores, de mil novecientos
+
+677
+00:40:29,297 --> 00:40:33,900
+noventa y nueve, publicado en el repositorio de la UCI con licencia abierta.
+
+678
+00:40:34,020 --> 00:40:37,960
+Son correos históricos, de fines de los noventa: el mismo conjunto que
+
+679
+00:40:37,960 --> 00:40:41,450
+usamos en la clase treinta y ocho para evaluar clasificadores.
+
+680
+00:40:41,570 --> 00:40:45,023
+Y la pregunta es la misma de siempre: dadas las señales de un
+
+681
+00:40:45,023 --> 00:40:48,080
+correo, ¿qué probabilidad de spam le asigna el modelo?
+
+682
+00:40:48,200 --> 00:40:51,774
+La diapositiva treinta y dos muestra una fila: el correo con
+
+683
+00:40:51,774 --> 00:40:55,050
+identificador uno, el menor del conjunto de desarrollo.
+
+684
+00:40:55,170 --> 00:41:00,310
+La palabra free: 0.32 por ciento de las palabras; presencia, uno.
+
+685
+00:41:00,430 --> 00:41:04,180
+La palabra money: cero por ciento; presencia, cero.
+
+686
+00:41:04,300 --> 00:41:10,640
+El carácter de exclamación: 0.778 por ciento de los caracteres; presencia, uno.
+
+687
+00:41:10,760 --> 00:41:16,680
+Ojo con la escala: el archivo guarda 0.32 para representar 0.32 por ciento.
+
+688
+00:41:16,800 --> 00:41:18,140
+Dos detalles más.
+
+689
+00:41:18,260 --> 00:41:21,521
+La predicción usa solo las señales: el identificador y la
+
+690
+00:41:21,521 --> 00:41:24,210
+etiqueta del correo no son entradas del modelo.
+
+691
+00:41:24,330 --> 00:41:27,771
+Y un dato adicional: de las cincuenta y cuatro señales de este
+
+692
+00:41:27,771 --> 00:41:30,990
+correo, nueve están presentes y cuarenta y cinco ausentes.
+
+693
+00:41:31,110 --> 00:41:34,630
+Para Bernoulli, las cuarenta y cinco ausencias también cuentan.
+
+694
+00:41:34,750 --> 00:41:37,455
+En código, la diapositiva treinta y tres lee el
+
+695
+00:41:37,455 --> 00:41:39,700
+archivo y separa entradas de respuesta.
+
+696
+00:41:39,820 --> 00:41:43,425
+Las variables se eligen por el nombre: las que empiezan con el prefijo de
+
+697
+00:41:43,425 --> 00:41:46,240
+frecuencia de palabra o con el de frecuencia de carácter.
+
+698
+00:41:46,360 --> 00:41:49,498
+Se toma el conjunto de entrenamiento, se arma la matriz X
+
+699
+00:41:49,498 --> 00:41:52,140
+con esas columnas y el vector y con la etiqueta.
+
+700
+00:41:52,260 --> 00:41:55,091
+Resultado: X tiene tres mil seiscientos ochenta
+
+701
+00:41:55,091 --> 00:41:57,560
+correos y cincuenta y cuatro frecuencias.
+
+702
+00:41:57,680 --> 00:42:00,568
+Elegir por nombre deja fuera identificadores,
+
+703
+00:42:00,568 --> 00:42:03,070
+grupos, pliegues y la propia respuesta.
+
+704
+00:42:03,190 --> 00:42:07,190
+La diapositiva treinta y cuatro conserva la partición guardada en los datos.
+
+705
+00:42:07,310 --> 00:42:12,630
+Desarrollo: tres mil seiscientos ochenta correos, para aprender y comparar recetas.
+
+706
+00:42:12,750 --> 00:42:17,290
+Prueba histórica: novecientos veintiuno, para comprobar la receta elegida.
+
+707
+00:42:17,410 --> 00:42:21,948
+Contando los datos: en desarrollo hay dos mil doscientos treinta legítimos y
+
+708
+00:42:21,948 --> 00:42:26,426
+mil cuatrocientos cincuenta spam, un 39.4 por ciento de spam; en la prueba,
+
+709
+00:42:26,426 --> 00:42:29,830
+quinientos cincuenta y ocho y trescientos sesenta y tres.
+
+710
+00:42:29,950 --> 00:42:33,000
+Dentro del desarrollo, se usan cinco pliegues.
+
+711
+00:42:33,120 --> 00:42:36,330
+En cada vuelta se aprende con cuatro y se predice el restante.
+
+712
+00:42:36,450 --> 00:42:39,890
+Al repetirlo cinco veces, cada correo recibe una
+
+713
+00:42:39,890 --> 00:42:43,330
+predicción fuera de pliegue, que abreviamos OOF.
+
+714
+00:42:43,450 --> 00:42:46,805
+Un detalle de diseño: las filas con las mismas cincuenta y siete
+
+715
+00:42:46,805 --> 00:42:49,950
+entradas originales se mantienen juntas en el mismo pliegue.
+
+716
+00:42:50,070 --> 00:42:55,860
+En los datos hay 4601 filas, pero solo cuatro mil doscientos siete grupos distintos.
+
+717
+00:42:55,980 --> 00:43:00,410
+Así, un correo repetido no puede estar a la vez en el ajuste y en la validación.
+
+718
+00:43:00,530 --> 00:43:05,187
+Y una advertencia honesta de la diapositiva: los novecientos veintiuno correos de prueba
+
+719
+00:43:05,187 --> 00:43:09,050
+ya se usaron al evaluar otros clasificadores, en la clase treinta y ocho.
+
+720
+00:43:09,170 --> 00:43:13,450
+Por eso la comprobación final es histórica, no una nueva prueba independiente.
+
+721
+00:43:13,570 --> 00:43:17,900
+Ahora, la primera predicción real, de la diapositiva treinta y cinco.
+
+722
+00:43:18,020 --> 00:43:21,440
+La función ajustar predecir, incluida en los dos scripts,
+
+723
+00:43:21,440 --> 00:43:24,680
+recibe los datos de ajuste y los correos por predecir.
+
+724
+00:43:24,800 --> 00:43:27,130
+Usamos Bernoulli con alfa igual a uno.
+
+725
+00:43:27,250 --> 00:43:29,960
+Internamente transforma cada frecuencia positiva en
+
+726
+00:43:29,960 --> 00:43:32,670
+presencia y combina las cincuenta y cuatro señales.
+
+727
+00:43:32,790 --> 00:43:35,620
+Para el correo de identificador uno, la
+
+728
+00:43:35,620 --> 00:43:39,030
+probabilidad de spam es aproximadamente 0.9964.
+
+729
+00:43:39,150 --> 00:43:40,970
+Una precisión sobre la grabación.
+
+730
+00:43:41,090 --> 00:43:45,088
+Al mostrar este resultado, cerca del minuto noventa
+
+731
+00:43:45,088 --> 00:43:48,380
+y dos, se leyó una probabilidad de 0.9954.
+
+732
+00:43:48,500 --> 00:43:56,570
+La diapositiva y el script dan 0.9964; recalculado con el script, 0.996442.
+
+733
+00:43:56,690 --> 00:43:59,610
+Y una advertencia importante de la misma diapositiva.
+
+734
+00:43:59,730 --> 00:44:03,470
+Este correo participa en el ajuste: el modelo aprendió con él.
+
+735
+00:44:03,590 --> 00:44:08,790
+Por eso el 0.9964 ilustra una predicción, pero no evalúa nada.
+
+736
+00:44:08,910 --> 00:44:12,680
+La calidad del filtro se va a medir con las probabilidades fuera de pliegue.
+
+737
+00:44:12,800 --> 00:44:15,767
+La diapositiva treinta y seis hace una pregunta clave:
+
+738
+00:44:15,767 --> 00:44:18,350
+¿basta con saber que una palabra está presente?
+
+739
+00:44:18,470 --> 00:44:22,363
+Con presencia, free entra como uno, porque 0.32 es mayor
+
+740
+00:44:22,363 --> 00:44:25,560
+que cero: solo sabemos que la palabra aparece.
+
+741
+00:44:25,680 --> 00:44:28,594
+Con frecuencia, entra como 0.32: sabemos qué
+
+742
+00:44:28,594 --> 00:44:31,640
+proporción de las palabras corresponde a free.
+
+743
+00:44:31,760 --> 00:44:37,150
+Bernoulli trata igual cualquier frecuencia positiva: 0.01 o diez da lo mismo.
+
+744
+00:44:37,270 --> 00:44:38,440
+Una analogía.
+
+745
+00:44:38,560 --> 00:44:41,570
+Presencia es preguntar: ¿tienes fiebre, sí o no?
+
+746
+00:44:41,690 --> 00:44:45,560
+Frecuencia es mirar el termómetro: treinta y siete y medio o cuarenta.
+
+747
+00:44:45,680 --> 00:44:49,290
+El termómetro da más información, pero para usarla hay que suponer
+
+748
+00:44:49,290 --> 00:44:52,080
+cómo se distribuyen las temperaturas en cada clase.
+
+749
+00:44:52,200 --> 00:44:56,690
+Y la diapositiva lo dice así: conservar más detalle exige otro supuesto, y
+
+750
+00:44:56,690 --> 00:45:00,270
+hay que comprobar si ese detalle mejora las probabilidades.
+
+751
+00:45:00,390 --> 00:45:02,560
+Errores típicos con datos reales.
+
+752
+00:45:02,680 --> 00:45:05,677
+Uno: dejar entrar el identificador, el pliegue o
+
+753
+00:45:05,677 --> 00:45:08,300
+la propia etiqueta como si fueran señales.
+
+754
+00:45:08,420 --> 00:45:10,890
+Seleccionar las columnas por nombre lo evita.
+
+755
+00:45:11,010 --> 00:45:14,053
+Dos: evaluar el filtro con un correo que participó
+
+756
+00:45:14,053 --> 00:45:16,670
+en el ajuste, como el de identificador uno.
+
+757
+00:45:16,790 --> 00:45:21,630
+Y tres: mirar los correos de prueba mientras todavía se están comparando recetas.
+
+758
+00:45:21,750 --> 00:45:22,970
+Piensa un segundo.
+
+759
+00:45:23,090 --> 00:45:28,120
+En un correo de doscientas palabras, la frecuencia de free es 1.5 por ciento.
+
+760
+00:45:28,240 --> 00:45:32,690
+¿Cuántas veces aparece la palabra, y qué valor entra en el modelo de Bernoulli?
+
+761
+00:45:33,410 --> 00:45:37,440
+El 1.5 por ciento de doscientas palabras son tres apariciones.
+
+762
+00:45:37,560 --> 00:45:40,350
+Pero en Bernoulli entra solo un uno: presente.
+
+763
+00:45:40,470 --> 00:45:43,760
+Fíjate que para saber las tres apariciones necesitamos la
+
+764
+00:45:43,760 --> 00:45:47,050
+longitud del correo; con el porcentaje solo, no se puede.
+
+765
+00:45:47,170 --> 00:45:49,400
+Eso va a importar en la próxima parada.
+
+766
+00:45:49,520 --> 00:45:54,799
+Para llevarte: Spambase tiene 4601 correos y cincuenta y cuatro frecuencias; se aprende
+
+767
+00:45:54,799 --> 00:45:59,290
+con tres mil seiscientos ochenta y se comprueba con novecientos veintiuno.
+
+768
+00:45:59,410 --> 00:46:02,660
+Bernoulli convierte cada frecuencia positiva en presencia.
+
+769
+00:46:02,780 --> 00:46:07,598
+Y el correo de identificador uno recibe 0.9964 de probabilidad de
+
+770
+00:46:07,598 --> 00:46:11,600
+spam, pero participó en el ajuste: ilustra, no evalúa.
+
+771
+00:46:11,720 --> 00:46:14,010
+Siguiente parada: las variantes.
+
+772
+00:46:14,130 --> 00:46:17,211
+La gaussiana, que usa la frecuencia transformada,
+
+773
+00:46:17,211 --> 00:46:19,600
+y la multinomial, que cuenta palabras.
+
+774
+00:46:20,490 --> 00:46:21,550
+Octava parada.
+
+775
+00:46:21,670 --> 00:46:25,840
+El esquema es siempre el mismo: previa por factores, y normalizar.
+
+776
+00:46:25,960 --> 00:46:28,902
+Lo que cambia entre variantes es cómo se calcula cada
+
+777
+00:46:28,902 --> 00:46:31,900
+factor, y eso depende de cómo representamos el correo.
+
+778
+00:46:32,020 --> 00:46:35,430
+La diapositiva treinta y siete presenta la variante gaussiana.
+
+779
+00:46:35,550 --> 00:46:39,900
+Describe los valores de cada variable con una curva normal dentro de cada clase.
+
+780
+00:46:40,020 --> 00:46:44,655
+Qué aprende: una media, que sitúa el centro de la curva, y una dispersión,
+
+781
+00:46:44,655 --> 00:46:48,350
+que determina su amplitud, para cada variable y cada clase.
+
+782
+00:46:48,470 --> 00:46:52,711
+Cómo predice: evalúa las alturas de las curvas en los valores del correo,
+
+783
+00:46:52,711 --> 00:46:56,430
+multiplica esas alturas y la previa de clase, y luego normaliza.
+
+784
+00:46:56,550 --> 00:47:00,272
+Una advertencia de la misma diapositiva: la altura de la curva es
+
+785
+00:47:00,272 --> 00:47:03,250
+una densidad, no la probabilidad de un valor exacto.
+
+786
+00:47:03,370 --> 00:47:05,220
+Puede incluso ser mayor que uno.
+
+787
+00:47:05,340 --> 00:47:07,977
+Y se conserva el supuesto ingenuo: independencia
+
+788
+00:47:07,977 --> 00:47:10,010
+entre variables dentro de cada clase.
+
+789
+00:47:10,130 --> 00:47:13,000
+El script de la clase trae un ejemplo ilustrativo.
+
+790
+00:47:13,120 --> 00:47:16,460
+Una medición ficticia, equis igual a 1.5.
+
+791
+00:47:16,580 --> 00:47:21,160
+La clase cero tiene media cero, desviación uno y previa 0.8.
+
+792
+00:47:21,280 --> 00:47:25,910
+La clase uno tiene media dos, desviación uno y previa 0.2.
+
+793
+00:47:26,030 --> 00:47:29,308
+El gráfico muestra cada curva ya multiplicada por su
+
+794
+00:47:29,308 --> 00:47:32,270
+previa, y la línea punteada marca el valor 1.5.
+
+795
+00:47:32,390 --> 00:47:33,500
+Hagamos la cuenta.
+
+796
+00:47:33,620 --> 00:47:39,466
+La altura de la curva cero en 1.5: la exponencial de menos 1.5 al cuadrado
+
+797
+00:47:39,466 --> 00:47:44,680
+sobre dos, dividida por la raíz de dos pi: aproximadamente 0.1295.
+
+798
+00:47:44,800 --> 00:47:48,928
+La de la curva uno: la exponencial de menos 0.5 al
+
+799
+00:47:48,928 --> 00:47:52,890
+cuadrado sobre dos, sobre la misma raíz: 0.3521.
+
+800
+00:47:53,010 --> 00:48:04,270
+Multiplicamos por las previas: 0.8 por 0.1295 da 0.1036, y 0.2 por 0.3521 da 0.0704.
+
+801
+00:48:04,390 --> 00:48:10,260
+Normalizando, la probabilidad de la clase uno es aproximadamente 0.4046.
+
+802
+00:48:10,380 --> 00:48:12,100
+Fíjate en algo interesante.
+
+803
+00:48:12,220 --> 00:48:15,974
+La densidad de la clase uno en 1.5 es casi tres veces la de la
+
+804
+00:48:15,974 --> 00:48:18,940
+clase cero: el valor está más cerca de su centro.
+
+805
+00:48:19,060 --> 00:48:21,930
+Pero la previa de la clase cero es cuatro veces mayor.
+
+806
+00:48:22,050 --> 00:48:25,695
+Y la previa gana: la probabilidad de la clase uno
+
+807
+00:48:25,695 --> 00:48:28,670
+queda en 0.4046, por debajo de un medio.
+
+808
+00:48:28,790 --> 00:48:31,300
+Para aplicar la gaussiana a las frecuencias, la
+
+809
+00:48:31,300 --> 00:48:33,970
+diapositiva treinta y ocho las transforma primero.
+
+810
+00:48:34,090 --> 00:48:37,780
+Las frecuencias no son negativas, y algunas pueden ser grandes.
+
+811
+00:48:37,900 --> 00:48:42,370
+En la receta gaussiana se usa zeta igual al logaritmo natural de uno más equis.
+
+812
+00:48:42,490 --> 00:48:46,625
+Para free en el correo de identificador uno: el
+
+813
+00:48:46,625 --> 00:48:50,320
+logaritmo de 1.32, aproximadamente 0.2776.
+
+814
+00:48:50,440 --> 00:48:54,490
+Para money, que vale cero: el logaritmo de uno, que es cero.
+
+815
+00:48:54,610 --> 00:48:58,330
+La transformación comprime los valores grandes y conserva los ceros.
+
+816
+00:48:58,450 --> 00:48:59,450
+¿Cuánto comprime?
+
+817
+00:48:59,570 --> 00:49:03,858
+Un cálculo adicional con el valor más grande del archivo: una de las
+
+818
+00:49:03,858 --> 00:49:07,830
+palabras del vocabulario llega a 42.81 por ciento en un correo.
+
+819
+00:49:07,950 --> 00:49:13,730
+Transformado, el logaritmo de 43.81 es aproximadamente 3.78.
+
+820
+00:49:13,850 --> 00:49:16,490
+Medias y dispersiones se aprenden en esta escala.
+
+821
+00:49:16,610 --> 00:49:20,407
+Y la diapositiva advierte: transformar no garantiza normalidad ni
+
+822
+00:49:20,407 --> 00:49:23,620
+independencia; lo dirá la comparación fuera de pliegue.
+
+823
+00:49:23,740 --> 00:49:27,006
+En código, R y Python usan la función log uno pe, que
+
+824
+00:49:27,006 --> 00:49:30,210
+calcula el logaritmo de uno más equis con precisión.
+
+825
+00:49:30,330 --> 00:49:33,000
+Aquí corresponde una precisión sobre la grabación.
+
+826
+00:49:33,120 --> 00:49:37,251
+Al hablar de esta transformación, cerca del minuto noventa y seis, se dijo que
+
+827
+00:49:37,251 --> 00:49:40,800
+las frecuencias a lo más pueden ser cero y a lo más pueden ser uno.
+
+828
+00:49:40,920 --> 00:49:45,001
+En este archivo las frecuencias son porcentajes: pueden ir de
+
+829
+00:49:45,001 --> 00:49:48,480
+cero a cien, y el valor más alto observado es 42.81.
+
+830
+00:49:48,600 --> 00:49:52,360
+Justamente por eso conviene comprimirlas, como se dijo enseguida.
+
+831
+00:49:52,480 --> 00:49:56,440
+La tercera variante es la multinomial, en la diapositiva treinta y nueve.
+
+832
+00:49:56,560 --> 00:49:58,690
+Contar repeticiones requiere el texto.
+
+833
+00:49:58,810 --> 00:50:02,894
+Con un vocabulario de tres términos, oferta, reunión y hoy, el
+
+834
+00:50:02,894 --> 00:50:06,320
+mensaje oferta hoy tiene los conteos uno, cero, uno.
+
+835
+00:50:06,440 --> 00:50:09,970
+El mensaje oferta oferta hoy tiene dos, cero, uno.
+
+836
+00:50:10,090 --> 00:50:15,120
+En Bernoulli, los dos mensajes tienen las mismas presencias: uno, cero, uno.
+
+837
+00:50:15,240 --> 00:50:17,890
+En la multinomial, cada aparición aporta un
+
+838
+00:50:17,890 --> 00:50:20,540
+factor: la repetición sí cambia el cálculo.
+
+839
+00:50:20,660 --> 00:50:23,180
+El script de la clase hace la cuenta completa.
+
+840
+00:50:23,300 --> 00:50:25,180
+Cuenta las palabras de cada clase.
+
+841
+00:50:25,300 --> 00:50:28,870
+Legítimo: cero oferta, cuatro reunión y dos hoy.
+
+842
+00:50:28,990 --> 00:50:32,340
+Spam: cuatro oferta, cero reunión y dos hoy.
+
+843
+00:50:32,460 --> 00:50:36,369
+Suaviza sumando uno a cada término y tres al total, porque hay
+
+844
+00:50:36,369 --> 00:50:40,026
+tres términos: en el spam, oferta queda en cinco novenos y
+
+845
+00:50:40,026 --> 00:50:42,990
+reunión en un noveno; en el legítimo, al revés.
+
+846
+00:50:43,110 --> 00:50:45,610
+Hoy queda en tres novenos en las dos clases.
+
+847
+00:50:45,730 --> 00:50:47,990
+Y la previa es un medio para cada clase.
+
+848
+00:50:48,110 --> 00:50:49,810
+Ahora los dos mensajes.
+
+849
+00:50:49,930 --> 00:50:53,443
+Oferta hoy: el spam multiplica cinco novenos por tres
+
+850
+00:50:53,443 --> 00:50:56,690
+novenos; el legítimo, un noveno por tres novenos.
+
+851
+00:50:56,810 --> 00:51:00,511
+El cociente es cinco, así que la probabilidad de
+
+852
+00:51:00,511 --> 00:51:03,980
+spam es cinco sextos, aproximadamente 0.8333.
+
+853
+00:51:04,100 --> 00:51:08,200
+Oferta oferta hoy: ahora oferta entra dos veces, al cuadrado.
+
+854
+00:51:08,320 --> 00:51:12,331
+El cociente pasa a veinticinco, y la probabilidad, a
+
+855
+00:51:12,331 --> 00:51:16,420
+veinticinco sobre veintiséis: aproximadamente 0.9615.
+
+856
+00:51:16,540 --> 00:51:21,240
+En Bernoulli, los dos mensajes habrían recibido exactamente la misma probabilidad.
+
+857
+00:51:21,360 --> 00:51:23,770
+Una analogía para las tres variantes.
+
+858
+00:51:23,890 --> 00:51:25,990
+Piensa en describir un plato por su ajo.
+
+859
+00:51:26,110 --> 00:51:29,060
+Bernoulli pregunta: ¿tiene ajo, sí o no?
+
+860
+00:51:29,180 --> 00:51:32,170
+La gaussiana mide: ¿cuántos gramos de ajo tiene?
+
+861
+00:51:32,290 --> 00:51:33,710
+Una medición continua.
+
+862
+00:51:33,830 --> 00:51:36,770
+Y la multinomial cuenta: ¿cuántos dientes de ajo?
+
+863
+00:51:36,890 --> 00:51:41,700
+Para contar dientes necesitas el plato; con el porcentaje de ajo, no alcanza.
+
+864
+00:51:41,820 --> 00:51:46,020
+La diapositiva cuarenta aterriza todo en nuestras cincuenta y cuatro frecuencias.
+
+865
+00:51:46,140 --> 00:51:50,750
+Bernoulli necesita presencias o ausencias: usamos frecuencia mayor que cero.
+
+866
+00:51:50,870 --> 00:51:53,412
+La gaussiana necesita mediciones numéricas:
+
+867
+00:51:53,412 --> 00:51:56,190
+probamos el logaritmo de uno más la frecuencia.
+
+868
+00:51:56,310 --> 00:51:59,569
+La multinomial necesita conteos de términos, y eso requiere
+
+869
+00:51:59,569 --> 00:52:03,160
+información adicional: un porcentaje no permite recuperar cuántas
+
+870
+00:52:03,160 --> 00:52:06,640
+veces apareció una palabra sin conocer la longitud del mensaje.
+
+871
+00:52:06,760 --> 00:52:11,050
+Por eso, en la clase no se tratan estas frecuencias como conteos de palabras.
+
+872
+00:52:11,170 --> 00:52:14,148
+Se comparan Bernoulli y la receta gaussiana, sobre
+
+873
+00:52:14,148 --> 00:52:16,590
+los mismos correos y los mismos pliegues.
+
+874
+00:52:16,710 --> 00:52:20,310
+Y la pregunta siguiente es cuál produce mejores probabilidades.
+
+875
+00:52:20,430 --> 00:52:22,470
+Errores típicos con las variantes.
+
+876
+00:52:22,590 --> 00:52:26,820
+Uno: leer la altura de la curva gaussiana como si fuera una probabilidad.
+
+877
+00:52:26,940 --> 00:52:31,430
+Dos: aplicar la multinomial a porcentajes, como si fueran conteos.
+
+878
+00:52:31,550 --> 00:52:36,000
+Y tres: creer que la transformación logarítmica vuelve normales los datos.
+
+879
+00:52:36,120 --> 00:52:39,600
+Comprime, pero no garantiza nada: hay que comprobarlo.
+
+880
+00:52:39,720 --> 00:52:40,940
+Piensa un segundo.
+
+881
+00:52:41,060 --> 00:52:45,460
+Con la misma multinomial del script, el mensaje es oferta oferta oferta hoy.
+
+882
+00:52:45,580 --> 00:52:47,410
+¿Cuál es la probabilidad de spam?
+
+883
+00:52:47,530 --> 00:52:50,200
+¿Y qué daría Bernoulli comparado con oferta hoy?
+
+884
+00:52:50,920 --> 00:52:55,860
+Oferta entra tres veces: el cociente es cinco al cubo, ciento veinticinco.
+
+885
+00:52:55,980 --> 00:52:59,704
+La probabilidad de spam es ciento veinticinco sobre
+
+886
+00:52:59,704 --> 00:53:02,770
+ciento veintiséis, aproximadamente 0.9921.
+
+887
+00:53:02,890 --> 00:53:06,100
+En Bernoulli no cambia nada respecto de oferta hoy:
+
+888
+00:53:06,100 --> 00:53:08,870
+las presencias siguen siendo uno, cero, uno.
+
+889
+00:53:08,990 --> 00:53:13,055
+Para llevarte: la representación decide la variante: presencias para
+
+890
+00:53:13,055 --> 00:53:17,180
+Bernoulli, mediciones para la gaussiana, conteos para la multinomial.
+
+891
+00:53:17,300 --> 00:53:22,202
+La gaussiana multiplica densidades, no probabilidades; con
+
+892
+00:53:22,202 --> 00:53:26,090
+equis igual a 1.5, la previa gana y da 0.4046.
+
+893
+00:53:26,210 --> 00:53:30,133
+Y con frecuencias en porcentaje, la multinomial no se puede aplicar: se
+
+894
+00:53:30,133 --> 00:53:34,000
+comparan Bernoulli y la gaussiana sobre el logaritmo de uno más equis.
+
+895
+00:53:34,120 --> 00:53:38,329
+Siguiente parada: comparamos las recetas con predicciones fuera de pliegue, y
+
+896
+00:53:38,329 --> 00:53:42,100
+descubrimos que acertar no es lo mismo que dar buenas probabilidades.
+
+897
+00:53:42,970 --> 00:53:44,090
+Novena parada.
+
+898
+00:53:44,210 --> 00:53:46,350
+Tenemos cinco recetas candidatas.
+
+899
+00:53:46,470 --> 00:53:50,632
+Las vamos a comparar con predicciones fuera de pliegue, y vamos a ver por qué un
+
+900
+00:53:50,632 --> 00:53:53,910
+modelo que acierta bastante puede dar probabilidades muy malas.
+
+901
+00:53:54,030 --> 00:53:57,957
+La diapositiva cuarenta y uno define los candidatos, todos con las mismas
+
+902
+00:53:57,957 --> 00:54:01,130
+cincuenta y cuatro frecuencias y los mismos cinco pliegues.
+
+903
+00:54:01,250 --> 00:54:06,270
+Una referencia: la frecuencia de spam, una probabilidad sin usar ninguna señal.
+
+904
+00:54:06,390 --> 00:54:10,550
+Tres recetas de Bernoulli, con alfa 0.5, uno y dos.
+
+905
+00:54:10,670 --> 00:54:15,440
+Y una receta gaussiana, con medias y dispersiones del logaritmo de uno más equis.
+
+906
+00:54:15,560 --> 00:54:17,210
+Son cinco candidatos.
+
+907
+00:54:17,330 --> 00:54:20,110
+¿Por qué incluir una referencia que no usa señales?
+
+908
+00:54:20,230 --> 00:54:24,930
+Porque si una receta complicada no le gana a dividir dos números, no vale la pena.
+
+909
+00:54:25,050 --> 00:54:27,777
+El profesor lo dijo así: por qué complicarse la
+
+910
+00:54:27,777 --> 00:54:30,040
+vida si con dos divisiones queda mejor.
+
+911
+00:54:30,160 --> 00:54:33,699
+Y la regla de elección tiene dos pasos: primero, el
+
+912
+00:54:33,699 --> 00:54:36,960
+menor log loss; después, el umbral del ganador.
+
+913
+00:54:37,080 --> 00:54:41,350
+Primero comparamos probabilidades; después decidimos qué hacer con ellas.
+
+914
+00:54:41,470 --> 00:54:45,290
+Recordemos el log loss, que ya usamos en la clase treinta y ocho.
+
+915
+00:54:45,410 --> 00:54:49,162
+Para cada correo, miramos la probabilidad que el modelo le dio a la
+
+916
+00:54:49,162 --> 00:54:52,410
+clase que realmente ocurrió, y tomamos menos su logaritmo.
+
+917
+00:54:52,530 --> 00:54:53,880
+Luego promediamos.
+
+918
+00:54:54,000 --> 00:54:58,052
+Un cálculo adicional para sentirlo: si era spam y
+
+919
+00:54:58,052 --> 00:55:01,360
+el modelo dijo 0.9, el castigo es 0.105.
+
+920
+00:55:01,480 --> 00:55:05,520
+Si dijo 0.1, el castigo es 2.303.
+
+921
+00:55:05,640 --> 00:55:10,410
+Y si dijo 0.001, el castigo es 6.908.
+
+922
+00:55:10,530 --> 00:55:13,410
+Equivocarse con mucha seguridad sale carísimo.
+
+923
+00:55:13,530 --> 00:55:15,230
+¿Con qué predicciones se calcula?
+
+924
+00:55:15,350 --> 00:55:17,660
+La diapositiva cuarenta y dos lo dibuja.
+
+925
+00:55:17,780 --> 00:55:20,094
+Los tres mil seiscientos ochenta correos de
+
+926
+00:55:20,094 --> 00:55:22,570
+desarrollo están repartidos en cinco pliegues.
+
+927
+00:55:22,690 --> 00:55:27,640
+Se ajusta con cuatro, se predice el pliegue apartado, y se repite cinco veces.
+
+928
+00:55:27,760 --> 00:55:31,354
+Así, cada correo recibe una probabilidad que no participó en
+
+929
+00:55:31,354 --> 00:55:34,290
+su propio ajuste: la predicción fuera de pliegue.
+
+930
+00:55:34,410 --> 00:55:38,130
+Cinco recetas por cinco pliegues: veinticinco ajustes.
+
+931
+00:55:38,250 --> 00:55:40,967
+En código, la diapositiva cuarenta y tres muestra
+
+932
+00:55:40,967 --> 00:55:43,240
+el recorrido para Bernoulli con alfa uno.
+
+933
+00:55:43,360 --> 00:55:48,302
+Un vector vacío para las predicciones, un ciclo sobre los pliegues, y en cada vuelta:
+
+934
+00:55:48,302 --> 00:55:52,430
+val marca el pliegue apartado, se ajusta con el resto y se predice val.
+
+935
+00:55:52,550 --> 00:55:55,165
+Al final, pred reúne las tres mil seiscientos
+
+936
+00:55:55,165 --> 00:55:57,490
+ochenta probabilidades fuera de pliegue.
+
+937
+00:55:57,610 --> 00:56:02,010
+El script conserva también las log-probabilidades, para evaluar con precisión.
+
+938
+00:56:02,130 --> 00:56:03,950
+Una precisión sobre la grabación.
+
+939
+00:56:04,070 --> 00:56:08,017
+Al presentar esta comparación, cerca de los minutos ciento cuatro y ciento
+
+940
+00:56:08,017 --> 00:56:11,590
+nueve, se dijo que las recetas se evalúan en el conjunto de prueba.
+
+941
+00:56:11,710 --> 00:56:15,311
+En el material, la comparación usa las predicciones fuera de pliegue de
+
+942
+00:56:15,311 --> 00:56:18,100
+los tres mil seiscientos ochenta correos de desarrollo.
+
+943
+00:56:18,220 --> 00:56:21,727
+Los novecientos veintiuno de prueba se usan una sola vez,
+
+944
+00:56:21,727 --> 00:56:24,680
+al final, con la receta y el umbral ya elegidos.
+
+945
+00:56:24,800 --> 00:56:27,441
+Y estos son los resultados, de la diapositiva
+
+946
+00:56:27,441 --> 00:56:30,140
+cuarenta y cuatro, recalculados con el script.
+
+947
+00:56:30,260 --> 00:56:37,780
+La frecuencia de spam: log loss 0.671, Brier 0.239 y AUC 0.499.
+
+948
+00:56:37,900 --> 00:56:40,240
+Es la referencia: no ordena nada.
+
+949
+00:56:40,360 --> 00:56:49,350
+Bernoulli con alfa 0.5: log loss 0.556, Brier 0.099 y AUC 0.952.
+
+950
+00:56:49,470 --> 00:56:55,680
+Con alfa uno y dos, casi lo mismo: 0.557 y 0.558.
+
+951
+00:56:55,800 --> 00:57:03,790
+Y la gaussiana: Brier 0.190 y AUC 0.940, pero un log loss de 4.931.
+
+952
+00:57:03,910 --> 00:57:05,490
+Cómo se lee cada columna.
+
+953
+00:57:05,610 --> 00:57:08,388
+El Brier promedia el error cuadrático entre la
+
+954
+00:57:08,388 --> 00:57:11,710
+probabilidad y la etiqueta, cero o uno: menor es mejor.
+
+955
+00:57:11,830 --> 00:57:15,640
+El AUC mide el ordenamiento entre clases: mayor es mejor.
+
+956
+00:57:15,760 --> 00:57:19,390
+Por el menor log loss se elige Bernoulli con alfa 0.5.
+
+957
+00:57:19,510 --> 00:57:23,442
+Los tres suavizados dan resultados cercanos, como anticipamos:
+
+958
+00:57:23,442 --> 00:57:26,550
+con tantos correos, el suavizado casi no importa.
+
+959
+00:57:26,670 --> 00:57:29,048
+Y la advertencia de la diapositiva: el mínimo
+
+960
+00:57:29,048 --> 00:57:31,320
+fuera de pliegue intervino en la selección.
+
+961
+00:57:31,440 --> 00:57:35,780
+Elegimos al que salió mejor; por eso su número tiende a ser un poco optimista.
+
+962
+00:57:35,900 --> 00:57:39,010
+No constituye una evaluación independiente del ganador.
+
+963
+00:57:39,130 --> 00:57:42,660
+Esa la intentaremos con la prueba histórica, en la parada once.
+
+964
+00:57:42,780 --> 00:57:46,570
+La diapositiva cuarenta y cinco dibuja el log loss de cada receta.
+
+965
+00:57:46,690 --> 00:57:53,990
+Los tres Bernoulli quedan juntos, alrededor de 0.56; la referencia, en 0.67.
+
+966
+00:57:54,110 --> 00:57:56,680
+Y la gaussiana se dispara hasta casi cinco.
+
+967
+00:57:56,800 --> 00:58:03,330
+Lo curioso: con umbral 0.5, la gaussiana acierta el 80.8 por ciento de los correos.
+
+968
+00:58:03,450 --> 00:58:08,250
+No es un clasificador inútil; es un clasificador demasiado seguro de sí mismo.
+
+969
+00:58:08,370 --> 00:58:11,220
+¿Cómo puede acertar tanto y tener un log loss tan malo?
+
+970
+00:58:11,340 --> 00:58:13,220
+Un cálculo adicional lo explica.
+
+971
+00:58:13,340 --> 00:58:18,669
+La gaussiana pone el 98.6 por ciento de sus probabilidades fuera del
+
+972
+00:58:18,669 --> 00:58:22,980
+intervalo de 0.01 a 0.99: casi siempre dice cero o uno.
+
+973
+00:58:23,100 --> 00:58:27,508
+Y se equivoca con esa seguridad: quinientos noventa y dos correos
+
+974
+00:58:27,508 --> 00:58:31,170
+legítimos reciben probabilidad de spam de 0.999 o más.
+
+975
+00:58:31,290 --> 00:58:33,440
+Bernoulli hace eso con veintisiete.
+
+976
+00:58:33,560 --> 00:58:36,894
+Cada uno de esos errores suma al menos 6.9 al log
+
+977
+00:58:36,894 --> 00:58:39,480
+loss: el castigo de la tabla anterior.
+
+978
+00:58:39,600 --> 00:58:42,173
+La conclusión de la diapositiva: el log loss
+
+979
+00:58:42,173 --> 00:58:44,630
+penaliza los errores con certeza excesiva.
+
+980
+00:58:44,750 --> 00:58:47,790
+El porcentaje de aciertos no muestra esa diferencia.
+
+981
+00:58:47,910 --> 00:58:51,330
+Por eso se elige con el log loss, y no con la exactitud.
+
+982
+00:58:51,450 --> 00:58:54,490
+Una analogía: dos pronosticadores del tiempo.
+
+983
+00:58:54,610 --> 00:58:58,090
+El primero siempre dice cero por ciento o cien por ciento de lluvia.
+
+984
+00:58:58,210 --> 00:59:03,280
+Acierta muchos días, pero cuando falla, alguien sale sin paraguas bajo un aguacero.
+
+985
+00:59:03,400 --> 00:59:06,020
+El segundo dice setenta o veinte por ciento.
+
+986
+00:59:06,140 --> 00:59:10,340
+Acierta un poco menos de forma tajante, pero sus números significan algo.
+
+987
+00:59:10,460 --> 00:59:14,560
+Para decidir, a partir de una probabilidad, nos sirve el segundo.
+
+988
+00:59:14,680 --> 00:59:17,680
+Esa es la diferencia entre la gaussiana y Bernoulli aquí.
+
+989
+00:59:17,800 --> 00:59:19,530
+Errores típicos al comparar.
+
+990
+00:59:19,650 --> 00:59:23,181
+Uno: elegir la receta por la exactitud, y quedarse con un
+
+991
+00:59:23,181 --> 00:59:26,340
+modelo que acierta pero da probabilidades extremas.
+
+992
+00:59:26,460 --> 00:59:29,994
+Dos: leer el log loss del ganador como si fuera una evaluación
+
+993
+00:59:29,994 --> 00:59:32,730
+independiente, cuando participó en la selección.
+
+994
+00:59:32,850 --> 00:59:36,110
+Y tres: comparar recetas con distintos pliegues.
+
+995
+00:59:36,230 --> 00:59:39,600
+Todas deben usar los mismos correos y los mismos pliegues.
+
+996
+00:59:39,720 --> 00:59:40,940
+Piensa un segundo.
+
+997
+00:59:41,060 --> 00:59:42,170
+Dos correos.
+
+998
+00:59:42,290 --> 00:59:46,070
+El primero es spam, y el modelo le dio 0.8 de spam.
+
+999
+00:59:46,190 --> 00:59:50,330
+El segundo es legítimo, y el modelo le dio 0.4 de spam.
+
+1000
+00:59:50,450 --> 00:59:51,990
+¿Cuál es el log loss promedio?
+
+1001
+00:59:52,710 --> 00:59:58,690
+Para el spam, la probabilidad de lo que ocurrió es 0.8: castigo 0.223.
+
+1002
+00:59:58,810 --> 01:00:03,216
+Para el legítimo, lo que ocurrió tiene probabilidad
+
+1003
+01:00:03,216 --> 01:00:06,930
+uno menos 0.4, es decir 0.6: castigo 0.511.
+
+1004
+01:00:07,050 --> 01:00:10,650
+El promedio: aproximadamente 0.367.
+
+1005
+01:00:10,770 --> 01:00:14,167
+El error típico aquí es usar 0.4 en el segundo correo:
+
+1006
+01:00:14,167 --> 01:00:17,060
+hay que usar la probabilidad de la clase real.
+
+1007
+01:00:17,180 --> 01:00:21,175
+Para llevarte: se comparan cinco recetas con las mismas predicciones fuera de
+
+1008
+01:00:21,175 --> 01:00:24,600
+pliegue de los tres mil seiscientos ochenta correos de desarrollo.
+
+1009
+01:00:24,720 --> 01:00:31,880
+Gana Bernoulli con alfa 0.5, con log loss 0.556; los tres suavizados casi empatan.
+
+1010
+01:00:32,000 --> 01:00:35,904
+Y la gaussiana acierta el 80.8 por ciento, pero
+
+1011
+01:00:35,904 --> 01:00:39,310
+su log loss es 4.931: certeza equivocada.
+
+1012
+01:00:39,430 --> 01:00:43,370
+Siguiente parada: por qué las probabilidades salen tan extremas.
+
+1013
+01:00:43,490 --> 01:00:47,004
+Copiamos una señal, miramos la calibración y explicamos el
+
+1014
+01:00:47,004 --> 01:00:49,730
+correo de identificador uno, señal por señal.
+
+1015
+01:00:50,610 --> 01:00:51,730
+Décima parada.
+
+1016
+01:00:51,850 --> 01:00:55,098
+Vamos a ver qué pasa cuando el supuesto ingenuo falla de la
+
+1017
+01:00:55,098 --> 01:00:57,630
+forma más extrema posible: copiando una señal.
+
+1018
+01:00:57,750 --> 01:01:00,534
+Después miramos la calibración, y explicamos el
+
+1019
+01:01:00,534 --> 01:01:03,140
+correo de identificador uno señal por señal.
+
+1020
+01:01:03,260 --> 01:01:06,890
+La diapositiva cuarenta y seis propone un experimento controlado.
+
+1021
+01:01:07,010 --> 01:01:09,370
+Cien correos spam y cien legítimos.
+
+1022
+01:01:09,490 --> 01:01:12,950
+Una señal aparece en ochenta spam y en veinte legítimos.
+
+1023
+01:01:13,070 --> 01:01:18,347
+La probabilidad de spam al ver la señal: 0.5 por 0.8,
+
+1024
+01:01:18,347 --> 01:01:22,430
+dividido por 0.5 por 0.8 más 0.5 por 0.2.
+
+1025
+01:01:22,550 --> 01:01:25,400
+Exactamente 0.8000.
+
+1026
+01:01:25,520 --> 01:01:27,190
+Hasta aquí, nada nuevo.
+
+1027
+01:01:27,310 --> 01:01:30,490
+Ahora copiamos esa misma columna, con otro nombre.
+
+1028
+01:01:30,610 --> 01:01:36,794
+Para Naive Bayes son dos señales independientes, así que multiplica las dos
+
+1029
+01:01:36,794 --> 01:01:42,400
+copias: 0.5 por 0.8 por 0.8, sobre lo mismo más 0.5 por 0.2 por 0.2.
+
+1030
+01:01:42,520 --> 01:01:46,670
+Resultado: aproximadamente 0.9412.
+
+1031
+01:01:46,790 --> 01:01:49,930
+El correo es el mismo, y la información es la misma.
+
+1032
+01:01:50,050 --> 01:01:53,750
+El modelo contó dos veces una señal, y aumentó su certeza.
+
+1033
+01:01:53,870 --> 01:01:56,935
+El profesor lo contrastó con la regresión: allí, dos
+
+1034
+01:01:56,935 --> 01:01:59,470
+predictores idénticos no suman información.
+
+1035
+01:01:59,590 --> 01:02:01,410
+Una precisión sobre la grabación.
+
+1036
+01:02:01,530 --> 01:02:05,400
+Al plantear este ejemplo, cerca del minuto ciento doce, se dijo
+
+1037
+01:02:05,400 --> 01:02:08,410
+que de los doscientos correos, ochenta eran spam.
+
+1038
+01:02:08,530 --> 01:02:11,190
+En el ejemplo hay cien spam y cien legítimos; el
+
+1039
+01:02:11,190 --> 01:02:13,850
+ochenta es el número de spam que traen la señal.
+
+1040
+01:02:13,970 --> 01:02:16,630
+La diapositiva cuarenta y siete sigue copiando.
+
+1041
+01:02:16,750 --> 01:02:22,073
+Con cuatro copias, los factores se repiten cuatro veces: 0.5 por 0.8 a
+
+1042
+01:02:22,073 --> 01:02:26,180
+la cuarta, sobre lo mismo más 0.5 por 0.2 a la cuarta.
+
+1043
+01:02:26,300 --> 01:02:30,450
+La probabilidad sube a aproximadamente 0.9961.
+
+1044
+01:02:30,570 --> 01:02:36,180
+La línea horizontal marca la información que realmente hay: una sola señal, 0.8.
+
+1045
+01:02:36,300 --> 01:02:39,680
+La clase predicha no cambia; lo que crece es la certeza.
+
+1046
+01:02:39,800 --> 01:02:43,950
+Hay una forma muy limpia de verlo, un cálculo adicional con razones.
+
+1047
+01:02:44,070 --> 01:02:49,190
+Con una señal, la razón entre spam y legítimo es ochenta a veinte: cuatro a uno.
+
+1048
+01:02:49,310 --> 01:02:53,079
+Cada copia vuelve a multiplicar por cuatro: dieciséis a uno con dos
+
+1049
+01:02:53,079 --> 01:02:56,060
+copias, doscientos cincuenta y seis a uno con cuatro.
+
+1050
+01:02:56,180 --> 01:02:59,455
+Por eso la certeza crece tan rápido: en logaritmos,
+
+1051
+01:02:59,455 --> 01:03:02,280
+cada copia suma la misma evidencia otra vez.
+
+1052
+01:03:02,400 --> 01:03:05,630
+Aquí hubo una pregunta en clase: ¿esto es sobreajuste?
+
+1053
+01:03:05,750 --> 01:03:08,418
+La respuesta en la grabación fue que sí, que es un
+
+1054
+01:03:08,418 --> 01:03:10,980
+sobreajuste porque se cuenta dos veces lo mismo.
+
+1055
+01:03:11,100 --> 01:03:12,380
+Conviene precisarlo.
+
+1056
+01:03:12,500 --> 01:03:15,970
+Sobreajuste es aprender el ruido de los datos de entrenamiento.
+
+1057
+01:03:16,090 --> 01:03:20,450
+Aquí ocurre otra cosa: la misma evidencia se cuenta dos veces porque falla el
+
+1058
+01:03:20,450 --> 01:03:24,130
+supuesto de independencia, y el resultado es exceso de confianza.
+
+1059
+01:03:24,250 --> 01:03:29,140
+Y tampoco es una mejora: la probabilidad sube, pero no se agregó información.
+
+1060
+01:03:29,260 --> 01:03:31,340
+¿Pasa esto con los correos reales?
+
+1061
+01:03:31,460 --> 01:03:32,850
+Un cálculo adicional.
+
+1062
+01:03:32,970 --> 01:03:36,854
+Repetimos las cincuenta y cuatro señales de Spambase dos y cuatro
+
+1063
+01:03:36,854 --> 01:03:40,140
+veces, con Bernoulli y alfa uno, y los mismos pliegues.
+
+1064
+01:03:40,260 --> 01:03:44,744
+El log loss fuera de pliegue pasa de 0.557 a 1.042
+
+1065
+01:03:44,744 --> 01:03:48,600
+con dos repeticiones, y a 1.876 con cuatro.
+
+1066
+01:03:48,720 --> 01:03:53,124
+Pero el AUC queda exactamente igual, 0.951: el orden de los
+
+1067
+01:03:53,124 --> 01:03:57,230
+correos no cambia, solo se exageran las probabilidades.
+
+1068
+01:03:57,350 --> 01:04:02,000
+La otra cara de este problema es la calibración, en la diapositiva cuarenta y ocho.
+
+1069
+01:04:02,120 --> 01:04:07,390
+Agrupamos los correos según su probabilidad fuera de pliegue, en intervalos de 0.1.
+
+1070
+01:04:07,510 --> 01:04:10,280
+Para cada intervalo comparamos la probabilidad media
+
+1071
+01:04:10,280 --> 01:04:12,570
+con la fracción de spam que realmente hubo.
+
+1072
+01:04:12,690 --> 01:04:16,830
+Si el modelo estuviera bien calibrado, los puntos caerían sobre la diagonal.
+
+1073
+01:04:16,950 --> 01:04:20,310
+Este es Bernoulli con alfa uno; el ganador de la
+
+1074
+01:04:20,310 --> 01:04:23,950
+selección usa 0.5, y no se ajustó ningún calibrador.
+
+1075
+01:04:24,070 --> 01:04:27,410
+Mira el intervalo de arriba, de 0.9 a uno.
+
+1076
+01:04:27,530 --> 01:04:30,330
+Ahí caen mil ciento cincuenta y siete correos.
+
+1077
+01:04:30,450 --> 01:04:34,120
+La predicción media es 99.44 por ciento.
+
+1078
+01:04:34,240 --> 01:04:37,560
+Pero el spam observado es mil sesenta y seis de mil
+
+1079
+01:04:37,560 --> 01:04:40,360
+ciento cincuenta y siete: 92.13 por ciento.
+
+1080
+01:04:40,480 --> 01:04:43,060
+El modelo promete más certeza de la que cumple.
+
+1081
+01:04:43,180 --> 01:04:46,000
+Y el profesor lo notó en el gráfico: Bernoulli está
+
+1082
+01:04:46,000 --> 01:04:48,820
+bastante más cerca de la diagonal que la gaussiana.
+
+1083
+01:04:48,940 --> 01:04:50,110
+Una analogía.
+
+1084
+01:04:50,230 --> 01:04:54,837
+Un amigo dice estar seguro al noventa y nueve por ciento cada vez que apuesta,
+
+1085
+01:04:54,837 --> 01:04:58,440
+pero gana nueve de cada diez: acierta bastante, pero exagera.
+
+1086
+01:04:58,560 --> 01:05:00,600
+Con él hay que descontar el entusiasmo.
+
+1087
+01:05:00,720 --> 01:05:02,020
+Eso es recalibrar.
+
+1088
+01:05:02,140 --> 01:05:05,014
+Ahora, explicar el correo de identificador uno,
+
+1089
+01:05:05,014 --> 01:05:07,460
+como en la diapositiva cuarenta y nueve.
+
+1090
+01:05:07,580 --> 01:05:10,660
+Empezamos por una señal: address, presente.
+
+1091
+01:05:10,780 --> 01:05:13,523
+Entre los dos mil doscientos treinta legítimos de
+
+1092
+01:05:13,523 --> 01:05:16,490
+desarrollo, address aparece en doscientos veintiséis.
+
+1093
+01:05:16,610 --> 01:05:20,262
+Con alfa uno: doscientos veintisiete sobre dos mil
+
+1094
+01:05:20,262 --> 01:05:23,840
+doscientos treinta y dos, aproximadamente 0.1017.
+
+1095
+01:05:23,960 --> 01:05:27,356
+Entre los mil cuatrocientos cincuenta spam, aparece en
+
+1096
+01:05:27,356 --> 01:05:31,443
+cuatrocientos noventa y ocho: cuatrocientos noventa y nueve sobre
+
+1097
+01:05:31,443 --> 01:05:35,090
+mil cuatrocientos cincuenta y dos, aproximadamente 0.3437.
+
+1098
+01:05:35,210 --> 01:05:39,350
+Favorece al spam, pero aún faltan las otras cincuenta y tres señales.
+
+1099
+01:05:39,470 --> 01:05:43,790
+La diapositiva cincuenta muestra las ocho señales que más pesan en ese correo.
+
+1100
+01:05:43,910 --> 01:05:47,920
+Siete están presentes: free, address, el signo de exclamación,
+
+1101
+01:05:47,920 --> 01:05:51,090
+email y otras tres palabras frecuentes en inglés.
+
+1102
+01:05:51,210 --> 01:05:53,710
+Una está ausente: el signo pesos.
+
+1103
+01:05:53,830 --> 01:05:57,926
+Para cada señal, la barra azul es la probabilidad del estado observado
+
+1104
+01:05:57,926 --> 01:06:01,320
+dentro de los legítimos, y la naranja, dentro de los spam.
+
+1105
+01:06:01,440 --> 01:06:09,610
+Por ejemplo, free presente: 0.0959 entre los legítimos, y 0.5558 entre los spam.
+
+1106
+01:06:09,730 --> 01:06:13,249
+Es lo que dijo el profesor: cincuenta y tanto por ciento
+
+1107
+01:06:13,249 --> 01:06:16,140
+dentro de spam, y casi 0.1 dentro de legítimo.
+
+1108
+01:06:16,260 --> 01:06:20,314
+Las cincuenta y cuatro señales, junto con las frecuencias de
+
+1109
+01:06:20,314 --> 01:06:23,760
+clase, producen una probabilidad de spam de 0.9964.
+
+1110
+01:06:23,880 --> 01:06:27,293
+La diapositiva advierte: las alturas de las barras son
+
+1111
+01:06:27,293 --> 01:06:30,770
+factores; no se suman, ni representan efectos causales.
+
+1112
+01:06:30,890 --> 01:06:37,229
+Y un cálculo adicional con logaritmos lo reconstruye: la previa aporta menos 0.430, porque
+
+1113
+01:06:37,229 --> 01:06:42,370
+hay menos spam que legítimos; las cincuenta y cuatro señales suman 6.065.
+
+1114
+01:06:42,490 --> 01:06:49,090
+El total, 5.635, convertido a probabilidad, da 0.9964.
+
+1115
+01:06:49,210 --> 01:06:52,860
+Treinta y cuatro señales empujan hacia spam y veinte hacia legítimo.
+
+1116
+01:06:52,980 --> 01:06:55,340
+Errores típicos al leer estas salidas.
+
+1117
+01:06:55,460 --> 01:06:59,900
+Uno: leer las barras de un correo como efectos causales de cada palabra.
+
+1118
+01:07:00,020 --> 01:07:04,399
+Dos: creer que 0.9964 significa que el 99.64 por
+
+1119
+01:07:04,399 --> 01:07:08,140
+ciento de los correos parecidos son spam.
+
+1120
+01:07:08,260 --> 01:07:12,250
+Eso exige comprobar la calibración, y vimos que el modelo exagera.
+
+1121
+01:07:12,370 --> 01:07:15,630
+Y tres: arreglar la dependencia con más suavizado.
+
+1122
+01:07:15,750 --> 01:07:18,780
+El suavizado evita ceros; la dependencia se ataca
+
+1123
+01:07:18,780 --> 01:07:21,130
+con la representación, o recalibrando.
+
+1124
+01:07:21,250 --> 01:07:22,470
+Piensa un segundo.
+
+1125
+01:07:22,590 --> 01:07:25,688
+En el experimento controlado, ¿qué probabilidad de spam
+
+1126
+01:07:25,688 --> 01:07:28,110
+da Naive Bayes con tres copias de la señal?
+
+1127
+01:07:28,830 --> 01:07:31,970
+La razón es cuatro al cubo: sesenta y cuatro a uno.
+
+1128
+01:07:32,090 --> 01:07:38,280
+La probabilidad es sesenta y cuatro sobre sesenta y cinco, aproximadamente 0.9846.
+
+1129
+01:07:38,400 --> 01:07:43,180
+Con la información real de una sola señal, debería seguir siendo 0.8.
+
+1130
+01:07:43,300 --> 01:07:50,885
+Para llevarte: si dos señales repiten información, Naive Bayes la cuenta dos veces: con
+
+1131
+01:07:50,885 --> 01:07:56,900
+una señal copiada, 0.80 pasa a 0.9412, y con cuatro copias, a 0.9961.
+
+1132
+01:07:57,020 --> 01:08:02,910
+El orden de los correos no cambia, pero las probabilidades se vuelven extremas: en el
+
+1133
+01:08:02,910 --> 01:08:07,900
+intervalo de arriba, 99.44 por ciento predicho frente a 92.13 observado.
+
+1134
+01:08:08,020 --> 01:08:10,989
+Y para explicar un correo, cada señal aporta un
+
+1135
+01:08:10,989 --> 01:08:13,390
+factor por clase: no un efecto causal.
+
+1136
+01:08:13,510 --> 01:08:16,780
+Siguiente parada: pasar de la probabilidad a la acción.
+
+1137
+01:08:16,900 --> 01:08:19,553
+El umbral por costo, y la comprobación en los
+
+1138
+01:08:19,553 --> 01:08:21,970
+novecientos veintiuno correos históricos.
+
+1139
+01:08:22,850 --> 01:08:24,080
+Undécima parada.
+
+1140
+01:08:24,200 --> 01:08:25,710
+Hasta ahora predijimos.
+
+1141
+01:08:25,830 --> 01:08:29,238
+Ahora decidimos: con qué probabilidad conviene bloquear un
+
+1142
+01:08:29,238 --> 01:08:32,000
+correo, si los dos errores no cuestan lo mismo.
+
+1143
+01:08:32,120 --> 01:08:35,350
+La diapositiva cincuenta y uno fija los costos del ejemplo.
+
+1144
+01:08:35,470 --> 01:08:39,350
+Un falso positivo bloquea un correo legítimo: cuesta cinco.
+
+1145
+01:08:39,470 --> 01:08:42,770
+Un falso negativo deja pasar un spam: cuesta uno.
+
+1146
+01:08:42,890 --> 01:08:44,520
+Los aciertos cuestan cero.
+
+1147
+01:08:44,640 --> 01:08:48,224
+El profesor lo justificó así: bloquear un correo legítimo es
+
+1148
+01:08:48,224 --> 01:08:51,570
+mucho peor que dejar pasar un spam, que solo es tedioso.
+
+1149
+01:08:51,690 --> 01:08:54,842
+Los números son de ejemplo; en la práctica salen
+
+1150
+01:08:54,842 --> 01:08:57,600
+del contexto: dinero, tiempo, importancia.
+
+1151
+01:08:57,720 --> 01:09:01,920
+Si p es la probabilidad de spam, cada acción tiene un costo esperado.
+
+1152
+01:09:02,040 --> 01:09:06,070
+Bloquear arriesga el costo de un legítimo: cinco por uno menos p.
+
+1153
+01:09:06,190 --> 01:09:09,200
+Dejar pasar arriesga el de un spam: uno por p.
+
+1154
+01:09:09,320 --> 01:09:17,310
+Con p igual a 0.90: bloquear cuesta cinco por 0.10, 0.50; dejar pasar cuesta 0.90.
+
+1155
+01:09:17,430 --> 01:09:18,510
+Conviene bloquear.
+
+1156
+01:09:18,630 --> 01:09:26,690
+Con p igual a 0.70: bloquear cuesta cinco por 0.30, 1.50; dejar pasar cuesta 0.70.
+
+1157
+01:09:26,810 --> 01:09:28,240
+Conviene dejar pasar.
+
+1158
+01:09:28,360 --> 01:09:29,730
+¿Dónde está la frontera?
+
+1159
+01:09:29,850 --> 01:09:31,240
+Un cálculo adicional.
+
+1160
+01:09:31,360 --> 01:09:35,842
+Bloquear conviene cuando cinco por uno menos p es menor que p, es
+
+1161
+01:09:35,842 --> 01:09:39,910
+decir, cuando p supera cinco sextos, aproximadamente 0.833.
+
+1162
+01:09:40,030 --> 01:09:43,650
+Pero eso vale solo si las probabilidades están bien calibradas.
+
+1163
+01:09:43,770 --> 01:09:47,090
+Y en la parada anterior vimos que no lo están: exageran.
+
+1164
+01:09:47,210 --> 01:09:49,637
+Por eso la diapositiva propone otra cosa:
+
+1165
+01:09:49,637 --> 01:09:52,300
+comparar umbrales con los errores observados.
+
+1166
+01:09:52,420 --> 01:09:54,810
+El profesor dio un ejemplo fuera del correo.
+
+1167
+01:09:54,930 --> 01:09:58,496
+Si un diagnóstico de cáncer tiene un costo de error muy alto, una
+
+1168
+01:09:58,496 --> 01:10:02,500
+probabilidad de setenta u ochenta por ciento puede ser baja para decidir.
+
+1169
+01:10:02,620 --> 01:10:05,890
+Quizás se exija noventa y cinco o noventa y ocho por ciento.
+
+1170
+01:10:06,010 --> 01:10:10,210
+El umbral no es una propiedad del modelo: sale del costo de equivocarse.
+
+1171
+01:10:10,330 --> 01:10:14,110
+El mismo modelo, con otros costos, toma otra decisión.
+
+1172
+01:10:14,230 --> 01:10:18,260
+La diapositiva cincuenta y dos busca el umbral en las predicciones del ganador.
+
+1173
+01:10:18,380 --> 01:10:23,763
+La función medir cuenta falsos positivos y falsos negativos, y calcula mil por
+
+1174
+01:10:23,763 --> 01:10:28,110
+cinco FP más FN, dividido por n: el costo por cada mil correos.
+
+1175
+01:10:28,230 --> 01:10:32,547
+Se prueban diecinueve umbrales, de 0.05 a 0.95, con las
+
+1176
+01:10:32,547 --> 01:10:37,100
+probabilidades fuera de pliegue de Bernoulli con alfa 0.5.
+
+1177
+01:10:37,220 --> 01:10:41,380
+Se elige el de menor costo, y si dos empatan, el umbral mayor.
+
+1178
+01:10:41,500 --> 01:10:45,210
+Y este es el resultado, de la diapositiva cincuenta y tres.
+
+1179
+01:10:45,330 --> 01:10:49,046
+Con umbrales bajos, el costo es alto: con 0.05 llega a
+
+1180
+01:10:49,046 --> 01:10:52,280
+cuatrocientos cuarenta y nueve por mil correos.
+
+1181
+01:10:52,400 --> 01:10:55,320
+A medida que el umbral sube, el costo baja.
+
+1182
+01:10:55,440 --> 01:11:01,290
+El mínimo de la rejilla está en 0.95, con un costo de 219.0.
+
+1183
+01:11:01,410 --> 01:11:05,842
+Con umbral 0.95 hay setenta y ocho legítimos bloqueados y cuatrocientos
+
+1184
+01:11:05,842 --> 01:11:10,150
+dieciséis spam que pasan, entre tres mil seiscientos ochenta correos.
+
+1185
+01:11:10,270 --> 01:11:14,321
+El costo: cinco por setenta y ocho, más cuatrocientos dieciséis,
+
+1186
+01:11:14,321 --> 01:11:17,550
+dividido por tres mil seiscientos ochenta, por mil.
+
+1187
+01:11:17,670 --> 01:11:23,940
+Es decir, ochocientos seis sobre tres mil seiscientos ochenta, por mil: 219.0.
+
+1188
+01:11:24,060 --> 01:11:26,590
+Comparemos algunos umbrales de la misma tabla.
+
+1189
+01:11:26,710 --> 01:11:30,710
+Con 0.5: ciento cincuenta y dos falsos positivos y
+
+1190
+01:11:30,710 --> 01:11:35,190
+doscientos sesenta y tres falsos negativos; costo 278.0.
+
+1191
+01:11:35,310 --> 01:11:41,490
+Con 0.8: ciento once y trescientos veintiocho; costo 239.9.
+
+1192
+01:11:41,610 --> 01:11:47,820
+Con 0.9: noventa y dos y trescientos ochenta y tres; costo 229.1.
+
+1193
+01:11:47,940 --> 01:11:52,350
+Subir el umbral cambia falsos positivos caros por falsos negativos baratos.
+
+1194
+01:11:52,470 --> 01:11:54,800
+El profesor explicó la forma de la curva.
+
+1195
+01:11:54,920 --> 01:11:58,250
+Con un umbral muy bajo, se bloquea casi todo, y se
+
+1196
+01:11:58,250 --> 01:12:00,980
+bloquean muchos legítimos, que son caros.
+
+1197
+01:12:01,100 --> 01:12:04,090
+Con un umbral muy alto, no se bloquea nada, y
+
+1198
+01:12:04,090 --> 01:12:06,880
+queda un costo base: todos los spam pasan.
+
+1199
+01:12:07,000 --> 01:12:11,032
+Con estos datos, eso cuesta mil cuatrocientos cincuenta
+
+1200
+01:12:11,032 --> 01:12:14,770
+sobre tres mil seiscientos ochenta, por mil: 394.0.
+
+1201
+01:12:14,890 --> 01:12:19,440
+Y la diapositiva agrega una advertencia: que el mínimo esté en el borde de
+
+1202
+01:12:19,440 --> 01:12:23,190
+la rejilla no demuestra que 0.95 sea el mejor umbral posible.
+
+1203
+01:12:23,310 --> 01:12:26,400
+Un dato adicional que muestra que decidir no es acertar.
+
+1204
+01:12:26,520 --> 01:12:31,335
+La exactitud fuera de pliegue con umbral 0.5 es 88.7
+
+1205
+01:12:31,335 --> 01:12:35,410
+por ciento; con 0.95 baja a 86.6 por ciento.
+
+1206
+01:12:35,530 --> 01:12:38,817
+El umbral que minimiza el costo no es el que maximiza los
+
+1207
+01:12:38,817 --> 01:12:42,220
+aciertos: acepta más errores baratos para evitar los caros.
+
+1208
+01:12:42,340 --> 01:12:44,934
+Ahora sí, los novecientos veintiuno correos
+
+1209
+01:12:44,934 --> 01:12:47,890
+históricos, en la diapositiva cincuenta y cuatro.
+
+1210
+01:12:48,010 --> 01:12:53,570
+Con Bernoulli alfa 0.5 y umbral 0.95, elegidos en desarrollo.
+
+1211
+01:12:53,690 --> 01:12:55,540
+Filas: la clase real.
+
+1212
+01:12:55,660 --> 01:12:57,470
+Columnas: la decisión.
+
+1213
+01:12:57,590 --> 01:13:00,662
+Legítimos dejados pasar: quinientos cuarenta y
+
+1214
+01:13:00,662 --> 01:13:03,200
+uno; legítimos bloqueados: diecisiete.
+
+1215
+01:13:03,320 --> 01:13:08,470
+Spam que pasan: ochenta y nueve; spam bloqueados: doscientos setenta y cuatro.
+
+1216
+01:13:08,590 --> 01:13:12,815
+El costo: cinco por diecisiete, más ochenta y nueve,
+
+1217
+01:13:12,815 --> 01:13:16,390
+sobre novecientos veintiuno, por mil: 188.9.
+
+1218
+01:13:16,510 --> 01:13:18,680
+¿Es bueno 188.9?
+
+1219
+01:13:18,800 --> 01:13:20,250
+Hay que compararlo con algo.
+
+1220
+01:13:20,370 --> 01:13:24,084
+Si dejamos pasar todos los correos, pasan los ochenta y nueve más
+
+1221
+01:13:24,084 --> 01:13:27,570
+doscientos setenta y cuatro: trescientos sesenta y tres spam.
+
+1222
+01:13:27,690 --> 01:13:34,210
+El costo: trescientos sesenta y tres sobre novecientos veintiuno, por mil: 394.1.
+
+1223
+01:13:34,330 --> 01:13:38,160
+La regla reduce el costo a menos de la mitad frente a no filtrar nada.
+
+1224
+01:13:38,280 --> 01:13:42,642
+Además, el log loss en estos correos es 0.533 y el
+
+1225
+01:13:42,642 --> 01:13:46,480
+Brier, 0.094: parecidos a los de desarrollo.
+
+1226
+01:13:46,600 --> 01:13:50,440
+Y las advertencias de la diapositiva, que son parte del resultado.
+
+1227
+01:13:50,560 --> 01:13:53,606
+Es una comprobación retrospectiva: estos correos ya se
+
+1228
+01:13:53,606 --> 01:13:56,200
+habían usado al comparar otros clasificadores.
+
+1229
+01:13:56,320 --> 01:13:59,210
+El modelo y el umbral se eligieron en desarrollo; los
+
+1230
+01:13:59,210 --> 01:14:02,100
+correos de prueba no participaron en esas elecciones.
+
+1231
+01:14:02,220 --> 01:14:05,220
+Y el resultado no acredita rendimiento en correos
+
+1232
+01:14:05,220 --> 01:14:08,220
+actuales: son correos de hace más de veinte años.
+
+1233
+01:14:08,340 --> 01:14:10,140
+Errores típicos al decidir.
+
+1234
+01:14:10,260 --> 01:14:15,430
+Uno: usar 0.5 por costumbre, como si los dos errores costaran lo mismo.
+
+1235
+01:14:15,550 --> 01:14:18,665
+Dos: elegir el umbral mirando los correos de prueba;
+
+1236
+01:14:18,665 --> 01:14:21,540
+entonces la prueba deja de ser una comprobación.
+
+1237
+01:14:21,660 --> 01:14:24,872
+Y tres: usar la frontera teórica, cinco sextos,
+
+1238
+01:14:24,872 --> 01:14:27,810
+con probabilidades que no están calibradas.
+
+1239
+01:14:27,930 --> 01:14:29,150
+Piensa un segundo.
+
+1240
+01:14:29,270 --> 01:14:34,269
+Si bloquear un legítimo costara dos en vez de cinco, y las probabilidades estuvieran bien
+
+1241
+01:14:34,269 --> 01:14:38,200
+calibradas, ¿a partir de qué probabilidad de spam convendría bloquear?
+
+1242
+01:14:38,920 --> 01:14:43,191
+Bloquear conviene si dos por uno menos p es menor que p: es
+
+1243
+01:14:43,191 --> 01:14:47,100
+decir, si p supera dos tercios, aproximadamente 0.667.
+
+1244
+01:14:47,220 --> 01:14:51,310
+Un error menos caro baja el umbral: se bloquea con menos certeza.
+
+1245
+01:14:51,430 --> 01:14:56,007
+Para llevarte: el umbral sale de los costos: con falso positivo cinco y
+
+1246
+01:14:56,007 --> 01:14:59,810
+falso negativo uno, se compara cinco por uno menos p con p.
+
+1247
+01:14:59,930 --> 01:15:04,320
+Con las predicciones fuera de pliegue se eligió 0.95, con
+
+1248
+01:15:04,320 --> 01:15:07,940
+costo 219.0 por mil, en el borde de la rejilla.
+
+1249
+01:15:08,060 --> 01:15:14,294
+En los novecientos veintiuno correos históricos: diecisiete legítimos bloqueados,
+
+1250
+01:15:14,294 --> 01:15:19,990
+ochenta y nueve spam que pasan, y costo 188.9, frente a 394.1 sin filtrar.
+
+1251
+01:15:20,110 --> 01:15:24,275
+Siguiente y última parada: qué revisar antes de usar el filtro en otra
+
+1252
+01:15:24,275 --> 01:15:28,380
+bandeja, las bibliotecas de R y Python, y el repaso de toda la clase.
+
+1253
+01:15:29,250 --> 01:15:30,270
+Última parada.
+
+1254
+01:15:30,390 --> 01:15:33,978
+Vamos a ver qué hay que revisar antes de llevar este filtro a otra
+
+1255
+01:15:33,978 --> 01:15:37,784
+bandeja de correo, qué significa de verdad una probabilidad alta, cómo
+
+1256
+01:15:37,784 --> 01:15:40,720
+se hace todo con bibliotecas, y el repaso de la clase.
+
+1257
+01:15:40,840 --> 01:15:43,617
+La diapositiva cincuenta y cinco conecta lo aprendido con
+
+1258
+01:15:43,617 --> 01:15:45,760
+lo que hay que revisar en una bandeja nueva.
+
+1259
+01:15:45,880 --> 01:15:50,715
+Primero, la frecuencia de spam: con oferta, pasar de veinte a dos por
+
+1260
+01:15:50,715 --> 01:15:55,130
+ciento de spam llevó la probabilidad de 66.7 a 14.0 por ciento.
+
+1261
+01:15:55,250 --> 01:15:59,760
+Hay que revisar si la frecuencia de spam del ajuste representa a los nuevos correos.
+
+1262
+01:15:59,880 --> 01:16:03,909
+Segundo, copiar una señal elevó la certeza sin agregar información: hay
+
+1263
+01:16:03,909 --> 01:16:07,200
+que revisar la dependencia entre señales y la calibración.
+
+1264
+01:16:07,320 --> 01:16:11,305
+Y tercero, Spambase contiene correos históricos: falta ver
+
+1265
+01:16:11,305 --> 01:16:14,740
+resultados en correos actuales, aún no utilizados.
+
+1266
+01:16:14,860 --> 01:16:17,685
+En la clase hubo una pregunta relacionada: ¿hay que
+
+1267
+01:16:17,685 --> 01:16:20,400
+corregir algo si las clases están desbalanceadas?
+
+1268
+01:16:20,520 --> 01:16:24,749
+El profesor explicó que una opción es rebalancear, por ejemplo llevar los datos a
+
+1269
+01:16:24,749 --> 01:16:28,978
+cincuenta y cincuenta; pero que después hay que compensar ese balanceo, porque si
+
+1270
+01:16:28,978 --> 01:16:31,850
+no se sobreestiman las probabilidades de la clase rara.
+
+1271
+01:16:31,970 --> 01:16:34,910
+Con lo que vimos en la parada dos, se entiende por qué.
+
+1272
+01:16:35,030 --> 01:16:38,701
+Un cálculo ilustrativo: con la palabra oferta y previa
+
+1273
+01:16:38,701 --> 01:16:41,760
+veinte por ciento, la probabilidad es 0.6667.
+
+1274
+01:16:41,880 --> 01:16:45,339
+Si el ajuste se hizo con datos rebalanceados al
+
+1275
+01:16:45,339 --> 01:16:48,650
+cincuenta por ciento, el modelo diría 0.8889.
+
+1276
+01:16:48,770 --> 01:16:51,930
+Para volver a la realidad, hay que reponer la previa real.
+
+1277
+01:16:52,050 --> 01:16:56,650
+La diapositiva cincuenta y seis resume la regla completa, de los datos a la acción.
+
+1278
+01:16:56,770 --> 01:17:01,330
+Representar: cincuenta y cuatro frecuencias convertidas en presencia o ausencia.
+
+1279
+01:17:01,450 --> 01:17:06,270
+Aprender: frecuencias por clase con suavizado, alfa igual a 0.5.
+
+1280
+01:17:06,390 --> 01:17:11,350
+Predecir: combinar presencias y ausencias, y normalizar entre las dos clases.
+
+1281
+01:17:11,470 --> 01:17:16,460
+Actuar: bloquear cuando la probabilidad de spam sea al menos 0.95.
+
+1282
+01:17:16,580 --> 01:17:19,669
+Y comprobar: contar errores y costo, y revisar si
+
+1283
+01:17:19,669 --> 01:17:22,190
+las probabilidades reflejan frecuencias.
+
+1284
+01:17:22,310 --> 01:17:26,101
+Y la frase final de esa diapositiva, que conviene memorizar:
+
+1285
+01:17:26,101 --> 01:17:29,260
+el suavizado y el umbral cumplen tareas distintas.
+
+1286
+01:17:29,380 --> 01:17:32,310
+El suavizado modifica el cálculo de la probabilidad.
+
+1287
+01:17:32,430 --> 01:17:34,210
+El umbral modifica la acción.
+
+1288
+01:17:34,330 --> 01:17:38,729
+La diapositiva cincuenta y ocho vuelve al correo explicado, con
+
+1289
+01:17:38,729 --> 01:17:42,430
+probabilidad 0.9964, y pregunta qué podemos concluir.
+
+1290
+01:17:42,550 --> 01:17:45,571
+Sí: bajo ese ajuste de Bernoulli, las señales del
+
+1291
+01:17:45,571 --> 01:17:48,530
+correo favorecen mucho a spam frente a legítimo.
+
+1292
+01:17:48,650 --> 01:17:54,650
+Aún no: que el 99.64 por ciento de los correos parecidos sea realmente spam.
+
+1293
+01:17:54,770 --> 01:17:57,629
+Esa lectura requiere comprobar la calibración, y en
+
+1294
+01:17:57,629 --> 01:18:00,040
+la parada diez vimos que el modelo exagera.
+
+1295
+01:18:00,160 --> 01:18:02,590
+Tampoco: que el correo sea habitual.
+
+1296
+01:18:02,710 --> 01:18:05,374
+Un clasificador reparte la probabilidad entre sus
+
+1297
+01:18:05,374 --> 01:18:07,440
+clases aunque el caso resulte extraño.
+
+1298
+01:18:07,560 --> 01:18:09,930
+Una analogía para ese último punto.
+
+1299
+01:18:10,050 --> 01:18:14,744
+Si a un detector de spam le muestras una receta de cocina en otro idioma, igual tiene
+
+1300
+01:18:14,744 --> 01:18:18,610
+que repartir la probabilidad entre spam y legítimo: las dos suman uno.
+
+1301
+01:18:18,730 --> 01:18:21,769
+Puede decir noventa y cinco por ciento legítimo, aunque
+
+1302
+01:18:21,769 --> 01:18:24,310
+el correo no se parezca a nada que haya visto.
+
+1303
+01:18:24,430 --> 01:18:29,080
+La probabilidad de clase no mide qué tan raro es el caso: esa es otra pregunta.
+
+1304
+01:18:29,200 --> 01:18:33,080
+Por último, las bibliotecas, de la diapositiva sesenta y uno.
+
+1305
+01:18:33,200 --> 01:18:37,010
+Automatizan el ajuste y la predicción que construimos paso a paso.
+
+1306
+01:18:37,130 --> 01:18:40,163
+En R, hay un paquete con una función para cada
+
+1307
+01:18:40,163 --> 01:18:43,130
+variante: Bernoulli, gaussiana y multinomial.
+
+1308
+01:18:43,250 --> 01:18:46,234
+En Python, scikit-learn tiene una clase para cada
+
+1309
+01:18:46,234 --> 01:18:48,670
+una, con los mismos nombres de variante.
+
+1310
+01:18:48,790 --> 01:18:52,101
+Para obtener probabilidades: en R, predict con el
+
+1311
+01:18:52,101 --> 01:18:55,210
+tipo prob; en Python, el método predict proba.
+
+1312
+01:18:55,330 --> 01:18:59,190
+En el script de la clase, el Bernoulli se ajusta exactamente así.
+
+1313
+01:18:59,310 --> 01:19:03,423
+El argumento de binarización, igual a cero, convierte cada frecuencia
+
+1314
+01:19:03,423 --> 01:19:06,820
+positiva en presencia: es la representación que elegimos.
+
+1315
+01:19:06,940 --> 01:19:11,987
+Y la diapositiva cierra con una idea clave: la biblioteca automatiza las cuentas, pero la
+
+1316
+01:19:11,987 --> 01:19:16,240
+representación, la validación y el umbral los seguimos decidiendo nosotros.
+
+1317
+01:19:16,360 --> 01:19:19,858
+La diapositiva sesenta cierra con la pregunta del inicio: ¿basta
+
+1318
+01:19:19,858 --> 01:19:22,590
+con que un correo contenga oferta para bloquearlo?
+
+1319
+01:19:22,710 --> 01:19:24,940
+Uno: construir la probabilidad.
+
+1320
+01:19:25,060 --> 01:19:29,369
+En los cien correos, oferta sin enlace dio 0.4140 con suavizado:
+
+1321
+01:19:29,369 --> 01:19:33,140
+también importan las ausencias y la frecuencia de clase.
+
+1322
+01:19:33,260 --> 01:19:35,260
+Dos: comprobar su calidad.
+
+1323
+01:19:35,380 --> 01:19:40,440
+En Spambase se eligió Bernoulli con alfa 0.5 por el menor log loss fuera de pliegue.
+
+1324
+01:19:40,560 --> 01:19:42,820
+Tres: decidir con un propósito.
+
+1325
+01:19:42,940 --> 01:19:47,890
+Con costos de cinco y uno, se eligió el umbral 0.95 en desarrollo.
+
+1326
+01:19:48,010 --> 01:19:50,330
+Repasemos el recorrido con sus números.
+
+1327
+01:19:50,450 --> 01:19:53,986
+Previa, condicional y posterior: oferta dado
+
+1328
+01:19:53,986 --> 01:19:57,200
+spam 0.80, spam dado oferta dos tercios.
+
+1329
+01:19:57,320 --> 01:20:00,940
+Con dos por ciento de spam, 0.1404.
+
+1330
+01:20:01,060 --> 01:20:06,168
+Independencia dentro de cada clase: oferta sin enlace,
+
+1331
+01:20:06,168 --> 01:20:10,330
+0.4286; con el suavizado de Laplace, 0.4140.
+
+1332
+01:20:10,450 --> 01:20:14,339
+Variantes: la representación decide; con porcentajes, Bernoulli
+
+1333
+01:20:14,339 --> 01:20:17,920
+frente a la gaussiana sobre el logaritmo de uno más equis.
+
+1334
+01:20:18,040 --> 01:20:19,210
+Y la segunda mitad.
+
+1335
+01:20:19,330 --> 01:20:25,223
+Fuera de pliegue gana Bernoulli con alfa 0.5, un log loss de 0.556; la
+
+1336
+01:20:25,223 --> 01:20:30,190
+gaussiana acierta 80.8 por ciento con un log loss de 4.931.
+
+1337
+01:20:30,310 --> 01:20:35,398
+Las señales dependientes exageran la certeza: en el intervalo de arriba,
+
+1338
+01:20:35,398 --> 01:20:39,780
+99.44 por ciento predicho frente a 92.13 por ciento observado.
+
+1339
+01:20:39,900 --> 01:20:47,155
+Y la decisión: umbral 0.95, con costo de 219.0 por mil fuera de pliegue, y de
+
+1340
+01:20:47,155 --> 01:20:53,280
+188.9 por mil en la prueba histórica, frente a 394.1 sin filtrar.
+
+1341
+01:20:53,400 --> 01:20:57,770
+En la serie marcamos algunas precisiones sobre la grabación; aquí van juntas.
+
+1342
+01:20:57,890 --> 01:21:00,960
+Catorce correos spam tienen enlace, y seis no.
+
+1343
+01:21:01,080 --> 01:21:04,080
+Los seis sin enlace son spam, no legítimos.
+
+1344
+01:21:04,200 --> 01:21:06,440
+Y los veinte spam son veinte de cien.
+
+1345
+01:21:06,560 --> 01:21:10,150
+El suavizado cambió la probabilidad en cerca de un punto y medio.
+
+1346
+01:21:10,270 --> 01:21:14,320
+El correo de identificador uno tiene 0.9964.
+
+1347
+01:21:14,440 --> 01:21:18,400
+Y las frecuencias del archivo son porcentajes, no van de cero a uno.
+
+1348
+01:21:18,520 --> 01:21:22,460
+La comparación de recetas usa predicciones fuera de pliegue, no la prueba.
+
+1349
+01:21:22,580 --> 01:21:24,910
+El ejemplo de las copias tiene cien spam.
+
+1350
+01:21:25,030 --> 01:21:29,500
+Y copiar una señal no es sobreajuste, sino evidencia contada dos veces.
+
+1351
+01:21:29,620 --> 01:21:33,300
+Para comprobar que dominas la clase, intenta responder sin mirar.
+
+1352
+01:21:33,420 --> 01:21:37,190
+¿Puedes calcular a mano la probabilidad de spam desde una tabla de
+
+1353
+01:21:37,190 --> 01:21:40,560
+frecuencias, distinguiendo previa, condicional y posterior?
+
+1354
+01:21:40,680 --> 01:21:43,582
+¿Puedes explicar qué supone el modelo, y qué pasa si
+
+1355
+01:21:43,582 --> 01:21:45,870
+dos señales repiten la misma información?
+
+1356
+01:21:45,990 --> 01:21:48,480
+¿Y aplicar el suavizado a un conteo cero?
+
+1357
+01:21:48,600 --> 01:21:52,646
+¿Puedes explicar por qué se elige con log loss y no con exactitud, y
+
+1358
+01:21:52,646 --> 01:21:55,800
+elegir un umbral con costos, probándolo una sola vez?
+
+1359
+01:21:55,920 --> 01:21:58,000
+Y con eso cerramos la clase cuarenta.
+
+1360
+01:21:58,120 --> 01:22:02,128
+La idea que te llevas: un clasificador probabilístico entrega una
+
+1361
+01:22:02,128 --> 01:22:05,890
+probabilidad, no solo una etiqueta, y predecir no es decidir.
+
+1362
+01:22:06,010 --> 01:22:09,590
+El clasificador bayesiano ingenuo combina señales con un supuesto
+
+1363
+01:22:09,590 --> 01:22:13,281
+simple, se evalúa con predicciones fuera de pliegue, y se convierte
+
+1364
+01:22:13,281 --> 01:22:15,870
+en acción con un umbral que sale de los costos.
+
+1365
+01:22:15,990 --> 01:22:17,730
+Nos vemos en la próxima clase.
